@@ -1,6 +1,6 @@
 [project]
 name = "grounded-docparse"
-version = "0.1.0"
+version = "0.2.0"
 description = "Grounded agentic document parser for structured Markdown and JSON"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
