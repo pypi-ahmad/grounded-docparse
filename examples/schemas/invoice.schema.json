@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Invoice extraction",
+  "type": "object",
+  "properties": {
+    "invoice": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string",
+          "title": "Invoice number",
+          "x-docparse-aliases": ["invoice.number", "invoice no", "invoice #"]
+        },
+        "total": {
+          "type": "number",
+          "title": "Invoice total",
+          "x-docparse-aliases": ["invoice.total", "grand total", "amount due"]
+        }
+      },
+      "required": ["number", "total"],
+      "additionalProperties": false
+    },
+    "line_items": {
+      "type": "array",
+      "title": "Invoice line items",
+      "x-docparse-kind": "table",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "x-docparse-aliases": ["item", "product", "service"]
+          },
+          "quantity": {
+            "type": "number",
+            "x-docparse-aliases": ["qty"]
+          },
+          "amount": {
+            "type": "number",
+            "x-docparse-aliases": ["line total", "price"]
+          }
+        },
+        "required": ["description", "amount"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["invoice"],
+  "additionalProperties": false
+}
