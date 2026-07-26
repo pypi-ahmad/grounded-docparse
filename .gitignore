@@ -6,6 +6,7 @@ __pycache__/
 .code-review-graph/
 graphify-out/cache/
 .streamlit/secrets.toml
+.env
 .docparse/
 .worktrees/
 *.py[cod]

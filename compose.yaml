@@ -7,6 +7,9 @@ x-app: &app
     - path: .env
       required: false
   environment: &app-env
+    OPENAI_API_KEY: ${OPENAI_API_KEY}
+    OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+    DOCPARSE_API_TOKEN: ${DOCPARSE_API_TOKEN}
     DOCPARSE_DATABASE_URL: postgresql+psycopg://docparse:${POSTGRES_PASSWORD}@postgres:5432/docparse
     DOCPARSE_REDIS_URL: redis://redis:6379/0
     DOCPARSE_ARTIFACT_BACKEND: s3
@@ -20,9 +23,27 @@ x-app: &app
     minio-init: {condition: service_completed_successfully}
 
 services:
+  config-check:
+    image: python:3.13.7-slim
+    restart: "no"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      DOCPARSE_API_TOKEN: ${DOCPARSE_API_TOKEN}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ./src/grounded_docparse/compose_env.py:/compose_env.py:ro
+    command: ["python", "/compose_env.py", "check"]
   postgres:
     image: postgres:17.6-alpine
     restart: unless-stopped
+    depends_on:
+      config-check: {condition: service_completed_successfully}
     environment:
       POSTGRES_DB: docparse
       POSTGRES_USER: docparse
@@ -36,6 +57,8 @@ services:
   redis:
     image: redis:8.2.1-alpine
     restart: unless-stopped
+    depends_on:
+      config-check: {condition: service_completed_successfully}
     command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
     volumes: [redis-data:/data]
     healthcheck:
@@ -46,6 +69,8 @@ services:
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     restart: unless-stopped
+    depends_on:
+      config-check: {condition: service_completed_successfully}
     command: server /data --console-address :9001
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -61,15 +86,16 @@ services:
     depends_on:
       minio: {condition: service_healthy}
     entrypoint: ["/bin/sh", "-c"]
-    command: >-
-      mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}" &&
-      mc mb --ignore-existing local/documents
+    command:
+      - >-
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}" &&
+        mc mb --ignore-existing local/documents
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
   api:
     <<: *app
-    ports: ["8000:8000"]
+    ports: ["${DOCPARSE_API_PORT:-8000}:8000"]
   worker:
     <<: *app
     command: ["celery", "-A", "grounded_docparse.worker:celery_app", "worker", "--loglevel=INFO", "--queues=realtime"]
