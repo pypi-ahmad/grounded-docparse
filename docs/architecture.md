@@ -2,324 +2,190 @@
 
 ## Purpose
 
-Grounded Document Parser turns untrusted PDF and image uploads into two
-complementary representations:
+Grounded Document Parser is an asynchronous document-extraction service that preserves the relationship between every emitted value and visible source evidence. It favors explicit unresolved states over unsupported text.
 
-1. A physical record of pages, regions, coordinates, candidates, and provider
-   evidence.
-2. A semantic document tree suitable for retrieval, extraction, reasoning, and
-   human review.
+Two execution paths remain in the repository:
 
-The central design rule is that reasoning may organize evidence, but it may not
-invent evidence. Text reaches an export only through a recognized candidate and
-the final tree retains its page, bounding box, confidence, and provenance.
+- The production path uses Luna for page drafting and Terra for independent visual inspection. It is selected by `fast`, `balanced`, and `maximum`.
+- The compatibility path uses native PDF text, PaddleOCR-VL, GLM-OCR, and optional OpenAI adjudication. It is selected by `local-only`, `hybrid`, and `maximum-accuracy`.
+
+The default Compose deployment is designed for the production path. It does not provide Paddle or Ollama services.
 
 ## System context
 
 ```mermaid
 flowchart LR
-    U[Operator] --> UI[Streamlit UI]
-    U --> CLI[CLI]
-    UI --> P[DocumentParser]
-    CLI --> P
-    P --> I[PyMuPDF and image ingestion]
-    P --> D[Isolated PaddleOCR-VL container]
-    P --> G[Local Ollama GLM-OCR]
-    P -. explicit cloud profile .-> O[OpenAI Luna and Terra]
-    P --> T[Validated DocumentTree]
-    T --> R[Markdown, JSON, audit, quality, PDF, ZIP]
-    T --> E[Segmentation, extraction, evaluation]
+    U[Operator or client] --> UI[Streamlit]
+    U --> API[FastAPI]
+    UI --> API
+    API --> DB[(PostgreSQL)]
+    API --> A[(MinIO or local artifacts)]
+    API --> Q[Redis broker]
+    Q --> RW[Realtime Celery workers]
+    Q --> BW[Batch Celery worker]
+    RW --> O[OpenAI Responses API]
+    BW --> O
+    RW --> A
+    BW --> A
+    RW --> DB
+    BW --> DB
 ```
 
-The UI and CLI are thin adapters. `DocumentParser` owns orchestration and
-returns a `ParseResult`; renderers and reviewers derive every artifact from the
-validated `DocumentTree`.
+In API mode, the API validates uploads, persists source bytes, creates a durable job row, and dispatches a Celery task. Workers own parsing and artifact production, so browser reruns do not own or cancel work. Streamlit also has a local testing mode that invokes `DocumentParser` in-process using `OPENAI_BASE_URL` and `OPENAI_API_KEY`; that mode is synchronous and non-durable.
 
-## Component map
+## Component responsibilities
 
-| Area | Responsibility |
-|---|---|
-| `ingest.py` | Validate signatures and limits; render pages; extract native spans, links, fonts, and coordinates; enhance scans |
-| `paddle.py` / `paddle_worker.py` | Run the official PaddleOCR-VL pipeline in Docker; normalize regions and table cells |
-| `gateways.py` | Type-routed GLM recognition and schema-constrained OpenAI decisions |
-| `pipeline.py` | Orchestrate providers, retries, reconciliation, hierarchy, citations, segmentation, extraction, and exports |
-| `models.py` | Pydantic contracts for evidence, nodes, trees, retries, batches, and results |
-| `domain.py` | Detect or apply document profiles and grounded field/validation rules |
-| `segmentation.py` | Classify pages, detect identifiers and boundaries, and slice sub-document trees |
-| `extraction.py` | Validate the supported JSON Schema subset, map fields, stitch logical tables, and create sidecars |
-| `evaluation.py` | Compare a parse with a corrected same-source tree using deterministic metrics |
-| `render.py` | Escape and render Markdown, LLM Markdown, JSON, and ZIP bundles |
-| `audit.py` / `failures.py` | Produce safe operational summaries and structured failure cases |
-| `review.py` | Build quality reports, annotated PDFs, page previews, and batch bundles |
-| `streamlit_app.py` | Batch processing, source preview, synchronized read-only review, and downloads |
+| Component | Responsibility |
+| --- | --- |
+| `api.py` | Bearer authentication, submission, status, artifacts, reviews, evaluation, and purge |
+| `jobs.py` | Job transitions and local or S3-compatible artifact storage |
+| `worker.py` | Queue routing, retries, processing-cache lookup, parsing, and artifact persistence |
+| `pipeline.py` | Production and compatibility parsing orchestration |
+| `gateways.py` | Typed OpenAI and GLM provider calls |
+| `ingest.py` | Upload validation, PDF/image ingestion, page rendering, and source crops |
+| `models.py` | Validated document, grounding, verification, segmentation, and extraction contracts |
+| `render.py` | Markdown, strict LLM Markdown, JSON, and ZIP bundle generation |
+| `review.py` | Quality reports and annotated PDF rendering |
+| `segmentation.py` | Page classification, instance detection, boundaries, and subdocuments |
+| `evaluation.py` | Deterministic comparison with a corrected document tree |
+| `streamlit_app.py` | Local parsing or async submission, polling, source preview, and bundle download |
 
-## End-to-end data flow
+## Job lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> queued
+    queued --> running
+    running --> waiting_provider
+    waiting_provider --> running
+    running --> completed
+    running --> needs_review
+    running --> failed
+```
+
+`waiting_provider` is used when OpenAI returns a connection, timeout, or rate-limit error. Celery retries those failures with exponential backoff, jitter, and a maximum of three retries. Other exceptions terminate the job as `failed` with a bounded error string.
+
+A worker returns an already-terminal job unchanged. This makes duplicate delivery safe at the task boundary. `cancelled` and a future `needs_review` to `completed` transition exist in the internal state model, but no current HTTP endpoint reaches them.
+
+## Production data flow
 
 ### 1. Boundary validation and ingestion
 
-`DocumentParser.parse` validates an optional extraction schema before reading
-the document. `ingest_document` then checks the extension and file signature,
-size, page count, password state, and rendered-pixel limits.
+The API accepts supported PDF and image extensions, strips directory components from filenames, reads the upload, and stores its SHA-256 digest. Ingestion validates file size, page count, dimensions, and supported content before provider calls.
 
-PDF pages are rendered at 300 DPI by default. Native text blocks retain PDF
-point coordinates and normalized coordinates. A page with fewer than 20 native
-characters is treated as scanned for preprocessing and recognition routing;
-Paddle still analyzes every page. Scans are deskewed, denoised, and contrast
-enhanced without modifying the source file.
+Digital PDFs retain native blocks as supporting evidence. Full pages are rendered at `DOCPARSE_RENDER_DPI`, which defaults to 200 DPI.
 
-### 2. Layout perception with PaddleOCR-VL
+### 2. Luna page draft
 
-The full source is sent to the digest-pinned PaddleOCR-VL Docker image. Long
-PDFs are split into temporary 25-page source chunks, and provider work is
-reported in 10-page windows while original page numbers remain stable.
+For each page, Luna receives the page image and a strict `PageDraft` output contract. It returns ordered regions with:
 
-Paddle supplies ordered regions, semantic labels, text, tables, formulas,
-charts, figures, and cell coordinates where available. Its output is validated
-and converted into bounded `RegionEvidence`. When Paddle is disabled or fails,
-the pipeline falls back to native blocks or a full-page region and records a
-warning rather than silently declaring success.
+- region type and semantic role;
+- normalized bounding box and reading order;
+- literal text or Markdown;
+- tables and table cells;
+- form fields and checkbox state;
+- figure or chart structure; and
+- confidence signals.
 
-### 3. Automatic page-layout recovery
+The application creates stable region IDs and converts normalized boxes into pixel and PDF coordinates. Every grounded node receives a source crop reference and crop SHA-256.
 
-A page is eligible for one layout retry when Paddle reports a provider error or
-the page has only a full-page fallback. The page is enlarged toward 450 DPI,
-bounded by `DOCPARSE_MAX_PAGE_PIXELS`, and sent through Paddle again.
+`fast` stops after this stage. Its nodes are `grounded`, not independently `verified`, so strict LLM Markdown emits unresolved markers instead of draft text.
 
-The deterministic layout score gives equal weight to regions with coordinates
-and regions with non-empty text. The retry replaces the original layout only
-when this score improves. Applied, rejected, and failed attempts are retained
-as `AdaptiveRetryRecord` entries.
+### 3. Terra page inspection
 
-### 4. Independent local recognition
+`balanced` and `maximum` send the draft, region IDs, and page image to Terra under a strict `PageInspection` contract. Each decision is one of:
 
-GLM-OCR receives crops rather than the full document. Region type selects a
-text, table, formula, or figure prompt. Scanned pages route every region through
-GLM; digital pages use native text unless the region is complex or evidence
-conflicts.
+- `accept`: retain the literal draft and mark it verified;
+- `correct`: replace it with visually supported literal text and mark it verified;
+- `reject`: preserve the audit record but exclude the value from strict outputs; or
+- `inspect_crop`: request a closer source rendering.
 
-Processing is sequential to avoid simultaneous Paddle and GLM GPU pressure.
-Ten-page recognition windows are retried according to
-`DOCPARSE_WINDOW_RETRY_COUNT`; exhausted windows become degraded and preserve
-the evidence that remains.
+Every decision must cite one or more evidence references. The application—not the model—maps decisions back to known regions and applies state transitions.
 
-### 5. Candidate reconciliation and local recovery
+### 4. High-resolution crop loop
 
-Native, Paddle, and GLM text become `RecognitionCandidate` objects. The
-reconciler compares normalized text and caps agreement below the acceptance
-threshold whenever numeric tokens differ. Preferred source order depends on
-whether the page is scanned and whether the region is structurally complex.
+Requested crops are rendered directly from the original PDF or image at 450 DPI. Default padding is 5% and model-requested padding remains bounded. Balanced permits one crop inspection; Maximum permits two.
 
-In `local-only`, disputed, unreadable, unresolved, or sub-0.65-confidence
-regions receive one GLM retry using an 8% wider crop and an image enlarged up to
-twice the page DPI, capped at 1200 DPI. The new candidate is selected only when
-it resolves previously unusable evidence or improves confidence. Otherwise the
-prior selection is restored while the retry candidate remains auditable.
+The crop hash and coordinate variants remain attached to the node. A crop request that does not resolve becomes `needs_review`; it is not accepted by timeout or majority vote.
 
-### 6. Optional cloud verification
+### 5. Deterministic materialization
 
-Cloud calls exist only for `hybrid` and `maximum-accuracy` profiles and require
-`OPENAI_API_KEY`.
+Validated page evidence is transformed into:
 
-- **Hybrid:** Luna sees only uncertain regions with their page image and may
-  select an existing candidate or request a retry.
-- **Maximum accuracy:** Luna verifies every page. Terra may update heading roles
-  and add cross-page relationships such as continuation, caption, footnote,
-  reference, and same-table links.
+- physical page and content-node indexes;
+- semantic section hierarchy;
+- citations and provenance;
+- form, checkbox, table, and visual structures;
+- document classification and grounded fields;
+- logical tables and table exports;
+- mixed-document boundaries and subdocuments;
+- schema-defined extraction with per-value citations;
+- quality, failure, and audit reports; and
+- annotated PDF and ZIP artifacts.
 
-A novel Luna transcription is provisional. The pipeline performs an unbiased
-second GLM recognition from a wider, enlarged crop without disclosing Luna's
-answer. The correction is usable only when local evidence confirms it. Terra
-receives grounded node summaries and cannot rewrite text or create nodes.
+Models propose bounded evidence. Deterministic code owns identifiers, coordinate conversion, hierarchy assembly, validation, and export.
 
-### 7. Tree construction and grounding
+## Verification and export policy
 
-The intermediate evidence becomes `DocumentTree` schema 1.9.0. Stable node IDs
-are derived from the source hash, page, order, type, and bounding box.
+`VerificationState` is one of `draft`, `grounded`, `verified`, `rejected`, `needs_review`, or `human_verified`. The current review endpoint records `human_verified` metadata separately; it does not insert that state into the parsed tree.
 
-```text
-Document
-├── Pages                         physical index
-│   └── content_node_ids
-└── Sections                      semantic index
-    ├── Heading
-    ├── Paragraph / List
-    ├── Table → Row → Cell
-    ├── Figure / Chart → Caption
-    ├── Formula
-    └── FormField / Checkbox / Signature / Seal
-```
+The ordinary Markdown output preserves inspectable content for reviewers. Strict LLM Markdown and schema extraction are more restrictive:
 
-The same content node can be reached from its physical page and semantic
-section. This avoids duplicating text while supporting page overlays and
-meaningful traversal. Each node can carry normalized/source coordinates,
-reading order, candidates, the selected candidate, confidence signals,
-citations, provenance, relationships, and rendered Markdown.
+- Balanced and Maximum use `verified` evidence, plus `human_verified` evidence if an externally curated tree already contains that state.
+- Fast renders unverified content as explicit unresolved markers.
+- Rejected and needs-review values remain available in JSON, failures, and annotated review artifacts.
+- Missing required schema values remain missing or invalid; they are never invented to satisfy the schema.
 
-Tables preserve physical cells and merged spans. Exact cell boxes are used
-when Paddle provides them; otherwise cells explicitly inherit table-level
-grounding. Repeated headers and footers are related rather than deleted.
+Structured Outputs constrain response shape. They do not prove that model text matches the image, which is why visual inspection and deterministic evidence checks remain separate stages.
 
-### 8. Domain profiles and multi-document segmentation
+## Segmentation and extraction
 
-The pipeline applies an operator-selected or automatically detected document
-profile. Profiles add normalized fields and non-decisional validation findings
-grounded to existing nodes; they do not replace the document tree.
+When segmentation is `auto`, each page is assigned a declared or built-in document type. Repeated primary identifiers—such as invoice number, date, or order ID—support instance boundaries. The batch manifest records page classifications, boundary scores, identifiers, and subdocument ranges.
 
-With segmentation enabled, every page is classified and inspected for stable
-identifiers such as invoice number, order ID, claim number, and date. A
-deterministic boundary engine keeps uncertain adjacent pages together. In cloud
-profiles Luna may adjudicate an uncertain two-page boundary; maximum-accuracy
-may escalate an unresolved boundary to Terra. Only decisions with at least 0.65
-confidence override the conservative result.
+An optional Draft 2020-12 JSON Schema controls field extraction. Every emitted leaf has one or more node citations. Balanced and Maximum exclude unverified nodes before extraction. Tables retain physical cell nodes while logical tables support multi-page exports.
 
-Each PDF segment receives its own physical source PDF, tree, Markdown, audit,
-quality report, annotated PDF, assets, and ZIP. Source and segment page numbers
-are both retained.
+## Model and processing caches
 
-### 9. Schema-first extraction and logical tables
+Two unrelated caches exist:
 
-An optional, bounded subset of Draft 2020-12 JSON Schema defines the desired
-shape. Deterministic matching uses grounded profile fields, labels, form pairs,
-captions, and headers. Hybrid asks Luna only about unresolved scalar paths;
-maximum-accuracy verifies mappings more broadly and can use Terra for remaining
-unresolved paths. Models select existing node IDs and literal values; the
-application derives provenance from those nodes.
+1. OpenAI prompt caching uses stable `prompt_cache_key` prefixes. Cache hits require eligible, exact prefixes and are controlled by OpenAI. The gateway currently sends the legacy `prompt_cache_retention="24h"` field; current GPT-5.6 guidance deprecates that field in favor of `prompt_cache_options` and currently documents a 30-minute minimum TTL. Therefore the service must not promise 24-hour GPT-5.6 retention.
+2. The application processing cache copies completed artifacts under `cache/{cache_key}`. Its key includes the source hash, profile, segmentation, taxonomy, extraction schema, Luna model, Terra model, and prompt version.
 
-Every extracted leaf uses an RFC 6901 JSON Pointer with page, node, bounding
-box, confidence, and optional table-cell coordinates. Continued page tables are
-stitched into logical tables for JSONL and CSV export without modifying their
-physical table nodes.
+The application cache currently omits some rendering environment settings and has no TTL. Deleting a job removes `jobs/{job_id}` but not the shared cache prefix. Operators handling regulated data must add external lifecycle policies or disable cache reuse until complete invalidation and purge controls exist.
 
-### 10. Validation and export
+## Compatibility pipeline
 
-Before rendering, the pipeline validates node references, hierarchy, citations,
-limits, links, table metadata, extraction provenance, and model decisions.
-Renderers escape untrusted text and links.
+The compatibility profiles preserve the original local-first parser:
 
-The final result includes structured Markdown, grounded LLM Markdown, JSON,
-audit JSON, failure JSONL, quality JSON, annotated PDF, image assets,
-sub-documents, table sidecars, and a ZIP bundle. The UI's combined batch ZIP
-prefixes each document's files and includes a batch manifest.
+1. Native PDF blocks provide digital evidence.
+2. A digest-pinned PaddleOCR-VL container detects layout and regions.
+3. GLM-OCR through Ollama reads selected crops.
+4. Deterministic reconciliation selects supported candidates.
+5. Hybrid and Maximum Accuracy can use Luna/Terra for bounded adjudication.
 
-## Agentic control loop
+Paddle weights live in a named Docker volume after the one-time setup command, so normal local parses do not redownload them. This path remains useful for offline or migration scenarios, but it is not configured by `compose.yaml` and receives only compatibility maintenance.
 
-The system is agentic in a constrained engineering sense:
+## Deployment and trust boundaries
 
-```mermaid
-flowchart TD
-    A[Observe local evidence] --> B[Score agreement and quality]
-    B -->|layout failed| C[Retry Paddle at higher resolution]
-    B -->|local region weak| D[Retry GLM with wider crop]
-    B -->|cloud profile| E[Luna verifies bounded candidates]
-    E -->|novel text| D
-    B -->|maximum accuracy| F[Terra relates grounded nodes]
-    C --> G{Evidence improved?}
-    D --> G
-    G -->|yes| H[Apply]
-    G -->|no| I[Preserve previous result]
-    H --> J[Validate and export]
-    I --> J
-    F --> J
-```
+- Uploaded documents, filenames, model output, extraction schemas, and provider errors are untrusted.
+- The API uses one constant-time-compared bearer token. It provides no user accounts, tenant boundaries, or per-job authorization.
+- Compose exposes plain HTTP. TLS, identity, rate limits, and request filtering belong at the ingress.
+- PostgreSQL tables are created with SQLAlchemy `create_all`; production migrations are not yet supplied.
+- Redis delivery is durable enough for worker restart behavior but does not replace source/result persistence.
+- MinIO stores source documents and derived artifacts in readable object form. Encryption and lifecycle policy are deployment responsibilities.
+- Logs must not contain raw documents, crops, tokens, or full PII payloads.
 
-Planning is represented by deterministic triggers and bounded escalation, not
-an unrestricted model deciding arbitrary actions. Every retry has a fixed
-scope, fixed maximum count, explicit providers, an acceptance test, and an
-audit record.
+## Scalability model and limits
 
-## Processing profiles and trust boundaries
+Realtime and batch queues can scale independently, and content-addressed results can avoid repeat processing. Large files are bounded and segmentation can split multi-document batches after parsing.
 
-| Boundary | Local only | Hybrid | Maximum accuracy |
-|---|---|---|---|
-| Document bytes | Local | Local | Local |
-| Paddle container | Full source, offline | Full source, offline | Full source, offline |
-| GLM via Ollama | Region crops | Region crops | Region crops |
-| Luna | Never called | For each page containing uncertainty: the full page image and only its uncertain regions | Every page image and all its regions |
-| Terra | Never called | Not used for document resolution | Grounded summaries and difficult boundary/extraction cases |
+This is an architectural scaling model, not proof of million-page operation. The repository does not yet provide autoscaling, admission control, distributed tracing, database migrations, cache eviction, multi-region storage, tenant quotas, or published latency/accuracy benchmarks.
 
-The runtime Paddle container uses no network, a read-only root filesystem and
-model cache, dropped Linux capabilities, `no-new-privileges`, bounded memory,
-PID and shared-memory limits, isolated mounts, and timeout cleanup. Cache
-warm-up is deliberately separate because it requires network access and a
-writable cache volume.
+## Design decisions
 
-Uploads, document text, model output, filenames, hyperlinks, and provider
-errors are treated as untrusted. Raw document contents and secrets are excluded
-from structured failure records. Cloud consent is per Streamlit run; no content
-is persisted to a database by this project.
-
-## Scalability model
-
-The current design scales up within one workstation, not horizontally across a
-cluster:
-
-- Individual inputs are bounded to 500 pages and 250 MB by default.
-- Paddle processes 25-page source chunks sequentially.
-- Recognition uses 10-page windows with bounded in-run retries.
-- Streamlit accepts 10 files or 1 GB and processes files sequentially.
-- Table dimensions and total cells have explicit limits.
-- Temporary run data lives under `.docparse` and is removed when the run exits.
-
-Processing millions of pages requires an external durable queue, worker pool,
-object storage, idempotent job records, metrics, and backpressure. Those
-distributed-system concerns are intentionally outside this repository.
-
-## Failure and observability model
-
-Provider boundaries fail soft when deterministic evidence remains. Warnings
-name the stage and safe exception type. `model_runs` capture provider, model,
-stage, page or region, prompt version where applicable, latency, and token
-counts. Window and adaptive-retry records explain degraded or recovered work.
-
-`quality.json` reports OCR coverage, disagreements, unresolved nodes, mean
-confidence, candidate counts, warnings, retries, and table grounding proxies.
-These are operational signals, not measured accuracy. True accuracy is produced
-only by evaluation against a corrected tree for the exact same source hash.
-
-## Design decisions and tradeoffs
-
-### Dual physical and semantic indexes
-
-This supports both visual audit and semantic traversal without cloning content.
-The cost is more reference validation than a flat list.
-
-### Two independent local perception paths
-
-Paddle is strong at page structure; GLM supplies independent region text. Their
-disagreement exposes risk that a single OCR confidence score would hide. The
-cost is additional GPU time.
-
-### Deterministic final authority
-
-Models propose typed decisions, but code controls selection, grounding,
-relationships, retries, and rendering. This improves auditability at the cost
-of rejecting some correct vision-only answers that lack independent support.
-
-### Physical tables remain immutable
-
-Logical continued tables and extraction views are derived separately. This
-preserves page evidence and makes reconstruction reversible, at the cost of two
-table representations.
-
-### Read-only review
-
-The UI exposes candidates, confidence, citations, and overlays but does not
-edit OCR text or manually trigger providers. This keeps exported evidence
-reproducible. Human correction capture and model-training feedback loops remain
-future work.
-
-## Extension points
-
-- Add a document profile in `domain.py` and cover its grounded fields and
-  validation findings with public-contract tests.
-- Add a provider behind a typed gateway; convert its output to existing
-  candidates or decisions rather than bypassing `DocumentTree`.
-- Add an export by consuming the validated tree; do not re-run OCR in a
-  renderer.
-- Add a retry only with a bounded trigger, maximum count, deterministic
-  acceptance rule, and `AdaptiveRetryRecord`.
-- Add evaluation metrics in `evaluation.py` without collapsing dimensions into
-  an opaque composite score.
-
-Any schema-breaking `DocumentTree` change requires an explicit version update,
-migration consideration, renderer changes, and contract tests.
+- **Fail closed:** unsupported text is reviewable but excluded from strict output.
+- **Evidence before hierarchy:** source grounding is established before cross-page structure.
+- **Typed model boundaries:** provider responses are parsed into strict Pydantic contracts.
+- **Deterministic authority:** models inspect; code owns IDs, validation, and exports.
+- **Durable async work:** API and UI lifetimes are independent from worker execution.
+- **Separate physical and logical tables:** source geometry remains immutable while downstream tables can span pages.
