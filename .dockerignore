@@ -1,0 +1,9 @@
+.git
+.venv
+.worktrees
+.pytest_cache
+__pycache__
+output
+graphify-out
+*.pyc
+.env

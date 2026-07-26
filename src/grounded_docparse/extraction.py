@@ -19,6 +19,8 @@ from .models import (
     Relationship,
     SchemaExtraction,
     ValueCitation,
+    ProcessingProfile,
+    VerificationState,
 )
 
 MAX_SCHEMA_BYTES = 256 * 1024
@@ -95,11 +97,20 @@ def _aliases(name: str, definition: dict[str, Any]) -> set[str]:
 
 
 def _content_nodes(tree: DocumentTree) -> list[DocumentNode]:
+    strict_grounding = tree.processing_profile in {
+        ProcessingProfile.BALANCED,
+        ProcessingProfile.MAXIMUM,
+    }
     return [
         tree.nodes[node_id]
         for page in tree.pages
         for node_id in page.content_node_ids
         if tree.nodes[node_id].text
+        and (
+            not strict_grounding
+            or tree.nodes[node_id].verification_state
+            in {VerificationState.VERIFIED, VerificationState.HUMAN_VERIFIED}
+        )
     ]
 
 
@@ -603,7 +614,20 @@ def apply_extraction_decisions(
         }:
             continue
         nodes = [tree.nodes.get(node_id) for node_id in selection.source_node_ids]
-        if any(node is None or not node.citations for node in nodes):
+        strict_grounding = tree.processing_profile in {
+            ProcessingProfile.BALANCED,
+            ProcessingProfile.MAXIMUM,
+        }
+        if any(
+            node is None
+            or not node.citations
+            or (
+                strict_grounding
+                and node.verification_state
+                not in {VerificationState.VERIFIED, VerificationState.HUMAN_VERIFIED}
+            )
+            for node in nodes
+        ):
             continue
         source_nodes = [node for node in nodes if node is not None]
         evidence = "\n".join(node.text or "" for node in source_nodes)

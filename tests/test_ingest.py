@@ -5,7 +5,8 @@ from pathlib import Path
 import pymupdf
 import pytest
 
-from grounded_docparse.ingest import ingest_document
+from grounded_docparse.ingest import ingest_document, render_region_crop
+from grounded_docparse.models import BoundingBox
 
 
 def test_ingest_digital_pdf(simple_pdf: bytes, tmp_path: Path) -> None:
@@ -43,3 +44,29 @@ def test_rejects_excessive_page_count(tmp_path: Path) -> None:
             max_pages=1,
             max_page_pixels=20_000_000,
         )
+
+
+def test_region_crop_is_rerendered_from_pdf_at_requested_dpi(
+    simple_pdf: bytes, tmp_path: Path
+) -> None:
+    document = ingest_document(
+        simple_pdf,
+        "source.pdf",
+        tmp_path,
+        dpi=72,
+        max_bytes=1_000_000,
+    )
+    output = tmp_path / "crop.png"
+
+    render_region_crop(
+        document,
+        document.pages[0],
+        BoundingBox(x0=0.1, y0=0.1, x1=0.2, y1=0.2),
+        output,
+        dpi=450,
+        padding=0.05,
+    )
+
+    pixmap = pymupdf.Pixmap(str(output))
+    assert pixmap.width > 300
+    assert pixmap.height > 400

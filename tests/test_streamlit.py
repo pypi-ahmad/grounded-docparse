@@ -26,19 +26,17 @@ def test_pdf_previews_have_unique_explicit_keys() -> None:
     assert len(keys) == len(set(keys))
 
 
-def test_app_defaults_to_local_processing() -> None:
+def test_app_defaults_to_balanced_async_processing() -> None:
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
     assert not app.exception
     assert app.segmented_control[0].value == "Parse"
-    assert app.selectbox[0].value == "Local only"
-    assert len(app.checkbox) == 0
+    assert app.selectbox[0].value == "balanced"
     assert app.button[0].disabled is True
 
 
-def test_cloud_profile_requires_explicit_consent(monkeypatch) -> None:
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+def test_app_requires_api_token_before_submission(monkeypatch) -> None:
+    monkeypatch.delenv("DOCPARSE_API_TOKEN", raising=False)
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
-    app.selectbox[0].select("Hybrid").run(timeout=20)
     assert not app.exception
-    assert "I consent" in app.checkbox[0].label
-    assert app.checkbox[0].value is False
+    assert app.text_input[1].value == ""
+    assert app.button[0].disabled is True

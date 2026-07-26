@@ -9,6 +9,7 @@ import tempfile
 from collections import Counter
 from difflib import SequenceMatcher
 from pathlib import Path
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlparse
 
@@ -28,7 +29,13 @@ from .extraction import (
 )
 from .failures import derive_failure_cases, render_failures_jsonl
 from .gateways import PROMPT_VERSION, GlmOcrGateway, OpenAIDocumentGateway
-from .ingest import IngestedDocument, PageEvidence, TextBlock, ingest_document
+from .ingest import (
+    IngestedDocument,
+    PageEvidence,
+    TextBlock,
+    ingest_document,
+    render_region_crop,
+)
 from .models import (
     AdaptiveRetryRecord,
     BatchManifest,
@@ -43,6 +50,7 @@ from .models import (
     DocumentTree,
     FormFieldData,
     GroundingScope,
+    InspectionAction,
     NodeType,
     PageRecord,
     ParseResult,
@@ -51,6 +59,7 @@ from .models import (
     ProgressEvent,
     Provenance,
     RecognitionCandidate,
+    RegionDraft,
     RegionEvidence,
     Relationship,
     RunRecord,
@@ -60,6 +69,8 @@ from .models import (
     SubdocumentResult,
     VisualAnalysis,
     VisualDataPoint,
+    VerificationState,
+    VisualGrounding,
     WindowRun,
 )
 from .paddle import (
@@ -306,9 +317,56 @@ def _matching_node(
     return best[1] if best and best[0] > 0 else None
 
 
+def _draft_attributes(region: RegionDraft) -> dict[str, Any]:
+    attributes: dict[str, Any] = {}
+    if region.heading_level is not None:
+        attributes["heading_level"] = region.heading_level
+    if region.checkbox_state is not None:
+        attributes["state"] = str(region.checkbox_state)
+    if region.caption is not None:
+        attributes["caption"] = region.caption
+    if region.figure_description is not None:
+        attributes["figure_description"] = region.figure_description
+    if region.chart_type is not None:
+        attributes["chart_type"] = region.chart_type
+    if region.chart_data:
+        attributes["chart_data"] = [
+            point.model_dump(mode="json") for point in region.chart_data
+        ]
+    if region.table_cells:
+        rows: dict[int, list[Any]] = {}
+        for cell in sorted(
+            region.table_cells,
+            key=lambda item: (item.row_index, item.column_index),
+        ):
+            value: dict[str, Any] = {
+                "text": cell.text,
+                "header": cell.header,
+                "rowspan": cell.row_span,
+                "colspan": cell.column_span,
+                "score": cell.confidence,
+            }
+            if cell.bbox is not None:
+                value["bbox"] = [
+                    cell.bbox.x0,
+                    cell.bbox.y0,
+                    cell.bbox.x1,
+                    cell.bbox.y1,
+                ]
+            rows.setdefault(cell.row_index, []).append(value)
+        attributes["table_rows"] = [rows[index] for index in sorted(rows)]
+    return attributes
+
+
 class DocumentParser:
-    def __init__(self, config: ParserConfig | None = None) -> None:
+    def __init__(
+        self,
+        config: ParserConfig | None = None,
+        *,
+        gateway_factory: Callable[[ParserConfig], Any] | None = None,
+    ) -> None:
         self.config = config or ParserConfig.from_env()
+        self.gateway_factory = gateway_factory or OpenAIDocumentGateway
 
     def parse(
         self,
@@ -321,11 +379,27 @@ class DocumentParser:
         allow_cloud: bool | None = None,
         segmentation: SegmentationMode | str = SegmentationMode.AUTO,
         extraction_schema: dict[str, Any] | None = None,
+        taxonomy: list[str] | None = None,
     ) -> ParseResult:
         if extraction_schema is not None:
             extraction_schema = validate_extraction_schema(extraction_schema)
         selected_profile = self._select_profile(profile, allow_cloud)
         selected_document_profile = DocumentProfile(document_profile)
+        if selected_profile in {
+            ProcessingProfile.FAST,
+            ProcessingProfile.BALANCED,
+            ProcessingProfile.MAXIMUM,
+        }:
+            return self._parse_vision(
+                data,
+                filename,
+                selected_profile,
+                selected_document_profile,
+                SegmentationMode(segmentation),
+                extraction_schema,
+                taxonomy,
+                progress_callback,
+            )
         cloud_enabled = selected_profile != ProcessingProfile.LOCAL_ONLY
         if cloud_enabled and not self.config.enable_openai:
             raise ValueError("The selected processing profile requires OpenAI")
@@ -580,6 +654,296 @@ class DocumentParser:
             )
             _emit(progress_callback, "complete", total, total, "Exports ready")
             return parse_result
+
+    def _parse_vision(
+        self,
+        data: bytes,
+        filename: str,
+        profile: ProcessingProfile,
+        document_profile: DocumentProfile,
+        segmentation: SegmentationMode,
+        extraction_schema: dict[str, Any] | None,
+        taxonomy: list[str] | None,
+        progress_callback: ProgressCallback | None,
+    ) -> ParseResult:
+        if not self.config.enable_openai:
+            raise ValueError("Vision processing profiles require OpenAI")
+        if self.gateway_factory is OpenAIDocumentGateway and not os.getenv(
+            "OPENAI_API_KEY"
+        ):
+            raise RuntimeError("OPENAI_API_KEY is required by the selected profile")
+        base = Path.cwd() / ".docparse"
+        base.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="vision-", dir=base) as temporary:
+            workdir = Path(temporary)
+            _emit(progress_callback, "ingest", 0, 1, "Validating document")
+            document = ingest_document(
+                data,
+                filename,
+                workdir,
+                dpi=self.config.render_dpi,
+                max_bytes=self.config.max_upload_bytes,
+                max_pages=self.config.max_pages,
+                max_page_pixels=self.config.max_page_pixels,
+            )
+            gateway = self.gateway_factory(self.config)
+            model_runs: list[RunRecord] = []
+            warnings: list[str] = []
+            regions_by_page: dict[int, list[RegionEvidence]] = {}
+            inspection_assets: dict[str, bytes] = {}
+
+            for page in document.pages:
+                _emit(
+                    progress_callback,
+                    "luna",
+                    page.number,
+                    len(document.pages),
+                    f"Luna drafting page {page.number}",
+                )
+                draft, run = gateway.draft_page(page)
+                model_runs.append(run)
+                page_regions: list[RegionEvidence] = []
+                for index, region in enumerate(draft.regions):
+                    region_id = _node_id(
+                        document.sha256,
+                        page.number,
+                        region.reading_order + 1,
+                        NodeType(region.type),
+                        region.bbox,
+                    )
+                    candidate = RecognitionCandidate(
+                        id=f"{region_id}:luna:0",
+                        source="luna",
+                        task="page-draft",
+                        prompt_version=PROMPT_VERSION,
+                        pass_number=0,
+                        text=region.text,
+                        bbox=region.bbox,
+                        validation_signals={"provider_confidence": region.confidence},
+                    )
+                    page_regions.append(
+                        RegionEvidence(
+                            id=region_id,
+                            page_number=page.number,
+                            type=region.type,
+                            bbox=region.bbox,
+                            reading_order=region.reading_order,
+                            semantic_role=region.semantic_role,
+                            candidates=[candidate],
+                            agreement_score=0,
+                            verification_status="grounded"
+                            if profile == ProcessingProfile.FAST
+                            else "draft",
+                            selected_candidate_id=candidate.id
+                            if profile == ProcessingProfile.FAST
+                            else None,
+                            confidence=region.confidence,
+                            attributes=_draft_attributes(region),
+                        )
+                    )
+                warnings.extend(
+                    f"Page {page.number}: {warning}" for warning in draft.warnings
+                )
+
+                if profile != ProcessingProfile.FAST and page_regions:
+                    _emit(
+                        progress_callback,
+                        "terra",
+                        page.number,
+                        len(document.pages),
+                        f"Terra inspecting page {page.number}",
+                    )
+                    inspection, inspection_run = gateway.inspect_page(
+                        page,
+                        draft,
+                        region_ids=[region.id for region in page_regions],
+                    )
+                    model_runs.append(inspection_run)
+                    warnings.extend(
+                        f"Page {page.number}: {warning}"
+                        for warning in inspection.warnings
+                    )
+                    by_id = {region.id: region for region in page_regions}
+                    for decision in inspection.decisions:
+                        target = by_id.get(decision.region_id)
+                        if target is None:
+                            warnings.append(
+                                f"Page {page.number}: Terra returned unknown region ID"
+                            )
+                            continue
+                        original = target.candidates[0]
+                        if decision.action == InspectionAction.ACCEPT:
+                            target.selected_candidate_id = original.id
+                            target.verification_status = "verified"
+                            target.agreement_score = 1
+                            target.confidence = max(target.confidence, 0.95)
+                        elif decision.action == InspectionAction.CORRECT:
+                            corrected = RecognitionCandidate(
+                                id=f"{target.id}:terra:1",
+                                source="terra",
+                                task="visual-correction",
+                                prompt_version=PROMPT_VERSION,
+                                pass_number=1,
+                                text=decision.corrected_text or "",
+                                bbox=target.bbox,
+                            )
+                            target.candidates.append(corrected)
+                            target.selected_candidate_id = corrected.id
+                            target.verification_status = "verified"
+                            target.agreement_score = _text_similarity(
+                                original.text, corrected.text
+                            )
+                            target.confidence = 0.92
+                        elif decision.action == InspectionAction.REJECT:
+                            target.selected_candidate_id = None
+                            target.verification_status = "rejected"
+                            target.confidence = 0.1
+                        else:
+                            maximum_attempts = (
+                                2 if profile == ProcessingProfile.MAXIMUM else 1
+                            )
+                            crop_decision = decision
+                            for attempt in range(1, maximum_attempts + 1):
+                                if target.bbox is None:
+                                    break
+                                asset_ref = (
+                                    "assets/inspection/"
+                                    f"page-{page.number:04d}-{target.id}-"
+                                    f"attempt-{attempt}.png"
+                                )
+                                crop_path = workdir / Path(asset_ref).name
+                                render_region_crop(
+                                    document,
+                                    page,
+                                    target.bbox,
+                                    crop_path,
+                                    dpi=self.config.crop_dpi,
+                                    padding=min(
+                                        0.5,
+                                        self.config.crop_padding * attempt,
+                                    ),
+                                )
+                                inspection_assets[asset_ref] = crop_path.read_bytes()
+                                target.attributes.setdefault(
+                                    "inspection_crop_refs", []
+                                ).append(asset_ref)
+                                crop_decision, crop_run = gateway.inspect_crop(
+                                    crop_path,
+                                    region_id=target.id,
+                                    candidate_text=original.text,
+                                    evidence_ref=asset_ref,
+                                    attempt=attempt,
+                                )
+                                crop_run.page_number = page.number
+                                model_runs.append(crop_run)
+                                if crop_decision.action != InspectionAction.INSPECT_CROP:
+                                    break
+                            if crop_decision.action == InspectionAction.ACCEPT:
+                                target.selected_candidate_id = original.id
+                                target.verification_status = "verified"
+                                target.agreement_score = 1
+                                target.confidence = max(target.confidence, 0.95)
+                            elif crop_decision.action == InspectionAction.CORRECT:
+                                corrected = RecognitionCandidate(
+                                    id=f"{target.id}:terra:crop",
+                                    source="terra",
+                                    task="crop-correction",
+                                    prompt_version=PROMPT_VERSION,
+                                    pass_number=1,
+                                    text=crop_decision.corrected_text or "",
+                                    bbox=target.bbox,
+                                )
+                                target.candidates.append(corrected)
+                                target.selected_candidate_id = corrected.id
+                                target.verification_status = "verified"
+                                target.agreement_score = _text_similarity(
+                                    original.text, corrected.text
+                                )
+                                target.confidence = 0.92
+                            elif crop_decision.action == InspectionAction.REJECT:
+                                target.selected_candidate_id = None
+                                target.verification_status = "rejected"
+                                target.confidence = 0.1
+                            else:
+                                target.selected_candidate_id = None
+                                target.verification_status = "needs_review"
+                                target.confidence = 0.2
+                regions_by_page[page.number] = page_regions
+
+            window_runs = [
+                WindowRun(
+                    start_page=start,
+                    end_page=min(
+                        len(document.pages), start + self.config.page_window_size - 1
+                    ),
+                    status="complete",
+                )
+                for start in range(1, len(document.pages) + 1, self.config.page_window_size)
+            ]
+            tree, assets = self._build_tree(
+                document,
+                regions_by_page,
+                gateway,
+                warnings,
+                model_runs,
+                profile,
+                window_runs,
+                [],
+                use_terra=profile != ProcessingProfile.FAST,
+            )
+            assets.update(inspection_assets)
+            tree.assets = sorted(assets)
+            apply_document_profile(tree, document_profile)
+            self._populate_citations(tree)
+            self._attach_table_citation_metadata(tree)
+            manifest = build_batch_manifest(
+                tree,
+                profile,
+                document_profile,
+                enabled=segmentation == SegmentationMode.AUTO,
+                taxonomy=taxonomy,
+            )
+            tree.batch_manifest = manifest
+            extraction_json = ""
+            table_exports: dict[str, bytes] = {}
+            if extraction_schema is not None:
+                extraction = self._extract_with_profile(
+                    tree, extraction_schema, profile, gateway
+                )
+                tree.schema_extractions = [extraction]
+                extraction_json = extraction.model_dump_json(indent=2)
+                table_exports = build_table_exports(extraction, extraction_schema)
+            for node in tree.nodes.values():
+                node.markdown = render_node(node)
+            markdown = render_markdown(tree)
+            llm_markdown = render_llm_markdown(tree)
+            batch_files: dict[str, bytes | str] = {
+                "batch.manifest.json": manifest.model_dump_json(indent=2)
+            }
+            if extraction_json:
+                batch_files[f"{Path(filename).stem}.extraction.json"] = extraction_json
+                batch_files.update(table_exports)
+            result = self._finalize_result(
+                data=data,
+                filename=filename,
+                tree=tree,
+                assets=assets,
+                markdown=markdown,
+                llm_markdown=llm_markdown,
+                manifest=manifest,
+                subdocuments=[],
+                extraction_json=extraction_json,
+                table_exports=table_exports,
+                batch_files=batch_files,
+            )
+            _emit(
+                progress_callback,
+                "complete",
+                len(document.pages),
+                len(document.pages),
+                "Exports ready",
+            )
+            return result
 
     def _process_glm_windows(
         self,
@@ -1659,6 +2023,8 @@ class DocumentParser:
                             if candidate.source == "glm"
                             else self.config.luna_model
                             if candidate.source == "luna"
+                            else self.config.terra_model
+                            if candidate.source == "terra"
                             else None
                         ),
                         prompt_version=candidate.prompt_version,
@@ -1666,6 +2032,40 @@ class DocumentParser:
                     for candidate in region.candidates
                 ]
                 matching = _matching_block(page, bbox)
+                verification_state = {
+                    "grounded": VerificationState.GROUNDED,
+                    "verified": VerificationState.VERIFIED,
+                    "rejected": VerificationState.REJECTED,
+                    "needs_review": VerificationState.NEEDS_REVIEW,
+                }.get(region.verification_status, VerificationState.DRAFT)
+                grounding = None
+                if bbox is not None:
+                    asset_path, content = self._crop_asset(page, node_id, bbox)
+                    assets[asset_path] = content
+                    with Image.open(page.image_path) as rendered_page:
+                        pixel_width, pixel_height = rendered_page.size
+                    grounding = VisualGrounding(
+                        page_number=page.number,
+                        normalized_box=bbox,
+                        pixel_box=BoundingBox(
+                            x0=bbox.x0 * pixel_width,
+                            y0=bbox.y0 * pixel_height,
+                            x1=bbox.x1 * pixel_width,
+                            y1=bbox.y1 * pixel_height,
+                            unit="pixels",
+                        ),
+                        pdf_box=BoundingBox(
+                            x0=bbox.x0 * page.width,
+                            y0=bbox.y0 * page.height,
+                            x1=bbox.x1 * page.width,
+                            y1=bbox.y1 * page.height,
+                            unit="pdf_points",
+                        ),
+                        page_width_pixels=pixel_width,
+                        page_height_pixels=pixel_height,
+                        crop_ref=asset_path,
+                        crop_sha256=hashlib.sha256(content).hexdigest(),
+                    )
                 node = DocumentNode(
                     id=node_id,
                     type=node_type,
@@ -1683,6 +2083,8 @@ class DocumentParser:
                     agreement_score=region.agreement_score,
                     verification_status=region.verification_status,
                     selected_candidate_id=region.selected_candidate_id,
+                    verification_state=verification_state,
+                    grounding=grounding,
                     attributes=dict(region.attributes),
                 )
                 if node_type in {
@@ -1707,9 +2109,9 @@ class DocumentParser:
                     }
                     and bbox
                 ):
-                    asset_path, content = self._crop_asset(page, node_id, bbox)
-                    node.attributes["asset_path"] = asset_path
-                    assets[asset_path] = content
+                    node.attributes["asset_path"] = (
+                        grounding.crop_ref if grounding is not None else ""
+                    )
                 nodes[node_id] = node
                 page_node.children_ids.append(node_id)
                 page_record.content_node_ids.append(node_id)

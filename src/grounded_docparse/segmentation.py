@@ -45,7 +45,9 @@ def _page_nodes(tree: DocumentTree, page_number: int):
 
 
 def classify_pages(
-    tree: DocumentTree, requested: DocumentProfile
+    tree: DocumentTree,
+    requested: DocumentProfile,
+    allowed_profiles: set[DocumentProfile] | None = None,
 ) -> list[PageClassification]:
     classifications: list[PageClassification] = []
     for page in tree.pages:
@@ -55,6 +57,8 @@ def classify_pages(
         for node in nodes:
             text = (node.text or "").casefold()
             for profile, terms in PROFILE_TERMS.items():
+                if allowed_profiles is not None and profile not in allowed_profiles:
+                    continue
                 hits = sum(term in text for term in terms)
                 if hits:
                     scores[profile] += hits
@@ -183,8 +187,17 @@ def build_batch_manifest(
     *,
     enabled: bool = True,
     boundary_overrides: dict[int, tuple[str, float, str, str]] | None = None,
+    taxonomy: list[str] | None = None,
 ) -> BatchManifest:
-    pages = classify_pages(tree, requested)
+    allowed_profiles = None
+    if taxonomy is not None:
+        if not taxonomy:
+            raise ValueError("taxonomy must contain at least one document type")
+        try:
+            allowed_profiles = {DocumentProfile(item) for item in taxonomy}
+        except ValueError as exc:
+            raise ValueError(f"Unsupported taxonomy document type: {exc}") from exc
+    pages = classify_pages(tree, requested, allowed_profiles)
     boundaries = decide_boundaries(pages)
     if not enabled:
         for boundary in boundaries:

@@ -17,7 +17,10 @@ from .models import (
     BoundaryAdjudication,
     DocumentResolution,
     ExtractionDecisions,
+    InspectionDecision,
     NodeType,
+    PageDraft,
+    PageInspection,
     PageVerification,
     RecognitionCandidate,
     RegionEvidence,
@@ -109,11 +112,11 @@ class GlmOcrGateway:
 
 
 class OpenAIDocumentGateway:
-    def __init__(self, config: ParserConfig) -> None:
-        if not os.getenv("OPENAI_API_KEY"):
+    def __init__(self, config: ParserConfig, client: Any | None = None) -> None:
+        if client is None and not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set")
         self.config = config
-        self.client = OpenAI()
+        self.client = client or OpenAI()
 
     @staticmethod
     def _image_data_url(path: Path) -> str:
@@ -144,6 +147,208 @@ class OpenAIDocumentGateway:
         return (
             getattr(usage, "input_tokens", None),
             getattr(usage, "output_tokens", None),
+        )
+
+    def draft_page(self, page: PageEvidence) -> tuple[PageDraft, RunRecord]:
+        prompt = (
+            "Parse the page into a hierarchical, visually grounded item tree. "
+            "Return literal visible text only. Include headers, footers, sections, "
+            "tables, table cells, figures, charts, forms, and checkboxes when visible. "
+            "Every region must use normalized page coordinates and explicit reading "
+            "order. Never infer missing text or facts."
+        )
+        started = time.monotonic()
+        response = self.client.responses.parse(
+            model=self.config.luna_model,
+            reasoning={"effort": "low"},
+            temperature=0.0,
+            store=False,
+            prompt_cache_key=f"docparse:luna-draft:{PROMPT_VERSION}:0",
+            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": prompt,
+                            "prompt_cache_breakpoint": {"type": "default"},
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": page.digital_text[:200_000]
+                            or "No embedded PDF text is available.",
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": self._image_data_url(page.image_path),
+                            "detail": "original",
+                        },
+                    ],
+                },
+            ],
+            text_format=PageDraft,
+            max_output_tokens=self.config.luna_max_output_tokens,
+        )
+        input_tokens, output_tokens = self._usage(response)
+        return self._parsed(response, PageDraft), RunRecord(
+            provider="openai",
+            model=self.config.luna_model,
+            stage="page_draft",
+            page_number=page.number,
+            latency_ms=int((time.monotonic() - started) * 1000),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            prompt_version=PROMPT_VERSION,
+        )
+
+    def inspect_page(
+        self,
+        page: PageEvidence,
+        draft: PageDraft,
+        *,
+        region_ids: list[str],
+    ) -> tuple[PageInspection, RunRecord]:
+        prompt = (
+            "Independently inspect each supplied draft region against the page image. "
+            "For every region return accept, correct, reject, or inspect_crop. "
+            "Corrections must be literal visible text. Reject unsupported content and "
+            "request a crop when the page image is insufficient. Never invent IDs, "
+            "coordinates, text, or facts."
+        )
+        regions = []
+        for index, region in enumerate(draft.regions):
+            region_id = (
+                region_ids[index] if index < len(region_ids) else f"region-{index + 1}"
+            )
+            regions.append({"region_id": region_id, **region.model_dump(mode="json")})
+        started = time.monotonic()
+        response = self.client.responses.parse(
+            model=self.config.terra_model,
+            reasoning={"effort": "low"},
+            temperature=0.0,
+            store=False,
+            prompt_cache_key=f"docparse:terra-inspection:{PROMPT_VERSION}:0",
+            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": prompt,
+                            "prompt_cache_breakpoint": {"type": "default"},
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": json.dumps(regions, ensure_ascii=False)[:700_000],
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": self._image_data_url(page.image_path),
+                            "detail": "original",
+                        },
+                    ],
+                },
+            ],
+            text_format=PageInspection,
+            max_output_tokens=self.config.terra_max_output_tokens,
+        )
+        input_tokens, output_tokens = self._usage(response)
+        return self._parsed(response, PageInspection), RunRecord(
+            provider="openai",
+            model=self.config.terra_model,
+            stage="page_inspection",
+            page_number=page.number,
+            latency_ms=int((time.monotonic() - started) * 1000),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            prompt_version=PROMPT_VERSION,
+        )
+
+    def inspect_crop(
+        self,
+        crop_path: Path,
+        *,
+        region_id: str,
+        candidate_text: str,
+        evidence_ref: str,
+        attempt: int,
+    ) -> tuple[InspectionDecision, RunRecord]:
+        prompt = (
+            "Inspect this high-resolution source crop. Accept only when the candidate "
+            "is literally visible. Correct only with literal text from the crop, reject "
+            "unsupported content, or request another crop when still ambiguous. Preserve "
+            "the supplied region ID and evidence reference."
+        )
+        started = time.monotonic()
+        response = self.client.responses.parse(
+            model=self.config.terra_model,
+            reasoning={"effort": "low"},
+            temperature=0.0,
+            store=False,
+            prompt_cache_key=f"docparse:terra-crop:{PROMPT_VERSION}:0",
+            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
+            input=[
+                {
+                    "role": "system",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": prompt,
+                            "prompt_cache_breakpoint": {"type": "default"},
+                        }
+                    ],
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": json.dumps(
+                                {
+                                    "region_id": region_id,
+                                    "candidate_text": candidate_text,
+                                    "evidence_ref": evidence_ref,
+                                    "attempt": attempt,
+                                },
+                                ensure_ascii=False,
+                            ),
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": self._image_data_url(crop_path),
+                            "detail": "original",
+                        },
+                    ],
+                },
+            ],
+            text_format=InspectionDecision,
+            max_output_tokens=min(4_000, self.config.terra_max_output_tokens),
+        )
+        decision = self._parsed(response, InspectionDecision)
+        if decision.region_id != region_id or evidence_ref not in decision.evidence_refs:
+            raise RuntimeError("Crop inspection returned mismatched evidence")
+        input_tokens, output_tokens = self._usage(response)
+        return decision, RunRecord(
+            provider="openai",
+            model=self.config.terra_model,
+            stage="crop_inspection",
+            region_id=region_id,
+            latency_ms=int((time.monotonic() - started) * 1000),
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            prompt_version=PROMPT_VERSION,
         )
 
     def verify_page(

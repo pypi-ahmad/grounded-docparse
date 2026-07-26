@@ -21,7 +21,9 @@ class ParserConfig:
         "sha256:ad0b1f056a76967f9191cd06398e8babb21b49a4673a28c3de5fd31f481884db"
     )
     paddle_cache_volume: str = "grounded-docparse-paddle-cache"
-    render_dpi: int = 300
+    render_dpi: int = 200
+    crop_dpi: int = 450
+    crop_padding: float = 0.05
     max_upload_bytes: int = 250 * 1024 * 1024
     max_pages: int = 500
     max_page_pixels: int = 20_000_000
@@ -46,6 +48,7 @@ class ParserConfig:
     def __post_init__(self) -> None:
         for name in (
             "render_dpi",
+            "crop_dpi",
             "max_upload_bytes",
             "max_pages",
             "max_page_pixels",
@@ -64,6 +67,8 @@ class ParserConfig:
         ):
             if getattr(self, name) <= 0:
                 raise ValueError(f"{name} must be positive")
+        if not 0 <= self.crop_padding <= 0.5:
+            raise ValueError("crop_padding must be between 0 and 0.5")
         if self.enable_paddle and "@sha256:" not in self.paddle_image:
             raise ValueError("paddle_image must be pinned by sha256 digest")
 
@@ -80,6 +85,10 @@ class ParserConfig:
                 "DOCPARSE_PADDLE_CACHE_VOLUME", defaults.paddle_cache_volume
             ),
             render_dpi=int(os.getenv("DOCPARSE_RENDER_DPI", str(defaults.render_dpi))),
+            crop_dpi=int(os.getenv("DOCPARSE_CROP_DPI", str(defaults.crop_dpi))),
+            crop_padding=float(
+                os.getenv("DOCPARSE_CROP_PADDING", str(defaults.crop_padding))
+            ),
             max_upload_bytes=int(
                 os.getenv("DOCPARSE_MAX_UPLOAD_BYTES", str(defaults.max_upload_bytes))
             ),

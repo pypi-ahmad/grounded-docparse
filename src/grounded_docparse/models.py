@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Any, Literal
@@ -37,6 +36,9 @@ class NodeType(StrEnum):
 
 
 class ProcessingProfile(StrEnum):
+    FAST = "fast"
+    BALANCED = "balanced"
+    MAXIMUM = "maximum"
     LOCAL_ONLY = "local-only"
     HYBRID = "hybrid"
     MAXIMUM_ACCURACY = "maximum-accuracy"
@@ -71,6 +73,29 @@ class GroundingScope(StrEnum):
     UNRESOLVED = "unresolved"
 
 
+class VerificationState(StrEnum):
+    DRAFT = "draft"
+    GROUNDED = "grounded"
+    VERIFIED = "verified"
+    REJECTED = "rejected"
+    NEEDS_REVIEW = "needs_review"
+    HUMAN_VERIFIED = "human_verified"
+
+
+class InspectionAction(StrEnum):
+    ACCEPT = "accept"
+    CORRECT = "correct"
+    REJECT = "reject"
+    INSPECT_CROP = "inspect_crop"
+
+
+class CheckboxState(StrEnum):
+    CHECKED = "checked"
+    UNCHECKED = "unchecked"
+    INDETERMINATE = "indeterminate"
+    UNKNOWN = "unknown"
+
+
 class BoundingBox(BaseModel):
     x0: float = Field(ge=0)
     y0: float = Field(ge=0)
@@ -97,6 +122,52 @@ class BoundingBox(BaseModel):
         if "y0" in info.data and value < info.data["y0"]:
             raise ValueError("y1 must be >= y0")
         return value
+
+
+class VisualGrounding(BaseModel):
+    page_number: int = Field(ge=1)
+    normalized_box: BoundingBox
+    pixel_box: BoundingBox | None = None
+    pdf_box: BoundingBox | None = None
+    polygon: list[tuple[float, float]] = Field(default_factory=list, max_length=32)
+    page_width_pixels: int = Field(gt=0)
+    page_height_pixels: int = Field(gt=0)
+    crop_ref: str = Field(min_length=1, max_length=2_000)
+    crop_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @field_validator("normalized_box")
+    @classmethod
+    def require_normalized_box(cls, value: BoundingBox) -> BoundingBox:
+        if value.unit != "normalized":
+            raise ValueError("normalized_box must use normalized coordinates")
+        return value
+
+
+class InspectionDecision(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    region_id: str = Field(min_length=1, max_length=1_000)
+    action: InspectionAction
+    corrected_text: str | None = Field(default=None, max_length=100_000)
+    evidence_refs: list[str] = Field(min_length=1, max_length=20)
+    reason: str = Field(default="", max_length=2_000)
+    requested_padding: float | None = Field(default=None, ge=0, le=0.5)
+
+    @model_validator(mode="after")
+    def validate_action_payload(self) -> InspectionDecision:
+        if self.action == InspectionAction.CORRECT and not self.corrected_text:
+            raise ValueError("corrected_text is required for a correction")
+        if self.action != InspectionAction.CORRECT and self.corrected_text is not None:
+            raise ValueError("corrected_text is only valid for a correction")
+        return self
+
+    @property
+    def resulting_state(self) -> VerificationState:
+        if self.action in {InspectionAction.ACCEPT, InspectionAction.CORRECT}:
+            return VerificationState.VERIFIED
+        if self.action == InspectionAction.REJECT:
+            return VerificationState.REJECTED
+        return VerificationState.NEEDS_REVIEW
 
 
 class Confidence(BaseModel):
@@ -213,8 +284,17 @@ class PageVerification(BaseModel):
     warnings: list[str] = Field(default_factory=list, max_length=1_000)
 
 
+class PageInspection(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decisions: list[InspectionDecision] = Field(
+        default_factory=list, max_length=1_000
+    )
+    warnings: list[str] = Field(default_factory=list, max_length=1_000)
+
+
 class DocumentNode(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
+    model_config = ConfigDict(use_enum_values=False)
 
     id: str
     type: NodeType
@@ -236,6 +316,8 @@ class DocumentNode(BaseModel):
     agreement_score: float | None = Field(default=None, ge=0, le=1)
     verification_status: str | None = None
     selected_candidate_id: str | None = None
+    verification_state: VerificationState = VerificationState.DRAFT
+    grounding: VisualGrounding | None = None
     citations: list[Citation] = Field(default_factory=list, max_length=10_000)
     form_field: FormFieldData | None = None
     visual_analysis: VisualAnalysis | None = None
@@ -505,6 +587,26 @@ class ProgressEvent(BaseModel):
 ProgressCallback = Callable[[ProgressEvent], None]
 
 
+class TableCellDraft(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    row_index: int = Field(ge=0)
+    column_index: int = Field(ge=0)
+    text: str = Field(default="", max_length=100_000)
+    bbox: BoundingBox | None = None
+    row_span: int = Field(default=1, ge=1, le=1_000)
+    column_span: int = Field(default=1, ge=1, le=1_000)
+    header: bool = False
+    confidence: float = Field(default=0.5, ge=0, le=1)
+
+    @field_validator("bbox")
+    @classmethod
+    def normalized_bbox(cls, value: BoundingBox | None) -> BoundingBox | None:
+        if value is not None and value.unit != "normalized":
+            raise ValueError("table cell bbox must be normalized")
+        return value
+
+
 class RegionDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -515,14 +617,13 @@ class RegionDraft(BaseModel):
     text: str = Field(default="", max_length=100_000)
     confidence: float = Field(default=0.5, ge=0, le=1)
     source_refs: list[str] = Field(default_factory=list, max_length=10)
-    attributes: dict[str, Any] = Field(default_factory=dict)
-
-    @field_validator("attributes")
-    @classmethod
-    def bounded_attributes(cls, value: dict[str, Any]) -> dict[str, Any]:
-        if len(json.dumps(value, ensure_ascii=False, default=str)) > 1_000_000:
-            raise ValueError("region attributes exceed size limit")
-        return value
+    heading_level: int | None = Field(default=None, ge=1, le=6)
+    table_cells: list[TableCellDraft] = Field(default_factory=list, max_length=10_000)
+    checkbox_state: CheckboxState | None = None
+    caption: str | None = Field(default=None, max_length=20_000)
+    figure_description: str | None = Field(default=None, max_length=20_000)
+    chart_type: str | None = Field(default=None, max_length=1_000)
+    chart_data: list[VisualDataPoint] = Field(default_factory=list, max_length=10_000)
 
     @field_validator("bbox")
     @classmethod

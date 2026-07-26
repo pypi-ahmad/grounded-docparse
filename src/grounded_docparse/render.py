@@ -8,7 +8,13 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from .models import DocumentNode, DocumentTree, NodeType
+from .models import (
+    DocumentNode,
+    DocumentTree,
+    NodeType,
+    ProcessingProfile,
+    VerificationState,
+)
 
 
 def _bounded_int(value: Any, default: int, minimum: int, maximum: int) -> int:
@@ -255,6 +261,10 @@ def _source_comment(tree: DocumentTree, node: DocumentNode) -> str:
         values.append(f"confidence={confidence:.3f}")
     if citation:
         values.append(f"grounding_scope={citation.grounding_scope}")
+    values.append(f"verification={node.verification_state}")
+    if node.grounding:
+        values.append(f"crop={node.grounding.crop_ref}")
+        values.append(f"crop_sha256={node.grounding.crop_sha256}")
     if ancestors:
         values.append(f"section_path={'/'.join(reversed(ancestors))}")
     repeat_pages = node.attributes.get("repeat_pages")
@@ -331,6 +341,26 @@ def render_llm_markdown(tree: DocumentTree) -> str:
                 in {NodeType.FIGURE.value, NodeType.IMAGE.value, NodeType.CHART.value}
                 and node.type == NodeType.CAPTION.value
             ):
+                continue
+            if tree.processing_profile in {
+                ProcessingProfile.FAST,
+                ProcessingProfile.BALANCED,
+                ProcessingProfile.MAXIMUM,
+            } and node.verification_state not in {
+                VerificationState.VERIFIED,
+                VerificationState.HUMAN_VERIFIED,
+            }:
+                lines.extend(
+                    [
+                        _source_comment(tree, node),
+                        (
+                            '<p data-verification-state="'
+                            f'{html.escape(str(node.verification_state))}">'
+                            f"[UNRESOLVED node={html.escape(node.id)}]</p>"
+                        ),
+                        "",
+                    ]
+                )
                 continue
             rendered = render_node(node).strip()
             if rendered:

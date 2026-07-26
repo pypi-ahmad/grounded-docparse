@@ -49,6 +49,69 @@ class IngestedDocument:
     pages: list[PageEvidence]
 
 
+def render_region_crop(
+    document: IngestedDocument,
+    page: PageEvidence,
+    bbox: BoundingBox,
+    output: Path,
+    *,
+    dpi: int,
+    padding: float,
+) -> Path:
+    if bbox.unit != "normalized":
+        raise ValueError("region crop requires normalized coordinates")
+    if dpi <= 0:
+        raise ValueError("dpi must be positive")
+    if not 0 <= padding <= 0.5:
+        raise ValueError("padding must be between 0 and 0.5")
+    pad_x = (bbox.x1 - bbox.x0) * padding
+    pad_y = (bbox.y1 - bbox.y0) * padding
+    x0 = max(0.0, bbox.x0 - pad_x)
+    y0 = max(0.0, bbox.y0 - pad_y)
+    x1 = min(1.0, bbox.x1 + pad_x)
+    y1 = min(1.0, bbox.y1 + pad_y)
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    if document.source_path.suffix.casefold() == ".pdf":
+        source = pymupdf.open(document.source_path)
+        try:
+            source_page = source[page.number - 1]
+            rect = source_page.rect
+            clip = pymupdf.Rect(
+                rect.x0 + x0 * rect.width,
+                rect.y0 + y0 * rect.height,
+                rect.x0 + x1 * rect.width,
+                rect.y0 + y1 * rect.height,
+            )
+            pixmap = source_page.get_pixmap(dpi=dpi, clip=clip, alpha=False)
+            pixmap.save(output)
+        finally:
+            source.close()
+        return output
+
+    with Image.open(document.source_path) as source_image:
+        if getattr(source_image, "n_frames", 1) > 1:
+            source_image.seek(page.number - 1)
+        image = ImageOps.exif_transpose(source_image).convert("RGB")
+        width, height = image.size
+        crop = image.crop(
+            (
+                int(x0 * width),
+                int(y0 * height),
+                max(int(x1 * width), int(x0 * width) + 1),
+                max(int(y1 * height), int(y0 * height) + 1),
+            )
+        )
+        scale = max(1.0, dpi / max(page.dpi, 1))
+        if scale > 1:
+            crop = crop.resize(
+                (round(crop.width * scale), round(crop.height * scale)),
+                Image.Resampling.LANCZOS,
+            )
+        crop.save(output, "PNG")
+    return output
+
+
 def _normalized_bbox(
     bbox: tuple[float, float, float, float], width: float, height: float
 ) -> BoundingBox:
