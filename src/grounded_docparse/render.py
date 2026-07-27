@@ -19,6 +19,7 @@ from .models import (
     RunUsage,
     VerificationState,
 )
+from .quality import WORD_PATTERN
 
 ANNOTATION_COLORS = {
     VerificationState.VERIFIED: (0.0, 0.55, 0.2),
@@ -147,7 +148,17 @@ def _table(block: Block) -> str:
     return "\n".join(lines)
 
 
-def _visual(block: Block) -> str:
+@dataclass(frozen=True, slots=True)
+class _VisualSegment:
+    kind: str
+    raw_text: str
+    rendered_text: str
+    bbox: object
+    origin: str
+    provider: bool = False
+
+
+def _visual_segments(block: Block) -> list[_VisualSegment]:
     values: list[tuple[str, str]] = []
     if block.text:
         values.append(("text", block.text))
@@ -156,7 +167,7 @@ def _visual(block: Block) -> str:
     if block.figure_description:
         values.append(("description", block.figure_description))
 
-    parts: list[str] = []
+    segments: list[_VisualSegment] = []
     seen: set[str] = set()
     multiple = len({value for _kind, value in values}) > 1
     for kind, value in values:
@@ -164,21 +175,67 @@ def _visual(block: Block) -> str:
             continue
         seen.add(value)
         if multiple and kind != "text":
-            parts.append(f"{kind.title()}: {value}")
+            rendered = f"{kind.title()}: {value}"
         else:
-            parts.append(value)
+            rendered = value
+        segments.append(
+            _VisualSegment(
+                kind={
+                    "text": "visual_text",
+                    "caption": "caption",
+                    "description": "visual_description",
+                }[kind],
+                raw_text=value,
+                rendered_text=rendered,
+                bbox=block.bbox,
+                origin="generated_description"
+                if kind == "description"
+                else "literal",
+            )
+        )
     for atom in block.atoms:
         if atom.text and atom.text not in seen:
             seen.add(atom.text)
             label = atom.kind.replace("_", " ").title()
-            parts.append(f"{label}: {atom.text}")
+            segments.append(
+                _VisualSegment(
+                    kind=atom.kind,
+                    raw_text=atom.text,
+                    rendered_text=f"{label}: {atom.text}",
+                    bbox=atom.bbox or block.bbox,
+                    origin="literal",
+                    provider=True,
+                )
+            )
     if block.chart_type:
-        parts.append(f"Chart type: {block.chart_type}")
+        segments.append(
+            _VisualSegment(
+                kind="chart_type",
+                raw_text=block.chart_type,
+                rendered_text=f"Chart type: {block.chart_type}",
+                bbox=block.bbox,
+                origin="literal",
+            )
+        )
     for point in block.chart_data:
         prefix = f"{point.series} — " if point.series else ""
-        parts.append(f"{prefix}{point.label}: {point.value}")
-    content = "\n\n".join(parts)
-    return f"<figure>{content}</figure>" if parts else ""
+        rendered = f"{prefix}{point.label}: {point.value}"
+        segments.append(
+            _VisualSegment(
+                kind="chart_point",
+                raw_text=rendered,
+                rendered_text=rendered,
+                bbox=block.bbox,
+                origin="literal",
+            )
+        )
+    return segments
+
+
+def _visual(block: Block) -> str:
+    segments = _visual_segments(block)
+    content = "\n\n".join(segment.rendered_text for segment in segments)
+    return f"<figure>{content}</figure>" if segments else ""
 
 
 def _body(block: Block) -> str:
@@ -373,6 +430,45 @@ def _semantic_fragments(block: Block) -> list[str]:
     return list(dict.fromkeys(fragment for fragment in fragments if fragment))
 
 
+def _semantic_fields(block: Block) -> list[str]:
+    if block.type is NodeType.TABLE and block.table is not None:
+        return [block.text, *(cell.text for cell in block.table.cells)]
+    if block.type is NodeType.FORM_FIELD and block.form is not None:
+        return [
+            block.text,
+            block.form.label,
+            block.form.value or "",
+            block.form.hint or "",
+        ]
+    if block.type is NodeType.CHECKBOX:
+        return [block.text, block.checkbox_option or "", _checkbox_marker(block)]
+    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        fields = [
+            block.text,
+            block.caption or "",
+            block.figure_description or "",
+            block.chart_type or "",
+        ]
+        fields.extend(
+            value
+            for point in block.chart_data
+            for value in (point.series or "", point.label, point.value)
+        )
+        fields.extend(atom.text for atom in block.atoms)
+        return fields
+    fields = [block.text]
+    if block.type is NodeType.LIST_ITEM:
+        fields.append(block.list_marker or "-")
+    return fields
+
+
+def _semantic_tokens(block: Block) -> Counter[str]:
+    expected: Counter[str] = Counter()
+    for field in _semantic_fields(block):
+        expected |= Counter(WORD_PATTERN.findall(field.casefold()))
+    return expected
+
+
 def _incomplete_structure(block: Block) -> bool:
     if block.type is NodeType.TABLE:
         return block.table is None or not block.table.cells
@@ -392,13 +488,12 @@ def _incomplete_structure(block: Block) -> bool:
 def _semantic_coverage(block: Block, body: str) -> float:
     if block.verification is VerificationState.REJECTED:
         return 0.0
-    fragments = _semantic_fragments(block)
-    if not fragments:
+    expected = _semantic_tokens(block)
+    if not expected:
         return 0.0 if _incomplete_structure(block) else 1.0
-    searchable = body.replace(r"\|", "|")
-    total = sum(len(fragment) for fragment in fragments)
-    covered = sum(len(fragment) for fragment in fragments if fragment in searchable)
-    return round(covered / total, 6) if total else 1.0
+    rendered = Counter(WORD_PATTERN.findall(body.replace(r"\|", "|").casefold()))
+    covered = sum((expected & rendered).values())
+    return round(covered / sum(expected.values()), 6)
 
 
 def _page_quality_reasons(
@@ -507,14 +602,10 @@ def render_agentic_document(
                     "status": status.value,
                     "reading_order": len(page_nodes),
                     "confidence": block.confidence,
-                    "text": None
-                    if block.verification is VerificationState.REJECTED
-                    else block.text,
+                    "text": block.text,
                     "source": _source(page.number, start, end, block.bbox),
                     "atoms": atoms,
-                    "semantic": None
-                    if block.verification is VerificationState.REJECTED
-                    else _semantic_payload(block),
+                    "semantic": _semantic_payload(block),
                     "children": [child.id for child in block.children],
                     "rendered": rendered,
                     "reason": block.verification_reason
@@ -626,33 +717,41 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
             for text in _table_residual_lines(block)
         )
         return values
-    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-        values = [
-            (atom.kind, atom.text, atom.bbox or block.bbox, "literal")
-            for atom in block.atoms
-        ]
-        seen = {atom.text for atom in block.atoms}
-        if block.text and block.text not in seen:
-            values.append(("visual_text", block.text, block.bbox, "literal"))
-            seen.add(block.text)
-        if block.caption and block.caption not in seen:
-            values.append(("caption", block.caption, block.bbox, "literal"))
-            seen.add(block.caption)
-        if block.figure_description and block.figure_description not in seen:
-            values.append(
-                (
-                    "visual_description",
-                    block.figure_description,
-                    block.bbox,
-                    "generated_description",
-                )
-            )
-        return values
     visible = block.text or _body(block)
     return [
         ("line", line, block.bbox, "literal")
         for line in visible.splitlines()
         if line
+    ]
+
+
+def _visual_agentic_atoms(
+    block: Block,
+    start: int,
+    page_number: int,
+) -> list[dict]:
+    positioned: list[tuple[_VisualSegment, int, int]] = []
+    cursor = start + len("<figure>")
+    for segment in _visual_segments(block):
+        end = cursor + len(segment.rendered_text)
+        positioned.append((segment, cursor, end))
+        cursor = end + len("\n\n")
+    ordered = [item for item in positioned if item[0].provider]
+    ordered.extend(item for item in positioned if not item[0].provider)
+    return [
+        {
+            "id": f"{block.id}-a{index}",
+            "kind": segment.kind,
+            "text": segment.rendered_text,
+            "origin": segment.origin,
+            "source": _source(
+                block.citation.page if block.citation is not None else page_number,
+                atom_start,
+                atom_end,
+                segment.bbox,
+            ),
+        }
+        for index, (segment, atom_start, atom_end) in enumerate(ordered, start=1)
     ]
 
 
@@ -663,6 +762,8 @@ def _agentic_atoms(
     end: int,
     page_number: int,
 ) -> list[dict]:
+    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        return _visual_agentic_atoms(block, start, page_number)
     atoms: list[dict] = []
     atom_cursor = start
     for kind, text, bbox, origin in _atom_values(block):
