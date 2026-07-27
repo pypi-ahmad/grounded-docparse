@@ -334,7 +334,9 @@ class LiteralEvidenceGateway(ExtractionGateway):
 @pytest.mark.parametrize(
     ("kind", "value", "source_text"),
     [
+        ("string", "Alpha Beta", "Reference: Alpha Beta"),
         ("integer", 1234, "Total: 1,234"),
+        ("integer", 1234, "Total: 1234."),
         ("number", 1234.5, "Amount: $1,234.50"),
         ("boolean", True, "[x] Approved"),
         ("integer", -1234, "Balance: -$1,234"),
@@ -349,6 +351,8 @@ class LiteralEvidenceGateway(ExtractionGateway):
         ("boolean", False, "Approved: No."),
         ("boolean", True, "| Approved | Yes |"),
         ("boolean", False, "| Approved | No |"),
+        ("boolean", True, "| Account | **Yes.** | Notes | Current |"),
+        ("boolean", False, "| Account | _No!_ | Notes | Current |"),
     ],
 )
 def test_scalar_grounding_accepts_deterministic_literal_normalization(
@@ -410,10 +414,13 @@ def test_scalar_grounding_accepts_deterministic_literal_normalization(
         ("integer", 1234, "Balance: $-1,234"),
         ("integer", 1234, "Balance: ($1,234)"),
         ("integer", -1234, "Balance: -\n$1,234"),
+        ("integer", 1234, "Total: 1234.50"),
+        ("integer", 1234, "Total: 1,234,567"),
         ("boolean", True, "Approved: Maybe"),
         ("boolean", False, "Invoice No. 5"),
         ("boolean", False, "No. of items"),
         ("boolean", True, "Customer: Yes Bank"),
+        ("boolean", False, "| No. | Account | Description |"),
     ],
 )
 def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(
@@ -458,6 +465,64 @@ def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(
         annotated_pdf=b"",
     )
     gateway = LiteralEvidenceGateway(value)
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        parse_result, schema
+    )
+
+    assert result.data == {"value": None}
+    assert result.evidence == {}
+    assert any("does not contain extracted value" in item for item in result.warnings)
+
+
+class DisjointStringEvidenceGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+        self.extract_calls.append((use_terra, issues))
+        return {
+            "data": {"value": "Alpha Beta"},
+            "evidence": [
+                {
+                    "pointer": "/value",
+                    "block_ids": ["alpha", "beta"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+def test_string_grounding_does_not_join_disjoint_citation_slices() -> None:
+    schema = {
+        "type": "object",
+        "properties": {"value": {"type": ["string", "null"]}},
+        "required": ["value"],
+        "additionalProperties": False,
+    }
+    document = Document(
+        source_name="disjoint.pdf",
+        source_sha256="f" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(id="alpha", type="paragraph", text="Alpha", reading_order=0),
+                    Block(id="beta", type="paragraph", text="Beta", reading_order=1),
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    parse_result = ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        legacy_json=render_json(document),
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    gateway = DisjointStringEvidenceGateway()
 
     result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
         parse_result, schema

@@ -203,6 +203,9 @@ def test_unresolved_scanned_probe_remains_auditable_without_quality_inspection()
     assert page_payload["status"] == "needs_review"
     assert page_payload["blocks"][0]["rendered"] is False
     assert "unresolved_recovery" in page_payload["quality"]["needs_review_reasons"]
+    assert result.document.pages[0].quality.model_dump(mode="json") == page_payload["quality"]
+    legacy_page = json.loads(result.legacy_json)["pages"][0]
+    assert legacy_page["quality"] == page_payload["quality"]
 
 
 class ScanProbeRecoveryGateway:

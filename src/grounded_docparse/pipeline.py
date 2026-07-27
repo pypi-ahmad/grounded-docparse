@@ -30,6 +30,7 @@ from .models import (
     FormData,
     InspectionAction,
     InspectionDecision,
+    InspectionRegionAddition,
     NodeType,
     Page,
     PageInspection,
@@ -38,6 +39,8 @@ from .models import (
     ProgressEvent,
     RegionDraft,
     RunUsage,
+    SpecialistAdditionOpinion,
+    SpecialistAdditionResolution,
     SpecialistAudit,
     SpecialistOpinion,
     SpecialistOrderingOpinion,
@@ -55,7 +58,12 @@ from .quality import (
     select_repair_blocks,
     semantic_text,
 )
-from .render import render_agentic_document, render_annotated_pdf, render_json
+from .render import (
+    materialize_document_quality,
+    render_agentic_document,
+    render_annotated_pdf,
+    render_json,
+)
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
@@ -401,6 +409,28 @@ def _canonical_decision(decision: InspectionDecision) -> tuple[str, str]:
     )
 
 
+def _canonical_addition(addition: InspectionRegionAddition) -> str:
+    return json.dumps(
+        addition.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _addition_issue(
+    addition: InspectionRegionAddition,
+    region_id: str,
+    *,
+    source: str = "Verification",
+) -> str | None:
+    if addition.region_id != region_id:
+        return f"{source} returned a different additional region ID"
+    if _bbox(addition.region.bbox) is None:
+        return f"{source} addition contained an invalid bounding box"
+    return None
+
+
 def _decision_issue(
     decision: InspectionDecision,
     region_id: str,
@@ -607,10 +637,23 @@ class DocumentParser:
                 ordered_region_ids: list[str] = []
                 inspection_warnings: list[str] = []
                 opinions_by_region: dict[str, list[SpecialistOpinion]] = {}
+                addition_opinions_by_region: dict[
+                    str, list[SpecialistAdditionOpinion]
+                ] = {}
                 for tagged in inspections:
                     item = tagged.inspection
-                    additions.extend(item.additional_regions)
                     inspection_warnings.extend(item.warnings)
+                    for addition in item.additional_regions:
+                        addition_opinion = SpecialistAdditionOpinion(
+                            reviewer=tagged.reviewer,
+                            model=tagged.model,
+                            timestamp=tagged.timestamp,
+                            addition=addition,
+                        )
+                        specialist_audit.addition_opinions.append(addition_opinion)
+                        addition_opinions_by_region.setdefault(
+                            addition.region_id, []
+                        ).append(addition_opinion)
                     for decision in item.decisions:
                         opinion = SpecialistOpinion(
                             reviewer=tagged.reviewer,
@@ -776,6 +819,140 @@ class DocumentParser:
                             reasoning=reason,
                         )
                         inspection_warnings.append(reason)
+
+                addition_conflicts: list[str] = []
+                addition_resolutions: dict[str, SpecialistAdditionResolution] = {}
+                for region_id, opinions in addition_opinions_by_region.items():
+                    issue = next(
+                        (
+                            issue
+                            for opinion in opinions
+                            if (
+                                issue := _addition_issue(
+                                    opinion.addition,
+                                    region_id,
+                                )
+                            )
+                        ),
+                        None,
+                    )
+                    canonical = {
+                        _canonical_addition(opinion.addition) for opinion in opinions
+                    }
+                    if issue is not None:
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            reasoning=issue,
+                        )
+                        inspection_warnings.append(issue)
+                    elif len(canonical) == 1:
+                        final_addition = opinions[0].addition
+                        additions.append(final_addition)
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="consensus" if len(opinions) > 1 else "single",
+                            final_addition=final_addition,
+                            reasoning=(
+                                "Specialists supplied an identical additional region"
+                                if len(opinions) > 1
+                                else "Single specialist addition proposal"
+                            ),
+                        )
+                    else:
+                        addition_conflicts.append(region_id)
+
+                if addition_conflicts and manager_flow:
+                    arbitration_reason: str | None = None
+                    try:
+                        addition_arbitration = gateway.inspect_page(
+                            page,
+                            draft,
+                            region_ids=all_region_ids,
+                            target_region_ids=addition_conflicts,
+                            agent_role=AgentRole.EVIDENCE_CRITIC,
+                            use_terra=True,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - arbitration fails closed
+                        arbitration_reason = (
+                            f"Addition arbitration failed: {type(exc).__name__}: {exc}"
+                        )
+                        arbitration_additions = {}
+                    else:
+                        arbitration_additions: dict[
+                            str, list[InspectionRegionAddition]
+                        ] = {}
+                        arbitration_timestamp = datetime.now(UTC)
+                        unexpected_ids: list[str] = []
+                        for addition in addition_arbitration.additional_regions:
+                            specialist_audit.addition_opinions.append(
+                                SpecialistAdditionOpinion(
+                                    reviewer=AgentRole.EVIDENCE_CRITIC.value,
+                                    model=self.config.terra_model,
+                                    timestamp=arbitration_timestamp,
+                                    addition=addition,
+                                )
+                            )
+                            if addition.region_id not in addition_conflicts:
+                                unexpected_ids.append(addition.region_id)
+                            else:
+                                arbitration_additions.setdefault(
+                                    addition.region_id, []
+                                ).append(addition)
+                        if unexpected_ids:
+                            arbitration_reason = (
+                                "Addition arbitration returned a different region ID: "
+                                + ", ".join(unexpected_ids)
+                            )
+
+                    for region_id in addition_conflicts:
+                        candidates = arbitration_additions.get(region_id, [])
+                        issue = arbitration_reason
+                        if issue is None and len(candidates) != 1:
+                            issue = (
+                                "Addition arbitration did not return exactly one proposal for "
+                                f"{region_id}"
+                            )
+                        if issue is None:
+                            issue = _addition_issue(
+                                candidates[0],
+                                region_id,
+                                source="Addition arbitration",
+                            )
+                        if issue is not None:
+                            addition_resolutions[region_id] = (
+                                SpecialistAdditionResolution(
+                                    region_id=region_id,
+                                    outcome="needs_review",
+                                    reasoning=issue,
+                                )
+                            )
+                            inspection_warnings.append(issue)
+                        else:
+                            additions.append(candidates[0])
+                            addition_resolutions[region_id] = (
+                                SpecialistAdditionResolution(
+                                    region_id=region_id,
+                                    outcome="arbitrated",
+                                    final_addition=candidates[0],
+                                    reasoning=candidates[0].reason,
+                                )
+                            )
+                else:
+                    for region_id in addition_conflicts:
+                        reason = "Unresolved conflicting additional-region proposals"
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            reasoning=reason,
+                        )
+                        inspection_warnings.append(reason)
+
+                specialist_audit.addition_resolutions = [
+                    addition_resolutions[region_id]
+                    for region_id in addition_opinions_by_region
+                    if region_id in addition_resolutions
+                ]
 
                 specialist_audit.resolutions = [
                     resolutions[region_id]
@@ -1414,6 +1591,7 @@ class DocumentParser:
                 pages=pages,
                 warnings=warnings,
             )
+            materialize_document_quality(document)
             input_tokens = usage.input_tokens
             output_tokens = usage.output_tokens
             rendered = render_agentic_document(

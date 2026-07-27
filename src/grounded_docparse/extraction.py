@@ -34,7 +34,7 @@ NUMBER_BODY = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?"
 NUMERIC_LITERAL_PATTERN = re.compile(
     rf"(?<![\w.,])(?P<accounting>\()?[ \t]*(?P<sign_before>[+-])?[ \t]*"
     rf"(?P<currency>[$€£])?[ \t]*(?P<sign_after>[+-])?[ \t]*"
-    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?![\w.,])"
+    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?![\w,]|\.\d)"
 )
 
 
@@ -322,35 +322,8 @@ def _citations_contain_value(
             and 0 <= start <= end <= len(markdown)
         ):
             cited_text.append(markdown[start:end])
-    grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|")
-    folded = grounded.casefold()
     if isinstance(value, bool):
-        literal = re.search(rf"\b{str(value).casefold()}\b", folded)
-        yes_no = "yes" if value else "no"
-        contextual_yes_no = any(
-            line.casefold() == yes_no
-            or re.fullmatch(
-                rf"[^:\r\n]+:\s*(?:[*_]{{1,2}}\s*)?{yes_no}[.!?]?"
-                rf"(?:\s*[*_]{{1,2}})?",
-                line,
-                flags=re.IGNORECASE,
-            )
-            is not None
-            or re.fullmatch(
-                rf"\|\s*[^|\r\n]+\s*\|\s*{yes_no}\s*\|",
-                line,
-                flags=re.IGNORECASE,
-            )
-            is not None
-            for evidence in cited_text
-            for line in (part.strip() for part in evidence.splitlines())
-        )
-        checkbox = (
-            re.search(r"\[(?:x|✓)\]", folded)
-            if value
-            else re.search(r"\[\s\]", folded)
-        )
-        return literal is not None or contextual_yes_no or checkbox is not None
+        return any(_evidence_contains_boolean(evidence, value) for evidence in cited_text)
     if isinstance(value, (int, float)):
         try:
             expected_number = Decimal(str(value))
@@ -376,7 +349,106 @@ def _citations_contain_value(
                     continue
         return False
     expected = " ".join(str(value).split()).casefold()
-    return bool(expected and expected in folded)
+    return bool(
+        expected
+        and any(
+            expected
+            in " ".join(evidence.split()).replace(r"\|", "|").casefold()
+            for evidence in cited_text
+        )
+    )
+
+
+def _strip_markdown_emphasis(value: str) -> str:
+    value = value.strip()
+    while True:
+        for marker in ("**", "__", "*", "_"):
+            if value.startswith(marker) and value.endswith(marker) and len(value) > 2 * len(marker):
+                value = value[len(marker) : -len(marker)].strip()
+                break
+        else:
+            return value
+
+
+def _boolean_token(value: str) -> tuple[str, str] | None:
+    normalized = _strip_markdown_emphasis(value)
+    match = re.fullmatch(r"(?P<value>yes|no)(?P<punct>[.!?,;:]?)", normalized, re.IGNORECASE)
+    if match is None:
+        return None
+    return match.group("value").casefold(), match.group("punct")
+
+
+def _markdown_table_cells(line: str) -> list[str] | None:
+    stripped = line.strip()
+    if not (stripped.startswith("|") and stripped.endswith("|")):
+        return None
+    cells: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for character in stripped[1:-1]:
+        if escaped:
+            current.append(character)
+            escaped = False
+        elif character == "\\":
+            current.append(character)
+            escaped = True
+        elif character == "|":
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(character)
+    cells.append("".join(current).strip())
+    return cells
+
+
+def _separator_row(cells: list[str] | None) -> bool:
+    return bool(cells) and all(
+        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) is not None
+        for cell in cells
+    )
+
+
+def _evidence_contains_boolean(evidence: str, value: bool) -> bool:
+    normalized = evidence
+    folded = normalized.replace(r"\|", "|").casefold()
+    if re.search(rf"\b{str(value).casefold()}\b", folded):
+        return True
+    if value and re.search(r"\[(?:x|✓)\]", folded):
+        return True
+    if not value and re.search(r"\[\s\]", folded):
+        return True
+
+    expected = "yes" if value else "no"
+    lines = [line.strip() for line in normalized.splitlines() if line.strip()]
+    table_rows = [_markdown_table_cells(line) for line in lines]
+    for index, cells in enumerate(table_rows):
+        if cells is None or _separator_row(cells):
+            continue
+        next_cells = table_rows[index + 1] if index + 1 < len(table_rows) else None
+        if _separator_row(next_cells):
+            continue
+        for cell_index, cell in enumerate(cells):
+            token = _boolean_token(cell)
+            if (
+                cell_index > 0
+                and token is not None
+                and token[0] == expected
+                and any(previous.strip() for previous in cells[:cell_index])
+            ):
+                return True
+
+    for line in lines:
+        if _markdown_table_cells(line) is not None:
+            continue
+        label, separator, candidate = line.partition(":")
+        if separator and label.strip():
+            token = _boolean_token(candidate)
+            if token is not None and token[0] == expected:
+                return True
+        token = _boolean_token(line)
+        if token is not None and token[0] == expected and token != ("no", "."):
+            return True
+    return False
 
 
 def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None:
