@@ -325,14 +325,25 @@ def _citations_contain_value(
     grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|")
     folded = grounded.casefold()
     if isinstance(value, bool):
-        literals = ("true", "yes") if value else ("false", "no")
-        literal = any(re.search(rf"\b{item}\b", folded) for item in literals)
+        literal = re.search(rf"\b{str(value).casefold()}\b", folded)
+        yes_no = "yes" if value else "no"
+        contextual_yes_no = any(
+            line.casefold() == yes_no
+            or re.fullmatch(
+                rf"[^:\r\n]+:\s*(?:[*_]{{1,2}}\s*)?{yes_no}(?:\s*[*_]{{1,2}})?",
+                line,
+                flags=re.IGNORECASE,
+            )
+            is not None
+            for evidence in cited_text
+            for line in (part.strip() for part in evidence.splitlines())
+        )
         checkbox = (
             re.search(r"\[(?:x|✓)\]", folded)
             if value
             else re.search(r"\[\s\]", folded)
         )
-        return literal or checkbox is not None
+        return literal is not None or contextual_yes_no or checkbox is not None
     if isinstance(value, (int, float)):
         try:
             expected_number = Decimal(str(value))

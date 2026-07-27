@@ -341,6 +341,8 @@ class LiteralEvidenceGateway(ExtractionGateway):
         ("integer", -1234, "Balance: $-1,234"),
         ("integer", -1234, "Balance: ($1,234)"),
         ("number", 0.0012, "Rate: 1.2e-3"),
+        ("boolean", True, "Yes"),
+        ("boolean", False, "No"),
         ("boolean", True, "Approved: Yes"),
         ("boolean", False, "Approved: No"),
     ],
@@ -405,6 +407,9 @@ def test_scalar_grounding_accepts_deterministic_literal_normalization(
         ("integer", 1234, "Balance: ($1,234)"),
         ("integer", -1234, "Balance: -\n$1,234"),
         ("boolean", True, "Approved: Maybe"),
+        ("boolean", False, "Invoice No. 5"),
+        ("boolean", False, "No. of items"),
+        ("boolean", True, "Customer: Yes Bank"),
     ],
 )
 def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(

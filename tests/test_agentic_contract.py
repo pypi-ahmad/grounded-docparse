@@ -584,6 +584,36 @@ def test_visual_coverage_counts_overlapping_field_occurrences(
     assert page["blocks"][0]["status"] == "needs_review"
 
 
+def test_list_coverage_counts_marker_occurrence_separately(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    block = Block(
+        id="step",
+        type="list_item",
+        text="Step 1",
+        list_marker="1.",
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+    )
+    document = Document(
+        source_name="steps.pdf",
+        source_sha256="9" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    normal = json.loads(render_agentic_document(document).json)["document"]["pages"][
+        0
+    ]["blocks"][0]
+    monkeypatch.setattr(document_render, "_body", lambda item: item.text)
+    without_marker = json.loads(render_agentic_document(document).json)["document"][
+        "pages"
+    ][0]["blocks"][0]
+
+    assert normal["semantic_coverage"] == 1.0
+    assert without_marker["semantic_coverage"] == 0.666667
+    assert without_marker["status"] == "needs_review"
+
+
 def test_duplicate_visual_values_preserve_provider_kind_bbox_and_span() -> None:
     block_box = BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.9)
     provider_box = BoundingBox(x0=0.2, y0=0.2, x1=0.8, y1=0.3)
