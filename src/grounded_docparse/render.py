@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import re
+from collections import Counter
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,16 +42,89 @@ def _has_equivalent_leading_marker(text: str, marker: str) -> bool:
     )
 
 
-def _residual_lines(text: str, represented: list[str]) -> list[str]:
+def _line_key(value: str) -> str:
+    parts = [" ".join(part.split()) for part in value.strip(" |").split("|")]
+    return "|".join(parts)
+
+
+def _table_structure_lines(block: Block) -> Counter[str]:
+    if block.table is None:
+        return Counter()
+    cell_lines: Counter[str] = Counter()
+    flattened_cells: Counter[str] = Counter()
+    row_lines: Counter[str] = Counter()
+    rows: dict[int, list] = {}
+    for cell in block.table.cells:
+        rows.setdefault(cell.row, []).append(cell)
+        source_lines = [line for line in cell.text.splitlines() if line.strip()]
+        cell_lines.update(_line_key(line) for line in source_lines)
+        if len(source_lines) > 1:
+            flattened_cells[_line_key(" ".join(source_lines))] += 1
+    for cells in rows.values():
+        ordered = sorted(cells, key=lambda item: item.column)
+        row_text = " | ".join(
+            " ".join(cell.text.replace("\r", " ").splitlines()) for cell in ordered
+        )
+        row_lines[_line_key(row_text)] += 1
+    return cell_lines | flattened_cells | row_lines
+
+
+def _table_residual_lines(block: Block) -> list[str]:
+    represented = _table_structure_lines(block)
     residuals: list[str] = []
-    for line in text.splitlines():
-        residual = line
-        for value in represented:
-            if value:
-                residual = residual.replace(value.replace("\r", " ").replace("\n", " "), "", 1)
-        residual = residual.strip(" \t|")
-        if any(character not in ":()-[]" for character in residual):
-            residuals.append(residual)
+    for line in block.text.splitlines():
+        key = _line_key(line)
+        if represented[key]:
+            represented[key] -= 1
+        elif line.strip():
+            residuals.append(line.strip())
+    return residuals
+
+
+def _form_structure_lines(block: Block) -> Counter[str]:
+    if block.form is None:
+        return Counter()
+    fields = [
+        block.form.label,
+        block.form.value or "",
+        block.form.hint or "",
+    ]
+    individual: Counter[str] = Counter(
+        _line_key(line)
+        for field in fields
+        for line in field.splitlines()
+        if line.strip()
+    )
+    combined: Counter[str] = Counter()
+    label = block.form.label.rstrip().removesuffix(":")
+    combined[_line_key(f"{label}:")] += 1
+    if block.form.value:
+        combined[_line_key(f"{block.form.label} {block.form.value}")] += 1
+        combined[_line_key(f"{label}: {block.form.value}")] += 1
+    if block.form.hint:
+        combined[_line_key(f"{block.form.label} {block.form.hint}")] += 1
+        combined[_line_key(f"{label}: {block.form.hint}")] += 1
+    if block.form.value and block.form.hint:
+        combined[
+            _line_key(
+                f"{block.form.label} {block.form.value} ({block.form.hint})"
+            )
+        ] += 1
+        combined[
+            _line_key(f"{label}: {block.form.value} ({block.form.hint})")
+        ] += 1
+    return individual | combined
+
+
+def _form_residual_lines(block: Block) -> list[str]:
+    represented = _form_structure_lines(block)
+    residuals: list[str] = []
+    for line in block.text.splitlines():
+        key = _line_key(line)
+        if represented[key]:
+            represented[key] -= 1
+        elif line.strip():
+            residuals.append(line.strip())
     return residuals
 
 
@@ -67,10 +141,7 @@ def _table(block: Block) -> str:
         lines.append("| " + " | ".join(values) + " |")
         if row_index == min(rows):
             lines.append("| " + " | ".join("---" for _ in cells) + " |")
-    residuals = _residual_lines(
-        block.text,
-        [cell.text for cell in block.table.cells],
-    )
+    residuals = _table_residual_lines(block)
     if residuals:
         lines.extend(["", *residuals])
     return "\n".join(lines)
@@ -135,10 +206,7 @@ def _body(block: Block) -> str:
             body = f"**{label}:** {hint}"
         else:
             body = f"**{label}:**"
-        residuals = _residual_lines(
-            block.text,
-            [block.form.label, value or "", hint or ""],
-        )
+        residuals = _form_residual_lines(block)
         return "\n".join([body, *residuals])
     if block.type in {NodeType.HEADER, NodeType.FOOTER}:
         return text
@@ -174,6 +242,21 @@ class _MarkdownBuilder:
             self.emissions[block.id] = _Emission(start=start, end=end, body=body)
         self.append_raw("\n\n")
 
+    def append_checkbox_group(self, group: str, members: list[Block]) -> None:
+        prefix = f"**{group}:** "
+        options = [f"{_checkbox_marker(item)} {_checkbox_text(item)}" for item in members]
+        start = self.length
+        self.append_raw(prefix + " ".join(options))
+        cursor = start + len(prefix)
+        for member, option in zip(members, options, strict=True):
+            self.emissions[member.id] = _Emission(
+                start=cursor,
+                end=cursor + len(option),
+                body=option,
+            )
+            cursor += len(option) + 1
+        self.append_raw("\n\n")
+
     def finish(self) -> str:
         return "".join(self.parts).rstrip() + "\n"
 
@@ -207,11 +290,7 @@ def _render_blocks(blocks: list[Block], builder: _MarkdownBuilder) -> None:
                     members.append(ordered[index])
                 index += 1
             if members:
-                options = " ".join(
-                    f"{_checkbox_marker(item)} {_checkbox_text(item)}"
-                    for item in members
-                )
-                builder.append_body(f"**{group}:** {options}", members)
+                builder.append_checkbox_group(group, members)
             for member in members:
                 _render_blocks(member.children, builder)
             continue
@@ -246,10 +325,17 @@ class RenderedAgenticDocument:
 def _semantic_fragments(block: Block) -> list[str]:
     fragments: list[str] = []
     if block.type is NodeType.TABLE and block.table is not None and block.table.cells:
-        fragments.extend(cell.text for cell in block.table.cells)
         fragments.extend(
-            _residual_lines(block.text, [cell.text for cell in block.table.cells])
+            " ".join(cell.text.replace("\r", " ").splitlines())
+            for cell in block.table.cells
         )
+        represented = _table_structure_lines(block)
+        for line in block.text.splitlines():
+            key = _line_key(line)
+            if represented[key]:
+                represented[key] -= 1
+            elif line.strip():
+                fragments.append(line.strip())
     elif block.type is NodeType.FORM_FIELD and block.form is not None:
         fragments.extend(
             [
@@ -258,17 +344,11 @@ def _semantic_fragments(block: Block) -> list[str]:
                 block.form.hint or "",
             ]
         )
-        fragments.extend(
-            _residual_lines(
-                block.text,
-                [block.form.label, block.form.value or "", block.form.hint or ""],
-            )
-        )
+        fragments.extend(_form_residual_lines(block))
     elif block.type is NodeType.CHECKBOX:
         fragments.extend(
             [
                 _checkbox_marker(block),
-                block.checkbox_group or "",
                 block.checkbox_option or "",
                 block.text,
             ]
@@ -334,6 +414,11 @@ def _page_quality_reasons(
 
     if any(block.verification is VerificationState.REJECTED for block in blocks):
         add("rejected_content")
+    lineage = [item for block in blocks for item in block.correction_lineage]
+    if any(item.previous_state is VerificationState.REJECTED for item in lineage):
+        add("rejected_content")
+    if any("skip" in item.reason.casefold() for item in lineage):
+        add("skipped_correction")
     if any(block.verification is VerificationState.NEEDS_REVIEW for block in blocks):
         add("block_needs_review")
     if any(_incomplete_structure(block) for block in blocks):
@@ -422,10 +507,14 @@ def render_agentic_document(
                     "status": status.value,
                     "reading_order": len(page_nodes),
                     "confidence": block.confidence,
-                    "text": block.text,
+                    "text": None
+                    if block.verification is VerificationState.REJECTED
+                    else block.text,
                     "source": _source(page.number, start, end, block.bbox),
                     "atoms": atoms,
-                    "semantic": _semantic_payload(block),
+                    "semantic": None
+                    if block.verification is VerificationState.REJECTED
+                    else _semantic_payload(block),
                     "children": [child.id for child in block.children],
                     "rendered": rendered,
                     "reason": block.verification_reason
@@ -513,30 +602,43 @@ def _source(page: int, start: int | None, end: int | None, bbox) -> dict:
 
 
 def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
-    if block.atoms:
+    if block.atoms and block.type not in {
+        NodeType.FIGURE,
+        NodeType.IMAGE,
+        NodeType.CHART,
+    }:
         return [
             (atom.kind, atom.text, atom.bbox or block.bbox, "literal")
             for atom in block.atoms
         ]
     if block.type is NodeType.TABLE and block.table is not None:
         values = [
-            ("table_cell", cell.text, cell.bbox or block.bbox, "literal")
+            (
+                "table_cell",
+                " ".join(cell.text.replace("\r", " ").splitlines()),
+                cell.bbox or block.bbox,
+                "literal",
+            )
             for cell in block.table.cells
         ]
         values.extend(
             ("table_residual", text, block.bbox, "literal")
-            for text in _residual_lines(
-                block.text, [cell.text for cell in block.table.cells]
-            )
+            for text in _table_residual_lines(block)
         )
         return values
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-        values: list[tuple[str, str, object, str]] = []
-        if block.text:
+        values = [
+            (atom.kind, atom.text, atom.bbox or block.bbox, "literal")
+            for atom in block.atoms
+        ]
+        seen = {atom.text for atom in block.atoms}
+        if block.text and block.text not in seen:
             values.append(("visual_text", block.text, block.bbox, "literal"))
-        if block.caption:
+            seen.add(block.text)
+        if block.caption and block.caption not in seen:
             values.append(("caption", block.caption, block.bbox, "literal"))
-        if block.figure_description:
+            seen.add(block.caption)
+        if block.figure_description and block.figure_description not in seen:
             values.append(
                 (
                     "visual_description",

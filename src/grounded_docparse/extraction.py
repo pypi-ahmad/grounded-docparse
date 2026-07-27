@@ -210,6 +210,7 @@ def _validate_and_resolve(
                 atoms[atom["id"]] = (block["id"], atom)
 
     resolved: dict[str, list[dict]] = {}
+    markdown = parse_payload.get("markdown", "")
     for item in draft.get("evidence", []):
         pointer = item.get("pointer")
         if not isinstance(pointer, str) or not _pointer_exists(data, pointer):
@@ -250,6 +251,10 @@ def _validate_and_resolve(
                         "bbox": source["bbox"],
                     }
                 )
+        value = _pointer_value(data, pointer)
+        if citations and not _citations_contain_value(value, citations, markdown):
+            issues.append(f"{pointer}: cited evidence does not contain extracted value")
+            continue
         if citations:
             resolved[pointer] = citations
 
@@ -258,6 +263,38 @@ def _validate_and_resolve(
             if pointer not in resolved:
                 issues.append(f"{pointer}: missing evidence")
     return issues, resolved
+
+
+def _pointer_value(value: Any, pointer: str) -> Any:
+    current = value
+    for part in _pointer_parts(pointer):
+        current = current[int(part)] if isinstance(current, list) else current[part]
+    return current
+
+
+def _citations_contain_value(
+    value: Any,
+    citations: list[dict],
+    markdown: str,
+) -> bool:
+    if isinstance(value, (dict, list)):
+        return True
+    expected = " ".join(str(value).split()).casefold()
+    cited_text: list[str] = []
+    for citation in citations:
+        span = citation.get("span")
+        if not isinstance(span, dict):
+            continue
+        start = span.get("start")
+        end = span.get("end")
+        if (
+            isinstance(start, int)
+            and isinstance(end, int)
+            and 0 <= start <= end <= len(markdown)
+        ):
+            cited_text.append(markdown[start:end])
+    grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|").casefold()
+    return bool(expected and expected in grounded)
 
 
 def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None:
