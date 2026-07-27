@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from copy import deepcopy
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from .config import ParserConfig
@@ -28,6 +30,12 @@ UNSUPPORTED_KEYWORDS = {
     "minItems",
     "maxItems",
 }
+NUMBER_BODY = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?"
+NUMERIC_LITERAL_PATTERN = re.compile(
+    rf"(?<![\w.,])(?P<accounting>\()?[ \t]*(?P<sign_before>[+-])?[ \t]*"
+    rf"(?P<currency>[$€£])?[ \t]*(?P<sign_after>[+-])?[ \t]*"
+    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?!\w|[.,]\d)"
+)
 
 
 def validate_extraction_schema(schema: dict[str, Any]) -> None:
@@ -98,7 +106,7 @@ class DocumentExtractor:
         instruction = instruction.strip()
         if not instruction:
             raise ValueError("extraction instruction is required")
-        payload = json.loads(parse_result.json)
+        payload = _extraction_payload(json.loads(parse_result.json))
         raw = self.gateway.propose_schema(instruction, payload)
         schema_json = raw.get("schema_json") if isinstance(raw, dict) else raw.schema_text
         try:
@@ -118,7 +126,7 @@ class DocumentExtractor:
         schema: dict[str, Any],
     ) -> ExtractionResult:
         validate_extraction_schema(schema)
-        parse_payload = json.loads(parse_result.json)
+        parse_payload = _extraction_payload(json.loads(parse_result.json))
         draft = self.gateway.extract_document(
             parse_payload,
             schema,
@@ -181,6 +189,28 @@ def _usage(gateway: object) -> RunUsage:
     return usage if isinstance(usage, RunUsage) else RunUsage()
 
 
+def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
+    payload = deepcopy(parse_payload)
+    metadata = payload.get("metadata")
+    if isinstance(metadata, dict):
+        metadata.pop("warnings", None)
+        metadata.pop("trace", None)
+    for page in payload.get("document", {}).get("pages", []):
+        page["blocks"] = [
+            block
+            for block in page.get("blocks", [])
+            if block.get("rendered") is not False
+            and block.get("status") != "rejected"
+        ]
+        for block in page["blocks"]:
+            block.pop("correction_lineage", None)
+            block.pop("reason", None)
+            block.pop("verification_reason", None)
+        page.pop("specialist_audit", None)
+        page.pop("warnings", None)
+    return payload
+
+
 def _validate_and_resolve(
     draft: dict[str, Any],
     schema: dict[str, Any],
@@ -200,11 +230,17 @@ def _validate_and_resolve(
     atoms: dict[str, tuple[str, dict]] = {}
     for page in parse_payload.get("document", {}).get("pages", []):
         for block in page.get("blocks", []):
+            if (
+                block.get("rendered") is False
+                or block.get("status") == "rejected"
+            ):
+                continue
             blocks[block["id"]] = block
             for atom in block.get("atoms", []):
                 atoms[atom["id"]] = (block["id"], atom)
 
     resolved: dict[str, list[dict]] = {}
+    markdown = parse_payload.get("markdown", "")
     for item in draft.get("evidence", []):
         pointer = item.get("pointer")
         if not isinstance(pointer, str) or not _pointer_exists(data, pointer):
@@ -245,6 +281,10 @@ def _validate_and_resolve(
                         "bbox": source["bbox"],
                     }
                 )
+        value = _pointer_value(data, pointer)
+        if citations and not _citations_contain_value(value, citations, markdown):
+            issues.append(f"{pointer}: cited evidence does not contain extracted value")
+            continue
         if citations:
             resolved[pointer] = citations
 
@@ -253,6 +293,162 @@ def _validate_and_resolve(
             if pointer not in resolved:
                 issues.append(f"{pointer}: missing evidence")
     return issues, resolved
+
+
+def _pointer_value(value: Any, pointer: str) -> Any:
+    current = value
+    for part in _pointer_parts(pointer):
+        current = current[int(part)] if isinstance(current, list) else current[part]
+    return current
+
+
+def _citations_contain_value(
+    value: Any,
+    citations: list[dict],
+    markdown: str,
+) -> bool:
+    if isinstance(value, (dict, list)):
+        return True
+    cited_text: list[str] = []
+    for citation in citations:
+        span = citation.get("span")
+        if not isinstance(span, dict):
+            continue
+        start = span.get("start")
+        end = span.get("end")
+        if (
+            isinstance(start, int)
+            and isinstance(end, int)
+            and 0 <= start <= end <= len(markdown)
+        ):
+            cited_text.append(markdown[start:end])
+    if isinstance(value, bool):
+        return any(_evidence_contains_boolean(evidence, value) for evidence in cited_text)
+    if isinstance(value, (int, float)):
+        try:
+            expected_number = Decimal(str(value))
+        except InvalidOperation:
+            return False
+        for evidence in cited_text:
+            for match in NUMERIC_LITERAL_PATTERN.finditer(evidence.replace(r"\|", "|")):
+                sign_before = match.group("sign_before")
+                sign_after = match.group("sign_after")
+                explicit_signs = [sign for sign in (sign_before, sign_after) if sign]
+                if len(explicit_signs) > 1:
+                    continue
+                if match.group("accounting") and explicit_signs:
+                    continue
+                literal = match.group("number").replace(",", "")
+                try:
+                    parsed = Decimal(literal)
+                    if match.group("accounting") or explicit_signs == ["-"]:
+                        parsed = -parsed
+                    if parsed == expected_number:
+                        return True
+                except InvalidOperation:
+                    continue
+        return False
+    expected = " ".join(str(value).split()).casefold()
+    return bool(
+        expected
+        and any(
+            expected
+            in " ".join(evidence.split()).replace(r"\|", "|").casefold()
+            for evidence in cited_text
+        )
+    )
+
+
+def _strip_markdown_emphasis(value: str) -> str:
+    value = value.strip()
+    while True:
+        for marker in ("**", "__", "*", "_"):
+            if value.startswith(marker) and value.endswith(marker) and len(value) > 2 * len(marker):
+                value = value[len(marker) : -len(marker)].strip()
+                break
+        else:
+            return value
+
+
+def _boolean_token(value: str) -> tuple[str, str] | None:
+    normalized = _strip_markdown_emphasis(value)
+    match = re.fullmatch(r"(?P<value>yes|no)(?P<punct>[.!?,;:]?)", normalized, re.IGNORECASE)
+    if match is None:
+        return None
+    return match.group("value").casefold(), match.group("punct")
+
+
+def _markdown_table_cells(line: str) -> list[str] | None:
+    stripped = line.strip()
+    if not (stripped.startswith("|") and stripped.endswith("|")):
+        return None
+    cells: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for character in stripped[1:-1]:
+        if escaped:
+            current.append(character)
+            escaped = False
+        elif character == "\\":
+            current.append(character)
+            escaped = True
+        elif character == "|":
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(character)
+    cells.append("".join(current).strip())
+    return cells
+
+
+def _separator_row(cells: list[str] | None) -> bool:
+    return bool(cells) and all(
+        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) is not None
+        for cell in cells
+    )
+
+
+def _evidence_contains_boolean(evidence: str, value: bool) -> bool:
+    normalized = evidence
+    folded = normalized.replace(r"\|", "|").casefold()
+    if re.search(rf"\b{str(value).casefold()}\b", folded):
+        return True
+    if value and re.search(r"\[(?:x|✓)\]", folded):
+        return True
+    if not value and re.search(r"\[\s\]", folded):
+        return True
+
+    expected = "yes" if value else "no"
+    lines = [line.strip() for line in normalized.splitlines() if line.strip()]
+    table_rows = [_markdown_table_cells(line) for line in lines]
+    for index, cells in enumerate(table_rows):
+        if cells is None or _separator_row(cells):
+            continue
+        next_cells = table_rows[index + 1] if index + 1 < len(table_rows) else None
+        if _separator_row(next_cells):
+            continue
+        for cell_index, cell in enumerate(cells):
+            token = _boolean_token(cell)
+            if (
+                cell_index > 0
+                and token is not None
+                and token[0] == expected
+                and any(previous.strip() for previous in cells[:cell_index])
+            ):
+                return True
+
+    for line in lines:
+        if _markdown_table_cells(line) is not None:
+            continue
+        label, separator, candidate = line.partition(":")
+        if separator and label.strip():
+            token = _boolean_token(candidate)
+            if token is not None and token[0] == expected:
+                return True
+        token = _boolean_token(line)
+        if token is not None and token[0] == expected and token != ("no", "."):
+            return True
+    return False
 
 
 def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None:

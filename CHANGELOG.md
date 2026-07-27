@@ -8,6 +8,7 @@
 - Enforced fail-closed visual grounding for invalid or missing bounding boxes.
 - Left legacy `.docparse/` data untouched and ignored.
 - Raised default page batch size and page concurrency from 20/10 to 100/50.
+- Made Markdown/agentic JSON rendering lossless and span-exact, with full-history page quality and non-extractable rejected/correction audits.
 
 All notable changes to this project are documented in this file.
 

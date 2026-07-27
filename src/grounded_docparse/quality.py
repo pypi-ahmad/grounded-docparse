@@ -10,10 +10,20 @@ from .models import Block, BoundingBox, NodeType, RegionDraft, VerificationState
 
 SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
+REPAIR_CONFIDENCE_THRESHOLD = 0.85
+SCAN_UNCOVERED_INTERIOR_THRESHOLD = 0.30
+SCAN_LARGE_VISUAL_AREA = 0.15
+SCAN_INTERIOR = (0.1, 0.1, 0.9, 0.9)
 
 WORD_PATTERN = re.compile(r"[A-Za-z0-9]+(?:[./:@_-][A-Za-z0-9]+)*")
+ROMAN_NUMERAL_PATTERN = (
+    r"(?:(?=[MDCLXVI])M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})"
+    r"(?:IX|IV|V?I{0,3})|(?=[mdclxvi])m{0,3}(?:cm|cd|d?c{0,3})"
+    r"(?:xc|xl|l?x{0,3})(?:ix|iv|v?i{0,3}))"
+)
 LIST_PREFIX_PATTERN = re.compile(
-    r"^\s*(?P<marker>(?:\d+|[A-Za-z])[.)]|[-*•])\s+(?P<body>.+)$"
+    rf"^\s*(?P<marker>(?:\d+|{ROMAN_NUMERAL_PATTERN}|[A-Za-z])[.)]|"
+    rf"\((?:\d+|{ROMAN_NUMERAL_PATTERN}|[A-Za-z])\)|[-*•])\s+(?P<body>.+)$"
 )
 REPEATED_LABEL_PATTERN = re.compile(
     r"^(?P<label>[^\n–—]{1,80}?)(?P<separator>\s+[–—-]\s+)"
@@ -30,6 +40,7 @@ CRITICAL_PATTERNS = (
 )
 DEGRADED_MARKERS = ("ambiguous", "degraded", "handwritten", "illegible", "obscured")
 COMPLEX_TYPES = {NodeType.TABLE, NodeType.FORM_FIELD, NodeType.CHECKBOX}
+VISUAL_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 
 
 def _tokens(value: str) -> list[str]:
@@ -91,15 +102,130 @@ def _source_candidate(source: TextBlock, reading_order: int) -> RegionDraft:
     )
 
 
+def _scan_candidate(bbox: BoundingBox, reading_order: int) -> RegionDraft:
+    return RegionDraft(
+        type=NodeType.PARAGRAPH,
+        bbox=bbox.model_dump(exclude={"unit"}),
+        reading_order=reading_order,
+        text="",
+        confidence=0.5,
+    )
+
+
+def incomplete_table(block: Block) -> bool:
+    return block.type is NodeType.TABLE and (
+        block.table is None
+        or not block.table.cells
+        or any(not cell.text.strip() for cell in block.table.cells)
+    )
+
+
+def _incomplete_structured_content(block: Block) -> bool:
+    if block.type is NodeType.TABLE:
+        return incomplete_table(block)
+    if block.type is NodeType.FORM_FIELD:
+        return block.form is None or not block.form.label.strip()
+    if block.type is NodeType.CHECKBOX:
+        return not (block.checkbox_group or block.checkbox_option)
+    return False
+
+
+def _rectangle_union_area(boxes: list[BoundingBox]) -> float:
+    events: list[tuple[float, int, float, float]] = []
+    for box in boxes:
+        if box.x1 <= box.x0 or box.y1 <= box.y0:
+            continue
+        events.append((box.x0, 1, box.y0, box.y1))
+        events.append((box.x1, -1, box.y0, box.y1))
+    events.sort()
+    active: Counter[tuple[float, float]] = Counter()
+    area = 0.0
+    previous_x: float | None = None
+    index = 0
+    while index < len(events):
+        x = events[index][0]
+        if previous_x is not None and x > previous_x:
+            intervals = sorted(interval for interval, count in active.items() if count)
+            covered_y = 0.0
+            if intervals:
+                start, end = intervals[0]
+                for next_start, next_end in intervals[1:]:
+                    if next_start <= end:
+                        end = max(end, next_end)
+                    else:
+                        covered_y += end - start
+                        start, end = next_start, next_end
+                covered_y += end - start
+            area += (x - previous_x) * covered_y
+        while index < len(events) and events[index][0] == x:
+            _event_x, delta, y0, y1 = events[index]
+            active[(y0, y1)] += delta
+            if not active[(y0, y1)]:
+                del active[(y0, y1)]
+            index += 1
+        previous_x = x
+    return area
+
+
+def _covered_fraction(blocks: list[Block], region: BoundingBox) -> float:
+    boxes = [
+        BoundingBox(
+            x0=max(block.bbox.x0, region.x0),
+            y0=max(block.bbox.y0, region.y0),
+            x1=min(block.bbox.x1, region.x1),
+            y1=min(block.bbox.y1, region.y1),
+        )
+        for block in blocks
+        if block.verification is not VerificationState.REJECTED
+        and block.bbox is not None
+        and _intersection(block.bbox, region) > 0
+    ]
+    covered = _rectangle_union_area(boxes)
+    return covered / _area(region) if _area(region) else 0.0
+
+
+def _scan_probes(page: PageEvidence, blocks: list[Block]) -> list[RegionDraft]:
+    probes: list[RegionDraft] = []
+
+    def add_probe(bbox: BoundingBox) -> None:
+        candidate = _scan_candidate(bbox, len(blocks) + len(probes))
+        if not any(probe.bbox == candidate.bbox for probe in probes):
+            probes.append(candidate)
+
+    active_blocks = [
+        block for block in blocks if block.verification is not VerificationState.REJECTED
+    ]
+    for block in active_blocks:
+        if block.bbox is None:
+            continue
+        if (
+            block.type in VISUAL_TYPES
+            and not semantic_text(block).strip()
+            and _area(block.bbox) >= SCAN_LARGE_VISUAL_AREA
+        ):
+            add_probe(block.bbox)
+
+    interior = BoundingBox(
+        x0=SCAN_INTERIOR[0],
+        y0=SCAN_INTERIOR[1],
+        x1=SCAN_INTERIOR[2],
+        y1=SCAN_INTERIOR[3],
+    )
+    if not any(semantic_text(block).strip() for block in active_blocks) or (
+        1 - _covered_fraction(active_blocks, interior)
+        >= SCAN_UNCOVERED_INTERIOR_THRESHOLD
+    ):
+        add_probe(interior)
+    return probes
+
+
 def find_missing_source_regions(
     page: PageEvidence,
     blocks: list[Block],
     *,
     threshold: float = SOURCE_COVERAGE_THRESHOLD,
 ) -> list[RegionDraft]:
-    if page.scanned:
-        return []
-    missing: list[RegionDraft] = []
+    missing = _scan_probes(page, blocks) if page.scanned else []
     for source in page.text_blocks:
         if len(_tokens(source.text)) < 3:
             continue
@@ -122,36 +248,81 @@ def _critical_values(value: str) -> set[str]:
     }
 
 
+def _related_source_text(page: PageEvidence, block: Block) -> str:
+    return " ".join(
+        source.text
+        for source in page.text_blocks
+        if _spatially_related(source.bbox, block.bbox)
+    )
+
+
+def _structured_repair_risks(
+    page: PageEvidence,
+    block: Block,
+    warnings: list[str],
+) -> set[str]:
+    if block.type not in COMPLEX_TYPES:
+        return set()
+    candidate_text = semantic_text(block)
+    source_text = _related_source_text(page, block)
+    risks: set[str] = set()
+    if block.verification is VerificationState.REJECTED:
+        risks.add("rejected")
+    if _incomplete_structured_content(block):
+        risks.add("structure")
+    if block.confidence < REPAIR_CONFIDENCE_THRESHOLD:
+        risks.add("confidence")
+    if _clipped(block.bbox):
+        risks.add("geometry")
+    if _critical_values(candidate_text):
+        risks.add("critical_literal")
+    if source_text.strip() and (
+        _coverage(candidate_text, source_text) < SOURCE_COVERAGE_THRESHOLD
+        or _coverage(source_text, candidate_text) < SOURCE_COVERAGE_THRESHOLD
+    ):
+        risks.add("source_disagreement")
+    if any(
+        marker in warning.casefold()
+        for marker in DEGRADED_MARKERS
+        for warning in warnings
+    ):
+        risks.add("degraded")
+    return risks
+
+
 def select_repair_blocks(
     page: PageEvidence,
     blocks: list[Block],
     warnings: list[str],
     *,
-    limit: int = MAX_REPAIR_BLOCKS,
+    limit: int | None = None,
 ) -> list[Block]:
-    degraded = any(marker in warning.casefold() for marker in DEGRADED_MARKERS for warning in warnings)
     candidates: list[tuple[int, float, int, Block]] = []
     for block in blocks:
-        if block.verification is VerificationState.REJECTED or block.bbox is None:
+        structured = block.type in COMPLEX_TYPES
+        if block.verification is VerificationState.REJECTED and not structured:
             continue
         values = _critical_values(semantic_text(block))
-        source_text = " ".join(
-            source.text
-            for source in page.text_blocks
-            if _spatially_related(source.bbox, block.bbox)
-        )
+        source_text = _related_source_text(page, block)
         source_values = _critical_values(source_text)
         literal_mismatch = bool(source_values and not values.issubset(source_values))
-        degraded_complex = degraded and block.type in COMPLEX_TYPES and bool(values)
+        structured_risks = _structured_repair_risks(page, block, warnings)
         unresolved_literal = (
             block.verification is VerificationState.NEEDS_REVIEW and bool(values)
         )
-        if not (literal_mismatch or degraded_complex or unresolved_literal):
+        if not (literal_mismatch or structured_risks or unresolved_literal):
             continue
-        priority = 0 if literal_mismatch else 1 if degraded_complex else 2
+        priority = (
+            0
+            if literal_mismatch or "source_disagreement" in structured_risks
+            else 1
+            if structured_risks
+            else 2
+        )
         candidates.append((priority, block.confidence, block.reading_order, block))
     candidates.sort(key=lambda item: item[:3])
-    return [item[3] for item in candidates[:limit]]
+    selected = [item[3] for item in candidates]
+    return selected if limit is None else selected[:limit]
 
 
 def _normalize_marker(block: Block) -> None:
@@ -162,8 +333,11 @@ def _normalize_marker(block: Block) -> None:
     if block.type is not NodeType.LIST_ITEM or not block.list_marker:
         return
     marker = block.list_marker.strip()
-    if block.text.casefold().startswith(marker.casefold()):
-        block.text = block.text[len(marker) :].lstrip()
+    if not marker:
+        return
+    marker_prefix = re.compile(rf"^{re.escape(marker)}(?=\s|$)", re.IGNORECASE)
+    while marker_prefix.match(block.text):
+        block.text = marker_prefix.sub("", block.text, count=1).lstrip()
 
 
 def _fingerprint(block: Block) -> str:
@@ -203,8 +377,9 @@ def _duplicate(left: Block, right: Block) -> bool:
     return bottom_edge and (_clipped(left.bbox) or _clipped(right.bbox)) and similarity >= 0.75
 
 
-def _quality(block: Block) -> tuple[int, int, float, float]:
+def _quality(block: Block) -> tuple[int, int, int, float, float]:
     return (
+        int(block.verification is not VerificationState.REJECTED),
         int(not _clipped(block.bbox)),
         int(block.verification is VerificationState.VERIFIED),
         block.confidence,

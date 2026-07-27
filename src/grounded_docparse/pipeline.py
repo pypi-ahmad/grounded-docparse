@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 import re
 import tempfile
 import time
 from collections.abc import Callable
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
 from queue import Empty, SimpleQueue
 
@@ -13,6 +15,7 @@ from .config import ParserConfig
 from .gateways import OpenAIDocumentGateway
 from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
 from .models import (
+    AgentRole,
     AgentTraceEvent,
     AgentUsage,
     AtomicDraft,
@@ -20,12 +23,14 @@ from .models import (
     Block,
     BoundingBox,
     Citation,
+    CorrectionLineage,
     CropInspectionRequest,
     Document,
     DraftBoundingBox,
     FormData,
     InspectionAction,
     InspectionDecision,
+    InspectionRegionAddition,
     NodeType,
     Page,
     PageInspection,
@@ -34,6 +39,13 @@ from .models import (
     ProgressEvent,
     RegionDraft,
     RunUsage,
+    SpecialistAdditionOpinion,
+    SpecialistAdditionResolution,
+    SpecialistAudit,
+    SpecialistOpinion,
+    SpecialistOrderingOpinion,
+    SpecialistOrderingResolution,
+    SpecialistResolution,
     TableCell,
     TableCellDraft,
     TableData,
@@ -44,8 +56,14 @@ from .quality import (
     find_missing_source_regions,
     normalize_page_blocks,
     select_repair_blocks,
+    semantic_text,
 )
-from .render import render_agentic_document, render_annotated_pdf, render_json
+from .render import (
+    materialize_document_quality,
+    render_agentic_document,
+    render_annotated_pdf,
+    render_json,
+)
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
@@ -315,11 +333,14 @@ def _region_from_block(block: Block) -> RegionDraft:
 
 
 def _visible_region_text(region: RegionDraft) -> str:
-    values = [region.text, region.caption or "", region.figure_description or ""]
+    values = [region.text]
+    values.extend(cell.text for cell in region.table_cells)
     if region.form is not None:
         values.extend(
             [region.form.label, region.form.value or "", region.form.hint or ""]
         )
+    values.extend((region.checkbox_group or "", region.checkbox_option or ""))
+    values.extend((region.caption or "", region.figure_description or ""))
     return " ".join(
         " ".join(value.split()) for value in values if value
     ).casefold()
@@ -335,21 +356,22 @@ def _box_overlap(left: BoundingBox, right: BoundingBox) -> float:
     return intersection / union if union else 0.0
 
 
-def _is_duplicate_addition(region: RegionDraft, blocks: list[Block]) -> bool:
+def _matching_addition_blocks(region: RegionDraft, blocks: list[Block]) -> list[Block]:
     text = _visible_region_text(region)
     bbox = _bbox(region.bbox)
+    matches: list[Block] = []
     for block in blocks:
-        existing = _visible_region_text(_region_from_block(block))
-        if text and text == existing:
-            return True
-        if (
+        existing = " ".join(semantic_text(block).split()).casefold()
+        exact_text = bool(text and text == existing)
+        strong_overlap = (
             bbox is not None
             and block.bbox is not None
             and block.type is region.type
             and _box_overlap(bbox, block.bbox) >= 0.8
-        ):
-            return True
-    return False
+        )
+        if exact_text or strong_overlap:
+            matches.append(block)
+    return matches
 
 
 def _proactive_crop_priority(block: Block) -> int | None:
@@ -373,6 +395,108 @@ def _has_excessive_order_movement(
         abs(positions[region_id] - original_index) > maximum_movement
         for original_index, region_id in enumerate(original_ids)
     )
+
+
+def _canonical_decision(decision: InspectionDecision) -> tuple[str, str]:
+    corrected = (
+        decision.corrected_region.model_dump(mode="json")
+        if decision.corrected_region is not None
+        else None
+    )
+    return (
+        decision.action.value,
+        json.dumps(corrected, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+    )
+
+
+def _canonical_addition(addition: InspectionRegionAddition) -> str:
+    return json.dumps(
+        addition.region.model_dump(mode="json"),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _addition_issue(
+    addition: InspectionRegionAddition,
+    region_id: str | None = None,
+    *,
+    source: str = "Verification",
+) -> str | None:
+    if region_id is not None and addition.region_id != region_id:
+        return f"{source} returned a different additional region ID"
+    if _bbox(addition.region.bbox) is None:
+        return f"{source} addition contained an invalid bounding box"
+    return None
+
+
+def _same_addition_target(
+    left: InspectionRegionAddition,
+    right: InspectionRegionAddition,
+) -> bool:
+    if left.region_id == right.region_id:
+        return True
+    left_box = _bbox(left.region.bbox)
+    right_box = _bbox(right.region.bbox)
+    if left_box is None or right_box is None:
+        return False
+    width = max(0.0, min(left_box.x1, right_box.x1) - max(left_box.x0, right_box.x0))
+    height = max(0.0, min(left_box.y1, right_box.y1) - max(left_box.y0, right_box.y0))
+    intersection = width * height
+    smaller = min(
+        (left_box.x1 - left_box.x0) * (left_box.y1 - left_box.y0),
+        (right_box.x1 - right_box.x0) * (right_box.y1 - right_box.y0),
+    )
+    return bool(smaller and intersection / smaller >= 0.5)
+
+
+def _cluster_addition_opinions(
+    opinions: list[SpecialistAdditionOpinion],
+) -> list[list[SpecialistAdditionOpinion]]:
+    remaining = list(opinions)
+    clusters: list[list[SpecialistAdditionOpinion]] = []
+    while remaining:
+        cluster = [remaining.pop(0)]
+        changed = True
+        while changed:
+            changed = False
+            for opinion in list(remaining):
+                if any(
+                    _same_addition_target(opinion.addition, item.addition)
+                    for item in cluster
+                ):
+                    cluster.append(opinion)
+                    remaining.remove(opinion)
+                    changed = True
+        clusters.append(cluster)
+    return clusters
+
+
+def _decision_issue(
+    decision: InspectionDecision,
+    region_id: str,
+    *,
+    source: str = "Verification",
+) -> str | None:
+    if decision.region_id != region_id:
+        return f"{source} returned a different region ID"
+    if decision.action is InspectionAction.CORRECT:
+        if decision.corrected_region is None:
+            return (
+                f"{source} correction did not include a region"
+                if source == "Arbitration"
+                else "Correction did not include a region"
+            )
+        if _bbox(decision.corrected_region.bbox) is None:
+            return (
+                f"{source} correction contained an invalid bounding box"
+                if source == "Arbitration"
+                else "Correction contained an invalid bounding box"
+            )
+    elif decision.corrected_region is not None:
+        return f"{source} returned a correction for a non-correct decision"
+    return None
 
 
 def _hierarchy(blocks: list[Block], inherited_sections: list[str]) -> tuple[list[Block], list[str]]:
@@ -410,6 +534,15 @@ class _ProcessedPage:
     trace: list[AgentTraceEvent]
 
 
+@dataclass(frozen=True, slots=True)
+class _TaggedInspection:
+    inspection: PageInspection
+    reviewer: str
+    model: str
+    timestamp: datetime
+    target_ids: list[str]
+
+
 class DocumentParser:
     def __init__(
         self,
@@ -441,12 +574,16 @@ class DocumentParser:
             if _needs_verification(region)
         ]
         decisions: dict[str, InspectionDecision] = {}
+        resolution_failures: dict[str, str] = {}
+        specialist_audit = SpecialistAudit()
+        ordering_conflict = False
         inspection = None
         if risky:
             _emit(progress_callback, "verify", page.number, total, f"Verifying page {page.number}")
             risky_ids = [block.id for _region, block in risky]
-            inspections: list[PageInspection] = []
-            if callable(getattr(gateway, "plan_page", None)):
+            inspections: list[_TaggedInspection] = []
+            manager_flow = callable(getattr(gateway, "plan_page", None))
+            if manager_flow:
                 prior_inspections: list[dict] = []
                 for repair_round in range(1, 3):
                     try:
@@ -491,7 +628,19 @@ class DocumentParser:
                                 agent_role=delegation.role,
                                 use_terra=use_terra,
                             )
-                            inspections.append(delegated_inspection)
+                            inspections.append(
+                                _TaggedInspection(
+                                    inspection=delegated_inspection,
+                                    reviewer=delegation.role.value,
+                                    model=(
+                                        self.config.terra_model
+                                        if use_terra
+                                        else self.config.luna_model
+                                    ),
+                                    timestamp=datetime.now(UTC),
+                                    target_ids=targets,
+                                )
+                            )
                             prior_inspections.append(
                                 delegated_inspection.model_dump(mode="json")
                             )
@@ -504,12 +653,19 @@ class DocumentParser:
                         break
             else:
                 try:
+                    delegated_inspection = gateway.inspect_page(
+                        page,
+                        draft,
+                        region_ids=all_region_ids,
+                        target_region_ids=risky_ids,
+                    )
                     inspections.append(
-                        gateway.inspect_page(
-                            page,
-                            draft,
-                            region_ids=all_region_ids,
-                            target_region_ids=risky_ids,
+                        _TaggedInspection(
+                            inspection=delegated_inspection,
+                            reviewer=AgentRole.EVIDENCE_CRITIC.value,
+                            model=self.config.luna_model,
+                            timestamp=datetime.now(UTC),
+                            target_ids=risky_ids,
                         )
                     )
                 except Exception as exc:  # noqa: BLE001 - verification is best-effort
@@ -519,25 +675,402 @@ class DocumentParser:
                         block.verification_reason = block.verification_reason or reason
 
             if inspections:
-                merged_decisions: dict[str, InspectionDecision] = {}
                 additions = []
                 ordered_region_ids: list[str] = []
                 inspection_warnings: list[str] = []
-                for item in inspections:
-                    merged_decisions.update(
-                        (decision.region_id, decision) for decision in item.decisions
-                    )
-                    additions.extend(item.additional_regions)
-                    if item.ordered_region_ids:
-                        ordered_region_ids = item.ordered_region_ids
+                opinions_by_region: dict[str, list[SpecialistOpinion]] = {}
+                addition_opinions: list[SpecialistAdditionOpinion] = []
+                for tagged in inspections:
+                    item = tagged.inspection
                     inspection_warnings.extend(item.warnings)
+                    for addition in item.additional_regions:
+                        addition_opinion = SpecialistAdditionOpinion(
+                            reviewer=tagged.reviewer,
+                            model=tagged.model,
+                            timestamp=tagged.timestamp,
+                            addition=addition,
+                        )
+                        specialist_audit.addition_opinions.append(addition_opinion)
+                        addition_opinions.append(addition_opinion)
+                    for decision in item.decisions:
+                        opinion = SpecialistOpinion(
+                            reviewer=tagged.reviewer,
+                            model=tagged.model,
+                            timestamp=tagged.timestamp,
+                            decision=decision,
+                            confidence=decision.confidence,
+                            reasoning=decision.reason,
+                        )
+                        specialist_audit.opinions.append(opinion)
+                        if (
+                            decision.region_id not in all_region_ids
+                            or decision.region_id not in tagged.target_ids
+                        ):
+                            inspection_warnings.append(
+                                f"ignored {tagged.reviewer} decision for unexpected region ID "
+                                f"{decision.region_id}"
+                            )
+                            continue
+                        opinions_by_region.setdefault(decision.region_id, []).append(opinion)
+                    if item.ordered_region_ids:
+                        specialist_audit.ordering_opinions.append(
+                            SpecialistOrderingOpinion(
+                                reviewer=tagged.reviewer,
+                                model=tagged.model,
+                                timestamp=tagged.timestamp,
+                                ordered_region_ids=item.ordered_region_ids,
+                            )
+                        )
+
+                conflicting_ids: list[str] = []
+                resolutions: dict[str, SpecialistResolution] = {}
+                for region_id in risky_ids:
+                    opinions = opinions_by_region.get(region_id, [])
+                    if not opinions:
+                        reason = "No verification decision"
+                        resolution_failures[region_id] = reason
+                        resolutions[region_id] = SpecialistResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            reasoning=reason,
+                        )
+                        continue
+                    issue = next(
+                        (
+                            issue
+                            for opinion in opinions
+                            if (
+                                issue := _decision_issue(
+                                    opinion.decision,
+                                    region_id,
+                                )
+                            )
+                        ),
+                        None,
+                    )
+                    canonical = {
+                        _canonical_decision(opinion.decision) for opinion in opinions
+                    }
+                    if issue is not None:
+                        resolution_failures[region_id] = issue
+                        resolutions[region_id] = SpecialistResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            reasoning=issue,
+                        )
+                    elif len(canonical) == 1:
+                        final_decision = opinions[0].decision
+                        decisions[region_id] = final_decision
+                        resolutions[region_id] = SpecialistResolution(
+                            region_id=region_id,
+                            outcome="consensus" if len(opinions) > 1 else "single",
+                            final_decision=final_decision,
+                            reasoning=(
+                                "Specialists agreed on action and corrected payload"
+                                if len(opinions) > 1
+                                else "Single specialist opinion"
+                            ),
+                        )
+                    else:
+                        conflicting_ids.append(region_id)
+
+                if conflicting_ids and manager_flow:
+                    arbitration_reason: str | None = None
+                    try:
+                        arbitration = gateway.inspect_page(
+                            page,
+                            draft,
+                            region_ids=all_region_ids,
+                            target_region_ids=conflicting_ids,
+                            agent_role=AgentRole.EVIDENCE_CRITIC,
+                            use_terra=True,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - arbitration fails closed
+                        arbitration_reason = (
+                            f"Arbitration failed: {type(exc).__name__}: {exc}"
+                        )
+                        arbitration_decisions: dict[str, list[InspectionDecision]] = {}
+                    else:
+                        arbitration_timestamp = datetime.now(UTC)
+                        arbitration_decisions = {}
+                        unexpected_ids: list[str] = []
+                        for decision in arbitration.decisions:
+                            specialist_audit.opinions.append(
+                                SpecialistOpinion(
+                                    reviewer=AgentRole.EVIDENCE_CRITIC.value,
+                                    model=self.config.terra_model,
+                                    timestamp=arbitration_timestamp,
+                                    decision=decision,
+                                    confidence=decision.confidence,
+                                    reasoning=decision.reason,
+                                )
+                            )
+                            if decision.region_id not in conflicting_ids:
+                                unexpected_ids.append(decision.region_id)
+                            else:
+                                arbitration_decisions.setdefault(
+                                    decision.region_id, []
+                                ).append(decision)
+                        if unexpected_ids:
+                            arbitration_reason = (
+                                "Arbitration returned a different region ID: "
+                                + ", ".join(unexpected_ids)
+                            )
+
+                    for region_id in conflicting_ids:
+                        candidates = arbitration_decisions.get(region_id, [])
+                        issue = arbitration_reason
+                        if issue is None and len(candidates) != 1:
+                            issue = (
+                                "Arbitration did not return exactly one decision for "
+                                f"{region_id}"
+                            )
+                        if issue is None:
+                            issue = _decision_issue(
+                                candidates[0],
+                                region_id,
+                                source="Arbitration",
+                            )
+                        if issue is not None:
+                            resolution_failures[region_id] = issue
+                            resolutions[region_id] = SpecialistResolution(
+                                region_id=region_id,
+                                outcome="needs_review",
+                                reasoning=issue,
+                            )
+                            inspection_warnings.append(issue)
+                        else:
+                            decisions[region_id] = candidates[0]
+                            resolutions[region_id] = SpecialistResolution(
+                                region_id=region_id,
+                                outcome="arbitrated",
+                                final_decision=candidates[0],
+                                reasoning=candidates[0].reason,
+                            )
+                else:
+                    for region_id in conflicting_ids:
+                        reason = "Unresolved conflicting specialist opinions"
+                        resolution_failures[region_id] = reason
+                        resolutions[region_id] = SpecialistResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            reasoning=reason,
+                        )
+                        inspection_warnings.append(reason)
+
+                addition_clusters = _cluster_addition_opinions(addition_opinions)
+                addition_conflicts: dict[
+                    str, list[SpecialistAdditionOpinion]
+                ] = {}
+                addition_resolutions: dict[str, SpecialistAdditionResolution] = {}
+                addition_cluster_order: list[str] = []
+                for opinions in addition_clusters:
+                    proposal_region_ids = list(
+                        dict.fromkeys(
+                            opinion.addition.region_id for opinion in opinions
+                        )
+                    )
+                    region_id = proposal_region_ids[0]
+                    addition_cluster_order.append(region_id)
+                    issue = next(
+                        (
+                            issue
+                            for opinion in opinions
+                            if (issue := _addition_issue(opinion.addition))
+                        ),
+                        None,
+                    )
+                    canonical = {
+                        _canonical_addition(opinion.addition) for opinion in opinions
+                    }
+                    if issue is not None:
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            proposal_region_ids=proposal_region_ids,
+                            reasoning=issue,
+                        )
+                        inspection_warnings.append(issue)
+                    elif len(canonical) == 1:
+                        final_addition = opinions[0].addition
+                        additions.append(final_addition)
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="consensus" if len(opinions) > 1 else "single",
+                            proposal_region_ids=proposal_region_ids,
+                            final_addition=final_addition,
+                            reasoning=(
+                                "Specialists supplied an identical additional region"
+                                if len(opinions) > 1
+                                else "Single specialist addition proposal"
+                            ),
+                        )
+                    else:
+                        addition_conflicts[region_id] = opinions
+
+                if addition_conflicts and manager_flow:
+                    arbitration_reason: str | None = None
+                    addition_conflict_payloads = [
+                        {
+                            "cluster_id": region_id,
+                            "proposals": [
+                                opinion.addition.model_dump(mode="json")
+                                for opinion in opinions
+                            ],
+                        }
+                        for region_id, opinions in addition_conflicts.items()
+                    ]
+                    try:
+                        addition_arbitration = gateway.inspect_page(
+                            page,
+                            draft,
+                            region_ids=all_region_ids,
+                            target_region_ids=list(addition_conflicts),
+                            agent_role=AgentRole.EVIDENCE_CRITIC,
+                            use_terra=True,
+                            addition_conflicts=addition_conflict_payloads,
+                        )
+                    except Exception as exc:  # noqa: BLE001 - arbitration fails closed
+                        arbitration_reason = (
+                            f"Addition arbitration failed: {type(exc).__name__}: {exc}"
+                        )
+                        arbitration_additions = {}
+                    else:
+                        arbitration_additions: dict[
+                            str, list[InspectionRegionAddition]
+                        ] = {}
+                        arbitration_timestamp = datetime.now(UTC)
+                        unexpected_ids: list[str] = []
+                        for addition in addition_arbitration.additional_regions:
+                            specialist_audit.addition_opinions.append(
+                                SpecialistAdditionOpinion(
+                                    reviewer=AgentRole.EVIDENCE_CRITIC.value,
+                                    model=self.config.terra_model,
+                                    timestamp=arbitration_timestamp,
+                                    addition=addition,
+                                )
+                            )
+                            if addition.region_id not in addition_conflicts:
+                                unexpected_ids.append(addition.region_id)
+                            else:
+                                arbitration_additions.setdefault(
+                                    addition.region_id, []
+                                ).append(addition)
+                        if unexpected_ids:
+                            arbitration_reason = (
+                                "Addition arbitration returned a different region ID: "
+                                + ", ".join(unexpected_ids)
+                            )
+
+                    for region_id, opinions in addition_conflicts.items():
+                        proposal_region_ids = list(
+                            dict.fromkeys(
+                                opinion.addition.region_id for opinion in opinions
+                            )
+                        )
+                        candidates = arbitration_additions.get(region_id, [])
+                        issue = arbitration_reason
+                        if issue is None and len(candidates) != 1:
+                            issue = (
+                                "Addition arbitration did not return exactly one proposal for "
+                                f"{region_id}"
+                            )
+                        if issue is None:
+                            issue = _addition_issue(
+                                candidates[0],
+                                region_id,
+                                source="Addition arbitration",
+                            )
+                        if issue is None and _canonical_addition(
+                            candidates[0]
+                        ) not in {
+                            _canonical_addition(opinion.addition)
+                            for opinion in opinions
+                        }:
+                            issue = (
+                                "Addition arbitration returned a region payload outside "
+                                f"the competing proposals for {region_id}"
+                            )
+                        if issue is not None:
+                            addition_resolutions[region_id] = (
+                                SpecialistAdditionResolution(
+                                    region_id=region_id,
+                                    outcome="needs_review",
+                                    proposal_region_ids=proposal_region_ids,
+                                    reasoning=issue,
+                                )
+                            )
+                            inspection_warnings.append(issue)
+                        else:
+                            additions.append(candidates[0])
+                            addition_resolutions[region_id] = (
+                                SpecialistAdditionResolution(
+                                    region_id=region_id,
+                                    outcome="arbitrated",
+                                    proposal_region_ids=proposal_region_ids,
+                                    final_addition=candidates[0],
+                                    reasoning=candidates[0].reason,
+                                )
+                            )
+                else:
+                    for region_id, opinions in addition_conflicts.items():
+                        reason = "Unresolved conflicting additional-region proposals"
+                        addition_resolutions[region_id] = SpecialistAdditionResolution(
+                            region_id=region_id,
+                            outcome="needs_review",
+                            proposal_region_ids=list(
+                                dict.fromkeys(
+                                    opinion.addition.region_id for opinion in opinions
+                                )
+                            ),
+                            reasoning=reason,
+                        )
+                        inspection_warnings.append(reason)
+
+                specialist_audit.addition_resolutions = [
+                    addition_resolutions[region_id]
+                    for region_id in addition_cluster_order
+                    if region_id in addition_resolutions
+                ]
+
+                specialist_audit.resolutions = [
+                    resolutions[region_id]
+                    for region_id in risky_ids
+                    if region_id in resolutions
+                ]
+                ordering_values = {
+                    tuple(opinion.ordered_region_ids)
+                    for opinion in specialist_audit.ordering_opinions
+                }
+                if len(ordering_values) == 1:
+                    ordered_region_ids = list(next(iter(ordering_values)))
+                    specialist_audit.ordering_resolution = (
+                        SpecialistOrderingResolution(
+                            outcome=(
+                                "consensus"
+                                if len(specialist_audit.ordering_opinions) > 1
+                                else "single"
+                            ),
+                            ordered_region_ids=ordered_region_ids,
+                            reasoning="Specialists supplied the same complete order",
+                        )
+                    )
+                elif len(ordering_values) > 1:
+                    ordering_conflict = True
+                    warning = "ignored conflicting ordered_region_ids"
+                    inspection_warnings.append(warning)
+                    specialist_audit.ordering_resolution = (
+                        SpecialistOrderingResolution(
+                            outcome="needs_review",
+                            reasoning=warning,
+                        )
+                    )
                 inspection = PageInspection(
-                    decisions=list(merged_decisions.values()),
+                    decisions=list(decisions.values()),
                     additional_regions=additions,
                     ordered_region_ids=ordered_region_ids,
                     warnings=inspection_warnings,
                 )
-                decisions = merged_decisions
                 warnings.extend(
                     f"Page {page.number}: {item}" for item in inspection_warnings
                 )
@@ -552,7 +1085,9 @@ class DocumentParser:
             decision = decisions.get(block.id)
             if decision is None:
                 block.verification = VerificationState.NEEDS_REVIEW
-                block.verification_reason = block.verification_reason or "No verification decision"
+                block.verification_reason = block.verification_reason or resolution_failures.get(
+                    block.id, "No verification decision"
+                )
                 continue
             if decision.action is InspectionAction.REJECT:
                 _apply_decision(block, decision, page.number)
@@ -577,15 +1112,68 @@ class DocumentParser:
                         f"{addition.region_id} with invalid bounding box"
                     )
                     continue
-                if _is_duplicate_addition(addition.region, blocks):
+                matches = _matching_addition_blocks(addition.region, blocks)
+                active_matches = [
+                    block
+                    for block in matches
+                    if block.verification is not VerificationState.REJECTED
+                ]
+                if active_matches:
                     warnings.append(
                         f"Page {page.number}: skipped duplicate added region "
                         f"{addition.region_id}"
                     )
                     continue
+                rejected_matches = [
+                    block
+                    for block in matches
+                    if block.verification is VerificationState.REJECTED
+                ]
+                reason = addition.reason or "Added by page coverage inspection"
+                if len(rejected_matches) == 1:
+                    predecessor = rejected_matches[0]
+                    previous_state = predecessor.verification
+                    _apply_correction(predecessor, addition.region, page.number)
+                    predecessor.verification = VerificationState.VERIFIED
+                    predecessor.verification_reason = reason
+                    predecessor.correction_lineage.append(
+                        CorrectionLineage(
+                            original_id=predecessor.id,
+                            replacement_id=predecessor.id,
+                            provider_id=addition.region_id,
+                            reason=reason,
+                            previous_state=previous_state,
+                            final_state=predecessor.verification,
+                        )
+                    )
+                    addition_ids[addition.region_id] = predecessor.id
+                    continue
                 added = _block(addition.region, page.number, len(blocks))
-                added.verification = VerificationState.VERIFIED
-                added.verification_reason = addition.reason or "Added by page coverage inspection"
+                if rejected_matches:
+                    added.verification = VerificationState.NEEDS_REVIEW
+                    predecessor_ids = ", ".join(block.id for block in rejected_matches)
+                    added.verification_reason = (
+                        f"{reason}; ambiguous rejected predecessor matches: "
+                        f"{predecessor_ids}"
+                    )
+                    added.correction_lineage.extend(
+                        CorrectionLineage(
+                            original_id=predecessor.id,
+                            replacement_id=added.id,
+                            provider_id=addition.region_id,
+                            reason=reason,
+                            previous_state=predecessor.verification,
+                            final_state=added.verification,
+                        )
+                        for predecessor in rejected_matches
+                    )
+                    warnings.append(
+                        f"Page {page.number}: added region {addition.region_id} "
+                        f"matched multiple rejected predecessors: {predecessor_ids}"
+                    )
+                else:
+                    added.verification = VerificationState.VERIFIED
+                    added.verification_reason = reason
                 blocks.append(added)
                 addition_ids[addition.region_id] = added.id
 
@@ -600,11 +1188,27 @@ class DocumentParser:
                     warnings.append(
                         f"Page {page.number}: ignored invalid ordered_region_ids"
                     )
+                    if specialist_audit.ordering_resolution is not None:
+                        specialist_audit.ordering_resolution = (
+                            SpecialistOrderingResolution(
+                                outcome="needs_review",
+                                reasoning="ignored invalid ordered_region_ids",
+                            )
+                        )
                 elif _has_excessive_order_movement(supplied, all_region_ids):
                     warnings.append(
                         f"Page {page.number}: ignored ordered_region_ids "
                         "with excessive block movement"
                     )
+                    if specialist_audit.ordering_resolution is not None:
+                        specialist_audit.ordering_resolution = (
+                            SpecialistOrderingResolution(
+                                outcome="needs_review",
+                                reasoning=(
+                                    "ignored ordered_region_ids with excessive block movement"
+                                ),
+                            )
+                        )
                 else:
                     by_id = {block.id: block for block in blocks}
                     for order, provider_id in enumerate(supplied):
@@ -714,12 +1318,24 @@ class DocumentParser:
         quality_inspector = getattr(gateway, "inspect_quality_crops", None)
         if callable(quality_inspector):
             recovery_blocks: list[Block] = []
+            native_recovery_blocks: list[Block] = []
+            scan_probe_blocks: list[Block] = []
             for region in find_missing_source_regions(page, blocks):
                 recovered = _block(region, page.number, len(blocks))
                 recovered.verification = VerificationState.NEEDS_REVIEW
-                recovered.verification_reason = "Recovered from native text"
+                if page.scanned and not region.text:
+                    recovered.verification_reason = (
+                        "Scan omission probe awaiting high-resolution quality inspection"
+                    )
+                    scan_probe_blocks.append(recovered)
+                else:
+                    recovered.verification_reason = "Native source recovery awaiting quality inspection"
+                    native_recovery_blocks.append(recovered)
                 blocks.append(recovered)
                 recovery_blocks.append(recovered)
+
+            scan_probe_ids = {block.id for block in scan_probe_blocks}
+            grounded_corrections: list[Block] = []
 
             selected: list[Block] = []
             selected_ids: set[str] = set()
@@ -727,13 +1343,26 @@ class DocumentParser:
                 if block.id not in selected_ids:
                     selected.append(block)
                     selected_ids.add(block.id)
-                if len(selected) == MAX_REPAIR_BLOCKS:
-                    break
 
             quality_requests: list[CropInspectionRequest] = []
             quality_blocks: list[Block] = []
+            original_verification = {
+                block.id: block.verification for block in selected
+            }
+            original_reasons = {
+                block.id: block.verification_reason for block in selected
+            }
             for block in selected:
                 if block.bbox is None:
+                    if block.verification is not VerificationState.REJECTED:
+                        block.verification = VerificationState.NEEDS_REVIEW
+                        block.verification_reason = (
+                            block.verification_reason
+                            or "Quality repair requires valid geometry"
+                        )
+                    warnings.append(
+                        f"Page {page.number}: quality gate unresolved block {block.id}"
+                    )
                     continue
                 crop_path = workdir / f"{block.id}-quality-crop.png"
                 try:
@@ -746,10 +1375,14 @@ class DocumentParser:
                         padding=max(self.config.crop_padding, 0.1),
                     )
                 except Exception as exc:  # noqa: BLE001 - review failure is auditable
-                    block.verification = VerificationState.NEEDS_REVIEW
-                    block.verification_reason = (
-                        f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
-                    )
+                    if original_verification[block.id] is VerificationState.REJECTED:
+                        block.verification = VerificationState.REJECTED
+                        block.verification_reason = original_reasons[block.id]
+                    else:
+                        block.verification = VerificationState.NEEDS_REVIEW
+                        block.verification_reason = (
+                            f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
+                        )
                     warnings.append(
                         f"Page {page.number}: quality gate unresolved block {block.id}"
                     )
@@ -765,52 +1398,139 @@ class DocumentParser:
                 quality_blocks.append(block)
 
             if quality_requests:
-                try:
-                    quality_inspection = quality_inspector(
-                        quality_requests,
-                        page_number=page.number,
-                    )
-                except Exception as exc:  # noqa: BLE001 - review failure is auditable
-                    reason = f"Quality verification failed: {type(exc).__name__}: {exc}"
-                    quality_decisions = {}
-                else:
-                    reason = "No conclusive quality verification decision"
-                    quality_decisions = {
-                        item.region_id: item for item in quality_inspection.decisions
-                    }
-                for block in quality_blocks:
-                    decision = quality_decisions.get(block.id)
-                    if decision is not None and decision.action in {
-                        InspectionAction.ACCEPT,
-                        InspectionAction.CORRECT,
-                    }:
-                        _apply_decision(
-                            block,
-                            decision,
-                            page.number,
-                            preserve_layout=True,
-                        )
-                        continue
-                    block.verification = VerificationState.NEEDS_REVIEW
-                    block.verification_reason = (
-                        decision.reason if decision is not None and decision.reason else reason
-                    )
-                    warnings.append(
-                        f"Page {page.number}: quality gate unresolved block {block.id}"
-                    )
+                pending = list(zip(quality_requests, quality_blocks, strict=True))
+                rejection_counts: dict[str, int] = {}
+                geometry_rejection_counts: dict[str, int] = {}
+                for repair_round in range(1, 3):
+                    next_pending: list[tuple[CropInspectionRequest, Block]] = []
+                    for batch_start in range(0, len(pending), MAX_REPAIR_BLOCKS):
+                        batch = pending[batch_start : batch_start + MAX_REPAIR_BLOCKS]
+                        batch_requests = [request for request, _block_item in batch]
+                        try:
+                            quality_inspection = quality_inspector(
+                                batch_requests,
+                                page_number=page.number,
+                            )
+                        except Exception as exc:  # noqa: BLE001 - review failure is auditable
+                            fallback_reason = (
+                                f"Quality verification failed: {type(exc).__name__}: {exc}"
+                            )
+                            quality_decisions = {}
+                        else:
+                            fallback_reason = "No conclusive quality verification decision"
+                            quality_decisions = {
+                                item.region_id: item
+                                for item in quality_inspection.decisions
+                            }
+                        for request, block in batch:
+                            decision = quality_decisions.get(block.id)
+                            if decision is not None and decision.action in {
+                                InspectionAction.ACCEPT,
+                                InspectionAction.CORRECT,
+                            }:
+                                _apply_decision(
+                                    block,
+                                    decision,
+                                    page.number,
+                                    preserve_layout=True,
+                                )
+                                if (
+                                    decision.action is InspectionAction.CORRECT
+                                    and block.verification is VerificationState.VERIFIED
+                                    and semantic_text(block).strip()
+                                ):
+                                    grounded_corrections.append(block)
+                                if block.verification is VerificationState.VERIFIED:
+                                    continue
 
-            uninspected_recovery = [
-                block for block in recovery_blocks if block.id not in selected_ids
-            ]
-            for block in uninspected_recovery:
+                            if (
+                                decision is not None
+                                and decision.action is InspectionAction.CORRECT
+                                and block.verification_reason
+                            ):
+                                reason = block.verification_reason
+                            elif decision is not None and decision.reason:
+                                reason = decision.reason
+                            else:
+                                reason = fallback_reason
+                            if decision is not None and decision.action is InspectionAction.REJECT:
+                                rejection_counts[block.id] = (
+                                    rejection_counts.get(block.id, 0) + 1
+                                )
+                                if decision.geometry_only:
+                                    geometry_rejection_counts[block.id] = (
+                                        geometry_rejection_counts.get(block.id, 0) + 1
+                                    )
+                            if repair_round == 1:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = reason
+                                next_pending.append((request, block))
+                                continue
+
+                            if rejection_counts.get(block.id, 0) == 2:
+                                if geometry_rejection_counts.get(block.id, 0) == 2:
+                                    block.verification = VerificationState.NEEDS_REVIEW
+                                    block.verification_reason = (
+                                        "Geometry remained unresolved after two quality "
+                                        f"repair rounds: {reason}"
+                                    )
+                                else:
+                                    _apply_decision(
+                                        block,
+                                        decision,
+                                        page.number,
+                                        preserve_layout=True,
+                                    )
+                            elif original_verification[block.id] is VerificationState.REJECTED:
+                                block.verification = VerificationState.REJECTED
+                                block.verification_reason = original_reasons[block.id]
+                            else:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = (
+                                    f"Scan omission probe unresolved: {reason}"
+                                    if block.id in scan_probe_ids
+                                    else reason
+                                )
+                            warnings.append(
+                                f"Page {page.number}: quality gate unresolved block {block.id}"
+                            )
+                    pending = next_pending
+                    if not pending:
+                        break
+
+            if native_recovery_blocks:
                 warnings.append(
-                    f"Page {page.number}: quality gate unresolved block {block.id}; "
-                    "repair limit exceeded"
+                    f"Page {page.number}: queued {len(native_recovery_blocks)} native "
+                    "source recovery regions for high-resolution quality review"
                 )
-            if recovery_blocks:
+            if scan_probe_blocks:
                 warnings.append(
-                    f"Page {page.number}: recovered {len(recovery_blocks)} native text regions"
+                    f"Page {page.number}: created {len(scan_probe_blocks)} scan omission probes"
                 )
+            if grounded_corrections:
+                warnings.append(
+                    f"Page {page.number}: recovered {len(grounded_corrections)} "
+                    "grounded quality corrections"
+                )
+        elif page.scanned:
+            for region in find_missing_source_regions(page, blocks):
+                if region.text:
+                    continue
+                probe = _block(region, page.number, len(blocks))
+                probe.verification = VerificationState.NEEDS_REVIEW
+                probe.verification_reason = "Scan omission probe was not inspected"
+                blocks.append(probe)
+                warnings.append(
+                    f"Page {page.number}: quality gate unresolved block {probe.id}; "
+                    "high-resolution inspection unavailable"
+                )
+
+        if ordering_conflict:
+            for block in blocks:
+                if block.verification is VerificationState.REJECTED:
+                    continue
+                block.verification = VerificationState.NEEDS_REVIEW
+                block.verification_reason = "Conflicting specialist reading-order opinions"
 
         blocks, normalization_warnings = normalize_page_blocks(blocks)
         warnings.extend(
@@ -836,6 +1556,8 @@ class DocumentParser:
                 width=page.width,
                 height=page.height,
                 blocks=blocks,
+                specialist_audit=specialist_audit,
+                warnings=warnings,
             ),
             warnings=warnings,
             usage=usage,
@@ -933,6 +1655,9 @@ class DocumentParser:
                                 width=result.page.width,
                                 height=result.page.height,
                                 blocks=roots,
+                                specialist_audit=result.page.specialist_audit,
+                                warnings=result.page.warnings,
+                                quality=result.page.quality,
                             )
                         )
                         warnings.extend(result.warnings)
@@ -945,6 +1670,7 @@ class DocumentParser:
                 pages=pages,
                 warnings=warnings,
             )
+            materialize_document_quality(document)
             input_tokens = usage.input_tokens
             output_tokens = usage.output_tokens
             rendered = render_agentic_document(

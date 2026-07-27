@@ -196,6 +196,7 @@ class OpenAIDocumentGateway:
         target_region_ids: list[str] | None = None,
         agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
         use_terra: bool = False,
+        addition_conflicts: list[dict[str, Any]] | None = None,
     ) -> PageInspection:
         if len(region_ids) != len(draft.regions):
             raise ValueError("region IDs must match the complete page manifest")
@@ -204,6 +205,21 @@ class OpenAIDocumentGateway:
             {"region_id": region_ids[index], **region.model_dump(mode="json")}
             for index, region in enumerate(draft.regions)
         ]
+        request_payload: dict[str, Any] = {
+            "regions": regions,
+            "target_region_ids": targets,
+        }
+        if addition_conflicts is not None:
+            request_payload["competing_additional_regions"] = addition_conflicts
+        addition_arbitration_instruction = (
+            " Competing additional-region proposals are supplied by cluster. For each "
+            "cluster_id, choose exactly one supplied proposal that is literally supported "
+            "by the source, return it in additional_regions using cluster_id as region_id, "
+            "and preserve its complete region payload. Do not invent, merge, or correct a "
+            "proposal."
+            if addition_conflicts
+            else ""
+        )
         return self._request(
             PageInspection,
             agent=agent_role.value,
@@ -233,6 +249,9 @@ class OpenAIDocumentGateway:
                         "of all supplied and added region IDs in semantic reading order; place each visual beside "
                         "its related instruction rather than at the page end. Return decisions only for the "
                         "target_region_ids. Preserve every supplied region ID."
+                        " Include a calibrated confidence from 0 to 1 and concise reason for every "
+                        "decision."
+                        + addition_arbitration_instruction
                     ),
                 },
                 {
@@ -240,13 +259,7 @@ class OpenAIDocumentGateway:
                     "content": [
                         {
                             "type": "input_text",
-                            "text": json.dumps(
-                                {
-                                    "regions": regions,
-                                    "target_region_ids": targets,
-                                },
-                                ensure_ascii=False,
-                            ),
+                            "text": json.dumps(request_payload, ensure_ascii=False),
                         },
                         {"type": "input_image", "image_url": self._image(page.image_path), "detail": "original"},
                     ],
@@ -298,6 +311,10 @@ class OpenAIDocumentGateway:
                         "Verify each candidate against its corresponding source crop. Accept, "
                         "visibly correct by returning a complete corrected region, or reject each one. "
                         "Read ambiguous glyphs in emails, URLs, identifiers, and placeholders exactly. "
+                        "For critical literals—phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, "
+                        "policy numbers, and account numbers—preserve exact glyphs, punctuation, "
+                        "separators, and leading zeros. Do not infer unclear digits; return illegible "
+                        "or inconclusive when exact reading is impossible. "
                         "For every visual, return a complete figure_description covering visible objects, "
                         "actions, spatial relationships, arrows, labels, callouts, numbered markers, "
                         "prohibition marks, and functional features. Correct an incomplete visual description "
@@ -308,6 +325,9 @@ class OpenAIDocumentGateway:
                         "Keep non-instructional visual descriptions under 25 words and instructional "
                         "figures under 75 words. "
                         "A crop correction must not change the candidate bounding box or reading order. "
+                        "For rejections, set geometry_only=true only when rejection is exclusively caused "
+                        "by invalid, missing, or clipped bounding-box geometry; set it false for semantic, "
+                        "unsupported, ambiguous, or mixed failures. "
                         "Return one decision per crop and "
                         "preserve every supplied region ID and evidence reference."
                     ),
@@ -363,7 +383,14 @@ class OpenAIDocumentGateway:
                         "Return exactly one accept, complete literal correction, or rejection per crop. "
                         "Never invent obscured or unsupported content. Preserve exact visible identifiers, "
                         "dates, measurements, phone numbers, emails, URLs, list markers, table cells, and "
-                        "checkbox states. Preserve every supplied region ID, evidence reference, bounding "
+                        "checkbox states. For critical literals—phone numbers, NPIs, MRNs, dates, IDs, "
+                        "DOBs, tax IDs, policy numbers, and account numbers—preserve exact glyphs, "
+                        "punctuation, separators, and leading zeros. Do not infer unclear digits; return "
+                        "illegible or inconclusive when exact reading is impossible. For rejections, set "
+                        "geometry_only=true only when rejection is "
+                        "exclusively caused by invalid, missing, or clipped bounding-box geometry; set it "
+                        "false for semantic, unsupported, ambiguous, or mixed failures. Preserve every "
+                        "supplied region ID, evidence reference, bounding "
                         "box, and reading order."
                     ),
                 },
