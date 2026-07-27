@@ -7,6 +7,7 @@
 - Removed SQLite, local artifact/cache code, the custom Streamlit component, and their dependencies.
 - Enforced fail-closed visual grounding for invalid or missing bounding boxes.
 - Left legacy `.docparse/` data untouched and ignored.
+- Raised default page batch size and page concurrency from 20/10 to 100/50.
 
 All notable changes to this project are documented in this file.
 
