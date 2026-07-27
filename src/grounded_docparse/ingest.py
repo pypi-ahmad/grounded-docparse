@@ -5,8 +5,6 @@ import io
 from dataclasses import dataclass, field
 from pathlib import Path
 
-import cv2
-import numpy as np
 import pymupdf
 from PIL import Image, ImageOps, ImageSequence
 
@@ -19,7 +17,6 @@ SUPPORTED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}
 class TextBlock:
     text: str
     bbox: BoundingBox
-    source_bbox: BoundingBox
     font_size: float
     font: str
 
@@ -31,10 +28,8 @@ class PageEvidence:
     height: float
     dpi: int
     image_path: Path
-    ocr_image_path: Path
     scanned: bool
     text_blocks: list[TextBlock] = field(default_factory=list)
-    links: list[dict[str, object]] = field(default_factory=list)
 
     @property
     def digital_text(self) -> str:
@@ -124,37 +119,6 @@ def _normalized_bbox(
     )
 
 
-def _deskew_and_enhance(source: Path, destination: Path) -> None:
-    image = cv2.imread(str(source), cv2.IMREAD_GRAYSCALE)
-    if image is None:
-        raise ValueError(f"Cannot read rendered page: {source.name}")
-
-    inverted = cv2.bitwise_not(image)
-    points = np.column_stack(np.where(inverted > 32))
-    angle = 0.0
-    if len(points) > 100:
-        raw_angle = cv2.minAreaRect(points)[-1]
-        angle = -(90 + raw_angle) if raw_angle < -45 else -raw_angle
-        if abs(angle) > 7:
-            angle = 0.0
-
-    if abs(angle) >= 0.15:
-        height, width = image.shape
-        matrix = cv2.getRotationMatrix2D((width / 2, height / 2), angle, 1.0)
-        image = cv2.warpAffine(
-            image,
-            matrix,
-            (width, height),
-            flags=cv2.INTER_CUBIC,
-            borderMode=cv2.BORDER_REPLICATE,
-        )
-
-    denoised = cv2.fastNlMeansDenoising(image, None, 8, 7, 21)
-    enhanced = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8)).apply(denoised)
-    if not cv2.imwrite(str(destination), enhanced):
-        raise OSError(f"Cannot write enhanced page: {destination.name}")
-
-
 def _validate_input(data: bytes, filename: str, max_bytes: int) -> str:
     if not data:
         raise ValueError("Uploaded document is empty")
@@ -237,31 +201,19 @@ def _ingest_pdf(
                 text = " ".join(str(span["text"]).strip() for span in spans)
                 raw_bbox = tuple(float(value) for value in block["bbox"])
                 blocks.append(
-                    TextBlock(
-                        text=text,
-                        bbox=_normalized_bbox(raw_bbox, width, height),
-                        source_bbox=BoundingBox(
-                            x0=raw_bbox[0],
-                            y0=raw_bbox[1],
-                            x1=raw_bbox[2],
-                            y1=raw_bbox[3],
-                            unit="pdf_points",
-                        ),
-                        font_size=max(float(span.get("size", 0)) for span in spans),
+                        TextBlock(
+                            text=text,
+                            bbox=_normalized_bbox(raw_bbox, width, height),
+                            font_size=max(float(span.get("size", 0)) for span in spans),
                         font=str(spans[0].get("font", "")),
                     )
                 )
 
             char_count = sum(len(block.text.strip()) for block in blocks)
             # A short title page can still contain a valid native text layer.
-            # Treat only effectively empty layers as scans; Paddle still analyzes
+            # Treat only effectively empty text layers as scans; vision still analyzes
             # every page, so this flag only controls OCR preprocessing/verification.
             scanned = char_count < 20
-            ocr_path = pages_dir / f"page-{page_number:04d}-enhanced.png"
-            if scanned:
-                _deskew_and_enhance(image_path, ocr_path)
-            else:
-                ocr_path = image_path
             pages.append(
                 PageEvidence(
                     number=page_number,
@@ -269,10 +221,8 @@ def _ingest_pdf(
                     height=height,
                     dpi=dpi,
                     image_path=image_path,
-                    ocr_image_path=ocr_path,
                     scanned=scanned,
                     text_blocks=blocks,
-                    links=page.get_links(),
                 )
             )
     return pages
@@ -292,8 +242,6 @@ def _ingest_image(
             rgb = ImageOps.exif_transpose(frame).convert("RGB")
             image_path = pages_dir / f"page-{page_number:04d}.png"
             rgb.save(image_path, "PNG")
-            ocr_path = pages_dir / f"page-{page_number:04d}-enhanced.png"
-            _deskew_and_enhance(image_path, ocr_path)
             pages.append(
                 PageEvidence(
                     number=page_number,
@@ -301,7 +249,6 @@ def _ingest_image(
                     height=float(rgb.height),
                     dpi=dpi,
                     image_path=image_path,
-                    ocr_image_path=ocr_path,
                     scanned=True,
                 )
             )

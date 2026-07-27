@@ -28,19 +28,18 @@ Avoid unrelated refactors, generated artifacts, real documents, and live-provide
 ```powershell
 uv run python -m pytest -q
 uv run python -m compileall -q src streamlit_app.py tests
-docker compose --env-file .env.example config --quiet
 uv run grounded-docparse --help
 git diff --check
 ```
 
-Automated tests use synthetic documents and fake providers. Keep live OpenAI, Docker image build, GPU, Paddle, Ollama, load, and accuracy checks opt-in and document their exact environment.
+Automated tests use synthetic documents and fake OpenAI gateways. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment.
 
 ## Documentation changes
 
 - Treat code and tests as the source of truth for implemented behavior.
 - Verify version-sensitive external claims against official documentation.
 - Keep README quick-start material concise; place operational depth in `docs/run.md`.
-- Distinguish measured evaluation results from confidence, quality proxies, or architectural goals.
+- Distinguish measured results from confidence, quality proxies, or architectural goals.
 - Never claim that a provider cache duration, model capability, accuracy, or throughput is guaranteed without current evidence.
 - Validate internal links and remove stale command, profile, route, and environment-variable references.
 
@@ -54,14 +53,14 @@ A pull request must explain:
 - provider cost, retention, security, or compatibility consequences; and
 - residual risks or checks not run.
 
-Do not include API keys, bearer tokens, source documents, crops, model caches, database files, object-store data, or raw provider responses.
+Do not include API keys, bearer tokens, source documents, crops, local data, or raw provider responses.
 
 ## Architecture constraints
 
 - Models may propose typed evidence; deterministic code owns IDs, validation, hierarchy, and export policy.
 - Unsupported text must remain unresolved or rejected in strict outputs.
 - Every extracted leaf requires existing source-node citations.
-- New output-affecting configuration must be added to processing-cache invalidation.
+- New output-affecting configuration must be covered by public-contract tests.
 - New persistence requires an explicit retention and deletion design.
 - Public schema changes require versioning, migrations where applicable, renderer updates, and compatibility tests.
 

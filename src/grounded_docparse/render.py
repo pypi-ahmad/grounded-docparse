@@ -1,409 +1,347 @@
 from __future__ import annotations
 
-import html
 import io
 import json
-import zipfile
+from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-from urllib.parse import urlparse
+
+import pymupdf
+from PIL import Image, ImageOps, ImageSequence
 
 from .models import (
-    DocumentNode,
-    DocumentTree,
+    AgentTraceEvent,
+    Block,
+    Document,
     NodeType,
-    ProcessingProfile,
+    RunUsage,
     VerificationState,
 )
 
-
-def _bounded_int(value: Any, default: int, minimum: int, maximum: int) -> int:
-    try:
-        number = int(value)
-    except (TypeError, ValueError):
-        return default
-    return max(minimum, min(maximum, number))
-
-
-def _meta(node: DocumentNode) -> str:
-    values = [f'data-node-id="{html.escape(node.id)}"']
-    if node.confidence:
-        values.append(f'data-confidence="{node.confidence.score:.3f}"')
-    if node.bbox:
-        bbox = ",".join(
-            f"{value:.4f}"
-            for value in (node.bbox.x0, node.bbox.y0, node.bbox.x1, node.bbox.y1)
-        )
-        values.append(f'data-bbox="{bbox}"')
-    return " ".join(values)
+ANNOTATION_COLORS = {
+    VerificationState.VERIFIED: (0.0, 0.55, 0.2),
+    VerificationState.NEEDS_REVIEW: (1.0, 0.55, 0.0),
+    VerificationState.REJECTED: (0.85, 0.1, 0.1),
+    VerificationState.NOT_CHECKED: (0.1, 0.35, 0.85),
+}
 
 
-def _table_html(node: DocumentNode) -> str:
-    rows = node.attributes.get("table_rows")
-    if not isinstance(rows, list):
-        return f'<pre {_meta(node)}>{html.escape(node.text or "[UNREADABLE]")}</pre>'
-    output = [f'<table {_meta(node)}>']
-    for row in rows:
-        if not isinstance(row, list):
+def _checkbox_marker(block: Block) -> str:
+    return {"checked": "[x]", "unchecked": "[ ]"}.get(
+        str(block.checkbox_state), "[?]"
+    )
+
+
+def _table(block: Block) -> str:
+    if block.table is None or not block.table.cells:
+        return block.text
+    rows: dict[int, list] = {}
+    for cell in block.table.cells:
+        rows.setdefault(cell.row, []).append(cell)
+    lines: list[str] = []
+    for row_index in sorted(rows):
+        cells = sorted(rows[row_index], key=lambda item: item.column)
+        values = [cell.text.replace("\r", " ").replace("\n", " ").replace("|", r"\|") for cell in cells]
+        lines.append("| " + " | ".join(values) + " |")
+        if row_index == min(rows):
+            lines.append("| " + " | ".join("---" for _ in cells) + " |")
+    return "\n".join(lines)
+
+
+def _body(block: Block) -> str:
+    if block.verification is VerificationState.REJECTED:
+        return ""
+    text = block.text
+    if block.type is NodeType.HEADING:
+        return f"{'#' * (block.heading_level or 1)} {text}"
+    if block.type is NodeType.TABLE:
+        return _table(block)
+    if block.type is NodeType.CHECKBOX:
+        return f"{_checkbox_marker(block)} {text}"
+    if block.type is NodeType.LIST_ITEM:
+        return f"{block.list_marker or '-'} {text}"
+    if block.type is NodeType.FORM_FIELD and block.form is not None:
+        label = block.form.label.rstrip().removesuffix(":")
+        value = block.form.value
+        hint = block.form.hint
+        if value is not None and hint is not None:
+            return f"**{label}:** {value} ({hint})"
+        if value is not None:
+            return f"**{label}:** {value}"
+        if hint is not None:
+            return f"**{label}:** {hint}"
+        return f"**{label}:**"
+    if block.type in {NodeType.HEADER, NodeType.FOOTER}:
+        return text
+    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        description = block.figure_description or block.caption or text
+        return f"<figure>{description}</figure>" if description else ""
+    return text
+
+
+def _render_block(block: Block, lines: list[str]) -> None:
+    body = _body(block)
+    if body:
+        lines.extend([body, ""])
+    for child in sorted(block.children, key=lambda item: item.reading_order):
+        _render_block(child, lines)
+
+
+def _render_blocks(blocks: list[Block], lines: list[str]) -> None:
+    ordered = sorted(blocks, key=lambda item: item.reading_order)
+    index = 0
+    while index < len(ordered):
+        block = ordered[index]
+        if block.type is NodeType.CHECKBOX and block.checkbox_group:
+            group = block.checkbox_group
+            members: list[Block] = []
+            while (
+                index < len(ordered)
+                and ordered[index].type is NodeType.CHECKBOX
+                and ordered[index].checkbox_group == group
+            ):
+                if ordered[index].verification is not VerificationState.REJECTED:
+                    members.append(ordered[index])
+                index += 1
+            if members:
+                options = " ".join(
+                    f"{_checkbox_marker(item)} {item.checkbox_option or item.text}"
+                    for item in members
+                )
+                lines.extend([f"**{group}:** {options}", ""])
+            for member in members:
+                _render_blocks(member.children, lines)
             continue
-        output.append("  <tr>")
-        for cell in row:
-            if not isinstance(cell, dict):
-                continue
-            tag = "th" if cell.get("header") else "td"
-            attributes: list[str] = []
-            for name in ("rowspan", "colspan"):
-                try:
-                    value = max(1, min(1000, int(cell.get(name, 1))))
-                except (TypeError, ValueError):
-                    value = 1
-                if value > 1:
-                    attributes.append(f'{name}="{value}"')
-            if cell.get("citation_id"):
-                attributes.append(
-                    f'data-citation="{html.escape(str(cell["citation_id"]), quote=True)}"'
-                )
-            if cell.get("grounding_scope"):
-                attributes.append(
-                    f'data-grounding-scope="{html.escape(str(cell["grounding_scope"]), quote=True)}"'
-                )
-            if cell.get("page_number") is not None:
-                attributes.append(f'data-page="{int(cell["page_number"])}"')
-            if cell.get("confidence") is not None:
-                attributes.append(f'data-confidence="{float(cell["confidence"]):.3f}"')
-            bbox_value = cell.get("bbox")
-            if isinstance(bbox_value, dict):
-                try:
-                    bbox = ",".join(
-                        f"{float(bbox_value[key]):.4f}"
-                        for key in ("x0", "y0", "x1", "y1")
-                    )
-                    attributes.append(f'data-bbox="{bbox}"')
-                except (KeyError, TypeError, ValueError):
-                    pass
-            suffix = f" {' '.join(attributes)}" if attributes else ""
-            output.append(
-                f"    <{tag}{suffix}>{html.escape(str(cell.get('text', '')))}</{tag}>"
-            )
-        output.append("  </tr>")
-    output.append("</table>")
-    return "\n".join(output)
+        _render_block(block, lines)
+        index += 1
 
 
-def _render_node_body(node: DocumentNode) -> str:
-    text = node.text or ""
-    node_type = NodeType(node.type)
-    if node_type in {NodeType.SECTION, NodeType.HEADING}:
-        level = _bounded_int(node.attributes.get("heading_level"), 2, 1, 6)
-        return f"{'#' * level} {html.escape(text or '[UNREADABLE]')}"
-    if node_type == NodeType.TABLE:
-        return _table_html(node)
-    if node_type in {
-        NodeType.FIGURE,
-        NodeType.IMAGE,
-        NodeType.CHART,
-        NodeType.SIGNATURE,
-        NodeType.SEAL,
-    }:
-        source = html.escape(str(node.attributes.get("asset_path", "")))
-        caption = html.escape(str(node.attributes.get("caption", text)))
-        derived = ' data-derived="true"' if node.attributes.get("derived_caption") else ""
-        return (
-            f'<figure {_meta(node)}>\n'
-            f'  <img src="{source}" alt="{caption}">\n'
-            f'  <figcaption{derived}>{caption}</figcaption>\n'
-            "</figure>"
-        )
-    if node_type == NodeType.FORMULA:
-        formula = text.strip() or "\\text{[UNREADABLE]}"
-        return f'<pre data-role="formula" {_meta(node)}>{html.escape(formula)}</pre>'
-    if node_type == NodeType.LIST_ITEM:
-        depth = _bounded_int(node.attributes.get("depth"), 0, 0, 8)
-        return f"{'  ' * depth}- {html.escape(text or '[UNREADABLE]')}"
-    if node_type == NodeType.FORM_FIELD and node.form_field:
-        return (
-            f'<dl data-role="form-field" {_meta(node)}>'
-            f"<dt>{html.escape(node.form_field.label)}</dt>"
-            f"<dd>{html.escape(node.form_field.value or '[UNREADABLE]')}</dd></dl>"
-        )
-    if node_type == NodeType.CHECKBOX and node.form_field:
-        marker = {"checked": "[x]", "unchecked": "[ ]"}.get(
-            node.form_field.state or "unknown", "[?]"
-        )
-        return f"{marker} {html.escape(node.form_field.label)}"
-    if node_type == NodeType.FOOTNOTE:
-        return f"[^{node.id}]: {html.escape(text or '[UNREADABLE]')}"
-    if node_type == NodeType.HEADER:
-        return f'<header {_meta(node)}>{html.escape(text)}</header>'
-    if node_type == NodeType.FOOTER:
-        return f'<footer {_meta(node)}>{html.escape(text)}</footer>'
-    if node_type in {NodeType.SIDEBAR, NodeType.REFERENCE}:
-        return f'<aside {_meta(node)}>{html.escape(text)}</aside>'
-    if node_type in {NodeType.PARAGRAPH, NodeType.OCR_BLOCK, NodeType.CAPTION}:
-        return f'<p {_meta(node)}>{html.escape(text or "[UNREADABLE]")}</p>'
-    return html.escape(text)
-
-
-def render_node(node: DocumentNode) -> str:
-    body = _render_node_body(node)
-    if node.visual_analysis:
-        visual = node.visual_analysis
-        details: list[str] = []
-        if visual.chart_type:
-            details.append(f"Chart type: {html.escape(visual.chart_type)}")
-        if visual.axes:
-            details.append(f"Axes: {html.escape('; '.join(visual.axes))}")
-        if visual.legends:
-            details.append(f"Legends: {html.escape('; '.join(visual.legends))}")
-        if visual.data_points:
-            rows = ["<table data-role=\"chart-data\"><tr><th>Series</th><th>Label</th><th>Value</th></tr>"]
-            rows.extend(
-                "<tr>"
-                f"<td>{html.escape(point.series or '')}</td>"
-                f"<td>{html.escape(point.label or '')}</td>"
-                f"<td>{html.escape(point.value)}</td>"
-                "</tr>"
-                for point in visual.data_points
-            )
-            rows.append("</table>")
-            details.append("\n".join(rows))
-        if visual.derived_summary:
-            details.append(
-                '<p data-derived="true" data-literal="false">'
-                f"{html.escape(visual.derived_summary)}</p>"
-            )
-        if details:
-            body = f"{body}\n" + "\n".join(details)
-    links = [
-        link
-        for link in node.links
-        if urlparse(link.uri).scheme.lower() in {"http", "https", "mailto"}
-    ]
-    if not links:
-        return body
-    suffix = " ".join(
-        f'<a href="{html.escape(link.uri, quote=True)}">source link</a>'
-        for link in links
-    )
-    return f"{body}\n{suffix}" if body else suffix
-
-
-def render_markdown(tree: DocumentTree) -> str:
-    lines = [
-        "---",
-        f"schema_version: {tree.schema_version}",
-        f"document_id: {tree.document_id}",
-        f"source: {json.dumps(tree.source_name, ensure_ascii=False)}",
-        f"pages: {len(tree.pages)}",
-        "---",
-        "",
-    ]
-    for page in tree.pages:
-        lines.extend([f"<!-- page: {page.number}; node: {page.id} -->", ""])
-        nodes = [tree.nodes[node_id] for node_id in page.content_node_ids]
-        nodes.sort(key=lambda node: node.reading_order if node.reading_order is not None else 10**9)
-        for node in nodes:
-            if (
-                node.parent_id
-                and tree.nodes[node.parent_id].type
-                in {NodeType.FIGURE.value, NodeType.IMAGE.value}
-                and node.type == NodeType.CAPTION.value
-            ):
-                continue
-            rendered = render_node(node).strip()
-            if rendered:
-                lines.extend([rendered, ""])
-    if tree.warnings:
-        warnings = "\n".join(html.escape(item) for item in tree.warnings)
-        lines.extend([f'<pre data-role="parser-warnings">{warnings}</pre>', ""])
+def render_markdown(document: Document) -> str:
+    lines: list[str] = []
+    for page_index, page in enumerate(document.pages):
+        if page_index:
+            lines.extend(["<!-- PAGE BREAK -->", ""])
+        _render_blocks(page.blocks, lines)
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _box_reference(box: Any) -> str:
-    coordinates = ",".join(
-        f"{value:.4f}" for value in (box.x0, box.y0, box.x1, box.y1)
-    )
-    return f"{box.unit}:{coordinates}"
+def render_json(document: Document) -> str:
+    return document.model_dump_json(indent=2)
 
 
-def _source_comment(tree: DocumentTree, node: DocumentNode) -> str:
-    ancestors: list[str] = []
-    parent_id = node.parent_id
-    semantic_containers = {
-        NodeType.SECTION.value,
-        NodeType.LIST.value,
-        NodeType.FIGURE.value,
-        NodeType.CHART.value,
-        NodeType.TABLE.value,
+@dataclass(frozen=True, slots=True)
+class RenderedAgenticDocument:
+    markdown: str
+    json: str
+
+
+def render_agentic_document(
+    document: Document,
+    *,
+    usage: RunUsage | None = None,
+    trace: list[AgentTraceEvent] | None = None,
+    duration_ms: int = 0,
+) -> RenderedAgenticDocument:
+    """Render canonical Markdown together with its grounded v2 envelope."""
+
+    markdown = render_markdown(document)
+    cursor = 0
+    pages: list[dict] = []
+    for page in document.pages:
+        page_nodes: list[dict] = []
+        page_start: int | None = None
+        page_end: int | None = None
+        for block in _walk_blocks(page.blocks):
+            if block.verification is VerificationState.REJECTED:
+                continue
+            body = _body(block)
+            if not body:
+                continue
+            start = markdown.find(body, cursor)
+            if start < 0:
+                start = markdown.find(body)
+            if start < 0:
+                continue
+            end = start + len(body)
+            cursor = end
+            page_start = start if page_start is None else min(page_start, start)
+            page_end = end if page_end is None else max(page_end, end)
+            atoms = _agentic_atoms(block, body, markdown, start, end, page.number)
+            page_nodes.append(
+                {
+                    "id": block.id,
+                    "type": block.type.value,
+                    "status": block.verification.value,
+                    "reading_order": block.reading_order,
+                    "confidence": block.confidence,
+                    "text": block.text,
+                    "source": _source(page.number, start, end, block.bbox),
+                    "atoms": atoms,
+                    "semantic": _semantic_payload(block),
+                    "children": [child.id for child in block.children],
+                }
+            )
+        pages.append(
+            {
+                "id": f"page-{page.number}",
+                "number": page.number,
+                "status": "needs_review"
+                if any(node["status"] == VerificationState.NEEDS_REVIEW.value for node in page_nodes)
+                else "ok",
+                "width": page.width,
+                "height": page.height,
+                "source": _source(
+                    page.number,
+                    page_start or 0,
+                    page_end or (page_start or 0),
+                    None,
+                ),
+                "blocks": page_nodes,
+            }
+        )
+
+    run_usage = usage or RunUsage()
+    payload = {
+        "schema_version": "2.0.0",
+        "markdown": markdown,
+        "metadata": {
+            "source_name": document.source_name,
+            "source_sha256": document.source_sha256,
+            "page_count": len(document.pages),
+            "failed_pages": [],
+            "duration_ms": duration_ms,
+            "range_units": "unicode_codepoints",
+            "usage": run_usage.model_dump(mode="json"),
+            "trace": [event.model_dump(mode="json") for event in (trace or [])],
+            "warnings": document.warnings,
+        },
+        "document": {"id": "document", "pages": pages},
     }
-    while parent_id:
-        parent = tree.nodes[parent_id]
-        if parent.type in semantic_containers:
-            ancestors.append(parent.id)
-        parent_id = parent.parent_id
-    citation = node.citations[0] if node.citations else None
-    values = [f"citation={citation.id if citation else tree.document_id + ':' + node.id}", f"node={node.id}"]
-    page_number = citation.page_number if citation else node.page_number
-    bbox = citation.bbox if citation else node.bbox
-    source_bbox = citation.source_bbox if citation else node.source_bbox
-    confidence = citation.confidence if citation else (
-        node.confidence.score if node.confidence else None
+    return RenderedAgenticDocument(
+        markdown=markdown,
+        json=json.dumps(payload, ensure_ascii=False, indent=2),
     )
-    if page_number is not None:
-        values.append(f"page={page_number}")
-    if citation and citation.segment_page_number is not None:
-        values.append(f"segment_page={citation.segment_page_number}")
-    if bbox is not None:
-        values.append(f"bbox={_box_reference(bbox)}")
-    if source_bbox is not None:
-        values.append(f"source_bbox={_box_reference(source_bbox)}")
-    if confidence is not None:
-        values.append(f"confidence={confidence:.3f}")
-    if citation:
-        values.append(f"grounding_scope={citation.grounding_scope}")
-    values.append(f"verification={node.verification_state}")
-    if node.grounding:
-        values.append(f"crop={node.grounding.crop_ref}")
-        values.append(f"crop_sha256={node.grounding.crop_sha256}")
-    if ancestors:
-        values.append(f"section_path={'/'.join(reversed(ancestors))}")
-    repeat_pages = node.attributes.get("repeat_pages")
-    if isinstance(repeat_pages, list):
-        values.append(f"repeat_pages={','.join(str(item) for item in repeat_pages)}")
-    return f"<!-- source {'; '.join(values)} -->"
 
 
-def render_llm_markdown(tree: DocumentTree) -> str:
-    lines = [
-        "---",
-        "format: grounded-llm-markdown-v1",
-        f"schema_version: {tree.schema_version}",
-        f"document_id: {tree.document_id}",
-        f"source: {json.dumps(tree.source_name, ensure_ascii=False)}",
-        f"pages: {len(tree.pages)}",
-        f"processing_profile: {tree.processing_profile}",
-        "document_profile: "
-        + (
-            str(tree.document_classification.profile)
-            if tree.document_classification
-            else "unclassified"
-        ),
-        "---",
-        "",
-    ]
-    if tree.grounded_fields:
-        lines.extend(["## Grounded document fields", ""])
-        for field in tree.grounded_fields:
-            source_refs = "|".join(
-                f"{source.node_id}@p{source.page_number or 'unknown'}"
-                + (f"@{_box_reference(source.bbox)}" if source.bbox else "")
-                for source in field.sources
-            )
-            lines.extend(
-                [
-                    f"<!-- grounded-field path={field.path}; sources={source_refs}; confidence={field.confidence:.3f} -->",
-                    f"- **{html.escape(field.path)}:** {html.escape(field.normalized_value or field.raw_value)}",
-                ]
-            )
-        lines.append("")
-    form_nodes = [
-        node
-        for node in tree.nodes.values()
-        if node.type in {NodeType.FORM_FIELD.value, NodeType.CHECKBOX.value}
-        and node.form_field
-    ]
-    if form_nodes:
-        lines.extend(["## Grounded form fields", ""])
-        for node in sorted(
-            form_nodes,
-            key=lambda item: (
-                item.page_number or 0,
-                item.reading_order if item.reading_order is not None else 10**9,
-            ),
-        ):
-            lines.extend([_source_comment(tree, node), render_node(node), ""])
-    for page in tree.pages:
-        lines.extend([f"<!-- page: {page.number}; node: {page.id} -->", ""])
-        nodes = [tree.nodes[node_id] for node_id in page.content_node_ids]
-        nodes.sort(
-            key=lambda node: node.reading_order
-            if node.reading_order is not None
-            else 10**9
+def _source(page: int, start: int, end: int, bbox) -> dict:
+    return {
+        "page": page,
+        "span": {"start": start, "end": end},
+        "bbox": bbox.model_dump(mode="json") if bbox is not None else None,
+    }
+
+
+def _agentic_atoms(
+    block: Block, body: str, markdown: str, start: int, end: int, page_number: int
+) -> list[dict]:
+    if block.atoms:
+        values = [(atom.kind, atom.text, atom.bbox or block.bbox) for atom in block.atoms]
+    elif block.type is NodeType.TABLE and block.table is not None:
+        values = [("table_cell", cell.text, cell.bbox or block.bbox) for cell in block.table.cells]
+    elif block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        values = [("visual_region", body, block.bbox)]
+    else:
+        visible = block.text or body
+        values = [("line", line, block.bbox) for line in visible.splitlines() if line]
+
+    atoms: list[dict] = []
+    atom_cursor = start
+    for index, (kind, text, bbox) in enumerate(values, start=1):
+        atom_start = markdown.find(text, atom_cursor, end)
+        if atom_start < 0:
+            atom_start = start
+            atom_end = end
+        else:
+            atom_end = atom_start + len(text)
+            atom_cursor = atom_end
+        atoms.append(
+            {
+                "id": f"{block.id}-a{index}",
+                "kind": kind,
+                "text": markdown[atom_start:atom_end],
+                "origin": "generated_description"
+                if kind == "visual_region"
+                else "literal",
+                "source": _source(
+                    block.citation.page if block.citation is not None else page_number,
+                    atom_start,
+                    atom_end,
+                    bbox,
+                ),
+            }
         )
-        for node in nodes:
-            if node.attributes.get("repeated_decoration") and any(
-                relation.type == "repeats" for relation in node.relationships
-            ):
-                continue
-            if (
-                node.parent_id
-                and tree.nodes[node.parent_id].type
-                in {NodeType.FIGURE.value, NodeType.IMAGE.value, NodeType.CHART.value}
-                and node.type == NodeType.CAPTION.value
-            ):
-                continue
-            if tree.processing_profile in {
-                ProcessingProfile.FAST,
-                ProcessingProfile.BALANCED,
-                ProcessingProfile.MAXIMUM,
-            } and node.verification_state not in {
-                VerificationState.VERIFIED,
-                VerificationState.HUMAN_VERIFIED,
-            }:
-                lines.extend(
-                    [
-                        _source_comment(tree, node),
-                        (
-                            '<p data-verification-state="'
-                            f'{html.escape(str(node.verification_state))}">'
-                            f"[UNRESOLVED node={html.escape(node.id)}]</p>"
-                        ),
-                        "",
-                    ]
+    return atoms
+
+
+def _semantic_payload(block: Block) -> dict:
+    return {
+        "heading_level": block.heading_level,
+        "list_marker": block.list_marker,
+        "table": block.table.model_dump(mode="json") if block.table is not None else None,
+        "form": block.form.model_dump(mode="json") if block.form is not None else None,
+        "checkbox_state": block.checkbox_state.value if block.checkbox_state else None,
+        "checkbox_group": block.checkbox_group,
+        "checkbox_option": block.checkbox_option,
+        "caption": block.caption,
+        "figure_description": block.figure_description,
+        "chart_type": block.chart_type,
+        "chart_data": [point.model_dump(mode="json") for point in block.chart_data],
+    }
+
+
+def _as_pdf(data: bytes, filename: str) -> bytes:
+    if Path(filename).suffix.casefold() == ".pdf":
+        return data
+    with pymupdf.open() as output:
+        with Image.open(io.BytesIO(data)) as image:
+            for frame in ImageSequence.Iterator(image):
+                rgb = ImageOps.exif_transpose(frame).convert("RGB")
+                buffer = io.BytesIO()
+                rgb.save(buffer, "PNG")
+                page = output.new_page(width=rgb.width, height=rgb.height)
+                page.insert_image(page.rect, stream=buffer.getvalue())
+        return output.tobytes()
+
+
+def _walk_blocks(blocks: list[Block]) -> Iterator[Block]:
+    for block in blocks:
+        yield block
+        yield from _walk_blocks(block.children)
+
+
+def render_annotated_pdf(data: bytes, filename: str, document: Document) -> bytes:
+    source = _as_pdf(data, filename)
+    with pymupdf.open(stream=source, filetype="pdf") as output:
+        if output.page_count != len(document.pages):
+            raise ValueError("source and extracted document page counts do not match")
+        for index, page_record in enumerate(document.pages):
+            page = output[index]
+            for block in _walk_blocks(page_record.blocks):
+                if block.bbox is None:
+                    continue
+                rect = pymupdf.Rect(
+                    block.bbox.x0 * page.rect.width,
+                    block.bbox.y0 * page.rect.height,
+                    block.bbox.x1 * page.rect.width,
+                    block.bbox.y1 * page.rect.height,
                 )
-                continue
-            rendered = render_node(node).strip()
-            if rendered:
-                comments = [_source_comment(tree, node)]
-                if node.type in {
-                    NodeType.FIGURE.value,
-                    NodeType.IMAGE.value,
-                    NodeType.CHART.value,
-                }:
-                    comments.extend(
-                        _source_comment(tree, tree.nodes[child_id])
-                        for child_id in node.children_ids
-                        if tree.nodes[child_id].type == NodeType.CAPTION.value
-                    )
-                lines.extend([*comments, rendered, ""])
-    if tree.warnings:
-        warnings = "\n".join(html.escape(item) for item in tree.warnings)
-        lines.extend([f'<pre data-role="parser-warnings">{warnings}</pre>', ""])
-    return "\n".join(lines).rstrip() + "\n"
-
-
-def render_json(tree: DocumentTree) -> str:
-    return tree.model_dump_json(indent=2)
-
-
-def build_bundle(
-    source_name: str,
-    markdown: str,
-    llm_markdown: str,
-    audit_json: str,
-    json_text: str,
-    assets: dict[str, bytes],
-    extra_files: dict[str, bytes | str] | None = None,
-) -> bytes:
-    stem = Path(source_name).stem
-    buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr(f"{stem}.md", markdown)
-        archive.writestr(f"{stem}.llm.md", llm_markdown)
-        archive.writestr(f"{stem}.audit.json", audit_json)
-        archive.writestr(f"{stem}.json", json_text)
-        for path, content in sorted(assets.items()):
-            archive.writestr(path, content)
-        for path, content in sorted((extra_files or {}).items()):
-            archive.writestr(path, content)
-    return buffer.getvalue()
+                color = ANNOTATION_COLORS[block.verification]
+                page.draw_rect(rect, color=color, width=1, overlay=True)
+                label = (
+                    f"{block.id} {block.type.value} "
+                    f"{block.confidence:.0%} {block.verification.value}"
+                )[:80]
+                label_width = pymupdf.get_text_length(
+                    label, fontname="helv", fontsize=6
+                )
+                x = min(max(2.0, rect.x0), max(2.0, page.rect.width - label_width - 2))
+                y = rect.y0 - 2 if rect.y0 >= 9 else min(page.rect.height - 2, rect.y0 + 8)
+                page.insert_text(
+                    pymupdf.Point(x, y),
+                    label,
+                    fontname="helv",
+                    fontsize=6,
+                    color=color,
+                    overlay=True,
+                )
+        return output.tobytes(garbage=3, deflate=True)

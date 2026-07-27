@@ -1,205 +1,221 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
 
-import httpx
 import streamlit as st
 
-from grounded_docparse import DocumentParser
+from grounded_docparse import extraction, pipeline
 
 SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
-TERMINAL = {"completed", "needs_review", "failed", "cancelled"}
+RESULT_VERSION = "2.0.0"
 
 
-def _headers(token: str) -> dict[str, str]:
-    return {"Authorization": f"Bearer {token}"}
+def reset_document_state() -> None:
+    st.session_state.result = None
+    st.session_state.result_source_hash = None
+    st.session_state.schema_text = None
+    st.session_state.extraction_result = None
 
 
-def _request(method: str, url: str, token: str, **kwargs: object) -> httpx.Response:
-    response = httpx.request(method, url, headers=_headers(token), timeout=60, **kwargs)
-    response.raise_for_status()
-    return response
-
-
-def _show_source(data: bytes, filename: str) -> None:
-    if Path(filename).suffix.casefold() == ".pdf":
-        st.pdf(data, height=650, key="source-pdf-preview")
-    else:
-        st.image(data, caption=filename)
-
-
-st.set_page_config(page_title="Grounded document parser", layout="wide")
-st.session_state.setdefault("jobs", [])
-st.session_state.setdefault("local_results", [])
-st.title("Grounded document parser")
-st.caption("Visually grounded document extraction with auditable citations.")
-
-has_openai_environment = bool(
-    os.getenv("OPENAI_API_KEY") and os.getenv("OPENAI_BASE_URL")
+st.set_page_config(
+    page_title="Agentic document parser",
+    page_icon=":material/document_scanner:",
+    layout="wide",
 )
-with st.sidebar:
-    backend = st.segmented_control(
-        "Backend",
-        ["Local", "API"],
-        default="Local" if has_openai_environment else "API",
-    )
-    if backend == "API":
-        api_url = st.text_input(
-            "API URL", value=os.getenv("DOCPARSE_API_URL", "http://127.0.0.1:8000")
-        ).rstrip("/")
-        api_token = st.text_input(
-            "API token", value=os.getenv("DOCPARSE_API_TOKEN", ""), type="password"
-        )
-    else:
-        api_url = ""
-        api_token = ""
-        if has_openai_environment:
-            st.caption("Using OPENAI_BASE_URL and OPENAI_API_KEY from the environment.")
-        else:
-            st.error("Local mode requires OPENAI_BASE_URL and OPENAI_API_KEY.")
+if st.session_state.get("result_version") != RESULT_VERSION:
+    reset_document_state()
+st.session_state.result_version = RESULT_VERSION
 
-mode = st.segmented_control("Mode", ["Parse", "Evaluate"], default="Parse") or "Parse"
-first, second, third = st.columns(3)
-profile = first.selectbox("Processing profile", ["fast", "balanced", "maximum"], index=1)
-execution = second.selectbox(
-    "Execution", ["local"] if backend == "Local" else ["realtime", "batch"]
+st.title("Agentic document parser")
+st.caption(
+    "Parse a document with bounded specialist agents, then extract grounded structured data."
 )
-segmentation = third.selectbox("Segmentation", ["auto", "off"])
 
-with st.expander("Classification and extraction"):
-    taxonomy_text = st.text_area(
-        "Declared taxonomy (JSON, optional)",
-        placeholder='["invoice", "purchase_order", "contract"]',
-    )
-    schema_text = st.text_area(
-        "Extraction JSON Schema (optional)",
-        placeholder='{"type":"object","properties":{},"additionalProperties":false}',
-    )
+has_environment = bool(os.getenv("OPENAI_API_KEY"))
+if not has_environment:
+    st.error("OPENAI_API_KEY is required in the environment.")
 
-uploads = st.file_uploader(
-    "Documents", type=SUPPORTED_TYPES, accept_multiple_files=True, max_upload_size=250
+upload = st.file_uploader(
+    "Document",
+    type=SUPPORTED_TYPES,
+    accept_multiple_files=False,
+    max_upload_size=250,
 )
-if uploads:
-    selected = st.selectbox("Preview", uploads, format_func=lambda item: item.name)
-    with st.expander("Source preview"):
-        _show_source(selected.getvalue(), selected.name)
+source = upload.getvalue() if upload is not None else None
+source_hash = hashlib.sha256(source).hexdigest() if source is not None else None
 
-configuration_error = ""
-try:
-    taxonomy = json.loads(taxonomy_text) if taxonomy_text.strip() else None
-    schema = json.loads(schema_text) if schema_text.strip() else None
-except json.JSONDecodeError as exc:
-    configuration_error = f"Invalid JSON: {exc.msg}"
-    st.error(configuration_error)
-
-if st.button(
-    "Submit",
-    type="primary",
-    icon=":material/upload:",
-    disabled=(
-        not uploads
-        or bool(configuration_error)
-        or (backend == "API" and not api_token)
-        or (backend == "Local" and not has_openai_environment)
-    ),
+if (
+    st.session_state.get("result") is not None
+    and st.session_state.get("result_source_hash") != source_hash
 ):
-    for upload in uploads:
-        try:
-            if backend == "Local":
-                with st.spinner(f"Parsing {upload.name}"):
-                    result = DocumentParser().parse(
-                        upload.getvalue(),
-                        upload.name,
-                        profile=profile,
-                        segmentation=segmentation,
-                        taxonomy=taxonomy,
-                        extraction_schema=schema,
-                    )
-                st.session_state.local_results.append(
-                    {"name": upload.name, "bundle": result.bundle}
-                )
-            else:
-                response = _request(
-                    "POST",
-                    f"{api_url}/api/v1/jobs",
-                    api_token,
-                    data={
-                        "profile": profile,
-                        "execution": execution,
-                        "segmentation": segmentation,
-                        "taxonomy": json.dumps(taxonomy) if taxonomy is not None else "",
-                        "extraction_schema": json.dumps(schema) if schema is not None else "",
-                    },
-                    files={"file": (upload.name, upload.getvalue(), upload.type)},
-                )
-                job = response.json()
-                if not any(item["id"] == job["id"] for item in st.session_state.jobs):
-                    st.session_state.jobs.append(job)
-        except (httpx.HTTPError, RuntimeError, ValueError) as exc:
-            st.error(f"Could not submit {upload.name}: {exc}")
-    st.rerun()
+    reset_document_state()
 
-if backend == "Local" and st.session_state.local_results:
-    st.subheader("Local results")
-    for index, result in enumerate(st.session_state.local_results):
-        st.download_button(
-            f"Download {result['name']}",
-            result["bundle"],
-            file_name=f"{Path(result['name']).stem}.zip",
-            key=f"local-result-{index}",
+parse = st.button(
+    "Parse document",
+    type="primary",
+    icon=":material/document_scanner:",
+    disabled=source is None or not has_environment,
+)
+
+if parse and upload is not None and source is not None:
+    try:
+        with st.status("Parsing document", expanded=True) as status:
+
+            def show_progress(event) -> None:
+                status.write(event.message)
+
+            result = pipeline.DocumentParser().parse(
+                source,
+                upload.name,
+                progress_callback=show_progress,
+            )
+            status.update(label="Parsing complete", state="complete", expanded=False)
+        st.session_state.result = result
+        st.session_state.result_source_hash = source_hash
+        st.session_state.schema_text = None
+        st.session_state.extraction_result = None
+    except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
+        st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
+
+result = st.session_state.get("result")
+if result is not None and st.session_state.get("result_source_hash") == source_hash:
+    source_column, output_column = st.columns([1, 1], gap="large")
+    with source_column:
+        st.subheader("Source")
+        suffix = Path(upload.name).suffix.casefold() if upload is not None else ""
+        if suffix == ".pdf":
+            st.pdf(source, height=720, key="source-preview")
+        else:
+            st.image(source, caption=upload.name if upload is not None else None)
+
+    with output_column:
+        st.subheader("Output")
+        stem = Path(result.document.source_name).stem
+        with st.container(horizontal=True):
+            st.metric("Input tokens", f"{result.input_tokens:,}", border=True)
+            st.metric("Output tokens", f"{result.output_tokens:,}", border=True)
+
+        markdown_tab, agentic_tab, legacy_tab, annotated_tab, trace_tab, extract_tab = (
+            st.tabs(
+                [
+                    "Markdown",
+                    "Agentic JSON",
+                    "Legacy JSON",
+                    "Annotated PDF",
+                    "Agent trace",
+                    "Extract",
+                ]
+            )
         )
+        with markdown_tab:
+            st.download_button(
+                "Download Markdown",
+                result.markdown,
+                file_name=f"{stem}.md",
+                mime="text/markdown",
+                icon=":material/download:",
+                key="download-markdown",
+                on_click="ignore",
+            )
+            preview, raw = st.tabs(["Preview", "Raw"])
+            with preview:
+                st.markdown(result.markdown)
+            with raw:
+                st.code(result.markdown, language="markdown", wrap_lines=True, height=500)
 
+        with agentic_tab:
+            st.download_button(
+                "Download agentic JSON",
+                result.json,
+                file_name=f"{stem}.agentic.json",
+                mime="application/json",
+                icon=":material/download:",
+                key="download-agentic-json",
+                on_click="ignore",
+            )
+            preview, raw = st.tabs(["Preview", "Raw"])
+            with preview:
+                st.json(json.loads(result.json), expanded=2)
+            with raw:
+                st.code(result.json, language="json", wrap_lines=True, height=500)
 
-@st.fragment(run_every=2)
-def job_monitor() -> None:
-    if not st.session_state.jobs:
-        return
-    refreshed = []
-    for previous in st.session_state.jobs:
-        try:
-            job = _request(
-                "GET", f"{api_url}/api/v1/jobs/{previous['id']}", api_token
-            ).json()
-        except (httpx.HTTPError, ValueError):
-            job = previous
-        refreshed.append(job)
-    st.session_state.jobs = refreshed
-    st.subheader("Jobs")
-    st.dataframe(
-        [
-            {
-                "document": job["source_name"],
-                "profile": job["profile"],
-                "execution": job["execution"],
-                "status": job["status"],
-                "error": job.get("error") or "",
-            }
-            for job in refreshed
-        ],
-        hide_index=True,
-    )
-    completed = [job for job in refreshed if job["status"] in {"completed", "needs_review"}]
-    if completed:
-        chosen = st.selectbox("Result", completed, format_func=lambda item: item["source_name"])
-        artifacts = _request(
-            "GET", f"{api_url}/api/v1/jobs/{chosen['id']}/artifacts", api_token
-        ).json()
-        names = artifacts.get("artifacts", artifacts)
-        for key in names:
-            if key.endswith(".zip"):
-                content = _request(
-                    "GET",
-                    f"{api_url}/api/v1/jobs/{chosen['id']}/artifacts/{key.split('/')[-1]}",
-                    api_token,
-                ).content
-                st.download_button("Download result bundle", content, file_name=Path(key).name)
-                break
+        with legacy_tab:
+            st.download_button(
+                "Download legacy JSON",
+                result.legacy_json,
+                file_name=f"{stem}.legacy.json",
+                mime="application/json",
+                icon=":material/download:",
+                key="download-legacy-json",
+                on_click="ignore",
+            )
+            st.json(json.loads(result.legacy_json), expanded=2)
 
+        with annotated_tab:
+            st.download_button(
+                "Download annotated PDF",
+                result.annotated_pdf,
+                file_name=f"{stem}.annotated.pdf",
+                mime="application/pdf",
+                icon=":material/download:",
+                key="download-annotated-pdf",
+                on_click="ignore",
+            )
+            st.pdf(result.annotated_pdf, height=720, key="annotated-preview")
 
-if backend == "API":
-    job_monitor()
+        with trace_tab:
+            st.json([event.model_dump(mode="json") for event in result.trace], expanded=2)
 
-if mode == "Evaluate":
-    st.info("Evaluation reports are submitted against completed jobs through the API.")
+        with extract_tab:
+            instruction = st.text_area(
+                "Fields to extract",
+                placeholder="For example: invoice number, issue date, supplier, and total",
+            )
+            if st.button(
+                "Generate schema",
+                disabled=not instruction.strip(),
+                key="generate-schema",
+            ):
+                try:
+                    proposal = extraction.DocumentExtractor().propose_schema(
+                        instruction, result
+                    )
+                    schema_text = json.dumps(proposal.json_schema, indent=2)
+                    st.session_state.schema_text = schema_text
+                    st.session_state.schema_editor = schema_text
+                    st.session_state.extraction_result = None
+                except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
+                    st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
+
+            if st.session_state.get("schema_text"):
+                if "schema_editor" not in st.session_state:
+                    st.session_state.schema_editor = st.session_state.schema_text
+                schema_text = st.text_area("JSON Schema", key="schema_editor", height=300)
+                if st.button("Run extraction", type="primary", key="run-extraction"):
+                    try:
+                        selected_schema = json.loads(schema_text)
+                        st.session_state.extraction_result = (
+                            extraction.DocumentExtractor().extract(
+                                result, selected_schema
+                            )
+                        )
+                    except Exception as exc:  # noqa: BLE001 - validation is user-facing
+                        st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
+
+            extraction_result = st.session_state.get("extraction_result")
+            if extraction_result is not None:
+                st.download_button(
+                    "Download extraction JSON",
+                    extraction_result.json,
+                    file_name=f"{stem}.extraction.json",
+                    mime="application/json",
+                    icon=":material/download:",
+                    key="download-extraction-json",
+                    on_click="ignore",
+                )
+                st.json(extraction_result.data, expanded=2)
+                st.caption("Evidence")
+                st.json(extraction_result.evidence, expanded=2)

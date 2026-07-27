@@ -1,134 +1,129 @@
-# Graph Report - D:\AI\Project  (2026-07-25)
+# Graph Report - .  (2026-07-27)
 
 ## Corpus Check
-- Corpus is ~11,894 words - fits in a single context window. You may not need a graph.
+- Corpus is ~18,892 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 206 nodes · 557 edges · 17 communities (15 shown, 2 thin omitted)
-- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 82 edges (avg confidence: 0.63)
+- 392 nodes · 1389 edges · 15 communities (14 shown, 1 thin omitted)
+- Extraction: 56% EXTRACTED · 44% INFERRED · 0% AMBIGUOUS · INFERRED: 618 edges (avg confidence: 0.64)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- AI Model Gateways
+- Core Data Models
+- Benchmark Evaluation
+- OpenAI Gateway
+- Evidence Model Types
+- Schema Extraction
+- Agentic Architecture
+- Invoice Schema
+- Extraction Schema Fields
 - Document Ingestion
-- CLI and Configuration
-- Paddle Runtime
-- Parsing and Rendering
-- Document Data Model
-- Schema Validation Tests
-- Specifications and Samples
-- Grounding and Verification
-- Parser Architecture
-- Example Generation
-- Cross-Page Semantics
-- Remediation Tracking
-- Accuracy Evidence
-- Package Entry Point
+- Document Fixtures
+- Fixture Generation
+- Implementation Planning
+- Package Metadata
 
 ## God Nodes (most connected - your core abstractions)
-1. `DocumentParser` - 53 edges
-2. `ParserConfig` - 28 edges
-3. `BoundingBox` - 24 edges
-4. `OpenAIDocumentGateway` - 21 edges
-5. `GlmOcrGateway` - 18 edges
-6. `PageEvidence` - 18 edges
-7. `DocumentTree` - 17 edges
-8. `DocumentNode` - 16 edges
-9. `NodeType` - 15 edges
-10. `RegionEvidence` - 15 edges
+1. `DocumentParser` - 69 edges
+2. `ParserConfig` - 63 edges
+3. `RegionDraft` - 55 edges
+4. `PageInspection` - 48 edges
+5. `PageDraft` - 46 edges
+6. `InspectionDecision` - 43 edges
+7. `OpenAIDocumentGateway` - 37 edges
+8. `Document` - 37 edges
+9. `Block` - 36 edges
+10. `AcceptingGateway` - 32 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `test_mutable_paddle_image_is_rejected()` --calls--> `ParserConfig`  [INFERRED]
-  tests/test_models.py → src/grounded_docparse/config.py
-- `test_normalized_bbox_rejects_coordinates_above_one()` --calls--> `BoundingBox`  [INFERRED]
-  tests/test_models.py → src/grounded_docparse/models.py
-- `test_source_bbox_allows_absolute_coordinates()` --calls--> `BoundingBox`  [INFERRED]
-  tests/test_models.py → src/grounded_docparse/models.py
-- `test_runtime_command_is_offline_and_least_privilege()` --calls--> `ParserConfig`  [INFERRED]
-  tests/test_paddle.py → src/grounded_docparse/config.py
-- `test_timeout_forcibly_removes_container()` --calls--> `ParserConfig`  [INFERRED]
-  tests/test_paddle.py → src/grounded_docparse/config.py
+- `test_provider_draft_accepts_unordered_coordinates_for_local_validation()` --indirect_call--> `RegionDraft`  [INFERRED]
+  tests/test_simple_contract.py → src/grounded_docparse/models.py
+- `main()` --calls--> `DocumentParser`  [INFERRED]
+  scripts/evaluate_public_water.py → src/grounded_docparse/pipeline.py
+- `test_reference_comparison_reports_order_sensitive_and_token_metrics()` --calls--> `compare_markdown()`  [INFERRED]
+  tests/test_public_water_benchmark.py → src/grounded_docparse/benchmark.py
+- `test_reference_normalization_removes_html_tags_and_splits_punctuation()` --calls--> `compare_markdown()`  [INFERRED]
+  tests/test_public_water_benchmark.py → src/grounded_docparse/benchmark.py
+- `RecordingCreateResponses` --uses--> `ParserConfig`  [INFERRED]
+  tests/test_openai_vision_gateway.py → src/grounded_docparse/config.py
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Bounded Multi-Model Grounding Flow** — readme_paddleocr_vl_pipeline, readme_glm_ocr_region_recognition, readme_luna_candidate_verification, readme_deterministic_grounding_gate [EXTRACTED 1.00]
-- **Secure Hierarchical Parser Contract** — docs_spec_explicit_per_run_cloud_consent, docs_spec_untrusted_boundary_validation, docs_spec_json_schema_1_1_0 [EXTRACTED 1.00]
+- **Bounded Agentic Parse Pipeline** — docs_architecture_luna_manager, docs_how_it_works_adaptive_delegation, docs_architecture_terra_repair, docs_architecture_deterministic_validation [EXTRACTED 1.00]
+- **Grounded Output Bundle** — readme_agentic_json_v2, readme_annotated_pdf, readme_atomic_evidence, docs_how_it_works_actual_token_usage [EXTRACTED 1.00]
+- **Evidence Enforcement System** — docs_spec_strict_structured_outputs, docs_research_fail_closed_grounding, docs_architecture_deterministic_validation, contributing_source_grounding [INFERRED 0.95]
 
-## Communities (17 total, 2 thin omitted)
+## Communities (15 total, 1 thin omitted)
 
-### Community 0 - "AI Model Gateways"
-Cohesion: 0.15
-Nodes (22): BaseModel, GlmOcrGateway, OpenAIDocumentGateway, Any, Path, DocumentLink, DocumentResolution, NodeType (+14 more)
+### Community 0 - "Core Data Models"
+Cohesion: 0.11
+Nodes (53): ParserConfig, AgentDelegation, AgentRole, InspectionAction, InspectionDecision, InspectionRegionAddition, NodeType, PageDraft (+45 more)
 
-### Community 1 - "Document Ingestion"
-Cohesion: 0.16
-Nodes (24): _deskew_and_enhance(), ingest_document(), _ingest_image(), _ingest_pdf(), IngestedDocument, _normalized_bbox(), PageEvidence, Path (+16 more)
+### Community 1 - "Benchmark Evaluation"
+Cohesion: 0.09
+Nodes (56): main(), accuracy_threshold_failures(), compare_markdown(), _edit_distance(), evaluate_result(), _flatten(), _normalize_whitespace(), _searchable_text() (+48 more)
 
-### Community 2 - "CLI and Configuration"
-Cohesion: 0.15
-Nodes (19): main(), _bool_env(), ParserConfig, Grounded document parsing pipeline., ParseResult, main(), DocumentParser, offline_config() (+11 more)
+### Community 2 - "OpenAI Gateway"
+Cohesion: 0.13
+Nodes (22): OpenAIDocumentGateway, Any, Path, CropInspectionRequest, SchemaProposalWire, T, _additional_properties_values(), _assert_no_prompt_cache() (+14 more)
 
-### Community 3 - "Paddle Runtime"
-Cohesion: 0.12
-Nodes (16): RuntimeError, ProgressEvent, find_paddle_regions(), PaddleDockerRunner, PaddleUnavailable, Any, Path, ProgressCallback (+8 more)
+### Community 3 - "Evidence Model Types"
+Cohesion: 0.17
+Nodes (33): BaseModel, ProgressCallback, AtomicDraft, AtomicEvidence, ChartPoint, CheckboxState, Citation, DraftBoundingBox (+25 more)
 
-### Community 4 - "Parsing and Rendering"
-Cohesion: 0.22
-Nodes (15): DocumentNode, _emit(), Path, ProgressCallback, _bounded_int(), build_bundle(), _meta(), Any (+7 more)
+### Community 4 - "Schema Extraction"
+Cohesion: 0.14
+Nodes (26): DocumentExtractor, _issue_pointer(), _non_null_leaves(), _pointer_exists(), _pointer_parts(), Any, Validate the strict, fail-closed JSON Schema subset used by Extract., _set_pointer() (+18 more)
 
-### Community 5 - "Document Data Model"
-Cohesion: 0.23
-Nodes (7): Confidence, DocumentTree, PageRecord, Provenance, Relationship, _confidence(), _derived_id()
+### Community 5 - "Agentic Architecture"
+Cohesion: 0.08
+Nodes (29): Unreleased Agentic Rewrite, Deterministic Export Policy, Public-Contract Testing, Source Grounding, Deterministic Validation, Luna Manager, Schema-Driven Extraction, Synchronous Streamlit Architecture (+21 more)
 
-### Community 6 - "Schema Validation Tests"
-Cohesion: 0.18
-Nodes (6): Any, RegionDraft, test_mutable_paddle_image_is_rejected(), test_normalized_bbox_rejects_coordinates_above_one(), test_region_bbox_cannot_bypass_normalized_limit(), test_source_bbox_allows_absolute_coordinates()
+### Community 6 - "Invoice Schema"
+Cohesion: 0.07
+Nodes (27): additionalProperties, additionalProperties, properties, required, type, title, type, x-docparse-aliases (+19 more)
 
-### Community 7 - "Specifications and Samples"
-Cohesion: 0.20
-Nodes (10): Explicit Per-Run Cloud Consent, Grounded JSON Schema 1.1.0, Secure Hierarchical Document Parser Specification, Untrusted Boundary Validation, Layout-Aware Markdown with Grounding Metadata, Synthetic Clinical Operations Report Output, Routine Imaging Review Request, Synthetic Medical Fax (+2 more)
+### Community 7 - "Extraction Schema Fields"
+Cohesion: 0.08
+Nodes (26): type, x-docparse-aliases, type, x-docparse-aliases, additionalProperties, properties, required, type (+18 more)
 
-### Community 8 - "Grounding and Verification"
-Cohesion: 0.33
-Nodes (6): Bounded Agentic Pipeline, Unreadable Region Marker, OpenAI Structured Outputs, Two Independent Local OCR Paths, Deterministic Grounding Gate, Luna Candidate Verification
+### Community 8 - "Document Ingestion"
+Cohesion: 0.25
+Nodes (16): ingest_document(), _ingest_image(), _ingest_pdf(), IngestedDocument, _normalized_bbox(), PageEvidence, Path, render_region_crop() (+8 more)
 
-### Community 9 - "Parser Architecture"
-Cohesion: 0.40
-Nodes (5): LlamaParse Architectural Inspiration, GLM-OCR Region Recognition, Grounded Document Parser, PaddleOCR-VL 1.6 Pipeline, Secure Offline Container Runtime
+### Community 9 - "Document Fixtures"
+Cohesion: 0.50
+Nodes (4): Routine Imaging Review Request, Synthetic Medical Fax, Monthly Operations Metrics, Synthetic Clinical Operations Report PDF
 
-### Community 10 - "Example Generation"
+### Community 10 - "Fixture Generation"
 Cohesion: 0.83
 Nodes (3): digital_report(), fax_document(), main()
 
-### Community 11 - "Cross-Page Semantics"
-Cohesion: 0.67
-Nodes (3): Physical and Semantic Dual-Index Hierarchy, LandingAI ADE Architectural Inspiration, Terra Cross-Page Reasoning
-
-### Community 12 - "Remediation Tracking"
+### Community 12 - "Implementation Planning"
 Cohesion: 0.67
 Nodes (3): Security and Hierarchy Remediation Plan, Implementation Checklist, Pending Live Model Smoke Tests
 
 ## Knowledge Gaps
-- **13 isolated node(s):** `grounded-docparse`, `GLM-OCR Region Recognition`, `Terra Cross-Page Reasoning`, `Unreadable Region Marker`, `LlamaParse Architectural Inspiration` (+8 more)
+- **44 isolated node(s):** `$schema`, `title`, `type`, `type`, `type` (+39 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DocumentParser` connect `CLI and Configuration` to `AI Model Gateways`, `Document Ingestion`, `Paddle Runtime`, `Parsing and Rendering`, `Document Data Model`?**
-  _High betweenness centrality (0.151) - this node is a cross-community bridge._
-- **Why does `ParserConfig` connect `CLI and Configuration` to `AI Model Gateways`, `Document Ingestion`, `Paddle Runtime`, `Schema Validation Tests`?**
-  _High betweenness centrality (0.078) - this node is a cross-community bridge._
-- **Why does `BoundingBox` connect `Document Ingestion` to `AI Model Gateways`, `CLI and Configuration`, `Parsing and Rendering`, `Schema Validation Tests`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Are the 33 inferred relationships involving `DocumentParser` (e.g. with `ParserConfig` and `GlmOcrGateway`) actually correct?**
-  _`DocumentParser` has 33 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 8 inferred relationships involving `ParserConfig` (e.g. with `GlmOcrGateway` and `OpenAIDocumentGateway`) actually correct?**
-  _`ParserConfig` has 8 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 7 inferred relationships involving `BoundingBox` (e.g. with `IngestedDocument` and `PageEvidence`) actually correct?**
-  _`BoundingBox` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 9 inferred relationships involving `OpenAIDocumentGateway` (e.g. with `ParserConfig` and `PageEvidence`) actually correct?**
-  _`OpenAIDocumentGateway` has 9 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `DocumentParser` connect `Core Data Models` to `Benchmark Evaluation`, `OpenAI Gateway`, `Evidence Model Types`, `Schema Extraction`, `Document Ingestion`?**
+  _High betweenness centrality (0.080) - this node is a cross-community bridge._
+- **Why does `ParserConfig` connect `Core Data Models` to `OpenAI Gateway`, `Evidence Model Types`, `Schema Extraction`?**
+  _High betweenness centrality (0.053) - this node is a cross-community bridge._
+- **Why does `RegionDraft` connect `Core Data Models` to `Benchmark Evaluation`, `OpenAI Gateway`, `Evidence Model Types`?**
+  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+- **Are the 65 inferred relationships involving `DocumentParser` (e.g. with `main()` and `ParserConfig`) actually correct?**
+  _`DocumentParser` has 65 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 53 inferred relationships involving `ParserConfig` (e.g. with `DocumentExtractor` and `OpenAIDocumentGateway`) actually correct?**
+  _`ParserConfig` has 53 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 43 inferred relationships involving `RegionDraft` (e.g. with `DocumentParser` and `RecordingCreateResponses`) actually correct?**
+  _`RegionDraft` has 43 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 41 inferred relationships involving `PageInspection` (e.g. with `OpenAIDocumentGateway` and `DocumentParser`) actually correct?**
+  _`PageInspection` has 41 INFERRED edges - model-reasoned connections that need verification._

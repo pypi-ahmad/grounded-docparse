@@ -5,33 +5,17 @@ description = "Grounded agentic document parser for structured Markdown and JSON
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
 dependencies = [
-    "numpy>=2.0",
-    "ollama>=0.6",
     "openai>=2.0",
-    "opencv-python-headless>=4.10",
     "pillow>=11.0",
     "pydantic>=2.10",
     "pymupdf>=1.25",
-    "jsonschema>=4.25.1,<5",
     "streamlit[pdf]>=1.60,<2",
-    "fastapi>=0.140.0",
-    "celery>=5.6.3",
-    "redis>=8.0.1",
-    "sqlalchemy>=2.0.51",
-    "psycopg[binary]>=3.3.4",
-    "boto3>=1.43.56",
-    "alembic>=1.18.5",
 ]
 
 [dependency-groups]
 dev = [
-    "httpx2>=2.9.1",
     "pytest>=8.3",
 ]
-
-[project.scripts]
-grounded-docparse = "grounded_docparse.cli:main"
-grounded-docparse-paddle-setup = "grounded_docparse.paddle_setup:main"
 
 [build-system]
 requires = ["hatchling"]

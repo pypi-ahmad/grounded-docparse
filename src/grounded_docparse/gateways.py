@@ -7,108 +7,24 @@ import time
 from pathlib import Path
 from typing import Any, TypeVar
 
-import ollama
-from openai import OpenAI
-from pydantic import BaseModel
+from openai import OpenAI, OpenAIError
+from pydantic import BaseModel, ValidationError
 
 from .config import ParserConfig
 from .ingest import PageEvidence
 from .models import (
-    BoundaryAdjudication,
-    DocumentResolution,
-    ExtractionDecisions,
-    InspectionDecision,
-    NodeType,
+    AgentRole,
+    AgentTraceEvent,
+    AgentUsage,
+    CropInspectionRequest,
     PageDraft,
     PageInspection,
-    PageVerification,
-    RecognitionCandidate,
-    RegionEvidence,
-    RunRecord,
+    PagePlan,
+    RunUsage,
+    SchemaProposalWire,
 )
 
-PROMPT_VERSION = "grounded-v1"
-GLM_PROMPT_VERSION = "glm-region-v1"
 T = TypeVar("T", bound=BaseModel)
-
-
-class GlmOcrGateway:
-    def __init__(self, config: ParserConfig) -> None:
-        self.config = config
-        self.client = ollama.Client(host=config.ollama_host)
-
-    @staticmethod
-    def prompt_for(node_type: NodeType) -> str:
-        if node_type == NodeType.TABLE:
-            return "Table Recognition:"
-        if node_type == NodeType.FORMULA:
-            return "Formula Recognition:"
-        if node_type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-            return "Figure Recognition:"
-        return "Text Recognition:"
-
-    def recognize(self, image_path: Path) -> tuple[str, RunRecord]:
-        candidate, run = self.recognize_region(
-            image_path,
-            NodeType.OCR_BLOCK,
-            region_id="full-page",
-            pass_number=1,
-        )
-        return candidate.text, run
-
-    def recognize_region(
-        self,
-        image_path: Path,
-        node_type: NodeType,
-        *,
-        region_id: str,
-        pass_number: int,
-    ) -> tuple[RecognitionCandidate, RunRecord]:
-        started = time.monotonic()
-        prompt = self.prompt_for(node_type)
-        response = self.client.chat(
-            model=self.config.glm_model,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                    "images": [str(image_path)],
-                }
-            ],
-            options={
-                "temperature": 0,
-                "num_predict": self.config.glm_max_output_tokens,
-            },
-            keep_alive="5m",
-        )
-        content = response.message.content or ""
-        candidate = RecognitionCandidate(
-            id=f"{region_id}:glm:{pass_number}",
-            source="glm",
-            task=prompt.removesuffix(":").casefold().replace(" recognition", ""),
-            prompt_version=GLM_PROMPT_VERSION,
-            pass_number=pass_number,
-            text=content[:100_000],
-        )
-        return candidate, RunRecord(
-            provider="ollama",
-            model=self.config.glm_model,
-            stage="region_ocr" if region_id != "full-page" else "ocr",
-            region_id=region_id,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=getattr(response, "prompt_eval_count", None),
-            output_tokens=getattr(response, "eval_count", None),
-        )
-
-    def unload(self) -> None:
-        try:
-            self.client.generate(
-                model=self.config.glm_model,
-                prompt="",
-                keep_alive=0,
-            )
-        except Exception:  # noqa: BLE001,S110 - cleanup must never mask parse result
-            pass
 
 
 class OpenAIDocumentGateway:
@@ -117,94 +33,154 @@ class OpenAIDocumentGateway:
             raise RuntimeError("OPENAI_API_KEY is not set")
         self.config = config
         self.client = client or OpenAI()
+        self.input_tokens = 0
+        self.output_tokens = 0
+        self.usage = RunUsage()
+        self.trace: list[AgentTraceEvent] = []
 
     @staticmethod
-    def _image_data_url(path: Path) -> str:
-        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
-        return f"data:image/png;base64,{encoded}"
+    def _image(path: Path) -> str:
+        payload = base64.b64encode(path.read_bytes()).decode("ascii")
+        return f"data:image/png;base64,{payload}"
 
-    @staticmethod
-    def _parsed(response: Any, expected: type[T]) -> T:
+    def _record_usage(self, response: Any, *, agent: str, model: str) -> AgentUsage:
+        usage = (
+            response.get("usage")
+            if isinstance(response, dict)
+            else getattr(response, "usage", None)
+        )
+        if usage is None:
+            call = AgentUsage(agent=agent, model=model)
+            self.usage.calls.append(call)
+            return call
+        get = usage.get if isinstance(usage, dict) else lambda name, default: getattr(usage, name, default)
+        input_tokens = get("input_tokens", 0)
+        output_tokens = get("output_tokens", 0)
+        if isinstance(input_tokens, int) and input_tokens >= 0:
+            self.input_tokens += input_tokens
+        if isinstance(output_tokens, int) and output_tokens >= 0:
+            self.output_tokens += output_tokens
+        call = AgentUsage(
+            agent=agent,
+            model=model,
+            input_tokens=input_tokens if isinstance(input_tokens, int) and input_tokens >= 0 else 0,
+            output_tokens=output_tokens if isinstance(output_tokens, int) and output_tokens >= 0 else 0,
+        )
+        self.usage.calls.append(call)
+        return call
+
+    def _request(
+        self,
+        expected: type[T],
+        *,
+        agent: str,
+        stage: str,
+        page_number: int | None = None,
+        **kwargs: Any,
+    ) -> T:
+        started = time.perf_counter()
+        model = str(kwargs.get("model", "unknown"))
+        responses = self.client.responses
+        raw_api = getattr(responses, "with_raw_response", None)
+        if raw_api is None:
+            response = responses.parse(text_format=expected, **kwargs)
+            call_usage = self._record_usage(response, agent=agent, model=model)
+        else:
+            try:
+                raw = raw_api.parse(text_format=expected, **kwargs)
+            except OpenAIError as exc:
+                exc.docparse_stage = stage
+                exc.docparse_page_number = page_number
+                exc.docparse_model = kwargs.get("model")
+                raise
+            try:
+                response = raw.parse()
+            except ValidationError as exc:
+                try:
+                    payload = json.loads(raw.content)
+                except (TypeError, ValueError):
+                    payload = {}
+                self._record_usage(payload, agent=agent, model=model)
+                page = f" for page {page_number}" if page_number is not None else ""
+                request_id = getattr(raw, "request_id", None) or "unknown"
+                detail = exc.errors(include_url=False, include_input=False)[0]
+                location = ".".join(str(item) for item in detail.get("loc", ())) or "response"
+                incomplete = payload.get("incomplete_details", {}).get("reason")
+                status = incomplete or payload.get("status", "invalid")
+                raise RuntimeError(
+                    f"{stage}{page} using {kwargs.get('model')}: OpenAI response "
+                    f"{status} failed schema validation at "
+                    f"{location} ({detail.get('type', 'validation_error')}); "
+                    f"request ID {request_id}"
+                ) from exc
+            call_usage = self._record_usage(response, agent=agent, model=model)
+        self.trace.append(
+            AgentTraceEvent(
+                agent=agent,
+                model=model,
+                action=stage,
+                status="completed",
+                page=page_number,
+                duration_ms=round((time.perf_counter() - started) * 1000),
+                input_tokens=call_usage.input_tokens,
+                output_tokens=call_usage.output_tokens,
+            )
+        )
         parsed = getattr(response, "output_parsed", None)
         if isinstance(parsed, expected):
             return parsed
         for output in getattr(response, "output", []):
-            if getattr(output, "type", None) != "message":
-                continue
-            for item in getattr(output, "content", []):
-                if getattr(item, "type", None) == "refusal":
-                    raise RuntimeError(
-                        f"OpenAI refused document parsing: {item.refusal}"
-                    )
-                value = getattr(item, "parsed", None)
-                if isinstance(value, expected):
-                    return value
-        raise RuntimeError("OpenAI returned no schema-valid parsed result")
+            for content in getattr(output, "content", []):
+                if getattr(content, "type", None) == "refusal":
+                    raise RuntimeError(f"OpenAI refused extraction: {content.refusal}")
+                parsed = getattr(content, "parsed", None)
+                if isinstance(parsed, expected):
+                    return parsed
+        raise RuntimeError(f"{stage}: OpenAI returned no schema-valid result")
 
-    @staticmethod
-    def _usage(response: Any) -> tuple[int | None, int | None]:
-        usage = getattr(response, "usage", None)
-        return (
-            getattr(usage, "input_tokens", None),
-            getattr(usage, "output_tokens", None),
-        )
-
-    def draft_page(self, page: PageEvidence) -> tuple[PageDraft, RunRecord]:
-        prompt = (
-            "Parse the page into a hierarchical, visually grounded item tree. "
-            "Return literal visible text only. Include headers, footers, sections, "
-            "tables, table cells, figures, charts, forms, and checkboxes when visible. "
-            "Every region must use normalized page coordinates and explicit reading "
-            "order. Never infer missing text or facts."
-        )
-        started = time.monotonic()
-        response = self.client.responses.parse(
+    def draft_page(self, page: PageEvidence) -> PageDraft:
+        return self._request(
+            PageDraft,
+            agent="draft_parser",
+            stage="page_draft",
+            page_number=page.number,
             model=self.config.luna_model,
-            reasoning={"effort": "low"},
-            temperature=0.0,
+            reasoning={"effort": "medium"},
             store=False,
-            prompt_cache_key=f"docparse:luna-draft:{PROMPT_VERSION}:0",
-            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
             input=[
                 {
                     "role": "system",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": prompt,
-                            "prompt_cache_breakpoint": {"type": "default"},
-                        }
-                    ],
+                    "content": (
+                        "Extract every visible element in semantic reading order. Include complete "
+                        "paragraphs; ordered and unordered lists with their literal markers; forms "
+                        "and field values; tables and cells; checkboxes; headings; headers; footers; "
+                        "signatures; seals; figures; charts; formulas; images; and captions. Preserve "
+                        "literal visible text without summarizing or omitting content. Join visual line wraps "
+                        "Populate atoms with one normalized bounding box per visible text line, table cell, "
+                        "or visual region so every literal can be grounded below the block level. "
+                        "inside prose, but preserve wording, punctuation, identifiers, and real hyphens. "
+                        "Do not correct spelling or infer obscured text. Emit one region per visible form field; "
+                        "never combine a form section into one field. Populate form.label and form.value "
+                        "explicitly, and put faint printed examples, templates, units, and instructions in "
+                        "form.hint rather than treating them as entered values. Emit one region per checkbox "
+                        "and populate checkbox_group with the shared "
+                        "prompt and checkbox_option with that box's option. Give substantive "
+                        "and decorative visuals concise grounded descriptions that use exact visible terminology "
+                        "from nearby labels instead of generic synonyms. Emit each visual immediately beside "
+                        "its related procedure in reading order; never collect figures at the end of the page. "
+                        "Emit each list option once, without repeating its label. Use normalized page "
+                        "coordinates."
+                    ),
                 },
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "input_text",
-                            "text": page.digital_text[:200_000]
-                            or "No embedded PDF text is available.",
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(page.image_path),
-                            "detail": "original",
-                        },
+                        {"type": "input_text", "text": page.digital_text[:200_000] or "No embedded text."},
+                        {"type": "input_image", "image_url": self._image(page.image_path), "detail": "original"},
                     ],
                 },
             ],
-            text_format=PageDraft,
             max_output_tokens=self.config.luna_max_output_tokens,
-        )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, PageDraft), RunRecord(
-            provider="openai",
-            model=self.config.luna_model,
-            stage="page_draft",
-            page_number=page.number,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            prompt_version=PROMPT_VERSION,
         )
 
     def inspect_page(
@@ -213,102 +189,46 @@ class OpenAIDocumentGateway:
         draft: PageDraft,
         *,
         region_ids: list[str],
-    ) -> tuple[PageInspection, RunRecord]:
-        prompt = (
-            "Independently inspect each supplied draft region against the page image. "
-            "For every region return accept, correct, reject, or inspect_crop. "
-            "Corrections must be literal visible text. Reject unsupported content and "
-            "request a crop when the page image is insufficient. Never invent IDs, "
-            "coordinates, text, or facts."
-        )
-        regions = []
-        for index, region in enumerate(draft.regions):
-            region_id = (
-                region_ids[index] if index < len(region_ids) else f"region-{index + 1}"
-            )
-            regions.append({"region_id": region_id, **region.model_dump(mode="json")})
-        started = time.monotonic()
-        response = self.client.responses.parse(
-            model=self.config.terra_model,
-            reasoning={"effort": "low"},
-            temperature=0.0,
-            store=False,
-            prompt_cache_key=f"docparse:terra-inspection:{PROMPT_VERSION}:0",
-            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
-            input=[
-                {
-                    "role": "system",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": prompt,
-                            "prompt_cache_breakpoint": {"type": "default"},
-                        }
-                    ],
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": json.dumps(regions, ensure_ascii=False)[:700_000],
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(page.image_path),
-                            "detail": "original",
-                        },
-                    ],
-                },
-            ],
-            text_format=PageInspection,
-            max_output_tokens=self.config.terra_max_output_tokens,
-        )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, PageInspection), RunRecord(
-            provider="openai",
-            model=self.config.terra_model,
+        target_region_ids: list[str] | None = None,
+        agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
+        use_terra: bool = False,
+    ) -> PageInspection:
+        if len(region_ids) != len(draft.regions):
+            raise ValueError("region IDs must match the complete page manifest")
+        targets = target_region_ids or region_ids
+        regions = [
+            {"region_id": region_ids[index], **region.model_dump(mode="json")}
+            for index, region in enumerate(draft.regions)
+        ]
+        return self._request(
+            PageInspection,
+            agent=agent_role.value,
             stage="page_inspection",
             page_number=page.number,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            prompt_version=PROMPT_VERSION,
-        )
-
-    def inspect_crop(
-        self,
-        crop_path: Path,
-        *,
-        region_id: str,
-        candidate_text: str,
-        evidence_ref: str,
-        attempt: int,
-    ) -> tuple[InspectionDecision, RunRecord]:
-        prompt = (
-            "Inspect this high-resolution source crop. Accept only when the candidate "
-            "is literally visible. Correct only with literal text from the crop, reject "
-            "unsupported content, or request another crop when still ambiguous. Preserve "
-            "the supplied region ID and evidence reference."
-        )
-        started = time.monotonic()
-        response = self.client.responses.parse(
-            model=self.config.terra_model,
-            reasoning={"effort": "low"},
-            temperature=0.0,
+            model=self.config.terra_model if use_terra else self.config.luna_model,
+            reasoning={"effort": "medium"},
             store=False,
-            prompt_cache_key=f"docparse:terra-crop:{PROMPT_VERSION}:0",
-            prompt_cache_options={"mode": "explicit", "ttl": "24h"},
             input=[
                 {
                     "role": "system",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": prompt,
-                            "prompt_cache_breakpoint": {"type": "default"},
-                        }
-                    ],
+                    "content": (
+                        "Compare every proposed block with the source image. Accept literal matches, "
+                        f"Act as the {agent_role.value}. "
+                        "reject unsupported content, or request a crop when genuinely ambiguous. When "
+                        "anything is wrong, return a complete corrected region including type, text, "
+                        "bounding box, reading order, marker, form or checkbox structure, table cells, "
+                        "and visual description as applicable. Correct visual descriptions that replace exact "
+                        "visible terminology with generic synonyms. Do not accept a figure description that "
+                        "omits an annotated label, functional feature, or the nearby heading or label that "
+                        "identifies its subject; correct it or request a crop. "
+                        "Distinguish entered form values from printed hints and placeholders. Corrections must "
+                        "be literally visible. Inspect the complete manifest for any omitted visible region and "
+                        "return each omission in additional_regions with a temporary unique region ID and a "
+                        "precise normalized bounding box. Return ordered_region_ids as a complete permutation "
+                        "of all supplied and added region IDs in semantic reading order; place each visual beside "
+                        "its related instruction rather than at the page end. Return decisions only for the "
+                        "target_region_ids. Preserve every supplied region ID."
+                    ),
                 },
                 {
                     "role": "user",
@@ -317,222 +237,263 @@ class OpenAIDocumentGateway:
                             "type": "input_text",
                             "text": json.dumps(
                                 {
-                                    "region_id": region_id,
-                                    "candidate_text": candidate_text,
-                                    "evidence_ref": evidence_ref,
-                                    "attempt": attempt,
+                                    "regions": regions,
+                                    "target_region_ids": targets,
                                 },
                                 ensure_ascii=False,
                             ),
                         },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(crop_path),
-                            "detail": "original",
-                        },
+                        {"type": "input_image", "image_url": self._image(page.image_path), "detail": "original"},
                     ],
                 },
             ],
-            text_format=InspectionDecision,
-            max_output_tokens=min(4_000, self.config.terra_max_output_tokens),
-        )
-        decision = self._parsed(response, InspectionDecision)
-        if decision.region_id != region_id or evidence_ref not in decision.evidence_refs:
-            raise RuntimeError("Crop inspection returned mismatched evidence")
-        input_tokens, output_tokens = self._usage(response)
-        return decision, RunRecord(
-            provider="openai",
-            model=self.config.terra_model,
-            stage="crop_inspection",
-            region_id=region_id,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            prompt_version=PROMPT_VERSION,
-        )
-
-    def verify_page(
-        self,
-        page: PageEvidence,
-        regions: list[RegionEvidence],
-    ) -> tuple[PageVerification, RunRecord]:
-        evidence = [region.model_dump(mode="json") for region in regions]
-        prompt = (
-            "Verify OCR candidates against the page image. For each supplied region, "
-            "select an existing candidate ID when literal text matches. Set needs_retry "
-            "when candidates disagree or are wrong. proposed_text is allowed only for "
-            "literal visible text and will not be trusted until local OCR confirms it. "
-            "You may refine semantic_role. Never invent regions, IDs, facts, or text."
-        )
-        started = time.monotonic()
-        response = self.client.responses.parse(
-            model=self.config.luna_model,
-            reasoning={"effort": "low"},
-            input=[
-                {"role": "system", "content": prompt},
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": json.dumps(evidence, ensure_ascii=False)[:700_000],
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(page.image_path),
-                            "detail": "original",
-                        },
-                    ],
-                },
-            ],
-            text_format=PageVerification,
-            max_output_tokens=self.config.luna_max_output_tokens,
-        )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, PageVerification), RunRecord(
-            provider="openai",
-            model=self.config.luna_model,
-            stage="page_verification",
-            page_number=page.number,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-        )
-
-    def resolve_document(
-        self, node_summary: list[dict[str, Any]]
-    ) -> tuple[DocumentResolution, RunRecord]:
-        prompt = (
-            "Resolve cross-page document structure from grounded nodes. Only update "
-            "heading roles/levels and add explicit relationships such as continues, "
-            "caption_of, footnote_of, references, and same_table. Do not rewrite text, "
-            "invent nodes, or reference unknown IDs."
-        )
-        started = time.monotonic()
-        response = self.client.responses.parse(
-            model=self.config.terra_model,
-            reasoning={"effort": "high"},
-            input=[
-                {"role": "system", "content": prompt},
-                {
-                    "role": "user",
-                    "content": json.dumps(node_summary, ensure_ascii=False)[:700_000],
-                },
-            ],
-            text_format=DocumentResolution,
             max_output_tokens=self.config.terra_max_output_tokens,
         )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, DocumentResolution), RunRecord(
-            provider="openai",
-            model=self.config.terra_model,
-            stage="document_resolution",
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-        )
 
-    def resolve_extraction(
+    def inspect_crops(
         self,
-        schema: dict[str, Any],
-        evidence: list[dict[str, Any]],
+        crops: list[CropInspectionRequest],
         *,
-        unresolved_paths: list[str],
         use_terra: bool = False,
-    ) -> tuple[ExtractionDecisions, RunRecord]:
-        prompt = (
-            "Map requested scalar JSON Pointer paths to literal values in the supplied "
-            "grounded nodes. Return only existing node IDs and literal visible values. "
-            "Do not infer missing values, invent IDs, rewrite evidence, or provide coordinates. "
-            "Omit any path that is not directly supported."
-        )
-        model = self.config.terra_model if use_terra else self.config.luna_model
-        started = time.monotonic()
-        payload = json.dumps(
+    ) -> PageInspection:
+        manifest = [
             {
-                "schema": schema,
-                "requested_paths": unresolved_paths,
-                "evidence": evidence,
-            },
-            ensure_ascii=False,
-        )[:700_000]
-        response = self.client.responses.parse(
-            model=model,
-            reasoning={"effort": "medium" if use_terra else "low"},
+                "region_id": crop.region_id,
+                "candidate_region": crop.candidate_region.model_dump(mode="json"),
+                "evidence_ref": crop.evidence_ref,
+                "image_index": index,
+            }
+            for index, crop in enumerate(crops)
+        ]
+        content: list[dict[str, str]] = [
+            {"type": "input_text", "text": json.dumps(manifest, ensure_ascii=False)}
+        ]
+        content.extend(
+            {
+                "type": "input_image",
+                "image_url": self._image(Path(crop.crop_path)),
+                "detail": "original",
+            }
+            for crop in crops
+        )
+        return self._request(
+            PageInspection,
+            agent=AgentRole.VISUAL.value,
+            stage="crop_batch_inspection",
+            model=self.config.terra_model if use_terra else self.config.luna_model,
+            reasoning={"effort": "medium"},
+            store=False,
             input=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": payload},
-            ],
-            text_format=ExtractionDecisions,
-            max_output_tokens=(
-                self.config.terra_max_output_tokens
-                if use_terra
-                else self.config.luna_max_output_tokens
-            ),
-        )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, ExtractionDecisions), RunRecord(
-            provider="openai",
-            model=model,
-            stage="schema_extraction",
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            prompt_version="schema-extraction-v1",
-        )
-
-    def adjudicate_boundary(
-        self,
-        previous_page: PageEvidence,
-        current_page: PageEvidence,
-        evidence: dict[str, Any],
-        *,
-        use_terra: bool = False,
-    ) -> tuple[BoundaryAdjudication, RunRecord]:
-        model = self.config.terra_model if use_terra else self.config.luna_model
-        prompt = (
-            "Decide whether the current page begins a new contiguous document. "
-            "Use only supplied classifications, identifiers, node IDs, and visible "
-            "page evidence. Return split, keep, or uncertain. Never invent text, "
-            "identifiers, or facts. Repeated primary identifiers strongly imply keep; "
-            "a changed primary identifier strongly implies split."
-        )
-        started = time.monotonic()
-        response = self.client.responses.parse(
-            model=model,
-            reasoning={"effort": "high" if use_terra else "low"},
-            input=[
-                {"role": "system", "content": prompt},
+                {
+                    "role": "system",
+                    "content": (
+                        "Verify each candidate against its corresponding source crop. Accept, "
+                        "visibly correct by returning a complete corrected region, or reject each one. "
+                        "Read ambiguous glyphs in emails, URLs, identifiers, and placeholders exactly. "
+                        "For every visual, return a complete figure_description covering visible objects, "
+                        "actions, spatial relationships, arrows, labels, callouts, numbered markers, "
+                        "prohibition marks, and functional features. Correct an incomplete visual description "
+                        "even when its existing summary is broadly accurate. For a barcode, describe its "
+                        "orientation and associated visible labels or identifiers, but do not infer or claim "
+                        "to decode its encoded value. "
+                        "A crop correction must not change the candidate bounding box or reading order. "
+                        "Return one decision per crop and "
+                        "preserve every supplied region ID and evidence reference."
+                    ),
+                },
                 {
                     "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": json.dumps(evidence, ensure_ascii=False)[:100_000],
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(previous_page.image_path),
-                            "detail": "low",
-                        },
-                        {
-                            "type": "input_image",
-                            "image_url": self._image_data_url(current_page.image_path),
-                            "detail": "low",
-                        },
-                    ],
+                    "content": content,
                 },
             ],
-            text_format=BoundaryAdjudication,
-            max_output_tokens=min(2_000, self.config.terra_max_output_tokens if use_terra else self.config.luna_max_output_tokens),
+            max_output_tokens=min(16_000, self.config.terra_max_output_tokens),
         )
-        input_tokens, output_tokens = self._usage(response)
-        return self._parsed(response, BoundaryAdjudication), RunRecord(
-            provider="openai",
+
+    def plan_page(
+        self,
+        page: PageEvidence,
+        draft: PageDraft,
+        *,
+        region_ids: list[str],
+        target_region_ids: list[str],
+        repair_round: int,
+        prior_inspections: list[dict[str, Any]] | None = None,
+    ) -> PagePlan:
+        if repair_round not in {1, 2}:
+            raise ValueError("repair_round must be 1 or 2")
+        if len(region_ids) != len(draft.regions):
+            raise ValueError("region IDs must match the complete page manifest")
+        manifest = [
+            {"region_id": region_ids[index], **region.model_dump(mode="json")}
+            for index, region in enumerate(draft.regions)
+        ]
+        return self._request(
+            PagePlan,
+            agent="document_manager",
+            stage="page_plan",
+            page_number=page.number,
+            model=self.config.luna_model,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are the document manager. Decide which bounded specialist subagents "
+                        "must inspect the target regions: layout_text_specialist, "
+                        "table_form_specialist, visual_specialist, or evidence_critic. "
+                        "Delegate only work needed to establish literal fidelity, complete coverage, "
+                        "reading order, and grounding. Use Terra only when a Luna review could not "
+                        "resolve complex or critical evidence. Return at most two delegations. "
+                        "Set finish when the page can be finalized after these delegations."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "repair_round": repair_round,
+                            "target_region_ids": target_region_ids,
+                            "regions": manifest,
+                            "prior_inspections": prior_inspections or [],
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
+            ],
+            max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
+        )
+
+    def propose_schema(
+        self,
+        instruction: str,
+        parse_payload: dict[str, Any],
+    ) -> SchemaProposalWire:
+        markdown = str(parse_payload.get("markdown", ""))
+        return self._request(
+            SchemaProposalWire,
+            agent="schema_architect",
+            stage="schema_proposal",
+            model=self.config.luna_model,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Convert the user's extraction request into strict JSON Schema. "
+                        "Return the schema as schema_text. The root must be an object, every "
+                        "object must set additionalProperties to false and require every property, "
+                        "and every field below the root must accept null so absent document values "
+                        "can be represented without invention. Use only object, array, string, "
+                        "number, integer, boolean, null, enum, properties, required, items, and "
+                        "description."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "instruction": instruction,
+                            "document_excerpt": markdown[:50_000],
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
+            ],
+            max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
+        )
+
+    def extract_document(
+        self,
+        parse_payload: dict[str, Any],
+        schema: dict[str, Any],
+        *,
+        use_terra: bool,
+        issues: list[str] | None = None,
+    ) -> dict[str, Any]:
+        evidence_item = {
+            "type": "object",
+            "properties": {
+                "pointer": {"type": "string"},
+                "block_ids": {"type": "array", "items": {"type": "string"}},
+                "atom_ids": {"type": "array", "items": {"type": "string"}},
+            },
+            "required": ["pointer", "block_ids", "atom_ids"],
+            "additionalProperties": False,
+        }
+        envelope = {
+            "type": "object",
+            "properties": {
+                "data": schema,
+                "evidence": {"type": "array", "items": evidence_item},
+            },
+            "required": ["data", "evidence"],
+            "additionalProperties": False,
+        }
+        agent = "extraction_critic" if use_terra else "extractor"
+        model = self.config.terra_model if use_terra else self.config.luna_model
+        started = time.perf_counter()
+        response = self.client.responses.create(
             model=model,
-            stage="boundary_adjudication",
-            page_number=current_page.number,
-            latency_ms=int((time.monotonic() - started) * 1000),
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Extract only values supported by the grounded document. Return null when "
+                        "a value is absent or ambiguous. For every non-null scalar, include evidence "
+                        "at its RFC 6901 JSON Pointer using only supplied block_ids and atom_ids. "
+                        "Never invent identifiers or values."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": json.dumps(
+                        {
+                            "document": parse_payload,
+                            "repair_issues": issues or [],
+                        },
+                        ensure_ascii=False,
+                    ),
+                },
+            ],
+            text={
+                "format": {
+                    "type": "json_schema",
+                    "name": "grounded_extraction",
+                    "strict": True,
+                    "schema": envelope,
+                }
+            },
+            max_output_tokens=self.config.terra_max_output_tokens
+            if use_terra
+            else self.config.luna_max_output_tokens,
         )
+        call_usage = self._record_usage(response, agent=agent, model=model)
+        self.trace.append(
+            AgentTraceEvent(
+                agent=agent,
+                model=model,
+                action="extract_document",
+                status="completed",
+                duration_ms=round((time.perf_counter() - started) * 1000),
+                input_tokens=call_usage.input_tokens,
+                output_tokens=call_usage.output_tokens,
+            )
+        )
+        output_text = getattr(response, "output_text", None)
+        if not isinstance(output_text, str):
+            raise RuntimeError(  # noqa: TRY004 - malformed provider response
+                "extract_document: OpenAI returned no JSON output"
+            )
+        try:
+            payload = json.loads(output_text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("extract_document: OpenAI returned invalid JSON") from exc
+        if not isinstance(payload, dict):
+            raise RuntimeError(  # noqa: TRY004 - malformed provider response
+                "extract_document: OpenAI returned a non-object result"
+            )
+        return payload

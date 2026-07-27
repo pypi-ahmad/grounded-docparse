@@ -1,2 +1,23 @@
 [server]
 maxUploadSize = 250
+
+[theme]
+base = "dark"
+primaryColor = "#6366f1"
+backgroundColor = "#0c1017"
+secondaryBackgroundColor = "#161d29"
+codeBackgroundColor = "#111722"
+textColor = "#e5e7eb"
+linkColor = "#818cf8"
+borderColor = "#30394a"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "8px"
+buttonRadius = "7px"
+baseFontSize = 14
+linkUnderline = false
+
+[theme.sidebar]
+backgroundColor = "#111722"
+secondaryBackgroundColor = "#20293a"
+borderColor = "#273042"

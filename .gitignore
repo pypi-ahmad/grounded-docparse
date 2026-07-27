@@ -1,6 +1,10 @@
 .venv/
+node_modules/
+*.egg-info/
 __pycache__/
 .pytest_cache/
+.playwright-cli/
+output/
 .ruff_cache/
 .codegraph/
 .code-review-graph/

@@ -1,10 +1,28 @@
 # Changelog
 
+## Unreleased
+
+- Reduced the product to one synchronous Streamlit page: upload, extract, inspect Markdown/JSON, and download.
+- Replaced persisted jobs, review/evaluation workflows, annotated artifacts, and the CLI with a direct Luna-draft/Terra-verification pipeline.
+- Removed SQLite, local artifact/cache code, the custom Streamlit component, and their dependencies.
+- Enforced fail-closed visual grounding for invalid or missing bounding boxes.
+- Left legacy `.docparse/` data untouched and ignored.
+
 All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+
+- Replaced the multi-service deployment with one local Streamlit process, SQLite WAL metadata, and filesystem artifacts.
+- Removed Docker, Compose, FastAPI, Celery, Redis, PostgreSQL, MinIO/S3, PaddleOCR-VL, GLM-OCR, and Ollama integration.
+- Rebuilt the UI around persistent Workspace, Runs, Review, Export, and Evaluation workflows.
+- Made the Luna/Terra grounded vision pipeline the only extraction path.
+- Raised Luna and Terra output budgets to their documented 128,000-token limit and added provider-stage diagnostics for incomplete structured responses.
+- Allow a fresh submission after an identical prior run failed while retaining idempotency for active and successful runs.
+- Removed explicit OpenAI prompt-cache fields for compatibility with configured API endpoints.
 
 ## [0.2.0] - 2026-07-26
 

@@ -1,0 +1,149 @@
+{
+  "generated_at": "2026-07-27T08:18:18.400914+00:00",
+  "nodes": {
+    "src_grounded_docparse_extraction_documentextractor": {
+      "code_fingerprint": "5d2be3d9553561d0759042f541b68dae68c899b34c0dd58f95cec1d86ee8b797",
+      "label": "DocumentExtractor",
+      "last": "2026-07-27T08:17:10.766051+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:17:10.766051+00:00",
+          "outcome": "useful",
+          "q": "How many agents are there now, and will increasing agents and subagents improve speed while keeping accuracy?"
+        },
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 1.999945001,
+      "source_file": "src/grounded_docparse/extraction.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "src_grounded_docparse_gateways_openaidocumentgateway": {
+      "code_fingerprint": "8ef207408bd18827500d663a27fe2a8b59725ad93d0dd95ce2fb4ea49adc1279",
+      "label": "OpenAIDocumentGateway",
+      "last": "2026-07-27T08:17:10.766051+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:17:10.766051+00:00",
+          "outcome": "useful",
+          "q": "How many agents are there now, and will increasing agents and subagents improve speed while keeping accuracy?"
+        },
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 1.999945001,
+      "source_file": "src/grounded_docparse/gateways.py",
+      "status": "preferred",
+      "uses": 2
+    },
+    "src_grounded_docparse_models_agentdelegation": {
+      "code_fingerprint": "3c763dc28eb07b5d66c8fd5ec3df5783d06b66eb6a4888bfaaca1d90ffb33c19",
+      "label": "AgentDelegation",
+      "last": "2026-07-27T08:17:10.766051+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:17:10.766051+00:00",
+          "outcome": "useful",
+          "q": "How many agents are there now, and will increasing agents and subagents improve speed while keeping accuracy?"
+        }
+      ],
+      "score": 0.999981913,
+      "source_file": "src/grounded_docparse/models.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "src_grounded_docparse_models_agentrole": {
+      "code_fingerprint": "3c763dc28eb07b5d66c8fd5ec3df5783d06b66eb6a4888bfaaca1d90ffb33c19",
+      "label": "AgentRole",
+      "last": "2026-07-27T08:17:10.766051+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:17:10.766051+00:00",
+          "outcome": "useful",
+          "q": "How many agents are there now, and will increasing agents and subagents improve speed while keeping accuracy?"
+        }
+      ],
+      "score": 0.999981913,
+      "source_file": "src/grounded_docparse/models.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "src_grounded_docparse_models_block": {
+      "code_fingerprint": "3c763dc28eb07b5d66c8fd5ec3df5783d06b66eb6a4888bfaaca1d90ffb33c19",
+      "label": "Block",
+      "last": "2026-07-27T08:16:00.365561+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 0.999963088,
+      "source_file": "src/grounded_docparse/models.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "src_grounded_docparse_models_document": {
+      "code_fingerprint": "3c763dc28eb07b5d66c8fd5ec3df5783d06b66eb6a4888bfaaca1d90ffb33c19",
+      "label": "Document",
+      "last": "2026-07-27T08:16:00.365561+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 0.999963088,
+      "source_file": "src/grounded_docparse/models.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "src_grounded_docparse_models_runusage": {
+      "code_fingerprint": "3c763dc28eb07b5d66c8fd5ec3df5783d06b66eb6a4888bfaaca1d90ffb33c19",
+      "label": "RunUsage",
+      "last": "2026-07-27T08:16:00.365561+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 0.999963088,
+      "source_file": "src/grounded_docparse/models.py",
+      "status": "tentative",
+      "uses": 1
+    },
+    "src_grounded_docparse_pipeline_documentparser": {
+      "code_fingerprint": "2aed8ba1d7c843e3661639408a7b754cbdc62984d317c18ce8613b52eefd668d",
+      "label": "DocumentParser",
+      "last": "2026-07-27T08:17:10.766051+00:00",
+      "provenance": [
+        {
+          "date": "2026-07-27T08:17:10.766051+00:00",
+          "outcome": "useful",
+          "q": "How many agents are there now, and will increasing agents and subagents improve speed while keeping accuracy?"
+        },
+        {
+          "date": "2026-07-27T08:16:00.365561+00:00",
+          "outcome": "useful",
+          "q": "Why does DocumentParser connect five architecture communities?"
+        }
+      ],
+      "score": 1.999945001,
+      "source_file": "src/grounded_docparse/pipeline.py",
+      "status": "preferred",
+      "uses": 2
+    }
+  },
+  "version": 1
+}
