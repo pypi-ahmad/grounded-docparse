@@ -292,7 +292,7 @@ class OverflowingScanProbeGateway:
         return PageInspection()
 
 
-def test_all_scan_probes_receive_two_bounded_quality_rounds() -> None:
+def test_incomplete_scanned_structures_are_repaired_without_duplicate_probes() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
@@ -305,14 +305,9 @@ def test_all_scan_probes_receive_two_bounded_quality_rounds() -> None:
         gateway_factory=lambda _config: gateway,
     ).parse(data, "scan.pdf")
 
-    final_probe = result.document.pages[0].blocks[-1]
-    assert final_probe.text == ""
-    assert final_probe.verification is VerificationState.NEEDS_REVIEW
-    assert final_probe.verification_reason == (
-        "Scan omission probe unresolved: No conclusive quality verification decision"
-    )
-    assert [len(call[1]) for call in gateway.quality_calls] == [8, 8, 2, 8, 8, 2]
-    assert any("created 9 scan omission probes" in warning for warning in result.document.warnings)
+    assert len(result.document.pages[0].blocks) == 9
+    assert [len(call[1]) for call in gateway.quality_calls] == [8, 1, 8, 1]
+    assert not any("scan omission probes" in warning for warning in result.document.warnings)
     assert not any("recovered 9 native text regions" in warning for warning in result.document.warnings)
     assert not any("repair limit exceeded" in warning for warning in result.document.warnings)
 
@@ -486,6 +481,34 @@ def test_failed_quality_crop_does_not_expose_rejected_structured_content(
     assert "Hallucinated" not in result.markdown
 
 
+class MalformedCorrectionGateway(SecondRoundStructuredRepairGateway):
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.CORRECT,
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_malformed_quality_correction_retries_then_preserves_rejection() -> None:
+    gateway = MalformedCorrectionGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = result.document.pages[0].blocks[1]
+    assert len(gateway.quality_calls) == 2
+    assert block.verification is VerificationState.REJECTED
+    assert "Hallucinated" not in result.markdown
+
+
 class ManyQualityCandidatesGateway:
     input_tokens = 0
     output_tokens = 0
@@ -633,6 +656,47 @@ def test_geometry_only_rejection_remains_visible_for_review() -> None:
     assert [
         [crop.region_id for crop in call[1]] for call in gateway.quality_calls
     ] == [["p1-b2", "p1-b1"], ["p1-b1"]]
+
+
+class SemanticRejectionOfClippedGateway(GeometryOnlyQualityGateway):
+    def draft_page(self, page):
+        draft = super().draft_page(page)
+        form = draft.regions[0].form
+        assert form is not None
+        draft.regions[0] = draft.regions[0].model_copy(
+            update={"form": form.model_copy(update={"value": "Unsupported"})}
+        )
+        return draft
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=(
+                        InspectionAction.REJECT
+                        if crop.region_id == "p1-b1"
+                        else InspectionAction.ACCEPT
+                    ),
+                    reason="Unsupported form content" if crop.region_id == "p1-b1" else "",
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_semantic_rejection_of_clipped_content_remains_suppressed() -> None:
+    gateway = SemanticRejectionOfClippedGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = next(item for item in result.document.pages[0].blocks if item.id == "p1-b1")
+    assert block.verification is VerificationState.REJECTED
+    assert "Unsupported" not in result.markdown
 
 
 class AgenticRoutingGateway(AcceptingGateway):

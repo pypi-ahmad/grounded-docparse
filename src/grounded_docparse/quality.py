@@ -164,8 +164,6 @@ def _scan_probes(page: PageEvidence, blocks: list[Block]) -> list[RegionDraft]:
     for block in active_blocks:
         if block.bbox is None:
             continue
-        if _incomplete_structured_content(block):
-            add_probe(block.bbox)
         if (
             block.type in VISUAL_TYPES
             and not semantic_text(block).strip()
@@ -291,14 +289,6 @@ def select_repair_blocks(
     candidates.sort(key=lambda item: item[:3])
     selected = [item[3] for item in candidates]
     return selected if limit is None else selected[:limit]
-
-
-def is_geometry_only_repair_candidate(
-    page: PageEvidence,
-    block: Block,
-    warnings: list[str],
-) -> bool:
-    return _structured_repair_risks(page, block, warnings) == {"geometry"}
 
 
 def _normalize_marker(block: Block) -> None:
