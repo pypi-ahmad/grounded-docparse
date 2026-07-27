@@ -159,6 +159,50 @@ def test_normalization_strips_structural_marker_duplication() -> None:
     assert [block.reading_order for block in normalized] == [0, 1]
 
 
+def test_normalization_removes_repeated_ordered_markers_idempotently() -> None:
+    blocks = [
+        _block("numeric-dot", "1. 1. Collect the sample.", _box(0.1, 0.1, 0.9, 0.2), node_type=NodeType.LIST_ITEM, marker="1."),
+        _block("numeric-paren", "1) 1) Label the bottle.", _box(0.1, 0.2, 0.9, 0.3), node_type=NodeType.LIST_ITEM, marker="1)"),
+        _block("alpha-dot", "A. A. Preserve the chain of custody.", _box(0.1, 0.3, 0.9, 0.4), node_type=NodeType.LIST_ITEM, marker="A."),
+        _block("alpha-paren", "A) A) Complete the field log.", _box(0.1, 0.4, 0.9, 0.5), node_type=NodeType.LIST_ITEM, marker="A)"),
+        _block("roman", "IV. IV. Verify the result.", _box(0.1, 0.5, 0.9, 0.6), node_type=NodeType.LIST_ITEM, marker="IV."),
+        _block("parenthesized", "(iv) (iv) Archive the record.", _box(0.1, 0.6, 0.9, 0.7), node_type=NodeType.LIST_ITEM, marker="(iv)"),
+    ]
+
+    normalized, _warnings = normalize_page_blocks(blocks)
+    first_pass = [(block.list_marker, block.text) for block in normalized]
+    renormalized, _warnings = normalize_page_blocks(normalized)
+
+    assert first_pass == [
+        ("1.", "Collect the sample."),
+        ("1)", "Label the bottle."),
+        ("A.", "Preserve the chain of custody."),
+        ("A)", "Complete the field log."),
+        ("IV.", "Verify the result."),
+        ("(iv)", "Archive the record."),
+    ]
+    assert [(block.list_marker, block.text) for block in renormalized] == first_pass
+
+
+def test_source_recovery_recognizes_roman_and_parenthesized_ordered_markers_only() -> None:
+    roman_box = _box(0.1, 0.1, 0.9, 0.2)
+    parenthesized_box = _box(0.1, 0.25, 0.9, 0.35)
+    prose_box = _box(0.1, 0.4, 0.9, 0.5)
+    page = _page(
+        ("IV. Verify the sample collection record.", roman_box),
+        ("(2) Label the bottle before transport.", parenthesized_box),
+        ("(Note) This sentence remains ordinary prose.", prose_box),
+    )
+
+    missing = find_missing_source_regions(page, [])
+
+    assert [(region.type, region.list_marker, region.text) for region in missing] == [
+        (NodeType.LIST_ITEM, "IV.", "Verify the sample collection record."),
+        (NodeType.LIST_ITEM, "(2)", "Label the bottle before transport."),
+        (NodeType.PARAGRAPH, None, "(Note) This sentence remains ordinary prose."),
+    ]
+
+
 def test_normalization_removes_duplicate_table_with_same_order() -> None:
     valid_box = _box(0.1, 0.7, 0.9, 0.9)
     clipped_box = _box(0.1, 1.0, 0.9, 1.0)
