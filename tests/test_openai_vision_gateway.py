@@ -164,6 +164,8 @@ def test_incomplete_draft_reports_provider_context_before_schema_validation(
         gateway.draft_page(_page(tmp_path / "page.png"))
     assert getattr(gateway, "input_tokens", None) == 7
     assert getattr(gateway, "output_tokens", None) == 3
+    assert gateway.runtime.diagnostics().input_tokens == 7
+    assert gateway.runtime.diagnostics().output_tokens == 3
 
 
 def test_page_draft_schema_has_no_free_form_model_output() -> None:

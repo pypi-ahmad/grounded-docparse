@@ -22,8 +22,8 @@ from .models import (
     AtomicEvidence,
     Block,
     BoundingBox,
-    ConfidenceSpan,
     Citation,
+    ConfidenceSpan,
     CorrectionLineage,
     CropInspectionRequest,
     Document,
@@ -65,6 +65,7 @@ from .render import (
     render_annotated_pdf,
     render_json,
 )
+from .runtime import ProviderRuntime
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
@@ -650,8 +651,12 @@ class DocumentParser:
         workdir: Path,
         total: int,
         progress_callback: ProgressCallback | None,
+        runtime: ProviderRuntime,
     ) -> _ProcessedPage:
         gateway = self.gateway_factory(self.config)
+        bind_runtime = getattr(gateway, "bind_runtime", None)
+        if callable(bind_runtime):
+            bind_runtime(runtime)
         warnings: list[str] = []
         _emit(progress_callback, "draft", page.number, total, f"Reading page {page.number}")
         draft = gateway.draft_page(page)
@@ -1661,6 +1666,7 @@ class DocumentParser:
         progress_callback: ProgressCallback | None = None,
     ) -> ParseResult:
         started = time.perf_counter()
+        runtime = ProviderRuntime(self.config)
         with tempfile.TemporaryDirectory(prefix="docparse-") as temporary:
             workdir = Path(temporary)
             source = ingest_document(
@@ -1678,6 +1684,7 @@ class DocumentParser:
             usage = RunUsage()
             trace: list[AgentTraceEvent] = []
             total = len(source.pages)
+            runtime.reserve_base_drafts(total)
             progress_events: SimpleQueue[ProgressEvent] = SimpleQueue()
 
             def queue_progress(event: ProgressEvent) -> None:
@@ -1716,6 +1723,7 @@ class DocumentParser:
                             workdir,
                             total,
                             queue_progress if progress_callback is not None else None,
+                            runtime,
                         ): page.number
                         for page in batch
                     }
@@ -1763,10 +1771,12 @@ class DocumentParser:
             materialize_document_quality(document)
             input_tokens = usage.input_tokens
             output_tokens = usage.output_tokens
+            runtime_diagnostics = runtime.diagnostics()
             rendered = render_agentic_document(
                 document,
                 usage=usage,
                 trace=trace,
+                runtime_diagnostics=runtime_diagnostics,
                 duration_ms=round((time.perf_counter() - started) * 1000),
             )
             return ParseResult(
@@ -1779,4 +1789,5 @@ class DocumentParser:
                 legacy_json=render_json(document),
                 usage=usage,
                 trace=trace,
+                runtime_diagnostics=runtime_diagnostics,
             )
