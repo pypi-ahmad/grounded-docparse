@@ -19,6 +19,26 @@ from grounded_docparse.models import (
 from grounded_docparse.pipeline import DocumentParser
 
 
+def test_geometry_only_rejection_flag_is_additive_and_fail_closed() -> None:
+    try:
+        typed = InspectionDecision.model_validate(
+            {
+                "region_id": "p1-b1",
+                "action": "reject",
+                "geometry_only": True,
+            }
+        )
+    except ValueError:
+        typed = None
+
+    assert typed is not None
+    assert typed.geometry_only is True
+    assert InspectionDecision(
+        region_id="p1-b2",
+        action=InspectionAction.REJECT,
+    ).geometry_only is False
+
+
 class AcceptingGateway:
     inspected_region_ids = None
     input_tokens = 23
@@ -635,7 +655,8 @@ class GeometryOnlyQualityGateway:
                         if crop.region_id == "p1-b1"
                         else InspectionAction.ACCEPT
                     ),
-                    reason="Geometry is clipped" if crop.region_id == "p1-b1" else "",
+                    reason="Crop is unreadable" if crop.region_id == "p1-b1" else "",
+                    geometry_only=crop.region_id == "p1-b1",
                 )
                 for crop in crops
             ]
@@ -679,7 +700,11 @@ class SemanticRejectionOfClippedGateway(GeometryOnlyQualityGateway):
                         if crop.region_id == "p1-b1"
                         else InspectionAction.ACCEPT
                     ),
-                    reason="Unsupported form content" if crop.region_id == "p1-b1" else "",
+                    reason=(
+                        "Geometry is valid; content is unsupported"
+                        if crop.region_id == "p1-b1"
+                        else ""
+                    ),
                 )
                 for crop in crops
             ]
