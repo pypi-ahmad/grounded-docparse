@@ -343,8 +343,9 @@ def _duplicate(left: Block, right: Block) -> bool:
     return bottom_edge and (_clipped(left.bbox) or _clipped(right.bbox)) and similarity >= 0.75
 
 
-def _quality(block: Block) -> tuple[int, int, float, float]:
+def _quality(block: Block) -> tuple[int, int, int, float, float]:
     return (
+        int(block.verification is not VerificationState.REJECTED),
         int(not _clipped(block.bbox)),
         int(block.verification is VerificationState.VERIFIED),
         block.confidence,

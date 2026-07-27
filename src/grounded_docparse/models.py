@@ -129,6 +129,17 @@ class AtomicEvidence(BaseModel):
     bbox: BoundingBox | None = None
 
 
+class CorrectionLineage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    original_id: str
+    replacement_id: str | None = None
+    provider_id: str | None = None
+    reason: str
+    previous_state: VerificationState
+    final_state: VerificationState
+
+
 class Block(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -155,6 +166,7 @@ class Block(BaseModel):
     chart_type: str | None = None
     chart_data: list[ChartPoint] = Field(default_factory=list)
     atoms: list[AtomicEvidence] = Field(default_factory=list)
+    correction_lineage: list[CorrectionLineage] = Field(default_factory=list)
 
 
 class Page(BaseModel):

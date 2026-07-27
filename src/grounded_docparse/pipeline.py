@@ -20,6 +20,7 @@ from .models import (
     Block,
     BoundingBox,
     Citation,
+    CorrectionLineage,
     CropInspectionRequest,
     Document,
     DraftBoundingBox,
@@ -316,11 +317,14 @@ def _region_from_block(block: Block) -> RegionDraft:
 
 
 def _visible_region_text(region: RegionDraft) -> str:
-    values = [region.text, region.caption or "", region.figure_description or ""]
+    values = [region.text]
+    values.extend(cell.text for cell in region.table_cells)
     if region.form is not None:
         values.extend(
             [region.form.label, region.form.value or "", region.form.hint or ""]
         )
+    values.extend((region.checkbox_group or "", region.checkbox_option or ""))
+    values.extend((region.caption or "", region.figure_description or ""))
     return " ".join(
         " ".join(value.split()) for value in values if value
     ).casefold()
@@ -336,21 +340,22 @@ def _box_overlap(left: BoundingBox, right: BoundingBox) -> float:
     return intersection / union if union else 0.0
 
 
-def _is_duplicate_addition(region: RegionDraft, blocks: list[Block]) -> bool:
+def _matching_addition_blocks(region: RegionDraft, blocks: list[Block]) -> list[Block]:
     text = _visible_region_text(region)
     bbox = _bbox(region.bbox)
+    matches: list[Block] = []
     for block in blocks:
-        existing = _visible_region_text(_region_from_block(block))
-        if text and text == existing:
-            return True
-        if (
+        existing = " ".join(semantic_text(block).split()).casefold()
+        exact_text = bool(text and text == existing)
+        strong_overlap = (
             bbox is not None
             and block.bbox is not None
             and block.type is region.type
             and _box_overlap(bbox, block.bbox) >= 0.8
-        ):
-            return True
-    return False
+        )
+        if exact_text or strong_overlap:
+            matches.append(block)
+    return matches
 
 
 def _proactive_crop_priority(block: Block) -> int | None:
@@ -578,15 +583,67 @@ class DocumentParser:
                         f"{addition.region_id} with invalid bounding box"
                     )
                     continue
-                if _is_duplicate_addition(addition.region, blocks):
+                matches = _matching_addition_blocks(addition.region, blocks)
+                active_matches = [
+                    block
+                    for block in matches
+                    if block.verification is not VerificationState.REJECTED
+                ]
+                if active_matches:
                     warnings.append(
                         f"Page {page.number}: skipped duplicate added region "
                         f"{addition.region_id}"
                     )
                     continue
+                rejected_matches = [
+                    block
+                    for block in matches
+                    if block.verification is VerificationState.REJECTED
+                ]
+                reason = addition.reason or "Added by page coverage inspection"
+                if len(rejected_matches) == 1:
+                    predecessor = rejected_matches[0]
+                    previous_state = predecessor.verification
+                    _apply_correction(predecessor, addition.region, page.number)
+                    predecessor.verification = VerificationState.VERIFIED
+                    predecessor.verification_reason = reason
+                    predecessor.correction_lineage.append(
+                        CorrectionLineage(
+                            original_id=predecessor.id,
+                            replacement_id=predecessor.id,
+                            provider_id=addition.region_id,
+                            reason=reason,
+                            previous_state=previous_state,
+                            final_state=predecessor.verification,
+                        )
+                    )
+                    continue
                 added = _block(addition.region, page.number, len(blocks))
-                added.verification = VerificationState.VERIFIED
-                added.verification_reason = addition.reason or "Added by page coverage inspection"
+                if rejected_matches:
+                    added.verification = VerificationState.NEEDS_REVIEW
+                    predecessor_ids = ", ".join(block.id for block in rejected_matches)
+                    added.verification_reason = (
+                        f"{reason}; ambiguous rejected predecessor matches: "
+                        f"{predecessor_ids}"
+                    )
+                    added.correction_lineage.extend(
+                        CorrectionLineage(
+                            original_id=predecessor.id,
+                            replacement_id=added.id,
+                            provider_id=addition.region_id,
+                            reason=reason,
+                            previous_state=predecessor.verification,
+                            final_state=added.verification,
+                        )
+                        for predecessor in rejected_matches
+                    )
+                    warnings.append(
+                        f"Page {page.number}: added region {addition.region_id} "
+                        f"matched multiple rejected predecessors: {predecessor_ids}"
+                    )
+                else:
+                    added.verification = VerificationState.VERIFIED
+                    added.verification_reason = reason
                 blocks.append(added)
                 addition_ids[addition.region_id] = added.id
 
