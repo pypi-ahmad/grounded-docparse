@@ -10,6 +10,7 @@ from .models import Block, BoundingBox, NodeType, RegionDraft, VerificationState
 
 SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
+REPAIR_CONFIDENCE_THRESHOLD = 0.85
 SCAN_UNCOVERED_INTERIOR_THRESHOLD = 0.30
 SCAN_LARGE_VISUAL_AREA = 0.15
 SCAN_INTERIOR = (0.1, 0.1, 0.9, 0.9)
@@ -215,36 +216,89 @@ def _critical_values(value: str) -> set[str]:
     }
 
 
+def _related_source_text(page: PageEvidence, block: Block) -> str:
+    return " ".join(
+        source.text
+        for source in page.text_blocks
+        if _spatially_related(source.bbox, block.bbox)
+    )
+
+
+def _structured_repair_risks(
+    page: PageEvidence,
+    block: Block,
+    warnings: list[str],
+) -> set[str]:
+    if block.type not in COMPLEX_TYPES:
+        return set()
+    candidate_text = semantic_text(block)
+    source_text = _related_source_text(page, block)
+    risks: set[str] = set()
+    if block.verification is VerificationState.REJECTED:
+        risks.add("rejected")
+    if _incomplete_structured_content(block):
+        risks.add("structure")
+    if block.confidence < REPAIR_CONFIDENCE_THRESHOLD:
+        risks.add("confidence")
+    if _clipped(block.bbox):
+        risks.add("geometry")
+    if _critical_values(candidate_text):
+        risks.add("critical_literal")
+    if source_text.strip() and (
+        _coverage(candidate_text, source_text) < SOURCE_COVERAGE_THRESHOLD
+        or _coverage(source_text, candidate_text) < SOURCE_COVERAGE_THRESHOLD
+    ):
+        risks.add("source_disagreement")
+    if any(
+        marker in warning.casefold()
+        for marker in DEGRADED_MARKERS
+        for warning in warnings
+    ):
+        risks.add("degraded")
+    return risks
+
+
 def select_repair_blocks(
     page: PageEvidence,
     blocks: list[Block],
     warnings: list[str],
     *,
-    limit: int = MAX_REPAIR_BLOCKS,
+    limit: int | None = None,
 ) -> list[Block]:
-    degraded = any(marker in warning.casefold() for marker in DEGRADED_MARKERS for warning in warnings)
     candidates: list[tuple[int, float, int, Block]] = []
     for block in blocks:
-        if block.verification is VerificationState.REJECTED or block.bbox is None:
+        structured = block.type in COMPLEX_TYPES
+        if block.verification is VerificationState.REJECTED and not structured:
             continue
         values = _critical_values(semantic_text(block))
-        source_text = " ".join(
-            source.text
-            for source in page.text_blocks
-            if _spatially_related(source.bbox, block.bbox)
-        )
+        source_text = _related_source_text(page, block)
         source_values = _critical_values(source_text)
         literal_mismatch = bool(source_values and not values.issubset(source_values))
-        degraded_complex = degraded and block.type in COMPLEX_TYPES and bool(values)
+        structured_risks = _structured_repair_risks(page, block, warnings)
         unresolved_literal = (
             block.verification is VerificationState.NEEDS_REVIEW and bool(values)
         )
-        if not (literal_mismatch or degraded_complex or unresolved_literal):
+        if not (literal_mismatch or structured_risks or unresolved_literal):
             continue
-        priority = 0 if literal_mismatch else 1 if degraded_complex else 2
+        priority = (
+            0
+            if literal_mismatch or "source_disagreement" in structured_risks
+            else 1
+            if structured_risks
+            else 2
+        )
         candidates.append((priority, block.confidence, block.reading_order, block))
     candidates.sort(key=lambda item: item[:3])
-    return [item[3] for item in candidates[:limit]]
+    selected = [item[3] for item in candidates]
+    return selected if limit is None else selected[:limit]
+
+
+def is_geometry_only_repair_candidate(
+    page: PageEvidence,
+    block: Block,
+    warnings: list[str],
+) -> bool:
+    return _structured_repair_risks(page, block, warnings) == {"geometry"}
 
 
 def _normalize_marker(block: Block) -> None:

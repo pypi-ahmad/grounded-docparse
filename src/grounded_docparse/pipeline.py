@@ -42,6 +42,7 @@ from .models import (
 from .quality import (
     MAX_REPAIR_BLOCKS,
     find_missing_source_regions,
+    is_geometry_only_repair_candidate,
     normalize_page_blocks,
     select_repair_blocks,
     semantic_text,
@@ -740,13 +741,31 @@ class DocumentParser:
                 if block.id not in selected_ids:
                     selected.append(block)
                     selected_ids.add(block.id)
-                if len(selected) == MAX_REPAIR_BLOCKS:
-                    break
 
             quality_requests: list[CropInspectionRequest] = []
             quality_blocks: list[Block] = []
+            original_verification = {
+                block.id: block.verification for block in selected
+            }
+            original_reasons = {
+                block.id: block.verification_reason for block in selected
+            }
+            geometry_only_ids = {
+                block.id
+                for block in selected
+                if is_geometry_only_repair_candidate(page, block, warnings)
+            }
             for block in selected:
                 if block.bbox is None:
+                    if block.verification is not VerificationState.REJECTED:
+                        block.verification = VerificationState.NEEDS_REVIEW
+                        block.verification_reason = (
+                            block.verification_reason
+                            or "Quality repair requires valid geometry"
+                        )
+                    warnings.append(
+                        f"Page {page.number}: quality gate unresolved block {block.id}"
+                    )
                     continue
                 crop_path = workdir / f"{block.id}-quality-crop.png"
                 try:
@@ -759,10 +778,14 @@ class DocumentParser:
                         padding=max(self.config.crop_padding, 0.1),
                     )
                 except Exception as exc:  # noqa: BLE001 - review failure is auditable
-                    block.verification = VerificationState.NEEDS_REVIEW
-                    block.verification_reason = (
-                        f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
-                    )
+                    if original_verification[block.id] is VerificationState.REJECTED:
+                        block.verification = VerificationState.REJECTED
+                        block.verification_reason = original_reasons[block.id]
+                    else:
+                        block.verification = VerificationState.NEEDS_REVIEW
+                        block.verification_reason = (
+                            f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
+                        )
                     warnings.append(
                         f"Page {page.number}: quality gate unresolved block {block.id}"
                     )
@@ -778,67 +801,95 @@ class DocumentParser:
                 quality_blocks.append(block)
 
             if quality_requests:
-                try:
-                    quality_inspection = quality_inspector(
-                        quality_requests,
-                        page_number=page.number,
-                    )
-                except Exception as exc:  # noqa: BLE001 - review failure is auditable
-                    reason = f"Quality verification failed: {type(exc).__name__}: {exc}"
-                    quality_decisions = {}
-                else:
-                    reason = "No conclusive quality verification decision"
-                    quality_decisions = {
-                        item.region_id: item for item in quality_inspection.decisions
-                    }
-                for block in quality_blocks:
-                    decision = quality_decisions.get(block.id)
-                    if decision is not None and decision.action in {
-                        InspectionAction.ACCEPT,
-                        InspectionAction.CORRECT,
-                    }:
-                        _apply_decision(
-                            block,
-                            decision,
-                            page.number,
-                            preserve_layout=True,
-                        )
-                        if (
-                            decision.action is InspectionAction.CORRECT
-                            and block.verification is VerificationState.VERIFIED
-                            and semantic_text(block).strip()
-                        ):
-                            grounded_corrections.append(block)
-                        continue
-                    block.verification = VerificationState.NEEDS_REVIEW
-                    reason = (
-                        decision.reason if decision is not None and decision.reason else reason
-                    )
-                    block.verification_reason = (
-                        f"Scan omission probe unresolved: {reason}"
-                        if block.id in scan_probe_ids
-                        else reason
-                    )
-                    warnings.append(
-                        f"Page {page.number}: quality gate unresolved block {block.id}"
-                    )
+                pending = list(zip(quality_requests, quality_blocks, strict=True))
+                rejection_counts: dict[str, int] = {}
+                for repair_round in range(1, 3):
+                    next_pending: list[tuple[CropInspectionRequest, Block]] = []
+                    for batch_start in range(0, len(pending), MAX_REPAIR_BLOCKS):
+                        batch = pending[batch_start : batch_start + MAX_REPAIR_BLOCKS]
+                        batch_requests = [request for request, _block_item in batch]
+                        try:
+                            quality_inspection = quality_inspector(
+                                batch_requests,
+                                page_number=page.number,
+                            )
+                        except Exception as exc:  # noqa: BLE001 - review failure is auditable
+                            fallback_reason = (
+                                f"Quality verification failed: {type(exc).__name__}: {exc}"
+                            )
+                            quality_decisions = {}
+                        else:
+                            fallback_reason = "No conclusive quality verification decision"
+                            quality_decisions = {
+                                item.region_id: item
+                                for item in quality_inspection.decisions
+                            }
+                        for request, block in batch:
+                            decision = quality_decisions.get(block.id)
+                            if decision is not None and decision.action in {
+                                InspectionAction.ACCEPT,
+                                InspectionAction.CORRECT,
+                            }:
+                                _apply_decision(
+                                    block,
+                                    decision,
+                                    page.number,
+                                    preserve_layout=True,
+                                )
+                                if (
+                                    decision.action is InspectionAction.CORRECT
+                                    and block.verification is VerificationState.VERIFIED
+                                    and semantic_text(block).strip()
+                                ):
+                                    grounded_corrections.append(block)
+                                continue
 
-            uninspected_recovery = [
-                block for block in recovery_blocks if block.id not in selected_ids
-            ]
-            for block in uninspected_recovery:
-                if block.id in scan_probe_ids:
-                    block.verification_reason = (
-                        "Scan omission probe was not inspected; repair limit exceeded"
-                    )
-                else:
-                    block.verification_reason = (
-                        "Native source recovery was not inspected; repair limit exceeded"
-                    )
-                warnings.append(
-                    f"Page {page.number}: quality gate unresolved block {block.id}; "
-                    "repair limit exceeded"
-                )
+                            reason = (
+                                decision.reason
+                                if decision is not None and decision.reason
+                                else fallback_reason
+                            )
+                            if decision is not None and decision.action is InspectionAction.REJECT:
+                                rejection_counts[block.id] = (
+                                    rejection_counts.get(block.id, 0) + 1
+                                )
+                            if repair_round == 1:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = reason
+                                next_pending.append((request, block))
+                                continue
+
+                            if rejection_counts.get(block.id, 0) == 2:
+                                if block.id in geometry_only_ids:
+                                    block.verification = VerificationState.NEEDS_REVIEW
+                                    block.verification_reason = (
+                                        "Geometry remained unresolved after two quality "
+                                        f"repair rounds: {reason}"
+                                    )
+                                else:
+                                    _apply_decision(
+                                        block,
+                                        decision,
+                                        page.number,
+                                        preserve_layout=True,
+                                    )
+                            elif original_verification[block.id] is VerificationState.REJECTED:
+                                block.verification = VerificationState.REJECTED
+                                block.verification_reason = original_reasons[block.id]
+                            else:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = (
+                                    f"Scan omission probe unresolved: {reason}"
+                                    if block.id in scan_probe_ids
+                                    else reason
+                                )
+                            warnings.append(
+                                f"Page {page.number}: quality gate unresolved block {block.id}"
+                            )
+                    pending = next_pending
+                    if not pending:
+                        break
+
             if native_recovery_blocks:
                 warnings.append(
                     f"Page {page.number}: queued {len(native_recovery_blocks)} native "
