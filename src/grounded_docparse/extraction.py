@@ -34,7 +34,7 @@ NUMBER_BODY = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?"
 NUMERIC_LITERAL_PATTERN = re.compile(
     rf"(?<![\w.,])(?P<accounting>\()?[ \t]*(?P<sign_before>[+-])?[ \t]*"
     rf"(?P<currency>[$€£])?[ \t]*(?P<sign_after>[+-])?[ \t]*"
-    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?![\w,]|\.\d)"
+    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?!\w|[.,]\d)"
 )
 
 
