@@ -30,9 +30,11 @@ UNSUPPORTED_KEYWORDS = {
     "minItems",
     "maxItems",
 }
+NUMBER_BODY = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?"
 NUMERIC_LITERAL_PATTERN = re.compile(
-    r"(?<![\w.,])(?:[$€£]\s*)?[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
-    r"(?![\w.,])"
+    rf"(?<![\w.,])(?P<accounting>\()?[ \t]*(?P<sign_before>[+-])?[ \t]*"
+    rf"(?P<currency>[$€£])?[ \t]*(?P<sign_after>[+-])?[ \t]*"
+    rf"(?P<number>{NUMBER_BODY})[ \t]*(?(accounting)\))(?![\w.,])"
 )
 
 
@@ -323,25 +325,37 @@ def _citations_contain_value(
     grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|")
     folded = grounded.casefold()
     if isinstance(value, bool):
-        literal = re.search(rf"\b{str(value).casefold()}\b", folded)
+        literals = ("true", "yes") if value else ("false", "no")
+        literal = any(re.search(rf"\b{item}\b", folded) for item in literals)
         checkbox = (
             re.search(r"\[(?:x|✓)\]", folded)
             if value
             else re.search(r"\[\s\]", folded)
         )
-        return literal is not None or checkbox is not None
+        return literal or checkbox is not None
     if isinstance(value, (int, float)):
         try:
             expected_number = Decimal(str(value))
         except InvalidOperation:
             return False
-        for match in NUMERIC_LITERAL_PATTERN.finditer(grounded):
-            literal = re.sub(r"[$€£,\s]", "", match.group())
-            try:
-                if Decimal(literal) == expected_number:
-                    return True
-            except InvalidOperation:
-                continue
+        for evidence in cited_text:
+            for match in NUMERIC_LITERAL_PATTERN.finditer(evidence.replace(r"\|", "|")):
+                sign_before = match.group("sign_before")
+                sign_after = match.group("sign_after")
+                explicit_signs = [sign for sign in (sign_before, sign_after) if sign]
+                if len(explicit_signs) > 1:
+                    continue
+                if match.group("accounting") and explicit_signs:
+                    continue
+                literal = match.group("number").replace(",", "")
+                try:
+                    parsed = Decimal(literal)
+                    if match.group("accounting") or explicit_signs == ["-"]:
+                        parsed = -parsed
+                    if parsed == expected_number:
+                        return True
+                except InvalidOperation:
+                    continue
         return False
     expected = " ".join(str(value).split()).casefold()
     return bool(expected and expected in folded)
