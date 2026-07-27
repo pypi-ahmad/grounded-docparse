@@ -427,6 +427,29 @@ def test_normalization_removes_duplicate_table_with_same_order() -> None:
     assert normalized[0].reading_order == 0
 
 
+def test_normalization_prefers_active_correction_over_rejected_duplicate() -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.2)
+    rejected = _block(
+        "p1-b1",
+        "Grounded replacement",
+        bbox,
+        confidence=0.99,
+        verification=VerificationState.REJECTED,
+    )
+    corrected = _block(
+        "p1-b2",
+        "Grounded replacement",
+        bbox,
+        confidence=0.1,
+        verification=VerificationState.NEEDS_REVIEW,
+    )
+
+    normalized, warnings = normalize_page_blocks([rejected, corrected])
+
+    assert [block.id for block in normalized] == ["p1-b2"]
+    assert warnings == ["removed duplicate block p1-b1"]
+
+
 def test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations() -> None:
     first = _block(
         "p1-b1",
