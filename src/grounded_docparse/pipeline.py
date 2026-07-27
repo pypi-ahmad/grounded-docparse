@@ -96,6 +96,9 @@ def _clean_text(value: str | None) -> str | None:
     return value.translate({ord("\u00ad"): None, ord("\u200b"): None, ord("\ufeff"): None})
 
 
+_REMOVED_TEXT_CODEPOINTS = frozenset({"\u00ad", "\u200b", "\ufeff"})
+
+
 def _clean_form_data(value: FormData | None) -> FormData | None:
     if value is None:
         return None
@@ -137,14 +140,36 @@ def _valid_confidence_spans(
     return valid, len(valid) != len(spans)
 
 
+def _clean_confidence_spans(
+    text: str,
+    spans: list[ConfidenceSpan],
+) -> tuple[str, list[ConfidenceSpan], bool]:
+    valid, invalid = _valid_confidence_spans(text, spans)
+    cleaned = _clean_text(text) or ""
+    rebased: list[ConfidenceSpan] = []
+    for span in valid:
+        if any(character in _REMOVED_TEXT_CODEPOINTS for character in text[span.start : span.end]):
+            invalid = True
+            continue
+        rebased.append(
+            ConfidenceSpan(
+                start=sum(character not in _REMOVED_TEXT_CODEPOINTS for character in text[: span.start]),
+                end=sum(character not in _REMOVED_TEXT_CODEPOINTS for character in text[: span.end]),
+            )
+        )
+    return cleaned, rebased, invalid
+
+
 def _table(region: RegionDraft) -> tuple[TableData | None, bool]:
     if region.type is not NodeType.TABLE:
         return None, False
     invalid = False
     cells: list[TableCell] = []
     for cell in region.table_cells:
-        text = _clean_text(cell.text) or ""
-        spans, spans_invalid = _valid_confidence_spans(text, cell.low_confidence_spans)
+        text, spans, spans_invalid = _clean_confidence_spans(
+            cell.text,
+            cell.low_confidence_spans,
+        )
         invalid = invalid or spans_invalid
         cells.append(
             TableCell(
@@ -166,8 +191,10 @@ def _atoms(region: RegionDraft) -> tuple[list[AtomicEvidence], bool]:
     invalid = False
     atoms: list[AtomicEvidence] = []
     for atom in region.atoms:
-        text = _clean_text(atom.text) or ""
-        spans, spans_invalid = _valid_confidence_spans(text, atom.low_confidence_spans)
+        text, spans, spans_invalid = _clean_confidence_spans(
+            atom.text,
+            atom.low_confidence_spans,
+        )
         invalid = invalid or spans_invalid
         atoms.append(
             AtomicEvidence(

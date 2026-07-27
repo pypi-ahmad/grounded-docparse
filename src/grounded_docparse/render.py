@@ -832,7 +832,7 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str, object | Non
         values = [
             (
                 "table_cell",
-                " ".join(cell.text.replace("\r", " ").splitlines()),
+                _table_cell_atom_text(cell.text),
                 cell.bbox or block.bbox,
                 "literal",
                 cell,
@@ -858,6 +858,45 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str, object | Non
         ("line", line, block.bbox, "literal", None)
         for line in visible.splitlines()
         if line
+    ]
+
+
+def _table_cell_atom_text(text: str) -> str:
+    return text.replace("\r", " ").replace("\n", " ")
+
+
+def _emitted_confidence_spans(
+    evidence: object | None,
+    owner_text: str,
+    emitted_text: str,
+) -> list[dict[str, int]]:
+    if evidence is None or not evidence.low_confidence_spans:
+        return []
+    source_text = evidence.text
+    if owner_text == source_text:
+        normalize = lambda value: value
+    elif owner_text == _table_cell_atom_text(source_text):
+        normalize = _table_cell_atom_text
+    else:
+        return []
+    escaped_owner = owner_text.replace("|", r"\|")
+    if emitted_text == owner_text:
+        render = lambda value: value
+        prefix_length = 0
+    elif emitted_text == escaped_owner:
+        render = lambda value: value.replace("|", r"\|")
+        prefix_length = 0
+    elif emitted_text.endswith(escaped_owner):
+        render = lambda value: value.replace("|", r"\|")
+        prefix_length = len(emitted_text) - len(escaped_owner)
+    else:
+        return []
+    return [
+        {
+            "start": prefix_length + len(render(normalize(source_text[: span.start]))),
+            "end": prefix_length + len(render(normalize(source_text[: span.end]))),
+        }
+        for span in evidence.low_confidence_spans
     ]
 
 
@@ -891,11 +930,13 @@ def _visual_agentic_atoms(
         if segment.evidence is not None:
             if segment.evidence.confidence is not None:
                 item["confidence"] = segment.evidence.confidence
-            if segment.evidence.low_confidence_spans:
-                item["low_confidence_spans"] = [
-                    span.model_dump(mode="json")
-                    for span in segment.evidence.low_confidence_spans
-                ]
+            spans = _emitted_confidence_spans(
+                segment.evidence,
+                segment.raw_text,
+                segment.rendered_text,
+            )
+            if spans:
+                item["low_confidence_spans"] = spans
         atoms.append(item)
     return atoms
 
@@ -958,11 +999,9 @@ def _agentic_atoms(
         if evidence is not None:
             if evidence.confidence is not None:
                 item["confidence"] = evidence.confidence
-            if evidence.low_confidence_spans:
-                item["low_confidence_spans"] = [
-                    span.model_dump(mode="json")
-                    for span in evidence.low_confidence_spans
-                ]
+            spans = _emitted_confidence_spans(evidence, text, rendered_text)
+            if spans:
+                item["low_confidence_spans"] = spans
         atoms.append(item)
     return atoms
 
