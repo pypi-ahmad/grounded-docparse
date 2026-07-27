@@ -205,6 +205,7 @@ def render_agentic_document(
                     None,
                 ),
                 "blocks": page_nodes,
+                "specialist_audit": page.specialist_audit.model_dump(mode="json"),
             }
         )
 

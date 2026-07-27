@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
@@ -169,25 +170,6 @@ class Block(BaseModel):
     correction_lineage: list[CorrectionLineage] = Field(default_factory=list)
 
 
-class Page(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    number: int = Field(ge=1)
-    width: float = Field(gt=0)
-    height: float = Field(gt=0)
-    blocks: list[Block] = Field(default_factory=list)
-
-
-class Document(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    schema_version: str = "1.3.0"
-    source_name: str
-    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    pages: list[Page]
-    warnings: list[str] = Field(default_factory=list)
-
-
 class AgentUsage(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -310,6 +292,7 @@ class InspectionDecision(BaseModel):
     action: InspectionAction
     corrected_region: RegionDraft | None = None
     reason: str = ""
+    confidence: float = Field(default=0.5, ge=0, le=1)
     geometry_only: bool = False
     evidence_refs: list[str] = Field(default_factory=list)
 
@@ -329,6 +312,72 @@ class PageInspection(BaseModel):
     decisions: list[InspectionDecision] = Field(default_factory=list)
     additional_regions: list[InspectionRegionAddition] = Field(default_factory=list)
     ordered_region_ids: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class SpecialistOpinion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reviewer: str
+    model: str
+    timestamp: datetime
+    decision: InspectionDecision
+    confidence: float = Field(default=0.5, ge=0, le=1)
+    reasoning: str = ""
+
+
+class SpecialistResolution(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    region_id: str
+    outcome: str
+    final_decision: InspectionDecision | None = None
+    reasoning: str = ""
+
+
+class SpecialistOrderingOpinion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reviewer: str
+    model: str
+    timestamp: datetime
+    ordered_region_ids: list[str] = Field(default_factory=list)
+
+
+class SpecialistOrderingResolution(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    outcome: str
+    ordered_region_ids: list[str] = Field(default_factory=list)
+    reasoning: str = ""
+
+
+class SpecialistAudit(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    opinions: list[SpecialistOpinion] = Field(default_factory=list)
+    resolutions: list[SpecialistResolution] = Field(default_factory=list)
+    ordering_opinions: list[SpecialistOrderingOpinion] = Field(default_factory=list)
+    ordering_resolution: SpecialistOrderingResolution | None = None
+
+
+class Page(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    number: int = Field(ge=1)
+    width: float = Field(gt=0)
+    height: float = Field(gt=0)
+    blocks: list[Block] = Field(default_factory=list)
+    specialist_audit: SpecialistAudit = Field(default_factory=SpecialistAudit)
+
+
+class Document(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: str = "1.3.0"
+    source_name: str
+    source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    pages: list[Page]
     warnings: list[str] = Field(default_factory=list)
 
 

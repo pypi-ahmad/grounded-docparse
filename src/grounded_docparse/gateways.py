@@ -233,6 +233,8 @@ class OpenAIDocumentGateway:
                         "of all supplied and added region IDs in semantic reading order; place each visual beside "
                         "its related instruction rather than at the page end. Return decisions only for the "
                         "target_region_ids. Preserve every supplied region ID."
+                        " Include a calibrated confidence from 0 to 1 and concise reason for every "
+                        "decision."
                     ),
                 },
                 {
