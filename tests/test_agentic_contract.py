@@ -9,6 +9,7 @@ from grounded_docparse.models import (
     AtomicEvidence,
     Block,
     BoundingBox,
+    CheckboxState,
     CorrectionLineage,
     Document,
     Page,
@@ -234,6 +235,111 @@ def test_agentic_render_preserves_table_residual_and_all_visual_semantics() -> N
         assert span is not None
         assert rendered.markdown[span["start"] : span["end"]]
 
+    visual_atoms = nodes[1]["atoms"]
+    assert [atom["kind"] for atom in visual_atoms] == [
+        "transcription",
+        "visual_text",
+        "caption",
+        "visual_description",
+    ]
+    assert [atom["origin"] for atom in visual_atoms] == [
+        "literal",
+        "literal",
+        "literal",
+        "generated_description",
+    ]
+    assert [atom["text"] for atom in visual_atoms] == [
+        "Needle above green band",
+        "Dial reads 42 psi.",
+        "Pressure gauge",
+        "A round analog gauge mounted on a pipe.",
+    ]
+
+
+def test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells() -> None:
+    blocks = [
+        Block(
+            id="prose",
+            type="table",
+            text="Plan | tax\nPrices include tax.",
+            reading_order=0,
+            verification=VerificationState.VERIFIED,
+            table=TableData(
+                cells=[
+                    TableCell(row=0, column=0, text="Plan"),
+                    TableCell(row=0, column=1, text="tax"),
+                ]
+            ),
+        ),
+        Block(
+            id="multiline",
+            type="table",
+            text="Line one\nLine two\nFootnote remains.",
+            reading_order=1,
+            verification=VerificationState.VERIFIED,
+            table=TableData(
+                cells=[TableCell(row=0, column=0, text="Line one\nLine two")]
+            ),
+        ),
+    ]
+    document = Document(
+        source_name="tables.pdf",
+        source_sha256="2" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=blocks)],
+    )
+
+    rendered = render_agentic_document(document)
+    nodes = json.loads(rendered.json)["document"]["pages"][0]["blocks"]
+
+    assert "Prices include tax." in rendered.markdown
+    assert "Prices include ." not in rendered.markdown
+    assert rendered.markdown.count("Line one") == 1
+    assert rendered.markdown.count("Line two") == 1
+    assert "Footnote remains." in rendered.markdown
+    assert [node["semantic_coverage"] for node in nodes] == [1.0, 1.0]
+
+
+def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
+    document = Document(
+        source_name="checkboxes.pdf",
+        source_sha256="3" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="yes",
+                        type="checkbox",
+                        reading_order=0,
+                        checkbox_group="Approved",
+                        checkbox_option="Yes",
+                        checkbox_state=CheckboxState.UNCHECKED,
+                    ),
+                    Block(
+                        id="no",
+                        type="checkbox",
+                        reading_order=1,
+                        checkbox_group="Approved",
+                        checkbox_option="No",
+                        checkbox_state=CheckboxState.CHECKED,
+                    ),
+                ],
+            )
+        ],
+    )
+
+    rendered = render_agentic_document(document)
+    nodes = json.loads(rendered.json)["document"]["pages"][0]["blocks"]
+    slices = [
+        rendered.markdown[node["source"]["span"]["start"] : node["source"]["span"]["end"]]
+        for node in nodes
+    ]
+
+    assert slices == ["[ ] Yes", "[x] No"]
+    assert nodes[0]["source"]["span"] != nodes[1]["source"]["span"]
+
 
 def test_repeated_text_blocks_receive_distinct_exact_emission_spans() -> None:
     document = Document(
@@ -353,3 +459,33 @@ def test_verified_incomplete_structure_fails_full_semantic_coverage() -> None:
         "incomplete_structure",
         "semantic_coverage_loss",
     }
+
+
+def test_verified_replacement_preserves_rejected_lineage_in_page_status() -> None:
+    replacement = Block(
+        id="replacement",
+        type="paragraph",
+        text="Grounded replacement",
+        bbox=BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.2),
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+        correction_lineage=[
+            CorrectionLineage(
+                original_id="rejected-original",
+                replacement_id="replacement",
+                reason="Replaced unsupported predecessor",
+                previous_state=VerificationState.REJECTED,
+                final_state=VerificationState.VERIFIED,
+            )
+        ],
+    )
+    document = Document(
+        source_name="lineage.pdf",
+        source_sha256="4" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[replacement])],
+    )
+
+    page = json.loads(render_agentic_document(document).json)["document"]["pages"][0]
+
+    assert page["status"] == "needs_review"
+    assert "rejected_content" in page["quality"]["needs_review_reasons"]
