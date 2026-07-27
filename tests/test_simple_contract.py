@@ -292,6 +292,26 @@ def test_clean_markdown_renders_document_elements_and_exact_page_break() -> None
     assert not markdown.startswith("---\n")
 
 
+def test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text() -> None:
+    document = Document(
+        source_name="steps.pdf",
+        source_sha256="a" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(id="alpha", type="list_item", text="a. Preserve case.", list_marker="A.", reading_order=0),
+                    Block(id="roman", type="list_item", text="(iv) Archive the record.", list_marker="(IV)", reading_order=1),
+                ],
+            )
+        ],
+    )
+
+    assert render_markdown(document) == "a. Preserve case.\n\n(iv) Archive the record.\n"
+
+
 def test_schema_version_and_list_marker_are_preserved_in_json() -> None:
     block = Block(id="item", type="list_item", text="Step", list_marker="1.", reading_order=0)
     document = Document(
