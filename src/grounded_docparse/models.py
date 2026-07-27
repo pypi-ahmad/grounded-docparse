@@ -221,6 +221,32 @@ class AgentTraceEvent(BaseModel):
     summary: str | None = None
 
 
+class RuntimeBudgetDenial(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    budget: str
+    stage: str
+    model: str
+    page: int | None = Field(default=None, ge=1)
+    reason: str
+
+
+class RuntimeDiagnostics(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    http_attempts: int = Field(default=0, ge=0)
+    retries: int = Field(default=0, ge=0)
+    terra_attempts: int = Field(default=0, ge=0)
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+    rate_limit_events: int = Field(default=0, ge=0)
+    configured_concurrency: int = Field(ge=1)
+    effective_concurrency: int = Field(ge=1)
+    cooldown_until: float
+    elapsed_seconds: float = Field(default=0, ge=0)
+    budget_denials: list[RuntimeBudgetDenial] = Field(default_factory=list)
+
+
 class SchemaProposal(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -473,3 +499,4 @@ class ParseResult:
     legacy_json: str = ""
     usage: RunUsage | None = None
     trace: list[AgentTraceEvent] | None = None
+    runtime_diagnostics: RuntimeDiagnostics | None = None

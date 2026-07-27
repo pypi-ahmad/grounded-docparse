@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import time
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, TypeVar
 
@@ -23,20 +24,71 @@ from .models import (
     RunUsage,
     SchemaProposalWire,
 )
+from .runtime import BudgetExceeded, ProviderRuntime
 
 T = TypeVar("T", bound=BaseModel)
 
 
 class OpenAIDocumentGateway:
-    def __init__(self, config: ParserConfig, client: Any | None = None) -> None:
+    def __init__(
+        self,
+        config: ParserConfig,
+        client: Any | None = None,
+        runtime: ProviderRuntime | None = None,
+    ) -> None:
         if client is None and not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("OPENAI_API_KEY is not set")
         self.config = config
-        self.client = client or OpenAI()
+        self.client = client or OpenAI(max_retries=0)
+        self.runtime = runtime or ProviderRuntime(config)
         self.input_tokens = 0
         self.output_tokens = 0
         self.usage = RunUsage()
         self.trace: list[AgentTraceEvent] = []
+
+    def bind_runtime(self, runtime: ProviderRuntime) -> None:
+        self.runtime = runtime
+
+    def _provider_request(
+        self,
+        call: Callable[[], Any],
+        *,
+        agent: str,
+        stage: str,
+        model: str,
+        started: float,
+        page_number: int | None,
+        target_ids: list[str] | None,
+        on_success: Callable[[Any], None] | None = None,
+    ) -> Any:
+        try:
+            return self.runtime.request(
+                call,
+                model=model,
+                stage=stage,
+                page_number=page_number,
+                base_draft=stage == "page_draft",
+                on_success=on_success,
+            )
+        except BudgetExceeded as exc:
+            self.trace.append(
+                AgentTraceEvent(
+                    agent=agent,
+                    model=model,
+                    action=stage,
+                    status="budget_denied",
+                    page=page_number,
+                    target_ids=target_ids or [],
+                    duration_ms=round((time.perf_counter() - started) * 1000),
+                    summary=str(exc),
+                )
+            )
+            raise
+        except OpenAIError as exc:
+            exc.docparse_stage = stage
+            exc.docparse_page_number = page_number
+            exc.docparse_model = model
+            raise
 
     @staticmethod
     def _image(path: Path) -> str:
@@ -69,6 +121,16 @@ class OpenAIDocumentGateway:
         self.usage.calls.append(call)
         return call
 
+    def _record_runtime_usage(
+        self, response: Any, *, agent: str, model: str
+    ) -> AgentUsage:
+        usage = self._record_usage(response, agent=agent, model=model)
+        self.runtime.record_usage(
+            input_tokens=usage.input_tokens,
+            output_tokens=usage.output_tokens,
+        )
+        return usage
+
     def _request(
         self,
         expected: type[T],
@@ -83,38 +145,75 @@ class OpenAIDocumentGateway:
         model = str(kwargs.get("model", "unknown"))
         responses = self.client.responses
         raw_api = getattr(responses, "with_raw_response", None)
+        response: Any = None
+        call_usage: AgentUsage | None = None
         if raw_api is None:
-            response = responses.parse(text_format=expected, **kwargs)
-            call_usage = self._record_usage(response, agent=agent, model=model)
+            def finalize_response(result: Any) -> None:
+                nonlocal call_usage
+                call_usage = self._record_runtime_usage(
+                    result,
+                    agent=agent,
+                    model=model,
+                )
+
+            response = self._provider_request(
+                lambda: responses.parse(text_format=expected, **kwargs),
+                agent=agent,
+                stage=stage,
+                model=model,
+                started=started,
+                page_number=page_number,
+                target_ids=target_ids,
+                on_success=finalize_response,
+            )
         else:
-            try:
-                raw = raw_api.parse(text_format=expected, **kwargs)
-            except OpenAIError as exc:
-                exc.docparse_stage = stage
-                exc.docparse_page_number = page_number
-                exc.docparse_model = kwargs.get("model")
-                raise
-            try:
-                response = raw.parse()
-            except ValidationError as exc:
+            def finalize_raw(raw: Any) -> None:
+                nonlocal response, call_usage
                 try:
-                    payload = json.loads(raw.content)
-                except (TypeError, ValueError):
-                    payload = {}
-                self._record_usage(payload, agent=agent, model=model)
-                page = f" for page {page_number}" if page_number is not None else ""
-                request_id = getattr(raw, "request_id", None) or "unknown"
-                detail = exc.errors(include_url=False, include_input=False)[0]
-                location = ".".join(str(item) for item in detail.get("loc", ())) or "response"
-                incomplete = payload.get("incomplete_details", {}).get("reason")
-                status = incomplete or payload.get("status", "invalid")
-                raise RuntimeError(
-                    f"{stage}{page} using {kwargs.get('model')}: OpenAI response "
-                    f"{status} failed schema validation at "
-                    f"{location} ({detail.get('type', 'validation_error')}); "
-                    f"request ID {request_id}"
-                ) from exc
-            call_usage = self._record_usage(response, agent=agent, model=model)
+                    response = raw.parse()
+                except ValidationError as exc:
+                    try:
+                        payload = json.loads(raw.content)
+                    except (TypeError, ValueError):
+                        payload = {}
+                    call_usage = self._record_runtime_usage(
+                        payload,
+                        agent=agent,
+                        model=model,
+                    )
+                    page = f" for page {page_number}" if page_number is not None else ""
+                    request_id = getattr(raw, "request_id", None) or "unknown"
+                    detail = exc.errors(include_url=False, include_input=False)[0]
+                    location = (
+                        ".".join(str(item) for item in detail.get("loc", ()))
+                        or "response"
+                    )
+                    incomplete = payload.get("incomplete_details", {}).get("reason")
+                    status = incomplete or payload.get("status", "invalid")
+                    raise RuntimeError(
+                        f"{stage}{page} using {kwargs.get('model')}: OpenAI response "
+                        f"{status} failed schema validation at "
+                        f"{location} ({detail.get('type', 'validation_error')}); "
+                        f"request ID {request_id}"
+                    ) from exc
+                call_usage = self._record_runtime_usage(
+                    response,
+                    agent=agent,
+                    model=model,
+                )
+
+            self._provider_request(
+                lambda: raw_api.parse(text_format=expected, **kwargs),
+                agent=agent,
+                stage=stage,
+                model=model,
+                started=started,
+                page_number=page_number,
+                target_ids=target_ids,
+                on_success=finalize_raw,
+            )
+        if call_usage is None:
+            raise AssertionError("provider usage finalizer did not run")
         self.trace.append(
             AgentTraceEvent(
                 agent=agent,
@@ -524,44 +623,64 @@ class OpenAIDocumentGateway:
         agent = "extraction_critic" if use_terra else "extractor"
         model = self.config.terra_model if use_terra else self.config.luna_model
         started = time.perf_counter()
-        response = self.client.responses.create(
+        call_usage: AgentUsage | None = None
+
+        def finalize_response(result: Any) -> None:
+            nonlocal call_usage
+            call_usage = self._record_runtime_usage(
+                result,
+                agent=agent,
+                model=model,
+            )
+
+        response = self._provider_request(
+            lambda: self.client.responses.create(
+                model=model,
+                reasoning={"effort": "medium"},
+                store=False,
+                input=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "Extract only values supported by the grounded document. Return null when "
+                            "a value is absent or ambiguous. For every non-null scalar, include evidence "
+                            "at its RFC 6901 JSON Pointer using only supplied block_ids and atom_ids. "
+                            "Never invent identifiers or values."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": json.dumps(
+                            {
+                                "document": parse_payload,
+                                "repair_issues": issues or [],
+                            },
+                            ensure_ascii=False,
+                        ),
+                    },
+                ],
+                text={
+                    "format": {
+                        "type": "json_schema",
+                        "name": "grounded_extraction",
+                        "strict": True,
+                        "schema": envelope,
+                    }
+                },
+                max_output_tokens=self.config.terra_max_output_tokens
+                if use_terra
+                else self.config.luna_max_output_tokens,
+            ),
+            agent=agent,
+            stage="extract_document",
             model=model,
-            reasoning={"effort": "medium"},
-            store=False,
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Extract only values supported by the grounded document. Return null when "
-                        "a value is absent or ambiguous. For every non-null scalar, include evidence "
-                        "at its RFC 6901 JSON Pointer using only supplied block_ids and atom_ids. "
-                        "Never invent identifiers or values."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        {
-                            "document": parse_payload,
-                            "repair_issues": issues or [],
-                        },
-                        ensure_ascii=False,
-                    ),
-                },
-            ],
-            text={
-                "format": {
-                    "type": "json_schema",
-                    "name": "grounded_extraction",
-                    "strict": True,
-                    "schema": envelope,
-                }
-            },
-            max_output_tokens=self.config.terra_max_output_tokens
-            if use_terra
-            else self.config.luna_max_output_tokens,
+            started=started,
+            page_number=None,
+            target_ids=None,
+            on_success=finalize_response,
         )
-        call_usage = self._record_usage(response, agent=agent, model=model)
+        if call_usage is None:
+            raise AssertionError("provider usage finalizer did not run")
         self.trace.append(
             AgentTraceEvent(
                 agent=agent,
