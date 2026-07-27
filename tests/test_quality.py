@@ -137,7 +137,7 @@ def test_scanned_page_probes_untranscribed_large_visual_only() -> None:
     assert transcribed_probes == []
 
 
-def test_scanned_page_probes_incomplete_structured_content() -> None:
+def test_scanned_page_does_not_duplicate_repairable_structured_content() -> None:
     bbox = _box(0.1, 0.1, 0.9, 0.9)
     page = _page(scanned=True)
     incomplete_table = _block(
@@ -153,11 +153,7 @@ def test_scanned_page_probes_incomplete_structured_content() -> None:
         ),
     )
 
-    probes = find_missing_source_regions(page, [incomplete_table])
-
-    assert [probe.bbox.model_dump() for probe in probes if probe.bbox] == [
-        bbox.model_dump(exclude={"unit"})
-    ]
+    assert find_missing_source_regions(page, [incomplete_table]) == []
 
 
 def test_scanned_page_probes_large_uncovered_internal_region() -> None:

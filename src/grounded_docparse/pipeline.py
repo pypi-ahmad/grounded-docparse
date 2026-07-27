@@ -42,7 +42,6 @@ from .models import (
 from .quality import (
     MAX_REPAIR_BLOCKS,
     find_missing_source_regions,
-    is_geometry_only_repair_candidate,
     normalize_page_blocks,
     select_repair_blocks,
     semantic_text,
@@ -69,6 +68,7 @@ CRITICAL_WARNING_MARKERS = ("MUST", "DO NOT", "WILL NOT", "REQUIRED", "WARNING",
 AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
 )
+GEOMETRY_REJECTION_MARKERS = ("geometry", "bounding box", "bbox", "clipped")
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 
 
@@ -363,6 +363,13 @@ def _proactive_crop_priority(block: Block) -> int | None:
     if AMBIGUOUS_LITERAL_PATTERN.search(searchable):
         return 1
     return None
+
+
+def _is_geometry_rejection(decision: InspectionDecision) -> bool:
+    reason = decision.reason.casefold()
+    return decision.action is InspectionAction.REJECT and any(
+        marker in reason for marker in GEOMETRY_REJECTION_MARKERS
+    )
 
 
 def _has_excessive_order_movement(
@@ -750,11 +757,6 @@ class DocumentParser:
             original_reasons = {
                 block.id: block.verification_reason for block in selected
             }
-            geometry_only_ids = {
-                block.id
-                for block in selected
-                if is_geometry_only_repair_candidate(page, block, warnings)
-            }
             for block in selected:
                 if block.bbox is None:
                     if block.verification is not VerificationState.REJECTED:
@@ -803,6 +805,7 @@ class DocumentParser:
             if quality_requests:
                 pending = list(zip(quality_requests, quality_blocks, strict=True))
                 rejection_counts: dict[str, int] = {}
+                geometry_rejection_counts: dict[str, int] = {}
                 for repair_round in range(1, 3):
                     next_pending: list[tuple[CropInspectionRequest, Block]] = []
                     for batch_start in range(0, len(pending), MAX_REPAIR_BLOCKS):
@@ -842,17 +845,27 @@ class DocumentParser:
                                     and semantic_text(block).strip()
                                 ):
                                     grounded_corrections.append(block)
-                                continue
+                                if block.verification is VerificationState.VERIFIED:
+                                    continue
 
-                            reason = (
-                                decision.reason
-                                if decision is not None and decision.reason
-                                else fallback_reason
-                            )
+                            if (
+                                decision is not None
+                                and decision.action is InspectionAction.CORRECT
+                                and block.verification_reason
+                            ):
+                                reason = block.verification_reason
+                            elif decision is not None and decision.reason:
+                                reason = decision.reason
+                            else:
+                                reason = fallback_reason
                             if decision is not None and decision.action is InspectionAction.REJECT:
                                 rejection_counts[block.id] = (
                                     rejection_counts.get(block.id, 0) + 1
                                 )
+                                if _is_geometry_rejection(decision):
+                                    geometry_rejection_counts[block.id] = (
+                                        geometry_rejection_counts.get(block.id, 0) + 1
+                                    )
                             if repair_round == 1:
                                 block.verification = VerificationState.NEEDS_REVIEW
                                 block.verification_reason = reason
@@ -860,7 +873,7 @@ class DocumentParser:
                                 continue
 
                             if rejection_counts.get(block.id, 0) == 2:
-                                if block.id in geometry_only_ids:
+                                if geometry_rejection_counts.get(block.id, 0) == 2:
                                     block.verification = VerificationState.NEEDS_REVIEW
                                     block.verification_reason = (
                                         "Geometry remained unresolved after two quality "
