@@ -411,7 +411,7 @@ def _canonical_decision(decision: InspectionDecision) -> tuple[str, str]:
 
 def _canonical_addition(addition: InspectionRegionAddition) -> str:
     return json.dumps(
-        addition.model_dump(mode="json"),
+        addition.region.model_dump(mode="json"),
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -420,15 +420,57 @@ def _canonical_addition(addition: InspectionRegionAddition) -> str:
 
 def _addition_issue(
     addition: InspectionRegionAddition,
-    region_id: str,
+    region_id: str | None = None,
     *,
     source: str = "Verification",
 ) -> str | None:
-    if addition.region_id != region_id:
+    if region_id is not None and addition.region_id != region_id:
         return f"{source} returned a different additional region ID"
     if _bbox(addition.region.bbox) is None:
         return f"{source} addition contained an invalid bounding box"
     return None
+
+
+def _same_addition_target(
+    left: InspectionRegionAddition,
+    right: InspectionRegionAddition,
+) -> bool:
+    if left.region_id == right.region_id:
+        return True
+    left_box = _bbox(left.region.bbox)
+    right_box = _bbox(right.region.bbox)
+    if left_box is None or right_box is None:
+        return False
+    width = max(0.0, min(left_box.x1, right_box.x1) - max(left_box.x0, right_box.x0))
+    height = max(0.0, min(left_box.y1, right_box.y1) - max(left_box.y0, right_box.y0))
+    intersection = width * height
+    smaller = min(
+        (left_box.x1 - left_box.x0) * (left_box.y1 - left_box.y0),
+        (right_box.x1 - right_box.x0) * (right_box.y1 - right_box.y0),
+    )
+    return bool(smaller and intersection / smaller >= 0.5)
+
+
+def _cluster_addition_opinions(
+    opinions: list[SpecialistAdditionOpinion],
+) -> list[list[SpecialistAdditionOpinion]]:
+    remaining = list(opinions)
+    clusters: list[list[SpecialistAdditionOpinion]] = []
+    while remaining:
+        cluster = [remaining.pop(0)]
+        changed = True
+        while changed:
+            changed = False
+            for opinion in list(remaining):
+                if any(
+                    _same_addition_target(opinion.addition, item.addition)
+                    for item in cluster
+                ):
+                    cluster.append(opinion)
+                    remaining.remove(opinion)
+                    changed = True
+        clusters.append(cluster)
+    return clusters
 
 
 def _decision_issue(
@@ -637,9 +679,7 @@ class DocumentParser:
                 ordered_region_ids: list[str] = []
                 inspection_warnings: list[str] = []
                 opinions_by_region: dict[str, list[SpecialistOpinion]] = {}
-                addition_opinions_by_region: dict[
-                    str, list[SpecialistAdditionOpinion]
-                ] = {}
+                addition_opinions: list[SpecialistAdditionOpinion] = []
                 for tagged in inspections:
                     item = tagged.inspection
                     inspection_warnings.extend(item.warnings)
@@ -651,9 +691,7 @@ class DocumentParser:
                             addition=addition,
                         )
                         specialist_audit.addition_opinions.append(addition_opinion)
-                        addition_opinions_by_region.setdefault(
-                            addition.region_id, []
-                        ).append(addition_opinion)
+                        addition_opinions.append(addition_opinion)
                     for decision in item.decisions:
                         opinion = SpecialistOpinion(
                             reviewer=tagged.reviewer,
@@ -820,19 +858,25 @@ class DocumentParser:
                         )
                         inspection_warnings.append(reason)
 
-                addition_conflicts: list[str] = []
+                addition_clusters = _cluster_addition_opinions(addition_opinions)
+                addition_conflicts: dict[
+                    str, list[SpecialistAdditionOpinion]
+                ] = {}
                 addition_resolutions: dict[str, SpecialistAdditionResolution] = {}
-                for region_id, opinions in addition_opinions_by_region.items():
+                addition_cluster_order: list[str] = []
+                for opinions in addition_clusters:
+                    proposal_region_ids = list(
+                        dict.fromkeys(
+                            opinion.addition.region_id for opinion in opinions
+                        )
+                    )
+                    region_id = proposal_region_ids[0]
+                    addition_cluster_order.append(region_id)
                     issue = next(
                         (
                             issue
                             for opinion in opinions
-                            if (
-                                issue := _addition_issue(
-                                    opinion.addition,
-                                    region_id,
-                                )
-                            )
+                            if (issue := _addition_issue(opinion.addition))
                         ),
                         None,
                     )
@@ -843,6 +887,7 @@ class DocumentParser:
                         addition_resolutions[region_id] = SpecialistAdditionResolution(
                             region_id=region_id,
                             outcome="needs_review",
+                            proposal_region_ids=proposal_region_ids,
                             reasoning=issue,
                         )
                         inspection_warnings.append(issue)
@@ -852,6 +897,7 @@ class DocumentParser:
                         addition_resolutions[region_id] = SpecialistAdditionResolution(
                             region_id=region_id,
                             outcome="consensus" if len(opinions) > 1 else "single",
+                            proposal_region_ids=proposal_region_ids,
                             final_addition=final_addition,
                             reasoning=(
                                 "Specialists supplied an identical additional region"
@@ -860,18 +906,29 @@ class DocumentParser:
                             ),
                         )
                     else:
-                        addition_conflicts.append(region_id)
+                        addition_conflicts[region_id] = opinions
 
                 if addition_conflicts and manager_flow:
                     arbitration_reason: str | None = None
+                    addition_conflict_payloads = [
+                        {
+                            "cluster_id": region_id,
+                            "proposals": [
+                                opinion.addition.model_dump(mode="json")
+                                for opinion in opinions
+                            ],
+                        }
+                        for region_id, opinions in addition_conflicts.items()
+                    ]
                     try:
                         addition_arbitration = gateway.inspect_page(
                             page,
                             draft,
                             region_ids=all_region_ids,
-                            target_region_ids=addition_conflicts,
+                            target_region_ids=list(addition_conflicts),
                             agent_role=AgentRole.EVIDENCE_CRITIC,
                             use_terra=True,
+                            addition_conflicts=addition_conflict_payloads,
                         )
                     except Exception as exc:  # noqa: BLE001 - arbitration fails closed
                         arbitration_reason = (
@@ -905,7 +962,12 @@ class DocumentParser:
                                 + ", ".join(unexpected_ids)
                             )
 
-                    for region_id in addition_conflicts:
+                    for region_id, opinions in addition_conflicts.items():
+                        proposal_region_ids = list(
+                            dict.fromkeys(
+                                opinion.addition.region_id for opinion in opinions
+                            )
+                        )
                         candidates = arbitration_additions.get(region_id, [])
                         issue = arbitration_reason
                         if issue is None and len(candidates) != 1:
@@ -919,11 +981,22 @@ class DocumentParser:
                                 region_id,
                                 source="Addition arbitration",
                             )
+                        if issue is None and _canonical_addition(
+                            candidates[0]
+                        ) not in {
+                            _canonical_addition(opinion.addition)
+                            for opinion in opinions
+                        }:
+                            issue = (
+                                "Addition arbitration returned a region payload outside "
+                                f"the competing proposals for {region_id}"
+                            )
                         if issue is not None:
                             addition_resolutions[region_id] = (
                                 SpecialistAdditionResolution(
                                     region_id=region_id,
                                     outcome="needs_review",
+                                    proposal_region_ids=proposal_region_ids,
                                     reasoning=issue,
                                 )
                             )
@@ -934,23 +1007,29 @@ class DocumentParser:
                                 SpecialistAdditionResolution(
                                     region_id=region_id,
                                     outcome="arbitrated",
+                                    proposal_region_ids=proposal_region_ids,
                                     final_addition=candidates[0],
                                     reasoning=candidates[0].reason,
                                 )
                             )
                 else:
-                    for region_id in addition_conflicts:
+                    for region_id, opinions in addition_conflicts.items():
                         reason = "Unresolved conflicting additional-region proposals"
                         addition_resolutions[region_id] = SpecialistAdditionResolution(
                             region_id=region_id,
                             outcome="needs_review",
+                            proposal_region_ids=list(
+                                dict.fromkeys(
+                                    opinion.addition.region_id for opinion in opinions
+                                )
+                            ),
                             reasoning=reason,
                         )
                         inspection_warnings.append(reason)
 
                 specialist_audit.addition_resolutions = [
                     addition_resolutions[region_id]
-                    for region_id in addition_opinions_by_region
+                    for region_id in addition_cluster_order
                     if region_id in addition_resolutions
                 ]
 

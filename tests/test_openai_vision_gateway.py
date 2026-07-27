@@ -13,6 +13,7 @@ from grounded_docparse.models import (
     CropInspectionRequest,
     InspectionAction,
     InspectionDecision,
+    InspectionRegionAddition,
     PageDraft,
     PageInspection,
     PagePlan,
@@ -401,6 +402,61 @@ def test_inspection_escalates_to_terra_only_when_requested(tmp_path: Path) -> No
     assert call["model"] == "gpt-5.6-terra"
     assert call["reasoning"] == {"effort": "medium"}
     assert gateway.usage.calls[0].agent == AgentRole.TABLE_FORM.value
+
+
+def test_addition_arbitration_request_includes_every_competing_proposal(
+    tmp_path: Path,
+) -> None:
+    responses = RecordingResponses(PageInspection())
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+    draft = PageDraft(
+        regions=[RegionDraft(type="paragraph", reading_order=0, text="Draft")]
+    )
+    proposals = [
+        InspectionRegionAddition(
+            region_id=region_id,
+            region=RegionDraft(
+                type="paragraph",
+                reading_order=1,
+                text=text,
+                bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
+            ),
+            reason=f"{text} rationale",
+        )
+        for region_id, text in (
+            ("layout-addition", "Layout proposal"),
+            ("table-addition", "Table proposal"),
+        )
+    ]
+    conflicts = [
+        {
+            "cluster_id": "layout-addition",
+            "proposals": [proposal.model_dump(mode="json") for proposal in proposals],
+        }
+    ]
+
+    gateway.inspect_page(
+        _page(tmp_path / "page.png"),
+        draft,
+        region_ids=["p1-b1"],
+        target_region_ids=["layout-addition"],
+        agent_role=AgentRole.EVIDENCE_CRITIC,
+        use_terra=True,
+        addition_conflicts=conflicts,
+    )
+
+    call = responses.calls[0]
+    request = json.loads(call["input"][1]["content"][0]["text"])
+    assert request["regions"][0]["region_id"] == "p1-b1"
+    assert request["competing_additional_regions"] == conflicts
+    assert [
+        proposal["region_id"]
+        for proposal in request["competing_additional_regions"][0]["proposals"]
+    ] == ["layout-addition", "table-addition"]
+    assert "choose exactly one supplied proposal" in call["input"][0]["content"]
+    assert "Do not invent" in call["input"][0]["content"]
 
 
 def test_schema_architect_uses_luna_medium() -> None:
