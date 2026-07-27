@@ -331,8 +331,11 @@ def test_quality_crop_inspection_uses_terra_and_records_page_targets(
     assert call["model"] == "gpt-5.6-terra"
     assert "Never invent" in prompt
     assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
-    assert "NPIs, MRNs, dates, IDs, DOBs, tax IDs, policy numbers, and account numbers" in prompt
-    assert "exact glyphs, punctuation, separators, and leading zeros" in prompt
+    assert (
+        "For critical literals—phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, "
+        "policy numbers, and account numbers—preserve exact glyphs, punctuation, "
+        "separators, and leading zeros" in prompt
+    )
     assert "Do not infer unclear digits" in prompt
     assert "illegible or inconclusive" in prompt
     assert "geometry_only=true only when rejection is exclusively caused" in prompt
