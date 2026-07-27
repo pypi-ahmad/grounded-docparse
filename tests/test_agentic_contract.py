@@ -662,7 +662,9 @@ def test_visual_atom_span_uses_its_labeled_emission() -> None:
 
     assert transcription["text"] == "Transcription: Needle"
     assert transcription["confidence"] == 0.61
-    assert transcription["low_confidence_spans"] == [{"start": 0, "end": 6}]
+    assert transcription["low_confidence_spans"] == [{"start": 15, "end": 21}]
+    confidence_span = transcription["low_confidence_spans"][0]
+    assert transcription["text"][confidence_span["start"] : confidence_span["end"]] == "Needle"
     assert rendered.markdown[span["start"] : span["end"]] == "Transcription: Needle"
 
 
