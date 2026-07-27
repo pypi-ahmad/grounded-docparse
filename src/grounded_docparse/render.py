@@ -189,12 +189,17 @@ def render_agentic_document(
                     "children": [child.id for child in block.children],
                 }
             )
+        ordering_needs_review = (
+            page.specialist_audit.ordering_resolution is not None
+            and page.specialist_audit.ordering_resolution.outcome == "needs_review"
+        )
         pages.append(
             {
                 "id": f"page-{page.number}",
                 "number": page.number,
                 "status": "needs_review"
-                if any(node["status"] == VerificationState.NEEDS_REVIEW.value for node in page_nodes)
+                if ordering_needs_review
+                or any(node["status"] == VerificationState.NEEDS_REVIEW.value for node in page_nodes)
                 else "ok",
                 "width": page.width,
                 "height": page.height,
