@@ -97,6 +97,77 @@ def test_source_region_with_at_least_seventy_percent_coverage_is_not_recovered()
     assert find_missing_source_regions(page, blocks) == []
 
 
+def test_scanned_blank_page_creates_an_internal_quality_probe() -> None:
+    page = _page(scanned=True)
+
+    probes = find_missing_source_regions(page, [])
+
+    assert len(probes) == 1
+    assert probes[0].type is NodeType.PARAGRAPH
+    assert probes[0].text == ""
+    assert probes[0].bbox is not None
+    assert probes[0].bbox.model_dump() == {
+        "x0": 0.1,
+        "y0": 0.1,
+        "x1": 0.9,
+        "y1": 0.9,
+    }
+
+
+def test_scanned_page_probes_untranscribed_large_visual_only() -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.9)
+    page = _page(scanned=True)
+    blank_visual = _block("p1-b1", "", bbox, node_type=NodeType.IMAGE)
+    covered_text = _block("p1-b2", "Visible chart title", bbox)
+    transcribed_visual = _block(
+        "p1-b3", "Visible chart title", bbox, node_type=NodeType.IMAGE
+    )
+
+    blank_probes = find_missing_source_regions(page, [blank_visual, covered_text])
+    transcribed_probes = find_missing_source_regions(page, [transcribed_visual])
+
+    assert [probe.bbox.model_dump() for probe in blank_probes if probe.bbox] == [
+        bbox.model_dump(exclude={"unit"})
+    ]
+    assert transcribed_probes == []
+
+
+def test_scanned_page_probes_incomplete_structured_content() -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.9)
+    page = _page(scanned=True)
+    incomplete_table = _block(
+        "p1-b1",
+        "",
+        bbox,
+        node_type=NodeType.TABLE,
+        table=TableData(
+            cells=[
+                TableCell(row=0, column=0, text="Medication"),
+                TableCell(row=0, column=1, text=""),
+            ]
+        ),
+    )
+
+    probes = find_missing_source_regions(page, [incomplete_table])
+
+    assert [probe.bbox.model_dump() for probe in probes if probe.bbox] == [
+        bbox.model_dump(exclude={"unit"})
+    ]
+
+
+def test_scanned_page_probes_large_uncovered_internal_region() -> None:
+    page = _page(scanned=True)
+    small_text_block = _block(
+        "p1-b1", "Scanned notice", _box(0.1, 0.1, 0.2, 0.2)
+    )
+
+    probes = find_missing_source_regions(page, [small_text_block])
+
+    assert [probe.bbox.model_dump() for probe in probes if probe.bbox] == [
+        {"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.9}
+    ]
+
+
 def test_critical_literal_mismatch_is_selected_for_repair() -> None:
     bbox = _box(0.1, 0.1, 0.9, 0.2)
     page = _page(("NPI 1386746512", bbox))
