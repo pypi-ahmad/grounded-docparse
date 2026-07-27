@@ -93,6 +93,9 @@ if result is not None and st.session_state.get("result_source_hash") == source_h
 
     with output_column:
         st.subheader("Output")
+        st.caption(
+            "AI-extracted — check `needs_review` blocks and the Agent trace tab before relying on values."
+        )
         stem = Path(result.document.source_name).stem
         with st.container(horizontal=True):
             st.metric("Input tokens", f"{result.input_tokens:,}", border=True)
@@ -120,10 +123,16 @@ if result is not None and st.session_state.get("result_source_hash") == source_h
                 key="download-markdown",
                 on_click="ignore",
             )
-            preview, raw = st.tabs(["Preview", "Raw"])
-            with preview:
+            view = st.radio(
+                "View",
+                ["Preview", "Raw"],
+                horizontal=True,
+                key="markdown-view",
+                label_visibility="collapsed",
+            )
+            if view == "Preview":
                 st.markdown(result.markdown)
-            with raw:
+            else:
                 st.code(result.markdown, language="markdown", wrap_lines=True, height=500)
 
         with agentic_tab:
@@ -136,10 +145,16 @@ if result is not None and st.session_state.get("result_source_hash") == source_h
                 key="download-agentic-json",
                 on_click="ignore",
             )
-            preview, raw = st.tabs(["Preview", "Raw"])
-            with preview:
+            view = st.radio(
+                "View",
+                ["Preview", "Raw"],
+                horizontal=True,
+                key="agentic-view",
+                label_visibility="collapsed",
+            )
+            if view == "Preview":
                 st.json(json.loads(result.json), expanded=2)
-            with raw:
+            else:
                 st.code(result.json, language="json", wrap_lines=True, height=500)
 
         with legacy_tab:
@@ -197,13 +212,17 @@ if result is not None and st.session_state.get("result_source_hash") == source_h
                 if st.button("Run extraction", type="primary", key="run-extraction"):
                     try:
                         selected_schema = json.loads(schema_text)
-                        st.session_state.extraction_result = (
-                            extraction.DocumentExtractor().extract(
-                                result, selected_schema
+                    except json.JSONDecodeError as exc:
+                        st.error(f"Invalid JSON schema — check syntax. {exc}")
+                    else:
+                        try:
+                            st.session_state.extraction_result = (
+                                extraction.DocumentExtractor().extract(
+                                    result, selected_schema
+                                )
                             )
-                        )
-                    except Exception as exc:  # noqa: BLE001 - validation is user-facing
-                        st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
+                        except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
+                            st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
 
             extraction_result = st.session_state.get("extraction_result")
             if extraction_result is not None:
