@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from copy import deepcopy
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from .config import ParserConfig
@@ -28,6 +30,10 @@ UNSUPPORTED_KEYWORDS = {
     "minItems",
     "maxItems",
 }
+NUMERIC_LITERAL_PATTERN = re.compile(
+    r"(?<![\w.,])(?:[$€£]\s*)?[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
+    r"(?![\w.,])"
+)
 
 
 def validate_extraction_schema(schema: dict[str, Any]) -> None:
@@ -98,7 +104,7 @@ class DocumentExtractor:
         instruction = instruction.strip()
         if not instruction:
             raise ValueError("extraction instruction is required")
-        payload = json.loads(parse_result.json)
+        payload = _extraction_payload(json.loads(parse_result.json))
         raw = self.gateway.propose_schema(instruction, payload)
         schema_json = raw.get("schema_json") if isinstance(raw, dict) else raw.schema_text
         try:
@@ -118,7 +124,7 @@ class DocumentExtractor:
         schema: dict[str, Any],
     ) -> ExtractionResult:
         validate_extraction_schema(schema)
-        parse_payload = json.loads(parse_result.json)
+        parse_payload = _extraction_payload(json.loads(parse_result.json))
         draft = self.gateway.extract_document(
             parse_payload,
             schema,
@@ -179,6 +185,28 @@ class DocumentExtractor:
 def _usage(gateway: object) -> RunUsage:
     usage = getattr(gateway, "usage", None)
     return usage if isinstance(usage, RunUsage) else RunUsage()
+
+
+def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
+    payload = deepcopy(parse_payload)
+    metadata = payload.get("metadata")
+    if isinstance(metadata, dict):
+        metadata.pop("warnings", None)
+        metadata.pop("trace", None)
+    for page in payload.get("document", {}).get("pages", []):
+        page["blocks"] = [
+            block
+            for block in page.get("blocks", [])
+            if block.get("rendered") is not False
+            and block.get("status") != "rejected"
+        ]
+        for block in page["blocks"]:
+            block.pop("correction_lineage", None)
+            block.pop("reason", None)
+            block.pop("verification_reason", None)
+        page.pop("specialist_audit", None)
+        page.pop("warnings", None)
+    return payload
 
 
 def _validate_and_resolve(
@@ -279,7 +307,6 @@ def _citations_contain_value(
 ) -> bool:
     if isinstance(value, (dict, list)):
         return True
-    expected = " ".join(str(value).split()).casefold()
     cited_text: list[str] = []
     for citation in citations:
         span = citation.get("span")
@@ -293,8 +320,31 @@ def _citations_contain_value(
             and 0 <= start <= end <= len(markdown)
         ):
             cited_text.append(markdown[start:end])
-    grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|").casefold()
-    return bool(expected and expected in grounded)
+    grounded = " ".join(" ".join(cited_text).split()).replace(r"\|", "|")
+    folded = grounded.casefold()
+    if isinstance(value, bool):
+        literal = re.search(rf"\b{str(value).casefold()}\b", folded)
+        checkbox = (
+            re.search(r"\[(?:x|✓)\]", folded)
+            if value
+            else re.search(r"\[\s\]", folded)
+        )
+        return literal is not None or checkbox is not None
+    if isinstance(value, (int, float)):
+        try:
+            expected_number = Decimal(str(value))
+        except InvalidOperation:
+            return False
+        for match in NUMERIC_LITERAL_PATTERN.finditer(grounded):
+            literal = re.sub(r"[$€£,\s]", "", match.group())
+            try:
+                if Decimal(literal) == expected_number:
+                    return True
+            except InvalidOperation:
+                continue
+        return False
+    expected = " ".join(str(value).split()).casefold()
+    return bool(expected and expected in folded)
 
 
 def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None:
