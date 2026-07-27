@@ -289,6 +289,13 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     assert "complete figure_description" in prompt
     assert "Do not repeat literal text already captured" in prompt
     assert "75 words" in prompt
+    assert (
+        "phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, policy numbers, "
+        "and account numbers" in prompt
+    )
+    assert "exact glyphs, punctuation, separators, and leading zeros" in prompt
+    assert "Do not infer unclear digits" in prompt
+    assert "illegible or inconclusive" in prompt
     assert "geometry_only=true only when rejection is exclusively caused" in prompt
     assert "false for semantic, unsupported, ambiguous, or mixed failures" in prompt
     manifest = call["input"][1]["content"][0]["text"]
@@ -324,6 +331,10 @@ def test_quality_crop_inspection_uses_terra_and_records_page_targets(
     assert call["model"] == "gpt-5.6-terra"
     assert "Never invent" in prompt
     assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
+    assert "NPIs, MRNs, dates, IDs, DOBs, tax IDs, policy numbers, and account numbers" in prompt
+    assert "exact glyphs, punctuation, separators, and leading zeros" in prompt
+    assert "Do not infer unclear digits" in prompt
+    assert "illegible or inconclusive" in prompt
     assert "geometry_only=true only when rejection is exclusively caused" in prompt
     assert "false for semantic, unsupported, ambiguous, or mixed failures" in prompt
     assert gateway.usage.calls[0].agent == AgentRole.EVIDENCE_CRITIC.value
