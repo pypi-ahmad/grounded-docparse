@@ -337,6 +337,12 @@ class LiteralEvidenceGateway(ExtractionGateway):
         ("integer", 1234, "Total: 1,234"),
         ("number", 1234.5, "Amount: $1,234.50"),
         ("boolean", True, "[x] Approved"),
+        ("integer", -1234, "Balance: -$1,234"),
+        ("integer", -1234, "Balance: $-1,234"),
+        ("integer", -1234, "Balance: ($1,234)"),
+        ("number", 0.0012, "Rate: 1.2e-3"),
+        ("boolean", True, "Approved: Yes"),
+        ("boolean", False, "Approved: No"),
     ],
 )
 def test_scalar_grounding_accepts_deterministic_literal_normalization(
@@ -389,3 +395,65 @@ def test_scalar_grounding_accepts_deterministic_literal_normalization(
     assert result.data == {"value": value}
     assert result.warnings == []
     assert gateway.extract_calls == [(False, None)]
+
+
+@pytest.mark.parametrize(
+    ("kind", "value", "source_text"),
+    [
+        ("integer", 1234, "Balance: -$1,234"),
+        ("integer", 1234, "Balance: $-1,234"),
+        ("integer", 1234, "Balance: ($1,234)"),
+        ("integer", -1234, "Balance: -\n$1,234"),
+        ("boolean", True, "Approved: Maybe"),
+    ],
+)
+def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(
+    kind: str,
+    value,
+    source_text: str,
+) -> None:
+    schema = {
+        "type": "object",
+        "properties": {"value": {"type": [kind, "null"]}},
+        "required": ["value"],
+        "additionalProperties": False,
+    }
+    document = Document(
+        source_name="literal.pdf",
+        source_sha256="e" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="accepted",
+                        type="paragraph",
+                        text=source_text,
+                        reading_order=0,
+                        verification=VerificationState.VERIFIED,
+                    )
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    parse_result = ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        legacy_json=render_json(document),
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    gateway = LiteralEvidenceGateway(value)
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        parse_result, schema
+    )
+
+    assert result.data == {"value": None}
+    assert result.evidence == {}
+    assert any("does not contain extracted value" in item for item in result.warnings)
