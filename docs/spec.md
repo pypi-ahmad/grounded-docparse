@@ -14,8 +14,10 @@ Parse one PDF or image into grounded document outputs, then optionally extract u
 - Markdown, agentic JSON v2, legacy JSON, agent trace, and annotated PDF previews/downloads
 - Actual input and output token totals from provider usage
 - Deterministic source-coverage, duplicate, and critical-literal quality gates
-- At most eight high-resolution quality crops per affected page in one targeted Terra pass
+- All high-resolution quality candidates processed in batches of eight across up to two targeted Terra rounds
 - Unresolved content remains visible and is marked `needs_review` with a warning
+- Verified block semantics have full Markdown coverage and exact emission spans; rejected text is JSON-auditable but never rendered or accepted as extraction evidence
+- Page status includes rejected, skipped, conflicting, incomplete, unresolved-recovery, coverage, and geometry history
 - Editable strict JSON Schema and evidence for every non-null extracted scalar
 - `OPENAI_API_KEY` required; `OPENAI_BASE_URL` optional
 
