@@ -160,3 +160,62 @@ def test_missing_evidence_gets_one_terra_repair() -> None:
     assert result.data["invoice_number"] == "INV-7"
     assert [use_terra for use_terra, _issues in gateway.extract_calls] == [False, True]
     assert result.warnings == []
+
+
+class RejectedEvidenceGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+        self.extract_calls.append((use_terra, issues))
+        return {
+            "data": {"invoice_number": "UNSUPPORTED-9"},
+            "evidence": [
+                {
+                    "pointer": "/invoice_number",
+                    "block_ids": ["rejected"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+def test_rejected_audit_block_cannot_be_used_as_extraction_evidence() -> None:
+    document = Document(
+        source_name="rejected.pdf",
+        source_sha256="b" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="rejected",
+                        type="paragraph",
+                        text="Invoice number: UNSUPPORTED-9",
+                        reading_order=0,
+                        verification=VerificationState.REJECTED,
+                        verification_reason="Hallucinated",
+                    )
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    parse_result = ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        legacy_json=render_json(document),
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    gateway = RejectedEvidenceGateway()
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        parse_result, SCHEMA
+    )
+
+    assert result.data == {"invoice_number": None}
+    assert result.evidence == {}
+    assert any("unknown block rejected" in warning for warning in result.warnings)
+    assert [use_terra for use_terra, _issues in gateway.extract_calls] == [False, True]

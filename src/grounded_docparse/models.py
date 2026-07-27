@@ -361,6 +361,14 @@ class SpecialistAudit(BaseModel):
     ordering_resolution: SpecialistOrderingResolution | None = None
 
 
+class PageQuality(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    semantic_coverage: float = Field(default=1.0, ge=0, le=1)
+    coverage_threshold: float = Field(default=1.0, ge=0, le=1)
+    needs_review_reasons: list[str] = Field(default_factory=list)
+
+
 class Page(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -369,6 +377,8 @@ class Page(BaseModel):
     height: float = Field(gt=0)
     blocks: list[Block] = Field(default_factory=list)
     specialist_audit: SpecialistAudit = Field(default_factory=SpecialistAudit)
+    warnings: list[str] = Field(default_factory=list)
+    quality: PageQuality = Field(default_factory=PageQuality)
 
 
 class Document(BaseModel):
