@@ -13,6 +13,7 @@ from grounded_docparse.models import (
     CropInspectionRequest,
     InspectionAction,
     InspectionDecision,
+    InspectionRegionAddition,
     PageDraft,
     PageInspection,
     PagePlan,
@@ -233,6 +234,15 @@ def test_luna_inspection_returns_fail_closed_decisions(tmp_path: Path) -> None:
     assert "nearby heading or label that identifies its subject" in prompt
     assert "omitted visible region" in prompt
     assert "ordered_region_ids" in prompt
+    assert "calibrated confidence from 0 to 1" in prompt
+    schema = to_strict_json_schema(PageInspection)
+    assert schema["$defs"]["InspectionDecision"]["properties"]["confidence"] == {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Confidence",
+        "type": "number",
+    }
     manifest = call["input"][1]["content"][0]["text"]
     assert '"region_id": "region-0"' in manifest
     assert '"target_region_ids": ["region-1"]' in manifest
@@ -289,6 +299,15 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     assert "complete figure_description" in prompt
     assert "Do not repeat literal text already captured" in prompt
     assert "75 words" in prompt
+    assert (
+        "phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, policy numbers, "
+        "and account numbers" in prompt
+    )
+    assert "exact glyphs, punctuation, separators, and leading zeros" in prompt
+    assert "Do not infer unclear digits" in prompt
+    assert "illegible or inconclusive" in prompt
+    assert "geometry_only=true only when rejection is exclusively caused" in prompt
+    assert "false for semantic, unsupported, ambiguous, or mixed failures" in prompt
     manifest = call["input"][1]["content"][0]["text"]
     assert '"candidate_region"' in manifest
     _assert_no_prompt_cache(call)
@@ -322,6 +341,15 @@ def test_quality_crop_inspection_uses_terra_and_records_page_targets(
     assert call["model"] == "gpt-5.6-terra"
     assert "Never invent" in prompt
     assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
+    assert (
+        "For critical literals—phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, "
+        "policy numbers, and account numbers—preserve exact glyphs, punctuation, "
+        "separators, and leading zeros" in prompt
+    )
+    assert "Do not infer unclear digits" in prompt
+    assert "illegible or inconclusive" in prompt
+    assert "geometry_only=true only when rejection is exclusively caused" in prompt
+    assert "false for semantic, unsupported, ambiguous, or mixed failures" in prompt
     assert gateway.usage.calls[0].agent == AgentRole.EVIDENCE_CRITIC.value
     assert gateway.trace[0].page == 7
     assert gateway.trace[0].target_ids == ["p7-b3"]
@@ -374,6 +402,61 @@ def test_inspection_escalates_to_terra_only_when_requested(tmp_path: Path) -> No
     assert call["model"] == "gpt-5.6-terra"
     assert call["reasoning"] == {"effort": "medium"}
     assert gateway.usage.calls[0].agent == AgentRole.TABLE_FORM.value
+
+
+def test_addition_arbitration_request_includes_every_competing_proposal(
+    tmp_path: Path,
+) -> None:
+    responses = RecordingResponses(PageInspection())
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+    draft = PageDraft(
+        regions=[RegionDraft(type="paragraph", reading_order=0, text="Draft")]
+    )
+    proposals = [
+        InspectionRegionAddition(
+            region_id=region_id,
+            region=RegionDraft(
+                type="paragraph",
+                reading_order=1,
+                text=text,
+                bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
+            ),
+            reason=f"{text} rationale",
+        )
+        for region_id, text in (
+            ("layout-addition", "Layout proposal"),
+            ("table-addition", "Table proposal"),
+        )
+    ]
+    conflicts = [
+        {
+            "cluster_id": "layout-addition",
+            "proposals": [proposal.model_dump(mode="json") for proposal in proposals],
+        }
+    ]
+
+    gateway.inspect_page(
+        _page(tmp_path / "page.png"),
+        draft,
+        region_ids=["p1-b1"],
+        target_region_ids=["layout-addition"],
+        agent_role=AgentRole.EVIDENCE_CRITIC,
+        use_terra=True,
+        addition_conflicts=conflicts,
+    )
+
+    call = responses.calls[0]
+    request = json.loads(call["input"][1]["content"][0]["text"])
+    assert request["regions"][0]["region_id"] == "p1-b1"
+    assert request["competing_additional_regions"] == conflicts
+    assert [
+        proposal["region_id"]
+        for proposal in request["competing_additional_regions"][0]["proposals"]
+    ] == ["layout-addition", "table-addition"]
+    assert "choose exactly one supplied proposal" in call["input"][0]["content"]
+    assert "Do not invent" in call["input"][0]["content"]
 
 
 def test_schema_architect_uses_luna_medium() -> None:
