@@ -41,7 +41,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
-    assert app.session_state["result_version"] == "2.0.0"
+    assert app.session_state["result_version"] == "2.1.0"
 
 
 def test_single_page_app_shows_markdown_and_json_result(monkeypatch, simple_pdf: bytes) -> None:

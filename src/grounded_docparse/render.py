@@ -157,6 +157,7 @@ class _VisualSegment:
     bbox: object
     origin: str
     provider: bool = False
+    evidence: object | None = None
 
 
 def _visual_segments(block: Block) -> list[_VisualSegment]:
@@ -209,6 +210,7 @@ def _visual_segments(block: Block) -> list[_VisualSegment]:
                     bbox=bbox,
                     origin="literal",
                     provider=True,
+                    evidence=atom,
                 )
             )
     if block.chart_type:
@@ -389,7 +391,23 @@ def render_markdown(document: Document) -> str:
 
 
 def render_json(document: Document) -> str:
-    return document.model_dump_json(indent=2)
+    payload = document.model_dump(mode="json")
+
+    def strip_confidence_evidence(block: dict) -> None:
+        for atom in block["atoms"]:
+            atom.pop("confidence", None)
+            atom.pop("low_confidence_spans", None)
+        if block["table"] is not None:
+            for cell in block["table"]["cells"]:
+                cell.pop("confidence", None)
+                cell.pop("low_confidence_spans", None)
+        for child in block["children"]:
+            strip_confidence_evidence(child)
+
+    for page in payload["pages"]:
+        for block in page["blocks"]:
+            strip_confidence_evidence(block)
+    return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 @dataclass(frozen=True, slots=True)
@@ -769,7 +787,7 @@ def render_agentic_document(
 
     run_usage = usage or RunUsage()
     payload = {
-        "schema_version": "2.0.0",
+        "schema_version": "2.1.0",
         "markdown": markdown,
         "metadata": {
             "source_name": document.source_name,
@@ -800,14 +818,14 @@ def _source(page: int, start: int | None, end: int | None, bbox) -> dict:
     }
 
 
-def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
+def _atom_values(block: Block) -> list[tuple[str, str, object, str, object | None]]:
     if block.atoms and block.type not in {
         NodeType.FIGURE,
         NodeType.IMAGE,
         NodeType.CHART,
     }:
         return [
-            (atom.kind, atom.text, atom.bbox or block.bbox, "literal")
+            (atom.kind, atom.text, atom.bbox or block.bbox, "literal", atom)
             for atom in block.atoms
         ]
     if block.type is NodeType.TABLE and block.table is not None:
@@ -817,26 +835,27 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
                 " ".join(cell.text.replace("\r", " ").splitlines()),
                 cell.bbox or block.bbox,
                 "literal",
+                cell,
             )
             for cell in block.table.cells
         ]
         values.extend(
-            ("table_residual", text, block.bbox, "literal")
+            ("table_residual", text, block.bbox, "literal", None)
             for text in _table_residual_lines(block)
         )
         return values
     if block.type is NodeType.CHECKBOX:
         values = []
         if block.checkbox_group:
-            values.append(("checkbox_group", block.checkbox_group, block.bbox, "literal"))
-        values.append(("checkbox_marker", _checkbox_marker(block), block.bbox, "literal"))
+            values.append(("checkbox_group", block.checkbox_group, block.bbox, "literal", None))
+        values.append(("checkbox_marker", _checkbox_marker(block), block.bbox, "literal", None))
         option = _checkbox_text(block)
         if option:
-            values.append(("checkbox_option", option, block.bbox, "literal"))
+            values.append(("checkbox_option", option, block.bbox, "literal", None))
         return values
     visible = block.text or _body(block)
     return [
-        ("line", line, block.bbox, "literal")
+        ("line", line, block.bbox, "literal", None)
         for line in visible.splitlines()
         if line
     ]
@@ -855,8 +874,9 @@ def _visual_agentic_atoms(
         cursor = end + len("\n\n")
     ordered = [item for item in positioned if item[0].provider]
     ordered.extend(item for item in positioned if not item[0].provider)
-    return [
-        {
+    atoms = []
+    for index, (segment, atom_start, atom_end) in enumerate(ordered, start=1):
+        item = {
             "id": f"{block.id}-a{index}",
             "kind": segment.kind,
             "text": segment.rendered_text,
@@ -868,8 +888,16 @@ def _visual_agentic_atoms(
                 segment.bbox,
             ),
         }
-        for index, (segment, atom_start, atom_end) in enumerate(ordered, start=1)
-    ]
+        if segment.evidence is not None:
+            if segment.evidence.confidence is not None:
+                item["confidence"] = segment.evidence.confidence
+            if segment.evidence.low_confidence_spans:
+                item["low_confidence_spans"] = [
+                    span.model_dump(mode="json")
+                    for span in segment.evidence.low_confidence_spans
+                ]
+        atoms.append(item)
+    return atoms
 
 
 def _agentic_atoms(
@@ -885,7 +913,7 @@ def _agentic_atoms(
         return _visual_agentic_atoms(block, start, page_number)
     atoms: list[dict] = []
     atom_cursor = start
-    for kind, text, bbox, origin in _atom_values(block):
+    for kind, text, bbox, origin, evidence in _atom_values(block):
         if kind == "checkbox_group":
             if checkbox_group_span is None:
                 continue
@@ -915,20 +943,27 @@ def _agentic_atoms(
             atom_end = atom_start + len(rendered_text)
             atom_cursor = atom_end
         index = len(atoms) + 1
-        atoms.append(
-            {
-                "id": f"{block.id}-a{index}",
-                "kind": kind,
-                "text": markdown[atom_start:atom_end],
-                "origin": origin,
-                "source": _source(
-                    block.citation.page if block.citation is not None else page_number,
-                    atom_start,
-                    atom_end,
-                    bbox,
-                ),
-            }
-        )
+        item = {
+            "id": f"{block.id}-a{index}",
+            "kind": kind,
+            "text": markdown[atom_start:atom_end],
+            "origin": origin,
+            "source": _source(
+                block.citation.page if block.citation is not None else page_number,
+                atom_start,
+                atom_end,
+                bbox,
+            ),
+        }
+        if evidence is not None:
+            if evidence.confidence is not None:
+                item["confidence"] = evidence.confidence
+            if evidence.low_confidence_spans:
+                item["low_confidence_spans"] = [
+                    span.model_dump(mode="json")
+                    for span in evidence.low_confidence_spans
+                ]
+        atoms.append(item)
     return atoms
 
 

@@ -94,6 +94,13 @@ class Citation(BaseModel):
     bbox: BoundingBox | None = None
 
 
+class ConfidenceSpan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    start: int
+    end: int
+
+
 class TableCell(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -104,6 +111,8 @@ class TableCell(BaseModel):
     column_span: int = Field(default=1, ge=1)
     header: bool = False
     bbox: BoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    low_confidence_spans: list[ConfidenceSpan] = Field(default_factory=list)
 
 
 class TableData(BaseModel):
@@ -128,6 +137,8 @@ class AtomicEvidence(BaseModel):
     kind: str
     text: str
     bbox: BoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    low_confidence_spans: list[ConfidenceSpan] = Field(default_factory=list)
 
 
 class CorrectionLineage(BaseModel):
@@ -246,6 +257,8 @@ class TableCellDraft(BaseModel):
     row_span: int = Field(default=1, ge=1)
     column_span: int = Field(default=1, ge=1)
     header: bool = False
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    low_confidence_spans: list[ConfidenceSpan] = Field(default_factory=list)
 
 
 class AtomicDraft(BaseModel):
@@ -254,6 +267,8 @@ class AtomicDraft(BaseModel):
     kind: str
     text: str
     bbox: DraftBoundingBox | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1)
+    low_confidence_spans: list[ConfidenceSpan] = Field(default_factory=list)
 
 
 class RegionDraft(BaseModel):
