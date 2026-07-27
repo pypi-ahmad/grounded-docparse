@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-27T11:33:07.940341+00:00",
+  "generated_at": "2026-07-27T11:34:39.190434+00:00",
   "repo": "D:\\AI\\Project",
   "parameters": {
     "since": null,
@@ -8,7 +8,7 @@
     "bus_factor_threshold": 1,
     "stale_days": 365,
     "owner_threshold": 0.5,
-    "sensitive_config": null,
+    "sensitive_config": "ownership-map-out/sensitive.csv",
     "identity": "author",
     "date_field": "author",
     "include_merges": false,
@@ -44,19 +44,117 @@
     "community_top_owners": 5
   },
   "orphaned_sensitive_code": [],
-  "hidden_owners": [],
-  "bus_factor_hotspots": [],
+  "hidden_owners": [
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of secrets_template code",
+      "category": "secrets_template",
+      "share": 1.0
+    },
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of security_config code",
+      "category": "security_config",
+      "share": 1.0
+    },
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of api_egress code",
+      "category": "api_egress",
+      "share": 1.0
+    },
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of orchestration code",
+      "category": "orchestration",
+      "share": 1.0
+    },
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of evidence_validation code",
+      "category": "evidence_validation",
+      "share": 1.0
+    },
+    {
+      "person": "72138709+pypi-ahmad@users.noreply.github.com",
+      "name": "Ahmad Mujtaba",
+      "controls": "100% of untrusted_parsing code",
+      "category": "untrusted_parsing",
+      "share": 1.0
+    }
+  ],
+  "bus_factor_hotspots": [
+    {
+      "path": ".env.example",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T16:27:29+05:30",
+      "sensitivity_tags": [
+        "secrets_template"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    },
+    {
+      "path": "src/grounded_docparse/config.py",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T16:27:29+05:30",
+      "sensitivity_tags": [
+        "security_config"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    },
+    {
+      "path": "src/grounded_docparse/gateways.py",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T15:36:47+05:30",
+      "sensitivity_tags": [
+        "api_egress"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    },
+    {
+      "path": "src/grounded_docparse/pipeline.py",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T15:36:47+05:30",
+      "sensitivity_tags": [
+        "orchestration"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    },
+    {
+      "path": "src/grounded_docparse/extraction.py",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T14:08:29+05:30",
+      "sensitivity_tags": [
+        "evidence_validation"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    },
+    {
+      "path": "src/grounded_docparse/ingest.py",
+      "bus_factor": 1,
+      "last_touch": "2026-07-27T14:08:29+05:30",
+      "sensitivity_tags": [
+        "untrusted_parsing"
+      ],
+      "top_owner": "72138709+pypi-ahmad@users.noreply.github.com"
+    }
+  ],
   "stats": {
-    "commits": 15,
-    "commits_seen": 15,
+    "commits": 16,
+    "commits_seen": 16,
     "commits_excluded_identities": 0,
     "commits_excluded_merges": 0,
-    "edges": 244,
+    "edges": 253,
     "people": 1,
-    "files": 107,
-    "cochange_pairs_total": 562,
+    "files": 116,
+    "cochange_pairs_total": 598,
     "cochange_edges": 18,
-    "cochange_commits_used": 10,
+    "cochange_commits_used": 11,
     "cochange_commits_skipped": 2,
     "cochange_commits_filtered": 0,
     "cochange_files_excluded": 4

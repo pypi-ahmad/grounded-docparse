@@ -18,7 +18,7 @@
         "touches": 29,
         "touch_share": 1.0,
         "recency_share": 1.0,
-        "sensitive_share": 0.0,
+        "sensitive_share": 1.0,
         "primary_tz_offset": "+05:30"
       }
     ],
@@ -26,8 +26,8 @@
     "owner_count": 1,
     "totals": {
       "touches": 29,
-      "recency_weight": 28.935424,
-      "sensitive_weight": 0
+      "recency_weight": 28.935307,
+      "sensitive_weight": 4.4
     }
   },
   {
@@ -46,7 +46,7 @@
         "touches": 15,
         "touch_share": 1.0,
         "recency_share": 1.0,
-        "sensitive_share": 0.0,
+        "sensitive_share": 1.0,
         "primary_tz_offset": "+05:30"
       }
     ],
@@ -54,8 +54,8 @@
     "owner_count": 1,
     "totals": {
       "touches": 15,
-      "recency_weight": 14.96799,
-      "sensitive_weight": 0
+      "recency_weight": 14.967929,
+      "sensitive_weight": 6.0
     }
   },
   {
@@ -81,7 +81,7 @@
     "owner_count": 1,
     "totals": {
       "touches": 13,
-      "recency_weight": 12.962124,
+      "recency_weight": 12.962071,
       "sensitive_weight": 0
     }
   },
@@ -107,7 +107,7 @@
     "owner_count": 1,
     "totals": {
       "touches": 9,
-      "recency_weight": 8.974789,
+      "recency_weight": 8.974753,
       "sensitive_weight": 0
     }
   }
