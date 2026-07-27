@@ -44,6 +44,7 @@ from .quality import (
     find_missing_source_regions,
     normalize_page_blocks,
     select_repair_blocks,
+    semantic_text,
 )
 from .render import render_agentic_document, render_annotated_pdf, render_json
 
@@ -714,12 +715,24 @@ class DocumentParser:
         quality_inspector = getattr(gateway, "inspect_quality_crops", None)
         if callable(quality_inspector):
             recovery_blocks: list[Block] = []
+            native_recovery_blocks: list[Block] = []
+            scan_probe_blocks: list[Block] = []
             for region in find_missing_source_regions(page, blocks):
                 recovered = _block(region, page.number, len(blocks))
                 recovered.verification = VerificationState.NEEDS_REVIEW
-                recovered.verification_reason = "Recovered from native text"
+                if page.scanned and not region.text:
+                    recovered.verification_reason = (
+                        "Scan omission probe awaiting high-resolution quality inspection"
+                    )
+                    scan_probe_blocks.append(recovered)
+                else:
+                    recovered.verification_reason = "Native source recovery awaiting quality inspection"
+                    native_recovery_blocks.append(recovered)
                 blocks.append(recovered)
                 recovery_blocks.append(recovered)
+
+            scan_probe_ids = {block.id for block in scan_probe_blocks}
+            grounded_corrections: list[Block] = []
 
             selected: list[Block] = []
             selected_ids: set[str] = set()
@@ -790,10 +803,21 @@ class DocumentParser:
                             page.number,
                             preserve_layout=True,
                         )
+                        if (
+                            decision.action is InspectionAction.CORRECT
+                            and block.verification is VerificationState.VERIFIED
+                            and semantic_text(block).strip()
+                        ):
+                            grounded_corrections.append(block)
                         continue
                     block.verification = VerificationState.NEEDS_REVIEW
-                    block.verification_reason = (
+                    reason = (
                         decision.reason if decision is not None and decision.reason else reason
+                    )
+                    block.verification_reason = (
+                        f"Scan omission probe unresolved: {reason}"
+                        if block.id in scan_probe_ids
+                        else reason
                     )
                     warnings.append(
                         f"Page {page.number}: quality gate unresolved block {block.id}"
@@ -803,13 +827,31 @@ class DocumentParser:
                 block for block in recovery_blocks if block.id not in selected_ids
             ]
             for block in uninspected_recovery:
+                if block.id in scan_probe_ids:
+                    block.verification_reason = (
+                        "Scan omission probe was not inspected; repair limit exceeded"
+                    )
+                else:
+                    block.verification_reason = (
+                        "Native source recovery was not inspected; repair limit exceeded"
+                    )
                 warnings.append(
                     f"Page {page.number}: quality gate unresolved block {block.id}; "
                     "repair limit exceeded"
                 )
-            if recovery_blocks:
+            if native_recovery_blocks:
                 warnings.append(
-                    f"Page {page.number}: recovered {len(recovery_blocks)} native text regions"
+                    f"Page {page.number}: queued {len(native_recovery_blocks)} native "
+                    "source recovery regions for high-resolution quality review"
+                )
+            if scan_probe_blocks:
+                warnings.append(
+                    f"Page {page.number}: created {len(scan_probe_blocks)} scan omission probes"
+                )
+            if grounded_corrections:
+                warnings.append(
+                    f"Page {page.number}: recovered {len(grounded_corrections)} "
+                    "grounded quality corrections"
                 )
         elif page.scanned:
             for region in find_missing_source_regions(page, blocks):

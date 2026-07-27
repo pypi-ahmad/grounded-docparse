@@ -258,6 +258,58 @@ def test_scanned_image_probe_adds_only_quality_corrected_text() -> None:
     ]
 
 
+class OverflowingScanProbeGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def draft_page(self, _page):
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.TABLE,
+                    text="",
+                    reading_order=index,
+                    bbox={
+                        "x0": 0.1 + (index % 3) * (0.8 / 3),
+                        "y0": 0.1 + (index // 3) * (0.8 / 3),
+                        "x1": 0.1 + ((index % 3) + 1) * (0.8 / 3),
+                        "y1": 0.1 + ((index // 3) + 1) * (0.8 / 3),
+                    },
+                    table_cells=[
+                        {"row_index": 0, "column_index": 0, "text": "Medication"},
+                        {"row_index": 0, "column_index": 1, "text": ""},
+                    ],
+                )
+                for index in range(9)
+            ]
+        )
+
+    def inspect_quality_crops(self, _crops, *, page_number):
+        return PageInspection()
+
+
+def test_scan_probe_overflow_keeps_an_auditable_scan_specific_reason() -> None:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
+    data = document.tobytes()
+    document.close()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: OverflowingScanProbeGateway(),
+    ).parse(data, "scan.pdf")
+
+    overflow_probe = result.document.pages[0].blocks[-1]
+    assert overflow_probe.text == ""
+    assert overflow_probe.verification is VerificationState.NEEDS_REVIEW
+    assert overflow_probe.verification_reason == (
+        "Scan omission probe was not inspected; repair limit exceeded"
+    )
+    assert any("created 9 scan omission probes" in warning for warning in result.document.warnings)
+    assert not any("recovered 9 native text regions" in warning for warning in result.document.warnings)
+
+
 class UnresolvedCriticalGateway(QualityRecoveryGateway):
     def draft_page(self, page):
         source = page.text_blocks[0]
