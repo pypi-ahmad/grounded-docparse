@@ -262,6 +262,9 @@ class OverflowingScanProbeGateway:
     input_tokens = 0
     output_tokens = 0
 
+    def __init__(self) -> None:
+        self.quality_calls = []
+
     def draft_page(self, _page):
         return PageDraft(
             regions=[
@@ -284,30 +287,34 @@ class OverflowingScanProbeGateway:
             ]
         )
 
-    def inspect_quality_crops(self, _crops, *, page_number):
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
         return PageInspection()
 
 
-def test_scan_probe_overflow_keeps_an_auditable_scan_specific_reason() -> None:
+def test_all_scan_probes_receive_two_bounded_quality_rounds() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
     data = document.tobytes()
     document.close()
 
+    gateway = OverflowingScanProbeGateway()
     result = DocumentParser(
         ParserConfig(render_dpi=72, crop_dpi=144),
-        gateway_factory=lambda _config: OverflowingScanProbeGateway(),
+        gateway_factory=lambda _config: gateway,
     ).parse(data, "scan.pdf")
 
-    overflow_probe = result.document.pages[0].blocks[-1]
-    assert overflow_probe.text == ""
-    assert overflow_probe.verification is VerificationState.NEEDS_REVIEW
-    assert overflow_probe.verification_reason == (
-        "Scan omission probe was not inspected; repair limit exceeded"
+    final_probe = result.document.pages[0].blocks[-1]
+    assert final_probe.text == ""
+    assert final_probe.verification is VerificationState.NEEDS_REVIEW
+    assert final_probe.verification_reason == (
+        "Scan omission probe unresolved: No conclusive quality verification decision"
     )
+    assert [len(call[1]) for call in gateway.quality_calls] == [8, 8, 2, 8, 8, 2]
     assert any("created 9 scan omission probes" in warning for warning in result.document.warnings)
     assert not any("recovered 9 native text regions" in warning for warning in result.document.warnings)
+    assert not any("repair limit exceeded" in warning for warning in result.document.warnings)
 
 
 class UnresolvedCriticalGateway(QualityRecoveryGateway):
@@ -360,7 +367,272 @@ def test_unresolved_critical_literal_remains_visible_with_review_warning() -> No
     assert result.document.pages[0].blocks[0].verification is VerificationState.NEEDS_REVIEW
     assert any("quality gate" in warning.casefold() for warning in result.document.warnings)
     assert '"status": "needs_review"' in result.json
-    assert len(gateway.quality_calls) == 1
+    assert len(gateway.quality_calls) == 2
+
+
+def _account_pdf() -> bytes:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.insert_text((72, 90), "Account holder information", fontsize=11)
+    data = document.tobytes()
+    document.close()
+    return data
+
+
+class SecondRoundStructuredRepairGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.quality_calls = []
+
+    def draft_page(self, page):
+        source = page.text_blocks[0]
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.PARAGRAPH,
+                    text="Account holder information",
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                ),
+                RegionDraft(
+                    type=NodeType.FORM_FIELD,
+                    form={
+                        "label": "Account holder information",
+                        "value": "Hallucinated",
+                    },
+                    reading_order=1,
+                    confidence=0.99,
+                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                ),
+            ]
+        )
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=region_id, action=InspectionAction.REJECT)
+                for region_id in target_region_ids or region_ids
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        if len(self.quality_calls) == 1:
+            return PageInspection(
+                decisions=[
+                    InspectionDecision(
+                        region_id=crop.region_id,
+                        action=InspectionAction.REJECT,
+                        reason="First crop remained ambiguous",
+                    )
+                    for crop in crops
+                ]
+            )
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.CORRECT,
+                    corrected_region=crop.candidate_region.model_copy(
+                        update={
+                            "form": crop.candidate_region.form.model_copy(
+                                update={"value": "Verified"}
+                            )
+                        }
+                    ),
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_rejected_form_can_be_repaired_on_second_quality_round() -> None:
+    gateway = SecondRoundStructuredRepairGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = result.document.pages[0].blocks[1]
+    assert [[crop.region_id for crop in call[1]] for call in gateway.quality_calls] == [
+        ["p1-b2"],
+        ["p1-b2"],
+    ]
+    assert block.verification is VerificationState.VERIFIED
+    assert block.form is not None
+    assert block.form.value == "Verified"
+
+
+def test_failed_quality_crop_does_not_expose_rejected_structured_content(
+    monkeypatch,
+) -> None:
+    gateway = SecondRoundStructuredRepairGateway()
+
+    def fail_crop(*_args, **_kwargs):
+        raise RuntimeError("quality crop unavailable")
+
+    monkeypatch.setattr("grounded_docparse.pipeline.render_region_crop", fail_crop)
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = result.document.pages[0].blocks[1]
+    assert block.verification is VerificationState.REJECTED
+    assert "Hallucinated" not in result.markdown
+
+
+class ManyQualityCandidatesGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.quality_calls = []
+
+    def draft_page(self, page):
+        source = page.text_blocks[0]
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.FORM_FIELD,
+                    form={"label": "Account holder information"},
+                    reading_order=index,
+                    confidence=0.4,
+                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                )
+                for index in range(10)
+            ]
+        )
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
+                for region_id in target_region_ids or region_ids
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=crop.region_id, action=InspectionAction.ACCEPT)
+                for crop in crops
+            ]
+        )
+
+
+def test_quality_repair_processes_all_candidates_in_batches_of_eight() -> None:
+    gateway = ManyQualityCandidatesGateway()
+
+    DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "accounts.pdf")
+
+    assert [[crop.region_id for crop in call[1]] for call in gateway.quality_calls] == [
+        [f"p1-b{index}" for index in range(1, 9)],
+        ["p1-b9", "p1-b10"],
+    ]
+
+
+class RepeatedQualityRejectionGateway(ManyQualityCandidatesGateway):
+    def draft_page(self, page):
+        draft = super().draft_page(page)
+        return PageDraft(regions=draft.regions[:1])
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.REJECT,
+                    reason="Unsupported form content",
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_semantic_rejection_becomes_permanent_only_after_two_quality_rounds() -> None:
+    gateway = RepeatedQualityRejectionGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = result.document.pages[0].blocks[0]
+    assert len(gateway.quality_calls) == 2
+    assert block.verification is VerificationState.REJECTED
+    assert "Account holder information" not in result.markdown
+
+
+class GeometryOnlyQualityGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.quality_calls = []
+
+    def draft_page(self, _page):
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.FORM_FIELD,
+                    form={"label": "Account holder information"},
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox={"x0": 0.999, "y0": 0.1, "x1": 1.0, "y1": 0.2},
+                )
+            ]
+        )
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
+                for region_id in target_region_ids or region_ids
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=(
+                        InspectionAction.REJECT
+                        if crop.region_id == "p1-b1"
+                        else InspectionAction.ACCEPT
+                    ),
+                    reason="Geometry is clipped" if crop.region_id == "p1-b1" else "",
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_geometry_only_rejection_remains_visible_for_review() -> None:
+    gateway = GeometryOnlyQualityGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = next(item for item in result.document.pages[0].blocks if item.id == "p1-b1")
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "Account holder information" in result.markdown
+    assert [
+        [crop.region_id for crop in call[1]] for call in gateway.quality_calls
+    ] == [["p1-b2", "p1-b1"], ["p1-b1"]]
 
 
 class AgenticRoutingGateway(AcceptingGateway):

@@ -7,6 +7,7 @@ from grounded_docparse.models import (
     Block,
     BoundingBox,
     Citation,
+    FormData,
     NodeType,
     TableCell,
     TableData,
@@ -47,6 +48,8 @@ def _block(
     order: int = 0,
     marker: str | None = None,
     table: TableData | None = None,
+    form: FormData | None = None,
+    confidence: float = 0.5,
     verification: VerificationState = VerificationState.NOT_CHECKED,
 ) -> Block:
     return Block(
@@ -57,6 +60,8 @@ def _block(
         reading_order=order,
         list_marker=marker,
         table=table,
+        form=form,
+        confidence=confidence,
         verification=verification,
         citation=Citation(page=1, bbox=bbox),
     )
@@ -200,6 +205,111 @@ def test_degraded_scanned_table_with_codes_is_selected_for_repair() -> None:
     )
 
     assert selected == [block]
+
+
+def test_structured_risks_are_selected_without_warning_keywords() -> None:
+    table_box = _box(0.1, 0.1, 0.9, 0.3)
+    form_box = _box(0.1, 0.4, 0.9, 0.6)
+    page = _page(("Plan Gold", table_box))
+    disagreeing_table = _block(
+        "p1-b1",
+        "",
+        table_box,
+        node_type=NodeType.TABLE,
+        table=TableData(cells=[TableCell(row=0, column=0, text="Plan Silver")]),
+        confidence=0.99,
+    )
+    weak_form = _block(
+        "p1-b2",
+        "",
+        form_box,
+        node_type=NodeType.FORM_FIELD,
+        form=FormData(label="Account holder information"),
+        confidence=0.4,
+        order=1,
+    )
+    critical_table = _block(
+        "p1-b3",
+        "",
+        _box(0.1, 0.65, 0.9, 0.75),
+        node_type=NodeType.TABLE,
+        table=TableData(cells=[TableCell(row=0, column=0, text="NPI 1386746512")]),
+        confidence=0.99,
+        order=2,
+    )
+    incomplete_checkbox = _block(
+        "p1-b4",
+        "",
+        _box(0.1, 0.8, 0.9, 0.9),
+        node_type=NodeType.CHECKBOX,
+        confidence=0.99,
+        order=3,
+    )
+
+    selected = select_repair_blocks(
+        page,
+        [disagreeing_table, weak_form, critical_table, incomplete_checkbox],
+        [],
+    )
+
+    assert {block.id for block in selected} == {"p1-b1", "p1-b2", "p1-b3", "p1-b4"}
+
+
+def test_rejected_structured_block_remains_a_repair_candidate() -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.3)
+    rejected_checkbox = _block(
+        "p1-b1",
+        "Consent: Yes",
+        bbox,
+        node_type=NodeType.CHECKBOX,
+        confidence=0.99,
+        verification=VerificationState.REJECTED,
+    )
+    rejected_prose = _block(
+        "p1-b2",
+        "Unsupported prose",
+        bbox,
+        confidence=0.99,
+        verification=VerificationState.REJECTED,
+        order=1,
+    )
+
+    selected = select_repair_blocks(_page(), [rejected_checkbox, rejected_prose], [])
+
+    assert selected == [rejected_checkbox]
+
+
+def test_all_structural_candidates_are_returned_for_downstream_batching() -> None:
+    blocks = [
+        _block(
+            f"p1-b{index + 1}",
+            "",
+            _box(0.1, 0.1, 0.9, 0.2),
+            node_type=NodeType.FORM_FIELD,
+            form=FormData(label=f"Field {index + 1}"),
+            confidence=0.4,
+            order=index,
+        )
+        for index in range(10)
+    ]
+
+    selected = select_repair_blocks(_page(), blocks, [])
+
+    assert [block.id for block in selected] == [f"p1-b{index}" for index in range(1, 11)]
+
+
+def test_clipped_structured_geometry_is_selected_for_quality_repair() -> None:
+    clipped = _block(
+        "p1-b1",
+        "",
+        _box(0.999, 0.1, 1.0, 0.2),
+        node_type=NodeType.FORM_FIELD,
+        form=FormData(label="Account holder information"),
+        confidence=0.99,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert select_repair_blocks(_page(), [clipped], []) == [clipped]
 
 
 def test_normalization_strips_structural_marker_duplication() -> None:
