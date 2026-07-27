@@ -349,6 +349,7 @@ class SpecialistAdditionResolution(BaseModel):
 
     region_id: str
     outcome: str
+    proposal_region_ids: list[str] = Field(default_factory=list)
     final_addition: InspectionRegionAddition | None = None
     reasoning: str = ""
 

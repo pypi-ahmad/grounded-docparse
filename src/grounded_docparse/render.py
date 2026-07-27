@@ -697,6 +697,20 @@ def render_agentic_document(
                 if rendered
                 else []
             )
+            for atom in atoms:
+                atom_span = atom["source"]["span"]
+                if atom_span is None:
+                    continue
+                page_start = (
+                    atom_span["start"]
+                    if page_start is None
+                    else min(page_start, atom_span["start"])
+                )
+                page_end = (
+                    atom_span["end"]
+                    if page_end is None
+                    else max(page_end, atom_span["end"])
+                )
             page_nodes.append(
                 {
                     "id": block.id,

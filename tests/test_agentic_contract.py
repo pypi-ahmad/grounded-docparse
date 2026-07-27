@@ -363,6 +363,7 @@ def test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans() -> 
 
     rendered = render_agentic_document(document)
     nodes = json.loads(rendered.json)["document"]["pages"][0]["blocks"]
+    page_source = json.loads(rendered.json)["document"]["pages"][0]["source"]["span"]
     slices = [
         rendered.markdown[node["source"]["span"]["start"] : node["source"]["span"]["end"]]
         for node in nodes
@@ -377,6 +378,7 @@ def test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans() -> 
         span = group_atom["source"]["span"]
         group_spans.append(span)
         assert rendered.markdown[span["start"] : span["end"]] == "Yes"
+        assert page_source["start"] <= span["start"] <= span["end"] <= page_source["end"]
     assert group_spans[0] == group_spans[1]
 
 

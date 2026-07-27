@@ -58,6 +58,7 @@ class SpecialistGateway:
         self.table = table
         self.arbitration = arbitration
         self.calls: list[tuple[AgentRole, bool, list[str]]] = []
+        self.addition_conflicts: list[list[dict]] = []
 
     def draft_page(self, _page) -> PageDraft:
         return PageDraft(regions=[_region("Draft")])
@@ -98,9 +99,12 @@ class SpecialistGateway:
         target_region_ids=None,
         agent_role=AgentRole.EVIDENCE_CRITIC,
         use_terra=False,
+        addition_conflicts=None,
     ) -> PageInspection:
         targets = list(target_region_ids or region_ids)
         self.calls.append((agent_role, use_terra, targets))
+        if addition_conflicts is not None:
+            self.addition_conflicts.append(addition_conflicts)
         if agent_role is AgentRole.EVIDENCE_CRITIC and use_terra:
             if isinstance(self.arbitration, Exception):
                 raise self.arbitration
@@ -267,7 +271,15 @@ def test_identical_additional_regions_reach_one_audited_consensus(
             decisions=[
                 InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
             ],
-            additional_regions=[addition.model_copy(deep=True)],
+            additional_regions=[
+                addition.model_copy(
+                    update={
+                        "reason": "Different specialist rationale",
+                        "evidence_refs": ["page-1:other-evidence"],
+                    },
+                    deep=True,
+                )
+            ],
         ),
     )
 
@@ -293,37 +305,100 @@ def test_identical_additional_regions_reach_one_audited_consensus(
 def test_conflicting_additional_regions_are_arbitrated_by_terra(
     simple_pdf: bytes,
 ) -> None:
+    layout = _addition("Layout proposal", region_id="layout-addition")
+    table = _addition("Table proposal", region_id="table-addition")
+    table.region.bbox = table.region.bbox.model_copy(
+        update={"x0": 0.2, "y0": 0.25, "x1": 0.8, "y1": 0.35}
+    )
     gateway = SpecialistGateway(
         PageInspection(
             decisions=[
                 InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
             ],
-            additional_regions=[_addition("Layout proposal")],
+            additional_regions=[layout],
         ),
         PageInspection(
             decisions=[
                 InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
             ],
-            additional_regions=[_addition("Table proposal")],
+            additional_regions=[table],
         ),
-        PageInspection(additional_regions=[_addition("Terra resolution")]),
+        PageInspection(
+            additional_regions=[
+                InspectionRegionAddition(
+                    region_id="layout-addition",
+                    region=table.region.model_copy(deep=True),
+                    reason="Terra selected the grounded table proposal",
+                )
+            ]
+        ),
     )
 
     result = _parse(simple_pdf, gateway)
 
     page = result.document.pages[0]
     audit = page.specialist_audit
-    assert [block.text for block in page.blocks] == ["Draft", "Terra resolution"]
+    assert [block.text for block in page.blocks] == ["Draft", "Table proposal"]
     assert gateway.calls[-1] == (
         AgentRole.EVIDENCE_CRITIC,
         True,
-        ["addition-1"],
+        ["layout-addition"],
     )
+    assert len(gateway.addition_conflicts) == 1
+    sent = gateway.addition_conflicts[0][0]
+    assert sent["cluster_id"] == "layout-addition"
+    assert [proposal["region_id"] for proposal in sent["proposals"]] == [
+        "layout-addition",
+        "table-addition",
+    ]
     assert len(audit.addition_opinions) == 3
     assert audit.addition_opinions[-1].reviewer == AgentRole.EVIDENCE_CRITIC.value
     assert audit.addition_opinions[-1].model == "gpt-5.6-terra"
     assert audit.addition_resolutions[0].outcome == "arbitrated"
-    assert audit.addition_resolutions[0].final_addition.region.text == "Terra resolution"
+    assert audit.addition_resolutions[0].proposal_region_ids == [
+        "layout-addition",
+        "table-addition",
+    ]
+    assert audit.addition_resolutions[0].final_addition.region.text == "Table proposal"
+
+
+def test_addition_arbitration_cannot_invent_a_third_region_payload(
+    simple_pdf: bytes,
+) -> None:
+    gateway = SpecialistGateway(
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[
+                _addition("Layout proposal", region_id="layout-addition")
+            ],
+        ),
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[
+                _addition("Table proposal", region_id="table-addition")
+            ],
+        ),
+        PageInspection(
+            additional_regions=[
+                _addition("Invented compromise", region_id="layout-addition")
+            ]
+        ),
+    )
+
+    result = _parse(simple_pdf, gateway)
+
+    page = result.document.pages[0]
+    resolution = page.specialist_audit.addition_resolutions[0]
+    assert [block.text for block in page.blocks] == ["Draft"]
+    assert len(page.specialist_audit.addition_opinions) == 3
+    assert resolution.outcome == "needs_review"
+    assert resolution.final_addition is None
+    assert "outside the competing proposals" in resolution.reasoning
+    assert "specialist_conflict" in page.quality.needs_review_reasons
 
 
 class DuplicateAdditionGateway:
