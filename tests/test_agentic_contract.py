@@ -66,7 +66,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     payload = json.loads(rendered.json)
 
     assert rendered.markdown == "Alpha line\nBeta line\n"
-    assert payload["schema_version"] == "2.0.0"
+    assert payload["schema_version"] == "2.1.0"
     assert payload["metadata"]["range_units"] == "unicode_codepoints"
     assert payload["metadata"]["usage"]["input_tokens"] == 120
     assert payload["metadata"]["usage"]["output_tokens"] == 30
@@ -636,7 +636,14 @@ def test_visual_atom_span_uses_its_labeled_emission() -> None:
         type="figure",
         text="Gauge face",
         figure_description="Needle points to 42 psi.",
-        atoms=[AtomicEvidence(kind="transcription", text="Needle")],
+        atoms=[
+            AtomicEvidence(
+                kind="transcription",
+                text="Needle",
+                confidence=0.61,
+                low_confidence_spans=[{"start": 0, "end": 6}],
+            )
+        ],
         reading_order=0,
         verification=VerificationState.VERIFIED,
     )
@@ -654,6 +661,8 @@ def test_visual_atom_span_uses_its_labeled_emission() -> None:
     span = transcription["source"]["span"]
 
     assert transcription["text"] == "Transcription: Needle"
+    assert transcription["confidence"] == 0.61
+    assert transcription["low_confidence_spans"] == [{"start": 0, "end": 6}]
     assert rendered.markdown[span["start"] : span["end"]] == "Transcription: Needle"
 
 
