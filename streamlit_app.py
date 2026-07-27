@@ -10,7 +10,7 @@ import streamlit as st
 from grounded_docparse import extraction, pipeline
 
 SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
-RESULT_VERSION = "2.0.0"
+RESULT_VERSION = "2.1.0"
 
 
 def reset_document_state() -> None:

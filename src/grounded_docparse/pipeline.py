@@ -22,6 +22,7 @@ from .models import (
     AtomicEvidence,
     Block,
     BoundingBox,
+    ConfidenceSpan,
     Citation,
     CorrectionLineage,
     CropInspectionRequest,
@@ -86,6 +87,7 @@ AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
 )
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
+INVALID_CONFIDENCE_EVIDENCE_REASON = "Invalid confidence evidence"
 
 
 def _clean_text(value: str | None) -> str | None:
@@ -127,50 +129,93 @@ def _bbox(value: DraftBoundingBox | None) -> BoundingBox | None:
         return None
 
 
-def _table(region: RegionDraft) -> TableData | None:
+def _valid_confidence_spans(
+    text: str,
+    spans: list[ConfidenceSpan],
+) -> tuple[list[ConfidenceSpan], bool]:
+    valid = [span for span in spans if 0 <= span.start < span.end <= len(text)]
+    return valid, len(valid) != len(spans)
+
+
+def _table(region: RegionDraft) -> tuple[TableData | None, bool]:
     if region.type is not NodeType.TABLE:
-        return None
-    return TableData(
-        cells=[
+        return None, False
+    invalid = False
+    cells: list[TableCell] = []
+    for cell in region.table_cells:
+        text = _clean_text(cell.text) or ""
+        spans, spans_invalid = _valid_confidence_spans(text, cell.low_confidence_spans)
+        invalid = invalid or spans_invalid
+        cells.append(
             TableCell(
                 row=cell.row_index,
                 column=cell.column_index,
-                text=_clean_text(cell.text) or "",
+                text=text,
                 row_span=cell.row_span,
                 column_span=cell.column_span,
                 header=cell.header,
                 bbox=_bbox(cell.bbox),
+                confidence=cell.confidence,
+                low_confidence_spans=spans,
             )
-            for cell in region.table_cells
-        ]
-    )
-
-
-def _atoms(region: RegionDraft) -> list[AtomicEvidence]:
-    return [
-        AtomicEvidence(
-            kind=atom.kind,
-            text=_clean_text(atom.text) or "",
-            bbox=_bbox(atom.bbox),
         )
-        for atom in region.atoms
+    return TableData(cells=cells), invalid
+
+
+def _atoms(region: RegionDraft) -> tuple[list[AtomicEvidence], bool]:
+    invalid = False
+    atoms: list[AtomicEvidence] = []
+    for atom in region.atoms:
+        text = _clean_text(atom.text) or ""
+        spans, spans_invalid = _valid_confidence_spans(text, atom.low_confidence_spans)
+        invalid = invalid or spans_invalid
+        atoms.append(
+            AtomicEvidence(
+                kind=atom.kind,
+                text=text,
+                bbox=_bbox(atom.bbox),
+                confidence=atom.confidence,
+                low_confidence_spans=spans,
+            )
+        )
+    return atoms, invalid
+
+
+def _aggregated_confidence(region: RegionDraft) -> float:
+    values = [
+        region.confidence,
+        *(cell.confidence for cell in region.table_cells if cell.confidence is not None),
+        *(atom.confidence for atom in region.atoms if atom.confidence is not None),
     ]
+    return min(values)
+
+
+def _has_low_confidence_spans(block: Block) -> bool:
+    return bool(
+        any(atom.low_confidence_spans for atom in block.atoms)
+        or (
+            block.table is not None
+            and any(cell.low_confidence_spans for cell in block.table.cells)
+        )
+    )
 
 
 def _block(region: RegionDraft, page_number: int, index: int) -> Block:
     block_id = f"p{page_number}-b{index + 1}"
     bbox = _bbox(region.bbox)
+    table, invalid_table_confidence = _table(region)
+    atoms, invalid_atom_confidence = _atoms(region)
     block = Block(
         id=block_id,
         type=region.type,
         text=_clean_text(region.text) or "",
         bbox=bbox,
         reading_order=region.reading_order,
-        confidence=region.confidence,
+        confidence=_aggregated_confidence(region),
         citation=Citation(page=page_number, bbox=bbox),
         heading_level=region.heading_level,
         list_marker=region.list_marker,
-        table=_table(region),
+        table=table,
         form=_form(region),
         checkbox_state=region.checkbox_state,
         checkbox_group=region.checkbox_group,
@@ -188,17 +233,22 @@ def _block(region: RegionDraft, page_number: int, index: int) -> Block:
             )
             for point in region.chart_data
         ],
-        atoms=_atoms(region),
+        atoms=atoms,
     )
     if region.bbox is not None and bbox is None:
         block.verification = VerificationState.NEEDS_REVIEW
         block.verification_reason = "Invalid bounding box"
+    elif invalid_table_confidence or invalid_atom_confidence:
+        block.verification = VerificationState.NEEDS_REVIEW
+        block.verification_reason = INVALID_CONFIDENCE_EVIDENCE_REASON
     return block
 
 
-def _needs_verification(region: RegionDraft) -> bool:
+def _needs_verification(region: RegionDraft, block: Block) -> bool:
     return (
-        region.confidence < VERIFICATION_CONFIDENCE_THRESHOLD
+        block.confidence < VERIFICATION_CONFIDENCE_THRESHOLD
+        or _has_low_confidence_spans(block)
+        or block.verification is VerificationState.NEEDS_REVIEW
         or region.type in COMPLEX_REGION_TYPES
         or bool(CRITICAL_LITERAL_PATTERN.search(region.text))
         or any(marker in region.text for marker in CRITICAL_WARNING_MARKERS)
@@ -222,12 +272,14 @@ def _apply_correction(
     if not preserve_layout:
         block.bbox = bbox
         block.reading_order = region.reading_order
-    block.confidence = region.confidence
+    table, invalid_table_confidence = _table(region)
+    atoms, invalid_atom_confidence = _atoms(region)
+    block.confidence = _aggregated_confidence(region)
     if not preserve_layout:
         block.citation = Citation(page=page_number, bbox=bbox)
     block.heading_level = region.heading_level
     block.list_marker = region.list_marker
-    block.table = _table(region)
+    block.table = table
     block.form = _form(region)
     block.checkbox_state = region.checkbox_state
     block.checkbox_group = region.checkbox_group
@@ -245,7 +297,11 @@ def _apply_correction(
         )
         for point in region.chart_data
     ]
-    block.atoms = _atoms(region)
+    block.atoms = atoms
+    if invalid_table_confidence or invalid_atom_confidence:
+        block.verification = VerificationState.NEEDS_REVIEW
+        block.verification_reason = INVALID_CONFIDENCE_EVIDENCE_REASON
+        return False
     block.verification_reason = None
     return True
 
@@ -260,6 +316,9 @@ def _apply_decision(
     if decision.region_id != block.id:
         block.verification_reason = "Verification returned a different region ID"
     elif decision.action is InspectionAction.ACCEPT:
+        if block.verification_reason == INVALID_CONFIDENCE_EVIDENCE_REASON:
+            block.verification = VerificationState.NEEDS_REVIEW
+            return
         block.verification = VerificationState.VERIFIED
     elif decision.action is InspectionAction.CORRECT:
         if decision.corrected_region is None:
@@ -297,6 +356,8 @@ def _region_from_block(block: Block) -> RegionDraft:
                 row_span=cell.row_span,
                 column_span=cell.column_span,
                 header=cell.header,
+                confidence=cell.confidence,
+                low_confidence_spans=cell.low_confidence_spans,
             )
             for cell in block.table.cells
         ]
@@ -326,6 +387,8 @@ def _region_from_block(block: Block) -> RegionDraft:
                     if atom.bbox is not None
                     else None
                 ),
+                confidence=atom.confidence,
+                low_confidence_spans=atom.low_confidence_spans,
             )
             for atom in block.atoms
         ],
@@ -571,7 +634,7 @@ class DocumentParser:
         risky = [
             (region, block)
             for region, block in zip(draft.regions, blocks, strict=True)
-            if _needs_verification(region)
+            if _needs_verification(region, block)
         ]
         decisions: dict[str, InspectionDecision] = {}
         resolution_failures: dict[str, str] = {}
