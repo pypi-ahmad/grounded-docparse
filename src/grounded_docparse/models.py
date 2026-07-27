@@ -335,6 +335,24 @@ class SpecialistResolution(BaseModel):
     reasoning: str = ""
 
 
+class SpecialistAdditionOpinion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    reviewer: str
+    model: str
+    timestamp: datetime
+    addition: InspectionRegionAddition
+
+
+class SpecialistAdditionResolution(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    region_id: str
+    outcome: str
+    final_addition: InspectionRegionAddition | None = None
+    reasoning: str = ""
+
+
 class SpecialistOrderingOpinion(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -357,6 +375,8 @@ class SpecialistAudit(BaseModel):
 
     opinions: list[SpecialistOpinion] = Field(default_factory=list)
     resolutions: list[SpecialistResolution] = Field(default_factory=list)
+    addition_opinions: list[SpecialistAdditionOpinion] = Field(default_factory=list)
+    addition_resolutions: list[SpecialistAdditionResolution] = Field(default_factory=list)
     ordering_opinions: list[SpecialistOrderingOpinion] = Field(default_factory=list)
     ordering_resolution: SpecialistOrderingResolution | None = None
 

@@ -16,10 +16,11 @@ from .models import (
     Block,
     Document,
     NodeType,
+    PageQuality,
     RunUsage,
     VerificationState,
 )
-from .quality import WORD_PATTERN
+from .quality import WORD_PATTERN, incomplete_table
 
 ANNOTATION_COLORS = {
     VerificationState.VERIFIED: (0.0, 0.55, 0.2),
@@ -256,7 +257,7 @@ def _body(block: Block) -> str:
     if block.type is NodeType.TABLE:
         return _table(block)
     if block.type is NodeType.CHECKBOX:
-        return f"{_checkbox_marker(block)} {text}"
+        return f"{_checkbox_marker(block)} {_checkbox_text(block)}"
     if block.type is NodeType.LIST_ITEM:
         marker = block.list_marker or "-"
         return text if _has_equivalent_leading_marker(text, marker) else f"{marker} {text}"
@@ -286,6 +287,8 @@ class _Emission:
     start: int
     end: int
     body: str
+    coverage_body: str | None = None
+    checkbox_group_span: tuple[int, int] | None = None
 
 
 class _MarkdownBuilder:
@@ -313,18 +316,25 @@ class _MarkdownBuilder:
         options = [f"{_checkbox_marker(item)} {_checkbox_text(item)}" for item in members]
         start = self.length
         self.append_raw(prefix + " ".join(options))
+        group_span = (start + len("**"), start + len("**") + len(group))
         cursor = start + len(prefix)
         for member, option in zip(members, options, strict=True):
+            end = cursor + len(option)
             self.emissions[member.id] = _Emission(
                 start=cursor,
-                end=cursor + len(option),
+                end=end,
                 body=option,
+                coverage_body=prefix + option,
+                checkbox_group_span=group_span,
             )
-            cursor += len(option) + 1
+            cursor = end + 1
         self.append_raw("\n\n")
 
     def finish(self) -> str:
-        return "".join(self.parts).rstrip() + "\n"
+        value = "".join(self.parts)
+        if value.endswith("\n\n"):
+            return value[:-1]
+        return value if value.endswith("\n") else value + "\n"
 
 
 def _checkbox_text(block: Block) -> str:
@@ -415,6 +425,7 @@ def _semantic_fragments(block: Block) -> list[str]:
         fragments.extend(
             [
                 _checkbox_marker(block),
+                block.checkbox_group or "",
                 block.checkbox_option or "",
                 block.text,
             ]
@@ -464,13 +475,14 @@ def _semantic_tokens(block: Block) -> Counter[str]:
         )
         return _token_counts(block.text) | structured
     if block.type is NodeType.CHECKBOX:
+        group = _token_counts(block.checkbox_group or "")
         option = block.checkbox_option or ""
         content = (
             _token_counts(block.text) | _token_counts(option)
             if block.text == option
             else _sum_token_counts([block.text, option])
         )
-        return content + _token_counts(_checkbox_marker(block))
+        return group + content + _token_counts(_checkbox_marker(block))
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
         expected = _sum_token_counts(
             [
@@ -517,7 +529,7 @@ def _semantic_tokens(block: Block) -> Counter[str]:
 
 def _incomplete_structure(block: Block) -> bool:
     if block.type is NodeType.TABLE:
-        return block.table is None or not block.table.cells
+        return incomplete_table(block)
     if block.type is NodeType.FORM_FIELD:
         return block.form is None or not block.form.label.strip()
     if block.type is NodeType.CHECKBOX:
@@ -534,9 +546,11 @@ def _incomplete_structure(block: Block) -> bool:
 def _semantic_coverage(block: Block, body: str) -> float:
     if block.verification is VerificationState.REJECTED:
         return 0.0
+    if _incomplete_structure(block):
+        return 0.0
     expected = _semantic_tokens(block)
     if not expected:
-        return 0.0 if _incomplete_structure(block) else 1.0
+        return 1.0
     rendered = Counter(WORD_PATTERN.findall(body.replace(r"\|", "|").casefold()))
     covered = sum((expected & rendered).values())
     return round(covered / sum(expected.values()), 6)
@@ -577,6 +591,11 @@ def _page_quality_reasons(
         for resolution in page.specialist_audit.resolutions
     ):
         add("specialist_conflict")
+    if any(
+        resolution.outcome == "needs_review"
+        for resolution in page.specialist_audit.addition_resolutions
+    ):
+        add("specialist_conflict")
 
     warning_text = "\n".join(page.warnings).casefold()
     if "skipped" in warning_text:
@@ -602,6 +621,34 @@ def _page_quality_reasons(
     return reasons
 
 
+def _computed_page_quality(page, emissions: dict[str, _Emission]) -> PageQuality:
+    blocks = list(_walk_blocks(page.blocks))
+    coverages: list[float] = []
+    for block in blocks:
+        emission = emissions.get(block.id)
+        body = (emission.coverage_body or emission.body) if emission else ""
+        coverages.append(_semantic_coverage(block, body))
+    coverage = (
+        round(sum(coverages) / len(coverages), 6)
+        if coverages
+        else page.quality.semantic_coverage
+    )
+    return PageQuality(
+        semantic_coverage=coverage,
+        coverage_threshold=SEMANTIC_COVERAGE_THRESHOLD,
+        needs_review_reasons=_page_quality_reasons(page, blocks, coverages),
+    )
+
+
+def materialize_document_quality(document: Document) -> Document:
+    """Populate canonical page quality before serializing any document format."""
+
+    _markdown, emissions = _render_with_emissions(document)
+    for page in document.pages:
+        page.quality = _computed_page_quality(page, emissions)
+    return document
+
+
 def render_agentic_document(
     document: Document,
     *,
@@ -623,21 +670,30 @@ def render_agentic_document(
             emission = emissions.get(block.id)
             rendered = emission is not None
             body = emission.body if emission is not None else ""
+            coverage_body = (
+                emission.coverage_body or body if emission is not None else ""
+            )
             start = emission.start if emission is not None else None
             end = emission.end if emission is not None else None
-            coverage = _semantic_coverage(block, body)
+            coverage = _semantic_coverage(block, coverage_body)
             coverages.append(coverage)
             status = block.verification
-            if (
-                status is VerificationState.VERIFIED
-                and coverage < SEMANTIC_COVERAGE_THRESHOLD
+            if status is VerificationState.VERIFIED and (
+                coverage < SEMANTIC_COVERAGE_THRESHOLD or _incomplete_structure(block)
             ):
                 status = VerificationState.NEEDS_REVIEW
             if start is not None and end is not None:
                 page_start = start if page_start is None else min(page_start, start)
                 page_end = end if page_end is None else max(page_end, end)
             atoms = (
-                _agentic_atoms(block, markdown, start, end, page.number)
+                _agentic_atoms(
+                    block,
+                    markdown,
+                    start,
+                    end,
+                    page.number,
+                    checkbox_group_span=emission.checkbox_group_span,
+                )
                 if rendered
                 else []
             )
@@ -665,12 +721,8 @@ def render_agentic_document(
                     ],
                 }
             )
-        quality_reasons = _page_quality_reasons(page, page_blocks, coverages)
-        page_coverage = (
-            round(sum(coverages) / len(coverages), 6)
-            if coverages
-            else page.quality.semantic_coverage
-        )
+        computed_quality = _computed_page_quality(page, emissions)
+        quality_reasons = computed_quality.needs_review_reasons
         pages.append(
             {
                 "id": f"page-{page.number}",
@@ -697,11 +749,7 @@ def render_agentic_document(
                 "blocks": page_nodes,
                 "specialist_audit": page.specialist_audit.model_dump(mode="json"),
                 "warnings": page.warnings,
-                "quality": {
-                    "semantic_coverage": page_coverage,
-                    "coverage_threshold": SEMANTIC_COVERAGE_THRESHOLD,
-                    "needs_review_reasons": quality_reasons,
-                },
+                "quality": computed_quality.model_dump(mode="json"),
             }
         )
 
@@ -763,6 +811,15 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
             for text in _table_residual_lines(block)
         )
         return values
+    if block.type is NodeType.CHECKBOX:
+        values = []
+        if block.checkbox_group:
+            values.append(("checkbox_group", block.checkbox_group, block.bbox, "literal"))
+        values.append(("checkbox_marker", _checkbox_marker(block), block.bbox, "literal"))
+        option = _checkbox_text(block)
+        if option:
+            values.append(("checkbox_option", option, block.bbox, "literal"))
+        return values
     visible = block.text or _body(block)
     return [
         ("line", line, block.bbox, "literal")
@@ -807,32 +864,42 @@ def _agentic_atoms(
     start: int,
     end: int,
     page_number: int,
+    *,
+    checkbox_group_span: tuple[int, int] | None = None,
 ) -> list[dict]:
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
         return _visual_agentic_atoms(block, start, page_number)
     atoms: list[dict] = []
     atom_cursor = start
     for kind, text, bbox, origin in _atom_values(block):
-        candidates = [text]
-        escaped = text.replace("|", r"\|")
-        if escaped != text:
-            candidates.append(escaped)
-        matches = [
-            (markdown.find(candidate, atom_cursor, end), candidate)
-            for candidate in candidates
-        ]
-        matches = [match for match in matches if match[0] >= 0]
-        if not matches:
+        if kind == "checkbox_group":
+            if checkbox_group_span is None:
+                continue
+            atom_start, atom_end = checkbox_group_span
+            rendered_text = markdown[atom_start:atom_end]
+            if rendered_text != text:
+                continue
+        else:
+            candidates = [text]
+            escaped = text.replace("|", r"\|")
+            if escaped != text:
+                candidates.append(escaped)
             matches = [
-                (markdown.find(candidate, start, end), candidate)
+                (markdown.find(candidate, atom_cursor, end), candidate)
                 for candidate in candidates
             ]
             matches = [match for match in matches if match[0] >= 0]
-        if not matches:
-            continue
-        atom_start, rendered_text = min(matches, key=lambda match: match[0])
-        atom_end = atom_start + len(rendered_text)
-        atom_cursor = atom_end
+            if not matches:
+                matches = [
+                    (markdown.find(candidate, start, end), candidate)
+                    for candidate in candidates
+                ]
+                matches = [match for match in matches if match[0] >= 0]
+            if not matches:
+                continue
+            atom_start, rendered_text = min(matches, key=lambda match: match[0])
+            atom_end = atom_start + len(rendered_text)
+            atom_cursor = atom_end
         index = len(atoms) + 1
         atoms.append(
             {

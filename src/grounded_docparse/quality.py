@@ -112,16 +112,59 @@ def _scan_candidate(bbox: BoundingBox, reading_order: int) -> RegionDraft:
     )
 
 
+def incomplete_table(block: Block) -> bool:
+    return block.type is NodeType.TABLE and (
+        block.table is None
+        or not block.table.cells
+        or any(not cell.text.strip() for cell in block.table.cells)
+    )
+
+
 def _incomplete_structured_content(block: Block) -> bool:
     if block.type is NodeType.TABLE:
-        return block.table is None or not block.table.cells or any(
-            not cell.text.strip() for cell in block.table.cells
-        )
+        return incomplete_table(block)
     if block.type is NodeType.FORM_FIELD:
         return block.form is None or not block.form.label.strip()
     if block.type is NodeType.CHECKBOX:
         return not (block.checkbox_group or block.checkbox_option)
     return False
+
+
+def _rectangle_union_area(boxes: list[BoundingBox]) -> float:
+    events: list[tuple[float, int, float, float]] = []
+    for box in boxes:
+        if box.x1 <= box.x0 or box.y1 <= box.y0:
+            continue
+        events.append((box.x0, 1, box.y0, box.y1))
+        events.append((box.x1, -1, box.y0, box.y1))
+    events.sort()
+    active: Counter[tuple[float, float]] = Counter()
+    area = 0.0
+    previous_x: float | None = None
+    index = 0
+    while index < len(events):
+        x = events[index][0]
+        if previous_x is not None and x > previous_x:
+            intervals = sorted(interval for interval, count in active.items() if count)
+            covered_y = 0.0
+            if intervals:
+                start, end = intervals[0]
+                for next_start, next_end in intervals[1:]:
+                    if next_start <= end:
+                        end = max(end, next_end)
+                    else:
+                        covered_y += end - start
+                        start, end = next_start, next_end
+                covered_y += end - start
+            area += (x - previous_x) * covered_y
+        while index < len(events) and events[index][0] == x:
+            _event_x, delta, y0, y1 = events[index]
+            active[(y0, y1)] += delta
+            if not active[(y0, y1)]:
+                del active[(y0, y1)]
+            index += 1
+        previous_x = x
+    return area
 
 
 def _covered_fraction(blocks: list[Block], region: BoundingBox) -> float:
@@ -137,16 +180,7 @@ def _covered_fraction(blocks: list[Block], region: BoundingBox) -> float:
         and block.bbox is not None
         and _intersection(block.bbox, region) > 0
     ]
-    x_coordinates = sorted({region.x0, region.x1, *(box.x0 for box in boxes), *(box.x1 for box in boxes)})
-    y_coordinates = sorted({region.y0, region.y1, *(box.y0 for box in boxes), *(box.y1 for box in boxes)})
-    covered = 0.0
-    for x0, x1 in pairwise(x_coordinates):
-        for y0, y1 in pairwise(y_coordinates):
-            if any(
-                box.x0 <= x0 and x1 <= box.x1 and box.y0 <= y0 and y1 <= box.y1
-                for box in boxes
-            ):
-                covered += (x1 - x0) * (y1 - y0)
+    covered = _rectangle_union_area(boxes)
     return covered / _area(region) if _area(region) else 0.0
 
 
