@@ -351,8 +351,9 @@ def test_missing_specialist_decision_has_audited_review_resolution(
 
 
 class OrderingConflictGateway(SpecialistGateway):
-    def __init__(self) -> None:
+    def __init__(self, *, reject: bool = False) -> None:
         super().__init__(PageInspection(), PageInspection())
+        self.reject = reject
 
     def draft_page(self, _page) -> PageDraft:
         return PageDraft(regions=[_region(f"Block {index}", reading_order=index) for index in range(4)])
@@ -401,7 +402,12 @@ class OrderingConflictGateway(SpecialistGateway):
             order[1], order[2] = order[2], order[1]
         return PageInspection(
             decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
+                InspectionDecision(
+                    region_id=region_id,
+                    action=(
+                        InspectionAction.REJECT if self.reject else InspectionAction.ACCEPT
+                    ),
+                )
                 for region_id in targets
             ],
             ordered_region_ids=order,
@@ -422,3 +428,16 @@ def test_conflicting_order_opinions_are_ignored_audited_and_mark_page_for_review
     assert len(page.specialist_audit.ordering_opinions) == 2
     assert payload_page["status"] == "needs_review"
     assert any("conflicting ordered_region_ids" in warning for warning in result.document.warnings)
+
+
+def test_order_conflict_marks_all_rejected_page_for_review_in_agentic_output(
+    simple_pdf: bytes,
+) -> None:
+    result = _parse(simple_pdf, OrderingConflictGateway(reject=True))
+
+    page = result.document.pages[0]
+    payload_page = json.loads(result.json)["document"]["pages"][0]
+    assert all(block.verification is VerificationState.REJECTED for block in page.blocks)
+    assert page.specialist_audit.ordering_resolution.outcome == "needs_review"
+    assert payload_page["blocks"] == []
+    assert payload_page["status"] == "needs_review"
