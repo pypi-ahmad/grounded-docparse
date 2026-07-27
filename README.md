@@ -4,7 +4,7 @@ A single-page local Streamlit app that uses a bounded manager-and-specialist wor
 
 The workflow is inspired by LlamaParse and LandingAI ADE, but calls neither service. A Luna manager chooses only the specialists needed for each page. Luna performs the first pass; Terra is reserved for explicit repair or extraction-critic escalation. Delegation is bounded to two specialists per round and two repair rounds. Deterministic validation builds the hierarchy, verifies extraction evidence, and produces the exports.
 
-Documents are processed in ordered windows of 20 pages with up to 10 isolated page workers by default. Page-local agent calls run concurrently, while cross-page hierarchy, output order, usage, and traces are finalized deterministically. Provider capacity is account- and model-specific; lower `DOCPARSE_MAX_PAGE_CONCURRENCY` if the project reaches request, token, or image rate limits.
+Documents are processed in ordered windows of 100 pages with up to 50 isolated page workers by default. Page-local agent calls run concurrently, while cross-page hierarchy, output order, usage, and traces are finalized deterministically. Provider capacity is account- and model-specific; lower `DOCPARSE_MAX_PAGE_CONCURRENCY` if the project reaches request, token, or image rate limits.
 
 ## Run
 

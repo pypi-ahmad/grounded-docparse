@@ -1,7 +1,7 @@
 # How it works
 
 1. The upload is size/page limited and rendered locally.
-2. Pages are scheduled in ordered windows of 20, with up to 10 isolated page workers by default.
+2. Pages are scheduled in ordered windows of 100, with up to 50 isolated page workers by default.
 3. Luna drafts ordered typed regions and atomic evidence.
 4. A Luna manager reviews the complete page manifest and chooses only the layout/text, table/form, visual, or evidence specialist needed. Delegation is capped at two specialists per round and two repair rounds.
 5. Specialists use Luna by default. Terra is used only when the manager explicitly escalates a risky target. Deterministic code validates corrections, additions, coordinates, ordering, and evidence.
