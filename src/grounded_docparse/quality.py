@@ -10,6 +10,9 @@ from .models import Block, BoundingBox, NodeType, RegionDraft, VerificationState
 
 SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
+SCAN_UNCOVERED_INTERIOR_THRESHOLD = 0.30
+SCAN_LARGE_VISUAL_AREA = 0.15
+SCAN_INTERIOR = (0.1, 0.1, 0.9, 0.9)
 
 WORD_PATTERN = re.compile(r"[A-Za-z0-9]+(?:[./:@_-][A-Za-z0-9]+)*")
 ROMAN_NUMERAL_PATTERN = (
@@ -36,6 +39,7 @@ CRITICAL_PATTERNS = (
 )
 DEGRADED_MARKERS = ("ambiguous", "degraded", "handwritten", "illegible", "obscured")
 COMPLEX_TYPES = {NodeType.TABLE, NodeType.FORM_FIELD, NodeType.CHECKBOX}
+VISUAL_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 
 
 def _tokens(value: str) -> list[str]:
@@ -97,15 +101,98 @@ def _source_candidate(source: TextBlock, reading_order: int) -> RegionDraft:
     )
 
 
+def _scan_candidate(bbox: BoundingBox, reading_order: int) -> RegionDraft:
+    return RegionDraft(
+        type=NodeType.PARAGRAPH,
+        bbox=bbox.model_dump(exclude={"unit"}),
+        reading_order=reading_order,
+        text="",
+        confidence=0.5,
+    )
+
+
+def _incomplete_structured_content(block: Block) -> bool:
+    if block.type is NodeType.TABLE:
+        return block.table is None or not block.table.cells or any(
+            not cell.text.strip() for cell in block.table.cells
+        )
+    if block.type is NodeType.FORM_FIELD:
+        return block.form is None or not block.form.label.strip()
+    if block.type is NodeType.CHECKBOX:
+        return not (block.checkbox_group or block.checkbox_option)
+    return False
+
+
+def _covered_fraction(blocks: list[Block], region: BoundingBox) -> float:
+    boxes = [
+        BoundingBox(
+            x0=max(block.bbox.x0, region.x0),
+            y0=max(block.bbox.y0, region.y0),
+            x1=min(block.bbox.x1, region.x1),
+            y1=min(block.bbox.y1, region.y1),
+        )
+        for block in blocks
+        if block.verification is not VerificationState.REJECTED
+        and block.bbox is not None
+        and _intersection(block.bbox, region) > 0
+    ]
+    x_coordinates = sorted({region.x0, region.x1, *(box.x0 for box in boxes), *(box.x1 for box in boxes)})
+    y_coordinates = sorted({region.y0, region.y1, *(box.y0 for box in boxes), *(box.y1 for box in boxes)})
+    covered = 0.0
+    for x0, x1 in pairwise(x_coordinates):
+        for y0, y1 in pairwise(y_coordinates):
+            if any(
+                box.x0 <= x0 and x1 <= box.x1 and box.y0 <= y0 and y1 <= box.y1
+                for box in boxes
+            ):
+                covered += (x1 - x0) * (y1 - y0)
+    return covered / _area(region) if _area(region) else 0.0
+
+
+def _scan_probes(page: PageEvidence, blocks: list[Block]) -> list[RegionDraft]:
+    probes: list[RegionDraft] = []
+
+    def add_probe(bbox: BoundingBox) -> None:
+        candidate = _scan_candidate(bbox, len(blocks) + len(probes))
+        if not any(probe.bbox == candidate.bbox for probe in probes):
+            probes.append(candidate)
+
+    active_blocks = [
+        block for block in blocks if block.verification is not VerificationState.REJECTED
+    ]
+    for block in active_blocks:
+        if block.bbox is None:
+            continue
+        if _incomplete_structured_content(block):
+            add_probe(block.bbox)
+        if (
+            block.type in VISUAL_TYPES
+            and not semantic_text(block).strip()
+            and _area(block.bbox) >= SCAN_LARGE_VISUAL_AREA
+        ):
+            add_probe(block.bbox)
+
+    interior = BoundingBox(
+        x0=SCAN_INTERIOR[0],
+        y0=SCAN_INTERIOR[1],
+        x1=SCAN_INTERIOR[2],
+        y1=SCAN_INTERIOR[3],
+    )
+    if not any(semantic_text(block).strip() for block in active_blocks) or (
+        1 - _covered_fraction(active_blocks, interior)
+        >= SCAN_UNCOVERED_INTERIOR_THRESHOLD
+    ):
+        add_probe(interior)
+    return probes
+
+
 def find_missing_source_regions(
     page: PageEvidence,
     blocks: list[Block],
     *,
     threshold: float = SOURCE_COVERAGE_THRESHOLD,
 ) -> list[RegionDraft]:
-    if page.scanned:
-        return []
-    missing: list[RegionDraft] = []
+    missing = _scan_probes(page, blocks) if page.scanned else []
     for source in page.text_blocks:
         if len(_tokens(source.text)) < 3:
             continue

@@ -811,6 +811,18 @@ class DocumentParser:
                 warnings.append(
                     f"Page {page.number}: recovered {len(recovery_blocks)} native text regions"
                 )
+        elif page.scanned:
+            for region in find_missing_source_regions(page, blocks):
+                if region.text:
+                    continue
+                probe = _block(region, page.number, len(blocks))
+                probe.verification = VerificationState.NEEDS_REVIEW
+                probe.verification_reason = "Scan omission probe was not inspected"
+                blocks.append(probe)
+                warnings.append(
+                    f"Page {page.number}: quality gate unresolved block {probe.id}; "
+                    "high-resolution inspection unavailable"
+                )
 
         blocks, normalization_warnings = normalize_page_blocks(blocks)
         warnings.extend(
