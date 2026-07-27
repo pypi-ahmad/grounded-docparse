@@ -233,6 +233,15 @@ def test_luna_inspection_returns_fail_closed_decisions(tmp_path: Path) -> None:
     assert "nearby heading or label that identifies its subject" in prompt
     assert "omitted visible region" in prompt
     assert "ordered_region_ids" in prompt
+    assert "calibrated confidence from 0 to 1" in prompt
+    schema = to_strict_json_schema(PageInspection)
+    assert schema["$defs"]["InspectionDecision"]["properties"]["confidence"] == {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Confidence",
+        "type": "number",
+    }
     manifest = call["input"][1]["content"][0]["text"]
     assert '"region_id": "region-0"' in manifest
     assert '"target_region_ids": ["region-1"]' in manifest
