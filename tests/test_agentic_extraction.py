@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from grounded_docparse.extraction import DocumentExtractor
 from grounded_docparse.models import (
     AgentUsage,
@@ -222,7 +224,12 @@ def test_rejected_audit_block_cannot_be_used_as_extraction_evidence() -> None:
 
 
 class LaunderingEvidenceGateway(ExtractionGateway):
+    def __init__(self) -> None:
+        super().__init__()
+        self.payloads = []
+
     def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+        self.payloads.append(_parse_payload)
         self.extract_calls.append((use_terra, issues))
         return {
             "data": {"invoice_number": "REJECTED-ONLY-9"},
@@ -266,10 +273,24 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
         ],
     )
     rendered = render_agentic_document(document)
+    canonical_payload = json.loads(rendered.json)
+    canonical_payload["metadata"]["trace"] = [
+        {"summary": "Rejected audit echoed REJECTED-ONLY-9"}
+    ]
+    canonical_page = canonical_payload["document"]["pages"][0]
+    canonical_page["specialist_audit"] = {
+        "reason": "Rejected audit echoed REJECTED-ONLY-9"
+    }
+    accepted = next(
+        block for block in canonical_page["blocks"] if block["id"] == "accepted"
+    )
+    accepted["correction_lineage"] = [
+        {"reason": "Replaced rejected REJECTED-ONLY-9"}
+    ]
     parse_result = ParseResult(
         document=document,
         markdown=rendered.markdown,
-        json=rendered.json,
+        json=json.dumps(canonical_payload),
         legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
@@ -281,7 +302,90 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
         parse_result, SCHEMA
     )
 
-    assert "REJECTED-ONLY-9" not in parse_result.json
+    assert "REJECTED-ONLY-9" in parse_result.json
+    assert all(
+        "REJECTED-ONLY-9" not in json.dumps(payload)
+        for payload in gateway.payloads
+    )
     assert result.data == {"invoice_number": None}
     assert result.evidence == {}
     assert any("does not contain extracted value" in item for item in result.warnings)
+
+
+class LiteralEvidenceGateway(ExtractionGateway):
+    def __init__(self, value) -> None:
+        super().__init__()
+        self.value = value
+
+    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+        self.extract_calls.append((use_terra, issues))
+        return {
+            "data": {"value": self.value},
+            "evidence": [
+                {
+                    "pointer": "/value",
+                    "block_ids": ["accepted"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+@pytest.mark.parametrize(
+    ("kind", "value", "source_text"),
+    [
+        ("integer", 1234, "Total: 1,234"),
+        ("number", 1234.5, "Amount: $1,234.50"),
+        ("boolean", True, "[x] Approved"),
+    ],
+)
+def test_scalar_grounding_accepts_deterministic_literal_normalization(
+    kind: str,
+    value,
+    source_text: str,
+) -> None:
+    schema = {
+        "type": "object",
+        "properties": {"value": {"type": [kind, "null"]}},
+        "required": ["value"],
+        "additionalProperties": False,
+    }
+    document = Document(
+        source_name="literal.pdf",
+        source_sha256="d" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="accepted",
+                        type="paragraph",
+                        text=source_text,
+                        reading_order=0,
+                        verification=VerificationState.VERIFIED,
+                    )
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    parse_result = ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        legacy_json=render_json(document),
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    gateway = LiteralEvidenceGateway(value)
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        parse_result, schema
+    )
+
+    assert result.data == {"value": value}
+    assert result.warnings == []
+    assert gateway.extract_calls == [(False, None)]

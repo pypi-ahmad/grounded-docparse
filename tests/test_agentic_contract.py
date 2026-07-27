@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+import grounded_docparse.render as document_render
 from grounded_docparse.extraction import validate_extraction_schema
 from grounded_docparse.models import (
     AgentTraceEvent,
@@ -249,10 +250,10 @@ def test_agentic_render_preserves_table_residual_and_all_visual_semantics() -> N
         "generated_description",
     ]
     assert [atom["text"] for atom in visual_atoms] == [
-        "Needle above green band",
+        "Transcription: Needle above green band",
         "Dial reads 42 psi.",
-        "Pressure gauge",
-        "A round analog gauge mounted on a pipe.",
+        "Caption: Pressure gauge",
+        "Description: A round analog gauge mounted on a pipe.",
     ]
 
 
@@ -297,6 +298,36 @@ def test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells()
     assert rendered.markdown.count("Line two") == 1
     assert "Footnote remains." in rendered.markdown
     assert [node["semantic_coverage"] for node in nodes] == [1.0, 1.0]
+
+
+def test_table_coverage_detects_residual_omission_independently(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    block = Block(
+        id="table",
+        type="table",
+        text="Plan | tax\nPrices include tax.",
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+        table=TableData(
+            cells=[
+                TableCell(row=0, column=0, text="Plan"),
+                TableCell(row=0, column=1, text="tax"),
+            ]
+        ),
+    )
+    document = Document(
+        source_name="coverage.pdf",
+        source_sha256="5" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+    monkeypatch.setattr(document_render, "_table_residual_lines", lambda _block: [])
+
+    page = json.loads(render_agentic_document(document).json)["document"]["pages"][0]
+
+    assert page["blocks"][0]["semantic_coverage"] == 0.4
+    assert page["blocks"][0]["status"] == "needs_review"
+    assert "semantic_coverage_loss" in page["quality"]["needs_review_reasons"]
 
 
 def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
@@ -421,6 +452,8 @@ def test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review(
 
     assert "Unsupported account 999" not in rendered.markdown
     assert nodes["rejected"]["rendered"] is False
+    assert nodes["rejected"]["text"] == "Unsupported account 999"
+    assert nodes["rejected"]["semantic"] is not None
     assert nodes["rejected"]["reason"] == "Not grounded in the source"
     assert nodes["rejected"]["verification_reason"] == "Not grounded in the source"
     assert nodes["rejected"]["source"]["span"] is None
@@ -489,3 +522,30 @@ def test_verified_replacement_preserves_rejected_lineage_in_page_status() -> Non
 
     assert page["status"] == "needs_review"
     assert "rejected_content" in page["quality"]["needs_review_reasons"]
+
+
+def test_visual_atom_span_uses_its_labeled_emission() -> None:
+    block = Block(
+        id="visual",
+        type="figure",
+        text="Gauge face",
+        figure_description="Needle points to 42 psi.",
+        atoms=[AtomicEvidence(kind="transcription", text="Needle")],
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+    )
+    document = Document(
+        source_name="visual.pdf",
+        source_sha256="6" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    rendered = render_agentic_document(document)
+    atoms = json.loads(rendered.json)["document"]["pages"][0]["blocks"][0][
+        "atoms"
+    ]
+    transcription = next(atom for atom in atoms if atom["kind"] == "transcription")
+    span = transcription["source"]["span"]
+
+    assert transcription["text"] == "Transcription: Needle"
+    assert rendered.markdown[span["start"] : span["end"]] == "Transcription: Needle"
