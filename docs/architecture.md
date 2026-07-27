@@ -10,7 +10,7 @@ upload -> Luna draft -> manager page plan -> selected Luna specialists
 
 Streamlit runs the workflow synchronously in one local process. There is no API server, queue, worker, database, application cache, cost estimator, or artifact store.
 
-Within that process, the parser schedules strict 20-page windows and uses up to 10 isolated page threads. Each page owns its gateway, usage, and trace state. Worker progress is replayed on the caller thread; page results are sorted before cross-page hierarchy and final exports are built.
+Within that process, the parser schedules strict 100-page windows and uses up to 50 isolated page threads. Each page owns its gateway, usage, and trace state. Worker progress is replayed on the caller thread; page results are sorted before cross-page hierarchy and final exports are built.
 
 `ingest.py` validates and renders inputs. `gateways.py` owns strict OpenAI calls, usage accounting, and the agent trace. `pipeline.py` bounds manager delegation to two specialists per round and two repair rounds, assigns stable IDs, validates boxes and ordering, and builds the hierarchy. A deterministic quality gate recovers native-text regions below 70% spatial coverage, normalizes repeated content, and selects at most eight critical blocks per affected page for one high-resolution Terra crop pass. Unresolved blocks remain visible as `needs_review` and generate warnings. `extraction.py` validates editable schemas and requires evidence for every non-null scalar. `render.py` emits Markdown, agentic JSON v2, legacy JSON, and the annotated PDF.
 

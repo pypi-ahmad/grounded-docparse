@@ -16,8 +16,8 @@ class ParserConfig:
     max_page_pixels: int = 20_000_000
     luna_max_output_tokens: int = 128_000
     terra_max_output_tokens: int = 128_000
-    page_batch_size: int = 20
-    max_page_concurrency: int = 10
+    page_batch_size: int = 100
+    max_page_concurrency: int = 50
 
     def __post_init__(self) -> None:
         for name in (
