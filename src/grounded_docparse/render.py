@@ -509,7 +509,7 @@ def _semantic_tokens(block: Block) -> Counter[str]:
         return expected
     expected = _token_counts(block.text)
     if block.type is NodeType.LIST_ITEM:
-        expected |= _token_counts(block.list_marker or "-")
+        expected += _token_counts(block.list_marker or "-")
     return expected
 
 
