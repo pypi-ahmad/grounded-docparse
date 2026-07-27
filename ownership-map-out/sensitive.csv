@@ -1,0 +1,7 @@
+# pattern,tag,weight
+**/gateways.py,api_egress,1.0
+**/ingest.py,untrusted_parsing,1.0
+**/extraction.py,evidence_validation,0.8
+**/config.py,security_config,0.6
+**/pipeline.py,orchestration,0.5
+**/.env.example,secrets_template,0.5
