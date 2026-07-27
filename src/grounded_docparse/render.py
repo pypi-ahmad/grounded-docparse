@@ -17,6 +17,7 @@ from .models import (
     Document,
     NodeType,
     PageQuality,
+    RuntimeDiagnostics,
     RunUsage,
     VerificationState,
 )
@@ -672,6 +673,7 @@ def render_agentic_document(
     *,
     usage: RunUsage | None = None,
     trace: list[AgentTraceEvent] | None = None,
+    runtime_diagnostics: RuntimeDiagnostics | None = None,
     duration_ms: int = 0,
 ) -> RenderedAgenticDocument:
     """Render canonical Markdown together with its grounded v2 envelope."""
@@ -798,6 +800,11 @@ def render_agentic_document(
             "range_units": "unicode_codepoints",
             "usage": run_usage.model_dump(mode="json"),
             "trace": [event.model_dump(mode="json") for event in (trace or [])],
+            "runtime": (
+                runtime_diagnostics.model_dump(mode="json")
+                if runtime_diagnostics is not None
+                else None
+            ),
             "warnings": document.warnings,
         },
         "document": {"id": "document", "pages": pages},
