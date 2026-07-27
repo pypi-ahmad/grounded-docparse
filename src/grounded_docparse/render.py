@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
@@ -32,6 +33,12 @@ def _checkbox_marker(block: Block) -> str:
     )
 
 
+def _has_equivalent_leading_marker(text: str, marker: str) -> bool:
+    return bool(
+        re.match(rf"^{re.escape(marker)}(?=\s|$)", text.lstrip(), re.IGNORECASE)
+    )
+
+
 def _table(block: Block) -> str:
     if block.table is None or not block.table.cells:
         return block.text
@@ -59,7 +66,8 @@ def _body(block: Block) -> str:
     if block.type is NodeType.CHECKBOX:
         return f"{_checkbox_marker(block)} {text}"
     if block.type is NodeType.LIST_ITEM:
-        return f"{block.list_marker or '-'} {text}"
+        marker = block.list_marker or "-"
+        return text if _has_equivalent_leading_marker(text, marker) else f"{marker} {text}"
     if block.type is NodeType.FORM_FIELD and block.form is not None:
         label = block.form.label.rstrip().removesuffix(":")
         value = block.form.value
