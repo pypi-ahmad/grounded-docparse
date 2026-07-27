@@ -308,6 +308,9 @@ class OpenAIDocumentGateway:
                         "Keep non-instructional visual descriptions under 25 words and instructional "
                         "figures under 75 words. "
                         "A crop correction must not change the candidate bounding box or reading order. "
+                        "For rejections, set geometry_only=true only when rejection is exclusively caused "
+                        "by invalid, missing, or clipped bounding-box geometry; set it false for semantic, "
+                        "unsupported, ambiguous, or mixed failures. "
                         "Return one decision per crop and "
                         "preserve every supplied region ID and evidence reference."
                     ),
@@ -363,7 +366,10 @@ class OpenAIDocumentGateway:
                         "Return exactly one accept, complete literal correction, or rejection per crop. "
                         "Never invent obscured or unsupported content. Preserve exact visible identifiers, "
                         "dates, measurements, phone numbers, emails, URLs, list markers, table cells, and "
-                        "checkbox states. Preserve every supplied region ID, evidence reference, bounding "
+                        "checkbox states. For rejections, set geometry_only=true only when rejection is "
+                        "exclusively caused by invalid, missing, or clipped bounding-box geometry; set it "
+                        "false for semantic, unsupported, ambiguous, or mixed failures. Preserve every "
+                        "supplied region ID, evidence reference, bounding "
                         "box, and reading order."
                     ),
                 },

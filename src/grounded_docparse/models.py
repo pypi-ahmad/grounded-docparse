@@ -298,6 +298,7 @@ class InspectionDecision(BaseModel):
     action: InspectionAction
     corrected_region: RegionDraft | None = None
     reason: str = ""
+    geometry_only: bool = False
     evidence_refs: list[str] = Field(default_factory=list)
 
 

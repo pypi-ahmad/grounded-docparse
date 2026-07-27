@@ -68,7 +68,6 @@ CRITICAL_WARNING_MARKERS = ("MUST", "DO NOT", "WILL NOT", "REQUIRED", "WARNING",
 AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
 )
-GEOMETRY_REJECTION_MARKERS = ("geometry", "bounding box", "bbox", "clipped")
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 
 
@@ -363,13 +362,6 @@ def _proactive_crop_priority(block: Block) -> int | None:
     if AMBIGUOUS_LITERAL_PATTERN.search(searchable):
         return 1
     return None
-
-
-def _is_geometry_rejection(decision: InspectionDecision) -> bool:
-    reason = decision.reason.casefold()
-    return decision.action is InspectionAction.REJECT and any(
-        marker in reason for marker in GEOMETRY_REJECTION_MARKERS
-    )
 
 
 def _has_excessive_order_movement(
@@ -862,7 +854,7 @@ class DocumentParser:
                                 rejection_counts[block.id] = (
                                     rejection_counts.get(block.id, 0) + 1
                                 )
-                                if _is_geometry_rejection(decision):
+                                if decision.geometry_only:
                                     geometry_rejection_counts[block.id] = (
                                         geometry_rejection_counts.get(block.id, 0) + 1
                                     )
