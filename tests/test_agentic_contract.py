@@ -330,7 +330,7 @@ def test_table_coverage_detects_residual_omission_independently(
     assert "semantic_coverage_loss" in page["quality"]["needs_review_reasons"]
 
 
-def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
+def test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans() -> None:
     document = Document(
         source_name="checkboxes.pdf",
         source_sha256="3" * 64,
@@ -344,7 +344,7 @@ def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
                         id="yes",
                         type="checkbox",
                         reading_order=0,
-                        checkbox_group="Approved",
+                        checkbox_group="Yes",
                         checkbox_option="Yes",
                         checkbox_state=CheckboxState.UNCHECKED,
                     ),
@@ -352,7 +352,7 @@ def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
                         id="no",
                         type="checkbox",
                         reading_order=1,
-                        checkbox_group="Approved",
+                        checkbox_group="Yes",
                         checkbox_option="No",
                         checkbox_state=CheckboxState.CHECKED,
                     ),
@@ -370,6 +370,46 @@ def test_grouped_checkboxes_have_distinct_exact_member_spans() -> None:
 
     assert slices == ["[ ] Yes", "[x] No"]
     assert nodes[0]["source"]["span"] != nodes[1]["source"]["span"]
+    assert [node["semantic_coverage"] for node in nodes] == [1.0, 1.0]
+    group_spans = []
+    for node in nodes:
+        group_atom = next(atom for atom in node["atoms"] if atom["kind"] == "checkbox_group")
+        span = group_atom["source"]["span"]
+        group_spans.append(span)
+        assert rendered.markdown[span["start"] : span["end"]] == "Yes"
+    assert group_spans[0] == group_spans[1]
+
+
+def test_ungrouped_checkbox_renders_its_structured_option() -> None:
+    document = Document(
+        source_name="checkbox.pdf",
+        source_sha256="7" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="choice",
+                        type="checkbox",
+                        reading_order=0,
+                        checkbox_option="Email",
+                        checkbox_state=CheckboxState.CHECKED,
+                        verification=VerificationState.VERIFIED,
+                    )
+                ],
+            )
+        ],
+    )
+
+    rendered = render_agentic_document(document)
+    node = json.loads(rendered.json)["document"]["pages"][0]["blocks"][0]
+    span = node["source"]["span"]
+
+    assert rendered.markdown == "[x] Email\n"
+    assert rendered.markdown[span["start"] : span["end"]] == "[x] Email"
+    assert node["semantic_coverage"] == 1.0
 
 
 def test_repeated_text_blocks_receive_distinct_exact_emission_spans() -> None:
@@ -397,6 +437,45 @@ def test_repeated_text_blocks_receive_distinct_exact_emission_spans() -> None:
     assert [
         rendered.markdown[span["start"] : span["end"]] for span in spans
     ] == ["Same", "Same"]
+
+
+def test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds() -> None:
+    document = Document(
+        source_name="spaces.pdf",
+        source_sha256="8" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="spaces",
+                        type="paragraph",
+                        text="Trailing spaces   ",
+                        reading_order=0,
+                    )
+                ],
+            )
+        ],
+    )
+
+    rendered = render_agentic_document(document)
+    page = json.loads(rendered.json)["document"]["pages"][0]
+    node = page["blocks"][0]
+
+    assert rendered.markdown == "Trailing spaces   \n"
+    for record in [page, node, *node["atoms"]]:
+        span = record["source"]["span"]
+        assert span is not None
+        assert 0 <= span["start"] <= span["end"] <= len(rendered.markdown)
+    node_span = node["source"]["span"]
+    assert rendered.markdown[node_span["start"] : node_span["end"]] == (
+        "Trailing spaces   "
+    )
+    for atom in node["atoms"]:
+        span = atom["source"]["span"]
+        assert rendered.markdown[span["start"] : span["end"]] == atom["text"]
 
 
 def test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review() -> None:
@@ -492,6 +571,31 @@ def test_verified_incomplete_structure_fails_full_semantic_coverage() -> None:
         "incomplete_structure",
         "semantic_coverage_loss",
     }
+
+
+def test_verified_table_with_blank_cell_is_incomplete_and_needs_review() -> None:
+    block = Block(
+        id="partial-table",
+        type="table",
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+        table=TableData(
+            cells=[
+                TableCell(row=0, column=0, text="Name"),
+                TableCell(row=0, column=1, text=""),
+            ]
+        ),
+    )
+    document = Document(
+        source_name="partial.pdf",
+        source_sha256="9" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    page = json.loads(render_agentic_document(document).json)["document"]["pages"][0]
+
+    assert page["blocks"][0]["status"] == "needs_review"
+    assert "incomplete_structure" in page["quality"]["needs_review_reasons"]
 
 
 def test_verified_replacement_preserves_rejected_lineage_in_page_status() -> None:

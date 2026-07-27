@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from grounded_docparse.ingest import PageEvidence, TextBlock
 from grounded_docparse.models import (
     Block,
@@ -14,6 +16,7 @@ from grounded_docparse.models import (
     VerificationState,
 )
 from grounded_docparse.quality import (
+    _rectangle_union_area,
     find_missing_source_regions,
     normalize_page_blocks,
     select_repair_blocks,
@@ -167,6 +170,31 @@ def test_scanned_page_probes_large_uncovered_internal_region() -> None:
     assert [probe.bbox.model_dump() for probe in probes if probe.bbox] == [
         {"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.9}
     ]
+
+
+@pytest.mark.parametrize(
+    ("boxes", "expected"),
+    [
+        ([], 0.0),
+        ([_box(0.1, 0.1, 0.4, 0.4)], 0.09),
+        ([_box(0.1, 0.1, 0.5, 0.5), _box(0.3, 0.3, 0.7, 0.7)], 0.28),
+        ([_box(0.1, 0.1, 0.5, 0.5), _box(0.1, 0.1, 0.5, 0.5)], 0.16),
+        ([_box(0.1, 0.1, 0.1, 0.9), _box(0.2, 0.2, 0.8, 0.2)], 0.0),
+    ],
+)
+def test_rectangle_union_area_handles_overlap_duplicates_and_zero_area(
+    boxes: list[BoundingBox], expected: float
+) -> None:
+    assert _rectangle_union_area(boxes) == pytest.approx(expected)
+
+
+def test_rectangle_union_area_scales_to_many_disjoint_strips() -> None:
+    boxes = [
+        _box(index / 2_000, 0.1, (index + 1) / 2_000, 0.9)
+        for index in range(1_000)
+    ]
+
+    assert _rectangle_union_area(boxes) == pytest.approx(0.4)
 
 
 def test_critical_literal_mismatch_is_selected_for_repair() -> None:

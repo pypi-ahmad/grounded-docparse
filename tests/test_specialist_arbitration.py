@@ -8,11 +8,13 @@ from grounded_docparse.models import (
     AgentRole,
     InspectionAction,
     InspectionDecision,
+    InspectionRegionAddition,
     NodeType,
     PageDraft,
     PageInspection,
     PagePlan,
     RegionDraft,
+    SpecialistAudit,
     VerificationState,
 )
 from grounded_docparse.pipeline import DocumentParser
@@ -31,6 +33,15 @@ def _region(text: str, *, reading_order: int = 0) -> RegionDraft:
 
 def _correction(text: str) -> RegionDraft:
     return _region(text)
+
+
+def _addition(text: str, *, region_id: str = "addition-1") -> InspectionRegionAddition:
+    return InspectionRegionAddition(
+        region_id=region_id,
+        region=_region(text, reading_order=1),
+        reason=f"Visible omitted text: {text}",
+        evidence_refs=[f"page-1:{region_id}"],
+    )
 
 
 class SpecialistGateway:
@@ -115,6 +126,13 @@ def test_inspection_confidence_is_additive_and_defaulted() -> None:
     )
 
     assert decision.confidence == 0.5
+
+
+def test_specialist_addition_audit_fields_are_additive_and_defaulted() -> None:
+    audit = SpecialistAudit()
+
+    assert audit.addition_opinions == []
+    assert audit.addition_resolutions == []
 
 
 def test_identical_specialist_corrections_reach_audited_consensus(
@@ -232,6 +250,123 @@ def test_conflicting_specialists_are_resolved_by_terra_evidence_critic(
     assert audit.resolutions[0].final_decision.reason == (
         "Source image supports this literal"
     )
+
+
+def test_identical_additional_regions_reach_one_audited_consensus(
+    simple_pdf: bytes,
+) -> None:
+    addition = _addition("Omitted literal")
+    gateway = SpecialistGateway(
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[addition],
+        ),
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[addition.model_copy(deep=True)],
+        ),
+    )
+
+    result = _parse(simple_pdf, gateway)
+
+    page = result.document.pages[0]
+    audit = page.specialist_audit
+    assert [block.text for block in page.blocks] == ["Draft", "Omitted literal"]
+    assert [opinion.reviewer for opinion in audit.addition_opinions] == [
+        AgentRole.LAYOUT_TEXT.value,
+        AgentRole.TABLE_FORM.value,
+    ]
+    assert all(opinion.model == "gpt-5.6-luna" for opinion in audit.addition_opinions)
+    assert all(opinion.timestamp.tzinfo is not None for opinion in audit.addition_opinions)
+    assert len(audit.addition_resolutions) == 1
+    assert audit.addition_resolutions[0].outcome == "consensus"
+    assert audit.addition_resolutions[0].final_addition == addition
+    persisted = json.loads(result.json)["document"]["pages"][0]["specialist_audit"]
+    assert len(persisted["addition_opinions"]) == 2
+    assert persisted["addition_resolutions"][0]["outcome"] == "consensus"
+
+
+def test_conflicting_additional_regions_are_arbitrated_by_terra(
+    simple_pdf: bytes,
+) -> None:
+    gateway = SpecialistGateway(
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[_addition("Layout proposal")],
+        ),
+        PageInspection(
+            decisions=[
+                InspectionDecision(region_id="p1-b1", action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[_addition("Table proposal")],
+        ),
+        PageInspection(additional_regions=[_addition("Terra resolution")]),
+    )
+
+    result = _parse(simple_pdf, gateway)
+
+    page = result.document.pages[0]
+    audit = page.specialist_audit
+    assert [block.text for block in page.blocks] == ["Draft", "Terra resolution"]
+    assert gateway.calls[-1] == (
+        AgentRole.EVIDENCE_CRITIC,
+        True,
+        ["addition-1"],
+    )
+    assert len(audit.addition_opinions) == 3
+    assert audit.addition_opinions[-1].reviewer == AgentRole.EVIDENCE_CRITIC.value
+    assert audit.addition_opinions[-1].model == "gpt-5.6-terra"
+    assert audit.addition_resolutions[0].outcome == "arbitrated"
+    assert audit.addition_resolutions[0].final_addition.region.text == "Terra resolution"
+
+
+class DuplicateAdditionGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def draft_page(self, _page) -> PageDraft:
+        return PageDraft(regions=[_region("Draft")])
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        region_id = (target_region_ids or region_ids)[0]
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
+            ],
+            additional_regions=[
+                _addition("First proposal"),
+                _addition("Second proposal"),
+            ],
+        )
+
+    def inspect_crops(self, *_args, **_kwargs):
+        raise AssertionError("crop inspection was not requested")
+
+
+def test_conflicting_additional_regions_without_manager_fail_closed_and_audit(
+    simple_pdf: bytes,
+) -> None:
+    result = _parse(simple_pdf, DuplicateAdditionGateway())
+
+    page = result.document.pages[0]
+    audit = page.specialist_audit
+    payload_page = json.loads(result.json)["document"]["pages"][0]
+    assert [block.text for block in page.blocks] == ["Draft"]
+    assert len(audit.addition_opinions) == 2
+    assert len(audit.addition_resolutions) == 1
+    assert audit.addition_resolutions[0].outcome == "needs_review"
+    assert audit.addition_resolutions[0].final_addition is None
+    assert page.quality.needs_review_reasons == payload_page["quality"][
+        "needs_review_reasons"
+    ]
+    assert "specialist_conflict" in page.quality.needs_review_reasons
+    assert payload_page["status"] == "needs_review"
 
 
 @pytest.mark.parametrize(
