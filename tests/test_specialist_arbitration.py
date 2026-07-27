@@ -439,5 +439,7 @@ def test_order_conflict_marks_all_rejected_page_for_review_in_agentic_output(
     payload_page = json.loads(result.json)["document"]["pages"][0]
     assert all(block.verification is VerificationState.REJECTED for block in page.blocks)
     assert page.specialist_audit.ordering_resolution.outcome == "needs_review"
-    assert payload_page["blocks"] == []
+    assert payload_page["blocks"]
+    assert all(block["rendered"] is False for block in payload_page["blocks"])
+    assert all(block["source"]["span"] is None for block in payload_page["blocks"])
     assert payload_page["status"] == "needs_review"

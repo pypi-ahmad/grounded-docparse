@@ -200,6 +200,11 @@ def _validate_and_resolve(
     atoms: dict[str, tuple[str, dict]] = {}
     for page in parse_payload.get("document", {}).get("pages", []):
         for block in page.get("blocks", []):
+            if (
+                block.get("rendered") is False
+                or block.get("status") == "rejected"
+            ):
+                continue
             blocks[block["id"]] = block
             for atom in block.get("atoms", []):
                 atoms[atom["id"]] = (block["id"], atom)

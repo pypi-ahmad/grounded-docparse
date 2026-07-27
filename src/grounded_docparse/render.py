@@ -26,6 +26,8 @@ ANNOTATION_COLORS = {
     VerificationState.NOT_CHECKED: (0.1, 0.35, 0.85),
 }
 
+SEMANTIC_COVERAGE_THRESHOLD = 1.0
+
 
 def _checkbox_marker(block: Block) -> str:
     return {"checked": "[x]", "unchecked": "[ ]"}.get(
@@ -37,6 +39,19 @@ def _has_equivalent_leading_marker(text: str, marker: str) -> bool:
     return bool(
         re.match(rf"^{re.escape(marker)}(?=\s|$)", text.lstrip(), re.IGNORECASE)
     )
+
+
+def _residual_lines(text: str, represented: list[str]) -> list[str]:
+    residuals: list[str] = []
+    for line in text.splitlines():
+        residual = line
+        for value in represented:
+            if value:
+                residual = residual.replace(value.replace("\r", " ").replace("\n", " "), "", 1)
+        residual = residual.strip(" \t|")
+        if any(character not in ":()-[]" for character in residual):
+            residuals.append(residual)
+    return residuals
 
 
 def _table(block: Block) -> str:
@@ -52,7 +67,47 @@ def _table(block: Block) -> str:
         lines.append("| " + " | ".join(values) + " |")
         if row_index == min(rows):
             lines.append("| " + " | ".join("---" for _ in cells) + " |")
+    residuals = _residual_lines(
+        block.text,
+        [cell.text for cell in block.table.cells],
+    )
+    if residuals:
+        lines.extend(["", *residuals])
     return "\n".join(lines)
+
+
+def _visual(block: Block) -> str:
+    values: list[tuple[str, str]] = []
+    if block.text:
+        values.append(("text", block.text))
+    if block.caption:
+        values.append(("caption", block.caption))
+    if block.figure_description:
+        values.append(("description", block.figure_description))
+
+    parts: list[str] = []
+    seen: set[str] = set()
+    multiple = len({value for _kind, value in values}) > 1
+    for kind, value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        if multiple and kind != "text":
+            parts.append(f"{kind.title()}: {value}")
+        else:
+            parts.append(value)
+    for atom in block.atoms:
+        if atom.text and atom.text not in seen:
+            seen.add(atom.text)
+            label = atom.kind.replace("_", " ").title()
+            parts.append(f"{label}: {atom.text}")
+    if block.chart_type:
+        parts.append(f"Chart type: {block.chart_type}")
+    for point in block.chart_data:
+        prefix = f"{point.series} — " if point.series else ""
+        parts.append(f"{prefix}{point.label}: {point.value}")
+    content = "\n\n".join(parts)
+    return f"<figure>{content}</figure>" if parts else ""
 
 
 def _body(block: Block) -> str:
@@ -73,29 +128,69 @@ def _body(block: Block) -> str:
         value = block.form.value
         hint = block.form.hint
         if value is not None and hint is not None:
-            return f"**{label}:** {value} ({hint})"
-        if value is not None:
-            return f"**{label}:** {value}"
-        if hint is not None:
-            return f"**{label}:** {hint}"
-        return f"**{label}:**"
+            body = f"**{label}:** {value} ({hint})"
+        elif value is not None:
+            body = f"**{label}:** {value}"
+        elif hint is not None:
+            body = f"**{label}:** {hint}"
+        else:
+            body = f"**{label}:**"
+        residuals = _residual_lines(
+            block.text,
+            [block.form.label, value or "", hint or ""],
+        )
+        return "\n".join([body, *residuals])
     if block.type in {NodeType.HEADER, NodeType.FOOTER}:
         return text
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-        description = block.figure_description or block.caption or text
-        return f"<figure>{description}</figure>" if description else ""
+        return _visual(block)
     return text
 
 
-def _render_block(block: Block, lines: list[str]) -> None:
-    body = _body(block)
-    if body:
-        lines.extend([body, ""])
-    for child in sorted(block.children, key=lambda item: item.reading_order):
-        _render_block(child, lines)
+@dataclass(frozen=True, slots=True)
+class _Emission:
+    start: int
+    end: int
+    body: str
 
 
-def _render_blocks(blocks: list[Block], lines: list[str]) -> None:
+class _MarkdownBuilder:
+    def __init__(self) -> None:
+        self.parts: list[str] = []
+        self.length = 0
+        self.emissions: dict[str, _Emission] = {}
+
+    def append_raw(self, value: str) -> None:
+        self.parts.append(value)
+        self.length += len(value)
+
+    def append_body(self, body: str, blocks: list[Block]) -> None:
+        if not body:
+            return
+        start = self.length
+        self.append_raw(body)
+        end = self.length
+        for block in blocks:
+            self.emissions[block.id] = _Emission(start=start, end=end, body=body)
+        self.append_raw("\n\n")
+
+    def finish(self) -> str:
+        return "".join(self.parts).rstrip() + "\n"
+
+
+def _checkbox_text(block: Block) -> str:
+    option = block.checkbox_option or block.text
+    if block.checkbox_option and block.text and block.checkbox_option != block.text:
+        return f"{block.checkbox_option}: {block.text}"
+    return option
+
+
+def _render_block(block: Block, builder: _MarkdownBuilder) -> None:
+    builder.append_body(_body(block), [block])
+    _render_blocks(block.children, builder)
+
+
+def _render_blocks(blocks: list[Block], builder: _MarkdownBuilder) -> None:
     ordered = sorted(blocks, key=lambda item: item.reading_order)
     index = 0
     while index < len(ordered):
@@ -113,24 +208,29 @@ def _render_blocks(blocks: list[Block], lines: list[str]) -> None:
                 index += 1
             if members:
                 options = " ".join(
-                    f"{_checkbox_marker(item)} {item.checkbox_option or item.text}"
+                    f"{_checkbox_marker(item)} {_checkbox_text(item)}"
                     for item in members
                 )
-                lines.extend([f"**{group}:** {options}", ""])
+                builder.append_body(f"**{group}:** {options}", members)
             for member in members:
-                _render_blocks(member.children, lines)
+                _render_blocks(member.children, builder)
             continue
-        _render_block(block, lines)
+        _render_block(block, builder)
         index += 1
 
 
-def render_markdown(document: Document) -> str:
-    lines: list[str] = []
+def _render_with_emissions(document: Document) -> tuple[str, dict[str, _Emission]]:
+    builder = _MarkdownBuilder()
     for page_index, page in enumerate(document.pages):
         if page_index:
-            lines.extend(["<!-- PAGE BREAK -->", ""])
-        _render_blocks(page.blocks, lines)
-    return "\n".join(lines).rstrip() + "\n"
+            builder.append_raw("<!-- PAGE BREAK -->\n\n")
+        _render_blocks(page.blocks, builder)
+    return builder.finish(), builder.emissions
+
+
+def render_markdown(document: Document) -> str:
+    markdown, _emissions = _render_with_emissions(document)
+    return markdown
 
 
 def render_json(document: Document) -> str:
@@ -143,6 +243,139 @@ class RenderedAgenticDocument:
     json: str
 
 
+def _semantic_fragments(block: Block) -> list[str]:
+    fragments: list[str] = []
+    if block.type is NodeType.TABLE and block.table is not None and block.table.cells:
+        fragments.extend(cell.text for cell in block.table.cells)
+        fragments.extend(
+            _residual_lines(block.text, [cell.text for cell in block.table.cells])
+        )
+    elif block.type is NodeType.FORM_FIELD and block.form is not None:
+        fragments.extend(
+            [
+                block.form.label.rstrip().removesuffix(":"),
+                block.form.value or "",
+                block.form.hint or "",
+            ]
+        )
+        fragments.extend(
+            _residual_lines(
+                block.text,
+                [block.form.label, block.form.value or "", block.form.hint or ""],
+            )
+        )
+    elif block.type is NodeType.CHECKBOX:
+        fragments.extend(
+            [
+                _checkbox_marker(block),
+                block.checkbox_group or "",
+                block.checkbox_option or "",
+                block.text,
+            ]
+        )
+    elif block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        fragments.extend(
+            [
+                block.text,
+                block.caption or "",
+                block.figure_description or "",
+                block.chart_type or "",
+            ]
+        )
+        for point in block.chart_data:
+            fragments.extend([point.series or "", point.label, point.value])
+        fragments.extend(atom.text for atom in block.atoms)
+    else:
+        fragments.append(block.text)
+        if block.type is NodeType.LIST_ITEM:
+            fragments.append(block.list_marker or "-")
+
+    return list(dict.fromkeys(fragment for fragment in fragments if fragment))
+
+
+def _incomplete_structure(block: Block) -> bool:
+    if block.type is NodeType.TABLE:
+        return block.table is None or not block.table.cells
+    if block.type is NodeType.FORM_FIELD:
+        return block.form is None or not block.form.label.strip()
+    if block.type is NodeType.CHECKBOX:
+        return block.checkbox_state is None or not (
+            block.checkbox_option or block.text
+        )
+    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        return not _semantic_fragments(block)
+    if block.type is NodeType.LIST:
+        return not block.text and not block.children
+    return False
+
+
+def _semantic_coverage(block: Block, body: str) -> float:
+    if block.verification is VerificationState.REJECTED:
+        return 0.0
+    fragments = _semantic_fragments(block)
+    if not fragments:
+        return 0.0 if _incomplete_structure(block) else 1.0
+    searchable = body.replace(r"\|", "|")
+    total = sum(len(fragment) for fragment in fragments)
+    covered = sum(len(fragment) for fragment in fragments if fragment in searchable)
+    return round(covered / total, 6) if total else 1.0
+
+
+def _page_quality_reasons(
+    page,
+    blocks: list[Block],
+    coverages: list[float],
+) -> list[str]:
+    reasons = list(page.quality.needs_review_reasons)
+
+    def add(reason: str) -> None:
+        if reason not in reasons:
+            reasons.append(reason)
+
+    if any(block.verification is VerificationState.REJECTED for block in blocks):
+        add("rejected_content")
+    if any(block.verification is VerificationState.NEEDS_REVIEW for block in blocks):
+        add("block_needs_review")
+    if any(_incomplete_structure(block) for block in blocks):
+        add("incomplete_structure")
+    if any(coverage < SEMANTIC_COVERAGE_THRESHOLD for coverage in coverages):
+        add("semantic_coverage_loss")
+    if any(block.bbox is None for block in blocks):
+        add("geometry_loss")
+
+    ordering = page.specialist_audit.ordering_resolution
+    if ordering is not None and ordering.outcome == "needs_review":
+        add("ordering_failure")
+    if any(
+        resolution.outcome == "needs_review"
+        for resolution in page.specialist_audit.resolutions
+    ):
+        add("specialist_conflict")
+
+    warning_text = "\n".join(page.warnings).casefold()
+    if "skipped" in warning_text:
+        add("skipped_correction")
+    if any(term in warning_text for term in ("probe", "recovery", "quality gate")) and (
+        "unresolved" in warning_text
+        or "not inspected" in warning_text
+        or "unavailable" in warning_text
+        or "skipped" in warning_text
+    ):
+        add("unresolved_recovery")
+    if any(
+        term in warning_text
+        for term in ("unresolved", "failed", "invalid", "ignored", "ambiguous")
+    ):
+        add("unresolved_warning")
+
+    block_reasons = "\n".join(
+        block.verification_reason or "" for block in blocks
+    ).casefold()
+    if "probe" in block_reasons or "recovery" in block_reasons:
+        add("unresolved_recovery")
+    return reasons
+
+
 def render_agentic_document(
     document: Document,
     *,
@@ -152,34 +385,41 @@ def render_agentic_document(
 ) -> RenderedAgenticDocument:
     """Render canonical Markdown together with its grounded v2 envelope."""
 
-    markdown = render_markdown(document)
-    cursor = 0
+    markdown, emissions = _render_with_emissions(document)
     pages: list[dict] = []
     for page in document.pages:
         page_nodes: list[dict] = []
         page_start: int | None = None
         page_end: int | None = None
-        for block in _walk_blocks(page.blocks):
-            if block.verification is VerificationState.REJECTED:
-                continue
-            body = _body(block)
-            if not body:
-                continue
-            start = markdown.find(body, cursor)
-            if start < 0:
-                start = markdown.find(body)
-            if start < 0:
-                continue
-            end = start + len(body)
-            cursor = end
-            page_start = start if page_start is None else min(page_start, start)
-            page_end = end if page_end is None else max(page_end, end)
-            atoms = _agentic_atoms(block, body, markdown, start, end, page.number)
+        page_blocks = list(_walk_blocks(page.blocks))
+        coverages: list[float] = []
+        for block in page_blocks:
+            emission = emissions.get(block.id)
+            rendered = emission is not None
+            body = emission.body if emission is not None else ""
+            start = emission.start if emission is not None else None
+            end = emission.end if emission is not None else None
+            coverage = _semantic_coverage(block, body)
+            coverages.append(coverage)
+            status = block.verification
+            if (
+                status is VerificationState.VERIFIED
+                and coverage < SEMANTIC_COVERAGE_THRESHOLD
+            ):
+                status = VerificationState.NEEDS_REVIEW
+            if start is not None and end is not None:
+                page_start = start if page_start is None else min(page_start, start)
+                page_end = end if page_end is None else max(page_end, end)
+            atoms = (
+                _agentic_atoms(block, markdown, start, end, page.number)
+                if rendered
+                else []
+            )
             page_nodes.append(
                 {
                     "id": block.id,
                     "type": block.type.value,
-                    "status": block.verification.value,
+                    "status": status.value,
                     "reading_order": len(page_nodes),
                     "confidence": block.confidence,
                     "text": block.text,
@@ -187,30 +427,55 @@ def render_agentic_document(
                     "atoms": atoms,
                     "semantic": _semantic_payload(block),
                     "children": [child.id for child in block.children],
+                    "rendered": rendered,
+                    "reason": block.verification_reason
+                    or (None if rendered else "No renderable semantic content"),
+                    "verification_reason": block.verification_reason,
+                    "semantic_coverage": coverage,
+                    "coverage_threshold": SEMANTIC_COVERAGE_THRESHOLD,
+                    "correction_lineage": [
+                        item.model_dump(mode="json")
+                        for item in block.correction_lineage
+                    ],
                 }
             )
-        ordering_needs_review = (
-            page.specialist_audit.ordering_resolution is not None
-            and page.specialist_audit.ordering_resolution.outcome == "needs_review"
+        quality_reasons = _page_quality_reasons(page, page_blocks, coverages)
+        page_coverage = (
+            round(sum(coverages) / len(coverages), 6)
+            if coverages
+            else page.quality.semantic_coverage
         )
         pages.append(
             {
                 "id": f"page-{page.number}",
                 "number": page.number,
                 "status": "needs_review"
-                if ordering_needs_review
-                or any(node["status"] == VerificationState.NEEDS_REVIEW.value for node in page_nodes)
+                if quality_reasons
+                or any(
+                    node["status"]
+                    in {
+                        VerificationState.NEEDS_REVIEW.value,
+                        VerificationState.REJECTED.value,
+                    }
+                    for node in page_nodes
+                )
                 else "ok",
                 "width": page.width,
                 "height": page.height,
                 "source": _source(
                     page.number,
-                    page_start or 0,
-                    page_end or (page_start or 0),
+                    page_start,
+                    page_end,
                     None,
                 ),
                 "blocks": page_nodes,
                 "specialist_audit": page.specialist_audit.model_dump(mode="json"),
+                "warnings": page.warnings,
+                "quality": {
+                    "semantic_coverage": page_coverage,
+                    "coverage_threshold": SEMANTIC_COVERAGE_THRESHOLD,
+                    "needs_review_reasons": quality_reasons,
+                },
             }
         )
 
@@ -237,45 +502,95 @@ def render_agentic_document(
     )
 
 
-def _source(page: int, start: int, end: int, bbox) -> dict:
+def _source(page: int, start: int | None, end: int | None, bbox) -> dict:
     return {
         "page": page,
-        "span": {"start": start, "end": end},
+        "span": {"start": start, "end": end}
+        if start is not None and end is not None
+        else None,
         "bbox": bbox.model_dump(mode="json") if bbox is not None else None,
     }
 
 
-def _agentic_atoms(
-    block: Block, body: str, markdown: str, start: int, end: int, page_number: int
-) -> list[dict]:
+def _atom_values(block: Block) -> list[tuple[str, str, object, str]]:
     if block.atoms:
-        values = [(atom.kind, atom.text, atom.bbox or block.bbox) for atom in block.atoms]
-    elif block.type is NodeType.TABLE and block.table is not None:
-        values = [("table_cell", cell.text, cell.bbox or block.bbox) for cell in block.table.cells]
-    elif block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-        values = [("visual_region", body, block.bbox)]
-    else:
-        visible = block.text or body
-        values = [("line", line, block.bbox) for line in visible.splitlines() if line]
+        return [
+            (atom.kind, atom.text, atom.bbox or block.bbox, "literal")
+            for atom in block.atoms
+        ]
+    if block.type is NodeType.TABLE and block.table is not None:
+        values = [
+            ("table_cell", cell.text, cell.bbox or block.bbox, "literal")
+            for cell in block.table.cells
+        ]
+        values.extend(
+            ("table_residual", text, block.bbox, "literal")
+            for text in _residual_lines(
+                block.text, [cell.text for cell in block.table.cells]
+            )
+        )
+        return values
+    if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
+        values: list[tuple[str, str, object, str]] = []
+        if block.text:
+            values.append(("visual_text", block.text, block.bbox, "literal"))
+        if block.caption:
+            values.append(("caption", block.caption, block.bbox, "literal"))
+        if block.figure_description:
+            values.append(
+                (
+                    "visual_description",
+                    block.figure_description,
+                    block.bbox,
+                    "generated_description",
+                )
+            )
+        return values
+    visible = block.text or _body(block)
+    return [
+        ("line", line, block.bbox, "literal")
+        for line in visible.splitlines()
+        if line
+    ]
 
+
+def _agentic_atoms(
+    block: Block,
+    markdown: str,
+    start: int,
+    end: int,
+    page_number: int,
+) -> list[dict]:
     atoms: list[dict] = []
     atom_cursor = start
-    for index, (kind, text, bbox) in enumerate(values, start=1):
-        atom_start = markdown.find(text, atom_cursor, end)
-        if atom_start < 0:
-            atom_start = start
-            atom_end = end
-        else:
-            atom_end = atom_start + len(text)
-            atom_cursor = atom_end
+    for kind, text, bbox, origin in _atom_values(block):
+        candidates = [text]
+        escaped = text.replace("|", r"\|")
+        if escaped != text:
+            candidates.append(escaped)
+        matches = [
+            (markdown.find(candidate, atom_cursor, end), candidate)
+            for candidate in candidates
+        ]
+        matches = [match for match in matches if match[0] >= 0]
+        if not matches:
+            matches = [
+                (markdown.find(candidate, start, end), candidate)
+                for candidate in candidates
+            ]
+            matches = [match for match in matches if match[0] >= 0]
+        if not matches:
+            continue
+        atom_start, rendered_text = min(matches, key=lambda match: match[0])
+        atom_end = atom_start + len(rendered_text)
+        atom_cursor = atom_end
+        index = len(atoms) + 1
         atoms.append(
             {
                 "id": f"{block.id}-a{index}",
                 "kind": kind,
                 "text": markdown[atom_start:atom_end],
-                "origin": "generated_description"
-                if kind == "visual_region"
-                else "literal",
+                "origin": origin,
                 "source": _source(
                     block.citation.page if block.citation is not None else page_number,
                     atom_start,

@@ -22,8 +22,8 @@ Open <http://localhost:8501>, upload one document, and select **Parse document**
 - Ordered headings, paragraphs, lists, tables, figures, charts, forms, and checkboxes, including distinct form values and printed hints
 - Nested sections and page structure
 - Truthful `not_checked`, `verified`, `needs_review`, or `rejected` state plus confidence, page, and normalized coordinates per block
-- Clean document-first Markdown that excludes only explicitly rejected content
-- Agentic JSON v2 with pages, blocks, atomic evidence, usage, and agent trace; legacy JSON remains downloadable
+- Lossless document-first Markdown with per-block semantic coverage and exact spans
+- Agentic JSON v2 with page quality, rejected/correction audit history, atomic evidence, usage, and agent trace; legacy JSON remains downloadable
 - Schema-driven extraction where every non-null scalar must resolve to source evidence
 - Actual run-level input and output token totals
 - Viewable and downloadable annotated PDF with audit boxes and labels

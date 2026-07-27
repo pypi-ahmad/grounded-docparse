@@ -9,9 +9,12 @@ from grounded_docparse.models import (
     AtomicEvidence,
     Block,
     BoundingBox,
+    CorrectionLineage,
     Document,
     Page,
     RunUsage,
+    TableCell,
+    TableData,
     VerificationState,
 )
 from grounded_docparse.render import render_agentic_document, render_json
@@ -176,6 +179,177 @@ def test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed()
 
     payload = json.loads(render_agentic_document(document).json)
 
+    blocks = payload["document"]["pages"][0]["blocks"]
+    assert [block["reading_order"] for block in blocks] == [0, 1, 2]
+    assert [block["rendered"] for block in blocks] == [True, False, True]
+
+
+def test_agentic_render_preserves_table_residual_and_all_visual_semantics() -> None:
+    blocks = [
+        Block(
+            id="table",
+            type="table",
+            text="Plan | Cost\nPrices include tax.",
+            bbox=BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.4),
+            reading_order=0,
+            verification=VerificationState.VERIFIED,
+            table=TableData(
+                cells=[
+                    TableCell(row=0, column=0, text="Plan", header=True),
+                    TableCell(row=0, column=1, text="Cost", header=True),
+                ]
+            ),
+        ),
+        Block(
+            id="visual",
+            type="figure",
+            text="Dial reads 42 psi.",
+            caption="Pressure gauge",
+            figure_description="A round analog gauge mounted on a pipe.",
+            bbox=BoundingBox(x0=0.1, y0=0.5, x1=0.9, y1=0.9),
+            reading_order=1,
+            verification=VerificationState.VERIFIED,
+            atoms=[AtomicEvidence(kind="transcription", text="Needle above green band")],
+        ),
+    ]
+    document = Document(
+        source_name="semantics.pdf",
+        source_sha256="d" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=blocks)],
+    )
+
+    rendered = render_agentic_document(document)
+    payload = json.loads(rendered.json)
+    nodes = payload["document"]["pages"][0]["blocks"]
+
+    assert "Prices include tax." in rendered.markdown
+    assert "Dial reads 42 psi." in rendered.markdown
+    assert "Pressure gauge" in rendered.markdown
+    assert "A round analog gauge mounted on a pipe." in rendered.markdown
+    assert "Needle above green band" in rendered.markdown
+    assert [node["semantic_coverage"] for node in nodes] == [1.0, 1.0]
+    assert all(node["rendered"] for node in nodes)
+    for node in nodes:
+        span = node["source"]["span"]
+        assert span is not None
+        assert rendered.markdown[span["start"] : span["end"]]
+
+
+def test_repeated_text_blocks_receive_distinct_exact_emission_spans() -> None:
+    document = Document(
+        source_name="repeated.pdf",
+        source_sha256="e" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(id="first", type="paragraph", text="Same", reading_order=0),
+                    Block(id="second", type="paragraph", text="Same", reading_order=1),
+                ],
+            )
+        ],
+    )
+
+    rendered = render_agentic_document(document)
+    nodes = json.loads(rendered.json)["document"]["pages"][0]["blocks"]
+    spans = [node["source"]["span"] for node in nodes]
+
+    assert spans[0] != spans[1]
     assert [
-        block["reading_order"] for block in payload["document"]["pages"][0]["blocks"]
-    ] == [0, 1]
+        rendered.markdown[span["start"] : span["end"]] for span in spans
+    ] == ["Same", "Same"]
+
+
+def test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review() -> None:
+    rejected = Block(
+        id="rejected",
+        type="paragraph",
+        text="Unsupported account 999",
+        reading_order=0,
+        verification=VerificationState.REJECTED,
+        verification_reason="Not grounded in the source",
+    )
+    probe = Block(
+        id="probe",
+        type="image",
+        reading_order=1,
+        verification=VerificationState.NEEDS_REVIEW,
+        verification_reason="Scan omission probe was not inspected",
+    )
+    corrected = Block(
+        id="corrected",
+        type="paragraph",
+        text="Grounded account 123",
+        bbox=BoundingBox(x0=0.1, y0=0.7, x1=0.9, y1=0.8),
+        reading_order=2,
+        verification=VerificationState.VERIFIED,
+        correction_lineage=[
+            CorrectionLineage(
+                original_id="rejected",
+                replacement_id="corrected",
+                provider_id="addition-1",
+                reason="Grounded quality correction",
+                previous_state=VerificationState.REJECTED,
+                final_state=VerificationState.VERIFIED,
+            )
+        ],
+    )
+    page = Page(
+        number=1,
+        width=100,
+        height=100,
+        blocks=[rejected, probe, corrected],
+        warnings=["Page 1: skipped added region addition-2 with invalid bounding box"],
+    )
+    document = Document(
+        source_name="history.pdf",
+        source_sha256="f" * 64,
+        pages=[page],
+    )
+
+    rendered = render_agentic_document(document)
+    payload_page = json.loads(rendered.json)["document"]["pages"][0]
+    nodes = {node["id"]: node for node in payload_page["blocks"]}
+
+    assert "Unsupported account 999" not in rendered.markdown
+    assert nodes["rejected"]["rendered"] is False
+    assert nodes["rejected"]["reason"] == "Not grounded in the source"
+    assert nodes["rejected"]["verification_reason"] == "Not grounded in the source"
+    assert nodes["rejected"]["source"]["span"] is None
+    assert nodes["rejected"]["atoms"] == []
+    assert nodes["probe"]["rendered"] is False
+    assert nodes["corrected"]["correction_lineage"][0]["original_id"] == "rejected"
+    assert payload_page["status"] == "needs_review"
+    assert set(payload_page["quality"]["needs_review_reasons"]) >= {
+        "rejected_content",
+        "skipped_correction",
+        "unresolved_recovery",
+        "geometry_loss",
+    }
+
+
+def test_verified_incomplete_structure_fails_full_semantic_coverage() -> None:
+    block = Block(
+        id="empty-table",
+        type="table",
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+        table=TableData(),
+    )
+    document = Document(
+        source_name="incomplete.pdf",
+        source_sha256="1" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    page = json.loads(render_agentic_document(document).json)["document"]["pages"][0]
+    node = page["blocks"][0]
+
+    assert node["semantic_coverage"] == 0.0
+    assert node["status"] == "needs_review"
+    assert set(page["quality"]["needs_review_reasons"]) >= {
+        "incomplete_structure",
+        "semantic_coverage_loss",
+    }

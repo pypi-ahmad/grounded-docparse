@@ -199,6 +199,10 @@ def test_unresolved_scanned_probe_remains_auditable_without_quality_inspection()
     assert blocks[0].text == ""
     assert blocks[0].verification is VerificationState.NEEDS_REVIEW
     assert any("quality gate unresolved" in warning.casefold() for warning in result.document.warnings)
+    page_payload = json.loads(result.json)["document"]["pages"][0]
+    assert page_payload["status"] == "needs_review"
+    assert page_payload["blocks"][0]["rendered"] is False
+    assert "unresolved_recovery" in page_payload["quality"]["needs_review_reasons"]
 
 
 class ScanProbeRecoveryGateway:
