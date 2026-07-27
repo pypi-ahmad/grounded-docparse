@@ -13,6 +13,9 @@ Parse one PDF or image into grounded document outputs, then optionally extract u
 - Strict Structured Outputs, no explicit prompt-cache controls, and `store=False`
 - Markdown, agentic JSON v2, legacy JSON, agent trace, and annotated PDF previews/downloads
 - Actual input and output token totals from provider usage
+- Deterministic source-coverage, duplicate, and critical-literal quality gates
+- At most eight high-resolution quality crops per affected page in one targeted Terra pass
+- Unresolved content remains visible and is marked `needs_review` with a warning
 - Editable strict JSON Schema and evidence for every non-null extracted scalar
 - `OPENAI_API_KEY` required; `OPENAI_BASE_URL` optional
 

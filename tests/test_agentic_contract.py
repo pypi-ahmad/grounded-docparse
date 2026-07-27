@@ -154,3 +154,28 @@ def test_provider_line_grounding_is_preserved_in_v2_atoms() -> None:
     assert atoms[0]["source"]["page"] == 2
     assert atoms[0]["source"]["bbox"]["y1"] == 0.2
     assert atoms[1]["source"]["bbox"]["y0"] == 0.25
+
+
+def test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed() -> None:
+    blocks = [
+        Block(id="keep-1", type="paragraph", text="First", reading_order=0),
+        Block(
+            id="drop",
+            type="paragraph",
+            text="Unsupported",
+            reading_order=1,
+            verification=VerificationState.REJECTED,
+        ),
+        Block(id="keep-2", type="paragraph", text="Second", reading_order=2),
+    ]
+    document = Document(
+        source_name="sample.pdf",
+        source_sha256="c" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=blocks)],
+    )
+
+    payload = json.loads(render_agentic_document(document).json)
+
+    assert [
+        block["reading_order"] for block in payload["document"]["pages"][0]["blocks"]
+    ] == [0, 1]

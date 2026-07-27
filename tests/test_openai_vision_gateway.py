@@ -106,6 +106,8 @@ def test_luna_draft_uses_deterministic_structured_vision_request(tmp_path: Path)
     assert "exact visible terminology" in prompt
     assert "one region per visible form field" in prompt
     assert "form.hint" in prompt
+    assert "Form labels are not headings" in prompt
+    assert "typographically distinct" in prompt
     assert "immediately beside its related procedure" in prompt
 
 
@@ -285,9 +287,44 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     assert "arrows" in prompt and "numbered" in prompt
     assert "barcode" in prompt and "do not infer" in prompt
     assert "complete figure_description" in prompt
+    assert "Do not repeat literal text already captured" in prompt
+    assert "75 words" in prompt
     manifest = call["input"][1]["content"][0]["text"]
     assert '"candidate_region"' in manifest
     _assert_no_prompt_cache(call)
+
+
+def test_quality_crop_inspection_uses_terra_and_records_page_targets(
+    tmp_path: Path,
+) -> None:
+    responses = RecordingResponses(PageInspection())
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+    crop = tmp_path / "quality.png"
+    crop.write_bytes(b"crop")
+    request = CropInspectionRequest(
+        crop_path=str(crop),
+        region_id="p7-b3",
+        candidate_region=RegionDraft(
+            type="table",
+            reading_order=2,
+            text="Diabetes E11.9",
+            bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.4},
+        ),
+        evidence_ref="page:7:p7-b3:quality",
+    )
+
+    gateway.inspect_quality_crops([request], page_number=7)
+
+    call = responses.calls[0]
+    prompt = call["input"][0]["content"]
+    assert call["model"] == "gpt-5.6-terra"
+    assert "Never invent" in prompt
+    assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
+    assert gateway.usage.calls[0].agent == AgentRole.EVIDENCE_CRITIC.value
+    assert gateway.trace[0].page == 7
+    assert gateway.trace[0].target_ids == ["p7-b3"]
 
 
 def test_manager_uses_luna_medium_and_returns_subagent_plan(tmp_path: Path) -> None:

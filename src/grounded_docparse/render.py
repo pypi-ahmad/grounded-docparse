@@ -172,7 +172,7 @@ def render_agentic_document(
                     "id": block.id,
                     "type": block.type.value,
                     "status": block.verification.value,
-                    "reading_order": block.reading_order,
+                    "reading_order": len(page_nodes),
                     "confidence": block.confidence,
                     "text": block.text,
                     "source": _source(page.number, start, end, block.bbox),

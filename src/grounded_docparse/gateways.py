@@ -76,6 +76,7 @@ class OpenAIDocumentGateway:
         agent: str,
         stage: str,
         page_number: int | None = None,
+        target_ids: list[str] | None = None,
         **kwargs: Any,
     ) -> T:
         started = time.perf_counter()
@@ -121,6 +122,7 @@ class OpenAIDocumentGateway:
                 action=stage,
                 status="completed",
                 page=page_number,
+                target_ids=target_ids or [],
                 duration_ms=round((time.perf_counter() - started) * 1000),
                 input_tokens=call_usage.input_tokens,
                 output_tokens=call_usage.output_tokens,
@@ -162,7 +164,9 @@ class OpenAIDocumentGateway:
                         "Do not correct spelling or infer obscured text. Emit one region per visible form field; "
                         "never combine a form section into one field. Populate form.label and form.value "
                         "explicitly, and put faint printed examples, templates, units, and instructions in "
-                        "form.hint rather than treating them as entered values. Emit one region per checkbox "
+                        "form.hint rather than treating them as entered values. Emit one region per checkbox. "
+                        "Form labels are not headings. Classify text as a heading only when it is "
+                        "typographically distinct from surrounding labels and body text. "
                         "and populate checkbox_group with the shared "
                         "prompt and checkbox_option with that box's option. Give substantive "
                         "and decorative visuals concise grounded descriptions that use exact visible terminology "
@@ -205,6 +209,7 @@ class OpenAIDocumentGateway:
             agent=agent_role.value,
             stage="page_inspection",
             page_number=page.number,
+            target_ids=targets,
             model=self.config.terra_model if use_terra else self.config.luna_model,
             reasoning={"effort": "medium"},
             store=False,
@@ -255,6 +260,7 @@ class OpenAIDocumentGateway:
         crops: list[CropInspectionRequest],
         *,
         use_terra: bool = False,
+        page_number: int | None = None,
     ) -> PageInspection:
         manifest = [
             {
@@ -280,6 +286,8 @@ class OpenAIDocumentGateway:
             PageInspection,
             agent=AgentRole.VISUAL.value,
             stage="crop_batch_inspection",
+            page_number=page_number,
+            target_ids=[crop.region_id for crop in crops],
             model=self.config.terra_model if use_terra else self.config.luna_model,
             reasoning={"effort": "medium"},
             store=False,
@@ -296,6 +304,9 @@ class OpenAIDocumentGateway:
                         "even when its existing summary is broadly accurate. For a barcode, describe its "
                         "orientation and associated visible labels or identifiers, but do not infer or claim "
                         "to decode its encoded value. "
+                        "Do not repeat literal text already captured in the candidate or nearby blocks. "
+                        "Keep non-instructional visual descriptions under 25 words and instructional "
+                        "figures under 75 words. "
                         "A crop correction must not change the candidate bounding box or reading order. "
                         "Return one decision per crop and "
                         "preserve every supplied region ID and evidence reference."
@@ -305,6 +316,58 @@ class OpenAIDocumentGateway:
                     "role": "user",
                     "content": content,
                 },
+            ],
+            max_output_tokens=min(16_000, self.config.terra_max_output_tokens),
+        )
+
+    def inspect_quality_crops(
+        self,
+        crops: list[CropInspectionRequest],
+        *,
+        page_number: int,
+    ) -> PageInspection:
+        manifest = [
+            {
+                "region_id": crop.region_id,
+                "candidate_region": crop.candidate_region.model_dump(mode="json"),
+                "evidence_ref": crop.evidence_ref,
+                "image_index": index,
+            }
+            for index, crop in enumerate(crops)
+        ]
+        content: list[dict[str, str]] = [
+            {"type": "input_text", "text": json.dumps(manifest, ensure_ascii=False)}
+        ]
+        content.extend(
+            {
+                "type": "input_image",
+                "image_url": self._image(Path(crop.crop_path)),
+                "detail": "original",
+            }
+            for crop in crops
+        )
+        return self._request(
+            PageInspection,
+            agent=AgentRole.EVIDENCE_CRITIC.value,
+            stage="quality_crop_inspection",
+            page_number=page_number,
+            target_ids=[crop.region_id for crop in crops],
+            model=self.config.terra_model,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Verify each candidate against its corresponding high-resolution source crop. "
+                        "Return exactly one accept, complete literal correction, or rejection per crop. "
+                        "Never invent obscured or unsupported content. Preserve exact visible identifiers, "
+                        "dates, measurements, phone numbers, emails, URLs, list markers, table cells, and "
+                        "checkbox states. Preserve every supplied region ID, evidence reference, bounding "
+                        "box, and reading order."
+                    ),
+                },
+                {"role": "user", "content": content},
             ],
             max_output_tokens=min(16_000, self.config.terra_max_output_tokens),
         )

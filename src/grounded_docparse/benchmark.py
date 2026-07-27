@@ -75,18 +75,20 @@ def compare_markdown(
     candidate_pages = candidate.split("<!-- PAGE BREAK -->")
     reference_pages = reference.split("<!-- PAGE BREAK -->")
     page_count = max(len(candidate_pages), len(reference_pages))
+    candidate_page_tokens = [_tokens(page) for page in candidate_pages]
+    reference_page_tokens = [_tokens(page) for page in reference_pages]
     page_report: dict[str, dict[str, float]] = {}
     for page_index in range(page_count):
-        candidate_tokens = _tokens(candidate_pages[page_index]) if page_index < len(candidate_pages) else []
-        reference_tokens = _tokens(reference_pages[page_index]) if page_index < len(reference_pages) else []
+        candidate_tokens = candidate_page_tokens[page_index] if page_index < len(candidate_page_tokens) else []
+        reference_tokens = reference_page_tokens[page_index] if page_index < len(reference_page_tokens) else []
         accuracy, error_rate = _sequence_metrics(candidate_tokens, reference_tokens)
         page_report[str(page_index + 1)] = {
             "accuracy": accuracy,
             "word_error_rate": error_rate,
         }
 
-    candidate_tokens = _tokens(candidate)
-    reference_tokens = _tokens(reference)
+    candidate_tokens = [token for page in candidate_page_tokens for token in page]
+    reference_tokens = [token for page in reference_page_tokens for token in page]
     accuracy, error_rate = _sequence_metrics(candidate_tokens, reference_tokens)
     candidate_counts = Counter(candidate_tokens)
     reference_counts = Counter(reference_tokens)
@@ -99,14 +101,14 @@ def compare_markdown(
     dominant_candidate = [
         token
         for page_number in dominant
-        if page_number <= len(candidate_pages)
-        for token in _tokens(candidate_pages[page_number - 1])
+        if page_number <= len(candidate_page_tokens)
+        for token in candidate_page_tokens[page_number - 1]
     ]
     dominant_reference = [
         token
         for page_number in dominant
-        if page_number <= len(reference_pages)
-        for token in _tokens(reference_pages[page_number - 1])
+        if page_number <= len(reference_page_tokens)
+        for token in reference_page_tokens[page_number - 1]
     ]
     dominant_accuracy, _ = _sequence_metrics(dominant_candidate, dominant_reference)
     return {

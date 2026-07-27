@@ -6,7 +6,6 @@ import time
 from collections.abc import Callable
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from dataclasses import dataclass
-from itertools import pairwise
 from pathlib import Path
 from queue import Empty, SimpleQueue
 
@@ -40,6 +39,12 @@ from .models import (
     TableData,
     VerificationState,
 )
+from .quality import (
+    MAX_REPAIR_BLOCKS,
+    find_missing_source_regions,
+    normalize_page_blocks,
+    select_repair_blocks,
+)
 from .render import render_agentic_document, render_annotated_pdf, render_json
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
@@ -63,9 +68,6 @@ AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
 )
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
-REPEATED_LABEL_PATTERN = re.compile(
-    r"^(?P<label>[^\n–—]{1,80}?)(?P<separator>\s+[–—-]\s+)(?P=label)(?P=separator)"
-)
 
 
 def _clean_text(value: str | None) -> str | None:
@@ -348,28 +350,6 @@ def _is_duplicate_addition(region: RegionDraft, blocks: list[Block]) -> bool:
         ):
             return True
     return False
-
-
-def _clean_repeated_content(blocks: list[Block]) -> None:
-    ordered = sorted(blocks, key=lambda item: item.reading_order)
-    for block in ordered:
-        block.text = "\n".join(
-            REPEATED_LABEL_PATTERN.sub(
-                lambda match: f"{match.group('label')}{match.group('separator')}",
-                line,
-            )
-            for line in block.text.splitlines()
-        )
-    for previous, current in pairwise(ordered):
-        if previous.type is not NodeType.HEADING or not current.text:
-            continue
-        lines = current.text.splitlines()
-        if not lines:
-            continue
-        heading = previous.text.strip().removesuffix(":").casefold()
-        first_line = lines[0].strip().removesuffix(":").casefold()
-        if heading and heading == first_line:
-            current.text = "\n".join(lines[1:]).lstrip()
 
 
 def _proactive_crop_priority(block: Block) -> int | None:
@@ -731,7 +711,111 @@ class DocumentParser:
                             preserve_layout=True,
                         )
 
-        _clean_repeated_content(blocks)
+        quality_inspector = getattr(gateway, "inspect_quality_crops", None)
+        if callable(quality_inspector):
+            recovery_blocks: list[Block] = []
+            for region in find_missing_source_regions(page, blocks):
+                recovered = _block(region, page.number, len(blocks))
+                recovered.verification = VerificationState.NEEDS_REVIEW
+                recovered.verification_reason = "Recovered from native text"
+                blocks.append(recovered)
+                recovery_blocks.append(recovered)
+
+            selected: list[Block] = []
+            selected_ids: set[str] = set()
+            for block in recovery_blocks + select_repair_blocks(page, blocks, warnings):
+                if block.id not in selected_ids:
+                    selected.append(block)
+                    selected_ids.add(block.id)
+                if len(selected) == MAX_REPAIR_BLOCKS:
+                    break
+
+            quality_requests: list[CropInspectionRequest] = []
+            quality_blocks: list[Block] = []
+            for block in selected:
+                if block.bbox is None:
+                    continue
+                crop_path = workdir / f"{block.id}-quality-crop.png"
+                try:
+                    render_region_crop(
+                        source,
+                        page,
+                        block.bbox,
+                        crop_path,
+                        dpi=self.config.crop_dpi,
+                        padding=max(self.config.crop_padding, 0.1),
+                    )
+                except Exception as exc:  # noqa: BLE001 - review failure is auditable
+                    block.verification = VerificationState.NEEDS_REVIEW
+                    block.verification_reason = (
+                        f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
+                    )
+                    warnings.append(
+                        f"Page {page.number}: quality gate unresolved block {block.id}"
+                    )
+                    continue
+                quality_requests.append(
+                    CropInspectionRequest(
+                        crop_path=str(crop_path),
+                        region_id=block.id,
+                        candidate_region=_region_from_block(block),
+                        evidence_ref=f"page:{page.number}:{block.id}:quality",
+                    )
+                )
+                quality_blocks.append(block)
+
+            if quality_requests:
+                try:
+                    quality_inspection = quality_inspector(
+                        quality_requests,
+                        page_number=page.number,
+                    )
+                except Exception as exc:  # noqa: BLE001 - review failure is auditable
+                    reason = f"Quality verification failed: {type(exc).__name__}: {exc}"
+                    quality_decisions = {}
+                else:
+                    reason = "No conclusive quality verification decision"
+                    quality_decisions = {
+                        item.region_id: item for item in quality_inspection.decisions
+                    }
+                for block in quality_blocks:
+                    decision = quality_decisions.get(block.id)
+                    if decision is not None and decision.action in {
+                        InspectionAction.ACCEPT,
+                        InspectionAction.CORRECT,
+                    }:
+                        _apply_decision(
+                            block,
+                            decision,
+                            page.number,
+                            preserve_layout=True,
+                        )
+                        continue
+                    block.verification = VerificationState.NEEDS_REVIEW
+                    block.verification_reason = (
+                        decision.reason if decision is not None and decision.reason else reason
+                    )
+                    warnings.append(
+                        f"Page {page.number}: quality gate unresolved block {block.id}"
+                    )
+
+            uninspected_recovery = [
+                block for block in recovery_blocks if block.id not in selected_ids
+            ]
+            for block in uninspected_recovery:
+                warnings.append(
+                    f"Page {page.number}: quality gate unresolved block {block.id}; "
+                    "repair limit exceeded"
+                )
+            if recovery_blocks:
+                warnings.append(
+                    f"Page {page.number}: recovered {len(recovery_blocks)} native text regions"
+                )
+
+        blocks, normalization_warnings = normalize_page_blocks(blocks)
+        warnings.extend(
+            f"Page {page.number}: {warning}" for warning in normalization_warnings
+        )
         input_tokens = int(getattr(gateway, "input_tokens", 0))
         output_tokens = int(getattr(gateway, "output_tokens", 0))
         usage = getattr(gateway, "usage", None)

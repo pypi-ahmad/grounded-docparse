@@ -142,6 +142,16 @@ def test_reference_normalization_removes_html_tags_and_splits_punctuation() -> N
     assert report["token_f1"] == pytest.approx(100.0)
 
 
+def test_document_metrics_normalize_each_page_before_aggregation() -> None:
+    candidate = "<div\n<!-- PAGE BREAK -->\nAlpha> retained"
+    reference = "div\n<!-- PAGE BREAK -->\nAlpha retained"
+
+    report = compare_markdown(candidate, reference)
+
+    assert report["strict_word_accuracy"] == pytest.approx(100.0)
+    assert report["token_f1"] == pytest.approx(100.0)
+
+
 def test_required_content_search_includes_structured_form_hints() -> None:
     block = _grounded_block(
         type="form_field",

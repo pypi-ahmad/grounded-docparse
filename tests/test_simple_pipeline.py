@@ -88,6 +88,125 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
         assert len(rendered[0].get_drawings()) == 2
 
 
+def _procedure_pdf() -> bytes:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.insert_text((72, 90), "1. Open the cold water tap.", fontsize=11)
+    page.insert_text((72, 130), "2. Flame-sterilize the tap.", fontsize=11)
+    page.insert_text((72, 170), "3. Fold and ship the form.", fontsize=11)
+    data = document.tobytes()
+    document.close()
+    return data
+
+
+class QualityRecoveryGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.quality_calls = []
+
+    def draft_page(self, page):
+        source = page.text_blocks[0]
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.LIST_ITEM,
+                    text="Open the cold water tap.",
+                    list_marker="1.",
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                )
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
+            ]
+        )
+
+    def inspect_crops(self, *_args, **_kwargs):
+        raise AssertionError("ordinary crop inspection was not requested")
+
+
+def test_parser_recovers_missing_native_list_steps_with_one_quality_pass() -> None:
+    gateway = QualityRecoveryGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_procedure_pdf(), "procedures.pdf")
+
+    assert result.markdown.count("1. Open the cold water tap.") == 1
+    assert result.markdown.count("2. Flame-sterilize the tap.") == 1
+    assert result.markdown.count("3. Fold and ship the form.") == 1
+    assert len(gateway.quality_calls) == 1
+    assert gateway.quality_calls[0][0] == 1
+    assert len(gateway.quality_calls[0][1]) == 2
+
+
+class UnresolvedCriticalGateway(QualityRecoveryGateway):
+    def draft_page(self, page):
+        source = page.text_blocks[0]
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.FORM_FIELD,
+                    text="NPI: 1388746512",
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                )
+            ]
+        )
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        targets = target_region_ids or region_ids
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=["page:1"],
+                )
+                for region_id in targets
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection()
+
+
+def test_unresolved_critical_literal_remains_visible_with_review_warning() -> None:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.insert_text((72, 90), "NPI: 1386746512", fontsize=11)
+    data = document.tobytes()
+    document.close()
+    gateway = UnresolvedCriticalGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(data, "critical.pdf")
+
+    assert "1388746512" in result.markdown
+    assert result.document.pages[0].blocks[0].verification is VerificationState.NEEDS_REVIEW
+    assert any("quality gate" in warning.casefold() for warning in result.document.warnings)
+    assert '"status": "needs_review"' in result.json
+    assert len(gateway.quality_calls) == 1
+
+
 class AgenticRoutingGateway(AcceptingGateway):
     def __init__(self) -> None:
         self.plan_rounds = []
