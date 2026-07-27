@@ -1,0 +1,114 @@
+[
+  {
+    "id": 1,
+    "size": 7,
+    "files": [
+      ".env.example",
+      "README.md",
+      "compose.yaml",
+      "docs/architecture.md",
+      "docs/how-it-works.md",
+      "docs/spec.md",
+      "src/grounded_docparse/config.py"
+    ],
+    "maintainers": [
+      {
+        "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+        "name": "Ahmad Mujtaba",
+        "touches": 29,
+        "touch_share": 1.0,
+        "recency_share": 1.0,
+        "sensitive_share": 0.0,
+        "primary_tz_offset": "+05:30"
+      }
+    ],
+    "bus_factor": 1,
+    "owner_count": 1,
+    "totals": {
+      "touches": 29,
+      "recency_weight": 28.935424,
+      "sensitive_weight": 0
+    }
+  },
+  {
+    "id": 2,
+    "size": 4,
+    "files": [
+      "src/grounded_docparse/gateways.py",
+      "src/grounded_docparse/pipeline.py",
+      "src/grounded_docparse/render.py",
+      "tests/test_openai_vision_gateway.py"
+    ],
+    "maintainers": [
+      {
+        "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+        "name": "Ahmad Mujtaba",
+        "touches": 15,
+        "touch_share": 1.0,
+        "recency_share": 1.0,
+        "sensitive_share": 0.0,
+        "primary_tz_offset": "+05:30"
+      }
+    ],
+    "bus_factor": 1,
+    "owner_count": 1,
+    "totals": {
+      "touches": 15,
+      "recency_weight": 14.96799,
+      "sensitive_weight": 0
+    }
+  },
+  {
+    "id": 3,
+    "size": 3,
+    "files": [
+      "CHANGELOG.md",
+      "pyproject.toml",
+      "uv.lock"
+    ],
+    "maintainers": [
+      {
+        "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+        "name": "Ahmad Mujtaba",
+        "touches": 13,
+        "touch_share": 1.0,
+        "recency_share": 1.0,
+        "sensitive_share": 0.0,
+        "primary_tz_offset": "+05:30"
+      }
+    ],
+    "bus_factor": 1,
+    "owner_count": 1,
+    "totals": {
+      "touches": 13,
+      "recency_weight": 12.962124,
+      "sensitive_weight": 0
+    }
+  },
+  {
+    "id": 4,
+    "size": 2,
+    "files": [
+      "streamlit_app.py",
+      "tests/test_streamlit.py"
+    ],
+    "maintainers": [
+      {
+        "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+        "name": "Ahmad Mujtaba",
+        "touches": 9,
+        "touch_share": 1.0,
+        "recency_share": 1.0,
+        "sensitive_share": 0.0,
+        "primary_tz_offset": "+05:30"
+      }
+    ],
+    "bus_factor": 1,
+    "owner_count": 1,
+    "totals": {
+      "touches": 9,
+      "recency_weight": 8.974789,
+      "sensitive_weight": 0
+    }
+  }
+]
