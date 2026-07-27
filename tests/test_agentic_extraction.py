@@ -219,3 +219,69 @@ def test_rejected_audit_block_cannot_be_used_as_extraction_evidence() -> None:
     assert result.evidence == {}
     assert any("unknown block rejected" in warning for warning in result.warnings)
     assert [use_terra for use_terra, _issues in gateway.extract_calls] == [False, True]
+
+
+class LaunderingEvidenceGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+        self.extract_calls.append((use_terra, issues))
+        return {
+            "data": {"invoice_number": "REJECTED-ONLY-9"},
+            "evidence": [
+                {
+                    "pointer": "/invoice_number",
+                    "block_ids": ["accepted"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> None:
+    document = Document(
+        source_name="laundering.pdf",
+        source_sha256="c" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="rejected",
+                        type="paragraph",
+                        text="Invoice: REJECTED-ONLY-9",
+                        reading_order=0,
+                        verification=VerificationState.REJECTED,
+                        verification_reason="Unsupported",
+                    ),
+                    Block(
+                        id="accepted",
+                        type="paragraph",
+                        text="Invoice: ACCEPTED-7",
+                        reading_order=1,
+                        verification=VerificationState.VERIFIED,
+                    ),
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    parse_result = ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        legacy_json=render_json(document),
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    gateway = LaunderingEvidenceGateway()
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        parse_result, SCHEMA
+    )
+
+    assert "REJECTED-ONLY-9" not in parse_result.json
+    assert result.data == {"invoice_number": None}
+    assert result.evidence == {}
+    assert any("does not contain extracted value" in item for item in result.warnings)
