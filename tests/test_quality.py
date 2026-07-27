@@ -184,14 +184,31 @@ def test_normalization_removes_repeated_ordered_markers_idempotently() -> None:
     assert [(block.list_marker, block.text) for block in renormalized] == first_pass
 
 
+def test_normalization_ignores_whitespace_only_list_marker() -> None:
+    block = _block(
+        "empty-marker",
+        "",
+        _box(0.1, 0.1, 0.9, 0.2),
+        node_type=NodeType.LIST_ITEM,
+        marker=" ",
+    )
+
+    normalized, warnings = normalize_page_blocks([block])
+
+    assert warnings == []
+    assert [(item.list_marker, item.text) for item in normalized] == [(" ", "")]
+
+
 def test_source_recovery_recognizes_roman_and_parenthesized_ordered_markers_only() -> None:
     roman_box = _box(0.1, 0.1, 0.9, 0.2)
     parenthesized_box = _box(0.1, 0.25, 0.9, 0.35)
     prose_box = _box(0.1, 0.4, 0.9, 0.5)
+    roman_prose_box = _box(0.1, 0.55, 0.9, 0.65)
     page = _page(
         ("IV. Verify the sample collection record.", roman_box),
         ("(2) Label the bottle before transport.", parenthesized_box),
         ("(Note) This sentence remains ordinary prose.", prose_box),
+        ("Civil. Service requirements follow.", roman_prose_box),
     )
 
     missing = find_missing_source_regions(page, [])
@@ -200,6 +217,7 @@ def test_source_recovery_recognizes_roman_and_parenthesized_ordered_markers_only
         (NodeType.LIST_ITEM, "IV.", "Verify the sample collection record."),
         (NodeType.LIST_ITEM, "(2)", "Label the bottle before transport."),
         (NodeType.PARAGRAPH, None, "(Note) This sentence remains ordinary prose."),
+        (NodeType.PARAGRAPH, None, "Civil. Service requirements follow."),
     ]
 
 

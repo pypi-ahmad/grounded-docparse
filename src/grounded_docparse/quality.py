@@ -12,9 +12,14 @@ SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
 
 WORD_PATTERN = re.compile(r"[A-Za-z0-9]+(?:[./:@_-][A-Za-z0-9]+)*")
+ROMAN_NUMERAL_PATTERN = (
+    r"(?:(?=[MDCLXVI])M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})"
+    r"(?:IX|IV|V?I{0,3})|(?=[mdclxvi])m{0,3}(?:cm|cd|d?c{0,3})"
+    r"(?:xc|xl|l?x{0,3})(?:ix|iv|v?i{0,3}))"
+)
 LIST_PREFIX_PATTERN = re.compile(
-    r"^\s*(?P<marker>(?:\d+|[IVXLCDMivxlcdm]+|[A-Za-z])[.)]|"
-    r"\((?:\d+|[IVXLCDMivxlcdm]+|[A-Za-z])\)|[-*•])\s+(?P<body>.+)$"
+    rf"^\s*(?P<marker>(?:\d+|{ROMAN_NUMERAL_PATTERN}|[A-Za-z])[.)]|"
+    rf"\((?:\d+|{ROMAN_NUMERAL_PATTERN}|[A-Za-z])\)|[-*•])\s+(?P<body>.+)$"
 )
 REPEATED_LABEL_PATTERN = re.compile(
     r"^(?P<label>[^\n–—]{1,80}?)(?P<separator>\s+[–—-]\s+)"
@@ -163,6 +168,8 @@ def _normalize_marker(block: Block) -> None:
     if block.type is not NodeType.LIST_ITEM or not block.list_marker:
         return
     marker = block.list_marker.strip()
+    if not marker:
+        return
     marker_prefix = re.compile(rf"^{re.escape(marker)}(?=\s|$)", re.IGNORECASE)
     while marker_prefix.match(block.text):
         block.text = marker_prefix.sub("", block.text, count=1).lstrip()
