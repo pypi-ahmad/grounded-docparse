@@ -614,6 +614,39 @@ def test_list_coverage_counts_marker_occurrence_separately(
     assert without_marker["status"] == "needs_review"
 
 
+@pytest.mark.parametrize(
+    ("marker", "text"),
+    [
+        ("1.", "1. Step"),
+        ("A.", "a. Preserve case."),
+        ("(IV)", "(iv) Archive"),
+    ],
+)
+def test_list_coverage_does_not_duplicate_equivalent_leading_marker(
+    marker: str,
+    text: str,
+) -> None:
+    block = Block(
+        id="step",
+        type="list_item",
+        text=text,
+        list_marker=marker,
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+    )
+    document = Document(
+        source_name="steps.pdf",
+        source_sha256="a" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    node = json.loads(render_agentic_document(document).json)["document"]["pages"][
+        0
+    ]["blocks"][0]
+
+    assert node["semantic_coverage"] == 1.0
+
+
 def test_duplicate_visual_values_preserve_provider_kind_bbox_and_span() -> None:
     block_box = BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.9)
     provider_box = BoundingBox(x0=0.2, y0=0.2, x1=0.8, y1=0.3)

@@ -345,6 +345,10 @@ class LiteralEvidenceGateway(ExtractionGateway):
         ("boolean", False, "No"),
         ("boolean", True, "Approved: Yes"),
         ("boolean", False, "Approved: No"),
+        ("boolean", True, "Approved: Yes."),
+        ("boolean", False, "Approved: No."),
+        ("boolean", True, "| Approved | Yes |"),
+        ("boolean", False, "| Approved | No |"),
     ],
 )
 def test_scalar_grounding_accepts_deterministic_literal_normalization(
