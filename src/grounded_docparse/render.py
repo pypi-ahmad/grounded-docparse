@@ -168,41 +168,44 @@ def _visual_segments(block: Block) -> list[_VisualSegment]:
         values.append(("description", block.figure_description))
 
     segments: list[_VisualSegment] = []
-    seen: set[str] = set()
-    multiple = len({value for _kind, value in values}) > 1
+    seen: set[tuple] = set()
+    multiple = len(values) > 1
     for kind, value in values:
-        if value in seen:
+        segment_kind = {
+            "text": "visual_text",
+            "caption": "caption",
+            "description": "visual_description",
+        }[kind]
+        origin = "generated_description" if kind == "description" else "literal"
+        key = (segment_kind, value, origin, _bbox_key(block.bbox))
+        if key in seen:
             continue
-        seen.add(value)
+        seen.add(key)
         if multiple and kind != "text":
             rendered = f"{kind.title()}: {value}"
         else:
             rendered = value
         segments.append(
             _VisualSegment(
-                kind={
-                    "text": "visual_text",
-                    "caption": "caption",
-                    "description": "visual_description",
-                }[kind],
+                kind=segment_kind,
                 raw_text=value,
                 rendered_text=rendered,
                 bbox=block.bbox,
-                origin="generated_description"
-                if kind == "description"
-                else "literal",
+                origin=origin,
             )
         )
     for atom in block.atoms:
-        if atom.text and atom.text not in seen:
-            seen.add(atom.text)
+        bbox = atom.bbox or block.bbox
+        key = (atom.kind, atom.text, "literal", _bbox_key(bbox))
+        if atom.text and key not in seen:
+            seen.add(key)
             label = atom.kind.replace("_", " ").title()
             segments.append(
                 _VisualSegment(
                     kind=atom.kind,
                     raw_text=atom.text,
                     rendered_text=f"{label}: {atom.text}",
-                    bbox=atom.bbox or block.bbox,
+                    bbox=bbox,
                     origin="literal",
                     provider=True,
                 )
@@ -236,6 +239,12 @@ def _visual(block: Block) -> str:
     segments = _visual_segments(block)
     content = "\n\n".join(segment.rendered_text for segment in segments)
     return f"<figure>{content}</figure>" if segments else ""
+
+
+def _bbox_key(bbox) -> tuple | None:
+    if bbox is None:
+        return None
+    return (bbox.x0, bbox.y0, bbox.x1, bbox.y1, bbox.unit)
 
 
 def _body(block: Block) -> str:
@@ -430,42 +439,77 @@ def _semantic_fragments(block: Block) -> list[str]:
     return list(dict.fromkeys(fragment for fragment in fragments if fragment))
 
 
-def _semantic_fields(block: Block) -> list[str]:
+def _token_counts(value: str) -> Counter[str]:
+    return Counter(WORD_PATTERN.findall(value.casefold()))
+
+
+def _sum_token_counts(values) -> Counter[str]:
+    total: Counter[str] = Counter()
+    for value in values:
+        total += _token_counts(value)
+    return total
+
+
+def _semantic_tokens(block: Block) -> Counter[str]:
     if block.type is NodeType.TABLE and block.table is not None:
-        return [block.text, *(cell.text for cell in block.table.cells)]
+        cells = _sum_token_counts(cell.text for cell in block.table.cells)
+        return _token_counts(block.text) | cells
     if block.type is NodeType.FORM_FIELD and block.form is not None:
-        return [
-            block.text,
-            block.form.label,
-            block.form.value or "",
-            block.form.hint or "",
-        ]
+        structured = _sum_token_counts(
+            [
+                block.form.label,
+                block.form.value or "",
+                block.form.hint or "",
+            ]
+        )
+        return _token_counts(block.text) | structured
     if block.type is NodeType.CHECKBOX:
-        return [block.text, block.checkbox_option or "", _checkbox_marker(block)]
+        option = block.checkbox_option or ""
+        content = (
+            _token_counts(block.text) | _token_counts(option)
+            if block.text == option
+            else _sum_token_counts([block.text, option])
+        )
+        return content + _token_counts(_checkbox_marker(block))
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
-        fields = [
-            block.text,
-            block.caption or "",
-            block.figure_description or "",
-            block.chart_type or "",
-        ]
-        fields.extend(
+        expected = _sum_token_counts(
+            [
+                block.text,
+                block.caption or "",
+                block.figure_description or "",
+                block.chart_type or "",
+            ]
+        )
+        expected += _sum_token_counts(
             value
             for point in block.chart_data
             for value in (point.series or "", point.label, point.value)
         )
-        fields.extend(atom.text for atom in block.atoms)
-        return fields
-    fields = [block.text]
+        seen_atoms: set[tuple] = set()
+        if block.text:
+            seen_atoms.add(
+                ("visual_text", block.text, "literal", _bbox_key(block.bbox))
+            )
+        if block.caption:
+            seen_atoms.add(("caption", block.caption, "literal", _bbox_key(block.bbox)))
+        if block.figure_description:
+            seen_atoms.add(
+                (
+                    "visual_description",
+                    block.figure_description,
+                    "generated_description",
+                    _bbox_key(block.bbox),
+                )
+            )
+        for atom in block.atoms:
+            key = (atom.kind, atom.text, "literal", _bbox_key(atom.bbox or block.bbox))
+            if key not in seen_atoms:
+                seen_atoms.add(key)
+                expected += _token_counts(atom.text)
+        return expected
+    expected = _token_counts(block.text)
     if block.type is NodeType.LIST_ITEM:
-        fields.append(block.list_marker or "-")
-    return fields
-
-
-def _semantic_tokens(block: Block) -> Counter[str]:
-    expected: Counter[str] = Counter()
-    for field in _semantic_fields(block):
-        expected |= Counter(WORD_PATTERN.findall(field.casefold()))
+        expected |= _token_counts(block.list_marker or "-")
     return expected
 
 

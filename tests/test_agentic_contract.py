@@ -549,3 +549,83 @@ def test_visual_atom_span_uses_its_labeled_emission() -> None:
 
     assert transcription["text"] == "Transcription: Needle"
     assert rendered.markdown[span["start"] : span["end"]] == "Transcription: Needle"
+
+
+def test_visual_coverage_counts_overlapping_field_occurrences(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    block = Block(
+        id="visual",
+        type="figure",
+        text="Code A",
+        caption="A",
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+    )
+    document = Document(
+        source_name="coverage.pdf",
+        source_sha256="7" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+    visual_segments = document_render._visual_segments
+    monkeypatch.setattr(
+        document_render,
+        "_visual_segments",
+        lambda item: [
+            segment
+            for segment in visual_segments(item)
+            if segment.kind == "visual_text"
+        ],
+    )
+
+    page = json.loads(render_agentic_document(document).json)["document"]["pages"][0]
+
+    assert page["blocks"][0]["semantic_coverage"] == 0.666667
+    assert page["blocks"][0]["status"] == "needs_review"
+
+
+def test_duplicate_visual_values_preserve_provider_kind_bbox_and_span() -> None:
+    block_box = BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.9)
+    provider_box = BoundingBox(x0=0.2, y0=0.2, x1=0.8, y1=0.3)
+    block = Block(
+        id="visual",
+        type="figure",
+        text="Needle",
+        bbox=block_box,
+        atoms=[
+            AtomicEvidence(
+                kind="transcription",
+                text="Needle",
+                bbox=provider_box,
+            ),
+            AtomicEvidence(
+                kind="visual_text",
+                text="Needle",
+                bbox=block_box,
+            ),
+        ],
+        reading_order=0,
+        verification=VerificationState.VERIFIED,
+    )
+    document = Document(
+        source_name="duplicates.pdf",
+        source_sha256="8" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    rendered = render_agentic_document(document)
+    node = json.loads(rendered.json)["document"]["pages"][0]["blocks"][0]
+    atoms = node["atoms"]
+    transcription = next(atom for atom in atoms if atom["kind"] == "transcription")
+    visual_text = next(atom for atom in atoms if atom["kind"] == "visual_text")
+
+    assert rendered.markdown.count("Needle") == 2
+    assert transcription["origin"] == "literal"
+    assert transcription["source"]["bbox"] == provider_box.model_dump(mode="json")
+    assert transcription["text"] == "Transcription: Needle"
+    assert visual_text["text"] == "Needle"
+    assert sum(atom["kind"] == "visual_text" for atom in atoms) == 1
+    assert node["semantic_coverage"] == 1.0
+    for atom in (transcription, visual_text):
+        span = atom["source"]["span"]
+        assert rendered.markdown[span["start"] : span["end"]] == atom["text"]
