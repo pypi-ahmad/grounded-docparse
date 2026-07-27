@@ -154,6 +154,110 @@ def test_parser_recovers_missing_native_list_steps_with_one_quality_pass() -> No
     assert len(gateway.quality_calls[0][1]) == 2
 
 
+class NoQualityScanGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def draft_page(self, _page):
+        return PageDraft()
+
+
+def test_unresolved_scanned_probe_remains_auditable_without_quality_inspection() -> None:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
+    data = document.tobytes()
+    document.close()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: NoQualityScanGateway(),
+    ).parse(data, "scan.pdf")
+
+    blocks = result.document.pages[0].blocks
+    assert len(blocks) == 1
+    assert blocks[0].text == ""
+    assert blocks[0].verification is VerificationState.NEEDS_REVIEW
+    assert any("quality gate unresolved" in warning.casefold() for warning in result.document.warnings)
+
+
+class ScanProbeRecoveryGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.quality_calls = []
+
+    def draft_page(self, _page):
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.IMAGE,
+                    text="",
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.9},
+                )
+            ]
+        )
+
+    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
+                for region_id in target_region_ids or region_ids
+            ]
+        )
+
+    def inspect_crops(self, crops):
+        return PageInspection(
+            decisions=[
+                InspectionDecision(region_id=crop.region_id, action=InspectionAction.ACCEPT)
+                for crop in crops
+            ]
+        )
+
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.CORRECT,
+                    corrected_region=RegionDraft(
+                        type=NodeType.PARAGRAPH,
+                        text="Verified chart label",
+                        reading_order=1,
+                        confidence=0.99,
+                    ),
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_scanned_image_probe_adds_only_quality_corrected_text() -> None:
+    document = pymupdf.open()
+    page = document.new_page(width=612, height=792)
+    page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
+    data = document.tobytes()
+    document.close()
+    gateway = ScanProbeRecoveryGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(data, "scan.pdf")
+
+    assert len(gateway.quality_calls) == 1
+    assert gateway.quality_calls[0][0] == 1
+    assert [crop.candidate_region.text for crop in gateway.quality_calls[0][1]] == [""]
+    assert [block.text for block in result.document.pages[0].blocks] == [
+        "",
+        "Verified chart label",
+    ]
+
+
 class UnresolvedCriticalGateway(QualityRecoveryGateway):
     def draft_page(self, page):
         source = page.text_blocks[0]
