@@ -330,7 +330,14 @@ def _citations_contain_value(
         contextual_yes_no = any(
             line.casefold() == yes_no
             or re.fullmatch(
-                rf"[^:\r\n]+:\s*(?:[*_]{{1,2}}\s*)?{yes_no}(?:\s*[*_]{{1,2}})?",
+                rf"[^:\r\n]+:\s*(?:[*_]{{1,2}}\s*)?{yes_no}[.!?]?"
+                rf"(?:\s*[*_]{{1,2}})?",
+                line,
+                flags=re.IGNORECASE,
+            )
+            is not None
+            or re.fullmatch(
+                rf"\|\s*[^|\r\n]+\s*\|\s*{yes_no}\s*\|",
                 line,
                 flags=re.IGNORECASE,
             )
