@@ -1301,6 +1301,7 @@ class DocumentParser:
                 height=page.height,
                 blocks=blocks,
                 specialist_audit=specialist_audit,
+                warnings=warnings,
             ),
             warnings=warnings,
             usage=usage,
@@ -1399,6 +1400,8 @@ class DocumentParser:
                                 height=result.page.height,
                                 blocks=roots,
                                 specialist_audit=result.page.specialist_audit,
+                                warnings=result.page.warnings,
+                                quality=result.page.quality,
                             )
                         )
                         warnings.extend(result.warnings)
