@@ -1370,6 +1370,59 @@ def test_grounded_addition_supersedes_one_rejected_predecessor_with_lineage(
     ] == "provider-replacement"
 
 
+class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
+    def draft_page(self, page):
+        draft = super().draft_page(page)
+        draft.regions.append(
+            RegionDraft(
+                type=NodeType.PARAGRAPH,
+                text="Active companion",
+                confidence=0.4,
+                reading_order=1,
+                bbox={"x0": 0.1, "y0": 0.4, "x1": 0.9, "y1": 0.5},
+            )
+        )
+        return draft
+
+    def inspect_page(self, page, draft, *, region_ids, target_region_ids=None):
+        inspection = super().inspect_page(
+            page,
+            draft,
+            region_ids=region_ids,
+            target_region_ids=target_region_ids,
+        )
+        inspection.decisions[1] = InspectionDecision(
+            region_id="p1-b2",
+            action=InspectionAction.ACCEPT,
+            reason="Grounded draft",
+        )
+        inspection.ordered_region_ids = [
+            "p1-b2",
+            "p1-b1",
+            "provider-replacement",
+        ]
+        return inspection
+
+
+def test_superseding_provider_id_remains_a_valid_order_alias(simple_pdf: bytes) -> None:
+    result = DocumentParser(
+        ParserConfig(render_dpi=72),
+        gateway_factory=lambda _config: OrderedRejectedAdditionGateway(
+            overlap_correction=True
+        ),
+    ).parse(simple_pdf, "notice.pdf")
+
+    blocks = result.document.pages[0].blocks
+    assert [(block.id, block.text) for block in blocks] == [
+        ("p1-b2", "Active companion"),
+        ("p1-b1", "Grounded correction"),
+    ]
+    assert not any(
+        "ignored invalid ordered_region_ids" in warning
+        for warning in result.document.warnings
+    )
+
+
 def test_active_duplicate_still_suppresses_grounded_addition(simple_pdf: bytes) -> None:
     result = DocumentParser(
         ParserConfig(render_dpi=72),

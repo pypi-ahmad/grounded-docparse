@@ -617,6 +617,7 @@ class DocumentParser:
                             final_state=predecessor.verification,
                         )
                     )
+                    addition_ids[addition.region_id] = predecessor.id
                     continue
                 added = _block(addition.region, page.number, len(blocks))
                 if rejected_matches:
