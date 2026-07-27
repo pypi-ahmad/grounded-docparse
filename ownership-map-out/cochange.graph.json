@@ -1,0 +1,272 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "community_maintainers": [
+      {
+        "id": 1,
+        "size": 7,
+        "maintainers": [
+          {
+            "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+            "name": "Ahmad Mujtaba",
+            "touches": 29,
+            "touch_share": 1.0,
+            "recency_share": 1.0,
+            "sensitive_share": 0.0,
+            "primary_tz_offset": "+05:30"
+          }
+        ],
+        "bus_factor": 1,
+        "owner_count": 1,
+        "totals": {
+          "touches": 29,
+          "recency_weight": 28.935424,
+          "sensitive_weight": 0
+        }
+      },
+      {
+        "id": 2,
+        "size": 4,
+        "maintainers": [
+          {
+            "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+            "name": "Ahmad Mujtaba",
+            "touches": 15,
+            "touch_share": 1.0,
+            "recency_share": 1.0,
+            "sensitive_share": 0.0,
+            "primary_tz_offset": "+05:30"
+          }
+        ],
+        "bus_factor": 1,
+        "owner_count": 1,
+        "totals": {
+          "touches": 15,
+          "recency_weight": 14.96799,
+          "sensitive_weight": 0
+        }
+      },
+      {
+        "id": 3,
+        "size": 3,
+        "maintainers": [
+          {
+            "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+            "name": "Ahmad Mujtaba",
+            "touches": 13,
+            "touch_share": 1.0,
+            "recency_share": 1.0,
+            "sensitive_share": 0.0,
+            "primary_tz_offset": "+05:30"
+          }
+        ],
+        "bus_factor": 1,
+        "owner_count": 1,
+        "totals": {
+          "touches": 13,
+          "recency_weight": 12.962124,
+          "sensitive_weight": 0
+        }
+      },
+      {
+        "id": 4,
+        "size": 2,
+        "maintainers": [
+          {
+            "person_id": "72138709+pypi-ahmad@users.noreply.github.com",
+            "name": "Ahmad Mujtaba",
+            "touches": 9,
+            "touch_share": 1.0,
+            "recency_share": 1.0,
+            "sensitive_share": 0.0,
+            "primary_tz_offset": "+05:30"
+          }
+        ],
+        "bus_factor": 1,
+        "owner_count": 1,
+        "totals": {
+          "touches": 9,
+          "recency_weight": 8.974789,
+          "sensitive_weight": 0
+        }
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "community_id": 1,
+      "id": ".env.example"
+    },
+    {
+      "community_id": 1,
+      "id": "README.md"
+    },
+    {
+      "community_id": 1,
+      "id": "src/grounded_docparse/config.py"
+    },
+    {
+      "community_id": 1,
+      "id": "docs/architecture.md"
+    },
+    {
+      "community_id": 1,
+      "id": "docs/how-it-works.md"
+    },
+    {
+      "community_id": 1,
+      "id": "docs/spec.md"
+    },
+    {
+      "community_id": 2,
+      "id": "src/grounded_docparse/gateways.py"
+    },
+    {
+      "community_id": 2,
+      "id": "src/grounded_docparse/pipeline.py"
+    },
+    {
+      "community_id": 2,
+      "id": "src/grounded_docparse/render.py"
+    },
+    {
+      "community_id": 2,
+      "id": "tests/test_openai_vision_gateway.py"
+    },
+    {
+      "community_id": 3,
+      "id": "CHANGELOG.md"
+    },
+    {
+      "community_id": 3,
+      "id": "pyproject.toml"
+    },
+    {
+      "community_id": 3,
+      "id": "uv.lock"
+    },
+    {
+      "community_id": 1,
+      "id": "compose.yaml"
+    },
+    {
+      "community_id": 4,
+      "id": "streamlit_app.py"
+    },
+    {
+      "community_id": 4,
+      "id": "tests/test_streamlit.py"
+    }
+  ],
+  "edges": [
+    {
+      "weight": 0.5,
+      "count": 2,
+      "source": ".env.example",
+      "target": "README.md"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": ".env.example",
+      "target": "src/grounded_docparse/config.py"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": ".env.example",
+      "target": "compose.yaml"
+    },
+    {
+      "weight": 0.5,
+      "count": 2,
+      "source": "README.md",
+      "target": "docs/architecture.md"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": "README.md",
+      "target": "docs/how-it-works.md"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": "README.md",
+      "target": "src/grounded_docparse/config.py"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": "docs/architecture.md",
+      "target": "docs/how-it-works.md"
+    },
+    {
+      "weight": 0.666667,
+      "count": 2,
+      "source": "docs/architecture.md",
+      "target": "docs/spec.md"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/gateways.py",
+      "target": "src/grounded_docparse/pipeline.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/gateways.py",
+      "target": "src/grounded_docparse/render.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/gateways.py",
+      "target": "tests/test_openai_vision_gateway.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/pipeline.py",
+      "target": "src/grounded_docparse/render.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/pipeline.py",
+      "target": "tests/test_openai_vision_gateway.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "src/grounded_docparse/render.py",
+      "target": "tests/test_openai_vision_gateway.py"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "CHANGELOG.md",
+      "target": "pyproject.toml"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "CHANGELOG.md",
+      "target": "uv.lock"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "pyproject.toml",
+      "target": "uv.lock"
+    },
+    {
+      "weight": 1.0,
+      "count": 2,
+      "source": "streamlit_app.py",
+      "target": "tests/test_streamlit.py"
+    }
+  ]
+}
