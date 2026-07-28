@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.1",
+  "document_id": "cross-page-table",
+  "reference_text": "Quarterly Table - Part 1 Quarter Units Q1 10 Quarterly Table - Continued Q2 14 Q3 16",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [
+    {
+      "page": 1,
+      "ordinal": 0,
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "text": "Quarter"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "text": "Units"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "text": "Q1"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "text": "10"
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "ordinal": 0,
+      "cells": [
+        {
+          "row": 2,
+          "column": 0,
+          "text": "Q2"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "text": "14"
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "text": "Q3"
+        },
+        {
+          "row": 3,
+          "column": 1,
+          "text": "16"
+        }
+      ]
+    }
+  ],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [
+    [
+      "page-1-table-0",
+      "page-2-table-0"
+    ]
+  ],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

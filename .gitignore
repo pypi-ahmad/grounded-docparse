@@ -1,10 +1,12 @@
 .venv/
+.venv-wsl/
 node_modules/
 *.egg-info/
 __pycache__/
 .pytest_cache/
 .playwright-cli/
 output/
+data/
 .ruff_cache/
 .codegraph/
 .code-review-graph/
@@ -20,4 +22,5 @@ graphify-out/.needs_update
 .env
 .docparse/
 .worktrees/
+.runtime/
 *.py[cod]

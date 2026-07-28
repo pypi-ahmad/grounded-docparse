@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "annotation_schema_version": "1.1",
+  "corpus_id": "grounded-docparse-synthetic-v1",
+  "documents": [
+    {
+      "id": "native-text",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/native-text.pdf",
+        "sha256": "febf76d9e7f03f4ec84aa7e3a6b841801e7ba8f523021659b6d537850aa10dbf"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/native-text.json",
+      "features": [
+        "native_text"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "unicode-identifiers",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/unicode-identifiers.pdf",
+        "sha256": "9d4dfef386cfc0ef41ac24d4941f3aabf4ccdf701cd4501e2dd301e6736e2b80"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "features": [
+        "unicode_identifiers"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "multi-column",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/multi-column.pdf",
+        "sha256": "49acc4a2d286370d81f836ea41e4e052925b5e2018ad6e1455b3395f4beefe14"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "features": [
+        "multi_column",
+        "reading_order"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "lists",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/lists.pdf",
+        "sha256": "9f82d89b1e682988bb1c1c667f8eaef89422b0d86dc5cc378437b087550419b1"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/lists.json",
+      "features": [
+        "lists"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "tables",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/tables.pdf",
+        "sha256": "1abdfd3eb6f881dee28f98ece96ebf5d181f105525b563201848d9481eb28857"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/tables.json",
+      "features": [
+        "tables"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "cross-page-table",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/cross-page-table.pdf",
+        "sha256": "1457fbc0439c742a43977e764fee6b11eecc9f95256dcab15b16ea82aa4d620d"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "features": [
+        "tables",
+        "cross_page_continuity"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "form",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/form.pdf",
+        "sha256": "a32434f293b4e3ad532f3139d38ed707de7302cc6c78762f62f6ac27d7f9712c"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/form.json",
+      "features": [
+        "forms",
+        "schema_fields"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "checkboxes",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/checkboxes.pdf",
+        "sha256": "25c0c06c6ffce7f25506754d70dedff1c38d7a738c147bc22a1aea0ff7cd0c49"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "features": [
+        "checkboxes",
+        "rejection"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "figure-chart",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/figure-chart.pdf",
+        "sha256": "aa46103adb451606aef5ec4e0450537bc27558a14ed84324af9964e309c714d6"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "features": [
+        "figures",
+        "charts",
+        "grounding"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "degraded-scan",
+      "source": {
+        "kind": "local",
+        "path": "benchmarks/corpus-v1/documents/degraded-scan.pdf",
+        "sha256": "24cfa73278af3583d6f53f1a2c8e5b2f5333d5411a10f62abb670d5f4012e785"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "features": [
+        "degraded_scan",
+        "ocr_required"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "synthetic-report",
+      "source": {
+        "kind": "local",
+        "path": "examples/synthetic-report.pdf",
+        "sha256": "a68214a94f2cca7bd84491411eca0c2bc5b355cc49bd766e5e75be0bc75413c3"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "features": [
+        "native_text",
+        "tables"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "synthetic-medical-fax",
+      "source": {
+        "kind": "local",
+        "path": "examples/synthetic-medical-fax.pdf",
+        "sha256": "2789f3973df4c2736f3fde2d56b9d8ec5276d45a3a72b47e31af3b3c8c7757d1"
+      },
+      "annotation_path": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "features": [
+        "degraded_scan",
+        "ocr_required"
+      ],
+      "synthetic": true
+    },
+    {
+      "id": "public-water-mass-mailing",
+      "source": {
+        "kind": "external",
+        "path": "PublicWaterMassMailing.pdf"
+      },
+      "legacy_expectations_path": "tests/fixtures/public_water_expectations.json",
+      "annotation_path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "features": [
+        "external_live_regression",
+        "legacy_public_water"
+      ],
+      "synthetic": false
+    }
+  ]
+}

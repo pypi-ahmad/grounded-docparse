@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import json
 import re
 import tempfile
@@ -10,6 +11,9 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from queue import Empty, SimpleQueue
+from typing import Protocol
+
+from PIL import Image
 
 from .config import ParserConfig
 from .gateways import OpenAIDocumentGateway
@@ -34,12 +38,18 @@ from .models import (
     InspectionRegionAddition,
     NodeType,
     Page,
+    PageDraft,
     PageInspection,
+    ParseMetadata,
     ParseResult,
     ProgressCallback,
     ProgressEvent,
     RegionDraft,
     RunUsage,
+    SpanRepairAction,
+    SpanRepairDecision,
+    SpanRepairRequest,
+    SpanRepairTarget,
     SpecialistAdditionOpinion,
     SpecialistAdditionResolution,
     SpecialistAudit,
@@ -52,20 +62,26 @@ from .models import (
     TableData,
     VerificationState,
 )
+from .page_analysis import PageAnalyzer, draft_from_analysis
 from .quality import (
     MAX_REPAIR_BLOCKS,
     find_missing_source_regions,
+    literal_repair_candidates,
     normalize_page_blocks,
+    recovery_content_conflicts,
+    recovery_content_is_redundant,
+    requires_region_repair,
     select_repair_blocks,
     semantic_text,
 )
 from .render import (
+    build_elements,
     materialize_document_quality,
     render_agentic_document,
     render_annotated_pdf,
     render_json,
 )
-from .runtime import ProviderRuntime
+from .runtime import BudgetExceeded, ProviderRuntime
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
@@ -80,10 +96,25 @@ COMPLEX_REGION_TYPES = {
     NodeType.SIGNATURE,
     NodeType.SEAL,
 }
+
+
+class DocumentEngine(Protocol):
+    """Minimal engine boundary consumed by the document pipeline."""
+
+    def analyze_window(self, pages: list[PageEvidence]): ...
+
+    def model_versions(self) -> dict[str, str]: ...
 CRITICAL_LITERAL_PATTERN = re.compile(
     r"(?:\d|https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,})"
 )
-CRITICAL_WARNING_MARKERS = ("MUST", "DO NOT", "WILL NOT", "REQUIRED", "WARNING", "IMPORTANT")
+CRITICAL_WARNING_MARKERS = (
+    "MUST",
+    "DO NOT",
+    "WILL NOT",
+    "REQUIRED",
+    "WARNING",
+    "IMPORTANT",
+)
 AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
 )
@@ -94,7 +125,9 @@ INVALID_CONFIDENCE_EVIDENCE_REASON = "Invalid confidence evidence"
 def _clean_text(value: str | None) -> str | None:
     if value is None:
         return None
-    return value.translate({ord("\u00ad"): None, ord("\u200b"): None, ord("\ufeff"): None})
+    return value.translate(
+        {ord("\u00ad"): None, ord("\u200b"): None, ord("\ufeff"): None}
+    )
 
 
 _REMOVED_TEXT_CODEPOINTS = frozenset({"\u00ad", "\u200b", "\ufeff"})
@@ -110,9 +143,17 @@ def _clean_form_data(value: FormData | None) -> FormData | None:
     )
 
 
-def _emit(callback: ProgressCallback | None, stage: str, current: int, total: int, message: str) -> None:
+def _emit(
+    callback: ProgressCallback | None,
+    stage: str,
+    current: int,
+    total: int,
+    message: str,
+) -> None:
     if callback is not None:
-        callback(ProgressEvent(stage=stage, current=current, total=total, message=message))
+        callback(
+            ProgressEvent(stage=stage, current=current, total=total, message=message)
+        )
 
 
 def _form(region: RegionDraft) -> FormData | None:
@@ -121,7 +162,9 @@ def _form(region: RegionDraft) -> FormData | None:
     if region.form is not None:
         return _clean_form_data(region.form)
     label, separator, value = (_clean_text(region.text) or "").partition(":")
-    return FormData(label=label.strip() or "Field", value=value.strip() if separator else None)
+    return FormData(
+        label=label.strip() or "Field", value=value.strip() if separator else None
+    )
 
 
 def _bbox(value: DraftBoundingBox | None) -> BoundingBox | None:
@@ -144,20 +187,49 @@ def _valid_confidence_spans(
 def _clean_confidence_spans(
     text: str,
     spans: list[ConfidenceSpan],
+    *,
+    confidence: float | None,
+    bbox: BoundingBox | None,
+    source: str = "provider",
 ) -> tuple[str, list[ConfidenceSpan], bool]:
     valid, invalid = _valid_confidence_spans(text, spans)
     cleaned = _clean_text(text) or ""
     rebased: list[ConfidenceSpan] = []
-    for span in valid:
-        if any(character in _REMOVED_TEXT_CODEPOINTS for character in text[span.start : span.end]):
+    previous_end = -1
+    for span in sorted(valid, key=lambda item: (item.start, item.end)):
+        if span.start < previous_end:
+            invalid = True
+            continue
+        if any(
+            character in _REMOVED_TEXT_CODEPOINTS
+            for character in text[span.start : span.end]
+        ):
+            invalid = True
+            continue
+        start = sum(
+            character not in _REMOVED_TEXT_CODEPOINTS
+            for character in text[: span.start]
+        )
+        end = sum(
+            character not in _REMOVED_TEXT_CODEPOINTS for character in text[: span.end]
+        )
+        span_text = cleaned[start:end]
+        if span.text is not None and _clean_text(span.text) != span_text:
             invalid = True
             continue
         rebased.append(
             ConfidenceSpan(
-                start=sum(character not in _REMOVED_TEXT_CODEPOINTS for character in text[: span.start]),
-                end=sum(character not in _REMOVED_TEXT_CODEPOINTS for character in text[: span.end]),
+                start=start,
+                end=end,
+                text=span_text,
+                confidence=span.confidence
+                if span.confidence is not None
+                else confidence,
+                source=span.source or source,
+                bbox=span.bbox or bbox,
             )
         )
+        previous_end = span.end
     return cleaned, rebased, invalid
 
 
@@ -167,9 +239,14 @@ def _table(region: RegionDraft) -> tuple[TableData | None, bool]:
     invalid = False
     cells: list[TableCell] = []
     for cell in region.table_cells:
+        cell_bbox = _bbox(cell.bbox)
         text, spans, spans_invalid = _clean_confidence_spans(
             cell.text,
             cell.low_confidence_spans,
+            confidence=(
+                cell.confidence if cell.confidence is not None else region.confidence
+            ),
+            bbox=cell_bbox,
         )
         invalid = invalid or spans_invalid
         cells.append(
@@ -180,7 +257,7 @@ def _table(region: RegionDraft) -> tuple[TableData | None, bool]:
                 row_span=cell.row_span,
                 column_span=cell.column_span,
                 header=cell.header,
-                bbox=_bbox(cell.bbox),
+                bbox=cell_bbox,
                 confidence=cell.confidence,
                 low_confidence_spans=spans,
             )
@@ -192,16 +269,21 @@ def _atoms(region: RegionDraft) -> tuple[list[AtomicEvidence], bool]:
     invalid = False
     atoms: list[AtomicEvidence] = []
     for atom in region.atoms:
+        atom_bbox = _bbox(atom.bbox)
         text, spans, spans_invalid = _clean_confidence_spans(
             atom.text,
             atom.low_confidence_spans,
+            confidence=(
+                atom.confidence if atom.confidence is not None else region.confidence
+            ),
+            bbox=atom_bbox,
         )
         invalid = invalid or spans_invalid
         atoms.append(
             AtomicEvidence(
                 kind=atom.kind,
                 text=text,
-                bbox=_bbox(atom.bbox),
+                bbox=atom_bbox,
                 confidence=atom.confidence,
                 low_confidence_spans=spans,
             )
@@ -209,23 +291,17 @@ def _atoms(region: RegionDraft) -> tuple[list[AtomicEvidence], bool]:
     return atoms, invalid
 
 
-def _aggregated_confidence(region: RegionDraft) -> float:
+def _aggregated_confidence(region: RegionDraft) -> float | None:
     values = [
-        region.confidence,
-        *(cell.confidence for cell in region.table_cells if cell.confidence is not None),
+        *(value for value in [region.confidence] if value is not None),
+        *(
+            cell.confidence
+            for cell in region.table_cells
+            if cell.confidence is not None
+        ),
         *(atom.confidence for atom in region.atoms if atom.confidence is not None),
     ]
-    return min(values)
-
-
-def _has_low_confidence_spans(block: Block) -> bool:
-    return bool(
-        any(atom.low_confidence_spans for atom in block.atoms)
-        or (
-            block.table is not None
-            and any(cell.low_confidence_spans for cell in block.table.cells)
-        )
-    )
+    return min(values) if values else None
 
 
 def _block(region: RegionDraft, page_number: int, index: int) -> Block:
@@ -274,8 +350,10 @@ def _block(region: RegionDraft, page_number: int, index: int) -> Block:
 
 def _needs_verification(region: RegionDraft, block: Block) -> bool:
     return (
-        block.confidence < VERIFICATION_CONFIDENCE_THRESHOLD
-        or _has_low_confidence_spans(block)
+        (
+            block.confidence is not None
+            and block.confidence < VERIFICATION_CONFIDENCE_THRESHOLD
+        )
         or block.verification is VerificationState.NEEDS_REVIEW
         or region.type in COMPLEX_REGION_TYPES
         or bool(CRITICAL_LITERAL_PATTERN.search(region.text))
@@ -423,6 +501,193 @@ def _region_from_block(block: Block) -> RegionDraft:
     )
 
 
+def _span_owner(block: Block, owner_kind: str, owner_index: int):
+    if owner_kind == "atom" and owner_index < len(block.atoms):
+        return block.atoms[owner_index]
+    if (
+        owner_kind == "table_cell"
+        and block.table is not None
+        and owner_index < len(block.table.cells)
+    ):
+        return block.table.cells[owner_index]
+    return None
+
+
+def _span_repair_target(
+    block: Block,
+    candidate,
+    *,
+    page_number: int,
+) -> SpanRepairTarget | None:
+    owner = _span_owner(block, candidate.owner_kind, candidate.owner_index)
+    if owner is None:
+        return None
+    span = candidate.span
+    if not 0 <= span.start < span.end <= len(owner.text):
+        return None
+    text = owner.text[span.start : span.end]
+    if span.text is not None and span.text != text:
+        return None
+    target_id = (
+        f"{block.id}:{candidate.owner_kind}:{candidate.owner_index}:"
+        f"{candidate.span_index}"
+    )
+    evidence_ref = f"page:{page_number}:{target_id}"
+    return SpanRepairTarget(
+        target_id=target_id,
+        region_id=block.id,
+        owner_kind=candidate.owner_kind,
+        owner_index=candidate.owner_index,
+        start=span.start,
+        end=span.end,
+        text=text,
+        context_before=owner.text[max(0, span.start - 32) : span.start],
+        context_after=owner.text[span.end : span.end + 32],
+        confidence=(
+            span.confidence
+            if span.confidence is not None
+            else owner.confidence
+            if owner.confidence is not None
+            else block.confidence
+        ),
+        source=span.source or "unknown",
+        bbox=span.bbox or owner.bbox or block.bbox,
+        evidence_ref=evidence_ref,
+    )
+
+
+def _rebase_owner_spans(
+    owner,
+    target: SpanRepairTarget,
+    replacement: str,
+) -> None:
+    delta = len(replacement) - (target.end - target.start)
+    rebased: list[ConfidenceSpan] = []
+    removed = False
+    for span in owner.low_confidence_spans:
+        if (
+            not removed
+            and span.start == target.start
+            and span.end == target.end
+            and (span.text is None or span.text == target.text)
+        ):
+            removed = True
+            continue
+        if span.end <= target.start:
+            rebased.append(span)
+        elif span.start >= target.end:
+            rebased.append(
+                span.model_copy(
+                    update={"start": span.start + delta, "end": span.end + delta}
+                )
+            )
+        else:
+            # Overlaps are rejected during normalization; fail closed if one survives.
+            rebased.append(span)
+    owner.low_confidence_spans = rebased
+
+
+def _apply_span_repairs(
+    block: Block,
+    targets: list[SpanRepairTarget],
+    decisions: list[SpanRepairDecision],
+    *,
+    repair_source: str,
+) -> None:
+    by_id: dict[str, SpanRepairDecision] = {}
+    duplicate_ids: set[str] = set()
+    for decision in decisions:
+        if decision.target_id in by_id:
+            duplicate_ids.add(decision.target_id)
+        by_id[decision.target_id] = decision
+
+    for target in sorted(
+        targets, key=lambda item: (item.owner_kind, item.owner_index, -item.start)
+    ):
+        decision = by_id.get(target.target_id)
+        owner = _span_owner(block, target.owner_kind, target.owner_index)
+        if (
+            decision is None
+            or target.target_id in duplicate_ids
+            or decision.evidence_ref != target.evidence_ref
+            or owner is None
+            or owner.text[target.start : target.end] != target.text
+            or decision.action is SpanRepairAction.UNRESOLVED
+        ):
+            block.verification = VerificationState.NEEDS_REVIEW
+            block.verification_reason = (
+                decision.reason
+                if decision is not None and decision.reason
+                else "Targeted literal repair was inconclusive"
+            )
+            continue
+
+        replacement = (
+            target.text
+            if decision.action is SpanRepairAction.CONFIRM
+            else decision.replacement_text
+        )
+        if replacement is None:
+            block.verification = VerificationState.NEEDS_REVIEW
+            block.verification_reason = (
+                "Targeted literal repair omitted replacement text"
+            )
+            continue
+
+        previous_state = block.verification
+        original_owner_text = owner.text
+        mirrored_atom = None
+        if target.owner_kind == "table_cell":
+            matching_atoms = [
+                atom
+                for atom in block.atoms
+                if atom.text == original_owner_text
+                and (atom.bbox == owner.bbox or atom.bbox is None or owner.bbox is None)
+            ]
+            if len(matching_atoms) == 1:
+                mirrored_atom = matching_atoms[0]
+        if target.owner_kind == "atom" and block.type not in VISUAL_REGION_TYPES:
+            occurrences = [
+                match.start()
+                for match in re.finditer(re.escape(original_owner_text), block.text)
+            ]
+            if len(occurrences) != 1:
+                block.verification = VerificationState.NEEDS_REVIEW
+                block.verification_reason = (
+                    "Targeted atom could not be mapped uniquely to canonical text"
+                )
+                continue
+            block_start = occurrences[0] + target.start
+            block_end = occurrences[0] + target.end
+            block.text = block.text[:block_start] + replacement + block.text[block_end:]
+
+        owner.text = owner.text[: target.start] + replacement + owner.text[target.end :]
+        _rebase_owner_spans(owner, target, replacement)
+        owner.confidence = decision.confidence
+        if mirrored_atom is not None:
+            mirrored_atom.text = (
+                mirrored_atom.text[: target.start]
+                + replacement
+                + mirrored_atom.text[target.end :]
+            )
+            _rebase_owner_spans(mirrored_atom, target, replacement)
+            mirrored_atom.confidence = decision.confidence
+        block.correction_lineage.append(
+            CorrectionLineage(
+                original_id=block.id,
+                replacement_id=block.id,
+                provider_id=target.target_id,
+                reason=(
+                    f"{decision.reason or 'Targeted literal repair'}; "
+                    f"repair_source={repair_source}; source={target.source}; "
+                    f"{target.text!r} -> {replacement!r}"
+                ),
+                previous_state=previous_state,
+                final_state=block.verification,
+            )
+        )
+
+
 def _visible_region_text(region: RegionDraft) -> str:
     values = [region.text]
     values.extend(cell.text for cell in region.table_cells)
@@ -432,9 +697,7 @@ def _visible_region_text(region: RegionDraft) -> str:
         )
     values.extend((region.checkbox_group or "", region.checkbox_option or ""))
     values.extend((region.caption or "", region.figure_description or ""))
-    return " ".join(
-        " ".join(value.split()) for value in values if value
-    ).casefold()
+    return " ".join(" ".join(value.split()) for value in values if value).casefold()
 
 
 def _box_overlap(left: BoundingBox, right: BoundingBox) -> float:
@@ -476,10 +739,10 @@ def _proactive_crop_priority(block: Block) -> int | None:
     return None
 
 
-def _has_excessive_order_movement(
-    supplied: list[str], original_ids: list[str]
-) -> bool:
-    proposed_existing = [region_id for region_id in supplied if region_id in original_ids]
+def _has_excessive_order_movement(supplied: list[str], original_ids: list[str]) -> bool:
+    proposed_existing = [
+        region_id for region_id in supplied if region_id in original_ids
+    ]
     positions = {region_id: index for index, region_id in enumerate(proposed_existing)}
     maximum_movement = max(3, len(original_ids) // 4)
     return any(
@@ -496,7 +759,9 @@ def _canonical_decision(decision: InspectionDecision) -> tuple[str, str]:
     )
     return (
         decision.action.value,
-        json.dumps(corrected, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
+        json.dumps(
+            corrected, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ),
     )
 
 
@@ -590,7 +855,9 @@ def _decision_issue(
     return None
 
 
-def _hierarchy(blocks: list[Block], inherited_sections: list[str]) -> tuple[list[Block], list[str]]:
+def _hierarchy(
+    blocks: list[Block], inherited_sections: list[str]
+) -> tuple[list[Block], list[str]]:
     roots: list[Block] = []
     heading_stack: list[Block] = []
     sections = list(inherited_sections)
@@ -640,9 +907,11 @@ class DocumentParser:
         config: ParserConfig | None = None,
         *,
         gateway_factory: Callable[[ParserConfig], object] = OpenAIDocumentGateway,
+        engine_factory: Callable[[ParserConfig], DocumentEngine] = PageAnalyzer,
     ) -> None:
         self.config = config or ParserConfig.from_env()
         self.gateway_factory = gateway_factory
+        self.engine_factory = engine_factory
 
     def _process_page(
         self,
@@ -652,16 +921,110 @@ class DocumentParser:
         total: int,
         progress_callback: ProgressCallback | None,
         runtime: ProviderRuntime,
+        analyzer: DocumentEngine,
+        analysis=None,
     ) -> _ProcessedPage:
         gateway = self.gateway_factory(self.config)
         bind_runtime = getattr(gateway, "bind_runtime", None)
         if callable(bind_runtime):
             bind_runtime(runtime)
         warnings: list[str] = []
-        _emit(progress_callback, "draft", page.number, total, f"Reading page {page.number}")
-        draft = gateway.draft_page(page)
-        blocks = [_block(region, page.number, index) for index, region in enumerate(draft.regions)]
+        _emit(
+            progress_callback,
+            "draft",
+            page.number,
+            total,
+            f"Reading page {page.number}",
+        )
+        if not isinstance(gateway, OpenAIDocumentGateway) or analysis is None:
+            draft = gateway.draft_page(page)
+        else:
+            if analysis.quality.blank:
+                draft = PageDraft(
+                    warnings=["Page contains no visible raster foreground"]
+                )
+            elif not analysis.regions:
+                try:
+                    runtime.claim_full_page_fallback(page_number=page.number)
+                    draft = gateway.draft_page(page)
+                    draft.warnings.extend(analysis.warnings)
+                except BudgetExceeded as exc:
+                    draft = PageDraft(
+                        warnings=[
+                            *(
+                                analysis.warnings
+                                or ["GLM-OCR returned no layout regions"]
+                            ),
+                            str(exc),
+                        ]
+                    )
+            else:
+                draft = draft_from_analysis(analysis)
+        blocks = [
+            _block(region, page.number, index)
+            for index, region in enumerate(draft.regions)
+        ]
         all_region_ids = [block.id for block in blocks]
+        blocks_by_id = {block.id: block for block in blocks}
+        try:
+            with Image.open(page.image_path) as page_image:
+                source_page_pixels = page_image.width * page_image.height
+        except (FileNotFoundError, OSError):
+            source_page_pixels = 0
+
+        def inspect_targets(
+            target_ids: list[str],
+            *,
+            agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
+            repair_round: int | None = None,
+            stage: str = "specialist_crop_inspection",
+        ) -> PageInspection:
+            requests: list[CropInspectionRequest] = []
+            for target_id in target_ids:
+                block = blocks_by_id.get(target_id)
+                if block is None or block.bbox is None:
+                    continue
+                crop_path = workdir / f"{block.id}-{stage}.png"
+                render_region_crop(
+                    source,
+                    page,
+                    block.bbox,
+                    crop_path,
+                    dpi=self.config.crop_dpi,
+                    padding=max(self.config.crop_padding, 0.1),
+                )
+                requests.append(
+                    CropInspectionRequest(
+                        crop_path=str(crop_path),
+                        region_id=block.id,
+                        candidate_region=_region_from_block(block),
+                        evidence_ref=f"page:{page.number}:{block.id}:{stage}",
+                        source_page_pixels=source_page_pixels,
+                    )
+                )
+            if not requests:
+                return PageInspection()
+            crop_inspector = getattr(gateway, "inspect_crops", None)
+            if not callable(crop_inspector):
+                raise TypeError("gateway must implement crop inspection")
+            optional = {
+                "page_number": page.number,
+                "agent_role": agent_role,
+                "stage": stage,
+                "repair_round": repair_round,
+            }
+            signature = inspect.signature(crop_inspector)
+            accepts_kwargs = any(
+                parameter.kind is inspect.Parameter.VAR_KEYWORD
+                for parameter in signature.parameters.values()
+            )
+            supported = {
+                name: value
+                for name, value in optional.items()
+                if accepts_kwargs or name in signature.parameters
+            }
+            return crop_inspector(requests, **supported)
+
         warnings.extend(f"Page {page.number}: {item}" for item in draft.warnings)
         risky = [
             (region, block)
@@ -674,13 +1037,35 @@ class DocumentParser:
         ordering_conflict = False
         inspection = None
         if risky:
-            _emit(progress_callback, "verify", page.number, total, f"Verifying page {page.number}")
+            _emit(
+                progress_callback,
+                "verify",
+                page.number,
+                total,
+                f"Verifying page {page.number}",
+            )
             risky_ids = [block.id for _region, block in risky]
             inspections: list[_TaggedInspection] = []
             manager_flow = callable(getattr(gateway, "plan_page", None))
             if manager_flow:
                 prior_inspections: list[dict] = []
-                for repair_round in range(1, 3):
+                for repair_round in range(1, 2):
+                    try:
+                        runtime.claim_repair_round(
+                            stage="manager_repair",
+                            model=self.config.luna_model,
+                            page_number=page.number,
+                        )
+                    except BudgetExceeded as exc:
+                        reason = f"Manager repair budget exhausted: {exc}"
+                        for _region, block in risky:
+                            if block.verification is not VerificationState.REJECTED:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = (
+                                    block.verification_reason or reason
+                                )
+                        warnings.append(f"Page {page.number}: {reason}")
+                        break
                     try:
                         plan = gateway.plan_page(
                             page,
@@ -696,7 +1081,7 @@ class DocumentParser:
                             f"{type(exc).__name__}: {exc}"
                         )
                         break
-                    for delegation in plan.delegations[:2]:
+                    for delegation in plan.delegations[:1]:
                         targets = [
                             region_id
                             for region_id in delegation.target_region_ids
@@ -704,9 +1089,6 @@ class DocumentParser:
                         ]
                         if not targets:
                             continue
-                        use_terra = delegation.use_terra and any(
-                            region_id in risky_ids for region_id in targets
-                        )
                         _emit(
                             progress_callback,
                             "delegate",
@@ -715,23 +1097,16 @@ class DocumentParser:
                             f"{delegation.role.value} reviewing page {page.number}",
                         )
                         try:
-                            delegated_inspection = gateway.inspect_page(
-                                page,
-                                draft,
-                                region_ids=all_region_ids,
-                                target_region_ids=targets,
+                            delegated_inspection = inspect_targets(
+                                targets,
                                 agent_role=delegation.role,
-                                use_terra=use_terra,
+                                repair_round=repair_round,
                             )
                             inspections.append(
                                 _TaggedInspection(
                                     inspection=delegated_inspection,
                                     reviewer=delegation.role.value,
-                                    model=(
-                                        self.config.terra_model
-                                        if use_terra
-                                        else self.config.luna_model
-                                    ),
+                                    model=self.config.luna_model,
                                     timestamp=datetime.now(UTC),
                                     target_ids=targets,
                                 )
@@ -748,11 +1123,8 @@ class DocumentParser:
                         break
             else:
                 try:
-                    delegated_inspection = gateway.inspect_page(
-                        page,
-                        draft,
-                        region_ids=all_region_ids,
-                        target_region_ids=risky_ids,
+                    delegated_inspection = inspect_targets(
+                        risky_ids,
                     )
                     inspections.append(
                         _TaggedInspection(
@@ -806,7 +1178,9 @@ class DocumentParser:
                                 f"{decision.region_id}"
                             )
                             continue
-                        opinions_by_region.setdefault(decision.region_id, []).append(opinion)
+                        opinions_by_region.setdefault(decision.region_id, []).append(
+                            opinion
+                        )
                     if item.ordered_region_ids:
                         specialist_audit.ordering_opinions.append(
                             SpecialistOrderingOpinion(
@@ -872,13 +1246,10 @@ class DocumentParser:
                 if conflicting_ids and manager_flow:
                     arbitration_reason: str | None = None
                     try:
-                        arbitration = gateway.inspect_page(
-                            page,
-                            draft,
-                            region_ids=all_region_ids,
-                            target_region_ids=conflicting_ids,
+                        arbitration = inspect_targets(
+                            conflicting_ids,
                             agent_role=AgentRole.EVIDENCE_CRITIC,
-                            use_terra=True,
+                            stage="specialist_crop_arbitration",
                         )
                     except Exception as exc:  # noqa: BLE001 - arbitration fails closed
                         arbitration_reason = (
@@ -893,7 +1264,7 @@ class DocumentParser:
                             specialist_audit.opinions.append(
                                 SpecialistOpinion(
                                     reviewer=AgentRole.EVIDENCE_CRITIC.value,
-                                    model=self.config.terra_model,
+                                    model=self.config.luna_model,
                                     timestamp=arbitration_timestamp,
                                     decision=decision,
                                     confidence=decision.confidence,
@@ -954,9 +1325,7 @@ class DocumentParser:
                         inspection_warnings.append(reason)
 
                 addition_clusters = _cluster_addition_opinions(addition_opinions)
-                addition_conflicts: dict[
-                    str, list[SpecialistAdditionOpinion]
-                ] = {}
+                addition_conflicts: dict[str, list[SpecialistAdditionOpinion]] = {}
                 addition_resolutions: dict[str, SpecialistAdditionResolution] = {}
                 addition_cluster_order: list[str] = []
                 for opinions in addition_clusters:
@@ -1004,58 +1373,12 @@ class DocumentParser:
                         addition_conflicts[region_id] = opinions
 
                 if addition_conflicts and manager_flow:
-                    arbitration_reason: str | None = None
-                    addition_conflict_payloads = [
-                        {
-                            "cluster_id": region_id,
-                            "proposals": [
-                                opinion.addition.model_dump(mode="json")
-                                for opinion in opinions
-                            ],
-                        }
-                        for region_id, opinions in addition_conflicts.items()
-                    ]
-                    try:
-                        addition_arbitration = gateway.inspect_page(
-                            page,
-                            draft,
-                            region_ids=all_region_ids,
-                            target_region_ids=list(addition_conflicts),
-                            agent_role=AgentRole.EVIDENCE_CRITIC,
-                            use_terra=True,
-                            addition_conflicts=addition_conflict_payloads,
-                        )
-                    except Exception as exc:  # noqa: BLE001 - arbitration fails closed
-                        arbitration_reason = (
-                            f"Addition arbitration failed: {type(exc).__name__}: {exc}"
-                        )
-                        arbitration_additions = {}
-                    else:
-                        arbitration_additions: dict[
-                            str, list[InspectionRegionAddition]
-                        ] = {}
-                        arbitration_timestamp = datetime.now(UTC)
-                        unexpected_ids: list[str] = []
-                        for addition in addition_arbitration.additional_regions:
-                            specialist_audit.addition_opinions.append(
-                                SpecialistAdditionOpinion(
-                                    reviewer=AgentRole.EVIDENCE_CRITIC.value,
-                                    model=self.config.terra_model,
-                                    timestamp=arbitration_timestamp,
-                                    addition=addition,
-                                )
-                            )
-                            if addition.region_id not in addition_conflicts:
-                                unexpected_ids.append(addition.region_id)
-                            else:
-                                arbitration_additions.setdefault(
-                                    addition.region_id, []
-                                ).append(addition)
-                        if unexpected_ids:
-                            arbitration_reason = (
-                                "Addition arbitration returned a different region ID: "
-                                + ", ".join(unexpected_ids)
-                            )
+                    arbitration_reason = (
+                        "Addition arbitration requires forbidden full-page evidence"
+                    )
+                    arbitration_additions: dict[
+                        str, list[InspectionRegionAddition]
+                    ] = {}
 
                     for region_id, opinions in addition_conflicts.items():
                         proposal_region_ids = list(
@@ -1076,9 +1399,7 @@ class DocumentParser:
                                 region_id,
                                 source="Addition arbitration",
                             )
-                        if issue is None and _canonical_addition(
-                            candidates[0]
-                        ) not in {
+                        if issue is None and _canonical_addition(candidates[0]) not in {
                             _canonical_addition(opinion.addition)
                             for opinion in opinions
                         }:
@@ -1139,26 +1460,22 @@ class DocumentParser:
                 }
                 if len(ordering_values) == 1:
                     ordered_region_ids = list(next(iter(ordering_values)))
-                    specialist_audit.ordering_resolution = (
-                        SpecialistOrderingResolution(
-                            outcome=(
-                                "consensus"
-                                if len(specialist_audit.ordering_opinions) > 1
-                                else "single"
-                            ),
-                            ordered_region_ids=ordered_region_ids,
-                            reasoning="Specialists supplied the same complete order",
-                        )
+                    specialist_audit.ordering_resolution = SpecialistOrderingResolution(
+                        outcome=(
+                            "consensus"
+                            if len(specialist_audit.ordering_opinions) > 1
+                            else "single"
+                        ),
+                        ordered_region_ids=ordered_region_ids,
+                        reasoning="Specialists supplied the same complete order",
                     )
                 elif len(ordering_values) > 1:
                     ordering_conflict = True
                     warning = "ignored conflicting ordered_region_ids"
                     inspection_warnings.append(warning)
-                    specialist_audit.ordering_resolution = (
-                        SpecialistOrderingResolution(
-                            outcome="needs_review",
-                            reasoning=warning,
-                        )
+                    specialist_audit.ordering_resolution = SpecialistOrderingResolution(
+                        outcome="needs_review",
+                        reasoning=warning,
                     )
                 inspection = PageInspection(
                     decisions=list(decisions.values()),
@@ -1174,14 +1491,16 @@ class DocumentParser:
         candidate_pairs = [
             (region, block)
             for region, block in zip(draft.regions, blocks, strict=True)
-            if block.id in decisions or any(block.id == risky_block.id for _, risky_block in risky)
+            if block.id in decisions
+            or any(block.id == risky_block.id for _, risky_block in risky)
         ]
         for _region, block in candidate_pairs:
             decision = decisions.get(block.id)
             if decision is None:
                 block.verification = VerificationState.NEEDS_REVIEW
-                block.verification_reason = block.verification_reason or resolution_failures.get(
-                    block.id, "No verification decision"
+                block.verification_reason = (
+                    block.verification_reason
+                    or resolution_failures.get(block.id, "No verification decision")
                 )
                 continue
             if decision.action is InspectionAction.REJECT:
@@ -1275,9 +1594,8 @@ class DocumentParser:
             if inspection.ordered_region_ids:
                 expected = all_region_ids + list(addition_ids)
                 supplied = inspection.ordered_region_ids
-                valid_order = (
-                    len(supplied) == len(expected)
-                    and set(supplied) == set(expected)
+                valid_order = len(supplied) == len(expected) and set(supplied) == set(
+                    expected
                 )
                 if not valid_order:
                     warnings.append(
@@ -1296,13 +1614,11 @@ class DocumentParser:
                         "with excessive block movement"
                     )
                     if specialist_audit.ordering_resolution is not None:
-                        specialist_audit.ordering_resolution = (
-                            SpecialistOrderingResolution(
-                                outcome="needs_review",
-                                reasoning=(
-                                    "ignored ordered_region_ids with excessive block movement"
-                                ),
-                            )
+                        specialist_audit.ordering_resolution = SpecialistOrderingResolution(
+                            outcome="needs_review",
+                            reasoning=(
+                                "ignored ordered_region_ids with excessive block movement"
+                            ),
                         )
                 else:
                     by_id = {block.id: block for block in blocks}
@@ -1313,8 +1629,7 @@ class DocumentParser:
         nonvisual_candidates: dict[str, tuple[int, Block]] = {
             block.id: (0, block)
             for block in blocks
-            if block.id in explicit_crop_ids
-            and block.type not in VISUAL_REGION_TYPES
+            if block.id in explicit_crop_ids and block.type not in VISUAL_REGION_TYPES
         }
         for block in blocks:
             if block.verification is VerificationState.REJECTED or block.bbox is None:
@@ -1336,7 +1651,11 @@ class DocumentParser:
         ]
         requested_nonvisual = sorted(
             nonvisual_candidates.values(),
-            key=lambda item: (item[0], item[1].confidence),
+            key=lambda item: (
+                item[0],
+                item[1].confidence is None,
+                item[1].confidence if item[1].confidence is not None else 1.0,
+            ),
         )[:MAX_CROPS_PER_PAGE]
         requested_blocks = visual_blocks + [
             block for _priority, block in requested_nonvisual
@@ -1372,20 +1691,21 @@ class DocumentParser:
                         f"Crop rendering failed: {type(exc).__name__}: {exc}"
                     )
                     continue
-                crop_requests.append(CropInspectionRequest(
-                    crop_path=str(crop_path),
-                    region_id=block.id,
-                    candidate_region=_region_from_block(block),
-                    evidence_ref=f"page:{page.number}:{block.id}",
-                ))
+                crop_requests.append(
+                    CropInspectionRequest(
+                        crop_path=str(crop_path),
+                        region_id=block.id,
+                        candidate_region=_region_from_block(block),
+                        evidence_ref=f"page:{page.number}:{block.id}",
+                        source_page_pixels=source_page_pixels,
+                    )
+                )
                 crop_blocks.append(block)
         for batch_start in range(0, len(crop_requests), MAX_CROPS_PER_PAGE):
             batch_requests = crop_requests[
                 batch_start : batch_start + MAX_CROPS_PER_PAGE
             ]
-            batch_blocks = crop_blocks[
-                batch_start : batch_start + MAX_CROPS_PER_PAGE
-            ]
+            batch_blocks = crop_blocks[batch_start : batch_start + MAX_CROPS_PER_PAGE]
             try:
                 crop_inspection = gateway.inspect_crops(batch_requests)
             except Exception as exc:  # noqa: BLE001 - verification is best-effort
@@ -1418,18 +1738,19 @@ class DocumentParser:
             for region in find_missing_source_regions(page, blocks):
                 recovered = _block(region, page.number, len(blocks))
                 recovered.verification = VerificationState.NEEDS_REVIEW
-                if page.scanned and not region.text:
-                    recovered.verification_reason = (
-                        "Scan omission probe awaiting high-resolution quality inspection"
-                    )
+                if not region.text:
+                    recovered.verification_reason = "Scan omission probe awaiting high-resolution quality inspection"
                     scan_probe_blocks.append(recovered)
                 else:
-                    recovered.verification_reason = "Native source recovery awaiting quality inspection"
+                    recovered.verification_reason = (
+                        "Native source recovery awaiting quality inspection"
+                    )
                     native_recovery_blocks.append(recovered)
                 blocks.append(recovered)
                 recovery_blocks.append(recovered)
 
             scan_probe_ids = {block.id for block in scan_probe_blocks}
+            recovery_ids = {block.id for block in recovery_blocks}
             grounded_corrections: list[Block] = []
 
             selected: list[Block] = []
@@ -1438,16 +1759,106 @@ class DocumentParser:
                 if block.id not in selected_ids:
                     selected.append(block)
                     selected_ids.add(block.id)
+            for block in blocks:
+                if (
+                    block.verification is not VerificationState.REJECTED
+                    and block.id not in selected_ids
+                    and literal_repair_candidates(page, block)
+                ):
+                    selected.append(block)
+                    selected_ids.add(block.id)
 
             quality_requests: list[CropInspectionRequest] = []
             quality_blocks: list[Block] = []
-            original_verification = {
-                block.id: block.verification for block in selected
-            }
+            span_requests: list[SpanRepairRequest] = []
+            span_targets_by_block: dict[str, list[SpanRepairTarget]] = {}
+            span_blocks: dict[str, Block] = {}
+            span_repairer = getattr(gateway, "repair_spans", None)
+            original_verification = {block.id: block.verification for block in selected}
             original_reasons = {
                 block.id: block.verification_reason for block in selected
             }
             for block in selected:
+                candidates = literal_repair_candidates(page, block)
+                use_targeted = (
+                    callable(span_repairer)
+                    and bool(candidates)
+                    and block not in recovery_blocks
+                    and not requires_region_repair(page, block, warnings)
+                )
+                if use_targeted:
+                    targets = [
+                        target
+                        for candidate in candidates
+                        if (
+                            target := _span_repair_target(
+                                block,
+                                candidate,
+                                page_number=page.number,
+                            )
+                        )
+                        is not None
+                        and target.bbox is not None
+                    ]
+                    for index, target in enumerate(targets):
+                        crop_path = workdir / f"{block.id}-span-{index + 1}.png"
+                        context_crop_path: Path | None = None
+                        try:
+                            render_region_crop(
+                                source,
+                                page,
+                                target.bbox,
+                                crop_path,
+                                dpi=self.config.crop_dpi,
+                                padding=self.config.crop_padding,
+                            )
+                        except Exception as exc:  # noqa: BLE001 - review failure is auditable
+                            block.verification = VerificationState.NEEDS_REVIEW
+                            block.verification_reason = (
+                                "Targeted repair crop failed: "
+                                f"{type(exc).__name__}: {exc}"
+                            )
+                            continue
+                        context_padding = self.config.targeted_repair_context_padding
+                        if (
+                            context_padding is not None
+                            and context_padding > self.config.crop_padding
+                        ):
+                            candidate_context_path = (
+                                workdir / f"{block.id}-span-{index + 1}-context.png"
+                            )
+                            try:
+                                render_region_crop(
+                                    source,
+                                    page,
+                                    target.bbox,
+                                    candidate_context_path,
+                                    dpi=self.config.crop_dpi,
+                                    padding=context_padding,
+                                )
+                            except Exception as exc:  # noqa: BLE001 - optional context
+                                warnings.append(
+                                    f"Page {page.number}: targeted repair context crop "
+                                    f"failed for {target.target_id}: {type(exc).__name__}: {exc}"
+                                )
+                            else:
+                                context_crop_path = candidate_context_path
+                        span_requests.append(
+                            SpanRepairRequest(
+                                crop_path=str(crop_path),
+                                target=target,
+                                context_crop_path=(
+                                    str(context_crop_path)
+                                    if context_crop_path is not None
+                                    else None
+                                ),
+                                source_page_pixels=source_page_pixels,
+                            )
+                        )
+                        span_targets_by_block.setdefault(block.id, []).append(target)
+                        span_blocks[block.id] = block
+                    if targets:
+                        continue
                 if block.bbox is None:
                     if block.verification is not VerificationState.REJECTED:
                         block.verification = VerificationState.NEEDS_REVIEW
@@ -1475,9 +1886,7 @@ class DocumentParser:
                         block.verification_reason = original_reasons[block.id]
                     else:
                         block.verification = VerificationState.NEEDS_REVIEW
-                        block.verification_reason = (
-                            f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
-                        )
+                        block.verification_reason = f"Quality crop rendering failed: {type(exc).__name__}: {exc}"
                     warnings.append(
                         f"Page {page.number}: quality gate unresolved block {block.id}"
                     )
@@ -1488,15 +1897,105 @@ class DocumentParser:
                         region_id=block.id,
                         candidate_region=_region_from_block(block),
                         evidence_ref=f"page:{page.number}:{block.id}:quality",
+                        source_page_pixels=source_page_pixels,
                     )
                 )
                 quality_blocks.append(block)
 
-            if quality_requests:
+            if quality_requests or span_requests:
                 pending = list(zip(quality_requests, quality_blocks, strict=True))
                 rejection_counts: dict[str, int] = {}
                 geometry_rejection_counts: dict[str, int] = {}
-                for repair_round in range(1, 3):
+                for repair_round in range(1, 2):
+                    try:
+                        runtime.claim_repair_round(
+                            stage="quality_repair",
+                            model=self.config.luna_model,
+                            page_number=page.number,
+                        )
+                    except BudgetExceeded as exc:
+                        reason = f"Quality repair budget exhausted: {exc}"
+                        for block in span_blocks.values():
+                            block.verification = VerificationState.NEEDS_REVIEW
+                            block.verification_reason = reason
+                            warnings.append(
+                                f"Page {page.number}: quality gate unresolved block {block.id}"
+                            )
+                        for _request, block in pending:
+                            if block.verification is not VerificationState.REJECTED:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = reason
+                            warnings.append(
+                                f"Page {page.number}: quality gate unresolved block {block.id}"
+                            )
+                        warnings.append(f"Page {page.number}: {reason}")
+                        break
+                    if repair_round == 1 and span_requests:
+                        budget_denied = False
+                        for batch_start in range(
+                            0, len(span_requests), MAX_REPAIR_BLOCKS
+                        ):
+                            batch = span_requests[
+                                batch_start : batch_start + MAX_REPAIR_BLOCKS
+                            ]
+                            try:
+                                span_inspection = span_repairer(
+                                    batch,
+                                    page_number=page.number,
+                                )
+                            except BudgetExceeded as exc:
+                                reason = f"Targeted span repair budget exhausted: {exc}"
+                                budget_denied = True
+                                for request in batch:
+                                    block = span_blocks[request.target.region_id]
+                                    block.verification = VerificationState.NEEDS_REVIEW
+                                    block.verification_reason = reason
+                                    warnings.append(
+                                        f"Page {page.number}: quality gate unresolved block "
+                                        f"{block.id}"
+                                    )
+                                warnings.append(f"Page {page.number}: {reason}")
+                                break
+                            except Exception as exc:  # noqa: BLE001 - repair fails closed
+                                reason = (
+                                    "Targeted span repair failed: "
+                                    f"{type(exc).__name__}: {exc}"
+                                )
+                                for request in batch:
+                                    block = span_blocks[request.target.region_id]
+                                    block.verification = VerificationState.NEEDS_REVIEW
+                                    block.verification_reason = reason
+                                continue
+                            decisions_by_block: dict[str, list[SpanRepairDecision]] = {}
+                            for decision in span_inspection.decisions:
+                                region_id = decision.target_id.split(":", 1)[0]
+                                decisions_by_block.setdefault(region_id, []).append(
+                                    decision
+                                )
+                            for region_id, targets in span_targets_by_block.items():
+                                batch_ids = {
+                                    request.target.target_id for request in batch
+                                }
+                                batch_targets = [
+                                    target
+                                    for target in targets
+                                    if target.target_id in batch_ids
+                                ]
+                                if batch_targets:
+                                    _apply_span_repairs(
+                                        span_blocks[region_id],
+                                        batch_targets,
+                                        decisions_by_block.get(region_id, []),
+                                        repair_source=self.config.luna_model,
+                                    )
+                        span_requests = []
+                        if budget_denied:
+                            for _request, block in pending:
+                                block.verification = VerificationState.NEEDS_REVIEW
+                                block.verification_reason = (
+                                    "Quality repair skipped after budget exhaustion"
+                                )
+                            break
                     next_pending: list[tuple[CropInspectionRequest, Block]] = []
                     for batch_start in range(0, len(pending), MAX_REPAIR_BLOCKS):
                         batch = pending[batch_start : batch_start + MAX_REPAIR_BLOCKS]
@@ -1507,12 +2006,12 @@ class DocumentParser:
                                 page_number=page.number,
                             )
                         except Exception as exc:  # noqa: BLE001 - review failure is auditable
-                            fallback_reason = (
-                                f"Quality verification failed: {type(exc).__name__}: {exc}"
-                            )
+                            fallback_reason = f"Quality verification failed: {type(exc).__name__}: {exc}"
                             quality_decisions = {}
                         else:
-                            fallback_reason = "No conclusive quality verification decision"
+                            fallback_reason = (
+                                "No conclusive quality verification decision"
+                            )
                             quality_decisions = {
                                 item.region_id: item
                                 for item in quality_inspection.decisions
@@ -1529,6 +2028,37 @@ class DocumentParser:
                                     page.number,
                                     preserve_layout=True,
                                 )
+                                existing_blocks = [
+                                    item
+                                    for item in blocks
+                                    if item.id not in recovery_ids
+                                ]
+                                redundant_recovery = (
+                                    block.id in recovery_ids
+                                    and block.verification is VerificationState.VERIFIED
+                                    and recovery_content_is_redundant(
+                                        block, existing_blocks
+                                    )
+                                )
+                                conflicting_scan_probe = (
+                                    block.id in scan_probe_ids
+                                    and block.verification is VerificationState.VERIFIED
+                                    and recovery_content_conflicts(
+                                        block, existing_blocks
+                                    )
+                                )
+                                if redundant_recovery or conflicting_scan_probe:
+                                    block.verification = VerificationState.REJECTED
+                                    block.verification_reason = (
+                                        "Recovery content conflicts with active page evidence"
+                                        if conflicting_scan_probe
+                                        else "Recovery content duplicates active page content"
+                                    )
+                                    warnings.append(
+                                        f"Page {page.number}: suppressed unsupported recovery "
+                                        f"block {block.id}"
+                                    )
+                                    continue
                                 if (
                                     decision.action is InspectionAction.CORRECT
                                     and block.verification is VerificationState.VERIFIED
@@ -1548,7 +2078,10 @@ class DocumentParser:
                                 reason = decision.reason
                             else:
                                 reason = fallback_reason
-                            if decision is not None and decision.action is InspectionAction.REJECT:
+                            if (
+                                decision is not None
+                                and decision.action is InspectionAction.REJECT
+                            ):
                                 rejection_counts[block.id] = (
                                     rejection_counts.get(block.id, 0) + 1
                                 )
@@ -1576,7 +2109,10 @@ class DocumentParser:
                                         page.number,
                                         preserve_layout=True,
                                     )
-                            elif original_verification[block.id] is VerificationState.REJECTED:
+                            elif (
+                                original_verification[block.id]
+                                is VerificationState.REJECTED
+                            ):
                                 block.verification = VerificationState.REJECTED
                                 block.verification_reason = original_reasons[block.id]
                             else:
@@ -1593,6 +2129,31 @@ class DocumentParser:
                     if not pending:
                         break
 
+            existing_blocks = [item for item in blocks if item.id not in recovery_ids]
+            for block in recovery_blocks:
+                if block.verification is not VerificationState.VERIFIED:
+                    continue
+                redundant = recovery_content_is_redundant(block, existing_blocks)
+                conflicting = block.id in scan_probe_ids and recovery_content_conflicts(
+                    block, existing_blocks
+                )
+                if not (redundant or conflicting):
+                    continue
+                block.verification = VerificationState.REJECTED
+                block.verification_reason = (
+                    "Recovery content conflicts with active page evidence"
+                    if conflicting
+                    else "Recovery content duplicates active page content"
+                )
+                warnings.append(
+                    f"Page {page.number}: suppressed unsupported recovery block {block.id}"
+                )
+            grounded_corrections = [
+                block
+                for block in grounded_corrections
+                if block.verification is VerificationState.VERIFIED
+            ]
+
             if native_recovery_blocks:
                 warnings.append(
                     f"Page {page.number}: queued {len(native_recovery_blocks)} native "
@@ -1607,7 +2168,7 @@ class DocumentParser:
                     f"Page {page.number}: recovered {len(grounded_corrections)} "
                     "grounded quality corrections"
                 )
-        elif page.scanned:
+        else:
             for region in find_missing_source_regions(page, blocks):
                 if region.text:
                     continue
@@ -1625,7 +2186,9 @@ class DocumentParser:
                 if block.verification is VerificationState.REJECTED:
                     continue
                 block.verification = VerificationState.NEEDS_REVIEW
-                block.verification_reason = "Conflicting specialist reading-order opinions"
+                block.verification_reason = (
+                    "Conflicting specialist reading-order opinions"
+                )
 
         blocks, normalization_warnings = normalize_page_blocks(blocks)
         warnings.extend(
@@ -1653,6 +2216,7 @@ class DocumentParser:
                 blocks=blocks,
                 specialist_audit=specialist_audit,
                 warnings=warnings,
+                analysis=analysis,
             ),
             warnings=warnings,
             usage=usage,
@@ -1667,6 +2231,7 @@ class DocumentParser:
     ) -> ParseResult:
         started = time.perf_counter()
         runtime = ProviderRuntime(self.config)
+        analyzer = self.engine_factory(self.config)
         with tempfile.TemporaryDirectory(prefix="docparse-") as temporary:
             workdir = Path(temporary)
             source = ingest_document(
@@ -1684,7 +2249,7 @@ class DocumentParser:
             usage = RunUsage()
             trace: list[AgentTraceEvent] = []
             total = len(source.pages)
-            runtime.reserve_base_drafts(total)
+            runtime.reserve_full_page_fallbacks(total)
             progress_events: SimpleQueue[ProgressEvent] = SimpleQueue()
 
             def queue_progress(event: ProgressEvent) -> None:
@@ -1715,8 +2280,32 @@ class DocumentParser:
                         total,
                         f"Processing pages {batch[0].number}-{batch[-1].number}",
                     )
-                    futures = {
-                        executor.submit(
+                    futures = {}
+                    analyses = (
+                        analyzer.analyze_window(batch)
+                        if self.gateway_factory is OpenAIDocumentGateway
+                        else ((page, None) for page in batch)
+                    )
+                    analyzed_count = batch_start
+                    for item in analyses:
+                        if self.gateway_factory is OpenAIDocumentGateway:
+                            analysis = item
+                            page = next(
+                                page
+                                for page in batch
+                                if page.number == analysis.render.source_page
+                            )
+                        else:
+                            page, analysis = item
+                        analyzed_count += 1
+                        _emit(
+                            progress_callback,
+                            "layout",
+                            analyzed_count,
+                            total,
+                            f"Detected layout on page {page.number}",
+                        )
+                        future = executor.submit(
                             self._process_page,
                             source,
                             page,
@@ -1724,11 +2313,15 @@ class DocumentParser:
                             total,
                             queue_progress if progress_callback is not None else None,
                             runtime,
-                        ): page.number
-                        for page in batch
-                    }
+                            analyzer,
+                            analysis,
+                        )
+                        futures[future] = page.number
+                    if batch_start + len(batch) == total:
+                        runtime.release_full_page_fallback_reservations()
                     pending = set(futures)
                     processed: list[_ProcessedPage] = []
+                    completed_count = batch_start
                     while pending:
                         done, pending = wait(
                             pending,
@@ -1739,6 +2332,14 @@ class DocumentParser:
                         for future in done:
                             try:
                                 processed.append(future.result())
+                                completed_count += 1
+                                _emit(
+                                    progress_callback,
+                                    "recognize",
+                                    completed_count,
+                                    total,
+                                    f"Recognized page {futures[future]}",
+                                )
                             except Exception:
                                 for remaining in pending:
                                     remaining.cancel()
@@ -1756,6 +2357,7 @@ class DocumentParser:
                                 specialist_audit=result.page.specialist_audit,
                                 warnings=result.page.warnings,
                                 quality=result.page.quality,
+                                analysis=result.page.analysis,
                             )
                         )
                         warnings.extend(result.warnings)
@@ -1772,22 +2374,56 @@ class DocumentParser:
             input_tokens = usage.input_tokens
             output_tokens = usage.output_tokens
             runtime_diagnostics = runtime.diagnostics()
+            _emit(
+                progress_callback,
+                "assemble",
+                1,
+                1,
+                "Assembling Markdown and structured JSON",
+            )
+            elements = build_elements(document)
+            duration_ms = round((time.perf_counter() - started) * 1000)
+            version_getter = getattr(analyzer, "model_versions", None)
+            model_versions = version_getter() if callable(version_getter) else {}
+            metadata = ParseMetadata(
+                pages=len(document.pages),
+                processing_time=duration_ms / 1000,
+                model_versions=model_versions,
+            )
             rendered = render_agentic_document(
                 document,
                 usage=usage,
                 trace=trace,
                 runtime_diagnostics=runtime_diagnostics,
-                duration_ms=round((time.perf_counter() - started) * 1000),
+                duration_ms=duration_ms,
+                elements=elements,
+                parse_metadata=metadata,
             )
+            _emit(
+                progress_callback,
+                "annotate",
+                1,
+                1,
+                "Rendering PDF annotations",
+            )
+            annotated_pdf = render_annotated_pdf(
+                data,
+                source.name,
+                elements,
+                page_count=len(document.pages),
+            )
+            _emit(progress_callback, "complete", 1, 1, "Parsing complete")
             return ParseResult(
                 document=document,
                 markdown=rendered.markdown,
                 json=rendered.json,
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
-                annotated_pdf=render_annotated_pdf(data, source.name, document),
+                annotated_pdf=annotated_pdf,
                 legacy_json=render_json(document),
                 usage=usage,
                 trace=trace,
                 runtime_diagnostics=runtime_diagnostics,
+                elements=elements,
+                metadata=metadata,
             )

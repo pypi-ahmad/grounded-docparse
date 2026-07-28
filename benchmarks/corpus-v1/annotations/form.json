@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.1",
+  "document_id": "form",
+  "reference_text": "Synthetic Intake Form Record ID: FORM-204 Category: Public fixture Approved: Yes",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": {
+    "record_id": "FORM-204",
+    "category": "Public fixture",
+    "approved": true
+  },
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

@@ -6,6 +6,7 @@ import pytest
 
 from grounded_docparse.ingest import PageEvidence, TextBlock
 from grounded_docparse.models import (
+    AtomicEvidence,
     Block,
     BoundingBox,
     Citation,
@@ -18,16 +19,94 @@ from grounded_docparse.models import (
 from grounded_docparse.quality import (
     _rectangle_union_area,
     find_missing_source_regions,
+    literal_repair_candidates,
     normalize_page_blocks,
+    recovery_content_conflicts,
+    recovery_content_is_redundant,
     select_repair_blocks,
 )
+
+
+def test_literal_candidates_use_exact_disagreement_range(tmp_path: Path) -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.2)
+    page = PageEvidence(
+        number=1,
+        width=100,
+        height=100,
+        dpi=72,
+        image_path=tmp_path / "page.png",
+        scanned=False,
+        text_blocks=[TextBlock("Account 12345", bbox, 10, "Arial")],
+    )
+    block = Block(
+        id="p1-b1",
+        type=NodeType.PARAGRAPH,
+        text="Account l2345",
+        bbox=bbox,
+        reading_order=0,
+        confidence=0.9,
+        atoms=[AtomicEvidence(kind="line", text="Account l2345", bbox=bbox)],
+    )
+
+    candidates = literal_repair_candidates(page, block)
+
+    assert len(candidates) == 1
+    assert candidates[0].span.text == "l2345"
+    assert (
+        block.atoms[0].text[candidates[0].span.start : candidates[0].span.end]
+        == "l2345"
+    )
+    assert candidates[0].span.source == "deterministic_validation"
+
+
+def test_native_text_agreement_suppresses_confidence_only_repair(
+    tmp_path: Path,
+) -> None:
+    bbox = _box(0.1, 0.1, 0.9, 0.2)
+    page = PageEvidence(
+        number=1,
+        width=100,
+        height=100,
+        dpi=72,
+        image_path=tmp_path / "page.png",
+        scanned=False,
+        text_blocks=[TextBlock("Account 12345", bbox, 10, "Arial")],
+    )
+    block = Block(
+        id="p1-b1",
+        type=NodeType.PARAGRAPH,
+        text="Account 12345",
+        bbox=bbox,
+        reading_order=0,
+        atoms=[
+            AtomicEvidence(
+                kind="line",
+                text="Account 12345",
+                bbox=bbox,
+                confidence=0.4,
+                low_confidence_spans=[
+                    {
+                        "start": 8,
+                        "end": 13,
+                        "text": "12345",
+                        "confidence": 0.4,
+                        "source": "provider",
+                    }
+                ],
+            )
+        ],
+    )
+
+    assert literal_repair_candidates(page, block) == []
 
 
 def _box(x0: float, y0: float, x1: float, y1: float) -> BoundingBox:
     return BoundingBox(x0=x0, y0=y0, x1=x1, y1=y1)
 
 
-def _page(*source_blocks: tuple[str, BoundingBox], scanned: bool = False) -> PageEvidence:
+def _page(
+    *source_blocks: tuple[str, BoundingBox], scanned: bool = False
+) -> PageEvidence:
     return PageEvidence(
         number=1,
         width=612,
@@ -70,6 +149,123 @@ def _block(
     )
 
 
+def test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order() -> None:
+    full_page = _box(0.05, 0.05, 0.95, 0.95)
+    existing = [
+        _block("p1-b1", "First grounded line.", _box(0.1, 0.1, 0.9, 0.2), order=0),
+        _block("p1-b2", "Second grounded line.", _box(0.1, 0.3, 0.9, 0.4), order=1),
+    ]
+    recovery = _block(
+        "p1-b3",
+        "First grounded line. Second grounded line.",
+        full_page,
+        order=2,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert recovery_content_is_redundant(recovery, existing)
+
+
+def test_recovery_content_compares_nested_grounded_children() -> None:
+    full_page = _box(0.05, 0.05, 0.95, 0.95)
+    heading = _block(
+        "p1-b1",
+        "Physical Exam",
+        _box(0.1, 0.1, 0.9, 0.2),
+        node_type=NodeType.HEADING,
+        order=0,
+    )
+    heading.children = [
+        _block(
+            "p1-b2",
+            "General: They are not in acute distress.",
+            _box(0.1, 0.2, 0.9, 0.3),
+            order=1,
+        ),
+        _block(
+            "p1-b3",
+            "Appearance: They are not ill-appearing.",
+            _box(0.1, 0.3, 0.9, 0.4),
+            order=2,
+        ),
+    ]
+    recovery = _block(
+        "p1-b4",
+        "Physical Exam General: They are not in acute distress. "
+        "Appearance: They are not ill-appearing.",
+        full_page,
+        order=3,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert recovery_content_is_redundant(recovery, [heading])
+
+
+def test_recovery_content_with_novel_literal_is_not_redundant() -> None:
+    existing = [
+        _block("p1-b1", "First grounded line.", _box(0.1, 0.1, 0.9, 0.2), order=0)
+    ]
+    recovery = _block(
+        "p1-b2",
+        "First grounded line. Novel value 204.",
+        _box(0.05, 0.05, 0.95, 0.95),
+        order=1,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert not recovery_content_is_redundant(recovery, existing)
+
+
+def test_recovery_at_a_different_location_is_not_treated_as_duplicate() -> None:
+    existing = [_block("p1-b1", "Repeated label", _box(0.1, 0.1, 0.4, 0.2), order=0)]
+    recovery = _block(
+        "p1-b2",
+        "Repeated label",
+        _box(0.6, 0.7, 0.9, 0.8),
+        order=1,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert not recovery_content_is_redundant(recovery, existing)
+
+
+def test_scan_recovery_with_conflicting_critical_literal_is_rejected() -> None:
+    existing = [
+        _block("p1-b1", "PUBLIC TEST DATA", _box(0.1, 0.1, 0.9, 0.2), order=0),
+        _block("p1-b2", "Batch ID: SCAN-042", _box(0.1, 0.3, 0.9, 0.4), order=1),
+    ]
+    recovery = _block(
+        "p1-b3",
+        "PUBLIC TEST DATA\nBatch ID: SYN-0042",
+        _box(0.05, 0.05, 0.95, 0.95),
+        order=2,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert recovery_content_conflicts(recovery, existing)
+
+
+def test_full_page_recovery_allows_line_wrapped_hyphenated_literals() -> None:
+    existing = [
+        _block(
+            "p1-b1",
+            "Call 573-751-3334 for assistance.",
+            _box(0.1, 0.1, 0.9, 0.2),
+            order=0,
+        ),
+        _block("p1-b2", "Closing line", _box(0.1, 0.3, 0.9, 0.4), order=1),
+    ]
+    recovery = _block(
+        "p1-b3",
+        "Call 573-751-\n3334 for assistance. Closing line",
+        _box(0.05, 0.05, 0.95, 0.95),
+        order=2,
+        verification=VerificationState.VERIFIED,
+    )
+
+    assert recovery_content_is_redundant(recovery, existing)
+
+
 def test_missing_native_list_steps_become_grounded_recovery_regions() -> None:
     first_box = _box(0.1, 0.1, 0.9, 0.2)
     second_box = _box(0.1, 0.25, 0.9, 0.35)
@@ -97,7 +293,9 @@ def test_missing_native_list_steps_become_grounded_recovery_regions() -> None:
     assert missing[0].bbox.model_dump() == second_box.model_dump(exclude={"unit"})
 
 
-def test_source_region_with_at_least_seventy_percent_coverage_is_not_recovered() -> None:
+def test_source_region_with_at_least_seventy_percent_coverage_is_not_recovered() -> (
+    None
+):
     bbox = _box(0.1, 0.1, 0.9, 0.2)
     page = _page(("Location address or name of sampling point", bbox))
     blocks = [_block("p1-b1", "Location address name of sampling point", bbox)]
@@ -161,9 +359,7 @@ def test_scanned_page_does_not_duplicate_repairable_structured_content() -> None
 
 def test_scanned_page_probes_large_uncovered_internal_region() -> None:
     page = _page(scanned=True)
-    small_text_block = _block(
-        "p1-b1", "Scanned notice", _box(0.1, 0.1, 0.2, 0.2)
-    )
+    small_text_block = _block("p1-b1", "Scanned notice", _box(0.1, 0.1, 0.2, 0.2))
 
     probes = find_missing_source_regions(page, [small_text_block])
 
@@ -190,8 +386,7 @@ def test_rectangle_union_area_handles_overlap_duplicates_and_zero_area(
 
 def test_rectangle_union_area_scales_to_many_disjoint_strips() -> None:
     boxes = [
-        _box(index / 2_000, 0.1, (index + 1) / 2_000, 0.9)
-        for index in range(1_000)
+        _box(index / 2_000, 0.1, (index + 1) / 2_000, 0.9) for index in range(1_000)
     ]
 
     assert _rectangle_union_area(boxes) == pytest.approx(0.4)
@@ -319,7 +514,9 @@ def test_all_structural_candidates_are_returned_for_downstream_batching() -> Non
 
     selected = select_repair_blocks(_page(), blocks, [])
 
-    assert [block.id for block in selected] == [f"p1-b{index}" for index in range(1, 11)]
+    assert [block.id for block in selected] == [
+        f"p1-b{index}" for index in range(1, 11)
+    ]
 
 
 def test_clipped_structured_geometry_is_selected_for_quality_repair() -> None:
@@ -366,12 +563,48 @@ def test_normalization_strips_structural_marker_duplication() -> None:
 
 def test_normalization_removes_repeated_ordered_markers_idempotently() -> None:
     blocks = [
-        _block("numeric-dot", "1. 1. Collect the sample.", _box(0.1, 0.1, 0.9, 0.2), node_type=NodeType.LIST_ITEM, marker="1."),
-        _block("numeric-paren", "1) 1) Label the bottle.", _box(0.1, 0.2, 0.9, 0.3), node_type=NodeType.LIST_ITEM, marker="1)"),
-        _block("alpha-dot", "A. A. Preserve the chain of custody.", _box(0.1, 0.3, 0.9, 0.4), node_type=NodeType.LIST_ITEM, marker="A."),
-        _block("alpha-paren", "A) A) Complete the field log.", _box(0.1, 0.4, 0.9, 0.5), node_type=NodeType.LIST_ITEM, marker="A)"),
-        _block("roman", "IV. IV. Verify the result.", _box(0.1, 0.5, 0.9, 0.6), node_type=NodeType.LIST_ITEM, marker="IV."),
-        _block("parenthesized", "(iv) (iv) Archive the record.", _box(0.1, 0.6, 0.9, 0.7), node_type=NodeType.LIST_ITEM, marker="(iv)"),
+        _block(
+            "numeric-dot",
+            "1. 1. Collect the sample.",
+            _box(0.1, 0.1, 0.9, 0.2),
+            node_type=NodeType.LIST_ITEM,
+            marker="1.",
+        ),
+        _block(
+            "numeric-paren",
+            "1) 1) Label the bottle.",
+            _box(0.1, 0.2, 0.9, 0.3),
+            node_type=NodeType.LIST_ITEM,
+            marker="1)",
+        ),
+        _block(
+            "alpha-dot",
+            "A. A. Preserve the chain of custody.",
+            _box(0.1, 0.3, 0.9, 0.4),
+            node_type=NodeType.LIST_ITEM,
+            marker="A.",
+        ),
+        _block(
+            "alpha-paren",
+            "A) A) Complete the field log.",
+            _box(0.1, 0.4, 0.9, 0.5),
+            node_type=NodeType.LIST_ITEM,
+            marker="A)",
+        ),
+        _block(
+            "roman",
+            "IV. IV. Verify the result.",
+            _box(0.1, 0.5, 0.9, 0.6),
+            node_type=NodeType.LIST_ITEM,
+            marker="IV.",
+        ),
+        _block(
+            "parenthesized",
+            "(iv) (iv) Archive the record.",
+            _box(0.1, 0.6, 0.9, 0.7),
+            node_type=NodeType.LIST_ITEM,
+            marker="(iv)",
+        ),
     ]
 
     normalized, _warnings = normalize_page_blocks(blocks)
@@ -404,7 +637,9 @@ def test_normalization_ignores_whitespace_only_list_marker() -> None:
     assert [(item.list_marker, item.text) for item in normalized] == [(" ", "")]
 
 
-def test_source_recovery_recognizes_roman_and_parenthesized_ordered_markers_only() -> None:
+def test_source_recovery_recognizes_roman_and_parenthesized_ordered_markers_only() -> (
+    None
+):
     roman_box = _box(0.1, 0.1, 0.9, 0.2)
     parenthesized_box = _box(0.1, 0.25, 0.9, 0.35)
     prose_box = _box(0.1, 0.4, 0.9, 0.5)
@@ -478,7 +713,9 @@ def test_normalization_prefers_active_correction_over_rejected_duplicate() -> No
     assert warnings == ["removed duplicate block p1-b1"]
 
 
-def test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations() -> None:
+def test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations() -> (
+    None
+):
     first = _block(
         "p1-b1",
         "Plan: continue the current treatment.",
@@ -497,3 +734,54 @@ def test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations
     assert [block.id for block in normalized] == ["p1-b1", "p1-b2"]
     assert warnings == []
     assert [block.reading_order for block in normalized] == [0, 1]
+
+
+def test_normalization_rejects_conflicting_aggregate_paragraph() -> None:
+    blocks = [
+        _block(
+            "p1-b1",
+            "SYNTHETIC MEDICAL FAX - NO PHI",
+            _box(0.1, 0.1, 0.7, 0.2),
+            order=0,
+        ),
+        _block(
+            "p1-b2",
+            "FAX DATE: 2026-07-24",
+            _box(0.1, 0.25, 0.7, 0.35),
+            order=1,
+        ),
+        _block(
+            "p1-b3",
+            "SYNTHETIC MEDICAL FAX - NO PHI\nFAX DATE: 2025-07-14",
+            _box(0.05, 0.05, 0.95, 0.95),
+            order=2,
+            verification=VerificationState.VERIFIED,
+        ),
+    ]
+
+    normalized, warnings = normalize_page_blocks(blocks)
+
+    aggregate = next(block for block in normalized if block.id == "p1-b3")
+    assert aggregate.verification is VerificationState.REJECTED
+    assert aggregate.verification_reason == (
+        "Aggregate content conflicts with grounded page evidence"
+    )
+    assert warnings == ["rejected conflicting aggregate block p1-b3"]
+
+
+def test_normalization_removes_redundant_aggregate_paragraph() -> None:
+    blocks = [
+        _block("p1-b1", "First line", _box(0.1, 0.1, 0.7, 0.2), order=0),
+        _block("p1-b2", "Second line", _box(0.1, 0.25, 0.7, 0.35), order=1),
+        _block(
+            "p1-b3",
+            "First line\nSecond line",
+            _box(0.05, 0.05, 0.95, 0.95),
+            order=2,
+        ),
+    ]
+
+    normalized, warnings = normalize_page_blocks(blocks)
+
+    assert [block.id for block in normalized] == ["p1-b1", "p1-b2"]
+    assert warnings == ["removed redundant aggregate block p1-b3"]

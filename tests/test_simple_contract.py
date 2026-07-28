@@ -10,6 +10,7 @@ from grounded_docparse.models import (
     BoundingBox,
     Citation,
     Document,
+    Element,
     FormData,
     Page,
     PageDraft,
@@ -61,10 +62,9 @@ def test_annotated_pdf_draws_nested_audit_boxes(simple_pdf: bytes) -> None:
 
     with pymupdf.open(stream=annotated, filetype="pdf") as rendered:
         assert rendered.page_count == 1
-        assert len(rendered[0].get_drawings()) == 2
+        assert len(rendered[0].get_drawings()) == 4
         labels = rendered[0].get_text()
-    assert "p1-b1 heading 98% verified" in labels
-    assert "p1-b2 paragraph 95% needs_review" in labels
+    assert labels.splitlines()[-2:] == ["1", "2"]
 
 
 def test_annotated_pdf_converts_multiframe_image() -> None:
@@ -100,6 +100,37 @@ def test_annotated_pdf_rejects_page_count_mismatch(simple_pdf: bytes) -> None:
 
     with pytest.raises(ValueError, match="page counts do not match"):
         document_render.render_annotated_pdf(simple_pdf, "notice.pdf", document)
+
+
+def test_annotated_pdf_supports_semantic_labels_and_selected_overlay(
+    simple_pdf: bytes,
+) -> None:
+    element = Element(
+        id="table-1",
+        type="table",
+        page=1,
+        bbox=(0.1, 0.1, 0.9, 0.4),
+        text="A table",
+        reading_order=1,
+        confidence=0.9,
+    )
+
+    annotated = document_render.render_annotated_pdf(
+        simple_pdf,
+        "notice.pdf",
+        [element],
+        page_count=1,
+        show_reading_order=False,
+        selected_element_id="table-1",
+    )
+
+    with pymupdf.open(stream=annotated, filetype="pdf") as rendered:
+        drawings = rendered[0].get_drawings()
+        labels = rendered[0].get_text()
+    assert len(drawings) == 3
+    assert drawings[0]["color"] == pytest.approx((0.086, 0.639, 0.29), abs=0.01)
+    assert drawings[1]["color"] == pytest.approx((0.98, 0.76, 0.08), abs=0.01)
+    assert labels.splitlines()[-1] == "Table"
 
 
 def test_nested_document_renders_layout_aware_markdown_and_json() -> None:
@@ -322,7 +353,7 @@ def test_schema_version_and_list_marker_are_preserved_in_json() -> None:
 
     json_text = render_json(document)
 
-    assert document.schema_version == "1.3.0"
+    assert document.schema_version == "2.0.0"
     assert '"list_marker": "1."' in json_text
 
 

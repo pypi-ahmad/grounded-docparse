@@ -1,0 +1,594 @@
+from __future__ import annotations
+
+import math
+import re
+import time
+from collections.abc import Callable
+from importlib.metadata import PackageNotFoundError, version
+from itertools import pairwise
+from pathlib import Path
+
+from PIL import Image, ImageFilter, ImageStat
+
+from .config import ParserConfig
+from .ingest import PageEvidence
+from .local_ocr import GlmPageResult, GlmRegion, get_glmocr_runtime, glmocr_version
+from .models import (
+    AnalysisEngineEvidence,
+    AnalysisRegionType,
+    AtomicDraft,
+    BoundingBox,
+    BoundingBoxProvenance,
+    CheckboxState,
+    CoordinateBox,
+    DetectedPageFeatures,
+    LayoutRegionEvidence,
+    NodeType,
+    PageAnalysis,
+    PageComplexity,
+    PageDraft,
+    PageRenderEvidence,
+    QualityMeasurement,
+    ReadingOrderEvidence,
+    ReadingOrderStatus,
+    RegionComplexity,
+    RegionDraft,
+    ScanQualityEvidence,
+    TableCellDraft,
+)
+
+_TABLE = {"table"}
+_FORMULA = {"display_formula", "inline_formula", "formula"}
+_VISUAL = {"image", "chart", "figure"}
+_ROTATED = {"vertical_text", "rotated_text"}
+_TEXT = {
+    "text",
+    "title",
+    "doc_title",
+    "paragraph_title",
+    "paragraph",
+    "header",
+    "footer",
+    "caption",
+    "figure_title",
+    "list",
+    "reference",
+    "reference_content",
+    "abstract",
+    "content",
+    "vision_footnote",
+    "footnote",
+    "seal",
+    "formula_number",
+}
+
+
+def _percentile(histogram: list[int], fraction: float) -> int:
+    target, running = sum(histogram) * fraction, 0
+    for value, count in enumerate(histogram):
+        running += count
+        if running >= target:
+            return value
+    return 255
+
+
+class PageAnalyzer:
+    def __init__(
+        self,
+        config: ParserConfig,
+        runtime_factory: Callable[..., object] = get_glmocr_runtime,
+    ) -> None:
+        self.config = config
+        self.runtime_factory = runtime_factory
+
+    def analyze(self, page: PageEvidence) -> PageAnalysis:
+        return next(self.analyze_window([page]))
+
+    def model_versions(self) -> dict[str, str]:
+        try:
+            vllm_version = version("vllm")
+        except PackageNotFoundError:
+            vllm_version = "unavailable"
+        return {
+            "glmocr_sdk": glmocr_version() or "unavailable",
+            "ocr_model": "zai-org/GLM-OCR",
+            "layout_model": "PaddlePaddle/PP-DocLayoutV3_safetensors",
+            "vllm": vllm_version,
+            "luna": self.config.luna_model,
+        }
+
+    def analyze_window(self, pages: list[PageEvidence]):
+        started = {page.image_path.resolve(): time.perf_counter() for page in pages}
+        prepared: dict[
+            Path, tuple[PageEvidence, PageRenderEvidence, ScanQualityEvidence]
+        ] = {}
+        for page in pages:
+            render, quality = self._base(page)
+            if quality.blank:
+                yield self._finish(
+                    page, render, quality, [], started[page.image_path.resolve()]
+                )
+            else:
+                prepared[page.image_path.resolve()] = (page, render, quality)
+        if not prepared:
+            return
+        if not self.config.local_ocr_enabled:
+            for page, render, quality in prepared.values():
+                yield self._finish(
+                    page,
+                    render,
+                    quality,
+                    [],
+                    started[page.image_path.resolve()],
+                    "GLM-OCR disabled; page analysis uncertain",
+                )
+            return
+        try:
+            runtime = self.runtime_factory(
+                self.config.glmocr_config_path, self.config.glmocr_layout_device
+            )
+            if hasattr(runtime, "parse_many"):
+                results = runtime.parse_many(
+                    [item[0].image_path for item in prepared.values()]
+                )
+            else:
+                results = (
+                    GlmPageResult(page.image_path, runtime.parse(page.image_path))
+                    for page, _render, _quality in prepared.values()
+                )
+            for result in results:
+                item = prepared.pop(result.image_path.resolve(), None)
+                if item is None:
+                    continue
+                page, render, quality = item
+                warning = (
+                    f"GLM-OCR analysis unavailable: {result.error}"
+                    if result.error
+                    else None
+                )
+                yield self._finish(
+                    page,
+                    render,
+                    quality,
+                    result.regions,
+                    started[page.image_path.resolve()],
+                    warning,
+                )
+        except Exception as exc:  # noqa: BLE001 - OCR failure triggers bounded fallback
+            warning = f"GLM-OCR analysis unavailable: {type(exc).__name__}: {exc}"
+            for page, render, quality in prepared.values():
+                yield self._finish(
+                    page,
+                    render,
+                    quality,
+                    [],
+                    started[page.image_path.resolve()],
+                    warning,
+                )
+            return
+        for page, render, quality in prepared.values():
+            yield self._finish(
+                page,
+                render,
+                quality,
+                [],
+                started[page.image_path.resolve()],
+                "GLM-OCR returned no result for page",
+            )
+
+    def _base(
+        self, page: PageEvidence
+    ) -> tuple[PageRenderEvidence, ScanQualityEvidence]:
+        render = PageRenderEvidence(
+            render_width_pixels=page.render_width_pixels,
+            render_height_pixels=page.render_height_pixels,
+            render_dpi=float(page.dpi),
+            effective_dpi=page.effective_dpi,
+            source_page=page.number,
+            source_width=page.source_width,
+            source_height=page.source_height,
+            source_unit=page.source_unit,
+            source_rotation_degrees=page.source_rotation_degrees,
+        )
+        return render, self._quality(page)
+
+    def _finish(
+        self, page, render, quality, raw, started, warning=None
+    ) -> PageAnalysis:
+        engine = AnalysisEngineEvidence(
+            sdk_version=glmocr_version(), layout_device=self.config.glmocr_layout_device
+        )
+        if quality.blank:
+            engine.latency_ms = round((time.perf_counter() - started) * 1000)
+            return PageAnalysis(
+                render=render,
+                quality=quality,
+                complexity=PageComplexity.BLANK_PAGE,
+                engine=engine,
+            )
+        regions = [
+            self._region(page, item, position) for position, item in enumerate(raw, 1)
+        ]
+        skew = max(
+            (
+                abs(region.rotation_degrees)
+                for region in regions
+                if region.type is not AnalysisRegionType.ROTATED_TEXT
+            ),
+            default=0.0,
+        )
+        quality.measurements.append(
+            QualityMeasurement(
+                code="skew_degrees",
+                value=skew,
+                threshold=self.config.analysis_thresholds.skew_degrees,
+                warning=skew >= self.config.analysis_thresholds.skew_degrees,
+                basis="largest non-vertical GLM region baseline angle",
+            )
+        )
+        if quality.measurements[-1].warning:
+            quality.warnings.append("skew_degrees")
+        features = self._features(regions)
+        reading_order = self._reading_order(regions, features.multi_column_clusters)
+        complexity = self._complexity(page, quality, regions, features)
+        engine.latency_ms = round((time.perf_counter() - started) * 1000)
+        return PageAnalysis(
+            render=render,
+            quality=quality,
+            regions=regions,
+            reading_order=reading_order,
+            features=features,
+            complexity=complexity,
+            engine=engine,
+            warnings=[warning] if warning else [],
+        )
+
+    def _quality(self, page: PageEvidence) -> ScanQualityEvidence:
+        threshold = self.config.analysis_thresholds
+        with Image.open(page.image_path) as source:
+            gray = source.convert("L")
+            if gray.width > 1600:
+                gray = gray.resize(
+                    (1600, max(1, round(gray.height * 1600 / gray.width)))
+                )
+        histogram = gray.histogram()
+        total = gray.width * gray.height
+        foreground = sum(histogram[:245]) / total
+        contrast = float(_percentile(histogram, 0.95) - _percentile(histogram, 0.05))
+        edge_variance = float(
+            ImageStat.Stat(gray.filter(ImageFilter.FIND_EDGES)).var[0]
+        )
+        border = max(1, min(gray.size) // 100)
+        border_image = Image.new("L", gray.size, 255)
+        border_image.paste(gray.crop((0, 0, gray.width, border)), (0, 0))
+        border_image.paste(
+            gray.crop((0, gray.height - border, gray.width, gray.height)),
+            (0, gray.height - border),
+        )
+        border_image.paste(gray.crop((0, 0, border, gray.height)), (0, 0))
+        border_image.paste(
+            gray.crop((gray.width - border, 0, gray.width, gray.height)),
+            (gray.width - border, 0),
+        )
+        border_foreground = sum(border_image.histogram()[:245]) / max(
+            1, sum(histogram[:245])
+        )
+        low_resolution_value = page.effective_dpi or min(
+            page.render_width_pixels, page.render_height_pixels
+        )
+        low_resolution_threshold = (
+            threshold.min_effective_dpi
+            if page.effective_dpi
+            else threshold.min_short_edge_pixels
+        )
+        measurements = [
+            QualityMeasurement(
+                code="foreground_ratio",
+                value=foreground,
+                threshold=threshold.blank_foreground_ratio,
+                warning=foreground <= threshold.blank_foreground_ratio,
+                basis="fraction of grayscale pixels below 245",
+            ),
+            QualityMeasurement(
+                code="edge_variance",
+                value=edge_variance,
+                threshold=threshold.min_edge_variance,
+                warning=edge_variance < threshold.min_edge_variance,
+                basis="variance after Pillow FIND_EDGES; lower means blur",
+            ),
+            QualityMeasurement(
+                code="contrast_range",
+                value=contrast,
+                threshold=threshold.min_contrast_range,
+                warning=contrast < threshold.min_contrast_range,
+                basis="grayscale p95 minus p05",
+            ),
+            QualityMeasurement(
+                code="border_foreground_ratio",
+                value=border_foreground,
+                threshold=threshold.clipping_border_ratio,
+                warning=border_foreground > threshold.clipping_border_ratio,
+                basis="foreground touching outer 1% border",
+            ),
+            QualityMeasurement(
+                code="effective_resolution",
+                value=float(low_resolution_value),
+                threshold=float(low_resolution_threshold),
+                warning=low_resolution_value < low_resolution_threshold,
+                basis="DPI when known, otherwise shortest rendered edge pixels",
+            ),
+        ]
+        warnings = [item.code for item in measurements[1:] if item.warning]
+        return ScanQualityEvidence(
+            blank=measurements[0].warning, measurements=measurements, warnings=warnings
+        )
+
+    def _region(
+        self, page: PageEvidence, raw: GlmRegion, position: int
+    ) -> LayoutRegionEvidence:
+        width, height = page.render_width_pixels, page.render_height_pixels
+        x0, y0, x1, y1 = raw.bbox
+        if max(raw.bbox) <= 1.0:
+            x0, x1, y0, y1 = x0 * width, x1 * width, y0 * height, y1 * height
+        x0, x1 = sorted((max(0.0, min(width, x0)), max(0.0, min(width, x1))))
+        y0, y1 = sorted((max(0.0, min(height, y0)), max(0.0, min(height, y1))))
+        normalized = BoundingBox(
+            x0=x0 / width, y0=y0 / height, x1=x1 / width, y1=y1 / height
+        )
+        label = raw.label.casefold()
+        region_type = (
+            AnalysisRegionType.TABLE
+            if label in _TABLE
+            else AnalysisRegionType.FORMULA
+            if label in _FORMULA
+            else AnalysisRegionType.FIGURE
+            if label in _VISUAL
+            else AnalysisRegionType.ROTATED_TEXT
+            if label in _ROTATED
+            else AnalysisRegionType.TEXT
+            if label in _TEXT
+            else AnalysisRegionType.UNKNOWN
+        )
+        if region_type is AnalysisRegionType.TEXT and (
+            raw.content.count(":") >= 2
+            or any(mark in raw.content for mark in ("☐", "☑", "□", "✓"))
+        ):
+            region_type = AnalysisRegionType.FORM
+        rotation = 90.0 if label in _ROTATED else 0.0
+        if len(raw.polygon) >= 2:
+            rotation = math.degrees(
+                math.atan2(
+                    raw.polygon[1][1] - raw.polygon[0][1],
+                    raw.polygon[1][0] - raw.polygon[0][0],
+                )
+            )
+        complexity = (
+            RegionComplexity.STRUCTURED
+            if region_type
+            in {
+                AnalysisRegionType.TABLE,
+                AnalysisRegionType.FORM,
+                AnalysisRegionType.FORMULA,
+            }
+            else RegionComplexity.VISUAL
+            if region_type is AnalysisRegionType.FIGURE
+            else RegionComplexity.ROTATED
+            if abs(rotation) >= self.config.analysis_thresholds.skew_degrees
+            else RegionComplexity.SIMPLE_TEXT
+        )
+        return LayoutRegionEvidence(
+            id=f"p{page.number}-analysis-{position}",
+            native_label=raw.label,
+            type=region_type,
+            bbox=BoundingBoxProvenance(
+                normalized=normalized,
+                rendered=CoordinateBox(x0=x0, y0=y0, x1=x1, y1=y1, unit="pixels"),
+                source=CoordinateBox(
+                    x0=normalized.x0 * page.source_width,
+                    y0=normalized.y0 * page.source_height,
+                    x1=normalized.x1 * page.source_width,
+                    y1=normalized.y1 * page.source_height,
+                    unit=page.source_unit,
+                ),
+                source_page=page.number,
+            ),
+            polygon_rendered=list(raw.polygon),
+            text=raw.content,
+            layout_confidence=raw.confidence,
+            ocr_confidence=None,
+            rotation_degrees=rotation,
+            complexity=complexity,
+        )
+
+    def _features(self, regions: list[LayoutRegionEvidence]) -> DetectedPageFeatures:
+        ids = lambda kind: [region.id for region in regions if region.type is kind]
+        left = [r.id for r in regions if r.bbox.normalized.x1 <= 0.55]
+        right = [r.id for r in regions if r.bbox.normalized.x0 >= 0.45]
+        columns = [left, right] if len(left) >= 2 and len(right) >= 2 else []
+        return DetectedPageFeatures(
+            tables=ids(AnalysisRegionType.TABLE),
+            forms=ids(AnalysisRegionType.FORM),
+            figures=ids(AnalysisRegionType.FIGURE),
+            formulas=ids(AnalysisRegionType.FORMULA),
+            multi_column_clusters=columns,
+            rotated_regions=[
+                r.id
+                for r in regions
+                if abs(r.rotation_degrees)
+                >= self.config.analysis_thresholds.skew_degrees
+            ],
+        )
+
+    def _reading_order(
+        self, regions: list[LayoutRegionEvidence], columns: list[list[str]]
+    ) -> ReadingOrderEvidence:
+        if not regions:
+            return ReadingOrderEvidence(basis="GLM-OCR returned no layout regions")
+        order = [r.id for r in regions]
+        if columns:
+            membership = {
+                region_id: index
+                for index, group in enumerate(columns)
+                for region_id in group
+            }
+            sequence = [membership[item] for item in order if item in membership]
+            switches = sum(a != b for a, b in pairwise(sequence))
+            if switches > 1:
+                return ReadingOrderEvidence(
+                    status=ReadingOrderStatus.AMBIGUOUS,
+                    ambiguous_groups=columns,
+                    basis="GLM order alternates between detected columns",
+                )
+        return ReadingOrderEvidence(
+            status=ReadingOrderStatus.CONFIDENT,
+            ordered_region_ids=order,
+            confidence=1.0,
+            basis="GLM region index agrees with deterministic column check",
+        )
+
+    def _complexity(
+        self,
+        page: PageEvidence,
+        quality: ScanQualityEvidence,
+        regions: list[LayoutRegionEvidence],
+        features: DetectedPageFeatures,
+    ) -> PageComplexity:
+        if quality.warnings:
+            return PageComplexity.LOW_QUALITY_SCAN
+        if not regions:
+            return PageComplexity.UNCERTAIN
+        area = lambda ids: sum(
+            (r.bbox.normalized.x1 - r.bbox.normalized.x0)
+            * (r.bbox.normalized.y1 - r.bbox.normalized.y0)
+            for r in regions
+            if r.id in ids
+        )
+        threshold = self.config.analysis_thresholds
+        if area(features.tables + features.forms) >= threshold.table_form_area_ratio:
+            return PageComplexity.TABLE_OR_FORM_HEAVY
+        if area(features.figures) >= threshold.visual_area_ratio:
+            return PageComplexity.VISUAL_HEAVY
+        unknown = [
+            region.id for region in regions if region.type is AnalysisRegionType.UNKNOWN
+        ]
+        if area(unknown) >= threshold.unknown_area_ratio:
+            return PageComplexity.UNCERTAIN
+        if (
+            features.multi_column_clusters
+            or features.formulas
+            or features.rotated_regions
+            or len(regions) >= threshold.complex_region_count
+        ):
+            return PageComplexity.COMPLEX_LAYOUT
+        return (
+            PageComplexity.SIMPLE_TEXT_PAGE
+            if len(regions) == 1
+            else PageComplexity.SIMPLE_TEXT_REGIONS
+        )
+
+
+_HEADING_LABELS = {"doc_title", "paragraph_title", "title"}
+_CAPTION_LABELS = {"figure_title", "caption", "formula_number"}
+_REFERENCE_LABELS = {"reference", "reference_content"}
+_FOOTNOTE_LABELS = {"footnote", "vision_footnote"}
+_LIST_MARKER = re.compile(r"^\s*((?:[-*•]|\d+[.)]|[A-Za-z][.)]))\s+(.*)$", re.DOTALL)
+
+
+def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
+    regions: list[RegionDraft] = []
+    for order, source in enumerate(analysis.regions):
+        label = source.native_label.casefold()
+        node_type = NodeType.PARAGRAPH
+        heading_level = None
+        if label in _HEADING_LABELS:
+            node_type = NodeType.HEADING
+            heading_level = 1 if label == "doc_title" else 2
+        elif label == "table":
+            node_type = NodeType.TABLE
+        elif label in _FORMULA:
+            node_type = NodeType.FORMULA
+        elif label == "chart":
+            node_type = NodeType.CHART
+        elif label in {"image", "figure"}:
+            node_type = NodeType.IMAGE
+        elif label == "seal":
+            node_type = NodeType.SEAL
+        elif label in _CAPTION_LABELS:
+            node_type = NodeType.CAPTION
+        elif label in _REFERENCE_LABELS:
+            node_type = NodeType.REFERENCE
+        elif label in _FOOTNOTE_LABELS:
+            node_type = NodeType.FOOTNOTE
+        elif label == "header":
+            node_type = NodeType.HEADER
+        elif label == "footer":
+            node_type = NodeType.FOOTER
+        text = source.text
+        marker = _LIST_MARKER.match(text)
+        list_marker = None
+        if marker:
+            node_type, list_marker, text = (
+                NodeType.LIST_ITEM,
+                marker.group(1),
+                marker.group(2),
+            )
+        checkbox_state = None
+        if text.lstrip().startswith(("☐", "□", "☑", "✓")):
+            glyph = text.lstrip()[0]
+            checkbox_state = (
+                CheckboxState.CHECKED
+                if glyph in {"☑", "✓"}
+                else CheckboxState.UNCHECKED
+            )
+            node_type = NodeType.CHECKBOX
+            text = text.lstrip()[1:].lstrip()
+        bbox = source.bbox.normalized.model_dump(exclude={"unit"})
+        table_cells = _markdown_table_cells(text) if node_type is NodeType.TABLE else []
+        regions.append(
+            RegionDraft(
+                type=node_type,
+                bbox=bbox,
+                reading_order=order,
+                text=text,
+                confidence=source.ocr_confidence,
+                heading_level=heading_level,
+                list_marker=list_marker,
+                checkbox_state=checkbox_state,
+                table_cells=table_cells,
+                atoms=[
+                    AtomicDraft(
+                        kind="text",
+                        text=text,
+                        bbox=bbox,
+                        confidence=source.ocr_confidence,
+                    )
+                ]
+                if text
+                else [],
+            )
+        )
+    return PageDraft(regions=regions, warnings=list(analysis.warnings))
+
+
+def _markdown_table_cells(text: str) -> list[TableCellDraft]:
+    rows = [
+        [cell.strip() for cell in line.strip().strip("|").split("|")]
+        for line in text.splitlines()
+        if "|" in line
+    ]
+    if len(rows) < 2:
+        return []
+    separator = re.compile(r"^:?-{3,}:?$")
+    has_header = all(separator.fullmatch(cell.replace(" ", "")) for cell in rows[1])
+    if has_header:
+        rows.pop(1)
+    return [
+        TableCellDraft(
+            row_index=row_index,
+            column_index=column_index,
+            text=cell,
+            header=has_header and row_index == 0,
+        )
+        for row_index, row in enumerate(rows)
+        for column_index, cell in enumerate(row)
+    ]

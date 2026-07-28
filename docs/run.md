@@ -1,5 +1,15 @@
 # Run locally
 
+For the local GLM-OCR stack, double-click `Launch-GLM-OCR.cmd`. It installs the
+locked WSL environment on first use, starts vLLM, waits for `glm-ocr`, starts
+Streamlit with GPU layout preloaded, and opens <http://localhost:8501>. Runtime
+logs and PID files are stored under the ignored `.runtime/` directory.
+The large CUDA virtual environment is stored in WSL's native Linux filesystem at
+`~/.local/share/grounded-docparse/.venv` for faster installation and startup.
+
+Launching it again reuses healthy processes instead of reinstalling or restarting
+them. After a Windows reboot, run the launcher once to load the models again.
+
 From PowerShell in the repository root:
 
 ```powershell
@@ -19,7 +29,13 @@ Get-NetTCPConnection -LocalPort 8501 -State Listen -ErrorAction SilentlyContinue
 uv run streamlit run streamlit_app.py
 ```
 
-The app reads credentials from the process environment. If user-level variables were just created, open a new PowerShell window. Optional settings are `DOCPARSE_LUNA_MODEL`, `DOCPARSE_TERRA_MODEL`, render/crop DPI, upload/page limits, model output-token limits, `DOCPARSE_PAGE_BATCH_SIZE`, and `DOCPARSE_MAX_PAGE_CONCURRENCY`; see `.env.example` for defaults. Concurrency cannot exceed the batch size. Reduce it if the OpenAI project reaches request, token, or image rate limits.
+The app requires `OPENAI_API_KEY` and reads credentials from the process environment. Optional settings are `DOCPARSE_LUNA_MODEL`, render/crop DPI, upload/page limits, model output-token limits, concurrency, and `DOCPARSE_FULL_PAGE_FALLBACK_FRACTION`; see `.env.example` for defaults. PDFs are always rendered and evaluated visually; selectable text is ignored.
+
+`DOCPARSE_TARGETED_REPAIR_CONTEXT_PADDING` is an opt-in evaluation setting. When
+set above `DOCPARSE_CROP_PADDING`, Luna receives a second surrounding crop for an
+already-eligible uncertain span in the same request. Leave it unset in production;
+the current three-run Public Water experiment did not pass the accuracy and call-count
+promotion gates.
 
 The app reports run-level input and output token totals and stores no jobs or results. Use the Markdown, JSON, and annotated PDF download buttons before closing the session. Legacy `.docparse/` files are not read or changed.
 

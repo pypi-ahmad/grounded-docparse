@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.1",
+  "document_id": "tables",
+  "reference_text": "Synthetic Inventory Table Item Count Widgets 12 Gadgets 7",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [
+    {
+      "page": 1,
+      "ordinal": 0,
+      "cells": [
+        {
+          "row": 0,
+          "column": 0,
+          "text": "Item"
+        },
+        {
+          "row": 0,
+          "column": 1,
+          "text": "Count"
+        },
+        {
+          "row": 1,
+          "column": 0,
+          "text": "Widgets"
+        },
+        {
+          "row": 1,
+          "column": 1,
+          "text": "12"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "text": "Gadgets"
+        },
+        {
+          "row": 2,
+          "column": 1,
+          "text": "7"
+        }
+      ]
+    }
+  ],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

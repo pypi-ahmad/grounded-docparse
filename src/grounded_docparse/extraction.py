@@ -58,8 +58,10 @@ def _validate_schema_node(schema: Any, *, path: str) -> None:
 
     declared = schema.get("type")
     types = [declared] if isinstance(declared, str) else declared
-    if not isinstance(types, list) or not types or not all(
-        isinstance(item, str) and item in SUPPORTED_TYPES for item in types
+    if (
+        not isinstance(types, list)
+        or not types
+        or not all(isinstance(item, str) and item in SUPPORTED_TYPES for item in types)
     ):
         raise ValueError(f"{path}: type must use the supported JSON Schema subset")
 
@@ -108,7 +110,9 @@ class DocumentExtractor:
             raise ValueError("extraction instruction is required")
         payload = _extraction_payload(json.loads(parse_result.json))
         raw = self.gateway.propose_schema(instruction, payload)
-        schema_json = raw.get("schema_json") if isinstance(raw, dict) else raw.schema_text
+        schema_json = (
+            raw.get("schema_json") if isinstance(raw, dict) else raw.schema_text
+        )
         try:
             schema = json.loads(schema_json)
         except (TypeError, json.JSONDecodeError) as exc:
@@ -130,7 +134,7 @@ class DocumentExtractor:
         draft = self.gateway.extract_document(
             parse_payload,
             schema,
-            use_terra=False,
+            repair=False,
             issues=None,
         )
         issues, evidence = _validate_and_resolve(draft, schema, parse_payload)
@@ -138,7 +142,7 @@ class DocumentExtractor:
             draft = self.gateway.extract_document(
                 parse_payload,
                 schema,
-                use_terra=True,
+                repair=True,
                 issues=issues,
             )
             issues, evidence = _validate_and_resolve(draft, schema, parse_payload)
@@ -191,6 +195,7 @@ def _usage(gateway: object) -> RunUsage:
 
 def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
     payload = deepcopy(parse_payload)
+    active_block_ids: set[str] = set()
     metadata = payload.get("metadata")
     if isinstance(metadata, dict):
         metadata.pop("warnings", None)
@@ -199,15 +204,21 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
         page["blocks"] = [
             block
             for block in page.get("blocks", [])
-            if block.get("rendered") is not False
-            and block.get("status") != "rejected"
+            if block.get("rendered") is not False and block.get("status") != "rejected"
         ]
         for block in page["blocks"]:
+            active_block_ids.add(block["id"])
             block.pop("correction_lineage", None)
             block.pop("reason", None)
             block.pop("verification_reason", None)
         page.pop("specialist_audit", None)
         page.pop("warnings", None)
+    if isinstance(payload.get("elements"), list):
+        payload["elements"] = [
+            element
+            for element in payload["elements"]
+            if element.get("id") in active_block_ids
+        ]
     return payload
 
 
@@ -230,10 +241,7 @@ def _validate_and_resolve(
     atoms: dict[str, tuple[str, dict]] = {}
     for page in parse_payload.get("document", {}).get("pages", []):
         for block in page.get("blocks", []):
-            if (
-                block.get("rendered") is False
-                or block.get("status") == "rejected"
-            ):
+            if block.get("rendered") is False or block.get("status") == "rejected":
                 continue
             blocks[block["id"]] = block
             for atom in block.get("atoms", []):
@@ -242,9 +250,10 @@ def _validate_and_resolve(
     resolved: dict[str, list[dict]] = {}
     markdown = parse_payload.get("markdown", "")
     for item in draft.get("evidence", []):
-        pointer = item.get("pointer")
-        if not isinstance(pointer, str) or not _pointer_exists(data, pointer):
-            issues.append(f"invalid evidence pointer {pointer!r}")
+        raw_pointer = item.get("pointer")
+        pointer = _canonical_evidence_pointer(data, raw_pointer)
+        if pointer is None:
+            issues.append(f"invalid evidence pointer {raw_pointer!r}")
             continue
         citations: list[dict] = []
         atom_ids = item.get("atom_ids", [])
@@ -295,6 +304,18 @@ def _validate_and_resolve(
     return issues, resolved
 
 
+def _canonical_evidence_pointer(data: Any, pointer: Any) -> str | None:
+    if not isinstance(pointer, str):
+        return None
+    if _pointer_exists(data, pointer):
+        return pointer
+    if pointer.startswith("/data/"):
+        relative = pointer.removeprefix("/data")
+        if _pointer_exists(data, relative):
+            return relative
+    return None
+
+
 def _pointer_value(value: Any, pointer: str) -> Any:
     current = value
     for part in _pointer_parts(pointer):
@@ -323,7 +344,9 @@ def _citations_contain_value(
         ):
             cited_text.append(markdown[start:end])
     if isinstance(value, bool):
-        return any(_evidence_contains_boolean(evidence, value) for evidence in cited_text)
+        return any(
+            _evidence_contains_boolean(evidence, value) for evidence in cited_text
+        )
     if isinstance(value, (int, float)):
         try:
             expected_number = Decimal(str(value))
@@ -352,8 +375,7 @@ def _citations_contain_value(
     return bool(
         expected
         and any(
-            expected
-            in " ".join(evidence.split()).replace(r"\|", "|").casefold()
+            expected in " ".join(evidence.split()).replace(r"\|", "|").casefold()
             for evidence in cited_text
         )
     )
@@ -363,7 +385,11 @@ def _strip_markdown_emphasis(value: str) -> str:
     value = value.strip()
     while True:
         for marker in ("**", "__", "*", "_"):
-            if value.startswith(marker) and value.endswith(marker) and len(value) > 2 * len(marker):
+            if (
+                value.startswith(marker)
+                and value.endswith(marker)
+                and len(value) > 2 * len(marker)
+            ):
                 value = value[len(marker) : -len(marker)].strip()
                 break
         else:
@@ -372,7 +398,9 @@ def _strip_markdown_emphasis(value: str) -> str:
 
 def _boolean_token(value: str) -> tuple[str, str] | None:
     normalized = _strip_markdown_emphasis(value)
-    match = re.fullmatch(r"(?P<value>yes|no)(?P<punct>[.!?,;:]?)", normalized, re.IGNORECASE)
+    match = re.fullmatch(
+        r"(?P<value>yes|no)(?P<punct>[.!?,;:]?)", normalized, re.IGNORECASE
+    )
     if match is None:
         return None
     return match.group("value").casefold(), match.group("punct")
@@ -403,8 +431,7 @@ def _markdown_table_cells(line: str) -> list[str] | None:
 
 def _separator_row(cells: list[str] | None) -> bool:
     return bool(cells) and all(
-        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) is not None
-        for cell in cells
+        re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) is not None for cell in cells
     )
 
 
@@ -440,7 +467,9 @@ def _evidence_contains_boolean(evidence: str, value: bool) -> bool:
     for line in lines:
         if _markdown_table_cells(line) is not None:
             continue
-        label, separator, candidate = line.partition(":")
+        label, separator, candidate = (
+            line.replace("**", "").replace("__", "").partition(":")
+        )
         if separator and label.strip():
             token = _boolean_token(candidate)
             if token is not None and token[0] == expected:
@@ -463,7 +492,9 @@ def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None
         "object": lambda item: isinstance(item, dict),
         "array": lambda item: isinstance(item, list),
         "string": lambda item: isinstance(item, str),
-        "number": lambda item: isinstance(item, (int, float)) and not isinstance(item, bool),
+        "number": lambda item: (
+            isinstance(item, (int, float)) and not isinstance(item, bool)
+        ),
         "integer": lambda item: isinstance(item, int) and not isinstance(item, bool),
         "boolean": lambda item: isinstance(item, bool),
     }[kind](value)
@@ -499,7 +530,9 @@ def _pointer_parts(pointer: str) -> list[str]:
         return []
     if not pointer.startswith("/"):
         raise ValueError("JSON Pointer must start with /")
-    return [part.replace("~1", "/").replace("~0", "~") for part in pointer[1:].split("/")]
+    return [
+        part.replace("~1", "/").replace("~0", "~") for part in pointer[1:].split("/")
+    ]
 
 
 def _pointer_exists(value: Any, pointer: str) -> bool:

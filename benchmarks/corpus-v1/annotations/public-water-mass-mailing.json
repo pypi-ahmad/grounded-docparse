@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.1",
+  "document_id": "public-water-mass-mailing",
+  "reference_text": null,
+  "reference_basis": "source_verified",
+  "reference_pages": {},
+  "anchors": [
+    {
+      "id": "p4-01",
+      "text": "Order #: 984"
+    },
+    {
+      "id": "p4-02",
+      "text": "REPORT TO:"
+    },
+    {
+      "id": "p4-03",
+      "text": "65"
+    },
+    {
+      "id": "p4-04",
+      "text": "ADRIAN"
+    },
+    {
+      "id": "p4-05",
+      "text": "BILL TO:"
+    },
+    {
+      "id": "p4-06",
+      "text": "PUBLIC DRINKING WATER BACTERIAL ANALYSIS"
+    },
+    {
+      "id": "p4-07",
+      "text": "Collected Time"
+    },
+    {
+      "id": "p4-08",
+      "text": "24 hour format hh:mm"
+    },
+    {
+      "id": "p4-09",
+      "text": "Sample Collection Point Id"
+    },
+    {
+      "id": "p4-10",
+      "text": "Evidence of Tampering"
+    },
+    {
+      "id": "p4-11",
+      "text": "Evidence of Cooling"
+    },
+    {
+      "id": "p5-01",
+      "text": "SAMPLE COLLECTION INSTRUCTIONS"
+    },
+    {
+      "id": "p5-02",
+      "text": "BETWEEN THE TWO LINES"
+    },
+    {
+      "id": "p5-03",
+      "text": "100 mL"
+    },
+    {
+      "id": "p5-04",
+      "text": "120 mL"
+    },
+    {
+      "id": "p5-05",
+      "text": "DO NOT WRITE ON THE BOTTLE"
+    },
+    {
+      "id": "p6-01",
+      "text": "Bacteriological Sample Collection Procedures"
+    },
+    {
+      "id": "p6-02",
+      "text": "Open the cold water tap"
+    },
+    {
+      "id": "p6-03",
+      "text": "For single samples"
+    },
+    {
+      "id": "p6-04",
+      "text": "standard letter fold"
+    },
+    {
+      "id": "p6-05",
+      "text": "Do not use shredded paper"
+    }
+  ],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}
