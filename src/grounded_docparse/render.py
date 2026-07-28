@@ -15,28 +15,30 @@ from .models import (
     AgentTraceEvent,
     Block,
     Document,
+    Element,
     NodeType,
     PageQuality,
+    ParseMetadata,
     RuntimeDiagnostics,
     RunUsage,
     VerificationState,
 )
-from .quality import WORD_PATTERN, incomplete_table
+from .quality import WORD_PATTERN, incomplete_table, semantic_text
 
 ANNOTATION_COLORS = {
-    VerificationState.VERIFIED: (0.0, 0.55, 0.2),
-    VerificationState.NEEDS_REVIEW: (1.0, 0.55, 0.0),
-    VerificationState.REJECTED: (0.85, 0.1, 0.1),
-    VerificationState.NOT_CHECKED: (0.1, 0.35, 0.85),
+    "text": (0.376, 0.647, 0.98),
+    "heading": (0.114, 0.306, 0.847),
+    "table": (0.086, 0.639, 0.29),
+    "figure": (0.976, 0.451, 0.086),
+    "formula": (0.576, 0.2, 0.918),
+    "seal": (0.863, 0.149, 0.149),
 }
 
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
 
 
 def _checkbox_marker(block: Block) -> str:
-    return {"checked": "[x]", "unchecked": "[ ]"}.get(
-        str(block.checkbox_state), "[?]"
-    )
+    return {"checked": "[x]", "unchecked": "[ ]"}.get(str(block.checkbox_state), "[?]")
 
 
 def _has_equivalent_leading_marker(text: str, marker: str) -> bool:
@@ -109,13 +111,9 @@ def _form_structure_lines(block: Block) -> Counter[str]:
         combined[_line_key(f"{label}: {block.form.hint}")] += 1
     if block.form.value and block.form.hint:
         combined[
-            _line_key(
-                f"{block.form.label} {block.form.value} ({block.form.hint})"
-            )
+            _line_key(f"{block.form.label} {block.form.value} ({block.form.hint})")
         ] += 1
-        combined[
-            _line_key(f"{label}: {block.form.value} ({block.form.hint})")
-        ] += 1
+        combined[_line_key(f"{label}: {block.form.value} ({block.form.hint})")] += 1
     return individual | combined
 
 
@@ -140,7 +138,10 @@ def _table(block: Block) -> str:
     lines: list[str] = []
     for row_index in sorted(rows):
         cells = sorted(rows[row_index], key=lambda item: item.column)
-        values = [cell.text.replace("\r", " ").replace("\n", " ").replace("|", r"\|") for cell in cells]
+        values = [
+            cell.text.replace("\r", " ").replace("\n", " ").replace("|", r"\|")
+            for cell in cells
+        ]
         lines.append("| " + " | ".join(values) + " |")
         if row_index == min(rows):
             lines.append("| " + " | ".join("---" for _ in cells) + " |")
@@ -263,7 +264,9 @@ def _body(block: Block) -> str:
         return f"{_checkbox_marker(block)} {_checkbox_text(block)}"
     if block.type is NodeType.LIST_ITEM:
         marker = block.list_marker or "-"
-        return text if _has_equivalent_leading_marker(text, marker) else f"{marker} {text}"
+        return (
+            text if _has_equivalent_leading_marker(text, marker) else f"{marker} {text}"
+        )
     if block.type is NodeType.FORM_FIELD and block.form is not None:
         label = block.form.label.rstrip().removesuffix(":")
         value = block.form.value
@@ -316,7 +319,9 @@ class _MarkdownBuilder:
 
     def append_checkbox_group(self, group: str, members: list[Block]) -> None:
         prefix = f"**{group}:** "
-        options = [f"{_checkbox_marker(item)} {_checkbox_text(item)}" for item in members]
+        options = [
+            f"{_checkbox_marker(item)} {_checkbox_text(item)}" for item in members
+        ]
         start = self.length
         self.append_raw(prefix + " ".join(options))
         group_span = (start + len("**"), start + len("**") + len(group))
@@ -393,6 +398,8 @@ def render_markdown(document: Document) -> str:
 
 def render_json(document: Document) -> str:
     payload = document.model_dump(mode="json")
+    for page in payload["pages"]:
+        page.pop("analysis", None)
 
     def strip_confidence_evidence(block: dict) -> None:
         for atom in block["atoms"]:
@@ -415,6 +422,31 @@ def render_json(document: Document) -> str:
 class RenderedAgenticDocument:
     markdown: str
     json: str
+
+
+def build_elements(document: Document) -> list[Element]:
+    """Flatten the canonical document into the public engine-neutral contract."""
+
+    elements: list[Element] = []
+    for page in document.pages:
+        for order, block in enumerate(_walk_blocks(page.blocks), start=1):
+            bbox = (
+                (block.bbox.x0, block.bbox.y0, block.bbox.x1, block.bbox.y1)
+                if block.bbox is not None
+                else None
+            )
+            elements.append(
+                Element(
+                    id=block.id,
+                    type=block.type.value,
+                    page=page.number,
+                    bbox=bbox,
+                    text=semantic_text(block),
+                    reading_order=order,
+                    confidence=block.confidence,
+                )
+            )
+    return elements
 
 
 def _semantic_fragments(block: Block) -> list[str]:
@@ -552,9 +584,7 @@ def _incomplete_structure(block: Block) -> bool:
     if block.type is NodeType.FORM_FIELD:
         return block.form is None or not block.form.label.strip()
     if block.type is NodeType.CHECKBOX:
-        return block.checkbox_state is None or not (
-            block.checkbox_option or block.text
-        )
+        return block.checkbox_state is None or not (block.checkbox_option or block.text)
     if block.type in {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}:
         return not _semantic_fragments(block)
     if block.type is NodeType.LIST:
@@ -675,8 +705,10 @@ def render_agentic_document(
     trace: list[AgentTraceEvent] | None = None,
     runtime_diagnostics: RuntimeDiagnostics | None = None,
     duration_ms: int = 0,
+    elements: list[Element] | None = None,
+    parse_metadata: ParseMetadata | None = None,
 ) -> RenderedAgenticDocument:
-    """Render canonical Markdown together with its grounded v2 envelope."""
+    """Render canonical Markdown together with its grounded v4 envelope."""
 
     markdown, emissions = _render_with_emissions(document)
     pages: list[dict] = []
@@ -784,14 +816,23 @@ def render_agentic_document(
                 "specialist_audit": page.specialist_audit.model_dump(mode="json"),
                 "warnings": page.warnings,
                 "quality": computed_quality.model_dump(mode="json"),
+                "analysis": page.analysis.model_dump(mode="json")
+                if page.analysis
+                else None,
             }
         )
 
     run_usage = usage or RunUsage()
+    public_elements = elements if elements is not None else build_elements(document)
+    metadata = parse_metadata or ParseMetadata(
+        pages=len(document.pages),
+        processing_time=duration_ms / 1000,
+    )
     payload = {
-        "schema_version": "2.1.0",
+        "schema_version": "4.0.0",
         "markdown": markdown,
         "metadata": {
+            **metadata.model_dump(mode="json"),
             "source_name": document.source_name,
             "source_sha256": document.source_sha256,
             "page_count": len(document.pages),
@@ -807,6 +848,7 @@ def render_agentic_document(
             ),
             "warnings": document.warnings,
         },
+        "elements": [element.model_dump(mode="json") for element in public_elements],
         "document": {"id": "document", "pages": pages},
     }
     return RenderedAgenticDocument(
@@ -854,8 +896,12 @@ def _atom_values(block: Block) -> list[tuple[str, str, object, str, object | Non
     if block.type is NodeType.CHECKBOX:
         values = []
         if block.checkbox_group:
-            values.append(("checkbox_group", block.checkbox_group, block.bbox, "literal", None))
-        values.append(("checkbox_marker", _checkbox_marker(block), block.bbox, "literal", None))
+            values.append(
+                ("checkbox_group", block.checkbox_group, block.bbox, "literal", None)
+            )
+        values.append(
+            ("checkbox_marker", _checkbox_marker(block), block.bbox, "literal", None)
+        )
         option = _checkbox_text(block)
         if option:
             values.append(("checkbox_option", option, block.bbox, "literal", None))
@@ -876,7 +922,7 @@ def _emitted_confidence_spans(
     evidence: object | None,
     owner_text: str,
     emitted_text: str,
-) -> list[dict[str, int]]:
+) -> list[dict[str, object]]:
     if evidence is None or not evidence.low_confidence_spans:
         return []
     source_text = evidence.text
@@ -898,13 +944,28 @@ def _emitted_confidence_spans(
         prefix_length = len(emitted_text) - len(escaped_owner)
     else:
         return []
-    return [
-        {
-            "start": prefix_length + len(render(normalize(source_text[: span.start]))),
-            "end": prefix_length + len(render(normalize(source_text[: span.end]))),
+    emitted: list[dict[str, object]] = []
+    for span in evidence.low_confidence_spans:
+        start = prefix_length + len(render(normalize(source_text[: span.start])))
+        end = prefix_length + len(render(normalize(source_text[: span.end])))
+        item: dict[str, object] = {
+            "start": start,
+            "end": end,
+            "text": emitted_text[start:end],
+            "confidence": (
+                span.confidence
+                if span.confidence is not None
+                else evidence.confidence
+                if evidence.confidence is not None
+                else 0.5
+            ),
+            "source": span.source or "unknown",
         }
-        for span in evidence.low_confidence_spans
-    ]
+        bbox = span.bbox or evidence.bbox
+        if bbox is not None:
+            item["bbox"] = bbox.model_dump(mode="json")
+        emitted.append(item)
+    return emitted
 
 
 def _visual_agentic_atoms(
@@ -1014,10 +1075,34 @@ def _agentic_atoms(
 
 
 def _semantic_payload(block: Block) -> dict:
+    table = block.table.model_dump(mode="json") if block.table is not None else None
+    if table is not None and block.table is not None:
+        for cell, payload in zip(block.table.cells, table["cells"], strict=True):
+            payload["low_confidence_spans"] = [
+                {
+                    "start": span.start,
+                    "end": span.end,
+                    "text": cell.text[span.start : span.end],
+                    "confidence": (
+                        span.confidence
+                        if span.confidence is not None
+                        else cell.confidence
+                        if cell.confidence is not None
+                        else block.confidence
+                    ),
+                    "source": span.source or "unknown",
+                    "bbox": (
+                        (span.bbox or cell.bbox).model_dump(mode="json")
+                        if span.bbox is not None or cell.bbox is not None
+                        else None
+                    ),
+                }
+                for span in cell.low_confidence_spans
+            ]
     return {
         "heading_level": block.heading_level,
         "list_marker": block.list_marker,
-        "table": block.table.model_dump(mode="json") if block.table is not None else None,
+        "table": table,
         "form": block.form.model_dump(mode="json") if block.form is not None else None,
         "checkbox_state": block.checkbox_state.value if block.checkbox_state else None,
         "checkbox_group": block.checkbox_group,
@@ -1049,39 +1134,108 @@ def _walk_blocks(blocks: list[Block]) -> Iterator[Block]:
         yield from _walk_blocks(block.children)
 
 
-def render_annotated_pdf(data: bytes, filename: str, document: Document) -> bytes:
+def _annotation_group(element_type: str) -> str:
+    if element_type in {"heading", "title"}:
+        return "heading"
+    if element_type in {"table", "form_field", "checkbox"}:
+        return "table"
+    if element_type in {"figure", "image", "chart"}:
+        return "figure"
+    if element_type == "formula":
+        return "formula"
+    if element_type in {"seal", "signature"}:
+        return "seal"
+    return "text"
+
+
+def _annotation_label(element: Element, show_reading_order: bool) -> str:
+    group = _annotation_group(element.type)
+    names = {
+        "heading": "Title",
+        "table": "Form" if element.type in {"form_field", "checkbox"} else "Table",
+        "figure": "Figure",
+        "formula": "Formula",
+        "seal": "Seal" if element.type == "seal" else "Signature",
+        "text": "Text",
+    }
+    if show_reading_order:
+        return (
+            str(element.reading_order)
+            if group in {"text", "heading"}
+            else f"{names[group]} {element.reading_order}"
+        )
+    return names[group]
+
+
+def render_annotated_pdf(
+    data: bytes,
+    filename: str,
+    content: Document | list[Element],
+    *,
+    page_count: int | None = None,
+    show_reading_order: bool = True,
+    selected_element_id: str | None = None,
+) -> bytes:
     source = _as_pdf(data, filename)
+    if isinstance(content, Document):
+        elements = build_elements(content)
+        expected_pages = len(content.pages)
+    else:
+        elements = content
+        expected_pages = page_count
     with pymupdf.open(stream=source, filetype="pdf") as output:
-        if output.page_count != len(document.pages):
+        if expected_pages is not None and output.page_count != expected_pages:
             raise ValueError("source and extracted document page counts do not match")
-        for index, page_record in enumerate(document.pages):
-            page = output[index]
-            for block in _walk_blocks(page_record.blocks):
-                if block.bbox is None:
-                    continue
-                rect = pymupdf.Rect(
-                    block.bbox.x0 * page.rect.width,
-                    block.bbox.y0 * page.rect.height,
-                    block.bbox.x1 * page.rect.width,
-                    block.bbox.y1 * page.rect.height,
-                )
-                color = ANNOTATION_COLORS[block.verification]
-                page.draw_rect(rect, color=color, width=1, overlay=True)
-                label = (
-                    f"{block.id} {block.type.value} "
-                    f"{block.confidence:.0%} {block.verification.value}"
-                )[:80]
-                label_width = pymupdf.get_text_length(
-                    label, fontname="helv", fontsize=6
-                )
-                x = min(max(2.0, rect.x0), max(2.0, page.rect.width - label_width - 2))
-                y = rect.y0 - 2 if rect.y0 >= 9 else min(page.rect.height - 2, rect.y0 + 8)
-                page.insert_text(
-                    pymupdf.Point(x, y),
-                    label,
-                    fontname="helv",
-                    fontsize=6,
-                    color=color,
+        for element in elements:
+            if element.bbox is None or not 1 <= element.page <= output.page_count:
+                continue
+            page = output[element.page - 1]
+            x0, y0, x1, y1 = element.bbox
+            rect = pymupdf.Rect(
+                x0 * page.rect.width,
+                y0 * page.rect.height,
+                x1 * page.rect.width,
+                y1 * page.rect.height,
+            )
+            color = ANNOTATION_COLORS[_annotation_group(element.type)]
+            page.draw_rect(rect, color=color, width=1.25, overlay=True)
+            if element.id == selected_element_id:
+                halo = pymupdf.Rect(rect)
+                halo.x0 = max(0, halo.x0 - 2)
+                halo.y0 = max(0, halo.y0 - 2)
+                halo.x1 = min(page.rect.width, halo.x1 + 2)
+                halo.y1 = min(page.rect.height, halo.y1 + 2)
+                page.draw_rect(
+                    halo,
+                    color=(0.98, 0.76, 0.08),
+                    width=3,
                     overlay=True,
                 )
+
+            label = _annotation_label(element, show_reading_order)
+            font_size = 6
+            padding = 1.5
+            label_width = pymupdf.get_text_length(
+                label, fontname="helv", fontsize=font_size
+            )
+            box_width = label_width + padding * 2
+            box_height = font_size + padding * 2
+            x = min(max(1.0, rect.x0), max(1.0, page.rect.width - box_width - 1))
+            y0_label = rect.y0 - box_height if rect.y0 >= box_height + 1 else rect.y0
+            label_rect = pymupdf.Rect(x, y0_label, x + box_width, y0_label + box_height)
+            page.draw_rect(
+                label_rect,
+                color=color,
+                fill=color,
+                width=0.5,
+                overlay=True,
+            )
+            page.insert_text(
+                pymupdf.Point(x + padding, y0_label + font_size + padding / 2),
+                label,
+                fontname="helv",
+                fontsize=font_size,
+                color=(1, 1, 1),
+                overlay=True,
+            )
         return output.tobytes(garbage=3, deflate=True)

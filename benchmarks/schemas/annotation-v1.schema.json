@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "annotation-v1.schema.json",
+  "title": "Grounded DocParse evaluation annotation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_id"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "document_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference_text": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "anchors": {
+      "type": "array"
+    },
+    "tables": {
+      "type": "array"
+    },
+    "grounding_regions": {
+      "type": "object"
+    },
+    "schema_output": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "continuity_pairs": {
+      "type": "array"
+    },
+    "forbidden_literals": {
+      "type": "array"
+    },
+    "rejected_block_ids": {
+      "type": "array"
+    }
+  }
+}

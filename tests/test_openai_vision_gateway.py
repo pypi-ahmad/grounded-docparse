@@ -19,6 +19,11 @@ from grounded_docparse.models import (
     PagePlan,
     RegionDraft,
     SchemaProposalWire,
+    SpanRepairAction,
+    SpanRepairDecision,
+    SpanRepairInspection,
+    SpanRepairRequest,
+    SpanRepairTarget,
 )
 
 
@@ -78,7 +83,9 @@ def _page(path: Path) -> PageEvidence:
     )
 
 
-def test_luna_draft_uses_deterministic_structured_vision_request(tmp_path: Path) -> None:
+def test_luna_draft_uses_deterministic_structured_vision_request(
+    tmp_path: Path,
+) -> None:
     parsed = PageDraft(
         regions=[RegionDraft(type="paragraph", reading_order=0, text="Visible")]
     )
@@ -156,10 +163,7 @@ def test_incomplete_draft_reports_provider_context_before_schema_validation(
 
     with pytest.raises(
         RuntimeError,
-        match=(
-            "page_draft.*page 1.*gpt-5.6-luna.*max_output_tokens"
-            ".*req-incomplete"
-        ),
+        match=("page_draft.*page 1.*gpt-5.6-luna.*max_output_tokens.*req-incomplete"),
     ):
         gateway.draft_page(_page(tmp_path / "page.png"))
     assert getattr(gateway, "input_tokens", None) == 7
@@ -176,10 +180,7 @@ def test_page_draft_schema_has_no_free_form_model_output() -> None:
     assert "table_cells" in region["properties"]
     assert "atoms" in region["properties"]
     assert region["additionalProperties"] is False
-    assert all(
-        value is not True
-        for value in _additional_properties_values(schema)
-    )
+    assert all(value is not True for value in _additional_properties_values(schema))
 
 
 def _additional_properties_values(value):
@@ -215,40 +216,14 @@ def test_luna_inspection_returns_fail_closed_decisions(tmp_path: Path) -> None:
         ]
     )
 
-    inspection = gateway.inspect_page(
-        _page(tmp_path / "page.png"),
-        draft,
-        region_ids=["region-0", "region-1"],
-        target_region_ids=["region-1"],
-    )
-
-    call = responses.calls[0]
-    assert inspection.decisions[0].action is InspectionAction.REJECT
-    assert call["model"] == "gpt-5.6-luna"
-    assert "temperature" not in call
-    assert call["reasoning"] == {"effort": "medium"}
-    assert call["text_format"] is PageInspection
-    prompt = call["input"][0]["content"]
-    assert "complete corrected region" in prompt
-    assert "type, text, bounding box, reading order" in prompt
-    assert "generic synonyms" in prompt
-    assert "Do not accept a figure" in prompt
-    assert "nearby heading or label that identifies its subject" in prompt
-    assert "omitted visible region" in prompt
-    assert "ordered_region_ids" in prompt
-    assert "calibrated confidence from 0 to 1" in prompt
-    schema = to_strict_json_schema(PageInspection)
-    assert schema["$defs"]["InspectionDecision"]["properties"]["confidence"] == {
-        "default": 0.5,
-        "maximum": 1,
-        "minimum": 0,
-        "title": "Confidence",
-        "type": "number",
-    }
-    manifest = call["input"][1]["content"][0]["text"]
-    assert '"region_id": "region-0"' in manifest
-    assert '"target_region_ids": ["region-1"]' in manifest
-    _assert_no_prompt_cache(call)
+    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
+        gateway.inspect_page(
+            _page(tmp_path / "page.png"),
+            draft,
+            region_ids=["region-0", "region-1"],
+            target_region_ids=["region-1"],
+        )
+    assert responses.calls == []
 
 
 def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> None:
@@ -287,7 +262,9 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     inspection = gateway.inspect_crops(crops)
 
     call = responses.calls[0]
-    images = [item for item in call["input"][1]["content"] if item["type"] == "input_image"]
+    images = [
+        item for item in call["input"][1]["content"] if item["type"] == "input_image"
+    ]
     assert len(inspection.decisions) == 2
     assert len(images) == 2
     assert all(image["detail"] == "original" for image in images)
@@ -315,7 +292,7 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     _assert_no_prompt_cache(call)
 
 
-def test_quality_crop_inspection_uses_terra_and_records_page_targets(
+def test_quality_crop_inspection_uses_luna_and_records_page_targets(
     tmp_path: Path,
 ) -> None:
     responses = RecordingResponses(PageInspection())
@@ -340,7 +317,7 @@ def test_quality_crop_inspection_uses_terra_and_records_page_targets(
 
     call = responses.calls[0]
     prompt = call["input"][0]["content"]
-    assert call["model"] == "gpt-5.6-terra"
+    assert call["model"] == "gpt-5.6-luna"
     assert "Never invent" in prompt
     assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
     assert (
@@ -382,7 +359,7 @@ def test_manager_uses_luna_medium_and_returns_subagent_plan(tmp_path: Path) -> N
     assert gateway.usage.calls[0].agent == "document_manager"
 
 
-def test_inspection_escalates_to_terra_only_when_requested(tmp_path: Path) -> None:
+def test_full_page_inspection_remains_disabled(tmp_path: Path) -> None:
     responses = RecordingResponses(PageInspection())
     gateway = OpenAIDocumentGateway(
         ParserConfig(), client=SimpleNamespace(responses=responses)
@@ -391,19 +368,14 @@ def test_inspection_escalates_to_terra_only_when_requested(tmp_path: Path) -> No
         regions=[RegionDraft(type="table", reading_order=0, text="A | B")]
     )
 
-    gateway.inspect_page(
-        _page(tmp_path / "page.png"),
-        draft,
-        region_ids=["p1-b1"],
-        target_region_ids=["p1-b1"],
-        agent_role=AgentRole.TABLE_FORM,
-        use_terra=True,
-    )
-
-    call = responses.calls[0]
-    assert call["model"] == "gpt-5.6-terra"
-    assert call["reasoning"] == {"effort": "medium"}
-    assert gateway.usage.calls[0].agent == AgentRole.TABLE_FORM.value
+    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
+        gateway.inspect_page(
+            _page(tmp_path / "page.png"),
+            draft,
+            region_ids=["p1-b1"],
+            target_region_ids=["p1-b1"],
+            agent_role=AgentRole.TABLE_FORM,
+        )
 
 
 def test_addition_arbitration_request_includes_every_competing_proposal(
@@ -439,26 +411,15 @@ def test_addition_arbitration_request_includes_every_competing_proposal(
         }
     ]
 
-    gateway.inspect_page(
-        _page(tmp_path / "page.png"),
-        draft,
-        region_ids=["p1-b1"],
-        target_region_ids=["layout-addition"],
-        agent_role=AgentRole.EVIDENCE_CRITIC,
-        use_terra=True,
-        addition_conflicts=conflicts,
-    )
-
-    call = responses.calls[0]
-    request = json.loads(call["input"][1]["content"][0]["text"])
-    assert request["regions"][0]["region_id"] == "p1-b1"
-    assert request["competing_additional_regions"] == conflicts
-    assert [
-        proposal["region_id"]
-        for proposal in request["competing_additional_regions"][0]["proposals"]
-    ] == ["layout-addition", "table-addition"]
-    assert "choose exactly one supplied proposal" in call["input"][0]["content"]
-    assert "Do not invent" in call["input"][0]["content"]
+    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
+        gateway.inspect_page(
+            _page(tmp_path / "page.png"),
+            draft,
+            region_ids=["p1-b1"],
+            target_region_ids=["layout-addition"],
+            agent_role=AgentRole.EVIDENCE_CRITIC,
+            addition_conflicts=conflicts,
+        )
 
 
 def test_schema_architect_uses_luna_medium() -> None:
@@ -468,9 +429,7 @@ def test_schema_architect_uses_luna_medium() -> None:
         "required": ["name"],
         "additionalProperties": False,
     }
-    responses = RecordingResponses(
-        SchemaProposalWire(schema_text=json.dumps(schema))
-    )
+    responses = RecordingResponses(SchemaProposalWire(schema_text=json.dumps(schema)))
     gateway = OpenAIDocumentGateway(
         ParserConfig(), client=SimpleNamespace(responses=responses)
     )
@@ -487,7 +446,7 @@ def test_schema_architect_uses_luna_medium() -> None:
     assert gateway.usage.calls[0].agent == "schema_architect"
 
 
-def test_dynamic_extractor_uses_user_schema_and_optional_terra() -> None:
+def test_dynamic_extractor_uses_user_schema_and_luna_repair() -> None:
     schema = {
         "type": "object",
         "properties": {"name": {"type": ["string", "null"]}},
@@ -496,9 +455,7 @@ def test_dynamic_extractor_uses_user_schema_and_optional_terra() -> None:
     }
     payload = {
         "data": {"name": "Ada"},
-        "evidence": [
-            {"pointer": "/name", "block_ids": ["p1-b1"], "atom_ids": []}
-        ],
+        "evidence": [{"pointer": "/name", "block_ids": ["p1-b1"], "atom_ids": []}],
     }
     responses = RecordingCreateResponses(payload)
     gateway = OpenAIDocumentGateway(
@@ -508,15 +465,110 @@ def test_dynamic_extractor_uses_user_schema_and_optional_terra() -> None:
     result = gateway.extract_document(
         {"markdown": "Name: Ada", "document": {"pages": []}},
         schema,
-        use_terra=True,
+        repair=True,
         issues=["/name: missing evidence"],
     )
 
     call = responses.calls[0]
     assert result == payload
-    assert call["model"] == "gpt-5.6-terra"
+    assert call["model"] == "gpt-5.6-luna"
     assert call["reasoning"] == {"effort": "medium"}
     assert call["text"]["format"]["schema"]["properties"]["data"] == schema
     assert call["text"]["format"]["strict"] is True
     assert call["store"] is False
     assert gateway.usage.calls[0].agent == "extraction_critic"
+
+
+def test_targeted_span_repair_sends_only_literal_context_and_crop(
+    tmp_path: Path,
+) -> None:
+    crop = tmp_path / "span.png"
+    crop.write_bytes(b"crop")
+    target = SpanRepairTarget(
+        target_id="p1-b1:atom:0:0",
+        region_id="p1-b1",
+        owner_kind="atom",
+        owner_index=0,
+        start=5,
+        end=6,
+        text="l",
+        context_before="Acct ",
+        context_after="23",
+        confidence=0.4,
+        source="gpt-5.6-luna",
+        bbox={"x0": 0.1, "y0": 0.1, "x1": 0.2, "y1": 0.2},
+        evidence_ref="page:1:p1-b1:atom:0:0",
+    )
+    parsed = SpanRepairInspection(
+        decisions=[
+            SpanRepairDecision(
+                target_id=target.target_id,
+                action=SpanRepairAction.REPLACE,
+                replacement_text="1",
+                confidence=0.99,
+                evidence_ref=target.evidence_ref,
+            )
+        ]
+    )
+    responses = RecordingResponses(parsed)
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    result = gateway.repair_spans(
+        [SpanRepairRequest(crop_path=str(crop), target=target)],
+        page_number=1,
+    )
+
+    call = responses.calls[0]
+    manifest = json.loads(call["input"][1]["content"][0]["text"])
+    assert result.decisions[0].replacement_text == "1"
+    assert call["model"] == "gpt-5.6-luna"
+    assert call["text_format"] is SpanRepairInspection
+    assert manifest[0]["text"] == "l"
+    assert manifest[0]["context_before"] == "Acct "
+    assert "candidate_region" not in manifest[0]
+    assert len(call["input"][1]["content"]) == 2
+
+
+def test_targeted_span_repair_labels_optional_context_crop(tmp_path: Path) -> None:
+    crop = tmp_path / "span.png"
+    context = tmp_path / "span-context.png"
+    crop.write_bytes(b"crop")
+    context.write_bytes(b"context")
+    target = SpanRepairTarget(
+        target_id="p1-b1:atom:0:0",
+        region_id="p1-b1",
+        owner_kind="atom",
+        owner_index=0,
+        start=5,
+        end=6,
+        text="l",
+        context_before="Acct ",
+        context_after="23",
+        confidence=0.4,
+        source="gpt-5.6-luna",
+        bbox={"x0": 0.1, "y0": 0.1, "x1": 0.2, "y1": 0.2},
+        evidence_ref="page:1:p1-b1:atom:0:0",
+    )
+    responses = RecordingResponses(SpanRepairInspection())
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    gateway.repair_spans(
+        [
+            SpanRepairRequest(
+                crop_path=str(crop),
+                context_crop_path=str(context),
+                target=target,
+            )
+        ],
+        page_number=1,
+    )
+
+    content = responses.calls[0]["input"][1]["content"]
+    manifest = json.loads(content[0]["text"])
+    assert manifest[0]["image_index"] == 0
+    assert manifest[0]["context_image_index"] == 1
+    assert len(content) == 3

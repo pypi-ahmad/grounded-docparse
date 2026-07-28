@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, TypeVar
 
 from openai import OpenAI, OpenAIError
+from PIL import Image
 from pydantic import BaseModel, ValidationError
 
 from .config import ParserConfig
@@ -23,7 +24,10 @@ from .models import (
     PagePlan,
     RunUsage,
     SchemaProposalWire,
+    SpanRepairInspection,
+    SpanRepairRequest,
 )
+from .raster_regions import RasterRegion
 from .runtime import BudgetExceeded, ProviderRuntime
 
 T = TypeVar("T", bound=BaseModel)
@@ -48,6 +52,13 @@ class OpenAIDocumentGateway:
 
     def bind_runtime(self, runtime: ProviderRuntime) -> None:
         self.runtime = runtime
+
+    def _provider_responses(self) -> Any:
+        remaining = self.runtime.remaining_seconds()
+        with_options = getattr(self.client, "with_options", None)
+        if remaining is None or not callable(with_options):
+            return self.client.responses
+        return with_options(timeout=remaining).responses
 
     def _provider_request(
         self,
@@ -105,7 +116,11 @@ class OpenAIDocumentGateway:
             call = AgentUsage(agent=agent, model=model)
             self.usage.calls.append(call)
             return call
-        get = usage.get if isinstance(usage, dict) else lambda name, default: getattr(usage, name, default)
+        get = (
+            usage.get
+            if isinstance(usage, dict)
+            else lambda name, default: getattr(usage, name, default)
+        )
         input_tokens = get("input_tokens", 0)
         output_tokens = get("output_tokens", 0)
         if isinstance(input_tokens, int) and input_tokens >= 0:
@@ -115,8 +130,12 @@ class OpenAIDocumentGateway:
         call = AgentUsage(
             agent=agent,
             model=model,
-            input_tokens=input_tokens if isinstance(input_tokens, int) and input_tokens >= 0 else 0,
-            output_tokens=output_tokens if isinstance(output_tokens, int) and output_tokens >= 0 else 0,
+            input_tokens=input_tokens
+            if isinstance(input_tokens, int) and input_tokens >= 0
+            else 0,
+            output_tokens=output_tokens
+            if isinstance(output_tokens, int) and output_tokens >= 0
+            else 0,
         )
         self.usage.calls.append(call)
         return call
@@ -139,6 +158,11 @@ class OpenAIDocumentGateway:
         stage: str,
         page_number: int | None = None,
         target_ids: list[str] | None = None,
+        image_paths: list[Path] | None = None,
+        image_scope: str = "none",
+        source_page_path: Path | None = None,
+        source_page_pixels: int = 0,
+        repair_round: int | None = None,
         **kwargs: Any,
     ) -> T:
         started = time.perf_counter()
@@ -148,6 +172,7 @@ class OpenAIDocumentGateway:
         response: Any = None
         call_usage: AgentUsage | None = None
         if raw_api is None:
+
             def finalize_response(result: Any) -> None:
                 nonlocal call_usage
                 call_usage = self._record_runtime_usage(
@@ -157,7 +182,10 @@ class OpenAIDocumentGateway:
                 )
 
             response = self._provider_request(
-                lambda: responses.parse(text_format=expected, **kwargs),
+                lambda: self._provider_responses().parse(
+                    text_format=expected,
+                    **kwargs,
+                ),
                 agent=agent,
                 stage=stage,
                 model=model,
@@ -167,6 +195,7 @@ class OpenAIDocumentGateway:
                 on_success=finalize_response,
             )
         else:
+
             def finalize_raw(raw: Any) -> None:
                 nonlocal response, call_usage
                 try:
@@ -203,7 +232,10 @@ class OpenAIDocumentGateway:
                 )
 
             self._provider_request(
-                lambda: raw_api.parse(text_format=expected, **kwargs),
+                lambda: self._provider_responses().with_raw_response.parse(
+                    text_format=expected,
+                    **kwargs,
+                ),
                 agent=agent,
                 stage=stage,
                 model=model,
@@ -214,6 +246,20 @@ class OpenAIDocumentGateway:
             )
         if call_usage is None:
             raise AssertionError("provider usage finalizer did not run")
+        paths = image_paths or []
+        image_pixels = 0
+        for path in paths:
+            try:
+                with Image.open(path) as image:
+                    image_pixels += image.width * image.height
+            except (FileNotFoundError, OSError):
+                continue
+        if source_page_path is not None:
+            try:
+                with Image.open(source_page_path) as image:
+                    source_page_pixels = image.width * image.height
+            except (FileNotFoundError, OSError):
+                pass
         self.trace.append(
             AgentTraceEvent(
                 agent=agent,
@@ -225,6 +271,11 @@ class OpenAIDocumentGateway:
                 duration_ms=round((time.perf_counter() - started) * 1000),
                 input_tokens=call_usage.input_tokens,
                 output_tokens=call_usage.output_tokens,
+                image_scope=image_scope,
+                image_count=len(paths),
+                image_pixels=image_pixels,
+                source_page_pixels=source_page_pixels,
+                repair_round=repair_round,
             )
         )
         parsed = getattr(response, "output_parsed", None)
@@ -245,6 +296,9 @@ class OpenAIDocumentGateway:
             agent="draft_parser",
             stage="page_draft",
             page_number=page.number,
+            image_paths=[page.image_path],
+            image_scope="full_page",
+            source_page_path=page.image_path,
             model=self.config.luna_model,
             reasoning={"effort": "medium"},
             store=False,
@@ -259,6 +313,10 @@ class OpenAIDocumentGateway:
                         "literal visible text without summarizing or omitting content. Join visual line wraps "
                         "Populate atoms with one normalized bounding box per visible text line, table cell, "
                         "or visual region so every literal can be grounded below the block level. "
+                        "For an atom or table cell with uncertain glyphs, emit low_confidence_spans using "
+                        "exact Unicode-codepoint start/end offsets and the uncertain substring, calibrated "
+                        "confidence, and optional normalized bounding box. Do not emit a span for text that "
+                        "is merely important or visually clear. "
                         "inside prose, but preserve wording, punctuation, identifiers, and real hyphens. "
                         "Do not correct spelling or infer obscured text. Emit one region per visible form field; "
                         "never combine a form section into one field. Populate form.label and form.value "
@@ -278,10 +336,58 @@ class OpenAIDocumentGateway:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "input_text", "text": page.digital_text[:200_000] or "No embedded text."},
-                        {"type": "input_image", "image_url": self._image(page.image_path), "detail": "original"},
+                        {
+                            "type": "input_image",
+                            "image_url": self._image(page.image_path),
+                            "detail": "original",
+                        },
                     ],
                 },
+            ],
+            max_output_tokens=self.config.luna_max_output_tokens,
+        )
+
+    def draft_crops(self, page: PageEvidence, crops: list[RasterRegion]) -> PageDraft:
+        manifest = [
+            {"image_index": index, "page_bbox": crop.bbox}
+            for index, crop in enumerate(crops)
+        ]
+        content: list[dict[str, Any]] = [
+            {"type": "input_text", "text": json.dumps(manifest)}
+        ]
+        content.extend(
+            {
+                "type": "input_image",
+                "image_url": self._image(crop.path),
+                "detail": "original",
+            }
+            for crop in crops
+        )
+        return self._request(
+            PageDraft,
+            agent="draft_parser",
+            stage="page_draft",
+            page_number=page.number,
+            image_paths=[crop.path for crop in crops],
+            image_scope="crop_batch",
+            source_page_path=page.image_path,
+            model=self.config.luna_model,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Extract every visible element from these ordered crops. The supplied "
+                        "page_bbox values locate each crop on one source page. Return one complete "
+                        "page manifest in semantic reading order. Use normalized full-page coordinates, "
+                        "not crop-local coordinates. Preserve literal text, punctuation, identifiers, "
+                        "lists, forms, checkbox states, tables and cells, figures, captions, and visual "
+                        "labels. Populate line/cell atoms and low_confidence_spans for genuinely uncertain "
+                        "glyphs. Do not infer obscured content or duplicate overlap content."
+                    ),
+                },
+                {"role": "user", "content": content},
             ],
             max_output_tokens=self.config.luna_max_output_tokens,
         )
@@ -294,85 +400,26 @@ class OpenAIDocumentGateway:
         region_ids: list[str],
         target_region_ids: list[str] | None = None,
         agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
-        use_terra: bool = False,
         addition_conflicts: list[dict[str, Any]] | None = None,
     ) -> PageInspection:
-        if len(region_ids) != len(draft.regions):
-            raise ValueError("region IDs must match the complete page manifest")
-        targets = target_region_ids or region_ids
-        regions = [
-            {"region_id": region_ids[index], **region.model_dump(mode="json")}
-            for index, region in enumerate(draft.regions)
-        ]
-        request_payload: dict[str, Any] = {
-            "regions": regions,
-            "target_region_ids": targets,
-        }
-        if addition_conflicts is not None:
-            request_payload["competing_additional_regions"] = addition_conflicts
-        addition_arbitration_instruction = (
-            " Competing additional-region proposals are supplied by cluster. For each "
-            "cluster_id, choose exactly one supplied proposal that is literally supported "
-            "by the source, return it in additional_regions using cluster_id as region_id, "
-            "and preserve its complete region payload. Do not invent, merge, or correct a "
-            "proposal."
-            if addition_conflicts
-            else ""
+        del (
+            page,
+            draft,
+            region_ids,
+            target_region_ids,
+            agent_role,
+            addition_conflicts,
         )
-        return self._request(
-            PageInspection,
-            agent=agent_role.value,
-            stage="page_inspection",
-            page_number=page.number,
-            target_ids=targets,
-            model=self.config.terra_model if use_terra else self.config.luna_model,
-            reasoning={"effort": "medium"},
-            store=False,
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Compare every proposed block with the source image. Accept literal matches, "
-                        f"Act as the {agent_role.value}. "
-                        "reject unsupported content, or request a crop when genuinely ambiguous. When "
-                        "anything is wrong, return a complete corrected region including type, text, "
-                        "bounding box, reading order, marker, form or checkbox structure, table cells, "
-                        "and visual description as applicable. Correct visual descriptions that replace exact "
-                        "visible terminology with generic synonyms. Do not accept a figure description that "
-                        "omits an annotated label, functional feature, or the nearby heading or label that "
-                        "identifies its subject; correct it or request a crop. "
-                        "Distinguish entered form values from printed hints and placeholders. Corrections must "
-                        "be literally visible. Inspect the complete manifest for any omitted visible region and "
-                        "return each omission in additional_regions with a temporary unique region ID and a "
-                        "precise normalized bounding box. Return ordered_region_ids as a complete permutation "
-                        "of all supplied and added region IDs in semantic reading order; place each visual beside "
-                        "its related instruction rather than at the page end. Return decisions only for the "
-                        "target_region_ids. Preserve every supplied region ID."
-                        " Include a calibrated confidence from 0 to 1 and concise reason for every "
-                        "decision."
-                        + addition_arbitration_instruction
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "input_text",
-                            "text": json.dumps(request_payload, ensure_ascii=False),
-                        },
-                        {"type": "input_image", "image_url": self._image(page.image_path), "detail": "original"},
-                    ],
-                },
-            ],
-            max_output_tokens=self.config.terra_max_output_tokens,
-        )
+        raise RuntimeError("full-page inspection is disabled; use inspect_crops")
 
     def inspect_crops(
         self,
         crops: list[CropInspectionRequest],
         *,
-        use_terra: bool = False,
         page_number: int | None = None,
+        agent_role: AgentRole = AgentRole.VISUAL,
+        stage: str = "crop_batch_inspection",
+        repair_round: int | None = None,
     ) -> PageInspection:
         manifest = [
             {
@@ -396,18 +443,23 @@ class OpenAIDocumentGateway:
         )
         return self._request(
             PageInspection,
-            agent=AgentRole.VISUAL.value,
-            stage="crop_batch_inspection",
+            agent=agent_role.value,
+            stage=stage,
             page_number=page_number,
             target_ids=[crop.region_id for crop in crops],
-            model=self.config.terra_model if use_terra else self.config.luna_model,
+            image_paths=[Path(crop.crop_path) for crop in crops],
+            image_scope="crop_batch",
+            source_page_pixels=crops[0].source_page_pixels if crops else 0,
+            repair_round=repair_round,
+            model=self.config.luna_model,
             reasoning={"effort": "medium"},
             store=False,
             input=[
                 {
                     "role": "system",
                     "content": (
-                        "Verify each candidate against its corresponding source crop. Accept, "
+                        f"Act as the {agent_role.value}. Verify each candidate against its "
+                        "corresponding source crop. Accept, "
                         "visibly correct by returning a complete corrected region, or reject each one. "
                         "Read ambiguous glyphs in emails, URLs, identifiers, and placeholders exactly. "
                         "For critical literals—phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, "
@@ -436,7 +488,7 @@ class OpenAIDocumentGateway:
                     "content": content,
                 },
             ],
-            max_output_tokens=min(16_000, self.config.terra_max_output_tokens),
+            max_output_tokens=min(16_000, self.config.luna_max_output_tokens),
         )
 
     def inspect_quality_crops(
@@ -471,7 +523,10 @@ class OpenAIDocumentGateway:
             stage="quality_crop_inspection",
             page_number=page_number,
             target_ids=[crop.region_id for crop in crops],
-            model=self.config.terra_model,
+            image_paths=[Path(crop.crop_path) for crop in crops],
+            image_scope="crop_batch",
+            source_page_pixels=crops[0].source_page_pixels if crops else 0,
+            model=self.config.luna_model,
             reasoning={"effort": "medium"},
             store=False,
             input=[
@@ -495,7 +550,67 @@ class OpenAIDocumentGateway:
                 },
                 {"role": "user", "content": content},
             ],
-            max_output_tokens=min(16_000, self.config.terra_max_output_tokens),
+            max_output_tokens=min(16_000, self.config.luna_max_output_tokens),
+        )
+
+    def repair_spans(
+        self,
+        requests: list[SpanRepairRequest],
+        *,
+        page_number: int,
+    ) -> SpanRepairInspection:
+        manifest: list[dict[str, object]] = []
+        image_paths: list[Path] = []
+        for request in requests:
+            image_index = len(image_paths)
+            image_paths.append(Path(request.crop_path))
+            item: dict[str, object] = {
+                **request.target.model_dump(mode="json"),
+                "image_index": image_index,
+            }
+            if request.context_crop_path is not None:
+                item["context_image_index"] = len(image_paths)
+                image_paths.append(Path(request.context_crop_path))
+            manifest.append(item)
+        content: list[dict[str, str]] = [
+            {"type": "input_text", "text": json.dumps(manifest, ensure_ascii=False)}
+        ]
+        content.extend(
+            {
+                "type": "input_image",
+                "image_url": self._image(path),
+                "detail": "original",
+            }
+            for path in image_paths
+        )
+        return self._request(
+            SpanRepairInspection,
+            agent=AgentRole.EVIDENCE_CRITIC.value,
+            stage="targeted_span_repair",
+            page_number=page_number,
+            target_ids=[request.target.target_id for request in requests],
+            image_paths=image_paths,
+            image_scope="crop_batch",
+            source_page_pixels=requests[0].source_page_pixels if requests else 0,
+            model=self.config.luna_model,
+            reasoning={"effort": "medium"},
+            store=False,
+            input=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Resolve only each supplied uncertain literal against its matching crop. "
+                        "When context_image_index is present, use that second image only to locate "
+                        "and disambiguate the literal; the tight crop remains the repair target. "
+                        "Confirm it when exact, replace only that literal when the crop is conclusive, "
+                        "or return unresolved. Never rewrite context, adjacent text, layout, structure, "
+                        "or any text outside start:end. Preserve target_id and evidence_ref. Do not "
+                        "infer obscured glyphs."
+                    ),
+                },
+                {"role": "user", "content": content},
+            ],
+            max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
         )
 
     def plan_page(
@@ -508,12 +623,18 @@ class OpenAIDocumentGateway:
         repair_round: int,
         prior_inspections: list[dict[str, Any]] | None = None,
     ) -> PagePlan:
-        if repair_round not in {1, 2}:
-            raise ValueError("repair_round must be 1 or 2")
+        if repair_round != 1:
+            raise ValueError("repair_round must be 1")
         if len(region_ids) != len(draft.regions):
             raise ValueError("region IDs must match the complete page manifest")
         manifest = [
-            {"region_id": region_ids[index], **region.model_dump(mode="json")}
+            {
+                "region_id": region_ids[index],
+                "type": region.type,
+                "bbox": region.bbox,
+                "reading_order": region.reading_order,
+                "confidence": region.confidence,
+            }
             for index, region in enumerate(draft.regions)
         ]
         return self._request(
@@ -532,8 +653,7 @@ class OpenAIDocumentGateway:
                         "must inspect the target regions: layout_text_specialist, "
                         "table_form_specialist, visual_specialist, or evidence_critic. "
                         "Delegate only work needed to establish literal fidelity, complete coverage, "
-                        "reading order, and grounding. Use Terra only when a Luna review could not "
-                        "resolve complex or critical evidence. Return at most two delegations. "
+                        "reading order, and grounding. Return at most one delegation. "
                         "Set finish when the page can be finalized after these delegations."
                     ),
                 },
@@ -598,7 +718,7 @@ class OpenAIDocumentGateway:
         parse_payload: dict[str, Any],
         schema: dict[str, Any],
         *,
-        use_terra: bool,
+        repair: bool = False,
         issues: list[str] | None = None,
     ) -> dict[str, Any]:
         evidence_item = {
@@ -620,8 +740,8 @@ class OpenAIDocumentGateway:
             "required": ["data", "evidence"],
             "additionalProperties": False,
         }
-        agent = "extraction_critic" if use_terra else "extractor"
-        model = self.config.terra_model if use_terra else self.config.luna_model
+        agent = "extraction_critic" if repair else "extractor"
+        model = self.config.luna_model
         started = time.perf_counter()
         call_usage: AgentUsage | None = None
 
@@ -634,7 +754,7 @@ class OpenAIDocumentGateway:
             )
 
         response = self._provider_request(
-            lambda: self.client.responses.create(
+            lambda: self._provider_responses().create(
                 model=model,
                 reasoning={"effort": "medium"},
                 store=False,
@@ -667,9 +787,7 @@ class OpenAIDocumentGateway:
                         "schema": envelope,
                     }
                 },
-                max_output_tokens=self.config.terra_max_output_tokens
-                if use_terra
-                else self.config.luna_max_output_tokens,
+                max_output_tokens=self.config.luna_max_output_tokens,
             ),
             agent=agent,
             stage="extract_document",
@@ -700,7 +818,9 @@ class OpenAIDocumentGateway:
         try:
             payload = json.loads(output_text)
         except json.JSONDecodeError as exc:
-            raise RuntimeError("extract_document: OpenAI returned invalid JSON") from exc
+            raise RuntimeError(
+                "extract_document: OpenAI returned invalid JSON"
+            ) from exc
         if not isinstance(payload, dict):
             raise RuntimeError(  # noqa: TRY004 - malformed provider response
                 "extract_document: OpenAI returned a non-object result"

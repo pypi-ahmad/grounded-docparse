@@ -66,7 +66,20 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     payload = json.loads(rendered.json)
 
     assert rendered.markdown == "Alpha line\nBeta line\n"
-    assert payload["schema_version"] == "2.1.0"
+    assert payload["schema_version"] == "4.0.0"
+    assert payload["metadata"]["engine"] == "glm-ocr"
+    assert payload["metadata"]["pages"] == 1
+    assert payload["elements"] == [
+        {
+            "id": "p1-b1",
+            "type": "paragraph",
+            "page": 1,
+            "bbox": [0.1, 0.2, 0.9, 0.4],
+            "text": "Alpha line Beta line",
+            "reading_order": 1,
+            "confidence": 0.97,
+        }
+    ]
     assert payload["metadata"]["range_units"] == "unicode_codepoints"
     assert payload["metadata"]["usage"]["input_tokens"] == 120
     assert payload["metadata"]["usage"]["output_tokens"] == 30
@@ -81,7 +94,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
         assert rendered.markdown[atom_start:atom_end] == atom["text"]
         assert atom["source"]["bbox"]["unit"] == "normalized"
 
-    assert json.loads(render_json(document))["schema_version"] == "1.3.0"
+    assert json.loads(render_json(document))["schema_version"] == "2.0.0"
 
 
 def test_extraction_schema_requires_nullable_closed_objects() -> None:
@@ -662,7 +675,15 @@ def test_visual_atom_span_uses_its_labeled_emission() -> None:
 
     assert transcription["text"] == "Transcription: Needle"
     assert transcription["confidence"] == 0.61
-    assert transcription["low_confidence_spans"] == [{"start": 15, "end": 21}]
+    assert transcription["low_confidence_spans"] == [
+        {
+            "start": 15,
+            "end": 21,
+            "text": "Needle",
+            "confidence": 0.61,
+            "source": "unknown",
+        }
+    ]
     confidence_span = transcription["low_confidence_spans"][0]
     assert transcription["text"][confidence_span["start"] : confidence_span["end"]] == "Needle"
     assert rendered.markdown[span["start"] : span["end"]] == "Transcription: Needle"

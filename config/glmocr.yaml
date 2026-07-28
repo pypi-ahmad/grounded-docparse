@@ -1,0 +1,25 @@
+pipeline:
+  maas:
+    enabled: false
+  ocr_api:
+    api_host: localhost
+    api_port: 8080
+    api_mode: openai
+    model: glm-ocr
+    request_timeout: 120
+    retry_times: 3
+    connection_pool_size: 128
+    max_workers: 32
+  page_loader:
+    max_tokens: 8192
+  page_queue:
+    maxsize: 100
+  region_queue:
+    maxsize: 2000
+  layout:
+    model_dir: PaddlePaddle/PP-DocLayoutV3_safetensors
+    threshold: 0.3
+    batch_size: 1
+    workers: 1
+    device: cuda:0
+    use_polygon: true

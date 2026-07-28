@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.1",
+  "document_id": "synthetic-medical-fax",
+  "reference_text": "SYNTHETIC MEDICAL FAX - NO PHI FAX DATE: 2026-07-24 PAGES: 1 DOCUMENT TYPE: Referral test fixture Priority: Routine Requested service: Imaging review Clinical note: Synthetic text created for OCR evaluation. Medication list: None supplied Signature: [synthetic mark]",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

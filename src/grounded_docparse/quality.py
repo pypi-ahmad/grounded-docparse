@@ -2,11 +2,19 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from dataclasses import dataclass
 from difflib import SequenceMatcher
 from itertools import pairwise
 
-from .ingest import PageEvidence, TextBlock
-from .models import Block, BoundingBox, NodeType, RegionDraft, VerificationState
+from .ingest import PageEvidence
+from .models import (
+    Block,
+    BoundingBox,
+    ConfidenceSpan,
+    NodeType,
+    RegionDraft,
+    VerificationState,
+)
 
 SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
@@ -41,6 +49,15 @@ CRITICAL_PATTERNS = (
 DEGRADED_MARKERS = ("ambiguous", "degraded", "handwritten", "illegible", "obscured")
 COMPLEX_TYPES = {NodeType.TABLE, NodeType.FORM_FIELD, NodeType.CHECKBOX}
 VISUAL_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
+
+
+@dataclass(frozen=True, slots=True)
+class LiteralRepairCandidate:
+    owner_kind: str
+    owner_index: int
+    span_index: int
+    span: ConfidenceSpan
+    reason: str
 
 
 def _tokens(value: str) -> list[str]:
@@ -86,20 +103,65 @@ def semantic_text(block: Block) -> str:
     return " ".join(" ".join(value.split()) for value in values if value)
 
 
-def _source_candidate(source: TextBlock, reading_order: int) -> RegionDraft:
-    text = " ".join(source.text.split())
-    marker_match = LIST_PREFIX_PATTERN.match(text)
-    node_type = NodeType.LIST_ITEM if marker_match else NodeType.PARAGRAPH
-    marker = marker_match.group("marker") if marker_match else None
-    body = marker_match.group("body") if marker_match else text
-    return RegionDraft(
-        type=node_type,
-        bbox=source.bbox.model_dump(exclude={"unit"}),
-        reading_order=reading_order,
-        text=body,
-        confidence=0.99,
-        list_marker=marker,
+def _spatial_recovery_blocks(candidate: Block, existing: list[Block]) -> list[Block]:
+    related: list[Block] = []
+
+    def visit(block: Block) -> None:
+        if (
+            block.verification is not VerificationState.REJECTED
+            and _intersection(candidate.bbox, block.bbox) > 0
+        ):
+            related.append(block)
+        for child in sorted(block.children, key=lambda item: item.reading_order):
+            visit(child)
+
+    for block in sorted(existing, key=lambda item: item.reading_order):
+        visit(block)
+    return related
+
+
+def recovery_content_is_redundant(candidate: Block, existing: list[Block]) -> bool:
+    """Return whether a recovery repeats spatially related active content in order."""
+
+    candidate_tokens = _recovery_tokens(semantic_text(candidate))
+    if not candidate_tokens or candidate.bbox is None:
+        return False
+    existing_tokens = [
+        token
+        for block in _spatial_recovery_blocks(candidate, existing)
+        for token in _recovery_tokens(semantic_text(block))
+    ]
+    return _ordered_subsequence(candidate_tokens, existing_tokens)
+
+
+def recovery_content_conflicts(candidate: Block, existing: list[Block]) -> bool:
+    """Detect a scan probe that repeats known content with conflicting literals."""
+
+    if candidate.bbox is None:
+        return False
+    related = _spatial_recovery_blocks(candidate, existing)
+    candidate_text = semantic_text(candidate)
+    existing_text = " ".join(semantic_text(block) for block in related)
+    if not (_critical_values(candidate_text) - _critical_values(existing_text)):
+        return False
+    candidate_tokens = _recovery_tokens(candidate_text)
+    return any(
+        _ordered_subsequence(_recovery_tokens(semantic_text(block)), candidate_tokens)
+        for block in related
+        if semantic_text(block).strip()
     )
+
+
+def _recovery_tokens(value: str) -> list[str]:
+    joined = re.sub(r"(?<=\w)-\s+(?=\w)", "-", value)
+    return _tokens(joined)
+
+
+def _ordered_subsequence(candidate: list[str], reference: list[str]) -> bool:
+    if not candidate:
+        return False
+    iterator = iter(reference)
+    return all(token in iterator for token in candidate)
 
 
 def _scan_candidate(bbox: BoundingBox, reading_order: int) -> RegionDraft:
@@ -225,19 +287,8 @@ def find_missing_source_regions(
     *,
     threshold: float = SOURCE_COVERAGE_THRESHOLD,
 ) -> list[RegionDraft]:
-    missing = _scan_probes(page, blocks) if page.scanned else []
-    for source in page.text_blocks:
-        if len(_tokens(source.text)) < 3:
-            continue
-        related_text = " ".join(
-            semantic_text(block)
-            for block in blocks
-            if block.verification is not VerificationState.REJECTED
-            and _spatially_related(source.bbox, block.bbox)
-        )
-        if _coverage(related_text, source.text) < threshold:
-            missing.append(_source_candidate(source, len(blocks) + len(missing)))
-    return missing
+    del threshold
+    return _scan_probes(page, blocks)
 
 
 def _critical_values(value: str) -> set[str]:
@@ -248,12 +299,70 @@ def _critical_values(value: str) -> set[str]:
     }
 
 
-def _related_source_text(page: PageEvidence, block: Block) -> str:
-    return " ".join(
-        source.text
-        for source in page.text_blocks
-        if _spatially_related(source.bbox, block.bbox)
-    )
+def _critical_matches(value: str) -> list[re.Match[str]]:
+    matches = [match for pattern in CRITICAL_PATTERNS for match in pattern.finditer(value)]
+    return sorted(matches, key=lambda item: (item.start(), item.end()))
+
+
+def literal_repair_candidates(
+    page: PageEvidence,
+    block: Block,
+    *,
+    threshold: float = REPAIR_CONFIDENCE_THRESHOLD,
+) -> list[LiteralRepairCandidate]:
+    """Return exact, independently repairable literals without inventing ranges."""
+
+    owners: list[tuple[str, int, str, float | None, BoundingBox | None, list[ConfidenceSpan]]] = [
+        (
+            "atom",
+            index,
+            atom.text,
+            atom.confidence,
+            atom.bbox or block.bbox,
+            atom.low_confidence_spans,
+        )
+        for index, atom in enumerate(block.atoms)
+    ]
+    if block.table is not None:
+        owners.extend(
+            (
+                "table_cell",
+                index,
+                cell.text,
+                cell.confidence,
+                cell.bbox or block.bbox,
+                cell.low_confidence_spans,
+            )
+            for index, cell in enumerate(block.table.cells)
+        )
+
+    candidates: list[LiteralRepairCandidate] = []
+    for owner_kind, owner_index, text, owner_confidence, bbox, spans in owners:
+        occupied: list[tuple[int, int]] = []
+        for span_index, span in enumerate(spans):
+            confidence = span.confidence if span.confidence is not None else owner_confidence
+            confidence = block.confidence if confidence is None else confidence
+            if confidence is None:
+                continue
+            if confidence >= threshold:
+                continue
+            candidates.append(
+                LiteralRepairCandidate(
+                    owner_kind=owner_kind,
+                    owner_index=owner_index,
+                    span_index=span_index,
+                    span=span,
+                    reason="low confidence",
+                )
+            )
+            occupied.append((span.start, span.end))
+
+    return candidates
+
+
+def requires_region_repair(page: PageEvidence, block: Block, warnings: list[str]) -> bool:
+    risks = _structured_repair_risks(page, block, warnings)
+    return bool(risks.intersection({"rejected", "structure", "geometry", "degraded"}))
 
 
 def _structured_repair_risks(
@@ -264,23 +373,17 @@ def _structured_repair_risks(
     if block.type not in COMPLEX_TYPES:
         return set()
     candidate_text = semantic_text(block)
-    source_text = _related_source_text(page, block)
     risks: set[str] = set()
     if block.verification is VerificationState.REJECTED:
         risks.add("rejected")
     if _incomplete_structured_content(block):
         risks.add("structure")
-    if block.confidence < REPAIR_CONFIDENCE_THRESHOLD:
+    if block.confidence is not None and block.confidence < REPAIR_CONFIDENCE_THRESHOLD:
         risks.add("confidence")
     if _clipped(block.bbox):
         risks.add("geometry")
     if _critical_values(candidate_text):
         risks.add("critical_literal")
-    if source_text.strip() and (
-        _coverage(candidate_text, source_text) < SOURCE_COVERAGE_THRESHOLD
-        or _coverage(source_text, candidate_text) < SOURCE_COVERAGE_THRESHOLD
-    ):
-        risks.add("source_disagreement")
     if any(
         marker in warning.casefold()
         for marker in DEGRADED_MARKERS
@@ -303,19 +406,14 @@ def select_repair_blocks(
         if block.verification is VerificationState.REJECTED and not structured:
             continue
         values = _critical_values(semantic_text(block))
-        source_text = _related_source_text(page, block)
-        source_values = _critical_values(source_text)
-        literal_mismatch = bool(source_values and not values.issubset(source_values))
         structured_risks = _structured_repair_risks(page, block, warnings)
         unresolved_literal = (
             block.verification is VerificationState.NEEDS_REVIEW and bool(values)
         )
-        if not (literal_mismatch or structured_risks or unresolved_literal):
+        if not (structured_risks or unresolved_literal):
             continue
         priority = (
-            0
-            if literal_mismatch or "source_disagreement" in structured_risks
-            else 1
+            1
             if structured_risks
             else 2
         )
@@ -406,6 +504,28 @@ def normalize_page_blocks(blocks: list[Block]) -> tuple[list[Block], list[str]]:
             warnings.append(f"removed duplicate block {existing.id}")
         else:
             warnings.append(f"removed duplicate block {block.id}")
+    for candidate in list(kept):
+        if candidate.type is not NodeType.PARAGRAPH or candidate.bbox is None:
+            continue
+        related = [
+            block
+            for block in kept
+            if block is not candidate
+            and semantic_text(block).strip()
+            and _area(candidate.bbox) > _area(block.bbox)
+            and _intersection(candidate.bbox, block.bbox) > 0
+        ]
+        if len(related) < 2:
+            continue
+        if recovery_content_is_redundant(candidate, related):
+            kept.remove(candidate)
+            warnings.append(f"removed redundant aggregate block {candidate.id}")
+        elif recovery_content_conflicts(candidate, related):
+            candidate.verification = VerificationState.REJECTED
+            candidate.verification_reason = (
+                "Aggregate content conflicts with grounded page evidence"
+            )
+            warnings.append(f"rejected conflicting aggregate block {candidate.id}")
     kept.sort(key=lambda block: block.reading_order)
     for previous, current in pairwise(kept):
         if previous.type is not NodeType.HEADING or not current.text:
