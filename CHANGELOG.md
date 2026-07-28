@@ -1,30 +1,34 @@
 # Changelog
 
-## Unreleased
-
-- Reduced the product to one synchronous Streamlit page: upload, extract, inspect Markdown/JSON, and download.
-- Replaced persisted jobs, review/evaluation workflows, annotated artifacts, and the CLI with a direct Luna-draft/Terra-verification pipeline.
-- Removed SQLite, local artifact/cache code, the custom Streamlit component, and their dependencies.
-- Enforced fail-closed visual grounding for invalid or missing bounding boxes.
-- Left legacy `.docparse/` data untouched and ignored.
-- Raised default page batch size and page concurrency from 20/10 to 100/50.
-- Made Markdown/agentic JSON rendering lossless and span-exact, with full-history page quality and non-extractable rejected/correction audits.
-
 All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-28
+
+### Added
+
+- Full self-hosted GLM-OCR pipeline with PP-DocLayout-V3, parallel region OCR, WSL2/vLLM launch scripts, and a Windows launcher.
+- Unified engine-neutral parse results with normalized elements, runtime metadata, and structured JSON v4.
+- Document Parse Studio with page-range parsing, live stages, thumbnails, rendered Markdown, annotated PDF viewing, and a selectable layout tree.
+- Semantic PDF annotation colors, one-based reading-order labels, and selected-region highlighting.
+- Reproducible evaluation corpus, schemas, benchmark reports, rate cards, and source-grounded quality metrics.
+
 ### Changed
 
-- Replaced the multi-service deployment with one local Streamlit process, SQLite WAL metadata, and filesystem artifacts.
-- Removed Docker, Compose, FastAPI, Celery, Redis, PostgreSQL, MinIO/S3, PaddleOCR-VL, GLM-OCR, and Ollama integration.
-- Rebuilt the UI around persistent Workspace, Runs, Review, Export, and Evaluation workflows.
-- Made the Luna/Terra grounded vision pipeline the only extraction path.
-- Raised Luna and Terra output budgets to their documented 128,000-token limit and added provider-stage diagnostics for incomplete structured responses.
-- Allow a fresh submission after an identical prior run failed while retaining idempotency for active and successful runs.
-- Removed explicit OpenAI prompt-cache fields for compatibility with configured API endpoints.
+- Made GLM-OCR the primary local recognition engine and `gpt-5.6-luna` the only remote verification model.
+- Reduced deployment to a synchronous local Streamlit application backed by the high-performance WSL2 stack.
+- Added shared provider budgets, bounded retries, concurrent page processing, and detailed runtime diagnostics.
+- Made Markdown and structured JSON lossless and span-exact while retaining legacy backend compatibility.
+
+### Fixed
+
+- Rebased confidence spans after text normalization and preserved source evidence for low-confidence atoms and table cells.
+- Prevented rejected content from entering extraction prompts through v4 flat elements or audit metadata.
+- Corrected GLM-OCR normalized bounding-box conversion for strict Pydantic validation.
+- Hardened arbitration, recovery, visual enrichment, and incomplete-structure handling.
 
 ## [0.2.0] - 2026-07-26
 

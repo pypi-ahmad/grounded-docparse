@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.1",
+  "document_id": "lists",
+  "reference_text": "Synthetic Checklist 1. Open the public fixture 2. Review the sample 3. Record the result",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

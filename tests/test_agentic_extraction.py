@@ -81,13 +81,13 @@ class ExtractionGateway:
         )
         return {"schema_json": json.dumps(SCHEMA)}
 
-    def extract_document(self, _parse_payload, schema, *, use_terra, issues=None):
-        self.extract_calls.append((use_terra, issues))
+    def extract_document(self, _parse_payload, schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
         assert schema == SCHEMA
         self.usage.calls.append(
             AgentUsage(
-                agent="extractor" if not use_terra else "extraction_critic",
-                model="gpt-5.6-terra" if use_terra else "gpt-5.6-luna",
+                agent="extraction_critic" if repair else "extractor",
+                model="gpt-5.6-luna",
                 input_tokens=20,
                 output_tokens=8,
             )
@@ -136,10 +136,39 @@ def test_extract_returns_schema_data_with_resolved_evidence() -> None:
     assert json.loads(result.json)["data"] == result.data
 
 
+class EnvelopePointerGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
+        assert schema == SCHEMA
+        return {
+            "data": {"invoice_number": "INV-7"},
+            "evidence": [
+                {
+                    "pointer": "/data/invoice_number",
+                    "block_ids": ["p1-b1"],
+                    "atom_ids": ["p1-b1-a1"],
+                }
+            ],
+        }
+
+
+def test_extract_accepts_envelope_rooted_evidence_pointer() -> None:
+    gateway = EnvelopePointerGateway()
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        _parse_result(), SCHEMA
+    )
+
+    assert result.data == {"invoice_number": "INV-7"}
+    assert list(result.evidence) == ["/invoice_number"]
+    assert result.warnings == []
+    assert gateway.extract_calls == [(False, None)]
+
+
 class RepairingExtractionGateway(ExtractionGateway):
-    def extract_document(self, parse_payload, schema, *, use_terra, issues=None):
-        if not use_terra:
-            self.extract_calls.append((use_terra, issues))
+    def extract_document(self, parse_payload, schema, *, repair=False, issues=None):
+        if not repair:
+            self.extract_calls.append((repair, issues))
             return {
                 "data": {"invoice_number": "INV-7"},
                 "evidence": [],
@@ -148,25 +177,25 @@ class RepairingExtractionGateway(ExtractionGateway):
         return super().extract_document(
             parse_payload,
             schema,
-            use_terra=use_terra,
+            repair=repair,
             issues=issues,
         )
 
 
-def test_missing_evidence_gets_one_terra_repair() -> None:
+def test_missing_evidence_gets_one_luna_repair() -> None:
     gateway = RepairingExtractionGateway()
     extractor = DocumentExtractor(gateway_factory=lambda _config: gateway)
 
     result = extractor.extract(_parse_result(), SCHEMA)
 
     assert result.data["invoice_number"] == "INV-7"
-    assert [use_terra for use_terra, _issues in gateway.extract_calls] == [False, True]
+    assert [repair for repair, _issues in gateway.extract_calls] == [False, True]
     assert result.warnings == []
 
 
 class RejectedEvidenceGateway(ExtractionGateway):
-    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
-        self.extract_calls.append((use_terra, issues))
+    def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
         return {
             "data": {"invoice_number": "UNSUPPORTED-9"},
             "evidence": [
@@ -220,7 +249,7 @@ def test_rejected_audit_block_cannot_be_used_as_extraction_evidence() -> None:
     assert result.data == {"invoice_number": None}
     assert result.evidence == {}
     assert any("unknown block rejected" in warning for warning in result.warnings)
-    assert [use_terra for use_terra, _issues in gateway.extract_calls] == [False, True]
+    assert [repair for repair, _issues in gateway.extract_calls] == [False, True]
 
 
 class LaunderingEvidenceGateway(ExtractionGateway):
@@ -228,9 +257,9 @@ class LaunderingEvidenceGateway(ExtractionGateway):
         super().__init__()
         self.payloads = []
 
-    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
+    def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
         self.payloads.append(_parse_payload)
-        self.extract_calls.append((use_terra, issues))
+        self.extract_calls.append((repair, issues))
         return {
             "data": {"invoice_number": "REJECTED-ONLY-9"},
             "evidence": [
@@ -284,9 +313,7 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
     accepted = next(
         block for block in canonical_page["blocks"] if block["id"] == "accepted"
     )
-    accepted["correction_lineage"] = [
-        {"reason": "Replaced rejected REJECTED-ONLY-9"}
-    ]
+    accepted["correction_lineage"] = [{"reason": "Replaced rejected REJECTED-ONLY-9"}]
     parse_result = ParseResult(
         document=document,
         markdown=rendered.markdown,
@@ -304,8 +331,7 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
 
     assert "REJECTED-ONLY-9" in parse_result.json
     assert all(
-        "REJECTED-ONLY-9" not in json.dumps(payload)
-        for payload in gateway.payloads
+        "REJECTED-ONLY-9" not in json.dumps(payload) for payload in gateway.payloads
     )
     assert result.data == {"invoice_number": None}
     assert result.evidence == {}
@@ -317,8 +343,8 @@ class LiteralEvidenceGateway(ExtractionGateway):
         super().__init__()
         self.value = value
 
-    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
-        self.extract_calls.append((use_terra, issues))
+    def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
         return {
             "data": {"value": self.value},
             "evidence": [
@@ -347,6 +373,7 @@ class LiteralEvidenceGateway(ExtractionGateway):
         ("boolean", True, "Yes"),
         ("boolean", False, "No"),
         ("boolean", True, "Approved: Yes"),
+        ("boolean", True, "**Approved:** Yes"),
         ("boolean", False, "Approved: No"),
         ("boolean", True, "Approved: Yes."),
         ("boolean", False, "Approved: No."),
@@ -478,8 +505,8 @@ def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(
 
 
 class DisjointStringEvidenceGateway(ExtractionGateway):
-    def extract_document(self, _parse_payload, _schema, *, use_terra, issues=None):
-        self.extract_calls.append((use_terra, issues))
+    def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
         return {
             "data": {"value": "Alpha Beta"},
             "evidence": [

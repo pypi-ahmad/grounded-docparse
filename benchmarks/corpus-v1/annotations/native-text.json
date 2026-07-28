@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.1",
+  "document_id": "native-text",
+  "reference_text": "Synthetic Native Text Fixture Record NATIVE-001 is public test data. Status: complete",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [
+    {
+      "id": "native-title",
+      "text": "Synthetic Native Text Fixture"
+    },
+    {
+      "id": "native-status",
+      "text": "Status: complete"
+    }
+  ],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

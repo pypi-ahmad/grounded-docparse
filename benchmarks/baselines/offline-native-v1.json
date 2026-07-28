@@ -1,0 +1,638 @@
+{
+  "schema_version": "1.0",
+  "corpus_id": "grounded-docparse-synthetic-v1",
+  "evaluation_mode": "offline_native_ingest",
+  "broad_production_claim": false,
+  "documents": [
+    {
+      "id": "native-text",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "unicode-identifiers",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "multi-column",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "lists",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "tables",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "cross-page-table",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "form",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "checkboxes",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "figure-chart",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "degraded-scan",
+      "status": "native_text_unavailable",
+      "metrics": {
+        "semantic_text": {
+          "value": null,
+          "reason": "no native text evidence is available"
+        },
+        "source_verified_text": {
+          "value": null,
+          "reason": "reference is not source-verified"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "synthetic-report",
+      "status": "evaluated",
+      "metrics": {
+        "semantic_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "source_verified_text": {
+          "character_accuracy": 1.0,
+          "character_error_rate": 0.0,
+          "word_accuracy": 1.0,
+          "word_error_rate": 0.0,
+          "reference_basis": "synthetic_exact"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "synthetic-medical-fax",
+      "status": "native_text_unavailable",
+      "metrics": {
+        "semantic_text": {
+          "value": null,
+          "reason": "no native text evidence is available"
+        },
+        "source_verified_text": {
+          "value": null,
+          "reason": "reference is not source-verified"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "no generated or legacy comparison reference supplied"
+        },
+        "reading_order": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "tables": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "grounding": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "schema_fields": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "cross_page_continuity": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        },
+        "hallucination": {
+          "value": null,
+          "reason": "native ingest exposes text evidence only"
+        }
+      }
+    },
+    {
+      "id": "public-water-mass-mailing",
+      "status": "external_unavailable",
+      "metrics": {
+        "semantic_text": {
+          "value": null,
+          "reason": "external source is not bundled with the repository"
+        },
+        "source_verified_text": {
+          "value": null,
+          "reason": "external source is not bundled with the repository"
+        },
+        "legacy_reference_agreement": {
+          "value": null,
+          "reason": "external source is not bundled with the repository"
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "semantic_text": {
+      "character_accuracy": 1.0,
+      "character_error_rate": 0.0,
+      "word_accuracy": 1.0,
+      "word_error_rate": 0.0
+    },
+    "source_verified_text": {
+      "character_accuracy": 1.0,
+      "character_error_rate": 0.0,
+      "word_accuracy": 1.0,
+      "word_error_rate": 0.0
+    },
+    "legacy_reference_agreement": {
+      "value": null,
+      "reason": "no documents have generated or legacy native text references"
+    }
+  },
+  "telemetry": {
+    "latency_seconds": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    },
+    "model_calls": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    },
+    "input_tokens": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    },
+    "output_tokens": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    },
+    "terra_calls": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    },
+    "cost_per_page": {
+      "value": null,
+      "reason": "requires a live pipeline result bundle"
+    }
+  },
+  "limitations": [
+    "This baseline measures only text exposed by the existing native ingest path.",
+    "It is not an Agentic pipeline accuracy, OCR, structure, grounding, latency, or cost claim."
+  ]
+}

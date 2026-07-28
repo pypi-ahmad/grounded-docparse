@@ -98,14 +98,14 @@ class SpecialistGateway:
         region_ids,
         target_region_ids=None,
         agent_role=AgentRole.EVIDENCE_CRITIC,
-        use_terra=False,
+        use_luna=False,
         addition_conflicts=None,
     ) -> PageInspection:
         targets = list(target_region_ids or region_ids)
-        self.calls.append((agent_role, use_terra, targets))
+        self.calls.append((agent_role, use_luna, targets))
         if addition_conflicts is not None:
             self.addition_conflicts.append(addition_conflicts)
-        if agent_role is AgentRole.EVIDENCE_CRITIC and use_terra:
+        if agent_role is AgentRole.EVIDENCE_CRITIC:
             if isinstance(self.arbitration, Exception):
                 raise self.arbitration
             return self.arbitration or PageInspection()
@@ -196,7 +196,7 @@ def test_identical_specialist_corrections_reach_audited_consensus(
     assert persisted["resolutions"][0]["outcome"] == "consensus"
 
 
-def test_conflicting_specialists_are_resolved_by_terra_evidence_critic(
+def test_conflicting_specialists_are_resolved_by_luna_evidence_critic(
     simple_pdf: bytes,
 ) -> None:
     gateway = SpecialistGateway(
@@ -225,7 +225,7 @@ def test_conflicting_specialists_are_resolved_by_terra_evidence_critic(
                 InspectionDecision(
                     region_id="p1-b1",
                     action=InspectionAction.CORRECT,
-                    corrected_region=_correction("Terra resolution"),
+                    corrected_region=_correction("Luna resolution"),
                     confidence=0.95,
                     reason="Source image supports this literal",
                 )
@@ -237,7 +237,7 @@ def test_conflicting_specialists_are_resolved_by_terra_evidence_critic(
 
     block = result.document.pages[0].blocks[0]
     audit = result.document.pages[0].specialist_audit
-    assert block.text == "Terra resolution"
+    assert block.text == "Luna resolution"
     assert block.verification is VerificationState.VERIFIED
     assert gateway.calls[-1] == (
         AgentRole.EVIDENCE_CRITIC,
@@ -249,7 +249,7 @@ def test_conflicting_specialists_are_resolved_by_terra_evidence_critic(
         AgentRole.TABLE_FORM.value,
         AgentRole.EVIDENCE_CRITIC.value,
     ]
-    assert audit.opinions[-1].model == "gpt-5.6-terra"
+    assert audit.opinions[-1].model == "gpt-5.6-luna"
     assert audit.resolutions[0].outcome == "arbitrated"
     assert audit.resolutions[0].final_decision.reason == (
         "Source image supports this literal"
@@ -293,7 +293,9 @@ def test_identical_additional_regions_reach_one_audited_consensus(
         AgentRole.TABLE_FORM.value,
     ]
     assert all(opinion.model == "gpt-5.6-luna" for opinion in audit.addition_opinions)
-    assert all(opinion.timestamp.tzinfo is not None for opinion in audit.addition_opinions)
+    assert all(
+        opinion.timestamp.tzinfo is not None for opinion in audit.addition_opinions
+    )
     assert len(audit.addition_resolutions) == 1
     assert audit.addition_resolutions[0].outcome == "consensus"
     assert audit.addition_resolutions[0].final_addition == addition
@@ -302,7 +304,7 @@ def test_identical_additional_regions_reach_one_audited_consensus(
     assert persisted["addition_resolutions"][0]["outcome"] == "consensus"
 
 
-def test_conflicting_additional_regions_are_arbitrated_by_terra(
+def test_conflicting_additional_regions_are_arbitrated_by_luna(
     simple_pdf: bytes,
 ) -> None:
     layout = _addition("Layout proposal", region_id="layout-addition")
@@ -328,7 +330,7 @@ def test_conflicting_additional_regions_are_arbitrated_by_terra(
                 InspectionRegionAddition(
                     region_id="layout-addition",
                     region=table.region.model_copy(deep=True),
-                    reason="Terra selected the grounded table proposal",
+                    reason="Luna selected the grounded table proposal",
                 )
             ]
         ),
@@ -353,7 +355,7 @@ def test_conflicting_additional_regions_are_arbitrated_by_terra(
     ]
     assert len(audit.addition_opinions) == 3
     assert audit.addition_opinions[-1].reviewer == AgentRole.EVIDENCE_CRITIC.value
-    assert audit.addition_opinions[-1].model == "gpt-5.6-terra"
+    assert audit.addition_opinions[-1].model == "gpt-5.6-luna"
     assert audit.addition_resolutions[0].outcome == "arbitrated"
     assert audit.addition_resolutions[0].proposal_region_ids == [
         "layout-addition",
@@ -437,9 +439,10 @@ def test_conflicting_additional_regions_without_manager_fail_closed_and_audit(
     assert len(audit.addition_resolutions) == 1
     assert audit.addition_resolutions[0].outcome == "needs_review"
     assert audit.addition_resolutions[0].final_addition is None
-    assert page.quality.needs_review_reasons == payload_page["quality"][
-        "needs_review_reasons"
-    ]
+    assert (
+        page.quality.needs_review_reasons
+        == payload_page["quality"]["needs_review_reasons"]
+    )
     assert "specialist_conflict" in page.quality.needs_review_reasons
     assert payload_page["status"] == "needs_review"
 
@@ -447,7 +450,10 @@ def test_conflicting_additional_regions_without_manager_fail_closed_and_audit(
 @pytest.mark.parametrize(
     ("arbitration", "warning"),
     [
-        (RuntimeError("Terra unavailable"), "Arbitration failed: RuntimeError: Terra unavailable"),
+        (
+            RuntimeError("Luna unavailable"),
+            "Arbitration failed: RuntimeError: Luna unavailable",
+        ),
         (
             PageInspection(
                 decisions=[
@@ -566,7 +572,11 @@ class OrderingConflictGateway(SpecialistGateway):
         self.reject = reject
 
     def draft_page(self, _page) -> PageDraft:
-        return PageDraft(regions=[_region(f"Block {index}", reading_order=index) for index in range(4)])
+        return PageDraft(
+            regions=[
+                _region(f"Block {index}", reading_order=index) for index in range(4)
+            ]
+        )
 
     def plan_page(
         self,
@@ -603,10 +613,10 @@ class OrderingConflictGateway(SpecialistGateway):
         region_ids,
         target_region_ids=None,
         agent_role=AgentRole.EVIDENCE_CRITIC,
-        use_terra=False,
+        use_luna=False,
     ) -> PageInspection:
         targets = list(target_region_ids or region_ids)
-        self.calls.append((agent_role, use_terra, targets))
+        self.calls.append((agent_role, use_luna, targets))
         order = list(region_ids)
         if agent_role is AgentRole.TABLE_FORM:
             order[1], order[2] = order[2], order[1]
@@ -615,7 +625,9 @@ class OrderingConflictGateway(SpecialistGateway):
                 InspectionDecision(
                     region_id=region_id,
                     action=(
-                        InspectionAction.REJECT if self.reject else InspectionAction.ACCEPT
+                        InspectionAction.REJECT
+                        if self.reject
+                        else InspectionAction.ACCEPT
                     ),
                 )
                 for region_id in targets
@@ -631,13 +643,20 @@ def test_conflicting_order_opinions_are_ignored_audited_and_mark_page_for_review
 
     page = result.document.pages[0]
     payload_page = json.loads(result.json)["document"]["pages"][0]
-    assert [block.text for block in page.blocks] == [f"Block {index}" for index in range(4)]
-    assert all(block.verification is VerificationState.NEEDS_REVIEW for block in page.blocks)
+    assert [block.text for block in page.blocks] == [
+        f"Block {index}" for index in range(4)
+    ]
+    assert all(
+        block.verification is VerificationState.NEEDS_REVIEW for block in page.blocks
+    )
     assert page.specialist_audit.ordering_resolution.outcome == "needs_review"
     assert page.specialist_audit.ordering_resolution.ordered_region_ids == []
     assert len(page.specialist_audit.ordering_opinions) == 2
     assert payload_page["status"] == "needs_review"
-    assert any("conflicting ordered_region_ids" in warning for warning in result.document.warnings)
+    assert any(
+        "conflicting ordered_region_ids" in warning
+        for warning in result.document.warnings
+    )
 
 
 def test_order_conflict_marks_all_rejected_page_for_review_in_agentic_output(
@@ -647,7 +666,9 @@ def test_order_conflict_marks_all_rejected_page_for_review_in_agentic_output(
 
     page = result.document.pages[0]
     payload_page = json.loads(result.json)["document"]["pages"][0]
-    assert all(block.verification is VerificationState.REJECTED for block in page.blocks)
+    assert all(
+        block.verification is VerificationState.REJECTED for block in page.blocks
+    )
     assert page.specialist_audit.ordering_resolution.outcome == "needs_review"
     assert payload_page["blocks"]
     assert all(block["rendered"] is False for block in payload_page["blocks"])

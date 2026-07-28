@@ -15,6 +15,8 @@ SUPPORTED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}
 
 @dataclass(slots=True)
 class TextBlock:
+    """Legacy compatibility type; raster-only ingest never populates it."""
+
     text: str
     bbox: BoundingBox
     font_size: float
@@ -28,11 +30,20 @@ class PageEvidence:
     height: float
     dpi: int
     image_path: Path
-    scanned: bool
+    render_width_pixels: int = 1
+    render_height_pixels: int = 1
+    effective_dpi: float | None = None
+    source_width: float = 1
+    source_height: float = 1
+    source_unit: str = "pixels"
+    source_rotation_degrees: int = 0
+    scanned: bool = True
     text_blocks: list[TextBlock] = field(default_factory=list)
 
     @property
     def digital_text(self) -> str:
+        """Legacy compatibility accessor; never used as parser evidence."""
+
         return "\n".join(block.text for block in self.text_blocks if block.text.strip())
 
 
@@ -107,18 +118,6 @@ def render_region_crop(
     return output
 
 
-def _normalized_bbox(
-    bbox: tuple[float, float, float, float], width: float, height: float
-) -> BoundingBox:
-    x0, y0, x1, y1 = bbox
-    return BoundingBox(
-        x0=max(0, min(1, x0 / width)),
-        y0=max(0, min(1, y0 / height)),
-        x1=max(0, min(1, x1 / width)),
-        y1=max(0, min(1, y1 / height)),
-    )
-
-
 def _validate_input(data: bytes, filename: str, max_bytes: int) -> str:
     if not data:
         raise ValueError("Uploaded document is empty")
@@ -185,35 +184,6 @@ def _ingest_pdf(
             pixmap = page.get_pixmap(matrix=matrix, alpha=False)
             image_path.write_bytes(pixmap.tobytes("png"))
 
-            blocks: list[TextBlock] = []
-            text_dict = page.get_text("dict", flags=pymupdf.TEXTFLAGS_TEXT)
-            for block in text_dict.get("blocks", []):
-                if block.get("type") != 0:
-                    continue
-                spans = [
-                    span
-                    for line in block.get("lines", [])
-                    for span in line.get("spans", [])
-                    if span.get("text", "").strip()
-                ]
-                if not spans:
-                    continue
-                text = " ".join(str(span["text"]).strip() for span in spans)
-                raw_bbox = tuple(float(value) for value in block["bbox"])
-                blocks.append(
-                        TextBlock(
-                            text=text,
-                            bbox=_normalized_bbox(raw_bbox, width, height),
-                            font_size=max(float(span.get("size", 0)) for span in spans),
-                        font=str(spans[0].get("font", "")),
-                    )
-                )
-
-            char_count = sum(len(block.text.strip()) for block in blocks)
-            # A short title page can still contain a valid native text layer.
-            # Treat only effectively empty text layers as scans; vision still analyzes
-            # every page, so this flag only controls OCR preprocessing/verification.
-            scanned = char_count < 20
             pages.append(
                 PageEvidence(
                     number=page_number,
@@ -221,8 +191,13 @@ def _ingest_pdf(
                     height=height,
                     dpi=dpi,
                     image_path=image_path,
-                    scanned=scanned,
-                    text_blocks=blocks,
+                    render_width_pixels=pixmap.width,
+                    render_height_pixels=pixmap.height,
+                    effective_dpi=float(dpi),
+                    source_width=width,
+                    source_height=height,
+                    source_unit="pdf_points",
+                    source_rotation_degrees=int(page.rotation),
                 )
             )
     return pages
@@ -249,7 +224,12 @@ def _ingest_image(
                     height=float(rgb.height),
                     dpi=dpi,
                     image_path=image_path,
-                    scanned=True,
+                    render_width_pixels=rgb.width,
+                    render_height_pixels=rgb.height,
+                    effective_dpi=None,
+                    source_width=float(rgb.width),
+                    source_height=float(rgb.height),
+                    source_unit="pixels",
                 )
             )
     return pages

@@ -2,19 +2,21 @@
 
 ## Goal
 
-Parse one PDF or image into grounded document outputs, then optionally extract user-defined structured fields with source evidence.
+Parse one PDF or image into grounded document outputs through a GLM-OCR-first pipeline and a unified engine-neutral result contract.
 
 ## Required behavior
 
-- One document uploader with separate **Parse document** and **Extract** stages
+- One document uploader with optional contiguous page-range parsing
 - Luna-medium draft, manager, specialists, schema proposal, and initial extraction
-- Terra-medium only for explicit risky parse escalation or one failed-extraction repair
+- Luna-medium only for targeted risky-region or failed-extraction repair
 - At most two specialist delegations per parse round and two repair rounds
 - Strict Structured Outputs, no explicit prompt-cache controls, and `store=False`
-- Markdown, agentic JSON v2, legacy JSON, agent trace, and annotated PDF previews/downloads
+- Overview, Markdown, annotated PDF, and hierarchical Layout Tree views
+- Unified JSON v4 with normalized flat elements plus the compatible nested audit document
+- Semantic PDF boxes, optional reading-order labels, and selected-element highlighting
 - Actual input and output token totals from provider usage
 - Deterministic source-coverage, duplicate, and critical-literal quality gates
-- All high-resolution quality candidates processed in batches of eight across up to two targeted Terra rounds
+- All high-resolution quality candidates processed in batches of eight across bounded targeted Luna rounds
 - Unresolved content remains visible and is marked `needs_review` with a warning
 - Verified block semantics have full Markdown coverage and exact emission spans; rejected text is JSON-auditable but never rendered or accepted as extraction evidence
 - Page status includes rejected, skipped, conflicting, incomplete, unresolved-recovery, coverage, and geometry history

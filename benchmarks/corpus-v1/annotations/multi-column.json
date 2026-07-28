@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.1",
+  "document_id": "multi-column",
+  "reference_text": "Two Column Bulletin LEFT-1 Alpha LEFT-2 Beta RIGHT-1 Gamma RIGHT-2 Delta",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [
+    {
+      "id": "column-title",
+      "text": "Two Column Bulletin"
+    },
+    {
+      "id": "left-1",
+      "text": "LEFT-1 Alpha"
+    },
+    {
+      "id": "left-2",
+      "text": "LEFT-2 Beta"
+    },
+    {
+      "id": "right-1",
+      "text": "RIGHT-1 Gamma"
+    },
+    {
+      "id": "right-2",
+      "text": "RIGHT-2 Delta"
+    }
+  ],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}

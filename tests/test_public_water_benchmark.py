@@ -6,6 +6,7 @@ from grounded_docparse.benchmark import (
     evaluate_result,
 )
 from grounded_docparse.models import (
+    AtomicEvidence,
     Block,
     BoundingBox,
     Citation,
@@ -48,7 +49,7 @@ def test_benchmark_accepts_grounded_literal_content() -> None:
         ],
     )
     expectations = {
-        "schema_version": "1.3.0",
+        "schema_version": "2.0.0",
         "page_count": 1,
         "page_break_count": 0,
         "minimum_word_count": 5,
@@ -59,7 +60,12 @@ def test_benchmark_accepts_grounded_literal_content() -> None:
         "figure_terms_by_page": {},
     }
 
-    assert evaluate_result(document, "1. Call 573-751-3334 within 24 hours.\n", expectations) == []
+    assert (
+        evaluate_result(
+            document, "1. Call 573-751-3334 within 24 hours.\n", expectations
+        )
+        == []
+    )
 
 
 def test_benchmark_reports_content_structure_and_grounding_failures() -> None:
@@ -77,7 +83,7 @@ def test_benchmark_reports_content_structure_and_grounding_failures() -> None:
         pages=[Page(number=1, width=100, height=100, blocks=[block])],
     )
     expectations = {
-        "schema_version": "1.3.0",
+        "schema_version": "2.0.0",
         "page_count": 1,
         "page_break_count": 0,
         "minimum_word_count": 5,
@@ -165,7 +171,7 @@ def test_required_content_search_includes_structured_form_hints() -> None:
         pages=[Page(number=1, width=100, height=100, blocks=[block])],
     )
     expectations = {
-        "schema_version": "1.3.0",
+        "schema_version": "2.0.0",
         "page_count": 1,
         "page_break_count": 0,
         "minimum_word_count": 1,
@@ -176,7 +182,12 @@ def test_required_content_search_includes_structured_form_hints() -> None:
         "figure_terms_by_page": {},
     }
 
-    assert evaluate_result(document, "**Collected Time:** 24 hour format hh:mm\n", expectations) == []
+    assert (
+        evaluate_result(
+            document, "**Collected Time:** 24 hour format hh:mm\n", expectations
+        )
+        == []
+    )
 
 
 def test_visual_fact_groups_allow_alternatives_but_require_one_complete_block() -> None:
@@ -198,7 +209,7 @@ def test_visual_fact_groups_allow_alternatives_but_require_one_complete_block() 
         pages=[Page(number=1, width=100, height=100, blocks=[step, separate_cap])],
     )
     expectations = {
-        "schema_version": "1.3.0",
+        "schema_version": "2.0.0",
         "page_count": 1,
         "page_break_count": 0,
         "minimum_word_count": 1,
@@ -222,6 +233,41 @@ def test_visual_fact_groups_allow_alternatives_but_require_one_complete_block() 
 
     assert failures == ["page 1 has no visual block matching semantic fact group 1"]
 
-    step.figure_description = "Circled number 6 beneath a tap; another hand holds the cap."
+    step.figure_description = (
+        "Circled number 6 beneath a tap; another hand holds the cap."
+    )
+
+    assert evaluate_result(document, "Visual instructions\n", expectations) == []
+
+
+def test_visual_fact_groups_search_atomic_visual_labels() -> None:
+    visual = _grounded_block(
+        id="p1-b1",
+        type="figure",
+        figure_description="A numbered collection step.",
+        reading_order=0,
+    )
+    visual.atoms = [
+        AtomicEvidence(kind="label", text="6"),
+        AtomicEvidence(kind="label", text="faucet"),
+        AtomicEvidence(kind="label", text="cap"),
+    ]
+    document = Document(
+        source_name="instructions.pdf",
+        source_sha256="e" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[visual])],
+    )
+    expectations = {
+        "schema_version": "2.0.0",
+        "page_count": 1,
+        "page_break_count": 0,
+        "minimum_word_count": 1,
+        "required_by_page": {},
+        "forbidden": [],
+        "list_markers_by_page": {},
+        "minimum_types_by_page": {},
+        "figure_terms_by_page": {},
+        "visual_fact_groups_by_page": {"1": [[["6"], ["faucet"], ["cap"]]]},
+    }
 
     assert evaluate_result(document, "Visual instructions\n", expectations) == []

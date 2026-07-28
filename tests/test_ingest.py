@@ -9,7 +9,7 @@ from grounded_docparse.ingest import ingest_document, render_region_crop
 from grounded_docparse.models import BoundingBox
 
 
-def test_ingest_digital_pdf(simple_pdf: bytes, tmp_path: Path) -> None:
+def test_ingest_pdf_ignores_selectable_text(simple_pdf: bytes, tmp_path: Path) -> None:
     document = ingest_document(
         simple_pdf,
         "test.pdf",
@@ -18,9 +18,9 @@ def test_ingest_digital_pdf(simple_pdf: bytes, tmp_path: Path) -> None:
         max_bytes=10_000_000,
     )
     assert len(document.pages) == 1
-    assert not document.pages[0].scanned
-    assert "Grounded source paragraph" in document.pages[0].digital_text
-    assert document.pages[0].text_blocks[0].bbox.unit == "normalized"
+    assert document.pages[0].scanned
+    assert document.pages[0].digital_text == ""
+    assert document.pages[0].text_blocks == []
 
 
 def test_rejects_fake_pdf(tmp_path: Path) -> None:

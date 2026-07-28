@@ -125,8 +125,8 @@ class ParallelGateway:
 
 
 def test_parallel_page_config_defaults_and_environment(monkeypatch) -> None:
-    assert ParserConfig().page_batch_size == 100
-    assert ParserConfig().max_page_concurrency == 50
+    assert ParserConfig().page_batch_size == 16
+    assert ParserConfig().max_page_concurrency == 8
 
     monkeypatch.setenv("DOCPARSE_PAGE_BATCH_SIZE", "8")
     monkeypatch.setenv("DOCPARSE_MAX_PAGE_CONCURRENCY", "4")

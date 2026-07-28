@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.1",
+  "document_id": "synthetic-report",
+  "reference_text": "Synthetic Clinical Operations Report 1. Summary This synthetic document contains no patient information. It exists only to exercise document parsing and reading-order behavior. Metric January February Reviewed forms 128 141 Average pages 4.2 4.5",
+  "reference_basis": "synthetic_exact",
+  "reference_pages": {},
+  "anchors": [],
+  "tables": [],
+  "grounding_regions": {},
+  "schema_output": null,
+  "continuity_pairs": [],
+  "forbidden_literals": [],
+  "rejected_block_ids": []
+}
