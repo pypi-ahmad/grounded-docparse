@@ -16,10 +16,10 @@ from grounded_docparse.models import (
     VerificationState,
 )
 from grounded_docparse.pipeline import _apply_decision, _apply_span_repairs, _block
-from grounded_docparse.render import render_agentic_document, render_json
+from grounded_docparse.render import render_agentic_document
 
 
-def test_agentic_confidence_evidence_uses_codepoint_spans_and_omits_them_from_legacy() -> None:
+def test_agentic_confidence_evidence_uses_codepoint_spans() -> None:
     region = RegionDraft(
         type=NodeType.TABLE,
         reading_order=0,
@@ -53,11 +53,7 @@ def test_agentic_confidence_evidence_uses_codepoint_spans_and_omits_them_from_le
     node = payload["document"]["pages"][0]["blocks"][0]
     cell = node["semantic"]["table"]["cells"][0]
     atom = node["atoms"][0]
-    legacy = json.loads(render_json(document))
-    legacy_cell = legacy["pages"][0]["blocks"][0]["table"]["cells"][0]
-    legacy_atom = legacy["pages"][0]["blocks"][0]["atoms"][0]
-
-    assert payload["schema_version"] == "4.0.0"
+    assert payload["schema_version"] == "4.4.0"
     assert block.confidence == 0.72
     assert cell["confidence"] == 0.72
     assert cell["low_confidence_spans"] == [
@@ -80,10 +76,6 @@ def test_agentic_confidence_evidence_uses_codepoint_spans_and_omits_them_from_le
             "source": "provider",
         }
     ]
-    assert "confidence" not in legacy_cell
-    assert "low_confidence_spans" not in legacy_cell
-    assert "confidence" not in legacy_atom
-    assert "low_confidence_spans" not in legacy_atom
 
 
 def test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified() -> None:

@@ -6,6 +6,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- `Setup-GLM-OCR.cmd`: one-time Windows 11 bootstrap that installs WSL2 + Ubuntu-24.04, checks GPU passthrough, installs `uv` inside WSL, and runs the existing launch stack to download weights and start the app.
+- Optional text-only Luna Markdown refinement with grounded presentation directives.
+- Unified JSON v4.4 with element provenance, split recovery/agentic timing, flat classification, sections, extraction, and recovered-only recovery-log fields; annotated PDF bytes remain outside JSON.
+- Extraction JSON v1.1 with canonical `element_id`, source text, and GLM-owned normalized boxes.
+- Deterministic recovery scoring from OCR confidence, empty-region area, character density, garbage ratio, and table quality.
+- Document-wide prioritization for up to eight high-effort Luna recovery requests, capped at three regions per page, with dashed orange annotations, recovered-region badges, and counts.
+- Structured Luna classification, hierarchical TOC generation, grounded document chat, and on-demand extraction.
+- Fast/Full/Custom ADE presets with Fast as the default; extraction keys now live in the post-parse Extract tab and Chat remains off by default.
+- Reusable compact document context, versioned Luna prompts, and one schema-format repair retry while GLM IDs and boxes remain authoritative.
+- SQLite-backed schema builder with JSON import/export and native annotated-page source navigation.
+
+### Changed
+
+- Enabled evidence-triggered Luna visual recovery by default with a sidebar opt-out while allowing GLM-only parsing without an OpenAI key.
+- Removed the API-key requirement from the Windows/WSL launcher.
+- Kept GLM parsing reusable when only agentic options change, avoiding unnecessary OCR reruns.
+- Restricted Luna recovery to high-confidence text-only corrections of existing GLM elements; additions, rejections, geometry changes, reading-order changes, and full-page fallback are ignored or disabled.
+- Made complete nonblank GLM failure terminal before Luna while retaining isolated failed pages as partial output with warnings.
+
+### Removed
+
+- Legacy JSON and v1 annotation compatibility.
+- Manager/specialist arbitration in favor of one direct evidence-critic inspection pass.
+- Disabled-by-default provider ceilings and optional targeted-repair context crops.
+
 ## [0.3.0] - 2026-07-28
 
 ### Added

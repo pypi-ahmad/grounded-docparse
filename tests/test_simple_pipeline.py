@@ -1,10 +1,11 @@
 import json
+from types import SimpleNamespace
 
 import pymupdf
 
+from grounded_docparse import pipeline as pipeline_module
 from grounded_docparse.config import ParserConfig
 from grounded_docparse.models import (
-    AgentDelegation,
     AgentRole,
     InspectionAction,
     InspectionDecision,
@@ -12,7 +13,6 @@ from grounded_docparse.models import (
     NodeType,
     PageDraft,
     PageInspection,
-    PagePlan,
     RegionDraft,
     VerificationState,
 )
@@ -66,8 +66,8 @@ class AcceptingGateway:
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         self.inspected_region_ids = targets
         return PageInspection(
             decisions=[
@@ -79,9 +79,6 @@ class AcceptingGateway:
                 for region_id in targets
             ]
         )
-
-    def inspect_crops(self, *_args, **_kwargs):
-        raise AssertionError("crop inspection was not requested")
 
 
 def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
@@ -99,27 +96,15 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
     assert heading.children[0].section_path == ["Public notice"]
     assert "# Public notice" in result.markdown
     payload = json.loads(result.json)
-    assert payload["schema_version"] == "4.0.0"
+    assert payload["schema_version"] == "4.4.0"
     assert payload["metadata"]["source_name"] == "notice.pdf"
     assert payload["metadata"]["usage"]["input_tokens"] == 23
-    assert json.loads(result.legacy_json)["schema_version"] == "2.0.0"
     assert getattr(result, "input_tokens", None) == 23
     assert getattr(result, "output_tokens", None) == 7
     annotated = getattr(result, "annotated_pdf", b"")
     assert annotated.startswith(b"%PDF")
     with pymupdf.open(stream=annotated, filetype="pdf") as rendered:
-        assert len(rendered[0].get_drawings()) == 2
-
-
-def _procedure_pdf() -> bytes:
-    document = pymupdf.open()
-    page = document.new_page(width=612, height=792)
-    page.insert_text((72, 90), "1. Open the cold water tap.", fontsize=11)
-    page.insert_text((72, 130), "2. Flame-sterilize the tap.", fontsize=11)
-    page.insert_text((72, 170), "3. Fold and ship the form.", fontsize=11)
-    data = document.tobytes()
-    document.close()
-    return data
+        assert len(rendered[0].get_drawings()) == 4
 
 
 class QualityRecoveryGateway:
@@ -129,8 +114,7 @@ class QualityRecoveryGateway:
     def __init__(self) -> None:
         self.quality_calls = []
 
-    def draft_page(self, page):
-        source = page.text_blocks[0]
+    def draft_page(self, _page):
         return PageDraft(
             regions=[
                 RegionDraft(
@@ -139,7 +123,7 @@ class QualityRecoveryGateway:
                     list_marker="1.",
                     reading_order=0,
                     confidence=0.99,
-                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
                 )
             ]
         )
@@ -157,25 +141,6 @@ class QualityRecoveryGateway:
             ]
         )
 
-    def inspect_crops(self, *_args, **_kwargs):
-        raise AssertionError("ordinary crop inspection was not requested")
-
-
-def test_parser_recovers_missing_native_list_steps_with_one_quality_pass() -> None:
-    gateway = QualityRecoveryGateway()
-
-    result = DocumentParser(
-        ParserConfig(render_dpi=72, crop_dpi=144),
-        gateway_factory=lambda _config: gateway,
-    ).parse(_procedure_pdf(), "procedures.pdf")
-
-    assert result.markdown.count("1. Open the cold water tap.") == 1
-    assert result.markdown.count("2. Flame-sterilize the tap.") == 1
-    assert result.markdown.count("3. Fold and ship the form.") == 1
-    assert len(gateway.quality_calls) == 1
-    assert gateway.quality_calls[0][0] == 1
-    assert len(gateway.quality_calls[0][1]) == 2
-
 
 class NoQualityScanGateway:
     input_tokens = 0
@@ -185,7 +150,7 @@ class NoQualityScanGateway:
         return PageDraft()
 
 
-def test_unresolved_scanned_probe_remains_auditable_without_quality_inspection() -> (
+def test_custom_gateway_without_analysis_does_not_synthesize_scan_probes() -> (
     None
 ):
     document = pymupdf.open()
@@ -200,23 +165,15 @@ def test_unresolved_scanned_probe_remains_auditable_without_quality_inspection()
     ).parse(data, "scan.pdf")
 
     blocks = result.document.pages[0].blocks
-    assert len(blocks) == 1
-    assert blocks[0].text == ""
-    assert blocks[0].verification is VerificationState.NEEDS_REVIEW
-    assert any(
-        "quality gate unresolved" in warning.casefold()
-        for warning in result.document.warnings
-    )
+    assert blocks == []
     page_payload = json.loads(result.json)["document"]["pages"][0]
-    assert page_payload["status"] == "needs_review"
-    assert page_payload["blocks"][0]["rendered"] is False
-    assert "unresolved_recovery" in page_payload["quality"]["needs_review_reasons"]
+    assert page_payload["status"] == "ok"
+    assert page_payload["blocks"] == []
+    assert page_payload["quality"]["needs_review_reasons"] == []
     assert (
         result.document.pages[0].quality.model_dump(mode="json")
         == page_payload["quality"]
     )
-    legacy_page = json.loads(result.legacy_json)["pages"][0]
-    assert legacy_page["quality"] == page_payload["quality"]
 
 
 class ScanProbeRecoveryGateway:
@@ -236,14 +193,6 @@ class ScanProbeRecoveryGateway:
                     confidence=0.99,
                     bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.9},
                 )
-            ]
-        )
-
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        return PageInspection(
-            decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in target_region_ids or region_ids
             ]
         )
 
@@ -276,7 +225,7 @@ class ScanProbeRecoveryGateway:
         )
 
 
-def test_scanned_image_probe_adds_only_quality_corrected_text() -> None:
+def test_visual_recovery_does_not_synthesize_missing_regions() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
@@ -289,13 +238,117 @@ def test_scanned_image_probe_adds_only_quality_corrected_text() -> None:
         gateway_factory=lambda _config: gateway,
     ).parse(data, "scan.pdf")
 
-    assert len(gateway.quality_calls) == 1
-    assert gateway.quality_calls[0][0] == 1
-    assert [crop.candidate_region.text for crop in gateway.quality_calls[0][1]] == [""]
-    assert [block.text for block in result.document.pages[0].blocks] == [
-        "",
-        "Verified chart label",
+    assert gateway.quality_calls == []
+    assert [block.text for block in result.document.pages[0].blocks] == [""]
+    assert result.metadata.visual_recovery_region_ids == []
+    assert result.recovery_log == []
+
+
+def test_visual_recovery_plan_prioritizes_failures_across_pages(monkeypatch) -> None:
+    candidates = {
+        1: [
+            pipeline_module._RecoveryCandidate(1, (0.1, 0.1, 0.2, 0.2), 3, 0.1, 0, "low"),
+            pipeline_module._RecoveryCandidate(1, (0.2, 0.2, 0.3, 0.3), 1, 0.9, 1, "broken"),
+        ],
+        2: [
+            pipeline_module._RecoveryCandidate(2, (0.3, 0.3, 0.4, 0.4), 0, 1.0, 0, "missing")
+        ],
+    }
+    monkeypatch.setattr(
+        pipeline_module,
+        "_page_recovery_candidates",
+        lambda page, _analysis: candidates[page.number],
+    )
+    pages = [SimpleNamespace(number=1), SimpleNamespace(number=2)]
+
+    plan = pipeline_module._visual_recovery_plan(
+        pages,
+        {1: None, 2: None},
+        enabled=True,
+        limit=2,
+    )
+
+    assert plan.candidate_count == 3
+    assert plan.allowed == {
+        1: {(0.2, 0.2, 0.3, 0.3)},
+        2: {(0.3, 0.3, 0.4, 0.4)},
+    }
+    assert plan.deferred == {1: {(0.1, 0.1, 0.2, 0.2)}}
+
+    disabled = pipeline_module._visual_recovery_plan(
+        pages,
+        {1: None, 2: None},
+        enabled=False,
+        limit=2,
+    )
+    assert disabled.allowed == {}
+    assert disabled.deferred == {
+        1: {(0.1, 0.1, 0.2, 0.2), (0.2, 0.2, 0.3, 0.3)},
+        2: {(0.3, 0.3, 0.4, 0.4)},
+    }
+    assert disabled.candidate_count == 3
+
+
+def test_visual_recovery_plan_enforces_document_and_page_limits(monkeypatch) -> None:
+    candidates = {
+        1: [
+            pipeline_module._RecoveryCandidate(
+                1,
+                (index / 10, 0.0, index / 10 + 0.05, 0.2),
+                4,
+                0.5,
+                index,
+                f"p1-{index}",
+            )
+            for index in range(5)
+        ],
+        2: [
+            pipeline_module._RecoveryCandidate(
+                2,
+                (index / 10, 0.3, index / 10 + 0.05, 0.5),
+                4,
+                0.5,
+                index,
+                f"p2-{index}",
+            )
+            for index in range(5)
+        ],
+    }
+    monkeypatch.setattr(
+        pipeline_module,
+        "_page_recovery_candidates",
+        lambda page, _analysis: candidates[page.number],
+    )
+    pages = [SimpleNamespace(number=1), SimpleNamespace(number=2)]
+    analyses = {
+        1: SimpleNamespace(quality=SimpleNamespace(warnings=[])),
+        2: SimpleNamespace(quality=SimpleNamespace(warnings=[])),
+    }
+
+    plan = pipeline_module._visual_recovery_plan(
+        pages, analyses, enabled=True, limit=8
+    )
+
+    assert sum(len(boxes) for boxes in plan.allowed.values()) == 6
+    assert all(len(boxes) <= 3 for boxes in plan.allowed.values())
+
+    candidates[1] = [
+        pipeline_module._RecoveryCandidate(
+            1, box, 1, 0.2, index, f"severe-{index}"
+        )
+        for index, box in enumerate(
+            ((0.0, 0.0, 0.4, 1.0), (0.4, 0.0, 0.8, 1.0), (0.8, 0.0, 1.0, 1.0))
+        )
     ]
+    severe = pipeline_module._visual_recovery_plan(
+        pages[:1], {1: analyses[1]}, enabled=True, limit=8
+    )
+    assert severe.allowed == {1: {candidate.bbox for candidate in candidates[1]}}
+
+
+def test_garbage_ratio_is_unicode_safe() -> None:
+    assert pipeline_module._garbage_ratio("Account: ₹15,480.50") == 0
+    assert pipeline_module._garbage_ratio("������") > 0.35
 
 
 class ConflictingScanProbeGateway(ScanProbeRecoveryGateway):
@@ -338,7 +391,7 @@ class ConflictingScanProbeGateway(ScanProbeRecoveryGateway):
         )
 
 
-def test_conflicting_full_page_scan_recovery_is_rejected() -> None:
+def test_full_page_scan_recovery_is_not_attempted() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
@@ -351,13 +404,8 @@ def test_conflicting_full_page_scan_recovery_is_rejected() -> None:
     ).parse(data, "scan.pdf")
 
     assert "2025-07-14" not in result.markdown
-    rejected = [
-        block
-        for block in result.document.pages[0].blocks
-        if block.verification is VerificationState.REJECTED
-    ]
-    assert len(rejected) == 1
-    assert "conflicts with" in rejected[0].verification_reason
+    assert "2026-07-24" in result.markdown
+    assert len(result.document.pages[0].blocks) == 2
 
 
 class OverflowingScanProbeGateway:
@@ -408,7 +456,7 @@ def test_incomplete_scanned_structures_are_repaired_without_duplicate_probes() -
     ).parse(data, "scan.pdf")
 
     assert len(result.document.pages[0].blocks) == 9
-    assert [len(call[1]) for call in gateway.quality_calls] == [8, 1, 8, 1]
+    assert [len(call[1]) for call in gateway.quality_calls] == [8, 1]
     assert not any(
         "scan omission probes" in warning for warning in result.document.warnings
     )
@@ -422,8 +470,7 @@ def test_incomplete_scanned_structures_are_repaired_without_duplicate_probes() -
 
 
 class UnresolvedCriticalGateway(QualityRecoveryGateway):
-    def draft_page(self, page):
-        source = page.text_blocks[0]
+    def draft_page(self, _page):
         return PageDraft(
             regions=[
                 RegionDraft(
@@ -431,13 +478,13 @@ class UnresolvedCriticalGateway(QualityRecoveryGateway):
                     text="NPI: 1388746512",
                     reading_order=0,
                     confidence=0.99,
-                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
                 )
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
@@ -472,11 +519,8 @@ def test_unresolved_critical_literal_remains_visible_with_review_warning() -> No
         result.document.pages[0].blocks[0].verification
         is VerificationState.NEEDS_REVIEW
     )
-    assert any(
-        "quality gate" in warning.casefold() for warning in result.document.warnings
-    )
     assert '"status": "needs_review"' in result.json
-    assert len(gateway.quality_calls) == 2
+    assert len(gateway.quality_calls) == 1
 
 
 def _account_pdf() -> bytes:
@@ -495,8 +539,7 @@ class SecondRoundStructuredRepairGateway:
     def __init__(self) -> None:
         self.quality_calls = []
 
-    def draft_page(self, page):
-        source = page.text_blocks[0]
+    def draft_page(self, _page):
         return PageDraft(
             regions=[
                 RegionDraft(
@@ -504,7 +547,7 @@ class SecondRoundStructuredRepairGateway:
                     text="Account holder information",
                     reading_order=0,
                     confidence=0.99,
-                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
                 ),
                 RegionDraft(
                     type=NodeType.FORM_FIELD,
@@ -514,16 +557,16 @@ class SecondRoundStructuredRepairGateway:
                     },
                     reading_order=1,
                     confidence=0.99,
-                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                    bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
                 ),
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+    def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
                 InspectionDecision(region_id=region_id, action=InspectionAction.REJECT)
-                for region_id in target_region_ids or region_ids
+                for region_id in [crop.region_id for crop in crops]
             ]
         )
 
@@ -558,7 +601,7 @@ class SecondRoundStructuredRepairGateway:
         )
 
 
-def test_rejected_form_can_be_repaired_on_second_quality_round() -> None:
+def test_rejected_form_remains_reviewable_after_one_quality_round() -> None:
     gateway = SecondRoundStructuredRepairGateway()
 
     result = DocumentParser(
@@ -567,16 +610,13 @@ def test_rejected_form_can_be_repaired_on_second_quality_round() -> None:
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[1]
-    assert [[crop.region_id for crop in call[1]] for call in gateway.quality_calls] == [
-        ["p1-b2"],
-        ["p1-b2"],
-    ]
-    assert block.verification is VerificationState.VERIFIED
+    assert gateway.quality_calls == []
+    assert block.verification is VerificationState.NEEDS_REVIEW
     assert block.form is not None
-    assert block.form.value == "Verified"
+    assert block.form.value == "Hallucinated"
 
 
-def test_failed_quality_crop_does_not_expose_rejected_structured_content(
+def test_failed_quality_crop_preserves_reviewable_structured_content(
     monkeypatch,
 ) -> None:
     gateway = SecondRoundStructuredRepairGateway()
@@ -591,8 +631,8 @@ def test_failed_quality_crop_does_not_expose_rejected_structured_content(
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[1]
-    assert block.verification is VerificationState.REJECTED
-    assert "Hallucinated" not in result.markdown
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "Hallucinated" in result.markdown
 
 
 class MalformedCorrectionGateway(SecondRoundStructuredRepairGateway):
@@ -609,7 +649,7 @@ class MalformedCorrectionGateway(SecondRoundStructuredRepairGateway):
         )
 
 
-def test_malformed_quality_correction_retries_then_preserves_rejection() -> None:
+def test_malformed_quality_correction_preserves_reviewable_content() -> None:
     gateway = MalformedCorrectionGateway()
 
     result = DocumentParser(
@@ -618,9 +658,9 @@ def test_malformed_quality_correction_retries_then_preserves_rejection() -> None
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[1]
-    assert len(gateway.quality_calls) == 2
-    assert block.verification is VerificationState.REJECTED
-    assert "Hallucinated" not in result.markdown
+    assert gateway.quality_calls == []
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "Hallucinated" in result.markdown
 
 
 class ManyQualityCandidatesGateway:
@@ -630,8 +670,7 @@ class ManyQualityCandidatesGateway:
     def __init__(self) -> None:
         self.quality_calls = []
 
-    def draft_page(self, page):
-        source = page.text_blocks[0]
+    def draft_page(self, _page):
         return PageDraft(
             regions=[
                 RegionDraft(
@@ -639,17 +678,17 @@ class ManyQualityCandidatesGateway:
                     form={"label": "Account holder information"},
                     reading_order=index,
                     confidence=0.4,
-                    bbox=source.bbox.model_dump(exclude={"unit"}),
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
                 )
                 for index in range(10)
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+    def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
                 InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in target_region_ids or region_ids
+                for region_id in [crop.region_id for crop in crops]
             ]
         )
 
@@ -698,7 +737,7 @@ class RepeatedQualityRejectionGateway(ManyQualityCandidatesGateway):
         )
 
 
-def test_semantic_rejection_becomes_permanent_only_after_two_quality_rounds() -> None:
+def test_semantic_rejection_remains_reviewable_after_one_quality_round() -> None:
     gateway = RepeatedQualityRejectionGateway()
 
     result = DocumentParser(
@@ -707,9 +746,9 @@ def test_semantic_rejection_becomes_permanent_only_after_two_quality_rounds() ->
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[0]
-    assert len(gateway.quality_calls) == 2
-    assert block.verification is VerificationState.REJECTED
-    assert "Account holder information" not in result.markdown
+    assert len(gateway.quality_calls) == 1
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "Account holder information" in result.markdown
 
 
 class GeometryOnlyQualityGateway:
@@ -732,11 +771,11 @@ class GeometryOnlyQualityGateway:
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+    def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
                 InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in target_region_ids or region_ids
+                for region_id in [crop.region_id for crop in crops]
             ]
         )
 
@@ -771,7 +810,6 @@ def test_geometry_only_rejection_remains_visible_for_review() -> None:
     assert block.verification is VerificationState.NEEDS_REVIEW
     assert "Account holder information" in result.markdown
     assert [[crop.region_id for crop in call[1]] for call in gateway.quality_calls] == [
-        ["p1-b2", "p1-b1"],
         ["p1-b1"],
     ]
 
@@ -817,61 +855,23 @@ def test_semantic_rejection_of_clipped_content_remains_suppressed() -> None:
     ).parse(_account_pdf(), "account.pdf")
 
     block = next(item for item in result.document.pages[0].blocks if item.id == "p1-b1")
-    assert block.verification is VerificationState.REJECTED
-    assert "Unsupported" not in result.markdown
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "Unsupported" in result.markdown
 
 
-class AgenticRoutingGateway(AcceptingGateway):
+class DirectInspectionGateway(AcceptingGateway):
     def __init__(self) -> None:
-        self.plan_rounds = []
-        self.delegations = []
-        self.manager_feedback = []
+        self.inspections = []
 
-    def plan_page(
+    def inspect_crops(
         self,
-        _page,
-        _draft,
+        crops,
         *,
-        region_ids,
-        target_region_ids,
-        repair_round,
-        prior_inspections,
-    ):
-        self.plan_rounds.append(repair_round)
-        self.manager_feedback.append(prior_inspections)
-        if repair_round == 1:
-            return PagePlan(
-                delegations=[
-                    AgentDelegation(
-                        role=AgentRole.LAYOUT_TEXT,
-                        target_region_ids=[region_ids[0]],
-                        reason="Check heading hierarchy",
-                    )
-                ]
-            )
-        return PagePlan(
-            delegations=[
-                AgentDelegation(
-                    role=AgentRole.EVIDENCE_CRITIC,
-                    target_region_ids=[region_ids[1]],
-                    reason="Luna left critical evidence unresolved",
-                )
-            ],
-            finish=True,
-        )
-
-    def inspect_page(
-        self,
-        _page,
-        _draft,
-        *,
-        region_ids,
-        target_region_ids=None,
         agent_role=AgentRole.EVIDENCE_CRITIC,
-        use_luna=False,
+        **_kwargs,
     ):
-        targets = target_region_ids or region_ids
-        self.delegations.append((agent_role, use_luna, list(targets)))
+        targets = [crop.region_id for crop in crops]
+        self.inspections.append((agent_role, list(targets)))
         return PageInspection(
             decisions=[
                 InspectionDecision(
@@ -883,21 +883,17 @@ class AgenticRoutingGateway(AcceptingGateway):
         )
 
 
-def test_manager_selects_subagents_with_two_bounded_repair_rounds(
+def test_risky_regions_are_inspected_directly(
     simple_pdf: bytes,
 ) -> None:
-    gateway = AgenticRoutingGateway()
+    gateway = DirectInspectionGateway()
 
     result = DocumentParser(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: gateway
     ).parse(simple_pdf, "notice.pdf")
 
-    assert gateway.plan_rounds == [1, 2]
-    assert gateway.manager_feedback[0] == []
-    assert gateway.manager_feedback[1][0]["decisions"][0]["region_id"] == "p1-b1"
-    assert gateway.delegations == [
-        (AgentRole.LAYOUT_TEXT, False, ["p1-b1"]),
-        (AgentRole.EVIDENCE_CRITIC, True, ["p1-b2"]),
+    assert gateway.inspections == [
+        (AgentRole.EVIDENCE_CRITIC, ["p1-b1", "p1-b2"]),
     ]
     assert result.document.pages[0].blocks[0].verification is VerificationState.VERIFIED
 
@@ -932,8 +928,8 @@ def test_invalid_grounding_cannot_be_verified(simple_pdf: bytes) -> None:
 
 
 class MissingCorrectionGateway(AcceptingGateway):
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
@@ -958,13 +954,14 @@ def test_missing_correction_remains_unresolved(simple_pdf: bytes) -> None:
 
 
 class CorrectingGateway(AcceptingGateway):
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
                     region_id=targets[0],
                     action=InspectionAction.CORRECT,
+                    confidence=0.95,
                     corrected_region=RegionDraft(
                         type=NodeType.HEADING,
                         text="Grounded correction",
@@ -985,13 +982,13 @@ def test_grounded_correction_replaces_draft_text(simple_pdf: bytes) -> None:
 
     block = result.document.pages[0].blocks[0]
     assert block.text == "Grounded correction"
-    assert block.heading_level == 2
+    assert block.heading_level == 1
     assert block.verification is VerificationState.VERIFIED
 
 
 class RejectingGateway(AcceptingGateway):
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
@@ -1003,13 +1000,13 @@ class RejectingGateway(AcceptingGateway):
         )
 
 
-def test_explicit_rejection_is_suppressed_from_markdown(simple_pdf: bytes) -> None:
+def test_explicit_rejection_keeps_glm_content_reviewable(simple_pdf: bytes) -> None:
     result = DocumentParser(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: RejectingGateway()
     ).parse(simple_pdf, "notice.pdf")
 
-    assert result.document.pages[0].blocks[0].verification is VerificationState.REJECTED
-    assert "Public notice" not in result.markdown
+    assert result.document.pages[0].blocks[0].verification is VerificationState.NEEDS_REVIEW
+    assert "Public notice" in result.markdown
 
 
 class WrongCropRegionGateway(AcceptingGateway):
@@ -1021,17 +1018,6 @@ class WrongCropRegionGateway(AcceptingGateway):
                     text="Candidate",
                     reading_order=0,
                     bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.3},
-                )
-            ]
-        )
-
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
-        return PageInspection(
-            decisions=[
-                InspectionDecision(
-                    region_id=targets[0],
-                    action=InspectionAction.INSPECT_CROP,
                 )
             ]
         )
@@ -1057,7 +1043,7 @@ def test_crop_decision_for_wrong_region_remains_unresolved(simple_pdf: bytes) ->
 
     block = result.document.pages[0].blocks[0]
     assert block.verification is VerificationState.NEEDS_REVIEW
-    assert block.verification_reason == "No crop verification decision"
+    assert block.verification_reason == "No verification decision"
 
 
 class SelectiveGateway(AcceptingGateway):
@@ -1145,13 +1131,14 @@ def test_critical_literals_are_verified_even_at_high_confidence(
 
 
 class InvalidCorrectionGateway(CorrectingGateway):
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
                     region_id=targets[0],
                     action=InspectionAction.CORRECT,
+                    confidence=0.95,
                     corrected_region=RegionDraft(
                         type=NodeType.HEADING,
                         text="Unsupported correction",
@@ -1163,7 +1150,7 @@ class InvalidCorrectionGateway(CorrectingGateway):
         )
 
 
-def test_invalid_corrected_region_preserves_original_for_review(
+def test_invalid_corrected_geometry_is_ignored_while_text_is_applied(
     simple_pdf: bytes,
 ) -> None:
     result = DocumentParser(
@@ -1172,13 +1159,18 @@ def test_invalid_corrected_region_preserves_original_for_review(
     ).parse(simple_pdf, "notice.pdf")
 
     block = result.document.pages[0].blocks[0]
-    assert block.text == "Public notice"
-    assert block.verification is VerificationState.NEEDS_REVIEW
-    assert block.verification_reason == "Correction contained an invalid bounding box"
+    assert block.text == "Unsupported correction"
+    assert block.verification is VerificationState.VERIFIED
+    assert block.bbox.model_dump(exclude={"unit"}) == {
+        "x0": 0.1,
+        "y0": 0.1,
+        "x1": 0.9,
+        "y1": 0.2,
+    }
 
 
 class FailingVerifierGateway(SelectiveGateway):
-    def inspect_page(self, *_args, **_kwargs):
+    def inspect_crops(self, *_args, **_kwargs):
         raise RuntimeError("provider unavailable")
 
 
@@ -1212,17 +1204,6 @@ class CropBatchGateway(AcceptingGateway):
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
-        return PageInspection(
-            decisions=[
-                InspectionDecision(
-                    region_id=region_id, action=InspectionAction.INSPECT_CROP
-                )
-                for region_id in targets
-            ]
-        )
-
     def inspect_crops(self, crops):
         self.crop_batches.append(crops)
         return PageInspection(
@@ -1235,7 +1216,7 @@ class CropBatchGateway(AcceptingGateway):
         )
 
 
-def test_crop_requests_are_batched_once_and_limited_to_eight_highest_risk(
+def test_crop_requests_cover_all_risky_regions_in_one_batch(
     simple_pdf: bytes,
 ) -> None:
     gateway = CropBatchGateway()
@@ -1245,18 +1226,12 @@ def test_crop_requests_are_batched_once_and_limited_to_eight_highest_risk(
 
     assert len(gateway.crop_batches) == 1
     assert [crop.region_id for crop in gateway.crop_batches[0]] == [
-        f"p1-b{index}" for index in range(1, 9)
-    ]
-    overflow = result.document.pages[0].blocks[8:]
-    assert [block.verification for block in overflow] == [
-        VerificationState.NEEDS_REVIEW,
-        VerificationState.NEEDS_REVIEW,
+        f"p1-b{index}" for index in range(1, 11)
     ]
     assert all(
-        block.verification_reason == "Crop inspection limit exceeded"
-        for block in overflow
+        block.verification is VerificationState.VERIFIED
+        for block in result.document.pages[0].blocks
     )
-    assert all(block.text in result.markdown for block in overflow)
 
 
 def test_crop_render_error_preserves_draft_text(
@@ -1276,13 +1251,7 @@ def test_crop_render_error_preserves_draft_text(
     blocks = result.document.pages[0].blocks
     assert gateway.crop_batches == []
     assert all(block.verification is VerificationState.NEEDS_REVIEW for block in blocks)
-    assert all(
-        "crop renderer unavailable" in block.verification_reason for block in blocks[:8]
-    )
-    assert all(
-        block.verification_reason == "Crop inspection limit exceeded"
-        for block in blocks[8:]
-    )
+    assert all("crop renderer unavailable" in block.verification_reason for block in blocks)
     assert all(block.text in result.markdown for block in blocks)
 
 
@@ -1328,9 +1297,10 @@ class CoverageGateway(AcceptingGateway):
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        self.full_region_ids = region_ids
-        self.target_region_ids = target_region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
+        self.full_region_ids = targets
+        self.target_region_ids = targets
         return PageInspection(
             decisions=[
                 InspectionDecision(
@@ -1354,7 +1324,7 @@ class CoverageGateway(AcceptingGateway):
         )
 
 
-def test_page_inspection_can_recover_missing_content_and_reorder_full_manifest(
+def test_page_inspection_cannot_add_content_or_reorder_glm_manifest(
     simple_pdf: bytes,
 ) -> None:
     gateway = CoverageGateway()
@@ -1364,16 +1334,15 @@ def test_page_inspection_can_recover_missing_content_and_reorder_full_manifest(
     ).parse(simple_pdf, "notice.pdf")
 
     blocks = result.document.pages[0].blocks
-    assert gateway.full_region_ids == ["p1-b1", "p1-b2"]
+    assert gateway.full_region_ids == ["p1-b2"]
     assert gateway.target_region_ids == ["p1-b2"]
     assert [block.text for block in blocks] == [
-        "Risky instructions",
-        "County: Enter the county name.",
         "Certain introduction",
+        "Risky instructions",
     ]
-    assert blocks[1].id == "p1-b3"
-    assert blocks[1].verification is VerificationState.VERIFIED
-    assert blocks[1].citation.page == 1
+    assert [block.id for block in blocks] == ["p1-b1", "p1-b2"]
+    assert any("ignored 1 Luna-added region" in warning for warning in result.document.warnings)
+    assert any("ignored Luna reading-order changes" in warning for warning in result.document.warnings)
 
 
 class RejectedAdditionGateway:
@@ -1410,7 +1379,8 @@ class RejectedAdditionGateway:
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
+    def inspect_crops(self, crops, **_kwargs):
+        region_ids = [crop.region_id for crop in crops]
         action = InspectionAction.REJECT if self.reject else InspectionAction.ACCEPT
         return PageInspection(
             decisions=[
@@ -1444,11 +1414,8 @@ class RejectedAdditionGateway:
             ],
         )
 
-    def inspect_crops(self, *_args, **_kwargs):
-        raise AssertionError("crop inspection was not requested")
 
-
-def test_grounded_addition_supersedes_one_rejected_predecessor_with_lineage(
+def test_luna_addition_cannot_supersede_glm_element(
     simple_pdf: bytes,
 ) -> None:
     result = DocumentParser(
@@ -1461,24 +1428,11 @@ def test_grounded_addition_supersedes_one_rejected_predecessor_with_lineage(
     blocks = result.document.pages[0].blocks
     assert len(blocks) == 1
     assert blocks[0].id == "p1-b1"
-    assert blocks[0].text == "Grounded correction"
-    assert blocks[0].verification is VerificationState.VERIFIED
-    assert blocks[0].confidence == 0.98
-    assert [item.model_dump(mode="json") for item in blocks[0].correction_lineage] == [
-        {
-            "original_id": "p1-b1",
-            "replacement_id": "p1-b1",
-            "provider_id": "provider-replacement",
-            "reason": "Grounded page inspection replacement",
-            "previous_state": "rejected",
-            "final_state": "verified",
-        }
-    ]
-    legacy = json.loads(result.legacy_json)
-    assert (
-        legacy["pages"][0]["blocks"][0]["correction_lineage"][0]["provider_id"]
-        == "provider-replacement"
-    )
+    assert blocks[0].text == "Grounded replacement"
+    assert blocks[0].verification is VerificationState.NEEDS_REVIEW
+    assert blocks[0].confidence == 0.4
+    assert blocks[0].correction_lineage == []
+    assert any("ignored 1 Luna-added region" in warning for warning in result.document.warnings)
 
 
 class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
@@ -1495,13 +1449,8 @@ class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
         )
         return draft
 
-    def inspect_page(self, page, draft, *, region_ids, target_region_ids=None):
-        inspection = super().inspect_page(
-            page,
-            draft,
-            region_ids=region_ids,
-            target_region_ids=target_region_ids,
-        )
+    def inspect_crops(self, crops, **kwargs):
+        inspection = super().inspect_crops(crops, **kwargs)
         inspection.decisions[1] = InspectionDecision(
             region_id="p1-b2",
             action=InspectionAction.ACCEPT,
@@ -1515,7 +1464,7 @@ class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
         return inspection
 
 
-def test_superseding_provider_id_remains_a_valid_order_alias(simple_pdf: bytes) -> None:
+def test_provider_order_alias_cannot_reorder_glm_elements(simple_pdf: bytes) -> None:
     result = DocumentParser(
         ParserConfig(render_dpi=72),
         gateway_factory=lambda _config: OrderedRejectedAdditionGateway(
@@ -1525,16 +1474,16 @@ def test_superseding_provider_id_remains_a_valid_order_alias(simple_pdf: bytes) 
 
     blocks = result.document.pages[0].blocks
     assert [(block.id, block.text) for block in blocks] == [
+        ("p1-b1", "Grounded replacement"),
         ("p1-b2", "Active companion"),
-        ("p1-b1", "Grounded correction"),
     ]
-    assert not any(
-        "ignored invalid ordered_region_ids" in warning
+    assert any(
+        "ignored Luna reading-order changes" in warning
         for warning in result.document.warnings
     )
 
 
-def test_active_duplicate_still_suppresses_grounded_addition(simple_pdf: bytes) -> None:
+def test_luna_addition_is_ignored_even_when_duplicate(simple_pdf: bytes) -> None:
     result = DocumentParser(
         ParserConfig(render_dpi=72),
         gateway_factory=lambda _config: RejectedAdditionGateway(reject=False),
@@ -1545,12 +1494,12 @@ def test_active_duplicate_still_suppresses_grounded_addition(simple_pdf: bytes) 
     assert blocks[0].confidence == 0.4
     assert blocks[0].correction_lineage == []
     assert any(
-        "skipped duplicate added region provider-replacement" in warning
+        "ignored 1 Luna-added region" in warning
         for warning in result.document.warnings
     )
 
 
-def test_ambiguous_rejected_predecessors_preserve_addition_for_review(
+def test_luna_addition_is_ignored_for_multiple_glm_predecessors(
     simple_pdf: bytes,
 ) -> None:
     result = DocumentParser(
@@ -1560,21 +1509,11 @@ def test_ambiguous_rejected_predecessors_preserve_addition_for_review(
 
     blocks = result.document.pages[0].blocks
     assert [block.verification for block in blocks] == [
-        VerificationState.REJECTED,
-        VerificationState.REJECTED,
+        VerificationState.NEEDS_REVIEW,
         VerificationState.NEEDS_REVIEW,
     ]
-    addition = blocks[2]
-    assert addition.id == "p1-b3"
-    assert "p1-b1, p1-b2" in addition.verification_reason
-    assert [item.original_id for item in addition.correction_lineage] == [
-        "p1-b1",
-        "p1-b2",
-    ]
-    assert all(
-        item.final_state is VerificationState.NEEDS_REVIEW
-        for item in addition.correction_lineage
-    )
+    assert [block.id for block in blocks] == ["p1-b1", "p1-b2"]
+    assert all(block.correction_lineage == [] for block in blocks)
 
 
 class NormalizingGateway(AcceptingGateway):
@@ -1646,16 +1585,6 @@ class ProactiveCropGateway(AcceptingGateway):
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
-        return PageInspection(
-            decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in targets
-            ],
-            ordered_region_ids=["p1-b2", "p1-b1"],
-        )
-
     def inspect_crops(self, crops):
         self.crop_batches.append(crops)
         return PageInspection(
@@ -1663,6 +1592,7 @@ class ProactiveCropGateway(AcceptingGateway):
                 InspectionDecision(
                     region_id="p1-b1",
                     action=InspectionAction.CORRECT,
+                    confidence=0.95,
                     corrected_region=RegionDraft(
                         type=NodeType.SIDEBAR,
                         text="Email: labweb1@health.mo.gov",
@@ -1674,6 +1604,7 @@ class ProactiveCropGateway(AcceptingGateway):
                 InspectionDecision(
                     region_id="p1-b2",
                     action=InspectionAction.CORRECT,
+                    confidence=0.95,
                     corrected_region=RegionDraft(
                         type=NodeType.FIGURE,
                         figure_description="Bottle with Max. fill line and Min. fill line labels.",
@@ -1695,9 +1626,9 @@ def test_accepted_visuals_are_crop_enriched_with_ambiguous_literals(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: gateway
     ).parse(simple_pdf, "notice.pdf")
 
-    assert len(gateway.crop_batches) == 1
-    assert [crop.region_id for crop in gateway.crop_batches[0]] == ["p1-b2", "p1-b1"]
-    assert [block.id for block in result.document.pages[0].blocks] == ["p1-b2", "p1-b1"]
+    assert len(gateway.crop_batches) == 2
+    assert [crop.region_id for crop in gateway.crop_batches[-1]] == ["p1-b2", "p1-b1"]
+    assert [block.id for block in result.document.pages[0].blocks] == ["p1-b1", "p1-b2"]
     assert [block.reading_order for block in result.document.pages[0].blocks] == [0, 1]
     assert "labweb1@health.mo.gov" in result.markdown
     assert "Bottle with Max. fill line and Min. fill line labels." in result.markdown
@@ -1728,6 +1659,7 @@ class ManyVisualsGateway(AcceptingGateway):
                 InspectionDecision(
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
+                    confidence=0.95,
                     corrected_region=crop.candidate_region.model_copy(
                         update={
                             "figure_description": f"Detailed visual {crop.region_id}"
@@ -1739,7 +1671,9 @@ class ManyVisualsGateway(AcceptingGateway):
         )
 
 
-def test_all_visuals_are_crop_enriched_in_batches_of_eight(simple_pdf: bytes) -> None:
+def test_all_visuals_are_verified_then_enriched_in_bounded_batches(
+    simple_pdf: bytes,
+) -> None:
     gateway = ManyVisualsGateway()
 
     result = DocumentParser(
@@ -1747,6 +1681,7 @@ def test_all_visuals_are_crop_enriched_in_batches_of_eight(simple_pdf: bytes) ->
     ).parse(simple_pdf, "notice.pdf")
 
     assert [[crop.region_id for crop in batch] for batch in gateway.crop_batches] == [
+        [f"p1-b{index}" for index in range(1, 11)],
         [f"p1-b{index}" for index in range(1, 9)],
         ["p1-b9", "p1-b10"],
     ]
@@ -1769,20 +1704,11 @@ def test_visual_crop_batch_failure_is_isolated(simple_pdf: bytes) -> None:
     ).parse(simple_pdf, "notice.pdf")
 
     blocks = result.document.pages[0].blocks
-    assert [block.verification for block in blocks[:8]] == [
-        VerificationState.VERIFIED
-    ] * 8
-    assert all(
-        block.figure_description.startswith("Detailed visual") for block in blocks[:8]
-    )
-    assert [block.verification for block in blocks[8:]] == [
-        VerificationState.NEEDS_REVIEW,
-        VerificationState.NEEDS_REVIEW,
-    ]
-    assert all(
-        "second visual batch failed" in block.verification_reason
-        for block in blocks[8:]
-    )
+    assert [block.verification for block in blocks] == [
+        VerificationState.NEEDS_REVIEW
+    ] * 10
+    assert all(block.figure_description.startswith("Detailed visual") for block in blocks)
+    assert all("second visual batch failed" in block.verification_reason for block in blocks)
 
 
 class ExtremeOrderGateway(AcceptingGateway):
@@ -1805,14 +1731,14 @@ class ExtremeOrderGateway(AcceptingGateway):
             ]
         )
 
-    def inspect_page(self, _page, _draft, *, region_ids, target_region_ids=None):
-        targets = target_region_ids or region_ids
+    def inspect_crops(self, crops, **_kwargs):
+        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
                 for region_id in targets
             ],
-            ordered_region_ids=list(reversed(region_ids)),
+            ordered_region_ids=list(reversed(targets)),
         )
 
 
@@ -1826,5 +1752,6 @@ def test_extreme_page_reordering_is_ignored_and_audited(simple_pdf: bytes) -> No
         f"Block {index}" for index in range(8)
     ]
     assert any(
-        "excessive block movement" in warning for warning in result.document.warnings
+        "ignored Luna reading-order changes" in warning
+        for warning in result.document.warnings
     )

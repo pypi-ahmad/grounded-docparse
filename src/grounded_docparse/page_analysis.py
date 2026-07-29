@@ -10,7 +10,7 @@ from pathlib import Path
 
 from PIL import Image, ImageFilter, ImageStat
 
-from .config import ParserConfig
+from .config import LUNA_MODEL, ParserConfig
 from .ingest import PageEvidence
 from .local_ocr import GlmPageResult, GlmRegion, get_glmocr_runtime, glmocr_version
 from .models import (
@@ -81,9 +81,6 @@ class PageAnalyzer:
         self.config = config
         self.runtime_factory = runtime_factory
 
-    def analyze(self, page: PageEvidence) -> PageAnalysis:
-        return next(self.analyze_window([page]))
-
     def model_versions(self) -> dict[str, str]:
         try:
             vllm_version = version("vllm")
@@ -94,7 +91,7 @@ class PageAnalyzer:
             "ocr_model": "zai-org/GLM-OCR",
             "layout_model": "PaddlePaddle/PP-DocLayoutV3_safetensors",
             "vllm": vllm_version,
-            "luna": self.config.luna_model,
+            "luna": LUNA_MODEL,
         }
 
     def analyze_window(self, pages: list[PageEvidence]):

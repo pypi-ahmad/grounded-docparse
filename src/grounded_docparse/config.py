@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
+LUNA_MODEL = "gpt-5.6-luna"
+
 
 @dataclass(frozen=True, slots=True)
 class AnalysisThresholds:
@@ -44,15 +46,14 @@ class AnalysisThresholds:
 
 @dataclass(frozen=True, slots=True)
 class ParserConfig:
-    luna_model: str = "gpt-5.6-luna"
     render_dpi: int = 200
     crop_dpi: int = 450
-    crop_padding: float = 0.05
-    targeted_repair_context_padding: float | None = None
+    crop_padding: float = 0.1
     max_upload_bytes: int = 250 * 1024 * 1024
     max_pages: int = 500
     max_page_pixels: int = 20_000_000
     luna_max_output_tokens: int = 128_000
+    max_visual_recovery_crops: int = 8
     page_batch_size: int = 16
     max_page_concurrency: int = 8
     provider_concurrency: int = 8
@@ -61,12 +62,6 @@ class ParserConfig:
     provider_retry_cap_seconds: float = 8.0
     provider_cooldown_seconds: float = 1.0
     provider_success_window: int = 10
-    max_model_calls: int | None = None
-    max_http_attempts: int | None = None
-    max_input_tokens: int | None = None
-    max_output_tokens: int | None = None
-    max_elapsed_seconds: float | None = None
-    max_repair_rounds: int | None = None
     full_page_fallback_fraction: float = 0.1
     local_ocr_enabled: bool = True
     glmocr_config_path: str = "config/glmocr.yaml"
@@ -81,6 +76,7 @@ class ParserConfig:
             "max_pages",
             "max_page_pixels",
             "luna_max_output_tokens",
+            "max_visual_recovery_crops",
             "page_batch_size",
             "max_page_concurrency",
             "provider_concurrency",
@@ -91,13 +87,6 @@ class ParserConfig:
                 raise ValueError(f"{name} must be positive")
         if not 0 <= self.crop_padding <= 0.5:
             raise ValueError("crop_padding must be between 0 and 0.5")
-        if (
-            self.targeted_repair_context_padding is not None
-            and not 0 <= self.targeted_repair_context_padding <= 0.5
-        ):
-            raise ValueError(
-                "targeted_repair_context_padding must be between 0 and 0.5"
-            )
         if self.max_page_concurrency > self.page_batch_size:
             raise ValueError("max_page_concurrency cannot exceed page_batch_size")
         for name in (
@@ -113,28 +102,9 @@ class ParserConfig:
             )
         if not 0 < self.full_page_fallback_fraction <= 1:
             raise ValueError("full_page_fallback_fraction must be in (0,1]")
-        for name in (
-            "max_model_calls",
-            "max_http_attempts",
-            "max_input_tokens",
-            "max_output_tokens",
-            "max_elapsed_seconds",
-            "max_repair_rounds",
-        ):
-            value = getattr(self, name)
-            if value is not None and value <= 0:
-                raise ValueError(f"{name} must be positive when set")
 
     @classmethod
     def from_env(cls) -> ParserConfig:
-        def optional_int(name: str) -> int | None:
-            value = os.getenv(name)
-            return int(value) if value else None
-
-        def optional_float(name: str) -> float | None:
-            value = os.getenv(name)
-            return float(value) if value else None
-
         defaults = cls()
         threshold_defaults = defaults.analysis_thresholds
         thresholds = AnalysisThresholds(
@@ -149,14 +119,10 @@ class ParserConfig:
             }
         )
         return cls(
-            luna_model=os.getenv("DOCPARSE_LUNA_MODEL", defaults.luna_model),
             render_dpi=int(os.getenv("DOCPARSE_RENDER_DPI", str(defaults.render_dpi))),
             crop_dpi=int(os.getenv("DOCPARSE_CROP_DPI", str(defaults.crop_dpi))),
             crop_padding=float(
                 os.getenv("DOCPARSE_CROP_PADDING", str(defaults.crop_padding))
-            ),
-            targeted_repair_context_padding=optional_float(
-                "DOCPARSE_TARGETED_REPAIR_CONTEXT_PADDING"
             ),
             max_upload_bytes=int(
                 os.getenv("DOCPARSE_MAX_UPLOAD_BYTES", str(defaults.max_upload_bytes))
@@ -169,6 +135,12 @@ class ParserConfig:
                 os.getenv(
                     "DOCPARSE_LUNA_MAX_OUTPUT_TOKENS",
                     str(defaults.luna_max_output_tokens),
+                )
+            ),
+            max_visual_recovery_crops=int(
+                os.getenv(
+                    "DOCPARSE_MAX_VISUAL_RECOVERY_CROPS",
+                    str(defaults.max_visual_recovery_crops),
                 )
             ),
             page_batch_size=int(
@@ -216,12 +188,6 @@ class ParserConfig:
                     str(defaults.provider_success_window),
                 )
             ),
-            max_model_calls=optional_int("DOCPARSE_MAX_MODEL_CALLS"),
-            max_http_attempts=optional_int("DOCPARSE_MAX_HTTP_ATTEMPTS"),
-            max_input_tokens=optional_int("DOCPARSE_MAX_INPUT_TOKENS"),
-            max_output_tokens=optional_int("DOCPARSE_MAX_OUTPUT_TOKENS"),
-            max_elapsed_seconds=optional_float("DOCPARSE_MAX_ELAPSED_SECONDS"),
-            max_repair_rounds=optional_int("DOCPARSE_MAX_REPAIR_ROUNDS"),
             full_page_fallback_fraction=float(
                 os.getenv(
                     "DOCPARSE_FULL_PAGE_FALLBACK_FRACTION",

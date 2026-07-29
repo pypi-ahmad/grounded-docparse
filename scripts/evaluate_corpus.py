@@ -10,11 +10,8 @@ import pymupdf
 
 from grounded_docparse.benchmark import (
     ReferenceBasis,
-    accuracy_threshold_failures,
     build_live_report,
-    compare_markdown,
     evaluate_live_document,
-    evaluate_result,
     live_telemetry_record,
     load_corpus_manifest,
 )
@@ -136,7 +133,6 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                         "model_usage": {},
                         "retries": 0,
                         "rate_limit_events": 0,
-                        "budget_denials": [],
                     },
                 }
             )
@@ -196,38 +192,6 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
             record["status"] = "evaluated"
             if source_pages is not None:
                 record["source_page_numbers"] = source_pages
-            if (
-                corpus_document.legacy_expectations_path is not None
-                and source_pages is None
-            ):
-                expectations = json.loads(
-                    (args.repository_root / corpus_document.legacy_expectations_path).read_text(
-                        encoding="utf-8"
-                    )
-                )
-                failures = evaluate_result(
-                    parse_result.document, parse_result.markdown, expectations
-                )
-                accuracy = None
-                if reference_text is not None:
-                    accuracy = compare_markdown(
-                        parse_result.markdown,
-                        reference_text,
-                        text_dominant_pages=[
-                            int(page)
-                            for page in expectations.get("text_dominant_pages", [])
-                        ],
-                    )
-                    failures.extend(
-                        accuracy_threshold_failures(
-                            accuracy, expectations.get("accuracy_thresholds", {})
-                        )
-                    )
-                record["legacy_expectations"] = {
-                    "passed": not failures,
-                    "failures": failures,
-                    "markdown_accuracy": accuracy,
-                }
             documents.append(record)
         except Exception as exc:  # noqa: BLE001 - corpus reports isolated failures
             had_error = True
@@ -248,7 +212,6 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                         "model_usage": {},
                         "retries": 0,
                         "rate_limit_events": 0,
-                        "budget_denials": [],
                     },
                 }
             )
@@ -300,7 +263,7 @@ def main() -> int:
         action="append",
         default=[],
         help=(
-            "DOCUMENT_ID=source_verified|synthetic_exact|generated|legacy; "
+            "DOCUMENT_ID=source_verified|synthetic_exact|generated; "
             "external references default to generated"
         ),
     )

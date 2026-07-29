@@ -174,11 +174,9 @@
         "kind": "external",
         "path": "PublicWaterMassMailing.pdf"
       },
-      "legacy_expectations_path": "tests/fixtures/public_water_expectations.json",
       "annotation_path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
       "features": [
-        "external_live_regression",
-        "legacy_public_water"
+        "external_live_regression"
       ],
       "synthetic": false
     }
