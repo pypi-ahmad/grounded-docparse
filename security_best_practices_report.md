@@ -1,32 +1,59 @@
-# Security best practices report: grounded-docparse
+# Security best-practices report: grounded-docparse
 
-## Executive summary
-No Python+Streamlit-specific reference exists in this skill's `references/` (only Django/Flask/FastAPI backend docs, which don't apply — Streamlit isn't a routed web-server framework). This report applies general Python secure-coding practices instead. Most substantive findings for this codebase were already produced this session in `grounded-docparse-threat-model.md` (abuse paths, trust boundaries) and a hardening pass (dependency audit). This report does not re-litigate those; it covers what a general-Python-practices pass adds on top, and confirms nothing new and critical was missed.
+> Repository state reviewed: 2026-07-29. See [the threat model](grounded-docparse-threat-model.md) for trust boundaries and abuse paths.
 
-**No critical or high findings.** One informational gap (no logging), everything else checked came back clean.
+## Summary
+
+No critical or high code-level finding was identified in this repository/code/documentation audit. The threat model tracks four medium-priority areas: native parsing, indirect prompt injection, endpoint confidentiality, and unauthenticated network exposure. The first two are code/data-path risks; the latter two are deployment risks. The trusted-workstation assumption bounds them but does not eliminate them.
 
 ## Medium
 
-None found in this pass beyond what's already tracked in `grounded-docparse-threat-model.md` (TM-001 native-parser risk, TM-002 indirect prompt injection) — see that report for detail; not duplicated here.
+### SBP-001: untrusted native parsing runs in the Streamlit process
 
-## Low / Informational
+- **Where:** `src/grounded_docparse/ingest.py` and crop rendering in the same module.
+- **Current controls:** extension/magic checks, byte/page/pixel limits, password-protected PDF rejection, temporary storage.
+- **Gap:** MuPDF and Pillow decode attacker-controlled bytes in the process that also holds provider credentials.
+- **Recommendation:** keep dependencies current and isolate decode/render work before accepting sensitive or externally supplied documents.
 
-### F-1: No logging module used anywhere in `src/`
-- **Where:** entire `src/grounded_docparse/` package — no `import logging` anywhere.
-- **Why it matters:** not a vulnerability by itself, but it means there's no audit trail of parse failures, provider errors, or the exception paths already surfaced to the user in `streamlit_app.py:81,191,215` (`st.error(f"{type(exc).__name__}: ...")`). If something goes wrong, there's nothing durable to look at afterward beyond the Streamlit session.
-- **Recommendation:** add a `logging.getLogger(__name__)` at the module boundaries that already catch exceptions (`streamlit_app.py`), log the exception at `warning`/`error` level before showing the user-facing message. Low urgency — this is an observability gap, not an exploitable issue, and the app has no persistence layer to write logs to today (per `docs/spec.md` non-goals: no application caching, no persistence).
+### SBP-002: grounding does not eliminate indirect prompt injection
 
-### F-2: Sequential, predictable block/region IDs
-- **Where:** `src/grounded_docparse/pipeline.py:143` — `block_id = f"p{page_number}-b{index + 1}"`.
-- **Why it matters:** the general best-practice guidance is to avoid incrementing public resource IDs since they let an attacker enumerate or guess other resources. Checked whether it applies here: it doesn't. These IDs only ever appear inside one document's own already-fully-returned JSON/Markdown output for a single local session — there's no multi-tenant server exposing them as addressable resources another party could enumerate into. **No action needed**, noted only to record that this was checked rather than skipped.
+- **Where:** crop prompts in `src/grounded_docparse/gateways.py`; compact Markdown/layout prompts used by classification, TOC, extraction, and chat.
+- **Current controls:** Structured Outputs, known-element validation, extraction evidence resolution, strict GLM ownership, `store=False`.
+- **Gap:** a schema-valid response can cite real evidence while interpreting malicious visible instructions as task instructions.
+- **Recommendation:** preserve human review for consequential outputs and surface the destination endpoint and confidence/provenance clearly.
 
-## Checked and clean
-- No `assert`-based validation in production code paths (would silently vanish under Python's `-O` flag) — all validation in `ingest.py`, `extraction.py`, `config.py` uses explicit `if: raise`.
-- No weak/predictable randomness used for anything security-relevant (no `random`/`uuid` use in `src/` at all).
-- No TLS verification bypass (`verify=False`, unverified SSL contexts) anywhere in the codebase.
-- No secrets, API keys, or credentials hardcoded in source (confirmed again this pass; matches the two `/security-review` passes run earlier this session).
-- Dependency vulnerabilities: already found and fixed this session — `requests` 2.31.0 → 2.34.2 (3 CVEs), `pip-audit` now clean.
+## Low / informational
 
-## See also
-- `grounded-docparse-threat-model.md` — full trust-boundary/abuse-path analysis (TM-001..TM-005), written earlier this session, is the authoritative source for this repo's real risk surface.
-- `ownership-map-out/summary.json` — git-ownership bus-factor analysis (single-author repo, expected bus-factor=1 everywhere).
+### SBP-003: no structured application logging
+
+- **Where:** `src/grounded_docparse/` and `streamlit_app.py` do not use Python's logging module.
+- **Impact:** failures are visible in the Streamlit session and result trace, but there is no durable application audit log after the session closes. Launcher stdout/stderr logs cover service startup, not structured parse events.
+- **Recommendation:** if operational auditability becomes a requirement, add redacted structured logs at parse/provider boundaries. Do not log document text, crops, schemas, keys, or full model responses.
+
+### SBP-004: custom endpoint destination is not shown before egress
+
+- **Where:** `OpenAI()` consumes `OPENAI_BASE_URL` from the environment; the UI shows only whether a key exists.
+- **Impact:** an operator may forget that a custom proxy receives document content.
+- **Recommendation:** display the destination host without credentials before enabling Luna calls.
+
+### SBP-005: reusable schemas persist unencrypted
+
+- **Where:** `data/document_studio.sqlite3` or `DOCPARSE_STUDIO_DB_PATH`.
+- **Impact:** schema names/descriptions may reveal business context on a shared workstation.
+- **Current controls:** local path, gitignored `data/`, parameterized SQL.
+- **Recommendation:** avoid sensitive values in schema descriptions and rely on OS disk/user protections; delete the database when schemas should be removed.
+
+## Checked and current
+
+- No hardcoded API key or bearer token is present in tracked source or documentation.
+- Provider requests set `store=False`.
+- No TLS-verification bypass is present in the application source.
+- SQL statements use parameters for user-controlled values.
+- Uploaded filenames are not used to construct temporary source paths.
+- Canonical annotation labels do not embed arbitrary model text.
+- Unknown model-returned source IDs are filtered before UI highlighting.
+- Saved results are not persisted by the application; schemas are the documented exception.
+
+## Deployment boundary
+
+This report does not approve public or multi-user deployment. The app has no authentication, authorization, tenant isolation, or per-user quota, and the launcher does not set an explicit Streamlit loopback address. Any network exposure requires a new threat model and deployment controls.

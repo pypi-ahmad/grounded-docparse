@@ -240,6 +240,10 @@ def _validate_toc(
 ) -> TableOfContents:
     flat = []
     for section in _flatten_sections(toc.sections):
+        title = re.sub(r"^\s{0,3}#{1,6}[ \t]+", "", section.title).strip()
+        if not title:
+            raise ValueError("TOC title is empty after Markdown normalization")
+        section = section.model_copy(update={"title": title})
         if section.page > page_count:
             raise ValueError(f"TOC page {section.page} is outside the document")
         if section.element_id is not None:
@@ -641,4 +645,12 @@ class DocumentAgent:
                 )
             )
         confidence = wire.confidence if sources else "low"
-        return ChatAnswer(answer=wire.answer, sources=sources, confidence=confidence)
+        usage = getattr(gateway, "usage", RunUsage()).model_copy(deep=True)
+        trace = list(getattr(gateway, "trace", []))
+        return ChatAnswer(
+            answer=wire.answer,
+            sources=sources,
+            confidence=confidence,
+            usage=usage,
+            trace=trace,
+        )

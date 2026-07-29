@@ -183,6 +183,52 @@ def test_live_metrics_separate_verified_and_generated_references() -> None:
     )
 
 
+def test_markdown_reference_scores_all_text_after_removing_presentation_syntax() -> (
+    None
+):
+    document = Document(
+        source_name="fixture.pdf",
+        source_sha256="a" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="p1-b1",
+                        type=NodeType.PARAGRAPH,
+                        text="Heading Bold bottle description",
+                        reading_order=0,
+                    )
+                ],
+            )
+        ],
+    )
+    corpus_document = CorpusDocument(
+        id="markdown-reference",
+        source=CorpusSource(kind="external", path="fixture.pdf"),
+        features=["ocr_required"],
+        synthetic=False,
+    )
+
+    result = evaluate_live_document(
+        corpus_document,
+        document,
+        telemetry={},
+        reference_text=(
+            "# Heading\n\n**Bold**\n\n"
+            "<figure><description>bottle description</description></figure>"
+        ),
+        reference_is_markdown=True,
+        reference_basis="source_verified",
+    )
+
+    semantic = result["metrics"]["semantic_text"]
+    assert semantic["character_accuracy"] == 1.0
+    assert semantic["word_accuracy"] == 1.0
+
+
 def test_reading_order_reports_pairwise_accuracy_and_anchor_coverage() -> None:
     metrics = reading_order_metrics(
         candidate_anchor_ids=["title", "right-column"],

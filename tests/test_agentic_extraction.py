@@ -238,6 +238,39 @@ def test_optional_inferred_mode_retains_value_with_grounded_box() -> None:
     assert "unit" not in field.model_dump(mode="json")["bbox"]
 
 
+class SourcePointerExtractionGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
+        assert schema == SCHEMA
+        return {
+            "data": {"invoice_number": "INV-7"},
+            "evidence": [
+                {
+                    "pointer": "/layout_tree/0/atoms/0/text",
+                    "block_ids": ["p1-b1"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+def test_inferred_mode_recovers_grounding_from_invalid_source_pointer() -> None:
+    gateway = SourcePointerExtractionGateway()
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        _parse_result(), SCHEMA, allow_inferred=True
+    )
+
+    field = result.fields["invoice_number"]
+    assert result.data == {"invoice_number": "INV-7"}
+    assert field.value == "INV-7"
+    assert field.confidence == "inferred"
+    assert field.element_id == "p1-b1"
+    assert field.page == 1
+    assert field.bbox == (0.1, 0.1, 0.7, 0.2)
+    assert field.source_text == "Invoice number: INV-7"
+
+
 class NestedEvidenceGateway(ExtractionGateway):
     def __init__(self, value, pointer: str) -> None:
         super().__init__()

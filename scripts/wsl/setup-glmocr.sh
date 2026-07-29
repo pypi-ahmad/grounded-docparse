@@ -39,4 +39,7 @@ source "$WSL_ENV/bin/activate"
 export UV_PROJECT_ENVIRONMENT="$WSL_ENV"
 "$UV_BIN" sync --locked --extra local-ocr
 "$WSL_ENV/bin/python" -c 'import glmocr, torch, transformers, vllm'
+echo "Downloading and pinning GLM-OCR model snapshots..."
+HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 \
+  "$WSL_ENV/bin/python" scripts/wsl/prepare_glmocr_runtime.py
 touch "$WSL_ENV/.docparse-local-ocr-ready"

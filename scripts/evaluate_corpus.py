@@ -77,10 +77,7 @@ def _subset_reference(reference: str, pages: list[int]) -> str:
 
 def _schema_node(value: Any, *, root: bool = False) -> dict[str, Any]:
     if isinstance(value, dict):
-        properties = {
-            name: _schema_node(child)
-            for name, child in value.items()
-        }
+        properties = {name: _schema_node(child) for name, child in value.items()}
         return {
             "type": "object" if root else ["object", "null"],
             "properties": properties,
@@ -101,6 +98,57 @@ def _schema_node(value: Any, *, root: bool = False) -> dict[str, Any]:
     return {"type": [kind, "null"]}
 
 
+def _glm_only_proof(parse_result) -> dict[str, Any]:
+    metadata = parse_result.metadata
+    luna_calls = list(parse_result.usage.calls) if parse_result.usage else []
+    proof = {
+        "visual_recovery_enabled": metadata.visual_recovery_enabled,
+        "recovery_log_entries": len(parse_result.recovery_log),
+        "luna_time": metadata.luna_time,
+        "luna_calls": len(luna_calls),
+    }
+    if (
+        proof["visual_recovery_enabled"]
+        or proof["recovery_log_entries"]
+        or proof["luna_time"]
+        or proof["luna_calls"]
+    ):
+        raise RuntimeError(f"GLM-only evaluation used Luna: {proof}")
+    return proof
+
+
+def _write_artifacts(
+    directory: Path,
+    document_id: str,
+    parse_result,
+    *,
+    pipeline_mode: str,
+    glm_only_proof: dict[str, Any] | None,
+) -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{document_id}.md").write_text(
+        parse_result.markdown, encoding="utf-8"
+    )
+    (directory / f"{document_id}.parse.json").write_text(
+        parse_result.json.rstrip() + "\n", encoding="utf-8"
+    )
+    provenance = {
+        "pipeline_mode": pipeline_mode,
+        "glm_only_proof": glm_only_proof,
+        "metadata": parse_result.metadata.model_dump(mode="json"),
+        "usage": (
+            parse_result.usage.model_dump(mode="json") if parse_result.usage else None
+        ),
+        "recovery_log": [
+            item.model_dump(mode="json") for item in parse_result.recovery_log
+        ],
+    }
+    (directory / f"{document_id}.run.json").write_text(
+        json.dumps(provenance, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+
+
 def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
     manifest = load_corpus_manifest(
         args.manifest, repository_root=args.repository_root.resolve()
@@ -115,7 +163,9 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
     for corpus_document in manifest.documents:
         if selected and corpus_document.id not in selected:
             continue
-        source_path = corpus_document.source_path or external_sources.get(corpus_document.id)
+        source_path = corpus_document.source_path or external_sources.get(
+            corpus_document.id
+        )
         if source_path is None:
             documents.append(
                 {
@@ -153,11 +203,16 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 else source_path.name
             )
             parse_result = DocumentParser().parse(
-                parse_data, parse_name
+                parse_data,
+                parse_name,
+                refine_markdown=not args.glm_only,
+                visual_recovery=not args.glm_only,
             )
+            glm_only_proof = _glm_only_proof(parse_result) if args.glm_only else None
             extraction_result = None
             if (
-                corpus_document.annotation is not None
+                not args.glm_only
+                and corpus_document.annotation is not None
                 and corpus_document.annotation.schema_output is not None
             ):
                 extraction_result = DocumentExtractor().extract(
@@ -184,14 +239,26 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 extraction_data=extraction_result.data if extraction_result else None,
                 reference_text=reference_text,
                 reference_is_markdown=bool(
-                    reference_path is not None and reference_path.suffix.casefold() == ".md"
+                    reference_path is not None
+                    and reference_path.suffix.casefold() == ".md"
                 ),
                 reference_basis=reference_bases.get(corpus_document.id),
                 source_page_numbers=source_pages,
             )
             record["status"] = "evaluated"
+            record["pipeline_mode"] = "glm_only" if args.glm_only else "full"
+            if glm_only_proof is not None:
+                record["glm_only_proof"] = glm_only_proof
             if source_pages is not None:
                 record["source_page_numbers"] = source_pages
+            if args.artifacts_dir is not None:
+                _write_artifacts(
+                    args.artifacts_dir,
+                    corpus_document.id,
+                    parse_result,
+                    pipeline_mode=record["pipeline_mode"],
+                    glm_only_proof=glm_only_proof,
+                )
             documents.append(record)
         except Exception as exc:  # noqa: BLE001 - corpus reports isolated failures
             had_error = True
@@ -249,6 +316,16 @@ def main() -> int:
         type=Path,
     )
     parser.add_argument("--live", action="store_true")
+    parser.add_argument(
+        "--glm-only",
+        action="store_true",
+        help="Disable Luna recovery, refinement, and extraction, and verify no Luna usage",
+    )
+    parser.add_argument(
+        "--artifacts-dir",
+        type=Path,
+        help="Write candidate Markdown, parse JSON, and run provenance per document",
+    )
     parser.add_argument("--document", action="append", default=[])
     parser.add_argument("--external-source", action="append", default=[])
     parser.add_argument("--reference", action="append", default=[])

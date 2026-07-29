@@ -24,19 +24,17 @@ Minimal synthetic input or fixture:
 ## Runtime
 
 - Commit or release:
-- Interface: API / Streamlit / compatibility CLI
-- Processing profile:
-- Execution queue: realtime / batch / not applicable
-- Job status and sanitized job ID:
-- Segmentation and schema options:
-- OS and Docker version:
-- Python and `uv` version, if running locally:
-- Configured model IDs, without credentials:
-- Paddle image digest and Ollama version, if using the compatibility path:
+- Interface: Streamlit / Python API / output schema / evaluation script
+- ADE mode and enabled feature toggles:
+- File type and page count, without document contents:
+- OS, WSL distribution, GPU, and driver version:
+- Python and `uv` version:
+- GLM-OCR, vLLM, and package versions:
+- Custom OpenAI-compatible endpoint in use: yes / no (do not include credentials):
 
 ## Sanitized diagnostics
 
-<!-- Include bounded error text and relevant failure codes. Do not attach source documents, crops, result bundles, raw provider responses, tokens, or full object-store paths. -->
+<!-- Include bounded error text, stage, page, model, and request ID when available. Do not attach source documents, crops, result bundles, raw provider responses, tokens, or local data paths. -->
 
 ## Security reports
 

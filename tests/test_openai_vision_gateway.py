@@ -175,7 +175,7 @@ def test_agentic_analysis_requests_are_structured_text_only(method, parsed) -> N
     assert gateway.trace[0].reasoning_effort == "medium"
     assert call["store"] is False
     assert "layout_tree" in json.loads(call["input"][1]["content"])
-    assert gateway.trace[0].prompt_version == "2026-07-29.3"
+    assert gateway.trace[0].prompt_version == "2026-07-29.4"
     _assert_no_image_payload(call)
 
 
@@ -531,7 +531,7 @@ def test_dynamic_extractor_repairs_invalid_json_once() -> None:
     assert gateway.extract_document({}, schema) == payload
     assert len(responses.calls) == 2
     assert gateway.trace[0].status == "schema_invalid"
-    assert gateway.trace[1].prompt_version == "2026-07-29.3"
+    assert gateway.trace[1].prompt_version == "2026-07-29.4"
 
 
 def test_targeted_span_repair_sends_only_literal_context_and_crop(

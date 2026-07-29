@@ -1,82 +1,170 @@
 # Grounded Document Parser
 
-A single-page local Streamlit studio that uses GLM-OCR plus bounded `gpt-5.6-luna` visual recovery, refinement, classification, TOC generation, grounded extraction, and document chat.
+A workstation-oriented Streamlit studio that parses PDFs and images with local GLM-OCR, then optionally sends selected crops or recognized document context to `gpt-5.6-luna` for bounded visual recovery and document-level reasoning.
 
-The workflow mirrors ADE's parse-then-reason split without calling ADE. GLM-OCR performs layout analysis and parallel region OCR. Up to eight prioritized Luna recovery requests per document, capped at three region crops per page, repair hard existing regions. Luna may replace only high-confidence text; GLM-owned IDs, boxes, types, reading order, confidence, and structure never change. Image recovery uses high reasoning effort; text-only Luna work uses medium effort. A separate text-only Luna pass can refine Markdown presentation without changing grounded text or geometry.
+Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ahmad/grounded-docparse)
 
-Documents are processed in ordered windows of 16 pages with up to 8 isolated page workers by default. Every PDF page is rendered and processed as pixels; embedded or selectable PDF text is never extraction evidence, ground truth, or validation input. Drafting starts from deterministic raster regions. Luna never synthesizes missing regions or replaces a full page; if every nonblank page lacks usable GLM elements, parsing stops before agentic stages.
+GLM-OCR owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Image recovery uses high reasoning effort. Markdown refinement, classification, table-of-contents generation, extraction, and chat use medium effort.
 
-## Run
-
-Requirements: Python 3.12–3.14 through `uv`. `OPENAI_API_KEY` enables Luna recovery and refinement; without it, GLM-OCR still returns grounded output. `OPENAI_BASE_URL` is optional.
-
-```powershell
-uv sync --locked
-uv run streamlit run streamlit_app.py
+```text
+upload
+  -> raster ingest
+  -> GLM-OCR layout and recognition
+  -> deterministic quality analysis
+  -> optional bounded Luna crop recovery
+  -> grounded Markdown, elements, JSON v4.4.0, annotated PDF
+  -> optional Luna refinement, classification, TOC, extraction, and chat
 ```
 
-On a fresh Windows 11 + NVIDIA GPU machine, double-click `Setup-GLM-OCR.cmd` once
-for a full offline GLM-OCR setup (WSL2, GPU check, `uv`, weights); use
-`Launch-GLM-OCR.cmd` afterward. See [run commands](docs/run.md).
+Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. The parser processes ordered windows of 16 pages with up to eight page workers by default. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
 
-Open <http://localhost:8501>, upload one document, choose an ADE mode, and select **Parse document**. **Fast** is the default and runs classification without Markdown refinement or TOC generation; **Full** enables all three. Extraction remains on demand: define or load field keys inside the post-parse Extract tab, then run it. Chat is off by default and makes no request until enabled and a question is submitted. Source actions open the cited annotated page and highlight its GLM box.
+## Install and set up
 
-## Output
+The supported runtime requires Windows 11, WSL2 with Ubuntu 24.04, an NVIDIA Windows driver with WSL GPU passthrough, Git, enough disk space for the WSL environment and model cache, and network access for the first dependency and model download.
 
-- Ordered headings, paragraphs, lists, tables, figures, charts, forms, and checkboxes, including distinct form values and printed hints
-- Nested sections and page structure
-- Truthful `not_checked`, `verified`, `needs_review`, or `rejected` state plus block confidence and optional exact low-confidence spans for atoms and table cells
-- Lossless document-first Markdown with per-block semantic coverage and exact spans
-- Unified JSON v4.4 with top-level `document_type`, `sections`, `extracted_fields`, and recovered-only `recovery_log`, plus element provenance, split Luna timing, refined `markdown`, grounded `base_markdown`, normalized elements, engine/model metadata, correction history, usage, and agent trace; annotated PDF bytes remain a separate download
-- Schema-driven extraction with exact, near-exact, inferred, or not-found grounding
-- Optional document classification, hierarchical TOC, and cited document chat
-- Versioned, compact Luna prompts with one schema-repair retry and reusable prepared context
-- SQLite-backed reusable schema library under the gitignored `data/` directory
-- Actual run-level input and output token totals
-- Viewable and downloadable annotated PDF with semantic type colors, reading-order labels, and Layout Tree selection highlighting
+1. Clone the repository from PowerShell:
+
+   ```powershell
+   git clone https://github.com/pypi-ahmad/grounded-docparse.git
+   Set-Location grounded-docparse
+   ```
+
+2. Confirm WSL and the GPU are available:
+
+   ```powershell
+   wsl --install -d Ubuntu-24.04
+   wsl --update
+   wsl -d Ubuntu-24.04 -- nvidia-smi
+   ```
+
+   Restart Windows and complete Ubuntu's first-login setup if requested.
+
+3. Optional: enable Luna visual recovery and document reasoning by saving the OpenAI values in the Windows user environment. Skip this step for local GLM-only parsing.
+
+   ```powershell
+   [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
+   # Optional OpenAI-compatible endpoint:
+   # [Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://example.com/v1", "User")
+   ```
+
+4. Run the first-time setup from the repository root:
+
+   ```powershell
+   .\Setup-GLM-OCR.cmd
+   ```
+
+   This creates the locked WSL environment, downloads the pinned GLM-OCR and PP-DocLayoutV3 snapshots, starts vLLM and Streamlit, validates a real OCR request, and opens <http://localhost:8501>.
+
+5. For later sessions, start or reuse the managed services with:
+
+   ```powershell
+   .\Launch-GLM-OCR.cmd
+   ```
+
+`Launch-GLM-OCR.cmd` refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from Windows user scope each time. See [setup](SETUP.md) for manual WSL installation, configuration, security boundaries, and troubleshooting, or [run commands](docs/run.md) for service lifecycle commands.
+
+## How to use the app
+
+1. Upload one PDF, PNG, JPEG, or TIFF. An optional inclusive page range is available for PDFs.
+2. Choose an **ADE mode**—the UI name for presets that control optional Luna features, not an external ADE integration. Every mode still runs the same GLM parse:
+   - **Fast**: classification is the only preset-controlled Luna feature; visual recovery is a separate toggle and defaults on when a key is available.
+   - **Full**: Markdown refinement, classification, and TOC generation.
+   - **Custom**: any other combination of those toggles.
+3. Keep visual recovery enabled to inspect up to eight prioritized crops per document, capped at three crops per page.
+4. Select **Parse document**.
+5. Review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
+6. Download the Markdown, annotated PDF, extraction JSON, or full grounded JSON required by the downstream workflow.
+
+Extraction is always on demand after parsing. Create, import, or load a scalar schema in the Extract tab, then select **Run extraction**. Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the GLM-owned box.
+
+## Outputs
+
+- Refined Markdown plus grounded `base_markdown`
+- Parse JSON v4.4.0 with normalized elements, page/block evidence, provenance, correction history, parse usage/trace, empty agentic placeholders, and recovery log
+- Full JSON v4.4.0 using the same envelope with current classification, sections, extraction, combined usage/trace, and feature statuses populated
+- Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and GLM-owned normalized boxes
+- Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes
+- Run metadata including GLM, Luna recovery, and Luna agentic timing
+
+Annotated PDF bytes are downloaded separately and are not embedded in JSON. Reusable extraction schemas persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
+
+## Public Python API
+
+The package exports `DocumentParser`, `DocumentAgent`, `DocumentExtractor`, `ParserConfig`, result models, and `render_combined_result`.
+
+```python
+from pathlib import Path
+
+from grounded_docparse import DocumentAgent, DocumentParser, render_combined_result
+
+source = Path("invoice.pdf")
+result = DocumentParser().parse(
+    source.read_bytes(),
+    source.name,
+    refine_markdown=False,
+    visual_recovery=True,
+)
+
+agent = DocumentAgent()
+analysis = agent.analyze(result, classify=True, generate_toc=False)
+full_json = render_combined_result(result, analysis)
+```
+
+`DocumentParser.parse` is synchronous. Luna failures do not invalidate a successful GLM parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
+
+## Repository layout
+
+```text
+.
+├── Setup-GLM-OCR.cmd             # First-run Windows/WSL bootstrap and launch
+├── Launch-GLM-OCR.cmd            # Subsequent Windows launcher
+├── streamlit_app.py              # Streamlit entry point
+├── src/grounded_docparse/        # Parser, models, gateways, renderers, agentic layer
+├── config/glmocr.yaml            # Source GLM-OCR SDK configuration
+├── scripts/wsl/                  # Locked WSL setup and launch scripts
+├── scripts/                      # Corpus generation and evaluation utilities
+├── benchmarks/                   # Versioned corpus, schemas, rate cards, baselines
+├── examples/                     # Synthetic documents and extraction schema
+├── tests/                        # Offline contract and behavior tests
+├── docs/                         # Architecture, operation, API, workflows, research
+├── pyproject.toml                # Package metadata and dependency declarations
+└── uv.lock                       # Cross-platform locked dependency graph
+```
+
+## Documentation
+
+| Guide | Purpose |
+| --- | --- |
+| [Setup](SETUP.md) | Supported Windows/WSL installation, runtime configuration, and troubleshooting |
+| [Run locally](docs/run.md) | Launcher behavior, manual service commands, and shutdown steps |
+| [Tutorial](docs/tutorial.md) | End-user walkthrough of parsing, extraction, chat, and downloads |
+| [Business extraction workflow](docs/business-user-extraction-workflow.md) | Non-technical workflow for large reusable field sets |
+| [Architecture](docs/architecture.md) | Components, ownership rules, pipeline stages, and failure boundaries |
+| [Python API](docs/api.md) | Exported names, signatures, schemas, and result contracts |
+| [Product specification](docs/spec.md) | Required behavior, public interfaces, and non-goals |
+| [Local GLM-OCR](docs/local-glmocr.md) | Locked GLM-OCR/vLLM runtime and evaluation path |
+| [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, and retention |
 
 ## Development
 
 ```powershell
+uv sync --locked
 uv run pytest -q
-uvx ruff check .
-uv run python -m compileall -q src streamlit_app.py tests
+uvx ruff check src streamlit_app.py tests scripts
+uv run python -m compileall -q src streamlit_app.py tests scripts
+git diff --check
 ```
 
-Run the representative visual live corpus with an
-explicit public-water source and reference:
+Live evaluation is opt-in and must run inside WSL with the setup-created environment while the local GLM service is available. External references default to generated-reference diagnostics unless an explicit reference basis is supplied. Use `--glm-only` to disable and verify the absence of Luna recovery, refinement, and extraction:
 
-```powershell
-uv run python scripts/evaluate_corpus.py --live --output benchmarks/baselines/live-visual-v1.json
-uv run python scripts/evaluate_corpus.py --live `
-  --external-source public-water-mass-mailing=data/pdf/PublicWaterMassMailing.pdf `
-  --reference public-water-mass-mailing=data/groundtruth/PublicWaterMassMailing.md `
-  --rate-card benchmarks/rate-cards/openai-standard-2026-07-28.json `
-  --output output/evaluation-corpus-live.json
+```bash
+source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate"
+python scripts/evaluate_corpus.py --live --glm-only \
+  --document synthetic-report \
+  --artifacts-dir output/synthetic-report-glm-only \
+  --output output/synthetic-report-glm-only.eval.json
 ```
 
-External references default to generated-reference diagnostics. Mark a reference
-as primary only when it has been checked against the source:
+The bundled public/synthetic corpus is a regression suite, not evidence of broad production accuracy or equivalence with an external product. See [extraction quality research](docs/extraction-quality-research.md), [architecture](docs/architecture.md), and [specification](docs/spec.md).
 
-```powershell
-uv run python scripts/evaluate_corpus.py --live `
-  --document public-water-mass-mailing `
-  --page-subset public-water-mass-mailing=4,5,6 `
-  --external-source public-water-mass-mailing=data/pdf/PublicWaterMassMailing.pdf `
-  --reference public-water-mass-mailing=data/groundtruth/PublicWaterMassMailing.md `
-  --reference-basis public-water-mass-mailing=generated
-```
-
-The live report groups results by manifest feature and records character/word accuracy,
-reading order, table cells, schema fields, continuity, hallucination/review outcomes,
-latency, calls, tokens, recovery deferrals, retries, throttles, and estimated
-cost. Missing annotations are reported as unavailable rather than scored as zero. The
-dated rate card is a reproducibility input, not a billing source. This small public and
-synthetic corpus does not establish broad production accuracy or equivalence with ADE,
-LandingAI, or any external benchmark. DocVQA answer rate is a question-answering metric;
-it is not character, field, table-cell, or grounding accuracy.
-
-See [extraction quality research](docs/extraction-quality-research.md) for the
-reference-provenance policy, observed failure modes, and targeted crop experiment.
-
-See [run commands](docs/run.md), [architecture](docs/architecture.md), and [the specification](docs/spec.md). Licensed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE).

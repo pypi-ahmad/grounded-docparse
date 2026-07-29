@@ -16,6 +16,8 @@ class GlmRegion:
     bbox: tuple[float, float, float, float]
     polygon: tuple[tuple[float, float], ...] = ()
     confidence: float | None = None
+    recognition_attempted: bool = False
+    recognition_failed: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +73,11 @@ def _regions(result: Any) -> list[GlmRegion]:
             continue
         index = int(item.get("index", position))
         raw_item = raw_by_index.get(index, {})
+        task_type = str(raw_item.get("task_type", item.get("task_type", ""))).casefold()
+        recognition_attempted = bool(task_type) and task_type not in {"skip", "abandon"}
+        recognition_failed = (
+            recognition_attempted and raw_item.get("content", item.get("content")) is None
+        )
         score = raw_item.get("score", raw_item.get("confidence"))
         polygon_value = raw_item.get("polygon", item.get("polygon", []))
         polygon = (
@@ -90,6 +97,8 @@ def _regions(result: Any) -> list[GlmRegion]:
                 bbox=box,
                 polygon=polygon,
                 confidence=float(score) if isinstance(score, (int, float)) else None,
+                recognition_attempted=recognition_attempted,
+                recognition_failed=recognition_failed,
             )
         )
     return sorted(output, key=lambda region: region.index)

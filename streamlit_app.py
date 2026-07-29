@@ -865,6 +865,11 @@ else:
                                     for citation in answer.sources
                                 ],
                                 "confidence": answer.confidence,
+                                "usage": answer.usage.model_dump(mode="json"),
+                                "trace": [
+                                    event.model_dump(mode="json")
+                                    for event in answer.trace
+                                ],
                             }
                         )
                     except Exception as exc:  # noqa: BLE001 - isolated feature error

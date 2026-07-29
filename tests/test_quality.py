@@ -297,7 +297,7 @@ def test_degraded_scanned_table_with_codes_is_selected_for_repair() -> None:
     assert selected == [block]
 
 
-def test_structured_risks_are_selected_without_warning_keywords() -> None:
+def test_only_failed_structured_content_is_selected_without_warning_keywords() -> None:
     table_box = _box(0.1, 0.1, 0.9, 0.3)
     form_box = _box(0.1, 0.4, 0.9, 0.6)
     page = _page()
@@ -342,7 +342,7 @@ def test_structured_risks_are_selected_without_warning_keywords() -> None:
         [],
     )
 
-    assert {block.id for block in selected} == {"p1-b2", "p1-b3", "p1-b4"}
+    assert {block.id for block in selected} == {"p1-b2", "p1-b4"}
 
 
 def test_rejected_structured_block_remains_a_repair_candidate() -> None:
