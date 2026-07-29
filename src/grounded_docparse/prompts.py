@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-PROMPT_VERSION = "2026-07-29.3"
+PROMPT_VERSION = "2026-07-29.4"
 
 SCHEMA_REPAIR_INSTRUCTION = (
     "The previous response did not satisfy the required output schema. "
@@ -42,6 +42,8 @@ CHAT_PROMPT = (
 EXTRACTION_PROMPT = (
     "Extract only values supported by the grounded document context. Prefer exact or "
     "near-exact source text. Return null when a value is absent or ambiguous. For every "
-    "non-null scalar, include evidence at its RFC 6901 JSON Pointer using only supplied "
-    "block_ids and atom_ids. Never invent identifiers, values, or bounding boxes."
+    "non-null scalar, include evidence at its RFC 6901 JSON Pointer within the returned "
+    "data object (for example /invoice_number), never a pointer into the supplied document "
+    "or layout tree. Use block_ids and atom_ids only to identify source evidence. Never "
+    "invent identifiers, values, or bounding boxes."
 )

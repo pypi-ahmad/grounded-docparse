@@ -72,6 +72,61 @@ def _percentile(histogram: list[int], fraction: float) -> int:
     return 255
 
 
+def _dense_form_order(regions: list[LayoutRegionEvidence]) -> list[str]:
+    def box(region: LayoutRegionEvidence) -> BoundingBox:
+        return region.bbox.normalized
+
+    def spatial_key(region: LayoutRegionEvidence) -> tuple[float, float]:
+        return round(box(region).y0, 2), box(region).x0
+
+    margins = [
+        region
+        for region in regions
+        if box(region).x1 <= 0.2
+        and box(region).y1 - box(region).y0 >= 0.08
+        and box(region).y1 - box(region).y0 > 2 * (box(region).x1 - box(region).x0)
+    ]
+    body = sorted(
+        (region for region in regions if region not in margins),
+        key=lambda region: (box(region).y0, box(region).x0),
+    )
+
+    top: list[LayoutRegionEvidence] = []
+    rest = body
+    if body:
+        bottom = box(body[0]).y1
+        for index, region in enumerate(body[1:], 1):
+            if index >= 4 and box(region).y0 - bottom >= 0.02:
+                top, rest = body[:index], body[index:]
+                break
+            bottom = max(bottom, box(region).y1)
+
+    components: list[list[LayoutRegionEvidence]] = []
+    component_right = 0.0
+    for region in sorted(top, key=lambda item: box(item).x0):
+        if not components or box(region).x0 > component_right + 0.01:
+            components.append([region])
+            component_right = box(region).x1
+        else:
+            components[-1].append(region)
+            component_right = max(component_right, box(region).x1)
+    ordered_top = [
+        region
+        for component in components
+        for region in sorted(component, key=spatial_key)
+    ]
+
+    trailing = [region for region in rest if box(region).y0 >= 0.92]
+    main = [region for region in rest if box(region).y0 < 0.92]
+    ordered = [
+        *ordered_top,
+        *sorted(main, key=spatial_key),
+        *sorted(margins, key=spatial_key),
+        *sorted(trailing, key=spatial_key),
+    ]
+    return [region.id for region in ordered]
+
+
 class PageAnalyzer:
     def __init__(
         self,
@@ -143,6 +198,22 @@ class PageAnalyzer:
                     if result.error
                     else None
                 )
+                recognition_attempts = sum(
+                    region.recognition_attempted for region in result.regions
+                )
+                recognition_failures = sum(
+                    region.recognition_failed for region in result.regions
+                )
+                if recognition_failures:
+                    recognition_warning = (
+                        "GLM-OCR recognition failed for "
+                        f"{recognition_failures} of {recognition_attempts} OCR regions"
+                    )
+                    warning = (
+                        f"{warning}; {recognition_warning}"
+                        if warning
+                        else recognition_warning
+                    )
                 yield self._finish(
                     page,
                     render,
@@ -325,13 +396,24 @@ class PageAnalyzer:
     ) -> LayoutRegionEvidence:
         width, height = page.render_width_pixels, page.render_height_pixels
         x0, y0, x1, y1 = raw.bbox
-        if max(raw.bbox) <= 1.0:
-            x0, x1, y0, y1 = x0 * width, x1 * width, y0 * height, y1 * height
-        x0, x1 = sorted((max(0.0, min(width, x0)), max(0.0, min(width, x1))))
-        y0, y1 = sorted((max(0.0, min(height, y0)), max(0.0, min(height, y1))))
-        normalized = BoundingBox(
-            x0=x0 / width, y0=y0 / height, x1=x1 / width, y1=y1 / height
+        scale = 1.0 if max(raw.bbox) <= 1.0 else 1000.0
+        x0, x1 = sorted(
+            (
+                max(0.0, min(1.0, x0 / scale)),
+                max(0.0, min(1.0, x1 / scale)),
+            )
         )
+        y0, y1 = sorted(
+            (
+                max(0.0, min(1.0, y0 / scale)),
+                max(0.0, min(1.0, y1 / scale)),
+            )
+        )
+        normalized = BoundingBox(x0=x0, y0=y0, x1=x1, y1=y1)
+        polygon_rendered = [
+            (point_x / scale * width, point_y / scale * height)
+            for point_x, point_y in raw.polygon
+        ]
         label = raw.label.casefold()
         region_type = (
             AnalysisRegionType.TABLE
@@ -352,11 +434,11 @@ class PageAnalyzer:
         ):
             region_type = AnalysisRegionType.FORM
         rotation = 90.0 if label in _ROTATED else 0.0
-        if len(raw.polygon) >= 2:
+        if len(polygon_rendered) >= 2:
             rotation = math.degrees(
                 math.atan2(
-                    raw.polygon[1][1] - raw.polygon[0][1],
-                    raw.polygon[1][0] - raw.polygon[0][0],
+                    polygon_rendered[1][1] - polygon_rendered[0][1],
+                    polygon_rendered[1][0] - polygon_rendered[0][0],
                 )
             )
         complexity = (
@@ -379,7 +461,13 @@ class PageAnalyzer:
             type=region_type,
             bbox=BoundingBoxProvenance(
                 normalized=normalized,
-                rendered=CoordinateBox(x0=x0, y0=y0, x1=x1, y1=y1, unit="pixels"),
+                rendered=CoordinateBox(
+                    x0=x0 * width,
+                    y0=y0 * height,
+                    x1=x1 * width,
+                    y1=y1 * height,
+                    unit="pixels",
+                ),
                 source=CoordinateBox(
                     x0=normalized.x0 * page.source_width,
                     y0=normalized.y0 * page.source_height,
@@ -389,7 +477,7 @@ class PageAnalyzer:
                 ),
                 source_page=page.number,
             ),
-            polygon_rendered=list(raw.polygon),
+            polygon_rendered=polygon_rendered,
             text=raw.content,
             layout_confidence=raw.confidence,
             ocr_confidence=None,
@@ -431,10 +519,25 @@ class PageAnalyzer:
             sequence = [membership[item] for item in order if item in membership]
             switches = sum(a != b for a, b in pairwise(sequence))
             if switches > 1:
+                colon_regions = sum(":" in region.text for region in regions)
+                short_regions = sum(len(region.text) < 100 for region in regions)
+                dense_form = (
+                    len(regions) >= 12
+                    and colon_regions >= 8
+                    and short_regions / len(regions) >= 0.75
+                )
                 return ReadingOrderEvidence(
                     status=ReadingOrderStatus.AMBIGUOUS,
+                    ordered_region_ids=(
+                        _dense_form_order(regions) if dense_form else []
+                    ),
+                    confidence=0.75 if dense_form else None,
                     ambiguous_groups=columns,
-                    basis="GLM order alternates between detected columns",
+                    basis=(
+                        "deterministic dense-form spatial order"
+                        if dense_form
+                        else "GLM order alternates between detected columns"
+                    ),
                 )
         return ReadingOrderEvidence(
             status=ReadingOrderStatus.CONFIDENT,
@@ -493,7 +596,17 @@ _LIST_MARKER = re.compile(r"^\s*((?:[-*•]|\d+[.)]|[A-Za-z][.)]))\s+(.*)$", re.
 
 def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
     regions: list[RegionDraft] = []
-    for order, source in enumerate(analysis.regions):
+    by_id = {region.id: region for region in analysis.regions}
+    ordered_sources = [
+        by_id[region_id]
+        for region_id in analysis.reading_order.ordered_region_ids
+        if region_id in by_id
+    ]
+    ordered_ids = {region.id for region in ordered_sources}
+    ordered_sources.extend(
+        region for region in analysis.regions if region.id not in ordered_ids
+    )
+    for order, source in enumerate(ordered_sources):
         label = source.native_label.casefold()
         node_type = NodeType.PARAGRAPH
         heading_level = None

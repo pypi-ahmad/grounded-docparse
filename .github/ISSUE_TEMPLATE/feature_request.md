@@ -17,8 +17,8 @@ labels: enhancement
 
 ## Interface and compatibility
 
-- Affected interface: API / Streamlit / CLI / output schema / deployment
-- Profiles affected:
+- Affected interface: Streamlit / Python API / output schema / evaluation / WSL launcher
+- ADE modes affected: Fast / Full / Custom / not applicable
 - Backward-compatibility expectations:
 
 ## Security, retention, and cost impact

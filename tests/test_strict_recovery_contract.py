@@ -5,9 +5,13 @@ import pytest
 from grounded_docparse import pipeline as pipeline_module
 from grounded_docparse.config import ParserConfig
 from grounded_docparse.models import (
+    AnalysisRegionType,
+    BoundingBoxProvenance,
+    CoordinateBox,
     InspectionAction,
     InspectionDecision,
     InspectionRegionAddition,
+    LayoutRegionEvidence,
     NodeType,
     PageAnalysis,
     PageDraft,
@@ -48,6 +52,7 @@ class RecoveryGateway:
             action=(InspectionAction.REJECT if self.reject else InspectionAction.CORRECT),
             reason="Unreadable" if self.reject else "Clearly visible",
             confidence=self.confidence,
+            evidence_refs=[crops[0].evidence_ref],
             corrected_region=(
                 None
                 if self.reject
@@ -76,6 +81,29 @@ class RecoveryGateway:
             ],
             ordered_region_ids=["luna-added", region_id],
         )
+
+
+class MismatchedEvidenceRecoveryGateway(RecoveryGateway):
+    def inspect_crops(self, crops, **_kwargs):
+        inspection = super().inspect_crops(crops, **_kwargs)
+        inspection.decisions[0].evidence_refs = ["page:1:another-region"]
+        return inspection
+
+
+class DuplicateRecoveryGateway(RecoveryGateway):
+    def inspect_crops(self, crops, **_kwargs):
+        inspection = super().inspect_crops(crops, **_kwargs)
+        inspection.decisions.append(
+            inspection.decisions[0].model_copy(
+                deep=True,
+                update={
+                    "corrected_region": inspection.decisions[0].corrected_region.model_copy(
+                        update={"text": "Duplicate decision text"}
+                    )
+                },
+            )
+        )
+        return inspection
 
 
 def _parse(simple_pdf: bytes, gateway: RecoveryGateway):
@@ -127,6 +155,26 @@ def test_luna_rejection_keeps_glm_text_visible(simple_pdf: bytes) -> None:
     assert result.recovery_log == []
 
 
+def test_mismatched_crop_evidence_fails_closed(simple_pdf: bytes) -> None:
+    result = _parse(simple_pdf, MismatchedEvidenceRecoveryGateway())
+
+    block = result.document.pages[0].blocks[0]
+    assert block.text == "GLM original"
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "evidence reference" in block.verification_reason
+    assert result.recovery_log == []
+
+
+def test_duplicate_crop_decisions_fail_closed(simple_pdf: bytes) -> None:
+    result = _parse(simple_pdf, DuplicateRecoveryGateway())
+
+    block = result.document.pages[0].blocks[0]
+    assert block.text == "GLM original"
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "multiple decisions" in block.verification_reason
+    assert result.recovery_log == []
+
+
 def test_glm_failure_on_all_nonblank_pages_stops_before_luna(
     monkeypatch, simple_pdf: bytes
 ) -> None:
@@ -155,6 +203,99 @@ def test_glm_failure_on_all_nonblank_pages_stops_before_luna(
         RuntimeError,
         match="GLM-OCR produced no usable elements for any nonblank page",
     ):
+        DocumentParser(ParserConfig(render_dpi=72)).parse(
+            simple_pdf,
+            "notice.pdf",
+            refine_markdown=False,
+            visual_recovery=False,
+        )
+
+
+def test_glm_recognition_failure_is_not_exported_as_an_image_only_success(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    class FailedRecognitionAnalyzer:
+        def __init__(self, _config):
+            pass
+
+        def analyze_window(self, pages):
+            for page in pages:
+                yield PageAnalysis(
+                    render=PageRenderEvidence(
+                        render_width_pixels=612,
+                        render_height_pixels=792,
+                        source_page=page.number,
+                        source_width=612,
+                        source_height=792,
+                        source_unit="points",
+                    ),
+                    quality=ScanQualityEvidence(blank=False),
+                    regions=[
+                        LayoutRegionEvidence(
+                            id=f"p{page.number}-analysis-1",
+                            native_label="text",
+                            type=AnalysisRegionType.TEXT,
+                            text="",
+                            bbox=BoundingBoxProvenance(
+                                normalized={
+                                    "x0": 0.1,
+                                    "y0": 0.1,
+                                    "x1": 0.9,
+                                    "y1": 0.2,
+                                },
+                                rendered=CoordinateBox(
+                                    x0=61.2,
+                                    y0=79.2,
+                                    x1=550.8,
+                                    y1=158.4,
+                                    unit="pixels",
+                                ),
+                                source=CoordinateBox(
+                                    x0=61.2,
+                                    y0=79.2,
+                                    x1=550.8,
+                                    y1=158.4,
+                                    unit="points",
+                                ),
+                                source_page=page.number,
+                            ),
+                        ),
+                        LayoutRegionEvidence(
+                            id=f"p{page.number}-analysis-2",
+                            native_label="image",
+                            type=AnalysisRegionType.FIGURE,
+                            text="",
+                            bbox=BoundingBoxProvenance(
+                                normalized={
+                                    "x0": 0.1,
+                                    "y0": 0.3,
+                                    "x1": 0.9,
+                                    "y1": 0.8,
+                                },
+                                rendered=CoordinateBox(
+                                    x0=61.2,
+                                    y0=237.6,
+                                    x1=550.8,
+                                    y1=633.6,
+                                    unit="pixels",
+                                ),
+                                source=CoordinateBox(
+                                    x0=61.2,
+                                    y0=237.6,
+                                    x1=550.8,
+                                    y1=633.6,
+                                    unit="points",
+                                ),
+                                source_page=page.number,
+                            ),
+                        ),
+                    ],
+                    warnings=["GLM-OCR recognition failed for 1 of 1 OCR regions"],
+                )
+
+    monkeypatch.setattr(pipeline_module, "PageAnalyzer", FailedRecognitionAnalyzer)
+
+    with pytest.raises(RuntimeError, match="GLM-OCR recognition failed"):
         DocumentParser(ParserConfig(render_dpi=72)).parse(
             simple_pdf,
             "notice.pdf",

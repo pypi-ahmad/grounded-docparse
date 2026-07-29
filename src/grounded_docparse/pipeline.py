@@ -26,6 +26,7 @@ from .models import (
     AgentRole,
     AgentTraceEvent,
     AgentUsage,
+    AnalysisRegionType,
     AtomicDraft,
     AtomicEvidence,
     Block,
@@ -122,16 +123,8 @@ class _UnavailableGateway:
 CRITICAL_LITERAL_PATTERN = re.compile(
     r"(?:\d|https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,})"
 )
-CRITICAL_WARNING_MARKERS = (
-    "MUST",
-    "DO NOT",
-    "WILL NOT",
-    "REQUIRED",
-    "WARNING",
-    "IMPORTANT",
-)
 AMBIGUOUS_LITERAL_PATTERN = re.compile(
-    r"(?:https?://|www\.|[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}|#{2,}|\b(?=\w*[A-Za-z])(?=\w*\d)[A-Za-z0-9_-]{5,}\b)"
+    r"(?:#{2,}|(?i:\b(?:id|no|number)2(?=\s+[A-Z0-9][A-Z0-9_-]{2,}\b)))"
 )
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 INVALID_CONFIDENCE_EVIDENCE_REASON = "Invalid confidence evidence"
@@ -363,16 +356,13 @@ def _block(region: RegionDraft, page_number: int, index: int) -> Block:
     return block
 
 
-def _needs_verification(region: RegionDraft, block: Block) -> bool:
+def _needs_verification(block: Block) -> bool:
     return (
         (
             block.confidence is not None
             and block.confidence < VERIFICATION_CONFIDENCE_THRESHOLD
         )
         or block.verification is VerificationState.NEEDS_REVIEW
-        or region.type in COMPLEX_REGION_TYPES
-        or bool(CRITICAL_LITERAL_PATTERN.search(region.text))
-        or any(marker in region.text for marker in CRITICAL_WARNING_MARKERS)
     )
 
 
@@ -838,6 +828,10 @@ def _page_recovery_candidates(
         key = _recovery_box_key(bbox or block.bbox)
         if key is None:
             return
+        if block.type in COMPLEX_REGION_TYPES or CRITICAL_LITERAL_PATTERN.search(
+            semantic_text(block)
+        ):
+            severity = max(0, severity - 1)
         candidate = _RecoveryCandidate(
             page=page.number,
             bbox=key,
@@ -900,17 +894,10 @@ def _page_recovery_candidates(
                     4,
                     bbox=target.bbox,
                     target_id=target.target_id,
-                    reasons=("critical_or_low_confidence_literal",),
+                    reasons=("low_confidence_literal",),
                 )
-        if _needs_verification(region, block):
-            severity = (
-                4
-                if block.verification is VerificationState.NEEDS_REVIEW
-                or (block.confidence is not None and block.confidence < VERIFICATION_CONFIDENCE_THRESHOLD)
-                or bool(CRITICAL_LITERAL_PATTERN.search(region.text))
-                else 6
-            )
-            add(block, severity, reasons=("verification_required",))
+        if _needs_verification(block):
+            add(block, 4, reasons=("verification_required",))
         if _proactive_crop_priority(block) is not None:
             add(block, 6, reasons=("visual_or_ambiguous_content",))
 
@@ -1019,6 +1006,74 @@ def _decision_issue(
     elif decision.corrected_region is not None:
         return f"{source} returned a correction for a non-correct decision"
     return None
+
+
+def _validated_crop_decisions(
+    requests: list[CropInspectionRequest],
+    inspection: PageInspection,
+    *,
+    source: str,
+) -> tuple[dict[str, InspectionDecision], str | None]:
+    expected: dict[str, str] = {}
+    duplicate_requests: set[str] = set()
+    for request in requests:
+        if request.region_id in expected:
+            duplicate_requests.add(request.region_id)
+        expected[request.region_id] = request.evidence_ref
+
+    returned: dict[str, InspectionDecision] = {}
+    seen_decision_ids: set[str] = set()
+    duplicate_decisions: set[str] = set()
+    unexpected_ids: set[str] = set()
+    evidence_mismatches: set[str] = set()
+    invalid_decisions: dict[str, str] = {}
+    for decision in inspection.decisions:
+        region_id = decision.region_id
+        if region_id not in expected:
+            unexpected_ids.add(region_id)
+            continue
+        if region_id in seen_decision_ids:
+            duplicate_decisions.add(region_id)
+            returned.pop(region_id, None)
+            continue
+        seen_decision_ids.add(region_id)
+        if decision.evidence_refs != [expected[region_id]]:
+            evidence_mismatches.add(region_id)
+            continue
+        issue = _decision_issue(decision, region_id, source=source)
+        if issue is not None:
+            invalid_decisions[region_id] = issue
+            continue
+        returned[region_id] = decision
+
+    missing_ids = set(expected).difference(
+        decision.region_id for decision in inspection.decisions
+    )
+    problems: list[str] = []
+    if duplicate_requests:
+        problems.append(
+            f"multiple requests for {', '.join(sorted(duplicate_requests))}"
+        )
+    if duplicate_decisions:
+        problems.append(
+            f"multiple decisions for {', '.join(sorted(duplicate_decisions))}"
+        )
+    if unexpected_ids:
+        problems.append(
+            f"unexpected region IDs {', '.join(sorted(unexpected_ids))}"
+        )
+    if missing_ids:
+        problems.append(f"missing decisions for {', '.join(sorted(missing_ids))}")
+    if evidence_mismatches:
+        problems.append(
+            "evidence reference mismatch for "
+            f"{', '.join(sorted(evidence_mismatches))}"
+        )
+    if invalid_decisions:
+        problems.extend(invalid_decisions[key] for key in sorted(invalid_decisions))
+    if problems:
+        return {}, f"{source} response rejected: {'; '.join(problems)}"
+    return returned, None
 
 
 def _hierarchy(
@@ -1212,7 +1267,17 @@ class DocumentParser:
                 for name, value in optional.items()
                 if accepts_kwargs or name in signature.parameters
             }
-            return crop_inspector(requests, **supported)
+            inspection_result = crop_inspector(requests, **supported)
+            bound_decisions, binding_issue = _validated_crop_decisions(
+                requests,
+                inspection_result,
+                source="Verification",
+            )
+            if binding_issue is not None:
+                raise ValueError(binding_issue)
+            return inspection_result.model_copy(
+                update={"decisions": list(bound_decisions.values())}
+            )
 
         warnings.extend(f"Page {page.number}: {item}" for item in draft.warnings)
         deferred_count = len(deferred_recovery_boxes or ())
@@ -1240,7 +1305,7 @@ class DocumentParser:
         risky = [
             (region, block)
             for region, block in zip(draft.regions, blocks, strict=True)
-            if _needs_verification(region, block)
+            if _needs_verification(block)
         ]
         decisions: dict[str, InspectionDecision] = {}
         resolution_failures: dict[str, str] = {}
@@ -1343,6 +1408,14 @@ class DocumentParser:
         for block in blocks:
             if block.verification is VerificationState.REJECTED or block.bbox is None:
                 continue
+            box = _recovery_box_key(block.bbox)
+            if (
+                allowed_recovery_boxes is not None
+                and box in allowed_recovery_boxes
+                and box not in used_recovery_boxes
+                and block.type not in VISUAL_REGION_TYPES
+            ):
+                nonvisual_candidates[block.id] = (-1, block)
             priority = _proactive_crop_priority(block)
             if (
                 priority is not None
@@ -1424,9 +1497,17 @@ class DocumentParser:
                     block.verification = VerificationState.NEEDS_REVIEW
                     block.verification_reason = reason
             else:
-                crop_decisions = {
-                    item.region_id: item for item in crop_inspection.decisions
-                }
+                crop_decisions, binding_issue = _validated_crop_decisions(
+                    batch_requests,
+                    crop_inspection,
+                    source="Crop verification",
+                )
+                if binding_issue is not None:
+                    warnings.append(f"Page {page.number}: {binding_issue}")
+                    for block in batch_blocks:
+                        block.verification = VerificationState.NEEDS_REVIEW
+                        block.verification_reason = binding_issue
+                    continue
                 for block in batch_blocks:
                     crop_decision = crop_decisions.get(block.id)
                     if crop_decision is None:
@@ -1649,13 +1730,20 @@ class DocumentParser:
                             fallback_reason = f"Quality verification failed: {type(exc).__name__}: {exc}"
                             quality_decisions = {}
                         else:
-                            fallback_reason = (
+                            quality_decisions, binding_issue = (
+                                _validated_crop_decisions(
+                                    batch_requests,
+                                    quality_inspection,
+                                    source="Quality verification",
+                                )
+                            )
+                            fallback_reason = binding_issue or (
                                 "No conclusive quality verification decision"
                             )
-                            quality_decisions = {
-                                item.region_id: item
-                                for item in quality_inspection.decisions
-                            }
+                            if binding_issue is not None:
+                                warnings.append(
+                                    f"Page {page.number}: {binding_issue}"
+                                )
                         for request, block in batch:
                             decision = quality_decisions.get(block.id)
                             if decision is not None and decision.action in {
@@ -1948,6 +2036,26 @@ class DocumentParser:
                 if nonblank and all(not analysis.regions for analysis in nonblank):
                     raise RuntimeError(
                         "GLM-OCR produced no usable elements for any nonblank page"
+                    )
+                ocr_regions = [
+                    region
+                    for analysis in nonblank
+                    for region in analysis.regions
+                    if region.type is not AnalysisRegionType.FIGURE
+                ]
+                recognition_failed = any(
+                    "GLM-OCR recognition failed" in warning
+                    for analysis in nonblank
+                    for warning in analysis.warnings
+                )
+                if (
+                    recognition_failed
+                    and ocr_regions
+                    and all(not region.text.strip() for region in ocr_regions)
+                ):
+                    raise RuntimeError(
+                        "GLM-OCR recognition failed for all detected OCR regions on "
+                        "nonblank pages"
                     )
 
             glm_time = time.perf_counter() - started

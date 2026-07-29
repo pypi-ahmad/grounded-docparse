@@ -2,9 +2,11 @@ import json
 from types import SimpleNamespace
 
 import pymupdf
+from PIL import Image
 
 from grounded_docparse import pipeline as pipeline_module
 from grounded_docparse.config import ParserConfig
+from grounded_docparse.ingest import IngestedDocument, PageEvidence
 from grounded_docparse.models import (
     AgentRole,
     InspectionAction,
@@ -14,9 +16,11 @@ from grounded_docparse.models import (
     PageDraft,
     PageInspection,
     RegionDraft,
+    TableCellDraft,
     VerificationState,
 )
 from grounded_docparse.pipeline import DocumentParser
+from grounded_docparse.runtime import ProviderRuntime
 
 
 def test_geometry_only_rejection_flag_is_additive_and_fail_closed() -> None:
@@ -67,16 +71,15 @@ class AcceptingGateway:
         )
 
     def inspect_crops(self, crops, **_kwargs):
-        targets = [crop.region_id for crop in crops]
-        self.inspected_region_ids = targets
+        self.inspected_region_ids = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=region_id,
+                    region_id=crop.region_id,
                     action=InspectionAction.ACCEPT,
-                    evidence_refs=["page:1"],
+                    evidence_refs=[crop.evidence_ref],
                 )
-                for region_id in targets
+                for crop in crops
             ]
         )
 
@@ -150,6 +153,82 @@ class NoQualityScanGateway:
         return PageDraft()
 
 
+class PlannedQualityCropGateway:
+    input_tokens = 0
+    output_tokens = 0
+
+    def __init__(self) -> None:
+        self.inspected = []
+
+    def draft_page(self, _page):
+        return PageDraft(
+            regions=[
+                RegionDraft(
+                    type=NodeType.PARAGRAPH,
+                    text="Short",
+                    reading_order=0,
+                    confidence=0.99,
+                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.9},
+                )
+            ]
+        )
+
+    def inspect_crops(self, crops, **_kwargs):
+        self.inspected.extend(crop.region_id for crop in crops)
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_planner_approved_nonvisual_box_is_dispatched(tmp_path) -> None:
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (200, 200), "white").save(image_path)
+    page = PageEvidence(
+        number=1,
+        width=200,
+        height=200,
+        dpi=72,
+        image_path=image_path,
+        render_width_pixels=200,
+        render_height_pixels=200,
+        effective_dpi=72,
+        source_width=200,
+        source_height=200,
+    )
+    source = IngestedDocument(
+        name="page.png",
+        sha256="a" * 64,
+        source_path=image_path,
+        pages=[page],
+    )
+    config = ParserConfig(render_dpi=72, crop_dpi=72)
+    gateway = PlannedQualityCropGateway()
+    parser = DocumentParser(config, gateway_factory=lambda _config: gateway)
+
+    processed = parser._process_page(
+        source,
+        page,
+        tmp_path,
+        1,
+        None,
+        ProviderRuntime(config),
+        None,
+        visual_recovery=True,
+        allowed_recovery_boxes={(0.1, 0.1, 0.9, 0.9)},
+        deferred_recovery_boxes=set(),
+    )
+
+    assert gateway.inspected == ["p1-b1"]
+    assert processed.visual_recovery_crops == 1
+
+
 def test_custom_gateway_without_analysis_does_not_synthesize_scan_probes() -> (
     None
 ):
@@ -200,7 +279,9 @@ class ScanProbeRecoveryGateway:
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=crop.region_id, action=InspectionAction.ACCEPT
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -213,6 +294,7 @@ class ScanProbeRecoveryGateway:
                 InspectionDecision(
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
+                    evidence_refs=[crop.evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.PARAGRAPH,
                         text="Verified chart label",
@@ -379,6 +461,7 @@ class ConflictingScanProbeGateway(ScanProbeRecoveryGateway):
                 InspectionDecision(
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
+                    evidence_refs=[crop.evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.PARAGRAPH,
                         text=("SYNTHETIC MEDICAL FAX - NO PHI\nFAX DATE: 2025-07-14"),
@@ -478,21 +561,20 @@ class UnresolvedCriticalGateway(QualityRecoveryGateway):
                     text="NPI: 1388746512",
                     reading_order=0,
                     confidence=0.99,
-                    bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
+                    bbox={"x0": 0.999, "y0": 0.1, "x1": 1.0, "y1": 0.2},
                 )
             ]
         )
 
     def inspect_crops(self, crops, **_kwargs):
-        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=region_id,
+                    region_id=crop.region_id,
                     action=InspectionAction.ACCEPT,
-                    evidence_refs=["page:1"],
+                    evidence_refs=[crop.evidence_ref],
                 )
-                for region_id in targets
+                for crop in crops
             ]
         )
 
@@ -501,7 +583,7 @@ class UnresolvedCriticalGateway(QualityRecoveryGateway):
         return PageInspection()
 
 
-def test_unresolved_critical_literal_remains_visible_with_review_warning() -> None:
+def test_clipped_critical_literal_remains_visible_with_review_warning() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.insert_text((72, 90), "NPI: 1386746512", fontsize=11)
@@ -557,7 +639,7 @@ class SecondRoundStructuredRepairGateway:
                     },
                     reading_order=1,
                     confidence=0.99,
-                    bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
+                    bbox={"x0": 0.999, "y0": 0.3, "x1": 1.0, "y1": 0.4},
                 ),
             ]
         )
@@ -565,8 +647,12 @@ class SecondRoundStructuredRepairGateway:
     def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.REJECT)
-                for region_id in [crop.region_id for crop in crops]
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.REJECT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
             ]
         )
 
@@ -579,6 +665,7 @@ class SecondRoundStructuredRepairGateway:
                         region_id=crop.region_id,
                         action=InspectionAction.REJECT,
                         reason="First crop remained ambiguous",
+                        evidence_refs=[crop.evidence_ref],
                     )
                     for crop in crops
                 ]
@@ -588,6 +675,7 @@ class SecondRoundStructuredRepairGateway:
                 InspectionDecision(
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
+                    evidence_refs=[crop.evidence_ref],
                     corrected_region=crop.candidate_region.model_copy(
                         update={
                             "form": crop.candidate_region.form.model_copy(
@@ -610,7 +698,7 @@ def test_rejected_form_remains_reviewable_after_one_quality_round() -> None:
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[1]
-    assert gateway.quality_calls == []
+    assert len(gateway.quality_calls) == 1
     assert block.verification is VerificationState.NEEDS_REVIEW
     assert block.form is not None
     assert block.form.value == "Hallucinated"
@@ -643,6 +731,7 @@ class MalformedCorrectionGateway(SecondRoundStructuredRepairGateway):
                 InspectionDecision(
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -658,7 +747,7 @@ def test_malformed_quality_correction_preserves_reviewable_content() -> None:
     ).parse(_account_pdf(), "account.pdf")
 
     block = result.document.pages[0].blocks[1]
-    assert gateway.quality_calls == []
+    assert len(gateway.quality_calls) == 1
     assert block.verification is VerificationState.NEEDS_REVIEW
     assert "Hallucinated" in result.markdown
 
@@ -687,8 +776,12 @@ class ManyQualityCandidatesGateway:
     def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in [crop.region_id for crop in crops]
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
             ]
         )
 
@@ -697,12 +790,52 @@ class ManyQualityCandidatesGateway:
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=crop.region_id, action=InspectionAction.ACCEPT
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
         )
 
+
+class MismatchedQualityEvidenceGateway(SecondRoundStructuredRepairGateway):
+    def inspect_quality_crops(self, crops, *, page_number):
+        self.quality_calls.append((page_number, crops))
+        return PageInspection(
+            decisions=[
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.CORRECT,
+                    confidence=0.95,
+                    evidence_refs=["page:1:another-region:quality"],
+                    corrected_region=crop.candidate_region.model_copy(
+                        update={
+                            "form": crop.candidate_region.form.model_copy(
+                                update={"value": "Cross-bound correction"}
+                            )
+                        }
+                    ),
+                )
+                for crop in crops
+            ]
+        )
+
+
+def test_mismatched_quality_crop_evidence_fails_closed() -> None:
+    gateway = MismatchedQualityEvidenceGateway()
+
+    result = DocumentParser(
+        ParserConfig(render_dpi=72, crop_dpi=144),
+        gateway_factory=lambda _config: gateway,
+    ).parse(_account_pdf(), "account.pdf")
+
+    block = result.document.pages[0].blocks[1]
+    assert len(gateway.quality_calls) == 1
+    assert block.form is not None
+    assert block.form.value == "Hallucinated"
+    assert block.verification is VerificationState.NEEDS_REVIEW
+    assert "evidence reference" in block.verification_reason
 
 def test_quality_repair_processes_all_candidates_in_batches_of_eight() -> None:
     gateway = ManyQualityCandidatesGateway()
@@ -731,6 +864,7 @@ class RepeatedQualityRejectionGateway(ManyQualityCandidatesGateway):
                     region_id=crop.region_id,
                     action=InspectionAction.REJECT,
                     reason="Unsupported form content",
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -774,8 +908,12 @@ class GeometryOnlyQualityGateway:
     def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in [crop.region_id for crop in crops]
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
             ]
         )
 
@@ -792,6 +930,7 @@ class GeometryOnlyQualityGateway:
                     ),
                     reason="Crop is unreadable" if crop.region_id == "p1-b1" else "",
                     geometry_only=crop.region_id == "p1-b1",
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -840,6 +979,7 @@ class SemanticRejectionOfClippedGateway(GeometryOnlyQualityGateway):
                         if crop.region_id == "p1-b1"
                         else ""
                     ),
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -870,15 +1010,15 @@ class DirectInspectionGateway(AcceptingGateway):
         agent_role=AgentRole.EVIDENCE_CRITIC,
         **_kwargs,
     ):
-        targets = [crop.region_id for crop in crops]
-        self.inspections.append((agent_role, list(targets)))
+        self.inspections.append((agent_role, [crop.region_id for crop in crops]))
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=region_id,
+                    region_id=crop.region_id,
                     action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
                 )
-                for region_id in targets
+                for crop in crops
             ]
         )
 
@@ -935,7 +1075,16 @@ class MissingCorrectionGateway(AcceptingGateway):
                 InspectionDecision(
                     region_id=targets[0],
                     action=InspectionAction.CORRECT,
-                )
+                    evidence_refs=[crops[0].evidence_ref],
+                ),
+                *[
+                    InspectionDecision(
+                        region_id=crop.region_id,
+                        action=InspectionAction.ACCEPT,
+                        evidence_refs=[crop.evidence_ref],
+                    )
+                    for crop in crops[1:]
+                ],
             ]
         )
 
@@ -950,7 +1099,7 @@ def test_missing_correction_remains_unresolved(simple_pdf: bytes) -> None:
 
     block = result.document.pages[0].blocks[0]
     assert block.verification is VerificationState.NEEDS_REVIEW
-    assert block.verification_reason == "Correction did not include a region"
+    assert "Correction did not include a region" in block.verification_reason
 
 
 class CorrectingGateway(AcceptingGateway):
@@ -962,6 +1111,7 @@ class CorrectingGateway(AcceptingGateway):
                     region_id=targets[0],
                     action=InspectionAction.CORRECT,
                     confidence=0.95,
+                    evidence_refs=[crops[0].evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.HEADING,
                         text="Grounded correction",
@@ -969,7 +1119,15 @@ class CorrectingGateway(AcceptingGateway):
                         heading_level=2,
                         bbox={"x0": 0.1, "y0": 0.1, "x1": 0.9, "y1": 0.2},
                     ),
-                )
+                ),
+                *[
+                    InspectionDecision(
+                        region_id=crop.region_id,
+                        action=InspectionAction.ACCEPT,
+                        evidence_refs=[crop.evidence_ref],
+                    )
+                    for crop in crops[1:]
+                ],
             ]
         )
 
@@ -995,6 +1153,7 @@ class RejectingGateway(AcceptingGateway):
                     region_id=targets[0],
                     action=InspectionAction.REJECT,
                     reason="Not visible",
+                    evidence_refs=[crops[0].evidence_ref],
                 )
             ]
         )
@@ -1022,12 +1181,13 @@ class WrongCropRegionGateway(AcceptingGateway):
             ]
         )
 
-    def inspect_crops(self, *_args, **_kwargs):
+    def inspect_crops(self, crops, **_kwargs):
         return PageInspection(
             decisions=[
                 InspectionDecision(
                     region_id="wrong-region",
                     action=InspectionAction.ACCEPT,
+                    evidence_refs=[crops[0].evidence_ref],
                 )
             ]
         )
@@ -1043,7 +1203,7 @@ def test_crop_decision_for_wrong_region_remains_unresolved(simple_pdf: bytes) ->
 
     block = result.document.pages[0].blocks[0]
     assert block.verification is VerificationState.NEEDS_REVIEW
-    assert block.verification_reason == "No verification decision"
+    assert "unexpected region IDs wrong-region" in block.verification_reason
 
 
 class SelectiveGateway(AcceptingGateway):
@@ -1066,16 +1226,22 @@ class SelectiveGateway(AcceptingGateway):
                 ),
                 RegionDraft(
                     type=NodeType.TABLE,
-                    text="Certain but complex",
+                    text="Name | Value\n--- | ---\nStatus | Current",
                     confidence=0.99,
                     reading_order=2,
                     bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.5},
+                    table_cells=[
+                        TableCellDraft(row_index=0, column_index=0, text="Name"),
+                        TableCellDraft(row_index=0, column_index=1, text="Value"),
+                        TableCellDraft(row_index=1, column_index=0, text="Status"),
+                        TableCellDraft(row_index=1, column_index=1, text="Current"),
+                    ],
                 ),
             ]
         )
 
 
-def test_only_low_confidence_and_complex_regions_are_sent_to_luna(
+def test_only_low_confidence_regions_are_sent_to_luna(
     simple_pdf: bytes,
 ) -> None:
     gateway = SelectiveGateway()
@@ -1083,7 +1249,7 @@ def test_only_low_confidence_and_complex_regions_are_sent_to_luna(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: gateway
     ).parse(simple_pdf, "notice.pdf")
 
-    assert gateway.inspected_region_ids == ["p1-b2", "p1-b3"]
+    assert gateway.inspected_region_ids == ["p1-b2"]
     assert "Certain paragraph" in result.markdown
     assert (
         result.document.pages[0].blocks[0].verification is VerificationState.NOT_CHECKED
@@ -1115,11 +1281,18 @@ class CriticalLiteralGateway(AcceptingGateway):
                     reading_order=2,
                     bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
                 ),
+                RegionDraft(
+                    type=NodeType.PARAGRAPH,
+                    text="Batch ID2 SCAN-042",
+                    confidence=0.99,
+                    reading_order=3,
+                    bbox={"x0": 0.1, "y0": 0.4, "x1": 0.9, "y1": 0.5},
+                ),
             ]
         )
 
 
-def test_critical_literals_are_verified_even_at_high_confidence(
+def test_only_ambiguous_critical_literals_trigger_luna(
     simple_pdf: bytes,
 ) -> None:
     gateway = CriticalLiteralGateway()
@@ -1127,7 +1300,7 @@ def test_critical_literals_are_verified_even_at_high_confidence(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: gateway
     ).parse(simple_pdf, "notice.pdf")
 
-    assert gateway.inspected_region_ids == ["p1-b2", "p1-b3"]
+    assert gateway.inspected_region_ids == ["p1-b4"]
 
 
 class InvalidCorrectionGateway(CorrectingGateway):
@@ -1139,13 +1312,22 @@ class InvalidCorrectionGateway(CorrectingGateway):
                     region_id=targets[0],
                     action=InspectionAction.CORRECT,
                     confidence=0.95,
+                    evidence_refs=[crops[0].evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.HEADING,
                         text="Unsupported correction",
                         reading_order=0,
                         bbox={"x0": 0.8, "y0": 0.1, "x1": 0.2, "y1": 0.2},
                     ),
-                )
+                ),
+                *[
+                    InspectionDecision(
+                        region_id=crop.region_id,
+                        action=InspectionAction.ACCEPT,
+                        evidence_refs=[crop.evidence_ref],
+                    )
+                    for crop in crops[1:]
+                ],
             ]
         )
 
@@ -1209,7 +1391,9 @@ class CropBatchGateway(AcceptingGateway):
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=crop.region_id, action=InspectionAction.ACCEPT
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
                 )
                 for crop in crops
             ]
@@ -1306,6 +1490,7 @@ class CoverageGateway(AcceptingGateway):
                 InspectionDecision(
                     region_id="p1-b2",
                     action=InspectionAction.ACCEPT,
+                    evidence_refs=[crops[0].evidence_ref],
                 )
             ],
             additional_regions=[
@@ -1380,16 +1565,16 @@ class RejectedAdditionGateway:
         )
 
     def inspect_crops(self, crops, **_kwargs):
-        region_ids = [crop.region_id for crop in crops]
         action = InspectionAction.REJECT if self.reject else InspectionAction.ACCEPT
         return PageInspection(
             decisions=[
                 InspectionDecision(
-                    region_id=region_id,
+                    region_id=crop.region_id,
                     action=action,
                     reason="Unsupported draft" if self.reject else "Grounded draft",
+                    evidence_refs=[crop.evidence_ref],
                 )
-                for region_id in region_ids
+                for crop in crops
             ],
             additional_regions=[
                 InspectionRegionAddition(
@@ -1455,6 +1640,7 @@ class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
             region_id="p1-b2",
             action=InspectionAction.ACCEPT,
             reason="Grounded draft",
+            evidence_refs=[crops[1].evidence_ref],
         )
         inspection.ordered_region_ids = [
             "p1-b2",
@@ -1593,6 +1779,7 @@ class ProactiveCropGateway(AcceptingGateway):
                     region_id="p1-b1",
                     action=InspectionAction.CORRECT,
                     confidence=0.95,
+                    evidence_refs=[crops[0].evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.SIDEBAR,
                         text="Email: labweb1@health.mo.gov",
@@ -1605,6 +1792,7 @@ class ProactiveCropGateway(AcceptingGateway):
                     region_id="p1-b2",
                     action=InspectionAction.CORRECT,
                     confidence=0.95,
+                    evidence_refs=[crops[0].evidence_ref],
                     corrected_region=RegionDraft(
                         type=NodeType.FIGURE,
                         figure_description="Bottle with Max. fill line and Min. fill line labels.",
@@ -1617,7 +1805,7 @@ class ProactiveCropGateway(AcceptingGateway):
         )
 
 
-def test_accepted_visuals_are_crop_enriched_with_ambiguous_literals(
+def test_unexpected_crop_decision_rejects_the_visual_batch(
     simple_pdf: bytes,
 ) -> None:
     gateway = ProactiveCropGateway()
@@ -1626,12 +1814,17 @@ def test_accepted_visuals_are_crop_enriched_with_ambiguous_literals(
         ParserConfig(render_dpi=72), gateway_factory=lambda _config: gateway
     ).parse(simple_pdf, "notice.pdf")
 
-    assert len(gateway.crop_batches) == 2
-    assert [crop.region_id for crop in gateway.crop_batches[-1]] == ["p1-b2", "p1-b1"]
+    assert len(gateway.crop_batches) == 1
+    assert [crop.region_id for crop in gateway.crop_batches[0]] == ["p1-b2"]
     assert [block.id for block in result.document.pages[0].blocks] == ["p1-b1", "p1-b2"]
     assert [block.reading_order for block in result.document.pages[0].blocks] == [0, 1]
-    assert "labweb1@health.mo.gov" in result.markdown
-    assert "Bottle with Max. fill line and Min. fill line labels." in result.markdown
+    assert "labwebl@health.mo.gov" in result.markdown
+    assert "Bottle with Max. fill line and Min. fill line labels." not in result.markdown
+    assert "<figure>Generic bottle</figure>" in result.markdown
+    assert any(
+        "unexpected region IDs p1-b1" in warning
+        for warning in result.document.warnings
+    )
 
 
 class ManyVisualsGateway(AcceptingGateway):
@@ -1660,6 +1853,7 @@ class ManyVisualsGateway(AcceptingGateway):
                     region_id=crop.region_id,
                     action=InspectionAction.CORRECT,
                     confidence=0.95,
+                    evidence_refs=[crop.evidence_ref],
                     corrected_region=crop.candidate_region.model_copy(
                         update={
                             "figure_description": f"Detailed visual {crop.region_id}"
@@ -1671,7 +1865,7 @@ class ManyVisualsGateway(AcceptingGateway):
         )
 
 
-def test_all_visuals_are_verified_then_enriched_in_bounded_batches(
+def test_all_visuals_are_enriched_in_bounded_batches(
     simple_pdf: bytes,
 ) -> None:
     gateway = ManyVisualsGateway()
@@ -1681,7 +1875,6 @@ def test_all_visuals_are_verified_then_enriched_in_bounded_batches(
     ).parse(simple_pdf, "notice.pdf")
 
     assert [[crop.region_id for crop in batch] for batch in gateway.crop_batches] == [
-        [f"p1-b{index}" for index in range(1, 11)],
         [f"p1-b{index}" for index in range(1, 9)],
         ["p1-b9", "p1-b10"],
     ]
@@ -1705,10 +1898,18 @@ def test_visual_crop_batch_failure_is_isolated(simple_pdf: bytes) -> None:
 
     blocks = result.document.pages[0].blocks
     assert [block.verification for block in blocks] == [
-        VerificationState.NEEDS_REVIEW
-    ] * 10
-    assert all(block.figure_description.startswith("Detailed visual") for block in blocks)
-    assert all("second visual batch failed" in block.verification_reason for block in blocks)
+        *([VerificationState.VERIFIED] * 8),
+        *([VerificationState.NEEDS_REVIEW] * 2),
+    ]
+    assert all(
+        block.figure_description.startswith("Detailed visual") for block in blocks[:8]
+    )
+    assert all(
+        block.figure_description.startswith("Generic visual") for block in blocks[8:]
+    )
+    assert all(
+        "second visual batch failed" in block.verification_reason for block in blocks[8:]
+    )
 
 
 class ExtremeOrderGateway(AcceptingGateway):
@@ -1732,13 +1933,18 @@ class ExtremeOrderGateway(AcceptingGateway):
         )
 
     def inspect_crops(self, crops, **_kwargs):
-        targets = [crop.region_id for crop in crops]
         return PageInspection(
             decisions=[
-                InspectionDecision(region_id=region_id, action=InspectionAction.ACCEPT)
-                for region_id in targets
+                InspectionDecision(
+                    region_id=crop.region_id,
+                    action=InspectionAction.ACCEPT,
+                    evidence_refs=[crop.evidence_ref],
+                )
+                for crop in crops
             ],
-            ordered_region_ids=list(reversed(targets)),
+            ordered_region_ids=list(
+                reversed([crop.region_id for crop in crops])
+            ),
         )
 
 

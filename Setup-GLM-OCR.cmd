@@ -39,6 +39,12 @@ if errorlevel 1 (
   goto :failed
 )
 
+set "OPENAI_API_KEY="
+for /f "usebackq delims=" %%V in (`powershell.exe -NoProfile -Command "[Environment]::GetEnvironmentVariable('OPENAI_API_KEY','User')"`) do set "OPENAI_API_KEY=%%V"
+set "OPENAI_BASE_URL="
+for /f "usebackq delims=" %%V in (`powershell.exe -NoProfile -Command "[Environment]::GetEnvironmentVariable('OPENAI_BASE_URL','User')"`) do set "OPENAI_BASE_URL=%%V"
+if not defined OPENAI_API_KEY echo WARNING: OPENAI_API_KEY is not set in the Windows user environment. Luna features will be unavailable.
+
 set "DOCPARSE_WINDOWS_ROOT=%CD%"
 set "DOCPARSE_OLD_WSLENV=%WSLENV%"
 if defined WSLENV (

@@ -1,14 +1,20 @@
 # Tutorial
 
-1. Optionally set `OPENAI_API_KEY` for Luna recovery/refinement; set `OPENAI_BASE_URL` only for a compatible custom endpoint.
-2. Run `uv sync --locked`, then `uv run streamlit run streamlit_app.py`.
-3. Upload one PDF or image and select **Parse document**.
-4. Review the classification, TOC, Markdown, token totals, and annotated PDF.
-5. For extraction, enable **Schema extract**, open **Manage schemas**, create or import a schema, and save it.
-6. Open **Extract**, select **Run extraction**, and use **Show source** to inspect the highlighted GLM box.
-7. Leave the default **Fast** mode for classification-only analysis, choose **Full** for refinement plus classification and TOC, or adjust individual toggles for **Custom**.
-8. After parsing, open **Extract**, define or load the desired field keys, and select **Run extraction**. Extraction is always on demand.
-9. Enable **Document chat** to ask grounded questions. Chat is off by default, runs only when a question is submitted, and cited answers expose **Show source**.
-10. Download Markdown, the annotated PDF, Extract JSON when available, or Full JSON.
+1. Complete [setup](../SETUP.md) and open <http://localhost:8501>.
+2. Optionally set `OPENAI_API_KEY` in the Windows user environment before launch. The Windows launcher refreshes it and optional `OPENAI_BASE_URL` from user scope each time.
+3. Upload one PDF, PNG, JPEG, or TIFF. For a PDF, optionally enable **Page range** and choose inclusive start/end pages.
+4. Choose an ADE mode:
+   - **Fast**: classification only.
+   - **Full**: Markdown refinement, classification, and TOC.
+   - **Custom**: change individual refinement, classification, or TOC toggles.
+   “ADE mode” is only a preset selector for optional Luna features; every mode runs the same core GLM parse.
+5. Leave **Enable visual recovery on hard regions** on to allow bounded Luna crop repair. Enable document chat only if needed.
+6. Select **Parse document** and wait for layout, recognition, recovery, assembly, annotation, enhancement, and analysis stages.
+7. Use Overview for type, metrics, TOC, thumbnails, and original pages. Use Markdown for rendered or raw output, Annotated PDF for boxes, and Layout Tree for grounded elements and Luna badges.
+8. Open Extract. In **Extraction keys**, create a schema name and fields of type `string`, `number`, `integer`, `boolean`, or `date`; load a saved schema; import JSON; or load the invoice example. Field names start with a letter or underscore and contain only letters, numbers, and underscores. Save if the schema should be reused, use **Export schema JSON** to download it, then select **Run extraction**.
+9. Inspect field confidence and select **Show source** to open the cited GLM box. `not_found` values have no source; `inferred` values require review.
+10. Enable Chat before or after parsing; changing this toggle does not rerun GLM. Ask a question. Cited responses expose **Show source**; answers without valid citations are low confidence.
+11. TOC entries, annotated-page elements, and Layout Tree items also open their highlighted source box.
+12. The bottom action bar downloads refined Markdown as `<stem>.md`, the annotated PDF as `<stem>.annotated.pdf`, Extract JSON as `<stem>.extract.json` when available, and current combined JSON as `<stem>.full.json`. Full JSON includes extraction whenever extraction has run.
 
-Readable draft text remains when verification is inconclusive. Agentic JSON preserves its state and reason; only explicitly rejected content is suppressed.
+Readable GLM text remains when Luna is unavailable or inconclusive. Luna recovery never changes element IDs, boxes, types, confidence, reading order, or structure.

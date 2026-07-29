@@ -7,7 +7,7 @@ Contributions should preserve source grounding, explicit uncertainty, and determ
 ```powershell
 git clone https://github.com/pypi-ahmad/grounded-docparse.git
 Set-Location grounded-docparse
-uv sync --python 3.13 --locked
+uv sync --python 3.12.10 --locked
 ```
 
 Do not install project dependencies with system `pip`. Keep `pyproject.toml` and `uv.lock` synchronized when an approved dependency changes.
@@ -19,7 +19,7 @@ Do not install project dependencies with system `pip`. Keep `pyproject.toml` and
 3. Add a failing public-contract test before changing behavior.
 4. Keep provider output behind validated models and preserve evidence references.
 5. Update user-facing documentation and `CHANGELOG.md` with behavior changes.
-6. Run the verification commands before opening a pull request.
+6. Run the verification commands and documentation checks before opening a pull request.
 
 Avoid unrelated refactors, generated artifacts, real documents, and live-provider fixtures.
 
@@ -27,12 +27,14 @@ Avoid unrelated refactors, generated artifacts, real documents, and live-provide
 
 ```powershell
 uv run python -m pytest -q
-uv run python -m compileall -q src streamlit_app.py tests
-uv run grounded-docparse --help
+uvx ruff check src streamlit_app.py tests scripts
+uv run python -m compileall -q src streamlit_app.py tests scripts
 git diff --check
 ```
 
-Automated tests use synthetic documents and fake OpenAI gateways. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment.
+Automated tests use synthetic documents and fake OpenAI gateways. The project has no installed CLI entry point; use `streamlit_app.py` for the application and `scripts/evaluate_corpus.py` for evaluation. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment.
+
+For documentation changes, also verify that every relative Markdown link resolves and every fenced block has a language identifier and closing fence. The repository does not install a dedicated Markdown-link checker.
 
 ## Documentation changes
 
@@ -57,7 +59,8 @@ Do not include API keys, bearer tokens, source documents, crops, local data, or 
 
 ## Architecture constraints
 
-- Models may propose typed evidence; deterministic code owns IDs, validation, hierarchy, and export policy.
+- Models may propose typed evidence; deterministic code derives stable IDs from GLM regions and owns validation, hierarchy, and export policy.
+- GLM-OCR originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. Luna recovery may change only high-confidence text on existing elements.
 - Unsupported text must remain unresolved or rejected in strict outputs.
 - Every extracted leaf requires existing source-node citations.
 - New output-affecting configuration must be covered by public-contract tests.

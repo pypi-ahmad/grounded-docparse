@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import math
 import re
 import statistics
@@ -209,6 +210,23 @@ def _semantic_words(value: str) -> list[str]:
     return re.findall(
         r"\w+(?:[-'’]\w+)*", _semantic_normalize(value).casefold(), re.UNICODE
     )
+
+
+def _markdown_reference_text(value: str) -> str:
+    pages = value.split("<!-- PAGE BREAK -->")
+    normalized: list[str] = []
+    for page in pages:
+        page = re.sub(r"<!--.*?-->", " ", page, flags=re.DOTALL)
+        page = re.sub(r"<br\s*/?>", "\n", page, flags=re.IGNORECASE)
+        page = re.sub(r"<[^>]+>", " ", page)
+        page = re.sub(r"!\[([^]]*)]\([^)]*\)", r"\1", page)
+        page = re.sub(r"\[([^]]+)]\([^)]*\)", r"\1", page)
+        page = re.sub(r"(?m)^\s{0,3}#{1,6}\s+", "", page)
+        page = re.sub(r"(?m)^\s*(?:[-+*]|\d+[.)])\s+", "", page)
+        page = page.replace("**", "").replace("__", "")
+        page = page.replace("`", "").replace("~~", "")
+        normalized.append(html.unescape(page))
+    return "<!-- PAGE BREAK -->".join(normalized)
 
 
 def semantic_text_metrics(candidate: str, reference: str) -> dict[str, float]:
@@ -823,6 +841,8 @@ def evaluate_live_document(
 ) -> dict[str, Any]:
     annotation = corpus_document.annotation
     reference = reference_text or (annotation.reference_text if annotation else None)
+    if reference is not None and reference_is_markdown:
+        reference = _markdown_reference_text(reference)
     reference_pages = (
         annotation.reference_pages
         if reference_text is None and annotation is not None
@@ -848,12 +868,6 @@ def evaluate_live_document(
             recognized_pages if basis.is_primary else pages,
             reference,
         )
-        if reference_is_markdown:
-            semantic["character_accuracy"] = None
-            semantic["character_error_rate"] = None
-            semantic["character_unavailable_reason"] = (
-                "reference contains Markdown presentation syntax"
-            )
     semantic["reference_basis"] = basis.value
     source_verified = (
         semantic

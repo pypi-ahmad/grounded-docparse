@@ -1,25 +1,165 @@
 pipeline:
   maas:
     enabled: false
+
   ocr_api:
-    api_host: localhost
+    api_host: 127.0.0.1
     api_port: 8080
     api_mode: openai
     model: glm-ocr
+    verify_ssl: false
+    connect_timeout: 30
     request_timeout: 120
-    retry_times: 3
+    retry_max_attempts: 2
+    retry_backoff_base_seconds: 0.5
+    retry_backoff_max_seconds: 8.0
+    retry_jitter_ratio: 0.2
+    retry_status_codes: [429, 500, 502, 503, 504]
     connection_pool_size: 128
-    max_workers: 32
+
+  max_workers: 16
+  page_maxsize: 100
+  region_maxsize: 800
+
   page_loader:
     max_tokens: 8192
-  page_queue:
-    maxsize: 100
-  region_queue:
-    maxsize: 2000
+    temperature: 0.0
+    top_p: 0.00001
+    top_k: 1
+    repetition_penalty: 1.1
+    t_patch_size: 2
+    patch_expand_factor: 1
+    image_expect_length: 6144
+    image_format: JPEG
+    min_pixels: 12544
+    # The SDK schema default and documented formula are 14 * 14 * 4 * 1280.
+    max_pixels: 1003520
+    task_prompt_mapping:
+      text: "Text Recognition:"
+      table: "Table Recognition:"
+      formula: "Formula Recognition:"
+    pdf_dpi: 200
+    pdf_max_pages: null
+    pdf_verbose: false
+
+  result_formatter:
+    output_format: both
+    enable_merge_formula_numbers: true
+    enable_merge_text_blocks: true
+    enable_format_bullet_points: true
+    label_visualization_mapping:
+      table: [table]
+      formula: [display_formula, inline_formula]
+      image: [chart, image]
+      text:
+        - abstract
+        - algorithm
+        - aside_text
+        - content
+        - doc_title
+        - figure_title
+        - footer
+        - footer_image
+        - footnote
+        - formula_number
+        - header
+        - header_image
+        - number
+        - paragraph_title
+        - reference
+        - reference_content
+        - seal
+        - text
+        - vertical_text
+        - vision_footnote
+
   layout:
+    # The runtime materializer replaces this in the generated .runtime config.
     model_dir: PaddlePaddle/PP-DocLayoutV3_safetensors
     threshold: 0.3
     batch_size: 1
     workers: 1
     device: cuda:0
-    use_polygon: true
+    use_polygon: false
+    layout_nms: true
+    layout_unclip_ratio: [1.0, 1.0]
+    layout_merge_bboxes_mode:
+      0: large
+      1: large
+      2: large
+      3: large
+      4: large
+      5: large
+      6: large
+      7: large
+      8: large
+      9: large
+      10: large
+      11: large
+      12: large
+      13: large
+      14: large
+      15: large
+      16: large
+      17: large
+      18: small
+      19: large
+      20: large
+      21: large
+      22: large
+      23: large
+      24: large
+    # Preserve document text that the stock SDK discards as boilerplate. Only
+    # non-textual chart/image regions bypass recognition.
+    label_task_mapping:
+      text:
+        - abstract
+        - algorithm
+        - aside_text
+        - content
+        - doc_title
+        - figure_title
+        - footer
+        - footer_image
+        - footnote
+        - formula_number
+        - header
+        - header_image
+        - number
+        - paragraph_title
+        - reference
+        - reference_content
+        - seal
+        - text
+        - vertical_text
+        - vision_footnote
+      table: [table]
+      formula: [display_formula, inline_formula]
+      skip: [chart, image]
+      abandon: []
+    id2label:
+      0: abstract
+      1: algorithm
+      2: aside_text
+      3: chart
+      4: content
+      5: display_formula
+      6: doc_title
+      7: figure_title
+      8: footer
+      9: footer_image
+      10: footnote
+      11: formula_number
+      12: header
+      13: header_image
+      14: image
+      15: inline_formula
+      16: number
+      17: paragraph_title
+      18: reference
+      19: reference_content
+      20: seal
+      21: table
+      22: text
+      23: vertical_text
+      24: vision_footnote
