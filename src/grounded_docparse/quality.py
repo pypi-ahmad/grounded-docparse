@@ -349,7 +349,6 @@ def _structured_repair_risks(
 ) -> set[str]:
     if block.type not in COMPLEX_TYPES:
         return set()
-    candidate_text = semantic_text(block)
     risks: set[str] = set()
     if block.verification is VerificationState.REJECTED:
         risks.add("rejected")
@@ -359,8 +358,6 @@ def _structured_repair_risks(
         risks.add("confidence")
     if _clipped(block.bbox):
         risks.add("geometry")
-    if _critical_values(candidate_text):
-        risks.add("critical_literal")
     if any(
         marker in warning.casefold()
         for marker in DEGRADED_MARKERS

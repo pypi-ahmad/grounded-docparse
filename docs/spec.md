@@ -2,38 +2,64 @@
 
 ## Goal
 
-Parse one PDF or image into grounded document outputs through a GLM-OCR-first pipeline and a unified engine-neutral result contract.
+Parse one PDF or image into grounded Markdown, structured JSON, and an annotated PDF through a GLM-OCR-first local workflow, with optional bounded Luna recovery and document reasoning.
+
+## Inputs
+
+- One PDF, PNG, JPEG, or TIFF
+- Optional inclusive contiguous PDF page range
+- Optional Luna feature toggles
+- Optional reusable scalar extraction schema
+- Optional document-chat questions after parsing
 
 ## Required behavior
 
-- One document uploader with optional contiguous page-range parsing
-- Evidence-triggered Luna visual recovery, schema proposal, and extraction
-- Optional text-only Luna Markdown refinement using presentation directives
-- Optional structured classification and hierarchical TOC generation
-- On-demand schema extraction and optional cited document chat
-- Luna-high for image recovery; Luna-medium for text-only refinement, classification, TOC, extraction, and chat
-- One direct evidence-critic inspection pass for risky regions
-- Strict Structured Outputs, no explicit prompt-cache controls, and `store=False`
-- Overview, Markdown, annotated PDF, post-parse on-demand Extract, optional Chat, and hierarchical Layout Tree views
-- Fast (default), Full, and automatically detected Custom ADE modes; visual recovery is enabled by default and can be turned off
-- Unified JSON v4.4 with refined Markdown, grounded base Markdown, normalized elements and provenance, split recovery/agentic timing, top-level classification/sections/extraction, recovered-only recovery log, and correction history; annotated PDF bytes are separate
-- Semantic PDF boxes, optional reading-order labels, and selected-element highlighting
-- Actual input and output token totals from provider usage
-- Deterministic source-coverage, duplicate, and critical-literal quality gates
-- At most eight prioritized visual-recovery requests per document and three region crops per page by default
-- Luna recovery applies only text-only corrections with confidence at or above 0.85; GLM IDs, boxes, types, confidence, reading order, and structure remain unchanged
-- Luna cannot add or reject GLM elements; all-nonblank-page GLM failure stops before recovery, while isolated failed pages remain partial with warnings
-- Unresolved content remains visible and is marked `needs_review` with a warning
-- Verified block semantics have full Markdown coverage and exact emission spans; rejected text is JSON-auditable but never rendered or accepted as extraction evidence
-- Page status includes rejected, skipped, conflicting, incomplete, unresolved-recovery, coverage, and geometry history
-- SQLite-backed scalar schema builder with JSON import/export
-- Extraction JSON v1.1 uses `element_id`; extracted fields are labeled `high`, `medium`, `inferred`, or `not_found`, and normalized boxes always come from GLM elements
-- `OPENAI_API_KEY` optional; missing credentials disable Luna but never block GLM-OCR
+- Render PDFs visually and never treat selectable PDF text as evidence.
+- Use GLM-OCR as the source of layout, identity, geometry, type, confidence, and reading order.
+- Process ordered 16-page windows with up to eight page workers by default.
+- Detect weak existing GLM regions deterministically and select at most eight recovery crops per document and three per page by default.
+- Use Luna high effort only for image recovery and apply only text corrections with confidence at least `0.85`.
+- Ignore Luna additions, rejections, geometry changes, order changes, type changes, confidence changes, and structural changes.
+- Stop before Luna when at least one page is nonblank and none of the nonblank pages contains a GLM layout region; preserve isolated page failures as partial output with warnings.
+- Optionally refine Markdown through presentation directives keyed by existing elements.
+- Optionally classify the document and generate a hierarchical, source-linked TOC.
+- Run extraction on demand with a strict nullable JSON Schema subset and existing-element evidence.
+- Run chat on demand and expose only citations to known elements.
+- Use medium Luna effort for refinement, classification, TOC, extraction, schema proposal, and chat.
+- Use strict Structured Outputs, one schema-format retry, `store=False`, and no application-supplied cache controls.
+- Keep Fast as classification-only, Full as refinement/classification/TOC, and Custom as any other toggle combination.
+- Keep visual recovery independently configurable and chat disabled by default.
+- Provide Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree tabs.
+- Provide source highlighting from TOC, extraction, chat, page elements, and layout-tree selections.
+- Emit parse JSON v4.4.0 with refined Markdown, grounded base Markdown, elements/provenance, page/block evidence, correction history, recovery log, parse timing/usage/trace, and empty agentic placeholders.
+- Emit Full JSON v4.4.0 with the same envelope and current classification, sections, extraction, combined usage/trace/timing, and feature statuses populated.
+- Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and GLM-owned normalized boxes.
+- Keep annotated PDF bytes outside JSON and offer them as a separate download.
+- Use SQLite only for intentional application-managed schema persistence; keep parse results in temporary/process/session state. Downloads, browser state, logs, model caches, and legacy data remain operator-managed residuals.
+- Allow GLM-only parsing without `OPENAI_API_KEY`.
+
+## Public interfaces
+
+- Streamlit entry point: `streamlit_app.py`
+- Parse API: `DocumentParser.parse(data, filename, progress_callback=None, *, refine_markdown=True, visual_recovery=True)`
+- Prepared context: `DocumentAgent.prepare(parse_result)`
+- Document analysis: `DocumentAgent.analyze(parse_result, *, classify=True, generate_toc=True, prepared_context=None)`
+- Extraction: `DocumentAgent.extract(parse_result, schema, *, prepared_context=None)`
+- Chat: `DocumentAgent.chat(parse_result, question, history, *, prepared_context=None)`
+- Direct schema proposal/extraction: `DocumentExtractor.propose_schema` and `DocumentExtractor.extract`
+- Combined JSON: `render_combined_result(parse_result, analysis=None, extraction=None)`
+- Evaluation entry point: `scripts/evaluate_corpus.py`
+
+The project does not install a command-line application entry point.
+Signatures, return-model summaries, schema rules, and envelope examples are in [the Python API reference](api.md). The repository does not publish a standalone JSON Schema for every nested v4.4.0 domain object.
 
 ## Non-goals
 
-Document/chat persistence, queues, multi-user serving, open-ended agent loops, human-review storage, cost estimation, application caching, CLI operation, and batch orchestration.
+Document/chat persistence, jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review storage, cost estimation, durable or cross-session result caching, full-page Luna fallback, missing-region synthesis, and batch orchestration in the UI. Reuse inside the active Streamlit session is in scope.
 
 ## Done when
 
-Contract, routing, evidence, gateway, ingest, and Streamlit tests pass; lint and compilation pass; no live paid request is required for automated verification.
+- Public contract, routing, evidence, gateway, ingest, agentic, schema-store, and Streamlit tests pass.
+- Ruff, compilation, Markdown link/fence checks, and `git diff --check` pass.
+- No live paid request is required for automated verification.
+- Documentation matches code paths, defaults, UI labels, and output versions.

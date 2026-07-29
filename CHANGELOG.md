@@ -2,15 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+Entries below **Unreleased** describe historical releases and may reference architectures or interfaces that are no longer present.
+
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-30
+
 ### Added
 
+- Functional GLM-OCR startup validation and a provenance-producing `--glm-only` live benchmark mode.
 - `Setup-GLM-OCR.cmd`: one-time Windows 11 bootstrap that installs WSL2 + Ubuntu-24.04, checks GPU passthrough, installs `uv` inside WSL, and runs the existing launch stack to download weights and start the app.
 - Optional text-only Luna Markdown refinement with grounded presentation directives.
-- Unified JSON v4.4 with element provenance, split recovery/agentic timing, flat classification, sections, extraction, and recovered-only recovery-log fields; annotated PDF bytes remain outside JSON.
+- Unified JSON v4.4.0 with element provenance, split recovery/agentic timing, flat classification, sections, extraction, and recovered-only recovery-log fields; annotated PDF bytes remain outside JSON.
 - Extraction JSON v1.1 with canonical `element_id`, source text, and GLM-owned normalized boxes.
 - Deterministic recovery scoring from OCR confidence, empty-region area, character density, garbage ratio, and table quality.
 - Document-wide prioritization for up to eight high-effort Luna recovery requests, capped at three regions per page, with dashed orange annotations, recovered-region badges, and counts.
@@ -21,6 +26,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Pinned GLM-OCR and PP-DocLayoutV3 snapshots for cached-offline startup, restored the SDK's task/label mappings while retaining document boilerplate, and selected measured WSL throughput defaults.
+- Corrected GLM's 0–1000 coordinates, dense-form reading order, vLLM context sizing, and WSL multimodal startup memory behavior.
+- Refreshed all repository documentation for the GLM-first pipeline, current Streamlit workflow, Python API, configuration, security boundaries, and locked WSL runtime.
 - Enabled evidence-triggered Luna visual recovery by default with a sidebar opt-out while allowing GLM-only parsing without an OpenAI key.
 - Removed the API-key requirement from the Windows/WSL launcher.
 - Kept GLM parsing reusable when only agentic options change, avoiding unnecessary OCR reruns.

@@ -500,6 +500,8 @@ class ChatAnswer(BaseModel):
     answer: str
     sources: list[ChatSource] = Field(default_factory=list)
     confidence: Literal["high", "medium", "low"] = "low"
+    usage: RunUsage = Field(default_factory=RunUsage)
+    trace: list[AgentTraceEvent] = Field(default_factory=list)
 
 
 class ChatCitationWire(BaseModel):

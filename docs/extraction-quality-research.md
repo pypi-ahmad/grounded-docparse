@@ -66,6 +66,8 @@ The crop experiment is motivated by coarse-to-fine document parsing research
 [OpenAI's image-input guidance](https://help.openai.com/en/articles/8400551-image-inputs-for-chatgpt-faq)
 to enlarge text without cropping away relevant context. The experiment was removed
 after it failed the promotion gates below; production always sends the tight crop.
+The current strict pipeline also disables Luna full-page fallback and missing-region
+synthesis; references to full-page recovery below describe historical runs only.
 
 ### July 2026 targeted result
 

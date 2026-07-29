@@ -159,26 +159,32 @@ class DocumentExtractor:
 
         data = deepcopy(draft.get("data", {}))
         warnings: list[str] = []
+        inferred: dict[str, list[dict]] = {}
         if issues and allow_inferred:
             inferred = _resolve_inferred_evidence(data, draft, parse_payload)
             evidence.update(inferred)
             inferred_pointers = set(inferred)
-            issues = [
-                issue
-                for issue in issues
-                if not (
-                    _issue_pointer(issue) in inferred_pointers
-                    and any(
-                        marker in issue
-                        for marker in (
-                            "missing evidence",
-                            "cited evidence does not contain",
-                            "unknown block",
-                            "unknown atom",
-                        )
+            unresolved = []
+            for issue in issues:
+                pointer = _issue_pointer(issue)
+                inferred_issue = pointer in inferred_pointers and any(
+                    marker in issue
+                    for marker in (
+                        "missing evidence",
+                        "cited evidence does not contain",
+                        "unknown block",
+                        "unknown atom",
                     )
                 )
-            ]
+                invalid_source_pointer = (
+                    issue.startswith("invalid evidence pointer ")
+                    and bool(inferred_pointers)
+                )
+                if inferred_issue or invalid_source_pointer:
+                    warnings.append(issue)
+                else:
+                    unresolved.append(issue)
+            issues = unresolved
         if issues:
             for issue in issues:
                 pointer = _issue_pointer(issue)
@@ -191,6 +197,14 @@ class DocumentExtractor:
                 schema,
                 parse_payload,
                 require_all=False,
+            )
+            evidence.update(
+                {
+                    pointer: citations
+                    for pointer, citations in inferred.items()
+                    if _pointer_exists(data, pointer)
+                    and _pointer_value(data, pointer) is not None
+                }
             )
 
         fields = _extracted_fields(data, evidence, parse_payload)

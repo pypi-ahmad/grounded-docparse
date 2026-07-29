@@ -5,6 +5,8 @@ from typing import ClassVar
 
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.models import (
+    AgentTraceEvent,
+    AgentUsage,
     Block,
     ChatAnswerWire,
     ChatCitationWire,
@@ -91,7 +93,7 @@ class FeatureGateway:
         return TableOfContents(
             sections=[
                 TocSection(
-                    title=first["text"],
+                    title=f"## {first['text']}",
                     level=1,
                     page=first["page"],
                     element_id=first["id"],
@@ -101,6 +103,24 @@ class FeatureGateway:
 
     def chat_document(self, question, markdown, layout, history):
         self.chat_calls.append((question, markdown, layout, history))
+        self.usage.calls.append(
+            AgentUsage(
+                agent="document_chat",
+                model="gpt-5.6-luna",
+                input_tokens=17,
+                output_tokens=5,
+            )
+        )
+        self.trace.append(
+            AgentTraceEvent(
+                agent="document_chat",
+                model="gpt-5.6-luna",
+                action="document_chat",
+                status="completed",
+                duration_ms=12,
+                reasoning_effort="medium",
+            )
+        )
         return ChatAnswerWire(
             answer="The first detail is present.",
             citations=[ChatCitationWire(element_id="p1-text")],
@@ -149,6 +169,7 @@ def test_analysis_classifies_first_two_pages_and_builds_grounded_toc() -> None:
 
     assert analysis.classification.primary_type == "Report"
     assert analysis.toc.sections[0].element_id == "p1-heading"
+    assert analysis.toc.sections[0].title == "Heading 1"
     classifier = next(item for item in FeatureGateway.instances if item.classify_calls)
     markdown, layout = classifier.classify_calls[0]
     assert "Heading 1" in markdown and "Heading 2" in markdown
@@ -167,6 +188,10 @@ def test_chat_maps_only_element_ids_to_grounded_citations() -> None:
     assert answer.sources[0].page == 1
     assert answer.sources[0].text == "Document detail 1"
     assert answer.confidence == "low"
+    assert answer.usage.input_tokens == 17
+    assert answer.usage.output_tokens == 5
+    assert answer.trace[0].action == "document_chat"
+    assert answer.trace[0].reasoning_effort == "medium"
 
 
 def test_combined_result_uses_additive_flat_v44_contract() -> None:
