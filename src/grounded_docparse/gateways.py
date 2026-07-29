@@ -12,25 +12,42 @@ from openai import OpenAI, OpenAIError
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .config import ParserConfig
+from .config import LUNA_MODEL, ParserConfig
 from .ingest import PageEvidence
 from .models import (
     AgentRole,
     AgentTraceEvent,
     AgentUsage,
+    ChatAnswerWire,
     CropInspectionRequest,
+    DocumentClassification,
+    MarkdownPresentationPlan,
     PageDraft,
     PageInspection,
-    PagePlan,
     RunUsage,
     SchemaProposalWire,
     SpanRepairInspection,
     SpanRepairRequest,
+    TableOfContents,
 )
-from .raster_regions import RasterRegion
-from .runtime import BudgetExceeded, ProviderRuntime
+from .prompts import (
+    CHAT_PROMPT,
+    CLASSIFICATION_PROMPT,
+    EXTRACTION_PROMPT,
+    MARKDOWN_REFINEMENT_PROMPT,
+    PROMPT_VERSION,
+    SCHEMA_REPAIR_INSTRUCTION,
+    TOC_PROMPT,
+)
+from .runtime import ProviderRuntime
 
 T = TypeVar("T", bound=BaseModel)
+_SCHEMA_FAILURE_MARKERS = ("schema", "validation", "no schema-valid result")
+
+
+def _is_schema_failure(exc: Exception) -> bool:
+    message = str(exc).casefold()
+    return any(marker in message for marker in _SCHEMA_FAILURE_MARKERS)
 
 
 class OpenAIDocumentGateway:
@@ -54,22 +71,15 @@ class OpenAIDocumentGateway:
         self.runtime = runtime
 
     def _provider_responses(self) -> Any:
-        remaining = self.runtime.remaining_seconds()
-        with_options = getattr(self.client, "with_options", None)
-        if remaining is None or not callable(with_options):
-            return self.client.responses
-        return with_options(timeout=remaining).responses
+        return self.client.responses
 
     def _provider_request(
         self,
         call: Callable[[], Any],
         *,
-        agent: str,
         stage: str,
         model: str,
-        started: float,
         page_number: int | None,
-        target_ids: list[str] | None,
         on_success: Callable[[Any], None] | None = None,
     ) -> Any:
         try:
@@ -78,23 +88,8 @@ class OpenAIDocumentGateway:
                 model=model,
                 stage=stage,
                 page_number=page_number,
-                base_draft=stage == "page_draft",
                 on_success=on_success,
             )
-        except BudgetExceeded as exc:
-            self.trace.append(
-                AgentTraceEvent(
-                    agent=agent,
-                    model=model,
-                    action=stage,
-                    status="budget_denied",
-                    page=page_number,
-                    target_ids=target_ids or [],
-                    duration_ms=round((time.perf_counter() - started) * 1000),
-                    summary=str(exc),
-                )
-            )
-            raise
         except OpenAIError as exc:
             exc.docparse_stage = stage
             exc.docparse_page_number = page_number
@@ -163,87 +158,119 @@ class OpenAIDocumentGateway:
         source_page_path: Path | None = None,
         source_page_pixels: int = 0,
         repair_round: int | None = None,
+        prompt_version: str | None = None,
         **kwargs: Any,
     ) -> T:
         started = time.perf_counter()
         model = str(kwargs.get("model", "unknown"))
+        reasoning = kwargs.get("reasoning")
+        reasoning_effort = (
+            str(reasoning.get("effort")) if isinstance(reasoning, dict) else None
+        )
         responses = self.client.responses
         raw_api = getattr(responses, "with_raw_response", None)
         response: Any = None
         call_usage: AgentUsage | None = None
-        if raw_api is None:
 
-            def finalize_response(result: Any) -> None:
-                nonlocal call_usage
-                call_usage = self._record_runtime_usage(
-                    result,
+        def record_schema_failure(exc: Exception) -> None:
+            if not _is_schema_failure(exc):
+                return
+            self.trace.append(
+                AgentTraceEvent(
                     agent=agent,
                     model=model,
+                    action=stage,
+                    status="schema_invalid",
+                    page=page_number,
+                    target_ids=target_ids or [],
+                    duration_ms=round((time.perf_counter() - started) * 1000),
+                    input_tokens=call_usage.input_tokens if call_usage else 0,
+                    output_tokens=call_usage.output_tokens if call_usage else 0,
+                    image_scope=image_scope,
+                    image_count=len(image_paths or []),
+                    source_page_pixels=source_page_pixels,
+                    repair_round=repair_round,
+                    prompt_version=prompt_version,
+                    reasoning_effort=reasoning_effort,
+                    summary=str(exc),
                 )
-
-            response = self._provider_request(
-                lambda: self._provider_responses().parse(
-                    text_format=expected,
-                    **kwargs,
-                ),
-                agent=agent,
-                stage=stage,
-                model=model,
-                started=started,
-                page_number=page_number,
-                target_ids=target_ids,
-                on_success=finalize_response,
             )
-        else:
 
-            def finalize_raw(raw: Any) -> None:
-                nonlocal response, call_usage
-                try:
-                    response = raw.parse()
-                except ValidationError as exc:
-                    try:
-                        payload = json.loads(raw.content)
-                    except (TypeError, ValueError):
-                        payload = {}
+        try:
+            if raw_api is None:
+
+                def finalize_response(result: Any) -> None:
+                    nonlocal call_usage
                     call_usage = self._record_runtime_usage(
-                        payload,
+                        result,
                         agent=agent,
                         model=model,
                     )
-                    page = f" for page {page_number}" if page_number is not None else ""
-                    request_id = getattr(raw, "request_id", None) or "unknown"
-                    detail = exc.errors(include_url=False, include_input=False)[0]
-                    location = (
-                        ".".join(str(item) for item in detail.get("loc", ()))
-                        or "response"
-                    )
-                    incomplete = payload.get("incomplete_details", {}).get("reason")
-                    status = incomplete or payload.get("status", "invalid")
-                    raise RuntimeError(
-                        f"{stage}{page} using {kwargs.get('model')}: OpenAI response "
-                        f"{status} failed schema validation at "
-                        f"{location} ({detail.get('type', 'validation_error')}); "
-                        f"request ID {request_id}"
-                    ) from exc
-                call_usage = self._record_runtime_usage(
-                    response,
-                    agent=agent,
-                    model=model,
-                )
 
-            self._provider_request(
-                lambda: self._provider_responses().with_raw_response.parse(
-                    text_format=expected,
-                    **kwargs,
-                ),
-                agent=agent,
-                stage=stage,
-                model=model,
-                started=started,
-                page_number=page_number,
-                target_ids=target_ids,
-                on_success=finalize_raw,
-            )
+                response = self._provider_request(
+                    lambda: self._provider_responses().parse(
+                        text_format=expected,
+                        **kwargs,
+                    ),
+                    stage=stage,
+                    model=model,
+                    page_number=page_number,
+                    on_success=finalize_response,
+                )
+            else:
+
+                def finalize_raw(raw: Any) -> None:
+                    nonlocal response, call_usage
+                    try:
+                        response = raw.parse()
+                    except ValidationError as exc:
+                        try:
+                            payload = json.loads(raw.content)
+                        except (TypeError, ValueError):
+                            payload = {}
+                        call_usage = self._record_runtime_usage(
+                            payload,
+                            agent=agent,
+                            model=model,
+                        )
+                        page = (
+                            f" for page {page_number}"
+                            if page_number is not None
+                            else ""
+                        )
+                        request_id = getattr(raw, "request_id", None) or "unknown"
+                        detail = exc.errors(include_url=False, include_input=False)[0]
+                        location = (
+                            ".".join(str(item) for item in detail.get("loc", ()))
+                            or "response"
+                        )
+                        incomplete = payload.get("incomplete_details", {}).get("reason")
+                        status = incomplete or payload.get("status", "invalid")
+                        raise RuntimeError(
+                            f"{stage}{page} using {kwargs.get('model')}: OpenAI response "
+                            f"{status} failed schema validation at "
+                            f"{location} ({detail.get('type', 'validation_error')}); "
+                            f"request ID {request_id}"
+                        ) from exc
+                    call_usage = self._record_runtime_usage(
+                        response,
+                        agent=agent,
+                        model=model,
+                    )
+
+                self._provider_request(
+                    lambda: self._provider_responses().with_raw_response.parse(
+                        text_format=expected,
+                        **kwargs,
+                    ),
+                    stage=stage,
+                    model=model,
+                    page_number=page_number,
+                    on_success=finalize_raw,
+                )
+        except (RuntimeError, ValidationError) as exc:
+            record_schema_failure(exc)
+            raise
         if call_usage is None:
             raise AssertionError("provider usage finalizer did not run")
         paths = image_paths or []
@@ -260,6 +287,24 @@ class OpenAIDocumentGateway:
                     source_page_pixels = image.width * image.height
             except (FileNotFoundError, OSError):
                 pass
+        parsed = getattr(response, "output_parsed", None)
+        if not isinstance(parsed, expected):
+            for output in getattr(response, "output", []):
+                for content in getattr(output, "content", []):
+                    if getattr(content, "type", None) == "refusal":
+                        raise RuntimeError(
+                            f"OpenAI refused extraction: {content.refusal}"
+                        )
+                    candidate = getattr(content, "parsed", None)
+                    if isinstance(candidate, expected):
+                        parsed = candidate
+                        break
+                if isinstance(parsed, expected):
+                    break
+        if not isinstance(parsed, expected):
+            exc = RuntimeError(f"{stage}: OpenAI returned no schema-valid result")
+            record_schema_failure(exc)
+            raise exc
         self.trace.append(
             AgentTraceEvent(
                 agent=agent,
@@ -276,19 +321,48 @@ class OpenAIDocumentGateway:
                 image_pixels=image_pixels,
                 source_page_pixels=source_page_pixels,
                 repair_round=repair_round,
+                prompt_version=prompt_version,
+                reasoning_effort=reasoning_effort,
             )
         )
-        parsed = getattr(response, "output_parsed", None)
-        if isinstance(parsed, expected):
-            return parsed
-        for output in getattr(response, "output", []):
-            for content in getattr(output, "content", []):
-                if getattr(content, "type", None) == "refusal":
-                    raise RuntimeError(f"OpenAI refused extraction: {content.refusal}")
-                parsed = getattr(content, "parsed", None)
-                if isinstance(parsed, expected):
-                    return parsed
-        raise RuntimeError(f"{stage}: OpenAI returned no schema-valid result")
+        return parsed
+
+    def _structured_document_request(
+        self,
+        expected: type[T],
+        *,
+        agent: str,
+        stage: str,
+        system_prompt: str,
+        payload: dict[str, Any],
+        max_output_tokens: int,
+    ) -> T:
+        for attempt in range(2):
+            prompt = system_prompt
+            if attempt:
+                prompt = f"{prompt}\n\n{SCHEMA_REPAIR_INSTRUCTION}"
+            try:
+                return self._request(
+                    expected,
+                    agent=agent,
+                    stage=stage,
+                    model=LUNA_MODEL,
+                    reasoning={"effort": "medium"},
+                    store=False,
+                    prompt_version=PROMPT_VERSION,
+                    input=[
+                        {"role": "system", "content": prompt},
+                        {
+                            "role": "user",
+                            "content": json.dumps(payload, ensure_ascii=False),
+                        },
+                    ],
+                    max_output_tokens=max_output_tokens,
+                )
+            except (RuntimeError, ValidationError) as exc:
+                if attempt or not _is_schema_failure(exc):
+                    raise
+        raise AssertionError("structured response retry did not return")
 
     def draft_page(self, page: PageEvidence) -> PageDraft:
         return self._request(
@@ -299,8 +373,8 @@ class OpenAIDocumentGateway:
             image_paths=[page.image_path],
             image_scope="full_page",
             source_page_path=page.image_path,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
+            model=LUNA_MODEL,
+            reasoning={"effort": "high"},
             store=False,
             input=[
                 {
@@ -347,77 +421,12 @@ class OpenAIDocumentGateway:
             max_output_tokens=self.config.luna_max_output_tokens,
         )
 
-    def draft_crops(self, page: PageEvidence, crops: list[RasterRegion]) -> PageDraft:
-        manifest = [
-            {"image_index": index, "page_bbox": crop.bbox}
-            for index, crop in enumerate(crops)
-        ]
-        content: list[dict[str, Any]] = [
-            {"type": "input_text", "text": json.dumps(manifest)}
-        ]
-        content.extend(
-            {
-                "type": "input_image",
-                "image_url": self._image(crop.path),
-                "detail": "original",
-            }
-            for crop in crops
-        )
-        return self._request(
-            PageDraft,
-            agent="draft_parser",
-            stage="page_draft",
-            page_number=page.number,
-            image_paths=[crop.path for crop in crops],
-            image_scope="crop_batch",
-            source_page_path=page.image_path,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
-            store=False,
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Extract every visible element from these ordered crops. The supplied "
-                        "page_bbox values locate each crop on one source page. Return one complete "
-                        "page manifest in semantic reading order. Use normalized full-page coordinates, "
-                        "not crop-local coordinates. Preserve literal text, punctuation, identifiers, "
-                        "lists, forms, checkbox states, tables and cells, figures, captions, and visual "
-                        "labels. Populate line/cell atoms and low_confidence_spans for genuinely uncertain "
-                        "glyphs. Do not infer obscured content or duplicate overlap content."
-                    ),
-                },
-                {"role": "user", "content": content},
-            ],
-            max_output_tokens=self.config.luna_max_output_tokens,
-        )
-
-    def inspect_page(
-        self,
-        page: PageEvidence,
-        draft: PageDraft,
-        *,
-        region_ids: list[str],
-        target_region_ids: list[str] | None = None,
-        agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
-        addition_conflicts: list[dict[str, Any]] | None = None,
-    ) -> PageInspection:
-        del (
-            page,
-            draft,
-            region_ids,
-            target_region_ids,
-            agent_role,
-            addition_conflicts,
-        )
-        raise RuntimeError("full-page inspection is disabled; use inspect_crops")
-
     def inspect_crops(
         self,
         crops: list[CropInspectionRequest],
         *,
         page_number: int | None = None,
-        agent_role: AgentRole = AgentRole.VISUAL,
+        agent_role: AgentRole = AgentRole.EVIDENCE_CRITIC,
         stage: str = "crop_batch_inspection",
         repair_round: int | None = None,
     ) -> PageInspection:
@@ -451,16 +460,16 @@ class OpenAIDocumentGateway:
             image_scope="crop_batch",
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
             repair_round=repair_round,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
+            model=LUNA_MODEL,
+            reasoning={"effort": "high"},
             store=False,
             input=[
                 {
                     "role": "system",
                     "content": (
                         f"Act as the {agent_role.value}. Verify each candidate against its "
-                        "corresponding source crop. Accept, "
-                        "visibly correct by returning a complete corrected region, or reject each one. "
+                        "corresponding source crop. Accept, return a high-confidence text-only "
+                        "correction, or mark the crop inconclusive. "
                         "Read ambiguous glyphs in emails, URLs, identifiers, and placeholders exactly. "
                         "For critical literals—phone numbers, NPIs, MRNs, dates, IDs, DOBs, tax IDs, "
                         "policy numbers, and account numbers—preserve exact glyphs, punctuation, "
@@ -475,7 +484,10 @@ class OpenAIDocumentGateway:
                         "Do not repeat literal text already captured in the candidate or nearby blocks. "
                         "Keep non-instructional visual descriptions under 25 words and instructional "
                         "figures under 75 words. "
-                        "A crop correction must not change the candidate bounding box or reading order. "
+                        "A corrected_region must preserve the supplied ID and may change only textual "
+                        "fields. Geometry, type, reading order, confidence, and structural fields are "
+                        "owned by GLM-OCR and ignored. Set confidence to at least 0.85 only when every "
+                        "corrected glyph is clearly visible. "
                         "For rejections, set geometry_only=true only when rejection is exclusively caused "
                         "by invalid, missing, or clipped bounding-box geometry; set it false for semantic, "
                         "unsupported, ambiguous, or mixed failures. "
@@ -526,15 +538,16 @@ class OpenAIDocumentGateway:
             image_paths=[Path(crop.crop_path) for crop in crops],
             image_scope="crop_batch",
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
+            model=LUNA_MODEL,
+            reasoning={"effort": "high"},
             store=False,
             input=[
                 {
                     "role": "system",
                     "content": (
                         "Verify each candidate against its corresponding high-resolution source crop. "
-                        "Return exactly one accept, complete literal correction, or rejection per crop. "
+                        "Return exactly one accept, high-confidence text-only correction, or inconclusive "
+                        "decision per crop. "
                         "Never invent obscured or unsupported content. Preserve exact visible identifiers, "
                         "dates, measurements, phone numbers, emails, URLs, list markers, table cells, and "
                         "checkbox states. For critical literals—phone numbers, NPIs, MRNs, dates, IDs, "
@@ -543,9 +556,10 @@ class OpenAIDocumentGateway:
                         "illegible or inconclusive when exact reading is impossible. For rejections, set "
                         "geometry_only=true only when rejection is "
                         "exclusively caused by invalid, missing, or clipped bounding-box geometry; set it "
-                        "false for semantic, unsupported, ambiguous, or mixed failures. Preserve every "
-                        "supplied region ID, evidence reference, bounding "
-                        "box, and reading order."
+                        "false for semantic, unsupported, ambiguous, or mixed failures. A corrected_region "
+                        "may change only textual fields and must preserve the supplied ID. Geometry, type, "
+                        "reading order, confidence, and structural fields are owned by GLM-OCR and ignored. "
+                        "Set confidence to at least 0.85 only when every corrected glyph is clearly visible."
                     ),
                 },
                 {"role": "user", "content": content},
@@ -568,9 +582,6 @@ class OpenAIDocumentGateway:
                 **request.target.model_dump(mode="json"),
                 "image_index": image_index,
             }
-            if request.context_crop_path is not None:
-                item["context_image_index"] = len(image_paths)
-                image_paths.append(Path(request.context_crop_path))
             manifest.append(item)
         content: list[dict[str, str]] = [
             {"type": "input_text", "text": json.dumps(manifest, ensure_ascii=False)}
@@ -592,8 +603,8 @@ class OpenAIDocumentGateway:
             image_paths=image_paths,
             image_scope="crop_batch",
             source_page_pixels=requests[0].source_page_pixels if requests else 0,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
+            model=LUNA_MODEL,
+            reasoning={"effort": "high"},
             store=False,
             input=[
                 {
@@ -613,64 +624,69 @@ class OpenAIDocumentGateway:
             max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
         )
 
-    def plan_page(
+    def refine_markdown(
         self,
-        page: PageEvidence,
-        draft: PageDraft,
-        *,
-        region_ids: list[str],
-        target_region_ids: list[str],
-        repair_round: int,
-        prior_inspections: list[dict[str, Any]] | None = None,
-    ) -> PagePlan:
-        if repair_round != 1:
-            raise ValueError("repair_round must be 1")
-        if len(region_ids) != len(draft.regions):
-            raise ValueError("region IDs must match the complete page manifest")
-        manifest = [
-            {
-                "region_id": region_ids[index],
-                "type": region.type,
-                "bbox": region.bbox,
-                "reading_order": region.reading_order,
-                "confidence": region.confidence,
-            }
-            for index, region in enumerate(draft.regions)
-        ]
-        return self._request(
-            PagePlan,
-            agent="document_manager",
-            stage="page_plan",
-            page_number=page.number,
-            model=self.config.luna_model,
-            reasoning={"effort": "medium"},
-            store=False,
-            input=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are the document manager. Decide which bounded specialist subagents "
-                        "must inspect the target regions: layout_text_specialist, "
-                        "table_form_specialist, visual_specialist, or evidence_critic. "
-                        "Delegate only work needed to establish literal fidelity, complete coverage, "
-                        "reading order, and grounding. Return at most one delegation. "
-                        "Set finish when the page can be finalized after these delegations."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": json.dumps(
-                        {
-                            "repair_round": repair_round,
-                            "target_region_ids": target_region_ids,
-                            "regions": manifest,
-                            "prior_inspections": prior_inspections or [],
-                        },
-                        ensure_ascii=False,
-                    ),
-                },
-            ],
+        anchored_markdown: str,
+        layout: list[dict[str, Any]],
+    ) -> MarkdownPresentationPlan:
+        """Return presentation-only instructions; document text is never accepted."""
+
+        return self._structured_document_request(
+            MarkdownPresentationPlan,
+            agent="markdown_refiner",
+            stage="markdown_refinement",
+            system_prompt=MARKDOWN_REFINEMENT_PROMPT,
+            payload={"anchored_markdown": anchored_markdown, "layout_tree": layout},
+            max_output_tokens=min(16_000, self.config.luna_max_output_tokens),
+        )
+
+    def classify_document(
+        self,
+        markdown: str,
+        layout: list[dict[str, Any]],
+    ) -> DocumentClassification:
+        return self._structured_document_request(
+            DocumentClassification,
+            agent="document_classifier",
+            stage="document_classification",
+            system_prompt=CLASSIFICATION_PROMPT,
+            payload={"document_markdown": markdown, "layout_tree": layout},
+            max_output_tokens=min(2_000, self.config.luna_max_output_tokens),
+        )
+
+    def generate_toc(
+        self,
+        markdown: str,
+        layout: list[dict[str, Any]],
+    ) -> TableOfContents:
+        return self._structured_document_request(
+            TableOfContents,
+            agent="toc_generator",
+            stage="toc_generation",
+            system_prompt=TOC_PROMPT,
+            payload={"document_markdown": markdown, "layout_tree": layout},
             max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
+        )
+
+    def chat_document(
+        self,
+        question: str,
+        markdown: str,
+        layout: list[dict[str, Any]],
+        history: list[dict[str, str]],
+    ) -> ChatAnswerWire:
+        return self._structured_document_request(
+            ChatAnswerWire,
+            agent="document_chat",
+            stage="document_chat",
+            system_prompt=CHAT_PROMPT,
+            payload={
+                "document_markdown": markdown,
+                "layout_tree": layout,
+                "chat_history": history,
+                "question": question,
+            },
+            max_output_tokens=min(4_000, self.config.luna_max_output_tokens),
         )
 
     def propose_schema(
@@ -683,7 +699,7 @@ class OpenAIDocumentGateway:
             SchemaProposalWire,
             agent="schema_architect",
             stage="schema_proposal",
-            model=self.config.luna_model,
+            model=LUNA_MODEL,
             reasoning={"effort": "medium"},
             store=False,
             input=[
@@ -741,88 +757,96 @@ class OpenAIDocumentGateway:
             "additionalProperties": False,
         }
         agent = "extraction_critic" if repair else "extractor"
-        model = self.config.luna_model
-        started = time.perf_counter()
-        call_usage: AgentUsage | None = None
+        model = LUNA_MODEL
+        for format_attempt in range(2):
+            started = time.perf_counter()
+            call_usage: AgentUsage | None = None
 
-        def finalize_response(result: Any) -> None:
-            nonlocal call_usage
-            call_usage = self._record_runtime_usage(
-                result,
-                agent=agent,
-                model=model,
-            )
+            def finalize_response(result: Any) -> None:
+                nonlocal call_usage
+                call_usage = self._record_runtime_usage(
+                    result,
+                    agent=agent,
+                    model=model,
+                )
 
-        response = self._provider_request(
-            lambda: self._provider_responses().create(
-                model=model,
-                reasoning={"effort": "medium"},
-                store=False,
-                input=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Extract only values supported by the grounded document. Return null when "
-                            "a value is absent or ambiguous. For every non-null scalar, include evidence "
-                            "at its RFC 6901 JSON Pointer using only supplied block_ids and atom_ids. "
-                            "Never invent identifiers or values."
-                        ),
+            system_prompt = EXTRACTION_PROMPT
+            if format_attempt:
+                system_prompt = f"{system_prompt}\n\n{SCHEMA_REPAIR_INSTRUCTION}"
+            response = self._provider_request(
+                lambda prompt=system_prompt: self._provider_responses().create(
+                    model=model,
+                    reasoning={"effort": "medium"},
+                    store=False,
+                    input=[
+                        {"role": "system", "content": prompt},
+                        {
+                            "role": "user",
+                            "content": json.dumps(
+                                {
+                                    "document": parse_payload,
+                                    "repair_issues": issues or [],
+                                },
+                                ensure_ascii=False,
+                            ),
+                        },
+                    ],
+                    text={
+                        "format": {
+                            "type": "json_schema",
+                            "name": "grounded_extraction",
+                            "strict": True,
+                            "schema": envelope,
+                        }
                     },
-                    {
-                        "role": "user",
-                        "content": json.dumps(
-                            {
-                                "document": parse_payload,
-                                "repair_issues": issues or [],
-                            },
-                            ensure_ascii=False,
-                        ),
-                    },
-                ],
-                text={
-                    "format": {
-                        "type": "json_schema",
-                        "name": "grounded_extraction",
-                        "strict": True,
-                        "schema": envelope,
-                    }
-                },
-                max_output_tokens=self.config.luna_max_output_tokens,
-            ),
-            agent=agent,
-            stage="extract_document",
-            model=model,
-            started=started,
-            page_number=None,
-            target_ids=None,
-            on_success=finalize_response,
-        )
-        if call_usage is None:
-            raise AssertionError("provider usage finalizer did not run")
-        self.trace.append(
-            AgentTraceEvent(
-                agent=agent,
+                    max_output_tokens=self.config.luna_max_output_tokens,
+                ),
+                stage="extract_document",
                 model=model,
-                action="extract_document",
-                status="completed",
-                duration_ms=round((time.perf_counter() - started) * 1000),
-                input_tokens=call_usage.input_tokens,
-                output_tokens=call_usage.output_tokens,
+                page_number=None,
+                on_success=finalize_response,
             )
-        )
-        output_text = getattr(response, "output_text", None)
-        if not isinstance(output_text, str):
-            raise RuntimeError(  # noqa: TRY004 - malformed provider response
-                "extract_document: OpenAI returned no JSON output"
+            if call_usage is None:
+                raise AssertionError("provider usage finalizer did not run")
+            output_text = getattr(response, "output_text", None)
+            try:
+                if not isinstance(output_text, str):
+                    raise TypeError("no JSON output")
+                payload = json.loads(output_text)
+                if not isinstance(payload, dict):
+                    raise TypeError("non-object result")
+            except (json.JSONDecodeError, TypeError) as exc:
+                self.trace.append(
+                    AgentTraceEvent(
+                        agent=agent,
+                        model=model,
+                        action="extract_document",
+                        status="schema_invalid",
+                        duration_ms=round((time.perf_counter() - started) * 1000),
+                        input_tokens=call_usage.input_tokens,
+                        output_tokens=call_usage.output_tokens,
+                        prompt_version=PROMPT_VERSION,
+                        reasoning_effort="medium",
+                        summary=str(exc),
+                    )
+                )
+                if format_attempt:
+                    raise RuntimeError(
+                        "extract_document: OpenAI returned invalid JSON twice"
+                    ) from exc
+                continue
+            self.trace.append(
+                AgentTraceEvent(
+                    agent=agent,
+                    model=model,
+                    action="extract_document",
+                    status="completed",
+                    duration_ms=round((time.perf_counter() - started) * 1000),
+                    input_tokens=call_usage.input_tokens,
+                    output_tokens=call_usage.output_tokens,
+                    prompt_version=PROMPT_VERSION,
+                    reasoning_effort="medium",
+                )
             )
-        try:
-            payload = json.loads(output_text)
-        except json.JSONDecodeError as exc:
-            raise RuntimeError(
-                "extract_document: OpenAI returned invalid JSON"
-            ) from exc
-        if not isinstance(payload, dict):
-            raise RuntimeError(  # noqa: TRY004 - malformed provider response
-                "extract_document: OpenAI returned a non-object result"
-            )
-        return payload
+            return payload
+        raise AssertionError("extraction response retry did not return")

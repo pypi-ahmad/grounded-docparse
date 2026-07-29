@@ -12,11 +12,6 @@ mkdir -p "$RUNTIME_DIR"
 cd "$PROJECT_ROOT"
 WSL_ENV="${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}"
 
-if [[ -z "${OPENAI_API_KEY:-}" ]]; then
-  echo "ERROR: OPENAI_API_KEY is not available inside WSL." >&2
-  exit 1
-fi
-
 if ! [[ -x "$WSL_ENV/bin/python" && -f "$WSL_ENV/.docparse-local-ocr-ready" ]]; then
   echo "Installing the locked GLM-OCR environment (first run only)..."
   bash scripts/wsl/setup-glmocr.sh

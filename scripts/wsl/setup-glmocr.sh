@@ -7,13 +7,26 @@ mkdir -p .runtime
 exec 9>.runtime/setup.lock
 flock 9
 WSL_ENV="${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}"
+UV_VERSION="0.11.32"
+UV_INSTALLER_SHA256="43aff33a967fe40e8c17949d8c85c65bc43f3b5c94742393c957f56ab5ba80f4"
 
 UV_BIN="$(command -v uv || true)"
 if [[ -z "$UV_BIN" && -x "$HOME/.local/bin/uv" ]]; then
   UV_BIN="$HOME/.local/bin/uv"
 fi
 if [[ -z "$UV_BIN" ]]; then
-  echo "ERROR: uv is not installed inside WSL." >&2
+  echo "uv not found inside WSL; installing version $UV_VERSION..."
+  UV_INSTALLER="$(mktemp)"
+  trap 'rm -f "$UV_INSTALLER"' EXIT
+  curl --proto '=https' --tlsv1.2 -LsSf \
+    "https://astral.sh/uv/$UV_VERSION/install.sh" \
+    -o "$UV_INSTALLER"
+  printf '%s  %s\n' "$UV_INSTALLER_SHA256" "$UV_INSTALLER" | sha256sum -c -
+  sh "$UV_INSTALLER"
+  UV_BIN="$HOME/.local/bin/uv"
+fi
+if [[ ! -x "$UV_BIN" ]]; then
+  echo "ERROR: uv install failed inside WSL." >&2
   exit 1
 fi
 

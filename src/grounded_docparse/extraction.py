@@ -5,11 +5,18 @@ import re
 from collections.abc import Callable
 from copy import deepcopy
 from decimal import Decimal, InvalidOperation
+from difflib import SequenceMatcher
 from typing import Any
 
 from .config import ParserConfig
 from .gateways import OpenAIDocumentGateway
-from .models import ExtractionResult, ParseResult, RunUsage, SchemaProposal
+from .models import (
+    ExtractedField,
+    ExtractionResult,
+    ParseResult,
+    RunUsage,
+    SchemaProposal,
+)
 
 SUPPORTED_TYPES = {"object", "array", "string", "number", "integer", "boolean", "null"}
 UNSUPPORTED_KEYWORDS = {
@@ -128,11 +135,14 @@ class DocumentExtractor:
         self,
         parse_result: ParseResult,
         schema: dict[str, Any],
+        *,
+        allow_inferred: bool = False,
     ) -> ExtractionResult:
         validate_extraction_schema(schema)
         parse_payload = _extraction_payload(json.loads(parse_result.json))
+        model_context = _model_extraction_context(parse_payload)
         draft = self.gateway.extract_document(
-            parse_payload,
+            model_context,
             schema,
             repair=False,
             issues=None,
@@ -140,7 +150,7 @@ class DocumentExtractor:
         issues, evidence = _validate_and_resolve(draft, schema, parse_payload)
         if issues:
             draft = self.gateway.extract_document(
-                parse_payload,
+                model_context,
                 schema,
                 repair=True,
                 issues=issues,
@@ -149,6 +159,26 @@ class DocumentExtractor:
 
         data = deepcopy(draft.get("data", {}))
         warnings: list[str] = []
+        if issues and allow_inferred:
+            inferred = _resolve_inferred_evidence(data, draft, parse_payload)
+            evidence.update(inferred)
+            inferred_pointers = set(inferred)
+            issues = [
+                issue
+                for issue in issues
+                if not (
+                    _issue_pointer(issue) in inferred_pointers
+                    and any(
+                        marker in issue
+                        for marker in (
+                            "missing evidence",
+                            "cited evidence does not contain",
+                            "unknown block",
+                            "unknown atom",
+                        )
+                    )
+                )
+            ]
         if issues:
             for issue in issues:
                 pointer = _issue_pointer(issue)
@@ -163,13 +193,18 @@ class DocumentExtractor:
                 require_all=False,
             )
 
+        fields = _extracted_fields(data, evidence, parse_payload)
+
         usage = _usage(self.gateway).model_copy(deep=True)
         trace = list(getattr(self.gateway, "trace", []))
         payload = {
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "schema": schema,
             "data": data,
             "evidence": evidence,
+            "fields": {
+                name: field.model_dump(mode="json") for name, field in fields.items()
+            },
             "warnings": warnings,
             "metadata": {
                 "usage": usage.model_dump(mode="json"),
@@ -185,6 +220,7 @@ class DocumentExtractor:
             output_tokens=usage.output_tokens,
             usage=usage,
             trace=trace,
+            fields=fields,
         )
 
 
@@ -195,6 +231,9 @@ def _usage(gateway: object) -> RunUsage:
 
 def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
     payload = deepcopy(parse_payload)
+    refined_markdown = payload.get("markdown", "")
+    payload["markdown"] = payload.get("base_markdown", refined_markdown)
+    payload["refined_markdown"] = refined_markdown
     active_block_ids: set[str] = set()
     metadata = payload.get("metadata")
     if isinstance(metadata, dict):
@@ -211,7 +250,6 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
             block.pop("correction_lineage", None)
             block.pop("reason", None)
             block.pop("verification_reason", None)
-        page.pop("specialist_audit", None)
         page.pop("warnings", None)
     if isinstance(payload.get("elements"), list):
         payload["elements"] = [
@@ -220,6 +258,37 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
             if element.get("id") in active_block_ids
         ]
     return payload
+
+
+def _model_extraction_context(parse_payload: dict[str, Any]) -> dict[str, Any]:
+    """Build the compact, identifier-rich context sent to Luna."""
+
+    layout = []
+    for page in parse_payload.get("document", {}).get("pages", []):
+        page_number = page.get("number")
+        for block in page.get("blocks", []):
+            layout.append(
+                {
+                    "id": block.get("id"),
+                    "type": block.get("type"),
+                    "page": page_number,
+                    "order": block.get("reading_order"),
+                    "text": block.get("text", ""),
+                    "atoms": [
+                        {
+                            "id": atom.get("id"),
+                            "text": atom.get("text", ""),
+                        }
+                        for atom in block.get("atoms", [])
+                    ],
+                }
+            )
+    return {
+        "document_markdown": parse_payload.get(
+            "refined_markdown", parse_payload.get("markdown", "")
+        ),
+        "layout_tree": layout,
+    }
 
 
 def _validate_and_resolve(
@@ -302,6 +371,117 @@ def _validate_and_resolve(
             if pointer not in resolved:
                 issues.append(f"{pointer}: missing evidence")
     return issues, resolved
+
+
+def _active_blocks(parse_payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        block["id"]: block
+        for page in parse_payload.get("document", {}).get("pages", [])
+        for block in page.get("blocks", [])
+        if block.get("rendered") is not False and block.get("status") != "rejected"
+    }
+
+
+def _resolve_inferred_evidence(
+    data: dict[str, Any],
+    draft: dict[str, Any],
+    parse_payload: dict[str, Any],
+) -> dict[str, list[dict]]:
+    blocks = _active_blocks(parse_payload)
+    requested: dict[str, list[str]] = {}
+    for item in draft.get("evidence", []):
+        pointer = _canonical_evidence_pointer(data, item.get("pointer"))
+        if pointer is not None:
+            requested[pointer] = [
+                block_id
+                for block_id in item.get("block_ids", [])
+                if block_id in blocks
+            ]
+
+    inferred: dict[str, list[dict]] = {}
+    candidates = [
+        block for block in blocks.values() if str(block.get("text", "")).strip()
+    ]
+    for pointer, value in _non_null_leaves(data):
+        block = next(
+            (blocks[block_id] for block_id in requested.get(pointer, [])),
+            None,
+        )
+        if block is None and candidates:
+            needle = str(value).casefold()
+            block = max(
+                candidates,
+                key=lambda item: SequenceMatcher(
+                    None,
+                    needle,
+                    str(item.get("text", "")).casefold()[:1_000],
+                ).ratio(),
+            )
+        if block is None:
+            continue
+        source = block["source"]
+        inferred[pointer] = [
+            {
+                "block_id": block["id"],
+                "atom_id": None,
+                "page": source["page"],
+                "span": source["span"],
+                "bbox": source["bbox"],
+                "confidence": "inferred",
+            }
+        ]
+    return inferred
+
+
+def _bbox_tuple(value: Any) -> tuple[float, float, float, float] | None:
+    if not isinstance(value, dict):
+        return None
+    coordinates = tuple(value.get(name) for name in ("x0", "y0", "x1", "y1"))
+    if not all(isinstance(item, (int, float)) for item in coordinates):
+        return None
+    return coordinates  # type: ignore[return-value]
+
+
+def _extracted_fields(
+    data: dict[str, Any],
+    evidence: dict[str, list[dict]],
+    parse_payload: dict[str, Any],
+) -> dict[str, ExtractedField]:
+    blocks = _active_blocks(parse_payload)
+    fields: dict[str, ExtractedField] = {}
+    for name, value in data.items():
+        escaped = name.replace("~", "~0").replace("/", "~1")
+        field_pointer = f"/{escaped}"
+        citations = list(evidence.get(field_pointer, []))
+        if not citations:
+            citations = [
+                citation
+                for pointer, pointer_citations in evidence.items()
+                if pointer.startswith(f"{field_pointer}/")
+                for citation in pointer_citations
+            ]
+        if value is None or not citations:
+            fields[name] = ExtractedField(value=value, confidence="not_found")
+            continue
+        citation = citations[0]
+        block = blocks.get(citation.get("block_id"), {})
+        source_text = str(block.get("text", ""))
+        confidence = citation.get("confidence")
+        if confidence != "inferred":
+            confidence = (
+                "high"
+                if str(value).casefold() in source_text.casefold()
+                else "medium"
+            )
+        fields[name] = ExtractedField(
+            value=value,
+            page=citation.get("page"),
+            bbox=_bbox_tuple(citation.get("bbox")),
+            confidence=confidence,
+            element_id=citation.get("block_id"),
+            source_text=source_text,
+        )
+    return fields
 
 
 def _canonical_evidence_pointer(data: Any, pointer: Any) -> str | None:

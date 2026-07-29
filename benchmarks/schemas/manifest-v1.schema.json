@@ -70,12 +70,6 @@
               "null"
             ]
           },
-          "legacy_expectations_path": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
           "features": {
             "type": "array",
             "items": {

@@ -19,7 +19,7 @@ from grounded_docparse.models import (
     TableData,
     VerificationState,
 )
-from grounded_docparse.render import render_agentic_document, render_json
+from grounded_docparse.render import render_agentic_document
 
 
 def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
@@ -49,7 +49,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     )
     trace = [
         AgentTraceEvent(
-            agent="document_manager",
+            agent="evidence_critic",
             model="gpt-5.6-luna",
             action="finish_page",
             page=1,
@@ -66,7 +66,14 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     payload = json.loads(rendered.json)
 
     assert rendered.markdown == "Alpha line\nBeta line\n"
-    assert payload["schema_version"] == "4.0.0"
+    assert payload["schema_version"] == "4.4.0"
+    assert payload["base_markdown"] == payload["markdown"]
+    assert payload["document_type"] is None
+    assert payload["sections"] == []
+    assert payload["extracted_fields"] == {}
+    assert payload["recovery_log"] == []
+    assert "annotated_pdf" not in payload
+    assert payload["metadata"]["range_target"] == "base_markdown"
     assert payload["metadata"]["engine"] == "glm-ocr"
     assert payload["metadata"]["pages"] == 1
     assert payload["elements"] == [
@@ -78,6 +85,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
             "text": "Alpha line Beta line",
             "reading_order": 1,
             "confidence": 0.97,
+            "source": "glm-ocr",
         }
     ]
     assert payload["metadata"]["range_units"] == "unicode_codepoints"
@@ -93,9 +101,6 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
         atom_start, atom_end = atom["source"]["span"].values()
         assert rendered.markdown[atom_start:atom_end] == atom["text"]
         assert atom["source"]["bbox"]["unit"] == "normalized"
-
-    assert json.loads(render_json(document))["schema_version"] == "2.0.0"
-
 
 def test_extraction_schema_requires_nullable_closed_objects() -> None:
     schema = {

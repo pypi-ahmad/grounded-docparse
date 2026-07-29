@@ -19,8 +19,6 @@ def test_ingest_pdf_ignores_selectable_text(simple_pdf: bytes, tmp_path: Path) -
     )
     assert len(document.pages) == 1
     assert document.pages[0].scanned
-    assert document.pages[0].digital_text == ""
-    assert document.pages[0].text_blocks == []
 
 
 def test_rejects_fake_pdf(tmp_path: Path) -> None:

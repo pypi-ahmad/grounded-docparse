@@ -2,6 +2,11 @@
 
 > Last verified: 2026-07-28. This guide sets up the complete local document-parsing pipelines for [GLM-OCR](https://github.com/zai-org/GLM-OCR) and [PaddleOCR-VL-1.6](https://paddlepaddle.github.io/PaddleX/3.7/en/pipeline_usage/tutorials/ocr_pipelines/PaddleOCR-VL.html). It uses a GPU when an officially supported route exists, then falls back to local CPU inference.
 
+On Windows 11 with an NVIDIA GPU, `Setup-GLM-OCR.cmd` in the repo root automates
+this guide's Windows 11 + vLLM route end to end (sections 1, 3-Windows, 4, 9, 10),
+including weight downloads. Use the manual steps below for other platforms, SGLang,
+MLX, Ollama, AMD ROCm, or PaddleOCR-VL.
+
 ## 1. Choose a route
 
 Do this before installing anything. A VLM server is only the recognition component: the GLM-OCR SDK and PaddleX pipeline still run layout analysis, region handling, reading order, and result assembly.
@@ -24,7 +29,7 @@ Use Python 3.12 and isolated environments. These pins are reproducible installat
 | --- | --- |
 | GLM-OCR SDK | `glmocr==0.1.5` |
 | Transformers | `transformers==5.14.1` |
-| vLLM | `vllm==0.26.0` |
+| vLLM | `vllm==0.19.1` |
 | SGLang | `sglang==0.5.16` |
 | PaddlePaddle CPU | `paddlepaddle==3.3.1` |
 | PaddlePaddle CUDA | `paddlepaddle-gpu==3.3.0` from Paddle's matching CUDA index |
@@ -122,7 +127,7 @@ Use this on Ubuntu, Fedora, or Ubuntu under WSL2 with an NVIDIA GPU. Start from 
 cd "$OCR_HOME/glm-server"
 uv venv --python 3.12 --seed
 source .venv/bin/activate
-uv pip install "transformers==5.14.1" "vllm==0.26.0"
+uv pip install "transformers==5.14.1" "vllm==0.19.1"
 
 # Put only documents you intend the server to read under this directory.
 export OCR_INPUT_ROOT="$OCR_HOME/input"
@@ -136,7 +141,7 @@ vllm serve zai-org/GLM-OCR \
   --max-model-len 8192 \
   --max-num-batched-tokens 8192 \
   --allowed-local-media-path "$OCR_INPUT_ROOT" \
-  --speculative-config '{"method":"mtp","num_speculative_tokens":2}'
+  --speculative-config '{"method":"mtp","num_speculative_tokens":3}'
 ```
 
 First startup downloads model files. Keep server terminal open. Do **not** use `--allowed-local-media-path /`: it unnecessarily exposes every readable local file to requests accepted by the server.
@@ -144,7 +149,7 @@ First startup downloads model files. Keep server terminal open. Do **not** use `
 If startup fails because the selected vLLM wheel and driver do not match, recreate the environment and let uv select the torch backend:
 
 ```bash
-uv pip install "vllm==0.26.0" --torch-backend=auto
+uv pip install "vllm==0.19.1" --torch-backend=auto
 ```
 
 The model's upstream guide requires vLLM `>=0.19.0` and documents MTP serving options. See [GLM-OCR self-hosting](https://github.com/zai-org/GLM-OCR#model-deployment).
@@ -332,6 +337,8 @@ glmocr parse "$env:OCR_HOME\input\document.pdf" --layout-device cpu --config "$e
 ```
 
 ## 11. PaddleOCR-VL-1.6 direct full pipeline
+
+This section documents a standalone alternative pipeline, not wired into this repo's `src/grounded_docparse` code path: the app only uses GLM-OCR plus PP-DocLayout for layout. Use sections 11-13 only if you are running PaddleOCR-VL-1.6 independently of this codebase.
 
 This is the simplest full-pipeline route and the CPU fallback. It runs PP-DocLayoutV3, cropping, reading order, VLM recognition, and assembly together.
 

@@ -12,6 +12,35 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 MANIFEST_SCHEMA_VERSION = "1.0"
 ANNOTATION_SCHEMA_VERSION = "1.1"
+PUBLIC_WATER_ANCHORS = {
+    4: [
+        "Order #: 984",
+        "REPORT TO:",
+        "65",
+        "ADRIAN",
+        "BILL TO:",
+        "PUBLIC DRINKING WATER BACTERIAL ANALYSIS",
+        "Collected Time",
+        "24 hour format hh:mm",
+        "Sample Collection Point Id",
+        "Evidence of Tampering",
+        "Evidence of Cooling",
+    ],
+    5: [
+        "SAMPLE COLLECTION INSTRUCTIONS",
+        "BETWEEN THE TWO LINES",
+        "100 mL",
+        "120 mL",
+        "DO NOT WRITE ON THE BOTTLE",
+    ],
+    6: [
+        "Bacteriological Sample Collection Procedures",
+        "Open the cold water tap",
+        "For single samples",
+        "standard letter fold",
+        "Do not use shredded paper",
+    ],
+}
 
 
 def _save_pdf(path: Path, pages: list[list[tuple[float, float, str]]]) -> None:
@@ -111,7 +140,6 @@ def _write_schemas(schema_dir: Path) -> None:
                             },
                         },
                         "annotation_path": {"type": ["string", "null"]},
-                        "legacy_expectations_path": {"type": ["string", "null"]},
                         "features": {
                             "type": "array",
                             "items": {"type": "string"},
@@ -138,7 +166,6 @@ def _write_schemas(schema_dir: Path) -> None:
                     "source_verified",
                     "synthetic_exact",
                     "generated",
-                    "legacy",
                 ]
             },
             "reference_pages": {
@@ -357,14 +384,6 @@ def generate_corpus(repository_root: Path) -> Path:
                 "synthetic": True,
             }
         )
-    public_water_expectations = (
-        root / "tests" / "fixtures" / "public_water_expectations.json"
-    )
-    if not public_water_expectations.is_file():
-        raise FileNotFoundError(
-            f"required Public Water expectations are missing: {public_water_expectations}"
-        )
-    expectations = json.loads(public_water_expectations.read_text(encoding="utf-8"))
     public_water_annotation = _annotation(
         "public-water-mass-mailing",
         None,
@@ -374,10 +393,8 @@ def generate_corpus(repository_root: Path) -> Path:
                 "id": f"p{page_number}-{index:02d}",
                 "text": text,
             }
-            for page_number in (4, 5, 6)
-            for index, text in enumerate(
-                expectations.get("required_by_page", {}).get(str(page_number), []), 1
-            )
+            for page_number, texts in PUBLIC_WATER_ANCHORS.items()
+            for index, text in enumerate(texts, 1)
         ],
     )
     public_water_annotation_path = (
@@ -391,9 +408,8 @@ def generate_corpus(repository_root: Path) -> Path:
         {
             "id": "public-water-mass-mailing",
             "source": {"kind": "external", "path": "PublicWaterMassMailing.pdf"},
-            "legacy_expectations_path": public_water_expectations.relative_to(root).as_posix(),
             "annotation_path": public_water_annotation_path.relative_to(root).as_posix(),
-            "features": ["external_live_regression", "legacy_public_water"],
+            "features": ["external_live_regression"],
             "synthetic": False,
         }
     )

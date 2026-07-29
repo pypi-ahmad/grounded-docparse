@@ -38,8 +38,8 @@ may retain aggregate metrics and page numbers only.
 ## Evaluation policy
 
 Corpus annotation v1.1 records a reference basis. Only `source_verified` and
-`synthetic_exact` references populate primary text metrics. Generated and legacy
-references populate `legacy_reference_agreement`; the existing `semantic_text`
+`synthetic_exact` references populate primary text metrics. Generated references
+populate `legacy_reference_agreement`; the existing `semantic_text`
 field remains as a compatibility alias. Figure descriptions are excluded from
 recognized-text scoring, while literal visual atoms remain eligible. Public Water
 pages 4–6 use source-checked literal anchors rather than an invented full-page
@@ -53,22 +53,19 @@ metric such as [TEDS](https://arxiv.org/abs/1911.10683), not WER alone.
 
 ## Changes and experiments
 
-1. Search atomic visual labels during legacy fact validation and test barcode
+1. Search atomic visual labels during source-anchor validation and test barcode
    presence separately from nearby order text.
 2. Compare recovery blocks with spatially overlapping nested descendants before
    accepting them. Suppress only normalized, order-preserving duplicates; preserve
    novel critical literals and text at distinct locations.
-3. Keep targeted repair eligibility and budgets unchanged. The optional
-   `DOCPARSE_TARGETED_REPAIR_CONTEXT_PADDING` experiment sends a tight span crop
-   plus one larger context crop in the same Luna call. It never sends the whole
-   page or permits adjacent-text replacement.
+3. Test a tight span crop plus one larger context crop in the same Luna call without
+   sending the whole page or permitting adjacent-text replacement.
 
 The crop experiment is motivated by coarse-to-fine document parsing research
 ([Cui et al., CVPR 2026](https://arxiv.org/abs/2603.24326)) and
 [OpenAI's image-input guidance](https://help.openai.com/en/articles/8400551-image-inputs-for-chatgpt-faq)
-to enlarge text without cropping away relevant context. It remains disabled by
-default until repeated targeted runs show a source-verified improvement without
-new hallucinations, model calls, or material latency regression.
+to enlarge text without cropping away relevant context. The experiment was removed
+after it failed the promotion gates below; production always sends the tight crop.
 
 ### July 2026 targeted result
 
@@ -78,7 +75,7 @@ but generated-reference word agreement decreased from 72.10% to 69.28%, insertio
 diagnostics increased from 5.29% to 7.32%, and median calls increased from 18 to 19.
 Median latency increased from 131.96 seconds to 134.45 seconds. The generated
 reference metrics are diagnostic rather than ground truth, but the hallucination
-and call-count gates independently failed, so the default remains disabled.
+and call-count gates independently failed, so the option was removed.
 
 An isolated live parse of local Amerigroup source page 32 emitted one copy of the
 two diagnostic phrases used to detect the prior full-page duplication. This is a

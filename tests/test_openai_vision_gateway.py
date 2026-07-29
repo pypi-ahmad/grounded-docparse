@@ -10,13 +10,16 @@ from grounded_docparse.gateways import OpenAIDocumentGateway
 from grounded_docparse.ingest import PageEvidence
 from grounded_docparse.models import (
     AgentRole,
+    ChatAnswerWire,
     CropInspectionRequest,
+    DocumentClassification,
     InspectionAction,
     InspectionDecision,
-    InspectionRegionAddition,
+    MarkdownPresentationPlan,
     PageDraft,
     PageInspection,
-    PagePlan,
+    PagePresentationPlan,
+    PresentationDirective,
     RegionDraft,
     SchemaProposalWire,
     SpanRepairAction,
@@ -24,6 +27,7 @@ from grounded_docparse.models import (
     SpanRepairInspection,
     SpanRepairRequest,
     SpanRepairTarget,
+    TableOfContents,
 )
 
 
@@ -59,6 +63,37 @@ class RecordingCreateResponses(RecordingResponses):
         )
 
 
+class RepairingResponses(RecordingResponses):
+    def parse(self, **kwargs: object) -> object:
+        self.calls.append(kwargs)
+        if len(self.calls) == 1:
+            raise RuntimeError("response failed schema validation")
+        return SimpleNamespace(
+            output_parsed=self.parsed,
+            output=[],
+            usage=SimpleNamespace(input_tokens=10, output_tokens=4),
+            id="response-repaired",
+            model=kwargs["model"],
+        )
+
+
+class RepairingCreateResponses(RecordingResponses):
+    def __init__(self, payload: dict) -> None:
+        super().__init__(PageDraft())
+        self.payload = payload
+
+    def create(self, **kwargs: object) -> object:
+        self.calls.append(kwargs)
+        output = "not json" if len(self.calls) == 1 else json.dumps(self.payload)
+        return SimpleNamespace(
+            output_text=output,
+            output=[],
+            usage=SimpleNamespace(input_tokens=14, output_tokens=6),
+            id="response-repaired",
+            model=kwargs["model"],
+        )
+
+
 def _assert_no_prompt_cache(value: object) -> None:
     if isinstance(value, dict):
         assert "prompt_cache_key" not in value
@@ -69,6 +104,121 @@ def _assert_no_prompt_cache(value: object) -> None:
     elif isinstance(value, list):
         for child in value:
             _assert_no_prompt_cache(child)
+
+
+def _assert_no_image_payload(value: object) -> None:
+    if isinstance(value, dict):
+        assert "image_url" not in value
+        assert value.get("type") != "input_image"
+        for child in value.values():
+            _assert_no_image_payload(child)
+    elif isinstance(value, list):
+        for child in value:
+            _assert_no_image_payload(child)
+    elif isinstance(value, str):
+        assert "data:image/" not in value
+
+
+def test_markdown_refinement_is_text_only() -> None:
+    parsed = MarkdownPresentationPlan(
+        pages=[
+            PagePresentationPlan(
+                page=1,
+                elements=[PresentationDirective(element_id="p1-b1")],
+            )
+        ]
+    )
+    responses = RecordingResponses(parsed)
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    result = gateway.refine_markdown(
+        "<!-- element:p1-b1 -->\nVisible\n",
+        [{"id": "p1-b1", "page": 1, "type": "paragraph"}],
+    )
+
+    assert result == parsed
+    assert responses.calls[0]["model"] == "gpt-5.6-luna"
+    _assert_no_image_payload(responses.calls[0])
+
+
+@pytest.mark.parametrize(
+    ("method", "parsed"),
+    [
+        (
+            "classify_document",
+            DocumentClassification(
+                primary_type="Report",
+                confidence=0.9,
+                secondary_types=[],
+                reasoning="Report structure",
+            ),
+        ),
+        ("generate_toc", TableOfContents()),
+    ],
+)
+def test_agentic_analysis_requests_are_structured_text_only(method, parsed) -> None:
+    responses = RecordingResponses(parsed)
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    getattr(gateway, method)(
+        "Document text",
+        [{"id": "p1-b1", "type": "paragraph", "page": 1, "order": 1, "text": "Document text"}],
+    )
+
+    call = responses.calls[0]
+    assert call["model"] == "gpt-5.6-luna"
+    assert call["reasoning"] == {"effort": "medium"}
+    assert gateway.trace[0].reasoning_effort == "medium"
+    assert call["store"] is False
+    assert "layout_tree" in json.loads(call["input"][1]["content"])
+    assert gateway.trace[0].prompt_version == "2026-07-29.3"
+    _assert_no_image_payload(call)
+
+
+def test_document_chat_request_is_structured_and_text_only() -> None:
+    responses = RecordingResponses(ChatAnswerWire(answer="Grounded answer"))
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    gateway.chat_document(
+        "Question?",
+        "Document text",
+        [{"id": "p1-b1", "type": "paragraph", "page": 1, "order": 1, "text": "Document text"}],
+        [{"role": "user", "content": "Earlier"}],
+    )
+
+    call = responses.calls[0]
+    assert call["reasoning"] == {"effort": "medium"}
+    assert gateway.trace[0].reasoning_effort == "medium"
+    assert call["store"] is False
+    _assert_no_image_payload(call)
+
+
+def test_structured_agentic_request_repairs_schema_failure_once() -> None:
+    parsed = DocumentClassification(
+        primary_type="Report",
+        confidence=0.9,
+        secondary_types=[],
+        reasoning="Report structure",
+    )
+    responses = RepairingResponses(parsed)
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    assert gateway.classify_document("Text", []).primary_type == "Report"
+    assert len(responses.calls) == 2
+    assert [event.status for event in gateway.trace] == [
+        "schema_invalid",
+        "completed",
+    ]
+    repair_prompt = responses.calls[1]["input"][0]["content"]
+    assert "previous response" in repair_prompt.casefold()
 
 
 def _page(path: Path) -> PageEvidence:
@@ -99,11 +249,13 @@ def test_luna_draft_uses_deterministic_structured_vision_request(
     call = responses.calls[0]
     assert draft.regions[0].text == "Visible"
     assert call["model"] == "gpt-5.6-luna"
+    assert call["reasoning"] == {"effort": "high"}
     assert "temperature" not in call
-    assert call["reasoning"] == {"effort": "medium"}
+    assert gateway.trace[0].reasoning_effort == "high"
     assert call["store"] is False
     assert call["text_format"] is PageDraft
     assert call["max_output_tokens"] == 128_000
+    assert call["input"][1]["content"][0]["detail"] == "original"
     _assert_no_prompt_cache(call)
     prompt = call["input"][0]["content"]
     assert "semantic reading order" in prompt
@@ -194,38 +346,6 @@ def _additional_properties_values(value):
             yield from _additional_properties_values(child)
 
 
-def test_luna_inspection_returns_fail_closed_decisions(tmp_path: Path) -> None:
-    parsed = PageInspection(
-        decisions=[
-            InspectionDecision(
-                region_id="region-1",
-                action=InspectionAction.REJECT,
-                evidence_refs=["page:1"],
-                reason="Not visible",
-            )
-        ]
-    )
-    responses = RecordingResponses(parsed)
-    gateway = OpenAIDocumentGateway(
-        ParserConfig(), client=SimpleNamespace(responses=responses)
-    )
-    draft = PageDraft(
-        regions=[
-            RegionDraft(type="paragraph", reading_order=0, text="Certain context"),
-            RegionDraft(type="paragraph", reading_order=1, text="Candidate"),
-        ]
-    )
-
-    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
-        gateway.inspect_page(
-            _page(tmp_path / "page.png"),
-            draft,
-            region_ids=["region-0", "region-1"],
-            target_region_ids=["region-1"],
-        )
-    assert responses.calls == []
-
-
 def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> None:
     parsed = PageInspection(
         decisions=[
@@ -269,6 +389,8 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     assert len(images) == 2
     assert all(image["detail"] == "original" for image in images)
     assert call["model"] == "gpt-5.6-luna"
+    assert call["reasoning"] == {"effort": "high"}
+    assert call["input"][1]["content"][1]["detail"] == "original"
     assert "temperature" not in call
     assert call["text_format"] is PageInspection
     prompt = call["input"][0]["content"]
@@ -318,6 +440,8 @@ def test_quality_crop_inspection_uses_luna_and_records_page_targets(
     call = responses.calls[0]
     prompt = call["input"][0]["content"]
     assert call["model"] == "gpt-5.6-luna"
+    assert call["reasoning"] == {"effort": "high"}
+    assert call["input"][1]["content"][1]["detail"] == "original"
     assert "Never invent" in prompt
     assert "identifiers, dates, measurements, phone numbers, emails, URLs" in prompt
     assert (
@@ -332,94 +456,6 @@ def test_quality_crop_inspection_uses_luna_and_records_page_targets(
     assert gateway.usage.calls[0].agent == AgentRole.EVIDENCE_CRITIC.value
     assert gateway.trace[0].page == 7
     assert gateway.trace[0].target_ids == ["p7-b3"]
-
-
-def test_manager_uses_luna_medium_and_returns_subagent_plan(tmp_path: Path) -> None:
-    responses = RecordingResponses(PagePlan(finish=True, summary="Draft is grounded"))
-    gateway = OpenAIDocumentGateway(
-        ParserConfig(), client=SimpleNamespace(responses=responses)
-    )
-    draft = PageDraft(
-        regions=[RegionDraft(type="paragraph", reading_order=0, text="Visible")]
-    )
-
-    plan = gateway.plan_page(
-        _page(tmp_path / "page.png"),
-        draft,
-        region_ids=["p1-b1"],
-        target_region_ids=["p1-b1"],
-        repair_round=1,
-    )
-
-    call = responses.calls[0]
-    assert plan.finish is True
-    assert call["model"] == "gpt-5.6-luna"
-    assert call["reasoning"] == {"effort": "medium"}
-    assert call["text_format"] is PagePlan
-    assert gateway.usage.calls[0].agent == "document_manager"
-
-
-def test_full_page_inspection_remains_disabled(tmp_path: Path) -> None:
-    responses = RecordingResponses(PageInspection())
-    gateway = OpenAIDocumentGateway(
-        ParserConfig(), client=SimpleNamespace(responses=responses)
-    )
-    draft = PageDraft(
-        regions=[RegionDraft(type="table", reading_order=0, text="A | B")]
-    )
-
-    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
-        gateway.inspect_page(
-            _page(tmp_path / "page.png"),
-            draft,
-            region_ids=["p1-b1"],
-            target_region_ids=["p1-b1"],
-            agent_role=AgentRole.TABLE_FORM,
-        )
-
-
-def test_addition_arbitration_request_includes_every_competing_proposal(
-    tmp_path: Path,
-) -> None:
-    responses = RecordingResponses(PageInspection())
-    gateway = OpenAIDocumentGateway(
-        ParserConfig(), client=SimpleNamespace(responses=responses)
-    )
-    draft = PageDraft(
-        regions=[RegionDraft(type="paragraph", reading_order=0, text="Draft")]
-    )
-    proposals = [
-        InspectionRegionAddition(
-            region_id=region_id,
-            region=RegionDraft(
-                type="paragraph",
-                reading_order=1,
-                text=text,
-                bbox={"x0": 0.1, "y0": 0.3, "x1": 0.9, "y1": 0.4},
-            ),
-            reason=f"{text} rationale",
-        )
-        for region_id, text in (
-            ("layout-addition", "Layout proposal"),
-            ("table-addition", "Table proposal"),
-        )
-    ]
-    conflicts = [
-        {
-            "cluster_id": "layout-addition",
-            "proposals": [proposal.model_dump(mode="json") for proposal in proposals],
-        }
-    ]
-
-    with pytest.raises(RuntimeError, match="full-page inspection is disabled"):
-        gateway.inspect_page(
-            _page(tmp_path / "page.png"),
-            draft,
-            region_ids=["p1-b1"],
-            target_region_ids=["layout-addition"],
-            agent_role=AgentRole.EVIDENCE_CRITIC,
-            addition_conflicts=conflicts,
-        )
 
 
 def test_schema_architect_uses_luna_medium() -> None:
@@ -479,6 +515,25 @@ def test_dynamic_extractor_uses_user_schema_and_luna_repair() -> None:
     assert gateway.usage.calls[0].agent == "extraction_critic"
 
 
+def test_dynamic_extractor_repairs_invalid_json_once() -> None:
+    schema = {
+        "type": "object",
+        "properties": {"name": {"type": ["string", "null"]}},
+        "required": ["name"],
+        "additionalProperties": False,
+    }
+    payload = {"data": {"name": None}, "evidence": []}
+    responses = RepairingCreateResponses(payload)
+    gateway = OpenAIDocumentGateway(
+        ParserConfig(), client=SimpleNamespace(responses=responses)
+    )
+
+    assert gateway.extract_document({}, schema) == payload
+    assert len(responses.calls) == 2
+    assert gateway.trace[0].status == "schema_invalid"
+    assert gateway.trace[1].prompt_version == "2026-07-29.3"
+
+
 def test_targeted_span_repair_sends_only_literal_context_and_crop(
     tmp_path: Path,
 ) -> None:
@@ -524,51 +579,10 @@ def test_targeted_span_repair_sends_only_literal_context_and_crop(
     manifest = json.loads(call["input"][1]["content"][0]["text"])
     assert result.decisions[0].replacement_text == "1"
     assert call["model"] == "gpt-5.6-luna"
+    assert call["reasoning"] == {"effort": "high"}
     assert call["text_format"] is SpanRepairInspection
     assert manifest[0]["text"] == "l"
     assert manifest[0]["context_before"] == "Acct "
     assert "candidate_region" not in manifest[0]
     assert len(call["input"][1]["content"]) == 2
-
-
-def test_targeted_span_repair_labels_optional_context_crop(tmp_path: Path) -> None:
-    crop = tmp_path / "span.png"
-    context = tmp_path / "span-context.png"
-    crop.write_bytes(b"crop")
-    context.write_bytes(b"context")
-    target = SpanRepairTarget(
-        target_id="p1-b1:atom:0:0",
-        region_id="p1-b1",
-        owner_kind="atom",
-        owner_index=0,
-        start=5,
-        end=6,
-        text="l",
-        context_before="Acct ",
-        context_after="23",
-        confidence=0.4,
-        source="gpt-5.6-luna",
-        bbox={"x0": 0.1, "y0": 0.1, "x1": 0.2, "y1": 0.2},
-        evidence_ref="page:1:p1-b1:atom:0:0",
-    )
-    responses = RecordingResponses(SpanRepairInspection())
-    gateway = OpenAIDocumentGateway(
-        ParserConfig(), client=SimpleNamespace(responses=responses)
-    )
-
-    gateway.repair_spans(
-        [
-            SpanRepairRequest(
-                crop_path=str(crop),
-                context_crop_path=str(context),
-                target=target,
-            )
-        ],
-        page_number=1,
-    )
-
-    content = responses.calls[0]["input"][1]["content"]
-    manifest = json.loads(content[0]["text"])
-    assert manifest[0]["image_index"] == 0
-    assert manifest[0]["context_image_index"] == 1
-    assert len(content) == 3
+    assert call["input"][1]["content"][1]["detail"] == "original"

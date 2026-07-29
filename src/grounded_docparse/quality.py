@@ -16,7 +16,6 @@ from .models import (
     VerificationState,
 )
 
-SOURCE_COVERAGE_THRESHOLD = 0.70
 MAX_REPAIR_BLOCKS = 8
 REPAIR_CONFIDENCE_THRESHOLD = 0.85
 SCAN_UNCOVERED_INTERIOR_THRESHOLD = 0.30
@@ -64,14 +63,6 @@ def _tokens(value: str) -> list[str]:
     return WORD_PATTERN.findall(value.casefold())
 
 
-def _coverage(candidate: str, reference: str) -> float:
-    reference_tokens = _tokens(reference)
-    if not reference_tokens:
-        return 1.0
-    overlap = sum((Counter(_tokens(candidate)) & Counter(reference_tokens)).values())
-    return overlap / len(reference_tokens)
-
-
 def _area(box: BoundingBox | None) -> float:
     if box is None:
         return 0.0
@@ -84,12 +75,6 @@ def _intersection(left: BoundingBox | None, right: BoundingBox | None) -> float:
     width = max(0.0, min(left.x1, right.x1) - max(left.x0, right.x0))
     height = max(0.0, min(left.y1, right.y1) - max(left.y0, right.y0))
     return width * height
-
-
-def _spatially_related(left: BoundingBox | None, right: BoundingBox | None) -> bool:
-    intersection = _intersection(left, right)
-    smaller = min(_area(left), _area(right))
-    return bool(smaller and intersection / smaller >= 0.2)
 
 
 def semantic_text(block: Block) -> str:
@@ -284,10 +269,7 @@ def _scan_probes(page: PageEvidence, blocks: list[Block]) -> list[RegionDraft]:
 def find_missing_source_regions(
     page: PageEvidence,
     blocks: list[Block],
-    *,
-    threshold: float = SOURCE_COVERAGE_THRESHOLD,
 ) -> list[RegionDraft]:
-    del threshold
     return _scan_probes(page, blocks)
 
 
@@ -297,11 +279,6 @@ def _critical_values(value: str) -> set[str]:
         for pattern in CRITICAL_PATTERNS
         for match in pattern.finditer(value)
     }
-
-
-def _critical_matches(value: str) -> list[re.Match[str]]:
-    matches = [match for pattern in CRITICAL_PATTERNS for match in pattern.finditer(value)]
-    return sorted(matches, key=lambda item: (item.start(), item.end()))
 
 
 def literal_repair_candidates(
