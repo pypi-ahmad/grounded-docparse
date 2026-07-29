@@ -12,16 +12,20 @@ import pymupdf
 from PIL import Image, ImageOps, ImageSequence
 
 from .models import (
+    AgenticAnalysis,
     AgentTraceEvent,
     Block,
     Document,
     Element,
+    ExtractionResult,
     NodeType,
     PageQuality,
     ParseMetadata,
+    ParseResult,
     RuntimeDiagnostics,
     RunUsage,
     VerificationState,
+    VisualRecoveryResult,
 )
 from .quality import WORD_PATTERN, incomplete_table, semantic_text
 
@@ -33,6 +37,7 @@ ANNOTATION_COLORS = {
     "formula": (0.576, 0.2, 0.918),
     "seal": (0.863, 0.149, 0.149),
 }
+RECOVERY_ANNOTATION_COLOR = (1.0, 0.55, 0.0)
 
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
 
@@ -396,35 +401,16 @@ def render_markdown(document: Document) -> str:
     return markdown
 
 
-def render_json(document: Document) -> str:
-    payload = document.model_dump(mode="json")
-    for page in payload["pages"]:
-        page.pop("analysis", None)
-
-    def strip_confidence_evidence(block: dict) -> None:
-        for atom in block["atoms"]:
-            atom.pop("confidence", None)
-            atom.pop("low_confidence_spans", None)
-        if block["table"] is not None:
-            for cell in block["table"]["cells"]:
-                cell.pop("confidence", None)
-                cell.pop("low_confidence_spans", None)
-        for child in block["children"]:
-            strip_confidence_evidence(child)
-
-    for page in payload["pages"]:
-        for block in page["blocks"]:
-            strip_confidence_evidence(block)
-    return json.dumps(payload, ensure_ascii=False, indent=2)
-
-
 @dataclass(frozen=True, slots=True)
 class RenderedAgenticDocument:
     markdown: str
     json: str
 
 
-def build_elements(document: Document) -> list[Element]:
+def build_elements(
+    document: Document,
+    recovered_element_ids: set[str] | None = None,
+) -> list[Element]:
     """Flatten the canonical document into the public engine-neutral contract."""
 
     elements: list[Element] = []
@@ -444,6 +430,11 @@ def build_elements(document: Document) -> list[Element]:
                     text=semantic_text(block),
                     reading_order=order,
                     confidence=block.confidence,
+                    source=(
+                        "luna-recovery"
+                        if block.id in (recovered_element_ids or set())
+                        else "glm-ocr"
+                    ),
                 )
             )
     return elements
@@ -632,20 +623,6 @@ def _page_quality_reasons(
     if any(block.bbox is None for block in blocks):
         add("geometry_loss")
 
-    ordering = page.specialist_audit.ordering_resolution
-    if ordering is not None and ordering.outcome == "needs_review":
-        add("ordering_failure")
-    if any(
-        resolution.outcome == "needs_review"
-        for resolution in page.specialist_audit.resolutions
-    ):
-        add("specialist_conflict")
-    if any(
-        resolution.outcome == "needs_review"
-        for resolution in page.specialist_audit.addition_resolutions
-    ):
-        add("specialist_conflict")
-
     warning_text = "\n".join(page.warnings).casefold()
     if "skipped" in warning_text:
         add("skipped_correction")
@@ -707,10 +684,13 @@ def render_agentic_document(
     duration_ms: int = 0,
     elements: list[Element] | None = None,
     parse_metadata: ParseMetadata | None = None,
+    markdown_override: str | None = None,
+    recovery_log: list[VisualRecoveryResult] | None = None,
 ) -> RenderedAgenticDocument:
     """Render canonical Markdown together with its grounded v4 envelope."""
 
-    markdown, emissions = _render_with_emissions(document)
+    base_markdown, emissions = _render_with_emissions(document)
+    markdown = markdown_override if markdown_override is not None else base_markdown
     pages: list[dict] = []
     for page in document.pages:
         page_nodes: list[dict] = []
@@ -740,7 +720,7 @@ def render_agentic_document(
             atoms = (
                 _agentic_atoms(
                     block,
-                    markdown,
+                    base_markdown,
                     start,
                     end,
                     page.number,
@@ -813,7 +793,6 @@ def render_agentic_document(
                     None,
                 ),
                 "blocks": page_nodes,
-                "specialist_audit": page.specialist_audit.model_dump(mode="json"),
                 "warnings": page.warnings,
                 "quality": computed_quality.model_dump(mode="json"),
                 "analysis": page.analysis.model_dump(mode="json")
@@ -829,8 +808,15 @@ def render_agentic_document(
         processing_time=duration_ms / 1000,
     )
     payload = {
-        "schema_version": "4.0.0",
+        "schema_version": "4.4.0",
         "markdown": markdown,
+        "base_markdown": base_markdown,
+        "document_type": None,
+        "sections": [],
+        "extracted_fields": {},
+        "recovery_log": [
+            item.model_dump(mode="json") for item in (recovery_log or [])
+        ],
         "metadata": {
             **metadata.model_dump(mode="json"),
             "source_name": document.source_name,
@@ -839,6 +825,7 @@ def render_agentic_document(
             "failed_pages": [],
             "duration_ms": duration_ms,
             "range_units": "unicode_codepoints",
+            "range_target": "base_markdown",
             "usage": run_usage.model_dump(mode="json"),
             "trace": [event.model_dump(mode="json") for event in (trace or [])],
             "runtime": (
@@ -855,6 +842,84 @@ def render_agentic_document(
         markdown=markdown,
         json=json.dumps(payload, ensure_ascii=False, indent=2),
     )
+
+
+def render_combined_result(
+    parse_result: ParseResult,
+    analysis: AgenticAnalysis | None = None,
+    extraction: ExtractionResult | None = None,
+) -> str:
+    """Flatten optional agentic results into the canonical v4.4 envelope."""
+
+    payload = parse_result.structured_json
+    payload["schema_version"] = "4.4.0"
+    payload["document_type"] = (
+        analysis.classification.model_dump(mode="json")
+        if analysis and analysis.classification
+        else None
+    )
+    payload["sections"] = (
+        [item.model_dump(mode="json") for item in analysis.toc.sections]
+        if analysis and analysis.toc
+        else []
+    )
+    payload["extracted_fields"] = (
+        {
+            name: field.model_dump(mode="json")
+            for name, field in extraction.fields.items()
+        }
+        if extraction
+        else {}
+    )
+    payload["recovery_log"] = [
+        item.model_dump(mode="json") for item in parse_result.recovery_log
+    ]
+
+    metadata = payload["metadata"]
+    extra_traces = [
+        *(analysis.trace if analysis else []),
+        *(extraction.trace if extraction else []),
+    ]
+    extra_usage = [
+        *(analysis.usage.calls if analysis else []),
+        *(extraction.usage.calls if extraction else []),
+    ]
+    extra_recovery_time = sum(
+        item.duration_ms for item in extra_traces if item.image_count
+    ) / 1000
+    extra_agentic_time = sum(
+        item.duration_ms for item in extra_traces if not item.image_count
+    ) / 1000
+    metadata["luna_recovery_time"] = (
+        parse_result.metadata.luna_recovery_time + extra_recovery_time
+    )
+    metadata["luna_agentic_time"] = (
+        parse_result.metadata.luna_agentic_time + extra_agentic_time
+    )
+    metadata["luna_time"] = (
+        metadata["luna_recovery_time"] + metadata["luna_agentic_time"]
+    )
+    metadata["engine"] = (
+        "glm-ocr + gpt-5.6-luna"
+        if parse_result.trace or extra_traces
+        else "glm-ocr"
+    )
+    metadata["feature_statuses"] = (
+        {
+            name: feature.model_dump(mode="json")
+            for name, feature in analysis.features.items()
+        }
+        if analysis
+        else {}
+    )
+    combined_usage = RunUsage(
+        calls=[*(parse_result.usage or RunUsage()).calls, *extra_usage]
+    )
+    metadata["usage"] = combined_usage.model_dump(mode="json")
+    metadata["trace"].extend(
+        item.model_dump(mode="json") for item in extra_traces
+    )
+    return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 def _source(page: int, start: int | None, end: int | None, bbox) -> dict:
@@ -1175,6 +1240,7 @@ def render_annotated_pdf(
     page_count: int | None = None,
     show_reading_order: bool = True,
     selected_element_id: str | None = None,
+    recovered_element_ids: set[str] | None = None,
 ) -> bytes:
     source = _as_pdf(data, filename)
     if isinstance(content, Document):
@@ -1183,6 +1249,7 @@ def render_annotated_pdf(
     else:
         elements = content
         expected_pages = page_count
+    recovered_ids = recovered_element_ids or set()
     with pymupdf.open(stream=source, filetype="pdf") as output:
         if expected_pages is not None and output.page_count != expected_pages:
             raise ValueError("source and extracted document page counts do not match")
@@ -1199,6 +1266,14 @@ def render_annotated_pdf(
             )
             color = ANNOTATION_COLORS[_annotation_group(element.type)]
             page.draw_rect(rect, color=color, width=1.25, overlay=True)
+            if element.id in recovered_ids:
+                page.draw_rect(
+                    rect,
+                    color=RECOVERY_ANNOTATION_COLOR,
+                    dashes="[4 2]",
+                    width=2,
+                    overlay=True,
+                )
             if element.id == selected_element_id:
                 halo = pymupdf.Rect(rect)
                 halo.x0 = max(0, halo.x0 - 2)

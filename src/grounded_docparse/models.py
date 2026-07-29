@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
@@ -46,9 +46,6 @@ class InspectionAction(StrEnum):
 
 
 class AgentRole(StrEnum):
-    LAYOUT_TEXT = "layout_text_specialist"
-    TABLE_FORM = "table_form_specialist"
-    VISUAL = "visual_specialist"
     EVIDENCE_CRITIC = "evidence_critic"
 
 
@@ -382,17 +379,9 @@ class AgentTraceEvent(BaseModel):
     image_pixels: int = Field(default=0, ge=0)
     source_page_pixels: int = Field(default=0, ge=0)
     repair_round: int | None = Field(default=None, ge=1)
+    prompt_version: str | None = None
+    reasoning_effort: str | None = None
     summary: str | None = None
-
-
-class RuntimeBudgetDenial(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    budget: str
-    stage: str
-    model: str
-    page: int | None = Field(default=None, ge=1)
-    reason: str
 
 
 class RuntimeDiagnostics(BaseModel):
@@ -402,7 +391,6 @@ class RuntimeDiagnostics(BaseModel):
     full_page_fallbacks: int = Field(default=0, ge=0)
     http_attempts: int = Field(default=0, ge=0)
     retries: int = Field(default=0, ge=0)
-    repair_rounds: int = Field(default=0, ge=0)
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
     rate_limit_events: int = Field(default=0, ge=0)
@@ -412,7 +400,6 @@ class RuntimeDiagnostics(BaseModel):
     elapsed_seconds: float = Field(default=0, ge=0)
     limiter_wait_seconds: float = Field(default=0, ge=0)
     retry_sleep_seconds: float = Field(default=0, ge=0)
-    budget_denials: list[RuntimeBudgetDenial] = Field(default_factory=list)
 
 
 class SchemaProposal(BaseModel):
@@ -429,6 +416,136 @@ class SchemaProposalWire(BaseModel):
     schema_text: str
 
 
+class SchemaField(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(pattern=r"^[A-Za-z_][A-Za-z0-9_]*$")
+    description: str = ""
+    type: Literal["string", "number", "integer", "boolean", "date"] = "string"
+
+
+class StoredSchema(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    name: str = Field(min_length=1, max_length=100)
+    fields: list[SchemaField]
+
+    @model_validator(mode="after")
+    def unique_fields(self) -> StoredSchema:
+        names = [field.name.casefold() for field in self.fields]
+        if len(names) != len(set(names)):
+            raise ValueError("schema field names must be unique")
+        if not names:
+            raise ValueError("schema requires at least one field")
+        return self
+
+
+class ChatSource(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    element_id: str
+    page: int = Field(ge=1)
+    text: str
+
+
+class ExtractedField(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    value: object | None = None
+    page: int | None = Field(default=None, ge=1)
+    bbox: tuple[float, float, float, float] | None = None
+    confidence: Literal["high", "medium", "inferred", "not_found"]
+    element_id: str | None = None
+    source_text: str | None = None
+
+
+class DocumentClassification(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    primary_type: Literal[
+        "Invoice",
+        "Contract",
+        "Bank Statement",
+        "Report",
+        "Form",
+        "Certificate",
+        "Letter",
+        "Other",
+    ]
+    confidence: float = Field(ge=0, le=1)
+    secondary_types: list[str] = Field(default_factory=list)
+    reasoning: str = ""
+
+
+class TocSection(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    level: int = Field(ge=1, le=6)
+    page: int = Field(ge=1)
+    element_id: str | None = None
+    children: list[TocSection] = Field(default_factory=list)
+
+
+class TableOfContents(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    sections: list[TocSection] = Field(default_factory=list)
+
+
+class ChatAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    answer: str
+    sources: list[ChatSource] = Field(default_factory=list)
+    confidence: Literal["high", "medium", "low"] = "low"
+
+
+class ChatCitationWire(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    element_id: str
+
+
+class ChatAnswerWire(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    answer: str
+    citations: list[ChatCitationWire] = Field(default_factory=list)
+    confidence: Literal["high", "medium", "low"] = "low"
+
+
+class VisualRecoveryResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    region_id: str
+    page: int = Field(ge=1)
+    original_element_id: str | None = None
+    status: Literal["recovered"] = "recovered"
+    recovered_text: str
+    confidence: Literal["high", "medium", "low"]
+    notes: str = ""
+
+
+class AgenticFeatureMetadata(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: Literal["off", "unavailable", "succeeded", "partial", "failed"]
+    duration_ms: int = Field(default=0, ge=0)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class AgenticAnalysis(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    classification: DocumentClassification | None = None
+    toc: TableOfContents | None = None
+    features: dict[str, AgenticFeatureMetadata] = Field(default_factory=dict)
+    usage: RunUsage = Field(default_factory=RunUsage)
+    trace: list[AgentTraceEvent] = Field(default_factory=list)
+
+
 @dataclass(slots=True)
 class ExtractionResult:
     data: dict
@@ -439,6 +556,7 @@ class ExtractionResult:
     output_tokens: int
     usage: RunUsage
     trace: list[AgentTraceEvent]
+    fields: dict[str, ExtractedField] = field(default_factory=dict)
 
 
 class TableCellDraft(BaseModel):
@@ -577,75 +695,6 @@ class SpanRepairInspection(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
-class SpecialistOpinion(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    reviewer: str
-    model: str
-    timestamp: datetime
-    decision: InspectionDecision
-    confidence: float = Field(default=0.5, ge=0, le=1)
-    reasoning: str = ""
-
-
-class SpecialistResolution(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    region_id: str
-    outcome: str
-    final_decision: InspectionDecision | None = None
-    reasoning: str = ""
-
-
-class SpecialistAdditionOpinion(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    reviewer: str
-    model: str
-    timestamp: datetime
-    addition: InspectionRegionAddition
-
-
-class SpecialistAdditionResolution(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    region_id: str
-    outcome: str
-    proposal_region_ids: list[str] = Field(default_factory=list)
-    final_addition: InspectionRegionAddition | None = None
-    reasoning: str = ""
-
-
-class SpecialistOrderingOpinion(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    reviewer: str
-    model: str
-    timestamp: datetime
-    ordered_region_ids: list[str] = Field(default_factory=list)
-
-
-class SpecialistOrderingResolution(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    outcome: str
-    ordered_region_ids: list[str] = Field(default_factory=list)
-    reasoning: str = ""
-
-
-class SpecialistAudit(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    opinions: list[SpecialistOpinion] = Field(default_factory=list)
-    resolutions: list[SpecialistResolution] = Field(default_factory=list)
-    addition_opinions: list[SpecialistAdditionOpinion] = Field(default_factory=list)
-    addition_resolutions: list[SpecialistAdditionResolution] = Field(
-        default_factory=list
-    )
-    ordering_opinions: list[SpecialistOrderingOpinion] = Field(default_factory=list)
-    ordering_resolution: SpecialistOrderingResolution | None = None
-
-
 class PageQuality(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -661,7 +710,6 @@ class Page(BaseModel):
     width: float = Field(gt=0)
     height: float = Field(gt=0)
     blocks: list[Block] = Field(default_factory=list)
-    specialist_audit: SpecialistAudit = Field(default_factory=SpecialistAudit)
     warnings: list[str] = Field(default_factory=list)
     quality: PageQuality = Field(default_factory=PageQuality)
     analysis: PageAnalysis | None = None
@@ -670,27 +718,10 @@ class Page(BaseModel):
 class Document(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: str = "2.0.0"
     source_name: str
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     pages: list[Page]
     warnings: list[str] = Field(default_factory=list)
-
-
-class AgentDelegation(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    role: AgentRole
-    target_region_ids: list[str] = Field(default_factory=list)
-    reason: str
-
-
-class PagePlan(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    delegations: list[AgentDelegation] = Field(default_factory=list)
-    finish: bool = False
-    summary: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -706,7 +737,6 @@ class CropInspectionRequest:
 class SpanRepairRequest:
     crop_path: str
     target: SpanRepairTarget
-    context_crop_path: str | None = None
     source_page_pixels: int = 0
 
 
@@ -718,6 +748,54 @@ class ProgressEvent(BaseModel):
 
 
 ProgressCallback = Callable[[ProgressEvent], None]
+
+
+class PresentationDirective(BaseModel):
+    """Text-free Luna instruction for deterministic Markdown presentation."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    element_id: str
+    render_as: Literal["source", "heading", "paragraph", "list_item", "caption"] = (
+        "source"
+    )
+    heading_level: int | None = Field(default=None, ge=1, le=6)
+    list_depth: int | None = Field(default=None, ge=0, le=6)
+    group_with_previous: bool = False
+
+    @model_validator(mode="after")
+    def validate_options(self) -> PresentationDirective:
+        if self.heading_level is not None and self.render_as != "heading":
+            raise ValueError("heading_level requires render_as=heading")
+        if self.list_depth is not None and self.render_as != "list_item":
+            raise ValueError("list_depth requires render_as=list_item")
+        return self
+
+
+class PagePresentationPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    page: int = Field(ge=1)
+    elements: list[PresentationDirective]
+
+
+class MarkdownPresentationPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    pages: list[PagePresentationPlan]
+
+
+class EnhancementMetadata(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    status: Literal["off", "unavailable", "succeeded", "partial", "failed"] = (
+        "off"
+    )
+    model: str = "gpt-5.6-luna"
+    chunks_total: int = Field(default=0, ge=0)
+    chunks_enhanced: int = Field(default=0, ge=0)
+    warnings: list[str] = Field(default_factory=list)
 
 
 class Element(BaseModel):
@@ -732,6 +810,7 @@ class Element(BaseModel):
     text: str = ""
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
+    source: Literal["glm-ocr", "luna-recovery"] = "glm-ocr"
 
     @model_validator(mode="after")
     def validate_bbox(self) -> Element:
@@ -751,7 +830,21 @@ class ParseMetadata(BaseModel):
     engine: str = "glm-ocr"
     pages: int = Field(default=0, ge=0)
     processing_time: float = Field(default=0.0, ge=0)
+    visual_parse_time: float = Field(default=0.0, ge=0)
+    refinement_time: float = Field(default=0.0, ge=0)
+    visual_recovery_request_time: float = Field(default=0.0, ge=0)
+    visual_recovery_enabled: bool = True
+    visual_recovery_candidates: int = Field(default=0, ge=0)
+    visual_recovery_crops: int = Field(default=0, ge=0)
+    visual_recovery_deferred: int = Field(default=0, ge=0)
+    visual_recovery_region_ids: list[str] = Field(default_factory=list)
+    glm_time: float = Field(default=0.0, ge=0)
+    luna_recovery_time: float = Field(default=0.0, ge=0)
+    luna_agentic_time: float = Field(default=0.0, ge=0)
+    luna_time: float = Field(default=0.0, ge=0)
+    recovered_regions: int = Field(default=0, ge=0)
     model_versions: dict[str, str] = Field(default_factory=dict)
+    enhancement: EnhancementMetadata = Field(default_factory=EnhancementMetadata)
 
 
 @dataclass(slots=True)
@@ -762,12 +855,13 @@ class ParseResult:
     input_tokens: int
     output_tokens: int
     annotated_pdf: bytes
-    legacy_json: str = ""
+    base_markdown: str = ""
     usage: RunUsage | None = None
     trace: list[AgentTraceEvent] | None = None
     runtime_diagnostics: RuntimeDiagnostics | None = None
     elements: list[Element] = field(default_factory=list)
     metadata: ParseMetadata = field(default_factory=ParseMetadata)
+    recovery_log: list[VisualRecoveryResult] = field(default_factory=list)
 
     @property
     def structured_json(self) -> dict:

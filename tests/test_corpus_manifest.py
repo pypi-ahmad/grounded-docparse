@@ -13,7 +13,7 @@ from pydantic import ValidationError
 from grounded_docparse.benchmark import ReferenceBasis, load_corpus_manifest
 
 
-def _write_annotation(path: Path, *, document_id: str, version: str = "1.0") -> None:
+def _write_annotation(path: Path, *, document_id: str, version: str = "1.1") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(
@@ -46,7 +46,7 @@ def _write_manifest(
         json.dumps(
             {
                 "schema_version": "1.0",
-                "annotation_schema_version": "1.0",
+                "annotation_schema_version": "1.1",
                 "corpus_id": "test-corpus-v1",
                 "documents": documents
                 or [
@@ -77,7 +77,7 @@ def test_load_manifest_validates_local_sources_and_annotations(tmp_path: Path) -
     assert manifest.documents[0].source_path == tmp_path / "documents" / "sample.pdf"
 
 
-def test_load_manifest_accepts_v11_reference_provenance(tmp_path: Path) -> None:
+def test_load_manifest_accepts_reference_provenance(tmp_path: Path) -> None:
     manifest_path = _write_manifest(tmp_path)
     manifest_payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest_payload["annotation_schema_version"] = "1.1"
@@ -183,10 +183,6 @@ def test_generator_builds_twelve_local_documents_and_external_public_water(
         page.insert_text((72, 72), f"Synthetic fixture {filename}")
         document.save(examples / filename)
         document.close()
-    fixture = tmp_path / "tests" / "fixtures" / "public_water_expectations.json"
-    fixture.parent.mkdir(parents=True)
-    fixture.write_text("{}", encoding="utf-8")
-
     script = Path(__file__).resolve().parents[1] / "scripts" / "generate_evaluation_corpus.py"
     completed = subprocess.run(
         [sys.executable, str(script), "--repository-root", str(tmp_path)],

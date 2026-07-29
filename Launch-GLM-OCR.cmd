@@ -11,11 +11,6 @@ if errorlevel 1 (
   goto :failed
 )
 
-if not defined OPENAI_API_KEY (
-  echo ERROR: OPENAI_API_KEY is not set in the Windows environment.
-  goto :failed
-)
-
 set "DOCPARSE_WINDOWS_ROOT=%CD%"
 set "DOCPARSE_OLD_WSLENV=%WSLENV%"
 if defined WSLENV (

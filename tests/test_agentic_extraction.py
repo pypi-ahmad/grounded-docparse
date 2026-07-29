@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from grounded_docparse.extraction import DocumentExtractor
+from grounded_docparse.extraction import DocumentExtractor, _extraction_payload
 from grounded_docparse.models import (
     AgentUsage,
     Block,
@@ -13,7 +13,7 @@ from grounded_docparse.models import (
     RunUsage,
     VerificationState,
 )
-from grounded_docparse.render import render_agentic_document, render_json
+from grounded_docparse.render import render_agentic_document
 
 SCHEMA = {
     "type": "object",
@@ -26,6 +26,21 @@ SCHEMA = {
     "required": ["invoice_number"],
     "additionalProperties": False,
 }
+
+
+def test_extraction_grounds_citations_in_base_markdown() -> None:
+    payload = _extraction_payload(
+        {
+            "markdown": "# Refined heading\n",
+            "base_markdown": "Original heading\n",
+            "metadata": {},
+            "document": {"pages": []},
+            "elements": [],
+        }
+    )
+
+    assert payload["markdown"] == "Original heading\n"
+    assert payload["refined_markdown"] == "# Refined heading\n"
 
 
 def _parse_result() -> ParseResult:
@@ -56,7 +71,6 @@ def _parse_result() -> ParseResult:
         document=document,
         markdown=rendered.markdown,
         json=rendered.json,
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",
@@ -193,6 +207,101 @@ def test_missing_evidence_gets_one_luna_repair() -> None:
     assert result.warnings == []
 
 
+class InferredExtractionGateway(ExtractionGateway):
+    def extract_document(self, _parse_payload, schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
+        assert schema == SCHEMA
+        return {
+            "data": {"invoice_number": "INV-8"},
+            "evidence": [
+                {
+                    "pointer": "/invoice_number",
+                    "block_ids": ["p1-b1"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+def test_optional_inferred_mode_retains_value_with_grounded_box() -> None:
+    gateway = InferredExtractionGateway()
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        _parse_result(), SCHEMA, allow_inferred=True
+    )
+
+    field = result.fields["invoice_number"]
+    assert field.value == "INV-8"
+    assert field.confidence == "inferred"
+    assert field.element_id == "p1-b1"
+    assert field.bbox == (0.1, 0.1, 0.7, 0.2)
+    assert "unit" not in field.model_dump(mode="json")["bbox"]
+
+
+class NestedEvidenceGateway(ExtractionGateway):
+    def __init__(self, value, pointer: str) -> None:
+        super().__init__()
+        self.value = value
+        self.pointer = pointer
+
+    def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
+        self.extract_calls.append((repair, issues))
+        return {
+            "data": {"record": self.value},
+            "evidence": [
+                {
+                    "pointer": self.pointer,
+                    "block_ids": ["p1-b1"],
+                    "atom_ids": [],
+                }
+            ],
+        }
+
+
+@pytest.mark.parametrize(
+    ("value", "field_schema", "pointer"),
+    [
+        (
+            {"number": "INV-7"},
+            {
+                "type": ["object", "null"],
+                "properties": {"number": {"type": ["string", "null"]}},
+                "required": ["number"],
+                "additionalProperties": False,
+            },
+            "/record/number",
+        ),
+        (
+            ["INV-7"],
+            {"type": ["array", "null"], "items": {"type": ["string", "null"]}},
+            "/record/0",
+        ),
+    ],
+)
+def test_nested_extraction_field_uses_descendant_evidence(
+    value,
+    field_schema: dict,
+    pointer: str,
+) -> None:
+    schema = {
+        "type": "object",
+        "properties": {"record": field_schema},
+        "required": ["record"],
+        "additionalProperties": False,
+    }
+    gateway = NestedEvidenceGateway(value, pointer)
+
+    result = DocumentExtractor(gateway_factory=lambda _config: gateway).extract(
+        _parse_result(), schema
+    )
+
+    field = result.fields["record"]
+    assert field.value == value
+    assert field.confidence == "medium"
+    assert field.element_id == "p1-b1"
+    assert field.bbox == (0.1, 0.1, 0.7, 0.2)
+
+
 class RejectedEvidenceGateway(ExtractionGateway):
     def extract_document(self, _parse_payload, _schema, *, repair=False, issues=None):
         self.extract_calls.append((repair, issues))
@@ -235,7 +344,6 @@ def test_rejected_audit_block_cannot_be_used_as_extraction_evidence() -> None:
         document=document,
         markdown=rendered.markdown,
         json=rendered.json,
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",
@@ -307,9 +415,6 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
         {"summary": "Rejected audit echoed REJECTED-ONLY-9"}
     ]
     canonical_page = canonical_payload["document"]["pages"][0]
-    canonical_page["specialist_audit"] = {
-        "reason": "Rejected audit echoed REJECTED-ONLY-9"
-    }
     accepted = next(
         block for block in canonical_page["blocks"] if block["id"] == "accepted"
     )
@@ -318,7 +423,6 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
         document=document,
         markdown=rendered.markdown,
         json=json.dumps(canonical_payload),
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",
@@ -333,6 +437,8 @@ def test_rejected_only_value_cannot_be_laundered_through_rendered_citation() -> 
     assert all(
         "REJECTED-ONLY-9" not in json.dumps(payload) for payload in gateway.payloads
     )
+    assert all(set(payload) == {"document_markdown", "layout_tree"} for payload in gateway.payloads)
+    assert all("bbox" not in json.dumps(payload) for payload in gateway.payloads)
     assert result.data == {"invoice_number": None}
     assert result.evidence == {}
     assert any("does not contain extracted value" in item for item in result.warnings)
@@ -419,7 +525,6 @@ def test_scalar_grounding_accepts_deterministic_literal_normalization(
         document=document,
         markdown=rendered.markdown,
         json=rendered.json,
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",
@@ -488,7 +593,6 @@ def test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean(
         document=document,
         markdown=rendered.markdown,
         json=rendered.json,
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",
@@ -546,7 +650,6 @@ def test_string_grounding_does_not_join_disjoint_citation_slices() -> None:
         document=document,
         markdown=rendered.markdown,
         json=rendered.json,
-        legacy_json=render_json(document),
         input_tokens=0,
         output_tokens=0,
         annotated_pdf=b"",

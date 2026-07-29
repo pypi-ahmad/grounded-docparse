@@ -24,7 +24,6 @@ def test_live_report_groups_documents_and_marks_missing_grounding() -> None:
                 },
                 "retries": 0,
                 "rate_limit_events": 0,
-                "budget_denials": [],
             },
         }
     ]

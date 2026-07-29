@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 import pymupdf
@@ -11,16 +11,6 @@ from PIL import Image, ImageOps, ImageSequence
 from .models import BoundingBox
 
 SUPPORTED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}
-
-
-@dataclass(slots=True)
-class TextBlock:
-    """Legacy compatibility type; raster-only ingest never populates it."""
-
-    text: str
-    bbox: BoundingBox
-    font_size: float
-    font: str
 
 
 @dataclass(slots=True)
@@ -38,13 +28,6 @@ class PageEvidence:
     source_unit: str = "pixels"
     source_rotation_degrees: int = 0
     scanned: bool = True
-    text_blocks: list[TextBlock] = field(default_factory=list)
-
-    @property
-    def digital_text(self) -> str:
-        """Legacy compatibility accessor; never used as parser evidence."""
-
-        return "\n".join(block.text for block in self.text_blocks if block.text.strip())
 
 
 @dataclass(slots=True)

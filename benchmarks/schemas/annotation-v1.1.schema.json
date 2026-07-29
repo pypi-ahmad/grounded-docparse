@@ -26,8 +26,7 @@
       "enum": [
         "source_verified",
         "synthetic_exact",
-        "generated",
-        "legacy"
+        "generated"
       ]
     },
     "reference_pages": {

@@ -19,7 +19,7 @@ from grounded_docparse.models import (
     TableData,
     VerificationState,
 )
-from grounded_docparse.render import render_json, render_markdown
+from grounded_docparse.render import render_agentic_document, render_markdown
 
 
 def test_annotated_pdf_draws_nested_audit_boxes(simple_pdf: bytes) -> None:
@@ -58,11 +58,18 @@ def test_annotated_pdf_draws_nested_audit_boxes(simple_pdf: bytes) -> None:
     renderer = getattr(document_render, "render_annotated_pdf", None)
 
     assert callable(renderer), "render_annotated_pdf is missing"
-    annotated = renderer(simple_pdf, "notice.pdf", document)
+    annotated = renderer(
+        simple_pdf,
+        "notice.pdf",
+        document,
+        recovered_element_ids={"p1-b2"},
+    )
 
     with pymupdf.open(stream=annotated, filetype="pdf") as rendered:
         assert rendered.page_count == 1
-        assert len(rendered[0].get_drawings()) == 4
+        drawings = rendered[0].get_drawings()
+        assert len(drawings) == 5
+        assert any(drawing["dashes"] != "[] 0" for drawing in drawings)
         labels = rendered[0].get_text()
     assert labels.splitlines()[-2:] == ["1", "2"]
 
@@ -164,14 +171,13 @@ def test_nested_document_renders_layout_aware_markdown_and_json() -> None:
     )
 
     markdown = render_markdown(document)
-    json_text = render_json(document)
+    json_text = render_agentic_document(document).json
 
     assert "# Water quality" in markdown
     assert "Visible source text." in markdown
     assert "page=1" not in markdown
     assert "<!-- source" not in markdown
     assert '"children"' in json_text
-    assert '"section_path"' in json_text
 
 
 def test_only_rejected_blocks_are_suppressed_without_warning_callouts() -> None:
@@ -211,8 +217,9 @@ def test_needs_review_text_remains_readable_and_auditable() -> None:
     )
 
     assert render_markdown(document) == "Readable draft text\n"
-    assert '"verification": "needs_review"' in render_json(document)
-    assert '"verification_reason": "No verification decision"' in render_json(document)
+    payload = render_agentic_document(document).json
+    assert '"status": "needs_review"' in payload
+    assert '"verification_reason": "No verification decision"' in payload
 
 
 def test_provider_draft_accepts_unordered_coordinates_for_local_validation() -> None:
@@ -351,9 +358,9 @@ def test_schema_version_and_list_marker_are_preserved_in_json() -> None:
         pages=[Page(number=1, width=100, height=100, blocks=[block])],
     )
 
-    json_text = render_json(document)
+    json_text = render_agentic_document(document).json
 
-    assert document.schema_version == "2.0.0"
+    assert '"schema_version": "4.4.0"' in json_text
     assert '"list_marker": "1."' in json_text
 
 
@@ -361,13 +368,13 @@ def test_unchecked_high_confidence_content_has_truthful_audit_state() -> None:
     block = Block(id="body", type="paragraph", text="Literal text", reading_order=0)
 
     assert block.verification is VerificationState.NOT_CHECKED
-    assert '"verification": "not_checked"' in render_json(
+    assert '"status": "not_checked"' in render_agentic_document(
         Document(
             source_name="scan.pdf",
             source_sha256="a" * 64,
             pages=[Page(number=1, width=100, height=100, blocks=[block])],
         )
-    )
+    ).json
 
 
 def test_provider_draft_accepts_explicit_form_and_checkbox_fields() -> None:
@@ -458,7 +465,7 @@ def test_form_hint_remains_visible_and_structured_in_json() -> None:
     )
 
     markdown = render_markdown(document)
-    json_text = render_json(document)
+    json_text = render_agentic_document(document).json
 
     assert "**PWS Id:** MO1010001 (MO######)" in markdown
     assert "**Collected Date:** yyyy-mm-dd" in markdown
