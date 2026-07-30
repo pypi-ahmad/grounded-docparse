@@ -13,6 +13,7 @@ GLMOCR_PERFORMANCE_MODE="${GLMOCR_PERFORMANCE_MODE:-throughput}"
 GLMOCR_MM_PROCESSOR_CACHE_GB="${GLMOCR_MM_PROCESSOR_CACHE_GB:-1}"
 echo "GLM-OCR runtime: revision=ca5d8b3e287e52589e37c28385d9655ee4372f9d context=${GLMOCR_MAX_MODEL_LEN:-32768} gpu_memory=${GLMOCR_GPU_MEMORY_UTILIZATION:-0.85} performance=$GLMOCR_PERFORMANCE_MODE mm_cache_gb=$GLMOCR_MM_PROCESSOR_CACHE_GB"
 exec vllm serve "$GLMOCR_MODEL_PATH" \
+  --host 127.0.0.1 \
   --port 8080 \
   --served-model-name glm-ocr \
   --speculative-config '{"method":"mtp","num_speculative_tokens":3}' \

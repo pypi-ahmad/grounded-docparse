@@ -13,4 +13,4 @@ export DOCPARSE_GLMOCR_CONFIG_PATH="$PROJECT_ROOT/.runtime/glmocr.yaml"
 export DOCPARSE_GLMOCR_LAYOUT_DEVICE="${DOCPARSE_GLMOCR_LAYOUT_DEVICE:-cuda:0}"
 export DOCPARSE_PRELOAD_LOCAL_OCR="${DOCPARSE_PRELOAD_LOCAL_OCR:-true}"
 echo "PP-DocLayoutV3 runtime: revision=97d101e6db2642e162a1d05392d1b0231c91033e device=$DOCPARSE_GLMOCR_LAYOUT_DEVICE workers=${GLMOCR_SDK_MAX_WORKERS:-16}"
-exec streamlit run streamlit_app.py "$@"
+exec streamlit run streamlit_app.py "$@" --server.address=127.0.0.1

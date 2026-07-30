@@ -89,7 +89,7 @@ GLM-OCR declares 131072 maximum positions, but this 8GB workstation cannot provi
 
 The vLLM command serves the pinned GLM-OCR snapshot as `glm-ocr`, uses three-token MTP speculation, 85% GPU memory, throughput mode, and a 1GB multimodal processor cache. Multimodal startup profiling remains disabled because it previously exhausted the 18GB WSL memory limit; `launch-stack.sh` compensates by requiring a real image-recognition request before declaring vLLM ready. The source `config/glmocr.yaml` contains the complete task, label, layout, and formatter contract. The generated `.runtime/glmocr.yaml` changes only the pinned layout path and selected SDK worker count.
 
-`scripts/wsl/serve-glmocr.sh` does not pass an explicit vLLM host/bind flag. Treat port `8080` as potentially reachable through WSL networking and protect it with Windows/host firewall rules; the repository does not enforce loopback-only vLLM binding.
+`scripts/wsl/serve-glmocr.sh` binds vLLM to `127.0.0.1`, and `scripts/wsl/run-app.sh` binds Streamlit to `127.0.0.1`. These launchers support the documented single-workstation deployment only. A cloud or shared deployment requires a separate security design with authentication, TLS termination, quotas, and tenant isolation.
 
 ## Luna configuration
 

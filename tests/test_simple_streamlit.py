@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pymupdf
+import pytest
 from streamlit.testing.v1 import AppTest
 
 from grounded_docparse import pipeline
@@ -67,6 +68,43 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
     assert app.session_state["result_version"] == "4.4.0"
+
+
+def test_studio_shows_default_luna_destination(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    assert any(
+        "Luna destination: OpenAI default endpoint" in item.value
+        for item in app.get("caption")
+    )
+
+
+@pytest.mark.parametrize(
+    ("base_url", "expected"),
+    [
+        (
+            "https://user:secret@proxy.example:8443/v1?token=hidden",
+            "proxy.example:8443",
+        ),
+        ("not a URL", "custom endpoint (invalid host)"),
+    ],
+)
+def test_studio_sanitizes_custom_luna_destination(
+    monkeypatch, base_url: str, expected: str
+) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENAI_BASE_URL", base_url)
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    warning = next(item.value for item in app.warning if "custom endpoint" in item.value)
+
+    assert expected in warning
+    assert "user" not in warning
+    assert "secret" not in warning
+    assert "token" not in warning
 
 
 def test_ade_presets_default_fast_and_allow_full_or_custom(monkeypatch) -> None:
@@ -189,6 +227,10 @@ def test_studio_shows_results_and_only_requested_tools(
     assert any(
         "Luna input tokens: 1,234" in item.value for item in app.get("caption")
     )
+    assert any(
+        "Review confidence and cited source regions" in item.value
+        for item in app.warning
+    )
 
     app.session_state["studio_tab"] = "Markdown"
     app = app.run(timeout=20)
@@ -204,6 +246,15 @@ def test_studio_shows_results_and_only_requested_tools(
     app = app.run(timeout=20)
     assert any(button.label.startswith("1 · Heading") for button in app.button)
     assert any("Luna" in item.value for item in app.markdown)
+
+    app.session_state.enable_chat = True
+    app.session_state.chat_history = [
+        {"role": "assistant", "content": "Grounded answer", "confidence": "high"}
+    ]
+    app = app.run(timeout=20)
+    app.session_state["studio_tab"] = "Chat"
+    app = app.run(timeout=20)
+    assert any("Confidence: high" in item.value for item in app.get("caption"))
 
 
 def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
