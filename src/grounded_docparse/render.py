@@ -18,10 +18,12 @@ from .models import (
     Document,
     Element,
     ExtractionResult,
+    FormClassificationResult,
     NodeType,
     PageQuality,
     ParseMetadata,
     ParseResult,
+    RoutedExtractionResult,
     RuntimeDiagnostics,
     RunUsage,
     VerificationState,
@@ -848,11 +850,14 @@ def render_combined_result(
     parse_result: ParseResult,
     analysis: AgenticAnalysis | None = None,
     extraction: ExtractionResult | None = None,
+    *,
+    custom_classification: FormClassificationResult | None = None,
+    routed_extraction: RoutedExtractionResult | None = None,
 ) -> str:
-    """Flatten optional agentic results into the canonical v4.4 envelope."""
+    """Flatten optional agentic results into the canonical v4.5 envelope."""
 
     payload = parse_result.structured_json
-    payload["schema_version"] = "4.4.0"
+    payload["schema_version"] = "4.5.0"
     payload["document_type"] = (
         analysis.classification.model_dump(mode="json")
         if analysis and analysis.classification
@@ -871,18 +876,65 @@ def render_combined_result(
         if extraction
         else {}
     )
+    routing = routed_extraction.classification if routed_extraction else custom_classification
+    payload["custom_classification"] = (
+        routing.model_dump(mode="json") if routing is not None else None
+    )
+    payload["form_extractions"] = (
+        [
+            {
+                "segment_id": item.segment_id,
+                "category": item.category,
+                "start_page": item.start_page,
+                "end_page": item.end_page,
+                "schema_name": item.schema_name,
+                "status": item.status,
+                "error": item.error,
+                "data": item.extraction.data if item.extraction else None,
+                "evidence": item.extraction.evidence if item.extraction else {},
+                "fields": (
+                    {
+                        name: field.model_dump(mode="json")
+                        for name, field in item.extraction.fields.items()
+                    }
+                    if item.extraction
+                    else {}
+                ),
+                "warnings": item.extraction.warnings if item.extraction else [],
+            }
+            for item in routed_extraction.forms
+        ]
+        if routed_extraction
+        else []
+    )
     payload["recovery_log"] = [
         item.model_dump(mode="json") for item in parse_result.recovery_log
     ]
 
     metadata = payload["metadata"]
+    routing_traces = (
+        routed_extraction.trace
+        if routed_extraction is not None
+        else custom_classification.trace
+        if custom_classification is not None
+        else []
+    )
+    routing_usage = (
+        routed_extraction.usage.calls
+        if routed_extraction is not None
+        else custom_classification.usage.calls
+        if custom_classification is not None
+        else []
+    )
     extra_traces = [
         *(analysis.trace if analysis else []),
         *(extraction.trace if extraction else []),
+        *routing_traces,
     ]
     extra_usage = [
         *(analysis.usage.calls if analysis else []),
         *(extraction.usage.calls if extraction else []),
+        *routing_usage,
     ]
     extra_recovery_time = sum(
         item.duration_ms for item in extra_traces if item.image_count

@@ -441,6 +441,100 @@ class StoredSchema(BaseModel):
         return self
 
 
+class ClassifierCategory(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    key: str = Field(pattern=r"^[A-Za-z_][A-Za-z0-9_]*$")
+    description: str = Field(min_length=1, max_length=1000)
+    extract: bool = False
+    schema_name: str | None = Field(default=None, min_length=1, max_length=100)
+
+    @model_validator(mode="after")
+    def validate_routing(self) -> ClassifierCategory:
+        if self.key.casefold() == "other":
+            raise ValueError("other is a reserved classifier category")
+        if self.extract and not self.schema_name:
+            raise ValueError("extractable categories require a schema name")
+        if not self.extract and self.schema_name is not None:
+            raise ValueError("non-extractable categories cannot reference a schema")
+        return self
+
+
+class ClassifierProfile(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    name: str = Field(min_length=1, max_length=100)
+    instructions: str = Field(default="", max_length=4000)
+    categories: list[ClassifierCategory]
+
+    @model_validator(mode="after")
+    def unique_categories(self) -> ClassifierProfile:
+        keys = [category.key.casefold() for category in self.categories]
+        if not keys:
+            raise ValueError("classifier profile requires at least one category")
+        if len(keys) != len(set(keys)):
+            raise ValueError("classifier category keys must be unique")
+        if len(keys) > 50:
+            raise ValueError("classifier profile supports at most 50 categories")
+        return self
+
+
+class FormSegmentWire(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    start_page: int = Field(ge=1)
+    end_page: int = Field(ge=1)
+    category: str
+    confidence: float = Field(ge=0, le=1)
+    reasoning: str = Field(default="", max_length=1000)
+    evidence_element_ids: list[str] = Field(default_factory=list)
+
+
+class FormSegmentationWire(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    segments: list[FormSegmentWire]
+
+
+class FormSegment(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    predicted_start_page: int = Field(ge=1)
+    predicted_end_page: int = Field(ge=1)
+    predicted_category: str
+    start_page: int = Field(ge=1)
+    end_page: int = Field(ge=1)
+    category: str
+    confidence: float = Field(ge=0, le=1)
+    reasoning: str = ""
+    evidence_element_ids: list[str] = Field(default_factory=list)
+    approved: bool = False
+    review_status: Literal["auto_approved", "needs_review", "user_confirmed", "user_corrected"]
+    eligible: bool = False
+    schema_name: str | None = None
+
+    @model_validator(mode="after")
+    def valid_range(self) -> FormSegment:
+        if self.start_page > self.end_page:
+            raise ValueError("form segment start page cannot exceed end page")
+        return self
+
+
+class FormClassificationResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    profile: ClassifierProfile
+    profile_fingerprint: str
+    confidence_threshold: float = Field(default=0.85, ge=0, le=1)
+    predicted_segments: list[FormSegmentWire] = Field(default_factory=list)
+    segments: list[FormSegment]
+    warnings: list[str] = Field(default_factory=list)
+    usage: RunUsage = Field(default_factory=RunUsage)
+    trace: list[AgentTraceEvent] = Field(default_factory=list)
+
+
 class ChatSource(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -559,6 +653,27 @@ class ExtractionResult:
     usage: RunUsage
     trace: list[AgentTraceEvent]
     fields: dict[str, ExtractedField] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
+class SegmentExtraction:
+    segment_id: str
+    category: str
+    start_page: int
+    end_page: int
+    schema_name: str
+    status: Literal["succeeded", "failed"]
+    extraction: ExtractionResult | None = None
+    error: str | None = None
+
+
+@dataclass(slots=True)
+class RoutedExtractionResult:
+    classification: FormClassificationResult
+    forms: list[SegmentExtraction]
+    json: str
+    usage: RunUsage
+    trace: list[AgentTraceEvent]
 
 
 class TableCellDraft(BaseModel):

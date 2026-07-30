@@ -9,7 +9,7 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 - One PDF, PNG, JPEG, or TIFF
 - Optional inclusive contiguous PDF page range
 - Optional Luna feature toggles
-- Optional reusable scalar extraction schema
+- Optional reusable scalar extraction schemas and custom form-routing profiles
 - Optional document-chat questions after parsing
 
 ## Required behavior
@@ -32,10 +32,10 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 - Provide Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree tabs.
 - Provide source highlighting from TOC, extraction, chat, page elements, and layout-tree selections.
 - Emit parse JSON v4.4.0 with refined Markdown, grounded base Markdown, elements/provenance, page/block evidence, correction history, recovery log, parse timing/usage/trace, and empty agentic placeholders.
-- Emit Full JSON v4.4.0 with the same envelope and current classification, sections, extraction, combined usage/trace/timing, and feature statuses populated.
+- Emit Full JSON v4.5.0 with the same envelope plus optional custom classification and per-form extraction, combined usage/trace/timing, and feature statuses.
 - Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and GLM-owned normalized boxes.
 - Keep annotated PDF bytes outside JSON and offer them as a separate download.
-- Use SQLite only for intentional application-managed schema persistence; keep parse results in temporary/process/session state. Downloads, browser state, logs, model caches, and legacy data remain operator-managed residuals.
+- Use SQLite only for intentional application-managed schema and routing-profile persistence; keep parse and routing results in temporary/process/session state.
 - Allow GLM-only parsing without `OPENAI_API_KEY`.
 
 ## Public interfaces
@@ -45,13 +45,14 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 - Prepared context: `DocumentAgent.prepare(parse_result)`
 - Document analysis: `DocumentAgent.analyze(parse_result, *, classify=True, generate_toc=True, prepared_context=None)`
 - Extraction: `DocumentAgent.extract(parse_result, schema, *, prepared_context=None)`
+- Custom routing: `DocumentAgent.classify_forms(...)` and `DocumentAgent.extract_forms(...)`
 - Chat: `DocumentAgent.chat(parse_result, question, history, *, prepared_context=None)`
 - Direct schema proposal/extraction: `DocumentExtractor.propose_schema` and `DocumentExtractor.extract`
 - Combined JSON: `render_combined_result(parse_result, analysis=None, extraction=None)`
 - Evaluation entry point: `scripts/evaluate_corpus.py`
 
 The project does not install a command-line application entry point.
-Signatures, return-model summaries, schema rules, and envelope examples are in [the Python API reference](api.md). The repository does not publish a standalone JSON Schema for every nested v4.4.0 domain object.
+Signatures, return-model summaries, schema rules, and envelope examples are in [the Python API reference](api.md). The repository does not publish a standalone JSON Schema for every nested v4.5.0 domain object.
 
 ## Non-goals
 

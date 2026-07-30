@@ -2,7 +2,7 @@
 
 ## System boundary
 
-The application is one synchronous Streamlit process plus a local GLM-OCR/vLLM service. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication layer. Streamlit session state reuses a successful GLM parse when only agentic toggles change. SQLite persists reusable extraction schemas only.
+The application is one synchronous Streamlit process plus a local GLM-OCR/vLLM service. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication layer. Streamlit session state reuses a successful GLM parse when only agentic toggles change. SQLite persists reusable extraction schemas and routing profiles only.
 
 ```text
 Browser
@@ -35,8 +35,8 @@ Browser
 | `src/grounded_docparse/agentic.py` | Prepared contexts, classification, TOC, extraction orchestration, chat |
 | `src/grounded_docparse/extraction.py` | JSON Schema subset validation and evidence resolution |
 | `src/grounded_docparse/models.py` | Pydantic domain contracts, API result records, progress events, diagnostics |
-| `src/grounded_docparse/schema_store.py` | SQLite schema CRUD and UI-schema compilation |
-| `src/grounded_docparse/render.py` | Markdown, JSON v4.4.0, elements, quality, annotations, combined result |
+| `src/grounded_docparse/schema_store.py` | SQLite schema/profile CRUD, Markdown import, and UI-schema compilation |
+| `src/grounded_docparse/render.py` | Markdown, JSON v4.4 parse/v4.5 full results, elements, quality, and annotations |
 | `src/grounded_docparse/runtime.py` | Provider concurrency, retries, cooldown, usage, diagnostics |
 | `src/grounded_docparse/benchmark.py` | Corpus contracts and evaluation metrics |
 | `config/glmocr.yaml` | Source GLM-OCR SDK, layout, recognition, and formatter configuration |
@@ -89,6 +89,8 @@ Markdown presentation directives may select source, heading, paragraph, list-ite
 
 Scalar extraction can run per context and merge the highest-confidence results; equal-rank conflicts are arbitrated over the implicated pages. Nested object/array schemas supported by the direct Python API use one direct extraction path and do not receive this per-context scalar merge. Every accepted field resolves to an existing block/atom. Invalid or missing evidence triggers one semantic repair; unresolved leaves become `null`/`not_found`, while on-demand agent extraction may expose a nearest cited region as `inferred`.
 
+Optional custom routing classifies grounded text/layout into contiguous form page ranges using a reusable profile. Long inputs use bounded windows with a boundary-page overlap. Invalid coverage, categories, or element citations receive one repair attempt; unresolved failures block extraction. Low-confidence or boundary-merged segments require review. Approved eligible ranges are converted to in-memory parse subsets that retain original page numbers, element IDs, and bounding boxes before their assigned schemas run sequentially.
+
 Chat sends the full prepared context when it fits. For long documents it deterministically retrieves up to 40 relevant elements plus neighbors. Only citations to known element IDs are exposed; an uncited answer receives low confidence.
 
 All text-only structured features use medium reasoning effort and retry one schema-invalid response. Visual recovery uses original-detail crops and high reasoning effort. Requests set `store=False`.
@@ -97,7 +99,7 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 `DocumentParser.parse` returns `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log.
 
-Both parse JSON and Full JSON use schema version `4.4.0` and the same top-level envelope. Parse JSON contains empty `document_type`, `sections`, and `extracted_fields` placeholders plus parse metadata. `render_combined_result` produces Full JSON by populating those fields and combining agentic usage, trace, timing, and statuses. Annotated PDF bytes remain a separate artifact. Extraction JSON uses schema version `1.1.0`.
+Parse JSON remains schema version `4.4.0`. Full JSON is `4.5.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 
 Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain GLM-owned.
 
