@@ -62,6 +62,8 @@ GROUP_ORDER = (
         "Architecture & reference",
         (
             "docs/architecture.md",
+            "docs/how-grounded-docparse-is-agentic.md",
+            "docs/agentic-document-extraction-comparison.md",
             "docs/spec.md",
             "docs/api.md",
             "docs/research.md",
