@@ -8,6 +8,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- Reusable Markdown/JSON extraction definitions and custom form-routing profiles for classifying mixed PDF packets, reviewing page segments, and extracting only selected categories.
+- Business, technical, and Azure bulk-fax guides, plus a sanitized application preview.
+- A responsive dark multipage documentation website generated from the repository's non-security Markdown files.
+
 ## [0.4.0] - 2026-07-30
 
 ### Added
