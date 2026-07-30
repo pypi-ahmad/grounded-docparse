@@ -1,0 +1,1545 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b1118">
+  <meta name="description" content="This tutorial explains the repository from first principles through day-to-day use, Python integration, internal implementation, testing, and production deployment boundaries. It is written for a newcomer who has never used the application,">
+  <title>Grounded DocParse: Zero-to-Hero Tutorial · Grounded DocParse Docs</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script>window.DOCS_SEARCH_INDEX = [{"title": "Grounded Document Parser", "path": "README.md", "url": "index.html", "summary": "A workstation-oriented Streamlit studio that parses PDFs and images with local GLM-OCR, then optionally sends selected crops or recognized document context to gpt-5.6-luna for bounded visual recovery and document-level reasoning.", "headings": ["Application preview", "Install and set up", "How to use the app", "Outputs", "Public Python API", "Repository layout", "Documentation", "Development"]}, {"title": "Grounded DocParse Complete User Guide", "path": "docs/complete-user-guide.md", "url": "complete-user-guide.html", "summary": "This guide explains Grounded DocParse in simple language for business users, reviewers, technical users, and administrators. It covers what the application can do, what it cannot do, every major screen and feature, and how to complete commo", "headings": ["1. Start here", "1.1 Which type of user are you?", "2. What the application can and cannot do", "2.1 What it can do", "2.2 What it cannot currently do", "2.3 Core parsing versus optional AI features", "3. Before you use the application", "3.1 Business-user checklist", "3.2 Technical setup summary", "3.3 Optional Luna configuration", "4. Understand where document data goes", "5. Upload a document", "5.1 Supported files", "5.2 Page range", "5.3 Show reading order", "6. Choose processing options", "6.1 ADE mode", "6.2 Enhance with gpt-5.6-luna", "6.3 Enable visual recovery on hard regions", "6.4 Classify document type", "6.5 Generate table of contents", "6.6 Enable document chat", "7. Parse the document", "7.1 What happens technically", "7.2 What happens when an optional feature fails", "7.3 Tab map", "8. Use the Overview tab", "8.1 Summary metrics", "8.2 Document type", "8.3 Table of contents", "8.4 Page thumbnails and original page viewer", "9. Use the Markdown tab", "9.1 Refined Markdown versus grounded Markdown", "9.2 What to do when Markdown looks wrong", "10. Use the Annotated PDF tab", "10.1 Annotation colors", "10.2 Page controls", "10.3 Selected regions", "10.4 Reviewer checklist", "11. Use the Layout Tree tab", "12. Extract business fields from the whole document", "12.1 When to use extraction", "12.2 Open the extraction builder", "12.3 Create a schema manually", "12.4 Import schema JSON", "12.5 Import schema Markdown", "12.6 Load a saved schema", "12.7 Review extraction results", "12.8 Large field sets", "13. Classify mixed forms and extract selected categories", "13.1 Understand the routing terms", "13.2 Prepare extraction schemas first", "13.3 Create a routing profile manually", "13.4 Import routing profile JSON", "13.5 Import routing profile Markdown", "13.6 Classify forms", "13.7 Review classified segments", "13.8 Extract eligible forms", "13.9 Review routed results", "14. Use document chat", "15. Download and understand outputs", "15.1 Download Markdown", "15.2 Download annotated PDF", "15.3 Download Extract JSON", "15.4 Download Full JSON", "15.5 Footer diagnostics", "16. Business operating model", "16.1 Recommended roles", "16.2 Recommended standard operating procedure", "16.3 Risk-based field review", "16.4 What a successful result means", "17. Technical behavior in simple terms", "17.1 Source ownership", "17.2 Grounding", "17.3 Structured output and validation", "17.4 Long documents", "17.5 Result versions", "18. Persistence, privacy, and security", "18.1 What is saved by the app", "18.2 What is session-only", "18.3 Other residual data", "18.4 Local-workstation boundary", "19. Technical integration and extension", "19.1 Python API", "19.2 Current integration limits", "19.3 Azure bulk processing", "20. Common workflows", "20.1 Simple invoice extraction", "20.2 Extract only new authorizations from a medical fax", "20.3 Process a sensitive document with no remote AI", "20.4 Review a long report", "20.5 Handle a poor scan", "21. Troubleshooting", "22. Frequently asked questions", "Does Fast mode mean no external API calls?", "Is extraction automatic after parsing?", "Can I upload a Markdown field list?", "Can I upload a Markdown routing definition?", "Can one PDF contain several forms?", "Can I extract only newauth and ignore medical records?", "Does approval make every category extractable?", "Can Luna change a bounding box?", "Can the app recover a region GLM never found?", "Does a high-confidence field require review?", "Can the UI process 100 PDFs at once?", "Are schemas and results both saved?", "23. Glossary", "24. Final checklist", "Further reading"]}, {"title": "Tutorial", "path": "docs/tutorial.md", "url": "tutorial.html", "summary": "1. Complete setup and open <http://localhost:8501>. 2. Optionally set OPENAIAPIKEY in the Windows user environment before launch. The Windows launcher refreshes it and optional OPENAIBASEURL from user scope each time. 3. Upload one PDF, PNG", "headings": []}, {"title": "Grounded DocParse: Zero-to-Hero Tutorial", "path": "docs/zero-to-hero-tutorial.md", "url": "zero-to-hero-tutorial.html", "summary": "This tutorial explains the repository from first principles through day-to-day use, Python integration, internal implementation, testing, and production deployment boundaries. It is written for a newcomer who has never used the application,", "headings": ["1. Choose your path through this tutorial", "2. What problem does this project solve?", "2.1 Core outputs", "3. Essential concepts and vocabulary", "3.1 Rasterization", "3.2 Layout analysis and OCR", "3.3 Grounding", "3.4 Recovery versus refinement versus extraction", "3.5 Document classification versus custom form routing", "3.6 Evidence confidence", "4. Architecture at a glance", "5. Install the supported local environment", "5.1 Prerequisites", "5.2 Clone and verify WSL/GPU access", "5.3 Decide whether optional Luna features are allowed", "5.4 Run first-time setup", "5.5 Manual WSL launch", "6. Your first successful parse", "6.1 ADE modes", "6.2 What happens after selecting Parse document?", "6.3 Recovery invariants", "7. Learn the Streamlit studio", "7.1 Overview", "7.2 Markdown", "7.3 Annotated PDF", "7.4 Extract", "7.5 Chat", "7.6 Layout Tree", "8. Define an extraction schema", "8.1 Good field design", "8.2 Build fields in the UI", "8.3 Import an extraction schema from Markdown", "8.4 Import or export JSON", "8.5 What the UI compiles", "9. Run and review whole-document extraction", "10. Understand extraction validation", "11. Mixed medical faxes: extract only new authorizations", "11.1 Save the extraction schema first", "11.2 Create a routing profile in the UI", "11.3 Import a routing profile from Markdown", "11.4 Classify and segment the packet", "11.5 Review before extraction", "11.6 Extract only eligible forms", "12. Persistence, downloads, and session behavior", "12.1 What persists", "12.2 What does not persist", "13. Use the public Python API", "13.1 Parse a document", "13.2 Observe progress", "13.3 Reuse prepared context for optional features", "13.4 Route mixed forms in Python", "13.5 Direct extraction API", "14. Read the code from the outside in", "14.1 Main UI call path", "14.2 Parse call path", "14.3 Optional feature call path", "15. Data contracts and invariants", "15.1 Canonical hierarchy", "15.2 ParseResult", "15.3 Routing contracts", "15.4 Schema restrictions", "16. Configuration and performance controls", "17. Security and privacy model", "17.1 Treat every document as untrusted", "17.2 Understand feature egress", "17.3 Keep local services local", "17.4 Know the residual data", "18. Test and contribute safely", "18.1 Install the locked development environment", "18.2 Run the standard checks", "18.3 Optional live evaluation", "19. Current limitations and production path", "20. Troubleshooting guide", "21. A practical learning sequence", "22. Completion checklist", "Further reading"]}, {"title": "Business User Workflow for Extracting Large Field Sets", "path": "docs/business-user-extraction-workflow.md", "url": "business-user-extraction-workflow.html", "summary": "Document Parse Studio turns scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI", "headings": ["Purpose", "The Workflow at a Glance", "1. Define the Business Fields First", "2. Upload the Document", "3. Choose the Processing Options", "4. Parse the Document", "5. Review the Parse Before Extracting", "6. Build and Save the Extraction Schema", "7. Run the Field Extraction", "8. Interpret and Validate the Results", "9. Use Chat for Follow-up Questions", "10. Export the Results", "11. Repeat Consistently", "Applying the Workflow Beyond Healthcare", "What a Successful Run Looks Like"]}, {"title": "Layout-Aware Workflow for Extracting Large Field Sets", "path": "docs/layout-aware-large-field-extraction-workflow.md", "url": "layout-aware-large-field-extraction-workflow.html", "summary": "This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio.", "headings": ["Purpose", "Current Capability and Proposed Extension", "The Two Inputs Must Remain Separate", "Plain-language terms", "Workflow for a Business User", "1. Define the business outcome", "2. Organize large field sets", "3. Upload and parse the source document", "4. Review the parse before extraction", "5. Select or prepare the field schema", "6. Run extraction", "7. Review the results", "8. Export and use the result", "Workflow for a Technical User", "Stage 1: Source ingestion and visual parsing", "Stage 2: Optional bounded visual recovery", "Stage 3: Extraction context preparation", "Stage 4: Schema-constrained extraction", "Stage 5: Evidence validation and repair", "Stage 6: Grounding and serialization", "Representative Extraction Output", "Optional Markdown Field-Specification Feature", "Recommended user experience", "Suggested field-specification content", "patientnpi", "servicefromdate", "Recommended first version", "Extension for 100+ fields", "Safety and Governance Requirements", "General Applicability", "Recommended Decision"]}, {"title": "How it works", "path": "docs/how-it-works.md", "url": "how-it-works.html", "summary": "1. The app validates the extension, bytes, upload size, page count, and per-page pixel count. 2. Every PDF page or image frame is rasterized locally. Selectable PDF text is ignored. 3. GLM-OCR runs layout and recognition in ordered windows ", "headings": []}, {"title": "Setup", "path": "SETUP.md", "url": "setup.html", "summary": "The supported local runtime is Windows 11 with Ubuntu 24.04 under WSL2 and an NVIDIA GPU. GLM-OCR and PP-DocLayout run inside WSL; Streamlit is launched from the same locked Linux environment. Native Windows does not install the local-ocr d", "headings": ["Prerequisites", "Automated Windows setup", "Manual WSL setup and launch", "Luna configuration", "Configuration reference", "Verification", "Troubleshooting"]}, {"title": "Run locally", "path": "docs/run.md", "url": "run.html", "summary": "Run Setup-GLM-OCR.cmd once on a new Windows 11 machine. It validates WSL2 and GPU passthrough, creates the locked WSL environment, starts vLLM and Streamlit, waits for health checks, and opens <http://localhost:8501>.", "headings": ["Recommended Windows launcher", "Manual commands", "Use the studio", "Stop and restart", "Troubleshooting"]}, {"title": "Local GLM-OCR runtime", "path": "docs/local-glmocr.md", "url": "local-glmocr.html", "summary": "The supported parser runtime is WSL2 Ubuntu 24.04. Recognition uses GLM-OCR; PP-DocLayout-V3 is its layout stage. PDF pages are always rendered to images, and selectable PDF text is never read as evidence.", "headings": []}, {"title": "Deploy Grounded DocParse on Azure for bulk medical faxes", "path": "docs/azure-bulk-fax-deployment.md", "url": "azure-bulk-fax-deployment.html", "summary": "This document is an implementation design and operations runbook for a single-organization, production deployment that processes protected health information (PHI). It covers browser batch uploads, automated Azure Blob Storage intake, local", "headings": ["Purpose and readiness warning", "Chosen production baseline", "Reference architecture", "Required application changes", "1. Separate the web process from document processing", "2. Add durable batch and document state", "3. Make queue processing idempotent", "4. Version Markdown definitions", "5. Add the batch UI and upload/download brokers", "6. Support automated Blob batches", "7. Add a provider factory", "Azure resource contract", "Required roles", "Build and deployment procedure", "1. Select the subscription and region", "2. Prepare deployment parameters", "3. Deploy shared infrastructure", "4. Build and validate the GPU image", "5. Build and publish application images", "6. Run database migrations", "7. Configure the AI provider", "8. Enable ingress last", "Runtime configuration", "Security and PHI controls", "Data minimization and logging", "Retention and deletion", "Availability and disaster recovery", "Network and host controls", "Autoscaling and capacity", "Operations", "Normal batch flow", "Alert baseline", "Retry and recovery", "Pre-production acceptance gates", "Functional", "Input and failure handling", "AI providers", "Security and compliance", "Troubleshooting", "Deployment evidence and handoff", "First-party references"]}, {"title": "Architecture", "path": "docs/architecture.md", "url": "architecture.html", "summary": "The application is one synchronous Streamlit process plus a local GLM-OCR/vLLM service. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication lay", "headings": ["System boundary", "Repository map", "Parse pipeline", "Ownership and recovery contract", "Agentic layer", "Result contracts", "Evaluation boundary"]}, {"title": "Product specification", "path": "docs/spec.md", "url": "spec.html", "summary": "Parse one PDF or image into grounded Markdown, structured JSON, and an annotated PDF through a GLM-OCR-first local workflow, with optional bounded Luna recovery and document reasoning.", "headings": ["Goal", "Inputs", "Required behavior", "Public interfaces", "Non-goals", "Done when"]}, {"title": "Python API", "path": "docs/api.md", "url": "api.html", "summary": "The package requires Python 3.12–3.14. Install the locked project environment with uv sync --locked. Actual GLM parsing also requires the Linux-only local OCR extra and running GLM service described in setup.", "headings": ["Exported names", "Parsing", "Agentic features", "Direct schema proposal and extraction", "Exported result models", "Combined JSON", "Configuration and test doubles"]}, {"title": "Design basis", "path": "docs/research.md", "url": "research.html", "summary": "The current design follows a parse-then-reason split: a local visual parser establishes the evidence geometry, then optional model calls operate on selected crops or compact structured context. The repository does not call or reproduce ADE,", "headings": []}, {"title": "Extraction quality research", "path": "docs/extraction-quality-research.md", "url": "extraction-quality-research.html", "summary": "The July 2026 app runs completed all 41 Masked Amerigroup pages and all eight Public Water pages. Their reported word accuracies (71.61% and 82.40%) measure agreement with supplied Markdown references, not independently verified source accu", "headings": ["Scope and interpretation", "Findings", "Evaluation policy", "Changes and experiments", "July 2026 targeted result", "Acceptance and limitations"]}, {"title": "Contributing", "path": "CONTRIBUTING.md", "url": "contributing.html", "summary": "Contributions should preserve source grounding, explicit uncertainty, and deterministic export behavior.", "headings": ["Setup", "Development workflow", "Verify changes", "Documentation changes", "Pull requests", "Architecture constraints", "Reporting security issues"]}, {"title": "Changelog", "path": "CHANGELOG.md", "url": "changelog.html", "summary": "All notable changes to this project are documented in this file.", "headings": ["[Unreleased]", "Added", "[0.4.0] - 2026-07-30", "Added", "Changed", "Removed", "[0.3.0] - 2026-07-28", "Added", "Changed", "Fixed", "[0.2.0] - 2026-07-26", "Added", "Changed", "Security", "[0.1.0] - 2026-07-26", "Added"]}, {"title": "Bug_Report", "path": ".github/ISSUE_TEMPLATE/bug_report.md", "url": "issue-template--bug-report.html", "summary": "<!-- Describe observed behavior without document contents, credentials, or PII. -->", "headings": ["Summary", "Reproduction", "Expected behavior", "Actual behavior", "Runtime", "Sanitized diagnostics", "Security reports"]}, {"title": "Feature_Request", "path": ".github/ISSUE_TEMPLATE/feature_request.md", "url": "issue-template--feature-request.html", "summary": "<!-- Describe the user or operator problem, not only the desired implementation. -->", "headings": ["Problem", "Proposed outcome", "Evidence and audit requirements", "Interface and compatibility", "Security, retention, and cost impact", "Alternatives considered", "Acceptance criteria", "Additional context"]}];</script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body data-page="zero-to-hero-tutorial.html">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="topbar">
+    <button class="icon-button menu-button" type="button" data-menu-toggle aria-label="Open document navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" href="index.html" aria-label="Grounded DocParse documentation home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span><strong>Grounded DocParse</strong><small>Documentation</small></span>
+    </a>
+    <div class="topbar-path"><span>Source</span>docs/zero-to-hero-tutorial.md</div>
+    <button class="icon-button search-button" type="button" data-search-toggle aria-label="Focus document search">/</button>
+  </header>
+  <div class="site-shell">
+    <aside class="document-shelf" data-document-shelf aria-label="Document navigation">
+      <div class="shelf-search">
+        <label for="shelf-search">Find a document</label>
+        <input id="shelf-search" type="search" data-shelf-search placeholder="Filter the shelf…" autocomplete="off">
+        <span class="keyboard-hint">/</span>
+      </div>
+      <nav><section class="shelf-group"><h2>Start here</h2><a class="shelf-link" href="index.html" data-search="grounded document parser readme.md"><span>Grounded Document Parser</span><small>README.md</small></a><a class="shelf-link" href="complete-user-guide.html" data-search="grounded docparse complete user guide docs/complete-user-guide.md"><span>Grounded DocParse Complete User Guide</span><small>docs/complete-user-guide.md</small></a><a class="shelf-link" href="tutorial.html" data-search="tutorial docs/tutorial.md"><span>Tutorial</span><small>docs/tutorial.md</small></a><a class="shelf-link is-active" href="zero-to-hero-tutorial.html" data-search="grounded docparse: zero-to-hero tutorial docs/zero-to-hero-tutorial.md"><span>Grounded DocParse: Zero-to-Hero Tutorial</span><small>docs/zero-to-hero-tutorial.md</small></a></section><section class="shelf-group"><h2>Business workflows</h2><a class="shelf-link" href="business-user-extraction-workflow.html" data-search="business user workflow for extracting large field sets docs/business-user-extraction-workflow.md"><span>Business User Workflow for Extracting Large Field Sets</span><small>docs/business-user-extraction-workflow.md</small></a><a class="shelf-link" href="layout-aware-large-field-extraction-workflow.html" data-search="layout-aware workflow for extracting large field sets docs/layout-aware-large-field-extraction-workflow.md"><span>Layout-Aware Workflow for Extracting Large Field Sets</span><small>docs/layout-aware-large-field-extraction-workflow.md</small></a><a class="shelf-link" href="how-it-works.html" data-search="how it works docs/how-it-works.md"><span>How it works</span><small>docs/how-it-works.md</small></a></section><section class="shelf-group"><h2>Setup &amp; operations</h2><a class="shelf-link" href="setup.html" data-search="setup setup.md"><span>Setup</span><small>SETUP.md</small></a><a class="shelf-link" href="run.html" data-search="run locally docs/run.md"><span>Run locally</span><small>docs/run.md</small></a><a class="shelf-link" href="local-glmocr.html" data-search="local glm-ocr runtime docs/local-glmocr.md"><span>Local GLM-OCR runtime</span><small>docs/local-glmocr.md</small></a><a class="shelf-link" href="azure-bulk-fax-deployment.html" data-search="deploy grounded docparse on azure for bulk medical faxes docs/azure-bulk-fax-deployment.md"><span>Deploy Grounded DocParse on Azure for bulk medical faxes</span><small>docs/azure-bulk-fax-deployment.md</small></a></section><section class="shelf-group"><h2>Architecture &amp; reference</h2><a class="shelf-link" href="architecture.html" data-search="architecture docs/architecture.md"><span>Architecture</span><small>docs/architecture.md</small></a><a class="shelf-link" href="spec.html" data-search="product specification docs/spec.md"><span>Product specification</span><small>docs/spec.md</small></a><a class="shelf-link" href="api.html" data-search="python api docs/api.md"><span>Python API</span><small>docs/api.md</small></a><a class="shelf-link" href="research.html" data-search="design basis docs/research.md"><span>Design basis</span><small>docs/research.md</small></a><a class="shelf-link" href="extraction-quality-research.html" data-search="extraction quality research docs/extraction-quality-research.md"><span>Extraction quality research</span><small>docs/extraction-quality-research.md</small></a></section><section class="shelf-group"><h2>Project</h2><a class="shelf-link" href="contributing.html" data-search="contributing contributing.md"><span>Contributing</span><small>CONTRIBUTING.md</small></a><a class="shelf-link" href="changelog.html" data-search="changelog changelog.md"><span>Changelog</span><small>CHANGELOG.md</small></a><a class="shelf-link" href="issue-template--bug-report.html" data-search="bug_report .github/issue_template/bug_report.md"><span>Bug_Report</span><small>.github/ISSUE_TEMPLATE/bug_report.md</small></a><a class="shelf-link" href="issue-template--feature-request.html" data-search="feature_request .github/issue_template/feature_request.md"><span>Feature_Request</span><small>.github/ISSUE_TEMPLATE/feature_request.md</small></a></section></nav>
+      <footer><span>20 documents</span><a href="https://github.com/pypi-ahmad/grounded-docparse">Repository ↗</a></footer>
+    </aside>
+    <button class="shelf-backdrop" type="button" data-menu-close aria-label="Close document navigation"></button>
+    <main id="content" class="reading-pane">
+
+      <article class="document-article">
+        <header class="document-header title-frame">
+          <span class="corner top-left"></span><span class="corner top-right"></span>
+          <span class="corner bottom-left"></span><span class="corner bottom-right"></span>
+          <p class="document-path">docs/zero-to-hero-tutorial.md</p>
+          <h1>Grounded DocParse: Zero-to-Hero Tutorial</h1>
+          <div class="document-meta">
+            <span>6,625 words</span>
+            <span>30 min read</span>
+            <a href="https://github.com/pypi-ahmad/grounded-docparse/blob/main/docs/zero-to-hero-tutorial.md">View Markdown source ↗</a>
+          </div>
+        </header>
+
+        <div class="markdown-body"><p>This tutorial explains the repository from first principles through day-to-day use, Python integration, internal implementation, testing, and production deployment boundaries. It is written for a newcomer who has never used the application, but it also shows developers where each behavior lives in the code.</p>
+<p>The short version is:</p>
+<pre><code class="language-text">PDF or image
+  -&gt; local GLM-OCR layout and recognition
+  -&gt; deterministic quality checks
+  -&gt; optional bounded Luna text recovery
+  -&gt; grounded document model, Markdown, JSON, and annotated PDF
+  -&gt; optional classification, form routing, extraction, TOC, and chat
+</code></pre>
+<p>The most important design rule is that GLM-OCR and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.</p>
+<h2 id="1-choose-your-path-through-this-tutorial">1. Choose your path through this tutorial<a class="heading-anchor" href="#1-choose-your-path-through-this-tutorial" title="Copy section link">#</a></h2>
+<p>Use these reading paths if you do not need every section immediately:</p>
+<ul>
+<li><strong>First-time user:</strong> Sections 2–10.</li>
+<li><strong>Medical-fax operator:</strong> Sections 2–12, especially Section 11.</li>
+<li><strong>Python integrator:</strong> Sections 2–6 and 13–15.</li>
+<li><strong>Repository contributor:</strong> Sections 2–6 and 13–18.</li>
+<li><strong>Production or Azure owner:</strong> Sections 16–19, then the dedicated <a href="azure-bulk-fax-deployment.html">Azure bulk-fax runbook</a>.</li>
+</ul>
+<h2 id="2-what-problem-does-this-project-solve">2. What problem does this project solve?<a class="heading-anchor" href="#2-what-problem-does-this-project-solve" title="Copy section link">#</a></h2>
+<p>Ordinary OCR answers “what text appears in this image?” A business document system needs more:</p>
+<ul>
+<li>Which page and region produced a value?</li>
+<li>Is the text a heading, paragraph, table, form field, or visual?</li>
+<li>What is the reading order?</li>
+<li>Can a reviewer open the original source location?</li>
+<li>Can an extracted field be rejected when its evidence is missing?</li>
+<li>Can a mixed fax packet be split into form ranges before extraction?</li>
+</ul>
+<p>Grounded DocParse converts one PDF or image into a structured, reviewable document representation. It is optimized for scanned and visually complex documents where source traceability matters.</p>
+<p>The current application is a workstation-oriented Streamlit studio. It processes one uploaded document at a time. It is not currently a batch service, REST API, multi-user system, or durable job processor.</p>
+<h3 id="21-core-outputs">2.1 Core outputs<a class="heading-anchor" href="#21-core-outputs" title="Copy section link">#</a></h3>
+<p>A successful parse can produce:</p>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Refined Markdown</td>
+<td>Human-readable reconstruction with optional presentation improvements</td>
+</tr>
+<tr>
+<td>Grounded <code>base_markdown</code></td>
+<td>Canonical Markdown to which source spans refer</td>
+</tr>
+<tr>
+<td>Parse JSON v4.4.0</td>
+<td>Parse structure, elements, quality, provenance, usage, and recovery information</td>
+</tr>
+<tr>
+<td>Full JSON v4.5.0</td>
+<td>Parse data plus optional analysis, routing, and extraction results</td>
+</tr>
+<tr>
+<td>Extraction JSON v1.1.0</td>
+<td>One-schema scalar extraction with evidence and field confidence</td>
+</tr>
+<tr>
+<td>Routed extraction JSON v2.0.0</td>
+<td>Per-form extraction results for approved eligible segments</td>
+</tr>
+<tr>
+<td>Annotated PDF</td>
+<td>Original pages with semantic boxes, reading order, and source highlighting</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-essential-concepts-and-vocabulary">3. Essential concepts and vocabulary<a class="heading-anchor" href="#3-essential-concepts-and-vocabulary" title="Copy section link">#</a></h2>
+<p>Understanding these terms makes the rest of the repository much easier to follow.</p>
+<h3 id="31-rasterization">3.1 Rasterization<a class="heading-anchor" href="#31-rasterization" title="Copy section link">#</a></h3>
+<p>Rasterization renders each PDF page into pixels. This project intentionally ignores selectable or embedded PDF text as extraction evidence. A visually scanned page and a digitally generated page therefore enter the same image-first pipeline.</p>
+<p>Why this matters: hidden, stale, malformed, or adversarial PDF text cannot disagree with what a reviewer sees and still become the authoritative source.</p>
+<h3 id="32-layout-analysis-and-ocr">3.2 Layout analysis and OCR<a class="heading-anchor" href="#32-layout-analysis-and-ocr" title="Copy section link">#</a></h3>
+<p>Layout analysis finds regions such as headings, paragraphs, tables, form areas, and images. OCR recognizes text inside those regions.</p>
+<p>GLM-OCR owns:</p>
+<ul>
+<li>element identity;</li>
+<li>normalized bounding boxes;</li>
+<li>region type and hierarchy;</li>
+<li>OCR confidence;</li>
+<li>reading order; and</li>
+<li>initial text.</li>
+</ul>
+<h3 id="33-grounding">3.3 Grounding<a class="heading-anchor" href="#33-grounding" title="Copy section link">#</a></h3>
+<p>Grounding means connecting an output back to known source evidence. The public <code>Element</code> contract contains:</p>
+<pre><code class="language-text">id, type, page, bbox, text, reading_order, confidence, source
+</code></pre>
+<p>An element ID is the stable bridge between the parsed document, extracted fields, chat citations, TOC links, and annotated-PDF highlighting.</p>
+<p>Bounding boxes are normalized coordinates:</p>
+<pre><code class="language-text">[x0, y0, x1, y1], where every value is between 0 and 1
+</code></pre>
+<p>Normalized coordinates make the result independent of a particular rendered pixel size.</p>
+<h3 id="34-recovery-versus-refinement-versus-extraction">3.4 Recovery versus refinement versus extraction<a class="heading-anchor" href="#34-recovery-versus-refinement-versus-extraction" title="Copy section link">#</a></h3>
+<p>These are three different operations:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Input</th>
+<th>Allowed result</th>
+<th>Runs when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visual recovery</td>
+<td>Selected difficult image crops</td>
+<td>Replacement text for an existing element</td>
+<td>During parsing, if enabled</td>
+</tr>
+<tr>
+<td>Markdown refinement</td>
+<td>Grounded Markdown and element anchors</td>
+<td>Presentation directives</td>
+<td>During parsing, if enabled</td>
+</tr>
+<tr>
+<td>Extraction</td>
+<td>Parsed Markdown/layout plus a schema</td>
+<td>Requested values with evidence</td>
+<td>On demand after parsing</td>
+</tr>
+</tbody>
+</table>
+<p>Visual recovery does not perform a second full-document OCR pass. Markdown refinement does not replace canonical evidence. Extraction does not change the parsed document.</p>
+<h3 id="35-document-classification-versus-custom-form-routing">3.5 Document classification versus custom form routing<a class="heading-anchor" href="#35-document-classification-versus-custom-form-routing" title="Copy section link">#</a></h3>
+<p>These features answer different questions:</p>
+<ul>
+<li><strong>Document classification:</strong> “What kind of document is this overall?” It uses recognized content/layout from the first two pages.</li>
+<li><strong>Custom form routing:</strong> “Which contiguous page ranges belong to which business categories, and which ranges should be extracted?” It can segment a mixed PDF into multiple forms.</li>
+</ul>
+<p>For a fax packet containing a cover sheet, a new authorization, medical records, and an authorization update, document classification is too coarse. Custom form routing is the correct tool.</p>
+<h3 id="36-evidence-confidence">3.6 Evidence confidence<a class="heading-anchor" href="#36-evidence-confidence" title="Copy section link">#</a></h3>
+<p>Extracted fields use four review-oriented states:</p>
+<ul>
+<li><code>high</code>: strong evidence supports the value;</li>
+<li><code>medium</code>: evidence exists, but the match is less certain;</li>
+<li><code>inferred</code>: a cited nearby region exists, but the exact value-to-source match was not verified;</li>
+<li><code>not_found</code>: no supportable value was found, so the result remains empty.</li>
+</ul>
+<p><code>inferred</code> is not equivalent to verified. Regulated or financially material values still require the organization’s review policy even when confidence is high.</p>
+<h2 id="4-architecture-at-a-glance">4. Architecture at a glance<a class="heading-anchor" href="#4-architecture-at-a-glance" title="Copy section link">#</a></h2>
+<p>The supported local topology is deliberately small:</p>
+<pre><code class="language-text">Browser
+  -&gt; Streamlit studio on 127.0.0.1:8501
+       -&gt; ingest and rasterization
+       -&gt; GLM-OCR SDK
+            -&gt; local vLLM service on 127.0.0.1:8080
+       -&gt; deterministic quality and recovery planning
+       -&gt; optional gpt-5.6-luna requests
+       -&gt; renderers, tabs, highlighting, and downloads
+</code></pre>
+<p>There are two AI execution boundaries:</p>
+<ol>
+<li><strong>Local GLM-OCR:</strong> layout and recognition run inside WSL against the local vLLM service.</li>
+<li><strong>Optional Luna:</strong> selected crops or recognized document context go to the configured OpenAI-compatible destination only when the associated feature is enabled and <code>OPENAI_API_KEY</code> is available.</li>
+</ol>
+<p>There is no open-ended agent loop. Optional features use bounded, typed requests followed by deterministic validation.</p>
+<h2 id="5-install-the-supported-local-environment">5. Install the supported local environment<a class="heading-anchor" href="#5-install-the-supported-local-environment" title="Copy section link">#</a></h2>
+<h3 id="51-prerequisites">5.1 Prerequisites<a class="heading-anchor" href="#51-prerequisites" title="Copy section link">#</a></h3>
+<p>The supported setup is:</p>
+<ul>
+<li>Windows 11;</li>
+<li>WSL2 with Ubuntu 24.04;</li>
+<li>an NVIDIA Windows driver with WSL GPU passthrough;</li>
+<li>Git;</li>
+<li>network access during the first dependency/model download; and</li>
+<li>enough disk space for the WSL environment and model cache.</li>
+</ul>
+<p>Python package metadata supports Python 3.12 through 3.14, but the automated WSL setup installs the repository’s verified Python 3.12.10 runtime.</p>
+<p>The repository does not publish universal minimum RAM, VRAM, or disk figures because page size, model cache, and concurrency change the requirement. The checked-in workstation profile was tuned around an 8 GB GPU and an 18 GB WSL memory limit; treat that as a verified reference profile, not a guarantee for every document. Confirm GPU visibility and leave capacity for the WSL environment, Python packages, and pinned model snapshots before setup.</p>
+<h3 id="52-clone-and-verify-wslgpu-access">5.2 Clone and verify WSL/GPU access<a class="heading-anchor" href="#52-clone-and-verify-wslgpu-access" title="Copy section link">#</a></h3>
+<p>Run in PowerShell:</p>
+<pre><code class="language-powershell">git clone https://github.com/pypi-ahmad/grounded-docparse.git
+Set-Location grounded-docparse
+
+wsl --install -d Ubuntu-24.04
+wsl --update
+wsl --list --verbose
+wsl -d Ubuntu-24.04 -- nvidia-smi
+</code></pre>
+<p>Restart Windows if WSL requests it, then complete Ubuntu’s first-login setup.</p>
+<h3 id="53-decide-whether-optional-luna-features-are-allowed">5.3 Decide whether optional Luna features are allowed<a class="heading-anchor" href="#53-decide-whether-optional-luna-features-are-allowed" title="Copy section link">#</a></h3>
+<p>Local GLM parsing does not require an OpenAI key. If visual recovery, classification, refinement, TOC, extraction, routing, or chat are required, save the key in the Windows user environment:</p>
+<pre><code class="language-powershell">[Environment]::SetEnvironmentVariable(&quot;OPENAI_API_KEY&quot;, &quot;your-key&quot;, &quot;User&quot;)
+
+# Optional trusted OpenAI-compatible endpoint:
+# [Environment]::SetEnvironmentVariable(
+#     &quot;OPENAI_BASE_URL&quot;,
+#     &quot;https://approved.example/v1&quot;,
+#     &quot;User&quot;
+# )
+</code></pre>
+<p>Do not place real credentials in <code>.env</code>, Markdown, scripts, source code, commits, logs, screenshots, or issue reports.</p>
+<p>The configured base URL receives the same sensitive content that would otherwise go to OpenAI. Verify the <strong>Luna destination</strong> displayed by the UI before processing real documents.</p>
+<h3 id="54-run-first-time-setup">5.4 Run first-time setup<a class="heading-anchor" href="#54-run-first-time-setup" title="Copy section link">#</a></h3>
+<p>From PowerShell in the repository root:</p>
+<pre><code class="language-powershell">.\Setup-GLM-OCR.cmd
+</code></pre>
+<p>The setup process:</p>
+<ol>
+<li>validates WSL and GPU visibility;</li>
+<li>installs or reuses <code>uv</code> inside WSL;</li>
+<li>installs the locked Python environment and Linux-only local OCR dependencies;</li>
+<li>downloads pinned GLM-OCR and PP-DocLayoutV3 model revisions;</li>
+<li>writes the resolved runtime configuration under <code>.runtime/</code>;</li>
+<li>starts local vLLM and Streamlit;</li>
+<li>validates a real image-recognition request; and</li>
+<li>opens <a href="http://localhost:8501">http://localhost:8501</a>.</li>
+</ol>
+<p>Later sessions use:</p>
+<pre><code class="language-powershell">.\Launch-GLM-OCR.cmd
+</code></pre>
+<p>The launcher reuses healthy managed processes and refreshes the Windows user-scope OpenAI settings.</p>
+<h3 id="55-manual-wsl-launch">5.5 Manual WSL launch<a class="heading-anchor" href="#55-manual-wsl-launch" title="Copy section link">#</a></h3>
+<p>Inside Ubuntu, setup and launch both services with:</p>
+<pre><code class="language-bash">bash scripts/wsl/setup-glmocr.sh
+bash scripts/wsl/launch-stack.sh
+</code></pre>
+<p>For foreground development, use two WSL terminals:</p>
+<pre><code class="language-bash"># Terminal 1
+bash scripts/wsl/serve-glmocr.sh
+</code></pre>
+<pre><code class="language-bash"># Terminal 2
+bash scripts/wsl/run-app.sh
+</code></pre>
+<p>Both managed services bind to loopback. Do not override that boundary on an untrusted network.</p>
+<h2 id="6-your-first-successful-parse">6. Your first successful parse<a class="heading-anchor" href="#6-your-first-successful-parse" title="Copy section link">#</a></h2>
+<p>Open <a href="http://localhost:8501">http://localhost:8501</a>, then follow this minimal path:</p>
+<ol>
+<li>Upload one PDF, PNG, JPEG, or TIFF. For a safe first run, use the bundled <code>examples/synthetic-report.pdf</code>.</li>
+<li>For a PDF, optionally enable <strong>Page range</strong> and choose an inclusive start/end range.</li>
+<li>Select an ADE mode.</li>
+<li>Decide whether visual recovery is allowed.</li>
+<li>Select <strong>Parse document</strong>.</li>
+<li>Review the generated tabs before running extraction.</li>
+</ol>
+<h3 id="61-ade-modes">6.1 ADE modes<a class="heading-anchor" href="#61-ade-modes" title="Copy section link">#</a></h3>
+<p>“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same core GLM parse.</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Markdown refinement</th>
+<th>Document classification</th>
+<th>TOC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fast</td>
+<td>Off</td>
+<td>On</td>
+<td>Off</td>
+</tr>
+<tr>
+<td>Full</td>
+<td>On</td>
+<td>On</td>
+<td>On</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td>User-selected</td>
+<td>User-selected</td>
+<td>User-selected</td>
+</tr>
+</tbody>
+</table>
+<p>Visual recovery and chat are separate toggles. Extraction is never automatically run by an ADE mode.</p>
+<p>If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a GLM-only run.</p>
+<h3 id="62-what-happens-after-selecting-parse-document">6.2 What happens after selecting Parse document?<a class="heading-anchor" href="#62-what-happens-after-selecting-parse-document" title="Copy section link">#</a></h3>
+<p>The progress UI reflects these major stages:</p>
+<pre><code class="language-text">layout -&gt; recognition -&gt; recovery -&gt; assembly -&gt; annotation
+       -&gt; optional enhancement -&gt; optional document analysis
+</code></pre>
+<p>The exact parser flow is:</p>
+<ol>
+<li>Validate extension, bytes, upload size, page count, and pixel limits.</li>
+<li>Rasterize every page or image frame.</li>
+<li>Run GLM-OCR in ordered windows of 16 pages.</li>
+<li>Analyze OCR confidence, density, garbage, empty-region area, and table structure.</li>
+<li>Rank recovery candidates.</li>
+<li>Optionally send at most eight crops per document and three per page to Luna.</li>
+<li>Accept only crop-backed text corrections with confidence of at least <code>0.85</code>.</li>
+<li>Restore source page order and build document hierarchy.</li>
+<li>Generate elements, quality state, <code>base_markdown</code>, parse JSON, and annotations.</li>
+<li>Optionally apply Markdown presentation directives.</li>
+<li>Optionally classify the whole document and generate the TOC.</li>
+</ol>
+<p>Pages are prepared/finalized concurrently within ordered windows, while the process-wide GLM-OCR SDK runtime serializes model access. Default page concurrency is eight.</p>
+<p>The UI implements a page range by creating a new subset PDF before parsing. Output page 1 therefore means the first selected page, not necessarily page 1 of the original PDF. If downstream users need original-file page numbers, retain the selected start-page offset or another explicit mapping outside the current result.</p>
+<h3 id="63-recovery-invariants">6.3 Recovery invariants<a class="heading-anchor" href="#63-recovery-invariants" title="Copy section link">#</a></h3>
+<p>Luna recovery may replace text on an existing element. It may not change:</p>
+<ul>
+<li>element ID;</li>
+<li>bounding box;</li>
+<li>type;</li>
+<li>hierarchy;</li>
+<li>reading order;</li>
+<li>GLM confidence; or</li>
+<li>document structure.</li>
+</ul>
+<p>Luna additions, rejected regions, geometry changes, and structural changes are ignored. If GLM misses a source region entirely, the default recovery path does not synthesize it.</p>
+<p>If at least one page is nonblank but no nonblank page contains any GLM layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.</p>
+<h2 id="7-learn-the-streamlit-studio">7. Learn the Streamlit studio<a class="heading-anchor" href="#7-learn-the-streamlit-studio" title="Copy section link">#</a></h2>
+<p>After parsing, the application exposes these views:</p>
+<h3 id="71-overview">7.1 Overview<a class="heading-anchor" href="#71-overview" title="Copy section link">#</a></h3>
+<p>Use Overview to inspect document classification, page count, summary metrics, warnings, recovery activity, and the optional table of contents.</p>
+<h3 id="72-markdown">7.2 Markdown<a class="heading-anchor" href="#72-markdown" title="Copy section link">#</a></h3>
+<p>The normal Markdown view renders the reconstructed document. The raw view is useful when inspecting headings, tables, comments, or exact text sent downstream.</p>
+<p>Remember the distinction:</p>
+<ul>
+<li><code>base_markdown</code> is the canonical grounded representation;</li>
+<li><code>markdown</code> may include optional presentation refinements.</li>
+</ul>
+<p>Source spans target <code>base_markdown</code>, not the presentation-refined string.</p>
+<h3 id="73-annotated-pdf">7.3 Annotated PDF<a class="heading-anchor" href="#73-annotated-pdf" title="Copy section link">#</a></h3>
+<p>The annotated PDF overlays semantic boxes and reading-order labels on the original pages. Recovered elements receive a distinct dashed treatment. Source actions from other tabs open the corresponding highlighted page/box.</p>
+<h3 id="74-extract">7.4 Extract<a class="heading-anchor" href="#74-extract" title="Copy section link">#</a></h3>
+<p>This tab appears only after parsing. It supports either:</p>
+<ul>
+<li>one schema against the whole parsed document; or</li>
+<li>custom form routing followed by per-segment extraction.</li>
+</ul>
+<p>An OpenAI key is required for extraction.</p>
+<h3 id="75-chat">7.5 Chat<a class="heading-anchor" href="#75-chat" title="Copy section link">#</a></h3>
+<p>Chat appears only when enabled. It sends no request until a question is submitted. Valid citations must resolve to known element IDs before <strong>Show source</strong> is exposed. Uncited answers receive low confidence.</p>
+<h3 id="76-layout-tree">7.6 Layout Tree<a class="heading-anchor" href="#76-layout-tree" title="Copy section link">#</a></h3>
+<p>The Layout Tree shows page-by-page hierarchy and reading order. Selecting an element opens its original source region and exposes its ID, type, text, confidence, and provenance.</p>
+<h2 id="8-define-an-extraction-schema">8. Define an extraction schema<a class="heading-anchor" href="#8-define-an-extraction-schema" title="Copy section link">#</a></h2>
+<p>Extraction is optional and always occurs after a successful parse. A schema tells the model exactly which business values to return.</p>
+<h3 id="81-good-field-design">8.1 Good field design<a class="heading-anchor" href="#81-good-field-design" title="Copy section link">#</a></h3>
+<p>Each field should have:</p>
+<ul>
+<li>a unique machine-safe name;</li>
+<li>a precise business description; and</li>
+<li>an expected type.</li>
+</ul>
+<p>Prefer:</p>
+<pre><code class="language-text">rendering_provider_npi
+The NPI of the clinician who rendered the requested service, not the facility NPI.
+</code></pre>
+<p>Avoid:</p>
+<pre><code class="language-text">provider_number
+Provider number.
+</code></pre>
+<p>The UI supports scalar types <code>string</code>, <code>number</code>, <code>integer</code>, <code>boolean</code>, and <code>date</code>. Field names must begin with a letter or underscore and then contain only letters, numbers, or underscores.</p>
+<h3 id="82-build-fields-in-the-ui">8.2 Build fields in the UI<a class="heading-anchor" href="#82-build-fields-in-the-ui" title="Copy section link">#</a></h3>
+<p>In <strong>Extract</strong>:</p>
+<ol>
+<li>Leave <strong>Use custom form routing</strong> off.</li>
+<li>Expand <strong>Extraction schemas</strong>.</li>
+<li>Choose <strong>New schema</strong> or load an existing saved schema.</li>
+<li>Enter the schema name.</li>
+<li>Add field rows with names, descriptions, and types.</li>
+<li>Select <strong>Save schema</strong> for reuse.</li>
+<li>Select <strong>Run extraction</strong>.</li>
+</ol>
+<p>Saving writes the reusable definition to the local SQLite database. An unsaved valid draft can still be used for whole-document extraction.</p>
+<h3 id="83-import-an-extraction-schema-from-markdown">8.3 Import an extraction schema from Markdown<a class="heading-anchor" href="#83-import-an-extraction-schema-from-markdown" title="Copy section link">#</a></h3>
+<p>Markdown is the easiest format for a business-owned field dictionary. Files must be UTF-8 <code>.md</code>, no larger than 1 MB, and use either a table or bullets—not both.</p>
+<p>Table form:</p>
+<pre><code class="language-markdown"># New Authorization
+
+| Field name | Description | Type |
+| --- | --- | --- |
+| patient_name | Full patient name on the authorization request | string |
+| member_id | Health-plan member identifier | string |
+| date_of_birth | Patient date of birth | date |
+| requested_service | Service or procedure being requested | string |
+| requesting_provider_npi | NPI of the requesting provider | string |
+| urgent | Whether the request is marked urgent | boolean |
+</code></pre>
+<p>Bullet form:</p>
+<pre><code class="language-markdown"># New Authorization
+
+- patient_name: Full patient name on the authorization request
+- member_id: Health-plan member identifier
+- date_of_birth (date): Patient date of birth
+- requested_service: Service or procedure being requested
+- requesting_provider_npi: NPI of the requesting provider
+- urgent (boolean): Whether the request is marked urgent
+</code></pre>
+<p>The H1 becomes the schema name. Without an H1, the filename stem is used. An omitted type defaults to <code>string</code>.</p>
+<p>Uploading Markdown loads an editable draft. It does not automatically save the schema or run extraction. Review the rows, then select <strong>Save schema</strong> if the definition should be reusable.</p>
+<p>The exact click path is <strong>Extract</strong> → <strong>Extraction schemas</strong> → <strong>Import schema Markdown</strong> → choose the <code>.md</code> file. The upload itself populates the draft; there is no separate Markdown-import button.</p>
+<h3 id="84-import-or-export-json">8.4 Import or export JSON<a class="heading-anchor" href="#84-import-or-export-json" title="Copy section link">#</a></h3>
+<p>The UI’s schema import/export shape is an application definition, not compiled JSON Schema:</p>
+<pre><code class="language-json">{
+  &quot;version&quot;: 1,
+  &quot;name&quot;: &quot;New Authorization&quot;,
+  &quot;fields&quot;: [
+    {
+      &quot;name&quot;: &quot;patient_name&quot;,
+      &quot;description&quot;: &quot;Full patient name on the authorization request&quot;,
+      &quot;type&quot;: &quot;string&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Selecting <strong>Import JSON</strong> validates and immediately persists the definition. Markdown import only populates the draft. <strong>Export schema JSON</strong> downloads the current valid draft.</p>
+<h3 id="85-what-the-ui-compiles">8.5 What the UI compiles<a class="heading-anchor" href="#85-what-the-ui-compiles" title="Copy section link">#</a></h3>
+<p>The application converts every scalar field to a required but nullable JSON Schema property. A date becomes a nullable string whose description asks for ISO 8601 output.</p>
+<p>Conceptually:</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;patient_name&quot;: {
+      &quot;type&quot;: [&quot;string&quot;, &quot;null&quot;],
+      &quot;description&quot;: &quot;Full patient name on the authorization request&quot;
+    }
+  },
+  &quot;required&quot;: [&quot;patient_name&quot;],
+  &quot;additionalProperties&quot;: false
+}
+</code></pre>
+<p>Required-but-nullable is deliberate: the response must mention every requested field, but it must use <code>null</code> instead of inventing a missing value.</p>
+<h2 id="9-run-and-review-whole-document-extraction">9. Run and review whole-document extraction<a class="heading-anchor" href="#9-run-and-review-whole-document-extraction" title="Copy section link">#</a></h2>
+<p>When <strong>Run extraction</strong> is selected, the application reuses the prepared grounded context. Long scalar schemas can be evaluated across multiple bounded document contexts; the highest-confidence compatible values are merged, and equal-rank conflicts are arbitrated over implicated pages.</p>
+<p>For each field, inspect:</p>
+<ul>
+<li>value;</li>
+<li>confidence;</li>
+<li>page;</li>
+<li>element ID;</li>
+<li>normalized bounding box; and</li>
+<li>source text.</li>
+</ul>
+<p>Use <strong>Show source</strong> for every medium, inferred, important, or regulated value. A correct number from the wrong role or section is still a business error.</p>
+<p>Recommended review policy:</p>
+<ol>
+<li>Review every <code>inferred</code>, <code>medium</code>, and <code>not_found</code> field.</li>
+<li>Always review critical identifiers, dates, totals, and compliance decisions.</li>
+<li>Sample <code>high</code> fields according to the organization’s quality policy.</li>
+<li>Reconcile related values, such as service dates and authorization periods.</li>
+<li>Record unresolved values for manual follow-up.</li>
+</ol>
+<h2 id="10-understand-extraction-validation">10. Understand extraction validation<a class="heading-anchor" href="#10-understand-extraction-validation" title="Copy section link">#</a></h2>
+<p>The extraction flow is more constrained than “send Markdown and hope for JSON”:</p>
+<pre><code class="language-text">schema validation
+  -&gt; bounded grounded context
+  -&gt; strict structured response
+  -&gt; JSON/evidence validation
+  -&gt; evidence resolution to known elements
+  -&gt; one semantic evidence-repair attempt if necessary
+  -&gt; deterministic exact/normalized/inferred/not-found decision
+</code></pre>
+<p>Accepted evidence must point to existing parsed elements. The final box comes from the GLM-owned element, not from a new model-generated coordinate.</p>
+<p>The UI builder supports scalar schemas. The direct Python <code>DocumentExtractor</code> API also supports nested objects and arrays, but nested schemas use one direct extraction path rather than the long-document scalar partition/merge strategy.</p>
+<h2 id="11-mixed-medical-faxes-extract-only-new-authorizations">11. Mixed medical faxes: extract only new authorizations<a class="heading-anchor" href="#11-mixed-medical-faxes-extract-only-new-authorizations" title="Copy section link">#</a></h2>
+<p>This is the canonical use case for custom form routing.</p>
+<p>Use the bundled <code>examples/synthetic-medical-fax.pdf</code> for a safe walkthrough, or suppose a representative packet contains:</p>
+<pre><code class="language-text">pages 1-2   fax cover sheet + new authorization
+pages 3-6   medical records
+pages 7-8   authorization update
+pages 9-10  another new authorization
+</code></pre>
+<p>The goal is not to extract from the whole packet. The goal is:</p>
+<ol>
+<li>parse all pages once;</li>
+<li>classify contiguous form segments;</li>
+<li>review uncertain boundaries/categories;</li>
+<li>mark only <code>newauth</code> as extractable; and</li>
+<li>run the New Authorization schema only against approved <code>newauth</code> ranges.</li>
+</ol>
+<h3 id="111-save-the-extraction-schema-first">11.1 Save the extraction schema first<a class="heading-anchor" href="#111-save-the-extraction-schema-first" title="Copy section link">#</a></h3>
+<p>Create and save the <code>New Authorization</code> extraction schema from Section 8. Routing profiles can only reference extraction schemas that already exist in the local schema store.</p>
+<h3 id="112-create-a-routing-profile-in-the-ui">11.2 Create a routing profile in the UI<a class="heading-anchor" href="#112-create-a-routing-profile-in-the-ui" title="Copy section link">#</a></h3>
+<p>In <strong>Extract</strong>:</p>
+<ol>
+<li>Enable <strong>Use custom form routing</strong>.</li>
+<li>Expand <strong>Routing profile</strong>.</li>
+<li>Name the profile, for example <code>Medical fax routing</code>.</li>
+<li>Add categories and descriptions.</li>
+<li>Check <strong>Extract</strong> only for <code>newauth</code>.</li>
+<li>Assign the saved <code>New Authorization</code> schema to <code>newauth</code>.</li>
+<li>Save the routing profile.</li>
+</ol>
+<p>Example category design:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+<th>Extract?</th>
+<th>Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>newauth</code></td>
+<td>Initial request for a new authorization</td>
+<td>Yes</td>
+<td><code>New Authorization</code></td>
+</tr>
+<tr>
+<td><code>authupdate</code></td>
+<td>Update to an existing authorization</td>
+<td>No</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>behavioral_health</code></td>
+<td>Behavioral-health form that is not a new authorization</td>
+<td>No</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>medical_records</code></td>
+<td>Medical records without a new authorization request</td>
+<td>No</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>other</code></td>
+<td>Built-in fallback when supplied categories do not apply</td>
+<td>Never</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><code>other</code> is reserved and automatically added. Do not define it in the profile.</p>
+<h3 id="113-import-a-routing-profile-from-markdown">11.3 Import a routing profile from Markdown<a class="heading-anchor" href="#113-import-a-routing-profile-from-markdown" title="Copy section link">#</a></h3>
+<p>Routing Markdown must also be UTF-8 <code>.md</code>, no larger than 1 MB, and use a table or bullets.</p>
+<p>Table form:</p>
+<pre><code class="language-markdown"># Medical fax routing
+
+&gt; Treat fax cover sheets as part of the following form when the pages clearly belong together.
+
+| Category | Description | Extract | Schema |
+| --- | --- | --- | --- |
+| newauth | Initial request for a new authorization | yes | New Authorization |
+| authupdate | Update to an existing authorization | no | |
+| behavioral_health | Behavioral-health form that is not a new authorization | no | |
+| medical_records | Medical records without an authorization request | no | |
+</code></pre>
+<p>Bullet form:</p>
+<pre><code class="language-markdown"># Medical fax routing
+
+&gt; Treat fax cover sheets as part of the following form when the pages clearly belong together.
+
+- newauth [extract=New Authorization]: Initial request for a new authorization
+- authupdate: Update to an existing authorization
+- behavioral_health: Behavioral-health form that is not a new authorization
+- medical_records: Medical records without an authorization request
+</code></pre>
+<p>Blockquote lines become optional routing instructions. In bullet format, <code>[extract=Schema Name]</code> makes that category eligible and assigns its schema.</p>
+<p>Markdown upload loads an editable draft. JSON import validates and persists the profile. Missing referenced schemas prevent the profile from becoming usable.</p>
+<h3 id="114-classify-and-segment-the-packet">11.4 Classify and segment the packet<a class="heading-anchor" href="#114-classify-and-segment-the-packet" title="Copy section link">#</a></h3>
+<p>Select <strong>Classify forms</strong>. The routing implementation:</p>
+<ol>
+<li>walks bounded prepared contexts across the parsed document;</li>
+<li>overlaps a boundary page between windows;</li>
+<li>requires contiguous, valid page coverage;</li>
+<li>validates category keys and evidence element IDs;</li>
+<li>retries one invalid structured response;</li>
+<li>reconciles window boundaries; and</li>
+<li>assigns extraction eligibility from the saved profile—not from the model.</li>
+</ol>
+<p>Each segment records both predicted and effective page range/category. “Predicted” here means the classifier result after deterministic window reconciliation: ranges may already be clipped to the current context, invalid evidence IDs filtered, and same-category boundary segments merged. It is not an untouched copy of the provider’s raw response. Effective values may then reflect user review.</p>
+<p>Segments at or above <code>0.85</code> confidence are normally auto-approved. Lower-confidence segments require review. A same-category segment merged across a classifier-window boundary also requires review, regardless of confidence.</p>
+<h3 id="115-review-before-extraction">11.5 Review before extraction<a class="heading-anchor" href="#115-review-before-extraction" title="Copy section link">#</a></h3>
+<p>The UI allows a reviewer to edit:</p>
+<ul>
+<li>start page;</li>
+<li>end page;</li>
+<li>category; and</li>
+<li>approval.</li>
+</ul>
+<p>It keeps confidence, reasoning, eligibility, and schema assignment read-only. Eligibility is always recalculated from the profile.</p>
+<p>Review every uncertain segment and select <strong>Apply routing review</strong>. The UI enables <strong>Extract eligible forms</strong> only when:</p>
+<ul>
+<li>every segment is approved;</li>
+<li>at least one segment is eligible; and</li>
+<li>the routing profile is unchanged since classification.</li>
+</ul>
+<p>Approving an ineligible <code>medical_records</code> or <code>other</code> segment confirms the routing decision; it does not make that segment extractable.</p>
+<h3 id="116-extract-only-eligible-forms">11.6 Extract only eligible forms<a class="heading-anchor" href="#116-extract-only-eligible-forms" title="Copy section link">#</a></h3>
+<p>Select <strong>Extract eligible forms</strong>. For each eligible segment, the code creates an in-memory <code>ParseResult</code> subset containing only the segment’s original pages and elements, then runs its assigned schema.</p>
+<p>The subset preserves:</p>
+<ul>
+<li>page numbers from the parsed document;</li>
+<li>element IDs;</li>
+<li>GLM bounding boxes; and</li>
+<li>source traceability.</li>
+</ul>
+<p>Non-eligible segments are skipped. One segment’s extraction failure is recorded on that segment without deleting successful results from other segments.</p>
+<p>If the user parsed a UI page-range subset, these are the subset’s renumbered pages rather than the page numbers of the original full PDF.</p>
+<h2 id="12-persistence-downloads-and-session-behavior">12. Persistence, downloads, and session behavior<a class="heading-anchor" href="#12-persistence-downloads-and-session-behavior" title="Copy section link">#</a></h2>
+<h3 id="121-what-persists">12.1 What persists<a class="heading-anchor" href="#121-what-persists" title="Copy section link">#</a></h3>
+<p>Reusable extraction schemas and routing profiles persist in:</p>
+<pre><code class="language-text">data/document_studio.sqlite3
+</code></pre>
+<p>Override the path with <code>DOCPARSE_STUDIO_DB_PATH</code>. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition.</p>
+<h3 id="122-what-does-not-persist">12.2 What does not persist<a class="heading-anchor" href="#122-what-does-not-persist" title="Copy section link">#</a></h3>
+<p>The current app keeps parse results, routing results, extraction results, chat, and review changes in Streamlit process/session state. Ending the session or restarting the process can lose them.</p>
+<p>Download required artifacts before ending the session:</p>
+<ul>
+<li><code>&lt;stem&gt;.md</code>;</li>
+<li><code>&lt;stem&gt;.annotated.pdf</code>;</li>
+<li><code>&lt;stem&gt;.extract.json</code> when extraction ran; and</li>
+<li><code>&lt;stem&gt;.full.json</code>.</li>
+</ul>
+<p>The active UI keeps only the latest whole-document or routed extraction result. It does not merge multiple schema runs into a single business record.</p>
+<h2 id="13-use-the-public-python-api">13. Use the public Python API<a class="heading-anchor" href="#13-use-the-public-python-api" title="Copy section link">#</a></h2>
+<p>The repository does not install a CLI entry point. Programmatic reuse is through the Python package.</p>
+<p>The snippets below are incremental: later examples assume the <code>result</code> produced in Section 13.1 unless they explicitly parse a different example. Save the combined imports and statements as <code>scratch.py</code> in the repository root.</p>
+<p>Actual GLM parsing must run inside the setup-created WSL environment because the <code>local-ocr</code> dependency is Linux-only. With the managed services already started, open WSL in the repository directory and run:</p>
+<pre><code class="language-bash">source &quot;${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate&quot;
+python scratch.py
+</code></pre>
+<p>Native Windows <code>uv run python scratch.py</code> can import the core package but does not install the Linux-only local OCR runtime, so it is not the supported way to perform a real parse.</p>
+<h3 id="131-parse-a-document">13.1 Parse a document<a class="heading-anchor" href="#131-parse-a-document" title="Copy section link">#</a></h3>
+<pre><code class="language-python">from pathlib import Path
+
+from grounded_docparse import DocumentParser
+
+source = Path(&quot;examples/synthetic-report.pdf&quot;)
+result = DocumentParser().parse(
+    source.read_bytes(),
+    source.name,
+    refine_markdown=False,
+    visual_recovery=True,
+)
+
+print(result.markdown)
+print(result.structured_json[&quot;schema_version&quot;])
+result_path = source.with_suffix(&quot;.annotated.pdf&quot;)
+result_path.write_bytes(result.annotated_pdf)
+</code></pre>
+<p><code>DocumentParser.parse</code> is synchronous. Supported extensions are <code>.pdf</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.tif</code>, and <code>.tiff</code>.</p>
+<p>The Python parse API has no page-range parameter. Slice the PDF before calling it or use the Streamlit page-range control.</p>
+<h3 id="132-observe-progress">13.2 Observe progress<a class="heading-anchor" href="#132-observe-progress" title="Copy section link">#</a></h3>
+<pre><code class="language-python">from pathlib import Path
+
+from grounded_docparse import DocumentParser
+
+
+def progress(event) -&gt; None:
+    print(f&quot;{event.stage}: {event.current}/{event.total} - {event.message}&quot;)
+
+
+source = Path(&quot;examples/synthetic-report.pdf&quot;)
+result = DocumentParser().parse(
+    source.read_bytes(),
+    source.name,
+    progress_callback=progress,
+)
+</code></pre>
+<p>Callbacks run on the caller thread after worker events are queued and replayed. Keep them fast and do not raise exceptions.</p>
+<h3 id="133-reuse-prepared-context-for-optional-features">13.3 Reuse prepared context for optional features<a class="heading-anchor" href="#133-reuse-prepared-context-for-optional-features" title="Copy section link">#</a></h3>
+<pre><code class="language-python">from grounded_docparse import DocumentAgent, render_combined_result
+
+agent = DocumentAgent()
+prepared = agent.prepare(result)
+
+analysis = agent.analyze(
+    result,
+    classify=True,
+    generate_toc=True,
+    prepared_context=prepared,
+)
+
+schema = {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+        &quot;invoice_number&quot;: {
+            &quot;type&quot;: [&quot;string&quot;, &quot;null&quot;],
+            &quot;description&quot;: &quot;Official invoice identifier&quot;,
+        },
+        &quot;total&quot;: {
+            &quot;type&quot;: [&quot;number&quot;, &quot;null&quot;],
+            &quot;description&quot;: &quot;Final amount payable&quot;,
+        },
+    },
+    &quot;required&quot;: [&quot;invoice_number&quot;, &quot;total&quot;],
+    &quot;additionalProperties&quot;: False,
+}
+
+extraction = agent.extract(result, schema, prepared_context=prepared)
+
+answer = agent.chat(
+    result,
+    &quot;Which page contains the total?&quot;,
+    history=[],
+    prepared_context=prepared,
+)
+
+full_json = render_combined_result(result, analysis, extraction)
+</code></pre>
+<p>Prepared context avoids rebuilding the same flattened elements and bounded document contexts for each feature.</p>
+<h3 id="134-route-mixed-forms-in-python">13.4 Route mixed forms in Python<a class="heading-anchor" href="#134-route-mixed-forms-in-python" title="Copy section link">#</a></h3>
+<pre><code class="language-python">from pathlib import Path
+
+from grounded_docparse import (
+    ClassifierCategory,
+    ClassifierProfile,
+    DocumentAgent,
+    DocumentParser,
+    FormSegment,
+    render_combined_result,
+)
+
+fax_source = Path(&quot;examples/synthetic-medical-fax.pdf&quot;)
+result = DocumentParser().parse(
+    fax_source.read_bytes(),
+    fax_source.name,
+    refine_markdown=False,
+    visual_recovery=True,
+)
+
+newauth_schema = {
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;properties&quot;: {
+        &quot;patient_name&quot;: {
+            &quot;type&quot;: [&quot;string&quot;, &quot;null&quot;],
+            &quot;description&quot;: &quot;Full patient name&quot;,
+        },
+        &quot;member_id&quot;: {
+            &quot;type&quot;: [&quot;string&quot;, &quot;null&quot;],
+            &quot;description&quot;: &quot;Health-plan member identifier&quot;,
+        },
+    },
+    &quot;required&quot;: [&quot;patient_name&quot;, &quot;member_id&quot;],
+    &quot;additionalProperties&quot;: False,
+}
+
+profile = ClassifierProfile(
+    name=&quot;Medical fax routing&quot;,
+    instructions=&quot;Treat a cover sheet as part of the following form when supported.&quot;,
+    categories=[
+        ClassifierCategory(
+            key=&quot;newauth&quot;,
+            description=&quot;Initial request for a new authorization&quot;,
+            extract=True,
+            schema_name=&quot;New Authorization&quot;,
+        ),
+        ClassifierCategory(
+            key=&quot;authupdate&quot;,
+            description=&quot;Update to an existing authorization&quot;,
+        ),
+        ClassifierCategory(
+            key=&quot;medical_records&quot;,
+            description=&quot;Medical records without an authorization request&quot;,
+        ),
+    ],
+)
+
+agent = DocumentAgent()
+prepared = agent.prepare(result)
+classification = agent.classify_forms(
+    result,
+    profile,
+    prepared_context=prepared,
+    confidence_threshold=0.85,
+)
+
+# Display predicted segments in a trusted review UI and collect decisions there.
+# This example shows one possible reviewed-decision payload. Omit automatically
+# approved segments; include every segment that a reviewer confirms or corrects.
+review_decisions = {
+    # &quot;form-002&quot;: {
+    #     &quot;start_page&quot;: 3,
+    #     &quot;end_page&quot;: 6,
+    #     &quot;category&quot;: &quot;medical_records&quot;,
+    #     &quot;approved&quot;: True,
+    # },
+}
+
+category_by_key = {category.key: category for category in profile.categories}
+reviewed_segments = []
+for original in classification.segments:
+    decision = review_decisions.get(original.id)
+    if decision is None:
+        reviewed_segments.append(original)
+        continue
+
+    start_page = int(decision[&quot;start_page&quot;])
+    end_page = int(decision[&quot;end_page&quot;])
+    category_key = str(decision[&quot;category&quot;])
+    approved = bool(decision[&quot;approved&quot;])
+    if category_key != &quot;other&quot; and category_key not in category_by_key:
+        raise ValueError(f&quot;Unknown reviewed category: {category_key}&quot;)
+    if not 1 &lt;= start_page &lt;= end_page &lt;= len(result.document.pages):
+        raise ValueError(f&quot;Invalid reviewed range: {start_page}-{end_page}&quot;)
+
+    category = category_by_key.get(category_key)
+    eligible = bool(category and category.extract)
+    changed = (start_page, end_page, category_key) != (
+        original.start_page,
+        original.end_page,
+        original.category,
+    )
+    reviewed_segments.append(
+        FormSegment(
+            id=original.id,
+            predicted_start_page=original.predicted_start_page,
+            predicted_end_page=original.predicted_end_page,
+            predicted_category=original.predicted_category,
+            start_page=start_page,
+            end_page=end_page,
+            category=category_key,
+            confidence=original.confidence,
+            reasoning=original.reasoning,
+            evidence_element_ids=original.evidence_element_ids,
+            approved=approved,
+            review_status=(
+                &quot;user_corrected&quot; if approved and changed
+                else &quot;user_confirmed&quot; if approved
+                else &quot;needs_review&quot;
+            ),
+            eligible=eligible,
+            schema_name=category.schema_name if eligible else None,
+        )
+    )
+
+reviewed_segments.sort(key=lambda segment: (segment.start_page, segment.end_page))
+covered_pages = [
+    page
+    for segment in reviewed_segments
+    for page in range(segment.start_page, segment.end_page + 1)
+]
+if covered_pages != list(range(1, len(result.document.pages) + 1)):
+    raise ValueError(&quot;Reviewed segments must cover every page exactly once&quot;)
+
+classification = classification.model_copy(
+    update={&quot;segments&quot;: reviewed_segments},
+    deep=True,
+)
+
+unapproved = [segment.id for segment in classification.segments if not segment.approved]
+if unapproved:
+    raise RuntimeError(f&quot;Human routing review required: {unapproved}&quot;)
+
+routed = agent.extract_forms(
+    result,
+    classification,
+    schemas_by_name={&quot;New Authorization&quot;: newauth_schema},
+)
+
+full_json = render_combined_result(
+    result,
+    custom_classification=classification,
+    routed_extraction=routed,
+)
+</code></pre>
+<p>The package intentionally does not provide a command-line review manager or durable review store. The Streamlit app implements this review in <code>_apply_routing_review</code>; another application must collect the equivalent decisions before resuming <code>extract_forms</code>. In production, store predicted and corrected values plus reviewer identity instead of mutating review state invisibly.</p>
+<h3 id="135-direct-extraction-api">13.5 Direct extraction API<a class="heading-anchor" href="#135-direct-extraction-api" title="Copy section link">#</a></h3>
+<p><code>DocumentExtractor</code> exposes lower-level schema proposal and extraction:</p>
+<pre><code class="language-python">from grounded_docparse import DocumentExtractor
+
+extractor = DocumentExtractor()
+proposal = extractor.propose_schema(
+    &quot;Extract invoice number, due date, and total&quot;,
+    result,
+)
+extraction = extractor.extract(
+    result,
+    proposal.json_schema,
+    allow_inferred=False,
+)
+</code></pre>
+<p>Use <code>allow_inferred=False</code> when unresolved fields must remain <code>null</code>. <code>DocumentAgent.extract</code> enables deterministic inferred grounding after its evidence-repair attempt.</p>
+<h2 id="14-read-the-code-from-the-outside-in">14. Read the code from the outside in<a class="heading-anchor" href="#14-read-the-code-from-the-outside-in" title="Copy section link">#</a></h2>
+<p>The fastest way to understand the implementation is to follow the user request through these files:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>streamlit_app.py</code></td>
+<td>Upload, modes, progress, tabs, schema/profile editors, review, downloads</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/config.py</code></td>
+<td>Environment parsing, parser limits, analysis thresholds, fixed Luna model</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/ingest.py</code></td>
+<td>Input validation, page rasterization, crop rerendering</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/local_ocr.py</code></td>
+<td>Process-wide GLM-OCR runtime and SDK normalization</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/page_analysis.py</code></td>
+<td>Page signals and GLM region conversion</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/quality.py</code></td>
+<td>Deterministic quality, verification, and recovery selection helpers</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/pipeline.py</code></td>
+<td><code>DocumentParser</code>, page orchestration, recovery, hierarchy, output assembly</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/gateways.py</code></td>
+<td>OpenAI Responses calls, structured output, usage, and trace collection</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/prompts.py</code></td>
+<td>Versioned prompts and untrusted-document boundaries</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/enhancement.py</code></td>
+<td>Markdown chunks and presentation-directive application</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/agentic.py</code></td>
+<td>Prepared contexts, document analysis, routing, extraction, chat</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/extraction.py</code></td>
+<td>Schema validation, evidence resolution, confidence decisions</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/models.py</code></td>
+<td>Pydantic domain and result contracts</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/schema_store.py</code></td>
+<td>Markdown parsers, JSON Schema compilation, SQLite stores</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/render.py</code></td>
+<td>Markdown, JSON, public elements, quality, and PDF annotations</td>
+</tr>
+<tr>
+<td><code>src/grounded_docparse/runtime.py</code></td>
+<td>Provider concurrency, retry, cooldown, and diagnostics</td>
+</tr>
+</tbody>
+</table>
+<h3 id="141-main-ui-call-path">14.1 Main UI call path<a class="heading-anchor" href="#141-main-ui-call-path" title="Copy section link">#</a></h3>
+<pre><code class="language-text">streamlit_app.py
+  -&gt; DocumentParser().parse(...)
+  -&gt; DocumentAgent.prepare(result)
+  -&gt; DocumentAgent.analyze(...)              # optional
+  -&gt; DocumentAgent.extract(...)              # optional whole document
+  -&gt; DocumentAgent.classify_forms(...)       # optional routing
+  -&gt; user routing review
+  -&gt; DocumentAgent.extract_forms(...)        # optional routed extraction
+  -&gt; render_combined_result(...)
+</code></pre>
+<h3 id="142-parse-call-path">14.2 Parse call path<a class="heading-anchor" href="#142-parse-call-path" title="Copy section link">#</a></h3>
+<p>At a conceptual level, <code>DocumentParser.parse</code> coordinates:</p>
+<pre><code class="language-text">ingest_document
+  -&gt; page analysis / local GLM runtime
+  -&gt; deterministic quality and candidate selection
+  -&gt; optional OpenAIDocumentGateway crop inspection
+  -&gt; deterministic correction validation
+  -&gt; cross-page hierarchy
+  -&gt; renderers and ParseResult
+</code></pre>
+<p>The parser restores source ordering before hierarchy and export, even when page work completes concurrently.</p>
+<h3 id="143-optional-feature-call-path">14.3 Optional feature call path<a class="heading-anchor" href="#143-optional-feature-call-path" title="Copy section link">#</a></h3>
+<p><code>DocumentAgent.prepare</code> converts the canonical result into compact contexts. Each normal context is limited to eight pages and 48,000 characters.</p>
+<p><code>DocumentAgent.analyze</code> can run document classification and TOC generation concurrently. Each feature fails independently. TOC failure can fall back to grounded GLM headings.</p>
+<p><code>DocumentAgent.classify_forms</code> validates contiguous segments, known categories, page bounds, and evidence IDs. Eligibility comes from <code>ClassifierProfile</code>, never from model output.</p>
+<p><code>DocumentAgent.extract_forms</code> creates page subsets and calls normal extraction sequentially for each eligible segment.</p>
+<h2 id="15-data-contracts-and-invariants">15. Data contracts and invariants<a class="heading-anchor" href="#15-data-contracts-and-invariants" title="Copy section link">#</a></h2>
+<h3 id="151-canonical-hierarchy">15.1 Canonical hierarchy<a class="heading-anchor" href="#151-canonical-hierarchy" title="Copy section link">#</a></h3>
+<p>The core domain is broadly:</p>
+<pre><code class="language-text">Document
+  -&gt; Page[]
+       -&gt; Block[]
+            -&gt; child Block[]
+            -&gt; text/table/form/visual details
+</code></pre>
+<p><code>build_elements</code> flattens the canonical hierarchy into the public <code>Element</code> list used by agentic features and source highlighting.</p>
+<h3 id="152-parseresult">15.2 ParseResult<a class="heading-anchor" href="#152-parseresult" title="Copy section link">#</a></h3>
+<p><code>DocumentParser.parse</code> returns a <code>ParseResult</code> containing:</p>
+<pre><code class="language-text">document
+markdown
+base_markdown
+json
+annotated_pdf
+elements
+metadata
+recovery_log
+usage and trace
+runtime diagnostics
+</code></pre>
+<h3 id="153-routing-contracts">15.3 Routing contracts<a class="heading-anchor" href="#153-routing-contracts" title="Copy section link">#</a></h3>
+<p><code>ClassifierProfile</code> supports 1–50 unique category keys. <code>other</code> is reserved. An extractable category must have a schema name; a non-extractable category may not have one.</p>
+<p><code>FormSegment</code> preserves:</p>
+<ul>
+<li>predicted range/category;</li>
+<li>effective range/category;</li>
+<li>confidence and reasoning;</li>
+<li>evidence element IDs;</li>
+<li>approval and review status;</li>
+<li>eligibility; and</li>
+<li>assigned schema name.</li>
+</ul>
+<p><code>RoutedExtractionResult</code> contains the reviewed classification, per-segment succeeded/failed records, serialized JSON, usage, and trace.</p>
+<h3 id="154-schema-restrictions">15.4 Schema restrictions<a class="heading-anchor" href="#154-schema-restrictions" title="Copy section link">#</a></h3>
+<p>Direct extraction schemas must have an object root. Supported value types are object, array, string, number, integer, boolean, and nullability expressed through type arrays. Every non-root field must accept <code>null</code>; every object property must appear in that object’s <code>required</code> list; and every object must set <code>additionalProperties</code> to <code>false</code>.</p>
+<p>The strict caller subset uses:</p>
+<pre><code class="language-text">type, enum, properties, required, items, additionalProperties, description
+</code></pre>
+<p>Constraints such as <code>pattern</code>, length/range bounds, conditional schemas, and composition keywords are intentionally rejected. Business constraints belong in clear descriptions and downstream deterministic validation.</p>
+<h2 id="16-configuration-and-performance-controls">16. Configuration and performance controls<a class="heading-anchor" href="#16-configuration-and-performance-controls" title="Copy section link">#</a></h2>
+<p><code>ParserConfig.from_env()</code> supplies defaults. The most operationally important variables are:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th style="text-align: right;">Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DOCPARSE_RENDER_DPI</code></td>
+<td style="text-align: right;"><code>200</code></td>
+<td>Full-page render resolution</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_CROP_DPI</code></td>
+<td style="text-align: right;"><code>450</code></td>
+<td>Source-crop rerender resolution</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_MAX_UPLOAD_BYTES</code></td>
+<td style="text-align: right;"><code>262144000</code></td>
+<td>Parser upload limit</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_MAX_PAGES</code></td>
+<td style="text-align: right;"><code>500</code></td>
+<td>Page/frame limit</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_MAX_PAGE_PIXELS</code></td>
+<td style="text-align: right;"><code>20000000</code></td>
+<td>Per-page pixel limit</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_MAX_VISUAL_RECOVERY_CROPS</code></td>
+<td style="text-align: right;"><code>8</code></td>
+<td>Recovery crops per document</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_PAGE_BATCH_SIZE</code></td>
+<td style="text-align: right;"><code>16</code></td>
+<td>Ordered page-window size</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_MAX_PAGE_CONCURRENCY</code></td>
+<td style="text-align: right;"><code>8</code></td>
+<td>Page worker limit</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_PROVIDER_CONCURRENCY</code></td>
+<td style="text-align: right;"><code>8</code></td>
+<td>Shared provider-call limit</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_PROVIDER_RETRY_ATTEMPTS</code></td>
+<td style="text-align: right;"><code>3</code></td>
+<td>Total retryable attempts</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_LOCAL_OCR_ENABLED</code></td>
+<td style="text-align: right;"><code>true</code></td>
+<td>Local GLM analysis enabled</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_GLMOCR_CONFIG_PATH</code></td>
+<td style="text-align: right;"><code>config/glmocr.yaml</code></td>
+<td>GLM SDK configuration</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_GLMOCR_LAYOUT_DEVICE</code></td>
+<td style="text-align: right;"><code>cuda:0</code></td>
+<td>Layout device</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_STUDIO_DB_PATH</code></td>
+<td style="text-align: right;"><code>data/document_studio.sqlite3</code></td>
+<td>Reusable-definition database</td>
+</tr>
+</tbody>
+</table>
+<p>The managed vLLM profile uses a deliberate 32,768-token ceiling for the verified workstation rather than attempting the model’s theoretical maximum context. Change runtime limits only after measuring GPU memory, WSL memory, representative pages, and failure behavior.</p>
+<p>Provider calls use bounded jittered exponential backoff. HTTP 429 responses reduce effective concurrency and apply <code>Retry-After</code> or the configured cooldown. Runtime diagnostics expose calls, retries, tokens, concurrency, cooldown, and wait durations.</p>
+<h2 id="17-security-and-privacy-model">17. Security and privacy model<a class="heading-anchor" href="#17-security-and-privacy-model" title="Copy section link">#</a></h2>
+<p>The supported repository boundary is a trusted local workstation. It has no multi-user authentication or tenant isolation.</p>
+<h3 id="171-treat-every-document-as-untrusted">17.1 Treat every document as untrusted<a class="heading-anchor" href="#171-treat-every-document-as-untrusted" title="Copy section link">#</a></h3>
+<p>Uploaded bytes, filenames, PDF structures, recognized text, model output, schemas, and routing profiles are untrusted inputs. Document text is data, not an instruction to the system. Prompt construction explicitly separates untrusted document content from application instructions.</p>
+<h3 id="172-understand-feature-egress">17.2 Understand feature egress<a class="heading-anchor" href="#172-understand-feature-egress" title="Copy section link">#</a></h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Potential remote content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Visual recovery</td>
+<td>Selected image crops and existing-region context</td>
+</tr>
+<tr>
+<td>Markdown refinement</td>
+<td>Anchored Markdown and compact layout records</td>
+</tr>
+<tr>
+<td>Document classification</td>
+<td>Recognized content/layout from the first two pages</td>
+</tr>
+<tr>
+<td>TOC</td>
+<td>Recognized content/layout across bounded contexts</td>
+</tr>
+<tr>
+<td>Custom routing</td>
+<td>Recognized content/layout across bounded form-classifier contexts plus profile</td>
+</tr>
+<tr>
+<td>Extraction</td>
+<td>Recognized content/layout plus extraction schema</td>
+</tr>
+<tr>
+<td>Chat</td>
+<td>Question, recent history, and bounded/retrieved document context</td>
+</tr>
+</tbody>
+</table>
+<p>Requests use <code>store=False</code>. This application setting does not replace contractual, organizational, retention, or compliance review of the provider.</p>
+<h3 id="173-keep-local-services-local">17.3 Keep local services local<a class="heading-anchor" href="#173-keep-local-services-local" title="Copy section link">#</a></h3>
+<p>The managed scripts bind Streamlit and vLLM to <code>127.0.0.1</code>. Do not expose ports <code>8501</code> or <code>8080</code> to an untrusted network.</p>
+<h3 id="174-know-the-residual-data">17.4 Know the residual data<a class="heading-anchor" href="#174-know-the-residual-data" title="Copy section link">#</a></h3>
+<p>Normal parse completion removes parser temporary directories, but abnormal process termination and storage recovery are outside that guarantee. Operators remain responsible for:</p>
+<ul>
+<li>downloaded outputs;</li>
+<li>browser/session data;</li>
+<li>backups;</li>
+<li>runtime logs;</li>
+<li>model caches;</li>
+<li>the SQLite database and WAL sidecars; and</li>
+<li>any source files copied outside the app.</li>
+</ul>
+<p>Do not use public issues for real documents, credentials, personal data, PHI, or result bundles. Follow <a href="security-content-excluded.html">SECURITY.md</a>.</p>
+<h2 id="18-test-and-contribute-safely">18. Test and contribute safely<a class="heading-anchor" href="#18-test-and-contribute-safely" title="Copy section link">#</a></h2>
+<h3 id="181-install-the-locked-development-environment">18.1 Install the locked development environment<a class="heading-anchor" href="#181-install-the-locked-development-environment" title="Copy section link">#</a></h3>
+<p>From PowerShell:</p>
+<pre><code class="language-powershell">uv sync --locked
+</code></pre>
+<p>Native Windows installs the core/test dependencies but not Linux-only <code>local-ocr</code>. Actual local GLM parsing uses the WSL environment created by setup.</p>
+<h3 id="182-run-the-standard-checks">18.2 Run the standard checks<a class="heading-anchor" href="#182-run-the-standard-checks" title="Copy section link">#</a></h3>
+<pre><code class="language-powershell">uv run pytest -q
+uvx ruff check src streamlit_app.py tests scripts
+uv run python -m compileall -q src streamlit_app.py tests scripts
+git diff --check
+</code></pre>
+<p>Automated tests use fake gateways and do not require paid requests. Important suites include:</p>
+<table>
+<thead>
+<tr>
+<th>Test area</th>
+<th>File</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core parse behavior and recovery</td>
+<td><code>tests/test_simple_pipeline.py</code></td>
+</tr>
+<tr>
+<td>Public contracts</td>
+<td><code>tests/test_simple_contract.py</code></td>
+</tr>
+<tr>
+<td>Form routing and gated extraction</td>
+<td><code>tests/test_form_routing.py</code></td>
+</tr>
+<tr>
+<td>Agent extraction and evidence</td>
+<td><code>tests/test_agentic_extraction.py</code></td>
+</tr>
+<tr>
+<td>Schema/profile persistence and Markdown</td>
+<td><code>tests/test_schema_store.py</code></td>
+</tr>
+<tr>
+<td>Streamlit controls and state</td>
+<td><code>tests/test_simple_streamlit.py</code></td>
+</tr>
+<tr>
+<td>Gateway structured requests</td>
+<td><code>tests/test_openai_vision_gateway.py</code></td>
+</tr>
+<tr>
+<td>Provider retry/concurrency</td>
+<td><code>tests/test_provider_runtime.py</code></td>
+</tr>
+<tr>
+<td>Quality decisions</td>
+<td><code>tests/test_quality.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>When behavior changes, test the public contract rather than private implementation details. A bug fix should begin with a reproducing test.</p>
+<h3 id="183-optional-live-evaluation">18.3 Optional live evaluation<a class="heading-anchor" href="#183-optional-live-evaluation" title="Copy section link">#</a></h3>
+<p>Live evaluation runs inside the setup-created WSL environment while the local GLM service is healthy. A GLM-only example is:</p>
+<pre><code class="language-bash">source &quot;${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate&quot;
+python scripts/evaluate_corpus.py --live --glm-only \
+  --document synthetic-report \
+  --artifacts-dir output/synthetic-report-glm-only \
+  --output output/synthetic-report-glm-only.eval.json
+</code></pre>
+<p>The bundled corpus is a regression suite. It is not proof of broad production accuracy or equivalence with another document product.</p>
+<h2 id="19-current-limitations-and-production-path">19. Current limitations and production path<a class="heading-anchor" href="#19-current-limitations-and-production-path" title="Copy section link">#</a></h2>
+<p>The repository intentionally does not currently provide:</p>
+<ul>
+<li>batch processing in the UI;</li>
+<li>a folder-upload workflow;</li>
+<li>a CLI application entry point;</li>
+<li>an HTTP application API;</li>
+<li>queues or workers;</li>
+<li>durable job/artifact state;</li>
+<li>document/chat persistence;</li>
+<li>multi-user authentication or authorization;</li>
+<li>tenant isolation;</li>
+<li>human-review audit storage;</li>
+<li>automatic cross-schema result merging; or</li>
+<li>safe shared-service deployment.</li>
+</ul>
+<p>Do not place a loop around Streamlit session calls and call it production batch processing. For 100 medical faxes, the recommended production architecture separates the web process from GPU workers and adds durable, idempotent orchestration.</p>
+<p>The repository’s production design uses:</p>
+<pre><code class="language-text">authenticated web/review UI
+  -&gt; malware-scanned Blob intake
+  -&gt; Service Bus work queue
+  -&gt; PostgreSQL job, definition, review, and audit state
+  -&gt; GPU VMSS workers with local GLM-OCR
+  -&gt; optional approved AI provider
+  -&gt; immutable Blob outputs
+</code></pre>
+<p>Required changes include immutable versioned Markdown definitions, per-document job state, idempotency keys, review pauses, output manifests, download brokers, role-based access, retention, monitoring, disaster recovery, and synthetic-data acceptance gates.</p>
+<p>Read <a href="azure-bulk-fax-deployment.html">Deploy Grounded DocParse on Azure for bulk medical faxes</a> before planning any shared or PHI deployment. The current repository is not deployable unchanged as a production PHI service.</p>
+<h2 id="20-troubleshooting-guide">20. Troubleshooting guide<a class="heading-anchor" href="#20-troubleshooting-guide" title="Copy section link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Browser does not open</td>
+<td>Streamlit did not start or health check failed</td>
+<td>Open <a href="http://localhost:8501">http://localhost:8501</a>; inspect <code>.runtime/streamlit.log</code></td>
+</tr>
+<tr>
+<td>GLM parse fails before layout</td>
+<td>Local service/model unavailable</td>
+<td>Check <code>.runtime/vllm.log</code>, <code>nvidia-smi</code>, and <code>http://127.0.0.1:8080/v1/models</code></td>
+</tr>
+<tr>
+<td>Luna controls are disabled</td>
+<td><code>OPENAI_API_KEY</code> unavailable to Streamlit</td>
+<td>Save it in Windows user scope and rerun <code>Launch-GLM-OCR.cmd</code></td>
+</tr>
+<tr>
+<td>Unexpected remote destination</td>
+<td>Custom <code>OPENAI_BASE_URL</code> is configured</td>
+<td>Stop; verify/remove the environment value before processing documents</td>
+</tr>
+<tr>
+<td>Extraction tab says key required</td>
+<td>Extraction is a Luna feature</td>
+<td>Configure an approved key or remain GLM-only</td>
+</tr>
+<tr>
+<td>Markdown schema is rejected</td>
+<td>Mixed table/bullets, invalid field, encoding, or size</td>
+<td>Use one supported format, UTF-8 <code>.md</code>, under 1 MB</td>
+</tr>
+<tr>
+<td>Routing profile is unusable</td>
+<td>Extractable category references an unsaved schema</td>
+<td>Save the named extraction schema first</td>
+</tr>
+<tr>
+<td>Extract eligible forms is disabled</td>
+<td>Unapproved segment, no eligible segment, or changed profile</td>
+<td>Apply review to every segment or rerun classification</td>
+</tr>
+<tr>
+<td>Segment requires review</td>
+<td>Confidence below <code>0.85</code> or window-boundary merge</td>
+<td>Verify pages/category and approve or correct it</td>
+</tr>
+<tr>
+<td>Extracted field is inferred</td>
+<td>Exact evidence match failed</td>
+<td>Inspect source; do not treat it as verified</td>
+</tr>
+<tr>
+<td>Block is <code>needs_review</code></td>
+<td>Deterministic quality/verification concern</td>
+<td>Compare text with its highlighted source region</td>
+</tr>
+<tr>
+<td>Page content is missing</td>
+<td>GLM did not detect the region</td>
+<td>Use a clearer source; Luna recovery cannot create missing regions</td>
+</tr>
+<tr>
+<td>Saved schemas disappeared</td>
+<td>Different SQLite path/process environment</td>
+<td>Check <code>DOCPARSE_STUDIO_DB_PATH</code> and database permissions</td>
+</tr>
+<tr>
+<td>Provider request fails</td>
+<td>Rate limit, endpoint, schema, or network error</td>
+<td>Use displayed request/stage diagnostics; inspect safe logs without document text</td>
+</tr>
+</tbody>
+</table>
+<h2 id="21-a-practical-learning-sequence">21. A practical learning sequence<a class="heading-anchor" href="#21-a-practical-learning-sequence" title="Copy section link">#</a></h2>
+<p>Use this sequence to move from beginner to confident contributor:</p>
+<ol>
+<li>Run a GLM-only parse and inspect every tab.</li>
+<li>Repeat with visual recovery and compare recovered elements.</li>
+<li>Import a three-field Markdown schema and run whole-document extraction.</li>
+<li>Trace each field from JSON to element ID to annotated source.</li>
+<li>Build the medical routing profile and classify a mixed synthetic fax.</li>
+<li>Correct a low-confidence segment and extract only <code>newauth</code>.</li>
+<li>Reproduce the same parse/extract workflow with the Python API.</li>
+<li>Read <code>models.py</code>, then <code>render.py</code>, then <code>pipeline.py</code>, then <code>agentic.py</code>.</li>
+<li>Run the routing, schema-store, extraction, and Streamlit tests.</li>
+<li>Read the Azure runbook before proposing batch or shared deployment.</li>
+</ol>
+<h2 id="22-completion-checklist">22. Completion checklist<a class="heading-anchor" href="#22-completion-checklist" title="Copy section link">#</a></h2>
+<p>You are ready to use the app when you can answer “yes” to these questions:</p>
+<ul>
+<li>Can I explain why GLM owns IDs and geometry?</li>
+<li>Do I know when document content leaves the workstation?</li>
+<li>Can I distinguish visual recovery, Markdown refinement, classification, routing, extraction, and chat?</li>
+<li>Can I build/import a schema and interpret every confidence state?</li>
+<li>Can I classify a mixed packet, review every segment, and extract only eligible categories?</li>
+<li>Can I trace an output value to an element and annotated source box?</li>
+<li>Do I understand what persists and what disappears with the session?</li>
+<li>Do I know the current single-document and trusted-workstation limits?</li>
+<li>Can I run the offline verification suite before changing code?</li>
+<li>Will I use the production runbook rather than exposing the local app directly?</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="heading-anchor" href="#further-reading" title="Copy section link">#</a></h2>
+<ul>
+<li><a href="index.html">Project overview</a></li>
+<li><a href="setup.html">Setup and configuration</a></li>
+<li><a href="architecture.html">Architecture</a></li>
+<li><a href="api.html">Python API</a></li>
+<li><a href="business-user-extraction-workflow.html">Business extraction workflow</a></li>
+<li><a href="extraction-quality-research.html">Extraction quality research</a></li>
+<li><a href="azure-bulk-fax-deployment.html">Azure bulk medical fax deployment</a></li>
+<li><a href="security-content-excluded.html">Security policy</a></li>
+</ul></div>
+        <nav class="document-pager" aria-label="Previous and next documents"><a class="pager-link previous" href="tutorial.html"><span>Previous</span><strong>Tutorial</strong></a><a class="pager-link next" href="business-user-extraction-workflow.html"><span>Next</span><strong>Business User Workflow for Extracting Large Field Sets</strong></a></nav>
+      </article>
+    </main>
+    <aside class="page-outline" aria-label="On this page">
+      <p>On this page</p>
+      <div class="outline-scroll"><div class="toc">
+<ul>
+<li><a href="#1-choose-your-path-through-this-tutorial">1. Choose your path through this tutorial</a></li>
+<li><a href="#2-what-problem-does-this-project-solve">2. What problem does this project solve?</a><ul>
+<li><a href="#21-core-outputs">2.1 Core outputs</a></li>
+</ul>
+</li>
+<li><a href="#3-essential-concepts-and-vocabulary">3. Essential concepts and vocabulary</a><ul>
+<li><a href="#31-rasterization">3.1 Rasterization</a></li>
+<li><a href="#32-layout-analysis-and-ocr">3.2 Layout analysis and OCR</a></li>
+<li><a href="#33-grounding">3.3 Grounding</a></li>
+<li><a href="#34-recovery-versus-refinement-versus-extraction">3.4 Recovery versus refinement versus extraction</a></li>
+<li><a href="#35-document-classification-versus-custom-form-routing">3.5 Document classification versus custom form routing</a></li>
+<li><a href="#36-evidence-confidence">3.6 Evidence confidence</a></li>
+</ul>
+</li>
+<li><a href="#4-architecture-at-a-glance">4. Architecture at a glance</a></li>
+<li><a href="#5-install-the-supported-local-environment">5. Install the supported local environment</a><ul>
+<li><a href="#51-prerequisites">5.1 Prerequisites</a></li>
+<li><a href="#52-clone-and-verify-wslgpu-access">5.2 Clone and verify WSL/GPU access</a></li>
+<li><a href="#53-decide-whether-optional-luna-features-are-allowed">5.3 Decide whether optional Luna features are allowed</a></li>
+<li><a href="#54-run-first-time-setup">5.4 Run first-time setup</a></li>
+<li><a href="#55-manual-wsl-launch">5.5 Manual WSL launch</a></li>
+</ul>
+</li>
+<li><a href="#6-your-first-successful-parse">6. Your first successful parse</a><ul>
+<li><a href="#61-ade-modes">6.1 ADE modes</a></li>
+<li><a href="#62-what-happens-after-selecting-parse-document">6.2 What happens after selecting Parse document?</a></li>
+<li><a href="#63-recovery-invariants">6.3 Recovery invariants</a></li>
+</ul>
+</li>
+<li><a href="#7-learn-the-streamlit-studio">7. Learn the Streamlit studio</a><ul>
+<li><a href="#71-overview">7.1 Overview</a></li>
+<li><a href="#72-markdown">7.2 Markdown</a></li>
+<li><a href="#73-annotated-pdf">7.3 Annotated PDF</a></li>
+<li><a href="#74-extract">7.4 Extract</a></li>
+<li><a href="#75-chat">7.5 Chat</a></li>
+<li><a href="#76-layout-tree">7.6 Layout Tree</a></li>
+</ul>
+</li>
+<li><a href="#8-define-an-extraction-schema">8. Define an extraction schema</a><ul>
+<li><a href="#81-good-field-design">8.1 Good field design</a></li>
+<li><a href="#82-build-fields-in-the-ui">8.2 Build fields in the UI</a></li>
+<li><a href="#83-import-an-extraction-schema-from-markdown">8.3 Import an extraction schema from Markdown</a></li>
+<li><a href="#84-import-or-export-json">8.4 Import or export JSON</a></li>
+<li><a href="#85-what-the-ui-compiles">8.5 What the UI compiles</a></li>
+</ul>
+</li>
+<li><a href="#9-run-and-review-whole-document-extraction">9. Run and review whole-document extraction</a></li>
+<li><a href="#10-understand-extraction-validation">10. Understand extraction validation</a></li>
+<li><a href="#11-mixed-medical-faxes-extract-only-new-authorizations">11. Mixed medical faxes: extract only new authorizations</a><ul>
+<li><a href="#111-save-the-extraction-schema-first">11.1 Save the extraction schema first</a></li>
+<li><a href="#112-create-a-routing-profile-in-the-ui">11.2 Create a routing profile in the UI</a></li>
+<li><a href="#113-import-a-routing-profile-from-markdown">11.3 Import a routing profile from Markdown</a></li>
+<li><a href="#114-classify-and-segment-the-packet">11.4 Classify and segment the packet</a></li>
+<li><a href="#115-review-before-extraction">11.5 Review before extraction</a></li>
+<li><a href="#116-extract-only-eligible-forms">11.6 Extract only eligible forms</a></li>
+</ul>
+</li>
+<li><a href="#12-persistence-downloads-and-session-behavior">12. Persistence, downloads, and session behavior</a><ul>
+<li><a href="#121-what-persists">12.1 What persists</a></li>
+<li><a href="#122-what-does-not-persist">12.2 What does not persist</a></li>
+</ul>
+</li>
+<li><a href="#13-use-the-public-python-api">13. Use the public Python API</a><ul>
+<li><a href="#131-parse-a-document">13.1 Parse a document</a></li>
+<li><a href="#132-observe-progress">13.2 Observe progress</a></li>
+<li><a href="#133-reuse-prepared-context-for-optional-features">13.3 Reuse prepared context for optional features</a></li>
+<li><a href="#134-route-mixed-forms-in-python">13.4 Route mixed forms in Python</a></li>
+<li><a href="#135-direct-extraction-api">13.5 Direct extraction API</a></li>
+</ul>
+</li>
+<li><a href="#14-read-the-code-from-the-outside-in">14. Read the code from the outside in</a><ul>
+<li><a href="#141-main-ui-call-path">14.1 Main UI call path</a></li>
+<li><a href="#142-parse-call-path">14.2 Parse call path</a></li>
+<li><a href="#143-optional-feature-call-path">14.3 Optional feature call path</a></li>
+</ul>
+</li>
+<li><a href="#15-data-contracts-and-invariants">15. Data contracts and invariants</a><ul>
+<li><a href="#151-canonical-hierarchy">15.1 Canonical hierarchy</a></li>
+<li><a href="#152-parseresult">15.2 ParseResult</a></li>
+<li><a href="#153-routing-contracts">15.3 Routing contracts</a></li>
+<li><a href="#154-schema-restrictions">15.4 Schema restrictions</a></li>
+</ul>
+</li>
+<li><a href="#16-configuration-and-performance-controls">16. Configuration and performance controls</a></li>
+<li><a href="#17-security-and-privacy-model">17. Security and privacy model</a><ul>
+<li><a href="#171-treat-every-document-as-untrusted">17.1 Treat every document as untrusted</a></li>
+<li><a href="#172-understand-feature-egress">17.2 Understand feature egress</a></li>
+<li><a href="#173-keep-local-services-local">17.3 Keep local services local</a></li>
+<li><a href="#174-know-the-residual-data">17.4 Know the residual data</a></li>
+</ul>
+</li>
+<li><a href="#18-test-and-contribute-safely">18. Test and contribute safely</a><ul>
+<li><a href="#181-install-the-locked-development-environment">18.1 Install the locked development environment</a></li>
+<li><a href="#182-run-the-standard-checks">18.2 Run the standard checks</a></li>
+<li><a href="#183-optional-live-evaluation">18.3 Optional live evaluation</a></li>
+</ul>
+</li>
+<li><a href="#19-current-limitations-and-production-path">19. Current limitations and production path</a></li>
+<li><a href="#20-troubleshooting-guide">20. Troubleshooting guide</a></li>
+<li><a href="#21-a-practical-learning-sequence">21. A practical learning sequence</a></li>
+<li><a href="#22-completion-checklist">22. Completion checklist</a></li>
+<li><a href="#further-reading">Further reading</a></li>
+</ul>
+</div>
+</div>
+      <a class="back-to-top" href="#content">Back to top ↑</a>
+    </aside>
+  </div>
+</body>
+</html>
