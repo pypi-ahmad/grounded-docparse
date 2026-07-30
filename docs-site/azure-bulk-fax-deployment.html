@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0b1118">
+  <meta name="description" content="This document is an implementation design and operations runbook for a single-organization, production deployment that processes protected health information (PHI). It covers browser batch uploads, automated Azure Blob Storage intake, local">
+  <title>Deploy Grounded DocParse on Azure for bulk medical faxes · Grounded DocParse Docs</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script>window.DOCS_SEARCH_INDEX = [{"title": "Grounded Document Parser", "path": "README.md", "url": "index.html", "summary": "A workstation-oriented Streamlit studio that parses PDFs and images with local GLM-OCR, then optionally sends selected crops or recognized document context to gpt-5.6-luna for bounded visual recovery and document-level reasoning.", "headings": ["Application preview", "Install and set up", "How to use the app", "Outputs", "Public Python API", "Repository layout", "Documentation", "Development"]}, {"title": "Grounded DocParse Complete User Guide", "path": "docs/complete-user-guide.md", "url": "complete-user-guide.html", "summary": "This guide explains Grounded DocParse in simple language for business users, reviewers, technical users, and administrators. It covers what the application can do, what it cannot do, every major screen and feature, and how to complete commo", "headings": ["1. Start here", "1.1 Which type of user are you?", "2. What the application can and cannot do", "2.1 What it can do", "2.2 What it cannot currently do", "2.3 Core parsing versus optional AI features", "3. Before you use the application", "3.1 Business-user checklist", "3.2 Technical setup summary", "3.3 Optional Luna configuration", "4. Understand where document data goes", "5. Upload a document", "5.1 Supported files", "5.2 Page range", "5.3 Show reading order", "6. Choose processing options", "6.1 ADE mode", "6.2 Enhance with gpt-5.6-luna", "6.3 Enable visual recovery on hard regions", "6.4 Classify document type", "6.5 Generate table of contents", "6.6 Enable document chat", "7. Parse the document", "7.1 What happens technically", "7.2 What happens when an optional feature fails", "7.3 Tab map", "8. Use the Overview tab", "8.1 Summary metrics", "8.2 Document type", "8.3 Table of contents", "8.4 Page thumbnails and original page viewer", "9. Use the Markdown tab", "9.1 Refined Markdown versus grounded Markdown", "9.2 What to do when Markdown looks wrong", "10. Use the Annotated PDF tab", "10.1 Annotation colors", "10.2 Page controls", "10.3 Selected regions", "10.4 Reviewer checklist", "11. Use the Layout Tree tab", "12. Extract business fields from the whole document", "12.1 When to use extraction", "12.2 Open the extraction builder", "12.3 Create a schema manually", "12.4 Import schema JSON", "12.5 Import schema Markdown", "12.6 Load a saved schema", "12.7 Review extraction results", "12.8 Large field sets", "13. Classify mixed forms and extract selected categories", "13.1 Understand the routing terms", "13.2 Prepare extraction schemas first", "13.3 Create a routing profile manually", "13.4 Import routing profile JSON", "13.5 Import routing profile Markdown", "13.6 Classify forms", "13.7 Review classified segments", "13.8 Extract eligible forms", "13.9 Review routed results", "14. Use document chat", "15. Download and understand outputs", "15.1 Download Markdown", "15.2 Download annotated PDF", "15.3 Download Extract JSON", "15.4 Download Full JSON", "15.5 Footer diagnostics", "16. Business operating model", "16.1 Recommended roles", "16.2 Recommended standard operating procedure", "16.3 Risk-based field review", "16.4 What a successful result means", "17. Technical behavior in simple terms", "17.1 Source ownership", "17.2 Grounding", "17.3 Structured output and validation", "17.4 Long documents", "17.5 Result versions", "18. Persistence, privacy, and security", "18.1 What is saved by the app", "18.2 What is session-only", "18.3 Other residual data", "18.4 Local-workstation boundary", "19. Technical integration and extension", "19.1 Python API", "19.2 Current integration limits", "19.3 Azure bulk processing", "20. Common workflows", "20.1 Simple invoice extraction", "20.2 Extract only new authorizations from a medical fax", "20.3 Process a sensitive document with no remote AI", "20.4 Review a long report", "20.5 Handle a poor scan", "21. Troubleshooting", "22. Frequently asked questions", "Does Fast mode mean no external API calls?", "Is extraction automatic after parsing?", "Can I upload a Markdown field list?", "Can I upload a Markdown routing definition?", "Can one PDF contain several forms?", "Can I extract only newauth and ignore medical records?", "Does approval make every category extractable?", "Can Luna change a bounding box?", "Can the app recover a region GLM never found?", "Does a high-confidence field require review?", "Can the UI process 100 PDFs at once?", "Are schemas and results both saved?", "23. Glossary", "24. Final checklist", "Further reading"]}, {"title": "Tutorial", "path": "docs/tutorial.md", "url": "tutorial.html", "summary": "1. Complete setup and open <http://localhost:8501>. 2. Optionally set OPENAIAPIKEY in the Windows user environment before launch. The Windows launcher refreshes it and optional OPENAIBASEURL from user scope each time. 3. Upload one PDF, PNG", "headings": []}, {"title": "Grounded DocParse: Zero-to-Hero Tutorial", "path": "docs/zero-to-hero-tutorial.md", "url": "zero-to-hero-tutorial.html", "summary": "This tutorial explains the repository from first principles through day-to-day use, Python integration, internal implementation, testing, and production deployment boundaries. It is written for a newcomer who has never used the application,", "headings": ["1. Choose your path through this tutorial", "2. What problem does this project solve?", "2.1 Core outputs", "3. Essential concepts and vocabulary", "3.1 Rasterization", "3.2 Layout analysis and OCR", "3.3 Grounding", "3.4 Recovery versus refinement versus extraction", "3.5 Document classification versus custom form routing", "3.6 Evidence confidence", "4. Architecture at a glance", "5. Install the supported local environment", "5.1 Prerequisites", "5.2 Clone and verify WSL/GPU access", "5.3 Decide whether optional Luna features are allowed", "5.4 Run first-time setup", "5.5 Manual WSL launch", "6. Your first successful parse", "6.1 ADE modes", "6.2 What happens after selecting Parse document?", "6.3 Recovery invariants", "7. Learn the Streamlit studio", "7.1 Overview", "7.2 Markdown", "7.3 Annotated PDF", "7.4 Extract", "7.5 Chat", "7.6 Layout Tree", "8. Define an extraction schema", "8.1 Good field design", "8.2 Build fields in the UI", "8.3 Import an extraction schema from Markdown", "8.4 Import or export JSON", "8.5 What the UI compiles", "9. Run and review whole-document extraction", "10. Understand extraction validation", "11. Mixed medical faxes: extract only new authorizations", "11.1 Save the extraction schema first", "11.2 Create a routing profile in the UI", "11.3 Import a routing profile from Markdown", "11.4 Classify and segment the packet", "11.5 Review before extraction", "11.6 Extract only eligible forms", "12. Persistence, downloads, and session behavior", "12.1 What persists", "12.2 What does not persist", "13. Use the public Python API", "13.1 Parse a document", "13.2 Observe progress", "13.3 Reuse prepared context for optional features", "13.4 Route mixed forms in Python", "13.5 Direct extraction API", "14. Read the code from the outside in", "14.1 Main UI call path", "14.2 Parse call path", "14.3 Optional feature call path", "15. Data contracts and invariants", "15.1 Canonical hierarchy", "15.2 ParseResult", "15.3 Routing contracts", "15.4 Schema restrictions", "16. Configuration and performance controls", "17. Security and privacy model", "17.1 Treat every document as untrusted", "17.2 Understand feature egress", "17.3 Keep local services local", "17.4 Know the residual data", "18. Test and contribute safely", "18.1 Install the locked development environment", "18.2 Run the standard checks", "18.3 Optional live evaluation", "19. Current limitations and production path", "20. Troubleshooting guide", "21. A practical learning sequence", "22. Completion checklist", "Further reading"]}, {"title": "Business User Workflow for Extracting Large Field Sets", "path": "docs/business-user-extraction-workflow.md", "url": "business-user-extraction-workflow.html", "summary": "Document Parse Studio turns scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI", "headings": ["Purpose", "The Workflow at a Glance", "1. Define the Business Fields First", "2. Upload the Document", "3. Choose the Processing Options", "4. Parse the Document", "5. Review the Parse Before Extracting", "6. Build and Save the Extraction Schema", "7. Run the Field Extraction", "8. Interpret and Validate the Results", "9. Use Chat for Follow-up Questions", "10. Export the Results", "11. Repeat Consistently", "Applying the Workflow Beyond Healthcare", "What a Successful Run Looks Like"]}, {"title": "Layout-Aware Workflow for Extracting Large Field Sets", "path": "docs/layout-aware-large-field-extraction-workflow.md", "url": "layout-aware-large-field-extraction-workflow.html", "summary": "This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio.", "headings": ["Purpose", "Current Capability and Proposed Extension", "The Two Inputs Must Remain Separate", "Plain-language terms", "Workflow for a Business User", "1. Define the business outcome", "2. Organize large field sets", "3. Upload and parse the source document", "4. Review the parse before extraction", "5. Select or prepare the field schema", "6. Run extraction", "7. Review the results", "8. Export and use the result", "Workflow for a Technical User", "Stage 1: Source ingestion and visual parsing", "Stage 2: Optional bounded visual recovery", "Stage 3: Extraction context preparation", "Stage 4: Schema-constrained extraction", "Stage 5: Evidence validation and repair", "Stage 6: Grounding and serialization", "Representative Extraction Output", "Optional Markdown Field-Specification Feature", "Recommended user experience", "Suggested field-specification content", "patientnpi", "servicefromdate", "Recommended first version", "Extension for 100+ fields", "Safety and Governance Requirements", "General Applicability", "Recommended Decision"]}, {"title": "How it works", "path": "docs/how-it-works.md", "url": "how-it-works.html", "summary": "1. The app validates the extension, bytes, upload size, page count, and per-page pixel count. 2. Every PDF page or image frame is rasterized locally. Selectable PDF text is ignored. 3. GLM-OCR runs layout and recognition in ordered windows ", "headings": []}, {"title": "Setup", "path": "SETUP.md", "url": "setup.html", "summary": "The supported local runtime is Windows 11 with Ubuntu 24.04 under WSL2 and an NVIDIA GPU. GLM-OCR and PP-DocLayout run inside WSL; Streamlit is launched from the same locked Linux environment. Native Windows does not install the local-ocr d", "headings": ["Prerequisites", "Automated Windows setup", "Manual WSL setup and launch", "Luna configuration", "Configuration reference", "Verification", "Troubleshooting"]}, {"title": "Run locally", "path": "docs/run.md", "url": "run.html", "summary": "Run Setup-GLM-OCR.cmd once on a new Windows 11 machine. It validates WSL2 and GPU passthrough, creates the locked WSL environment, starts vLLM and Streamlit, waits for health checks, and opens <http://localhost:8501>.", "headings": ["Recommended Windows launcher", "Manual commands", "Use the studio", "Stop and restart", "Troubleshooting"]}, {"title": "Local GLM-OCR runtime", "path": "docs/local-glmocr.md", "url": "local-glmocr.html", "summary": "The supported parser runtime is WSL2 Ubuntu 24.04. Recognition uses GLM-OCR; PP-DocLayout-V3 is its layout stage. PDF pages are always rendered to images, and selectable PDF text is never read as evidence.", "headings": []}, {"title": "Deploy Grounded DocParse on Azure for bulk medical faxes", "path": "docs/azure-bulk-fax-deployment.md", "url": "azure-bulk-fax-deployment.html", "summary": "This document is an implementation design and operations runbook for a single-organization, production deployment that processes protected health information (PHI). It covers browser batch uploads, automated Azure Blob Storage intake, local", "headings": ["Purpose and readiness warning", "Chosen production baseline", "Reference architecture", "Required application changes", "1. Separate the web process from document processing", "2. Add durable batch and document state", "3. Make queue processing idempotent", "4. Version Markdown definitions", "5. Add the batch UI and upload/download brokers", "6. Support automated Blob batches", "7. Add a provider factory", "Azure resource contract", "Required roles", "Build and deployment procedure", "1. Select the subscription and region", "2. Prepare deployment parameters", "3. Deploy shared infrastructure", "4. Build and validate the GPU image", "5. Build and publish application images", "6. Run database migrations", "7. Configure the AI provider", "8. Enable ingress last", "Runtime configuration", "Security and PHI controls", "Data minimization and logging", "Retention and deletion", "Availability and disaster recovery", "Network and host controls", "Autoscaling and capacity", "Operations", "Normal batch flow", "Alert baseline", "Retry and recovery", "Pre-production acceptance gates", "Functional", "Input and failure handling", "AI providers", "Security and compliance", "Troubleshooting", "Deployment evidence and handoff", "First-party references"]}, {"title": "Architecture", "path": "docs/architecture.md", "url": "architecture.html", "summary": "The application is one synchronous Streamlit process plus a local GLM-OCR/vLLM service. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication lay", "headings": ["System boundary", "Repository map", "Parse pipeline", "Ownership and recovery contract", "Agentic layer", "Result contracts", "Evaluation boundary"]}, {"title": "Product specification", "path": "docs/spec.md", "url": "spec.html", "summary": "Parse one PDF or image into grounded Markdown, structured JSON, and an annotated PDF through a GLM-OCR-first local workflow, with optional bounded Luna recovery and document reasoning.", "headings": ["Goal", "Inputs", "Required behavior", "Public interfaces", "Non-goals", "Done when"]}, {"title": "Python API", "path": "docs/api.md", "url": "api.html", "summary": "The package requires Python 3.12–3.14. Install the locked project environment with uv sync --locked. Actual GLM parsing also requires the Linux-only local OCR extra and running GLM service described in setup.", "headings": ["Exported names", "Parsing", "Agentic features", "Direct schema proposal and extraction", "Exported result models", "Combined JSON", "Configuration and test doubles"]}, {"title": "Design basis", "path": "docs/research.md", "url": "research.html", "summary": "The current design follows a parse-then-reason split: a local visual parser establishes the evidence geometry, then optional model calls operate on selected crops or compact structured context. The repository does not call or reproduce ADE,", "headings": []}, {"title": "Extraction quality research", "path": "docs/extraction-quality-research.md", "url": "extraction-quality-research.html", "summary": "The July 2026 app runs completed all 41 Masked Amerigroup pages and all eight Public Water pages. Their reported word accuracies (71.61% and 82.40%) measure agreement with supplied Markdown references, not independently verified source accu", "headings": ["Scope and interpretation", "Findings", "Evaluation policy", "Changes and experiments", "July 2026 targeted result", "Acceptance and limitations"]}, {"title": "Contributing", "path": "CONTRIBUTING.md", "url": "contributing.html", "summary": "Contributions should preserve source grounding, explicit uncertainty, and deterministic export behavior.", "headings": ["Setup", "Development workflow", "Verify changes", "Documentation changes", "Pull requests", "Architecture constraints", "Reporting security issues"]}, {"title": "Changelog", "path": "CHANGELOG.md", "url": "changelog.html", "summary": "All notable changes to this project are documented in this file.", "headings": ["[Unreleased]", "Added", "[0.4.0] - 2026-07-30", "Added", "Changed", "Removed", "[0.3.0] - 2026-07-28", "Added", "Changed", "Fixed", "[0.2.0] - 2026-07-26", "Added", "Changed", "Security", "[0.1.0] - 2026-07-26", "Added"]}, {"title": "Bug_Report", "path": ".github/ISSUE_TEMPLATE/bug_report.md", "url": "issue-template--bug-report.html", "summary": "<!-- Describe observed behavior without document contents, credentials, or PII. -->", "headings": ["Summary", "Reproduction", "Expected behavior", "Actual behavior", "Runtime", "Sanitized diagnostics", "Security reports"]}, {"title": "Feature_Request", "path": ".github/ISSUE_TEMPLATE/feature_request.md", "url": "issue-template--feature-request.html", "summary": "<!-- Describe the user or operator problem, not only the desired implementation. -->", "headings": ["Problem", "Proposed outcome", "Evidence and audit requirements", "Interface and compatibility", "Security, retention, and cost impact", "Alternatives considered", "Acceptance criteria", "Additional context"]}];</script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body data-page="azure-bulk-fax-deployment.html">
+  <a class="skip-link" href="#content">Skip to content</a>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <header class="topbar">
+    <button class="icon-button menu-button" type="button" data-menu-toggle aria-label="Open document navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" href="index.html" aria-label="Grounded DocParse documentation home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span><strong>Grounded DocParse</strong><small>Documentation</small></span>
+    </a>
+    <div class="topbar-path"><span>Source</span>docs/azure-bulk-fax-deployment.md</div>
+    <button class="icon-button search-button" type="button" data-search-toggle aria-label="Focus document search">/</button>
+  </header>
+  <div class="site-shell">
+    <aside class="document-shelf" data-document-shelf aria-label="Document navigation">
+      <div class="shelf-search">
+        <label for="shelf-search">Find a document</label>
+        <input id="shelf-search" type="search" data-shelf-search placeholder="Filter the shelf…" autocomplete="off">
+        <span class="keyboard-hint">/</span>
+      </div>
+      <nav><section class="shelf-group"><h2>Start here</h2><a class="shelf-link" href="index.html" data-search="grounded document parser readme.md"><span>Grounded Document Parser</span><small>README.md</small></a><a class="shelf-link" href="complete-user-guide.html" data-search="grounded docparse complete user guide docs/complete-user-guide.md"><span>Grounded DocParse Complete User Guide</span><small>docs/complete-user-guide.md</small></a><a class="shelf-link" href="tutorial.html" data-search="tutorial docs/tutorial.md"><span>Tutorial</span><small>docs/tutorial.md</small></a><a class="shelf-link" href="zero-to-hero-tutorial.html" data-search="grounded docparse: zero-to-hero tutorial docs/zero-to-hero-tutorial.md"><span>Grounded DocParse: Zero-to-Hero Tutorial</span><small>docs/zero-to-hero-tutorial.md</small></a></section><section class="shelf-group"><h2>Business workflows</h2><a class="shelf-link" href="business-user-extraction-workflow.html" data-search="business user workflow for extracting large field sets docs/business-user-extraction-workflow.md"><span>Business User Workflow for Extracting Large Field Sets</span><small>docs/business-user-extraction-workflow.md</small></a><a class="shelf-link" href="layout-aware-large-field-extraction-workflow.html" data-search="layout-aware workflow for extracting large field sets docs/layout-aware-large-field-extraction-workflow.md"><span>Layout-Aware Workflow for Extracting Large Field Sets</span><small>docs/layout-aware-large-field-extraction-workflow.md</small></a><a class="shelf-link" href="how-it-works.html" data-search="how it works docs/how-it-works.md"><span>How it works</span><small>docs/how-it-works.md</small></a></section><section class="shelf-group"><h2>Setup &amp; operations</h2><a class="shelf-link" href="setup.html" data-search="setup setup.md"><span>Setup</span><small>SETUP.md</small></a><a class="shelf-link" href="run.html" data-search="run locally docs/run.md"><span>Run locally</span><small>docs/run.md</small></a><a class="shelf-link" href="local-glmocr.html" data-search="local glm-ocr runtime docs/local-glmocr.md"><span>Local GLM-OCR runtime</span><small>docs/local-glmocr.md</small></a><a class="shelf-link is-active" href="azure-bulk-fax-deployment.html" data-search="deploy grounded docparse on azure for bulk medical faxes docs/azure-bulk-fax-deployment.md"><span>Deploy Grounded DocParse on Azure for bulk medical faxes</span><small>docs/azure-bulk-fax-deployment.md</small></a></section><section class="shelf-group"><h2>Architecture &amp; reference</h2><a class="shelf-link" href="architecture.html" data-search="architecture docs/architecture.md"><span>Architecture</span><small>docs/architecture.md</small></a><a class="shelf-link" href="spec.html" data-search="product specification docs/spec.md"><span>Product specification</span><small>docs/spec.md</small></a><a class="shelf-link" href="api.html" data-search="python api docs/api.md"><span>Python API</span><small>docs/api.md</small></a><a class="shelf-link" href="research.html" data-search="design basis docs/research.md"><span>Design basis</span><small>docs/research.md</small></a><a class="shelf-link" href="extraction-quality-research.html" data-search="extraction quality research docs/extraction-quality-research.md"><span>Extraction quality research</span><small>docs/extraction-quality-research.md</small></a></section><section class="shelf-group"><h2>Project</h2><a class="shelf-link" href="contributing.html" data-search="contributing contributing.md"><span>Contributing</span><small>CONTRIBUTING.md</small></a><a class="shelf-link" href="changelog.html" data-search="changelog changelog.md"><span>Changelog</span><small>CHANGELOG.md</small></a><a class="shelf-link" href="issue-template--bug-report.html" data-search="bug_report .github/issue_template/bug_report.md"><span>Bug_Report</span><small>.github/ISSUE_TEMPLATE/bug_report.md</small></a><a class="shelf-link" href="issue-template--feature-request.html" data-search="feature_request .github/issue_template/feature_request.md"><span>Feature_Request</span><small>.github/ISSUE_TEMPLATE/feature_request.md</small></a></section></nav>
+      <footer><span>20 documents</span><a href="https://github.com/pypi-ahmad/grounded-docparse">Repository ↗</a></footer>
+    </aside>
+    <button class="shelf-backdrop" type="button" data-menu-close aria-label="Close document navigation"></button>
+    <main id="content" class="reading-pane">
+
+      <article class="document-article">
+        <header class="document-header title-frame">
+          <span class="corner top-left"></span><span class="corner top-right"></span>
+          <span class="corner bottom-left"></span><span class="corner bottom-right"></span>
+          <p class="document-path">docs/azure-bulk-fax-deployment.md</p>
+          <h1>Deploy Grounded DocParse on Azure for bulk medical faxes</h1>
+          <div class="document-meta">
+            <span>7,288 words</span>
+            <span>33 min read</span>
+            <a href="https://github.com/pypi-ahmad/grounded-docparse/blob/main/docs/azure-bulk-fax-deployment.md">View Markdown source ↗</a>
+          </div>
+        </header>
+
+        <div class="markdown-body"><h2 id="purpose-and-readiness-warning">Purpose and readiness warning<a class="heading-anchor" href="#purpose-and-readiness-warning" title="Copy section link">#</a></h2>
+<p>This document is an implementation design and operations runbook for a single-organization, production deployment that processes protected health information (PHI). It covers browser batch uploads, automated Azure Blob Storage intake, local GLM-OCR on Azure GPU workers, optional classification and extraction, human review, and either Azure OpenAI or the official OpenAI API.</p>
+<p>The repository is <strong>not deployable in this form as a shared PHI service</strong>. Its supported runtime is a trusted single-user workstation, the UI accepts one document, results live in process/session state, reusable definitions use local SQLite, and it has no durable jobs, multi-user authorization, or tenant isolation. Complete the application changes and acceptance gates in this document before exposing the service. Do not publish ports <code>8501</code> or <code>8080</code> from the current launch scripts.</p>
+<p>This design does not make an organization HIPAA compliant by itself. Microsoft describes HIPAA as a shared responsibility and states that a Business Associate Agreement (BAA) does not by itself establish customer compliance. The organization must approve the architecture, contracts, data flows, retention, access policy, incident response, and operating procedures before PHI is used. See <a href="https://learn.microsoft.com/compliance/regulatory/offering-hipaa-hitech">Microsoft HIPAA/HITECH guidance</a>.</p>
+<h2 id="chosen-production-baseline">Chosen production baseline<a class="heading-anchor" href="#chosen-production-baseline" title="Copy section link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Baseline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Organization model</td>
+<td>One Microsoft Entra tenant and one healthcare organization; not multi-tenant SaaS</td>
+</tr>
+<tr>
+<td>Provisioning</td>
+<td>Bicep modules deployed with Azure CLI</td>
+</tr>
+<tr>
+<td>Web tier</td>
+<td>Linux Azure App Service custom container running Streamlit</td>
+</tr>
+<tr>
+<td>Authentication</td>
+<td>App Service authentication with Microsoft Entra ID; no anonymous access</td>
+</tr>
+<tr>
+<td>Edge</td>
+<td>Application Gateway WAF v2, HTTPS only, certificate from Key Vault</td>
+</tr>
+<tr>
+<td>Intake</td>
+<td>UI folder/multiple-file upload and automated Blob batch manifests</td>
+</tr>
+<tr>
+<td>Untrusted files</td>
+<td>Separate DMZ storage account with Defender for Storage on-upload malware scanning</td>
+</tr>
+<tr>
+<td>Work queue</td>
+<td>Azure Service Bus Premium queues with dead-lettering and duplicate detection</td>
+</tr>
+<tr>
+<td>Durable state</td>
+<td>Azure Database for PostgreSQL Flexible Server</td>
+</tr>
+<tr>
+<td>OCR workers</td>
+<td>Ubuntu 24.04 Azure Virtual Machine Scale Set (VMSS), <code>Standard_NC8as_T4_v3</code></td>
+</tr>
+<tr>
+<td>Worker scale</td>
+<td>Minimum 2, default 2, maximum 5; one active document per GPU worker</td>
+</tr>
+<tr>
+<td>OCR</td>
+<td>GLM-OCR and PP-DocLayoutV3 locally on each worker; vLLM stays on loopback</td>
+</tr>
+<tr>
+<td>Optional AI</td>
+<td>Administrator selects Azure OpenAI or official OpenAI per deployment</td>
+</tr>
+<tr>
+<td>Review</td>
+<td>Only the affected fax pauses when routing confidence is below <code>0.85</code> or segmentation needs review</td>
+</tr>
+<tr>
+<td>Retention</td>
+<td>Inputs and outputs expire after 30 days unless an approved policy overrides it</td>
+</tr>
+<tr>
+<td>Definitions</td>
+<td>Immutable, versioned Markdown routing profiles and extraction schemas</td>
+</tr>
+</tbody>
+</table>
+<p><code>Standard_NC8as_T4_v3</code> has one NVIDIA T4 GPU with 16 GB GPU memory, eight vCPUs, and 56 GiB system memory. Availability and quota vary by subscription and region; NC-family quota commonly starts at zero. Confirm the SKU and request quota before choosing a region. See the <a href="https://learn.microsoft.com/azure/virtual-machines/sizes/gpu-accelerated/ncast4v3-series">NCasT4_v3 specifications</a> and <a href="https://learn.microsoft.com/azure/quotas/regional-quota-requests">regional quota guidance</a>.</p>
+<h2 id="reference-architecture">Reference architecture<a class="heading-anchor" href="#reference-architecture" title="Copy section link">#</a></h2>
+<pre><code class="language-text">Corporate user
+    |
+    | HTTPS + Entra ID
+    v
+Application Gateway WAF v2
+    |
+    v
+Private App Service endpoint -- Streamlit batch/review UI
+    |             |                    |
+    |             |                    +--&gt; PostgreSQL: jobs, versions, audit
+    |             +--&gt; Service Bus: one message per fax
+    +--&gt; Upload broker --&gt; DMZ Blob Storage: untrusted uploads
+                         |
+                  Defender malware scan
+                         |
+                  Event Grid + Function
+                         |
+                         v
+                 Trusted Blob Storage
+                         |
+                  Service Bus work queue
+                         |
+                         v
+             GPU VMSS worker (2-5 instances)
+                |                 |
+                |                 +--&gt; Azure OpenAI private endpoint
+                |                      or approved OpenAI API through controlled egress
+                +--&gt; local GLM-OCR/vLLM on 127.0.0.1:8080
+                         |
+                         v
+            Trusted output Blob + PostgreSQL status/audit
+                         |
+                  Download broker
+</code></pre>
+<p>Use one virtual network with dedicated <code>ApplicationGatewaySubnet</code>, <code>AzureFirewallSubnet</code>, <code>AzureBastionSubnet</code>, web-integration, Function-integration, worker, private-endpoint, and image-build subnets. Delegate the two integration subnets to <code>Microsoft.Web/serverFarms</code>; do not place private endpoints in them. Route controlled outbound traffic through Azure Firewall Premium and use Azure DNS Private Resolver/approved corporate forwarding for private DNS. Use private DNS zones for Storage, Service Bus, Key Vault, PostgreSQL, Container Registry, and Azure OpenAI. Deny public network access on data services after private DNS and deployment access have been validated.</p>
+<p>The official OpenAI API is the one intentional exception to private Azure routing. Send it through Azure Firewall Premium with stable egress, destination allowlisting and no inbound path. TLS inspection must follow the organization's approved privacy/certificate policy; never silently weaken certificate verification. Do not proxy PHI through an unapproved OpenAI-compatible endpoint. Defender for Storage scan-result delivery to an Event Grid custom topic currently requires that topic to allow public IP access. Account for that documented limitation explicitly: restrict and authenticate delivery, expose no application HTTP endpoint, and validate every event against the expected topic, type, subject, unique event ID, blob URI, ETag and Defender-provided SHA-256. Recheck the limitation before implementation and prefer private delivery when Microsoft supports it.</p>
+<h2 id="required-application-changes">Required application changes<a class="heading-anchor" href="#required-application-changes" title="Copy section link">#</a></h2>
+<p>These changes are prerequisites, not optional production enhancements.</p>
+<h3 id="1-separate-the-web-process-from-document-processing">1. Separate the web process from document processing<a class="heading-anchor" href="#1-separate-the-web-process-from-document-processing" title="Copy section link">#</a></h3>
+<p>The Streamlit process must submit work and display durable state; it must not parse a batch during a browser session. Extract the existing <code>DocumentParser</code> and <code>DocumentAgent</code> calls into a worker entry point that:</p>
+<ol>
+<li>receives one Service Bus message;</li>
+<li>claims the document job atomically;</li>
+<li>downloads the clean source PDF and immutable definition snapshot;</li>
+<li>parses with local GLM-OCR;</li>
+<li>classifies and segments when routing is enabled;</li>
+<li>pauses only that document when human review is required;</li>
+<li>extracts approved, eligible form segments;</li>
+<li>writes outputs to Blob Storage;</li>
+<li>commits status, metrics, audit events and an outbox event; and</li>
+<li>completes the queue message only after the database commit succeeds.</li>
+</ol>
+<p>Run one active PDF per GPU worker. The parser may retain its existing page concurrency inside that PDF. Do not run multiple vLLM servers or multiple document jobs against the same GPU until a measured load test proves memory and latency remain safe.</p>
+<h3 id="2-add-durable-batch-and-document-state">2. Add durable batch and document state<a class="heading-anchor" href="#2-add-durable-batch-and-document-state" title="Copy section link">#</a></h3>
+<p>Replace session-state ownership of batch execution with PostgreSQL records. Use UUIDs, UTC timestamps, foreign keys, and optimistic concurrency. At minimum, persist:</p>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Required data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_job</code></td>
+<td>ID, creator Entra object ID, source, definition versions, provider mode, counts, status, created/completed timestamps</td>
+</tr>
+<tr>
+<td><code>document_job</code></td>
+<td>ID, batch ID, opaque display label, SHA-256, input blob URI/version/ETag, page count, stage, status, attempt, error code, review reason, worker lease/version</td>
+</tr>
+<tr>
+<td><code>definition</code></td>
+<td>ID, kind (<code>routing</code> or <code>extraction</code>), logical name, immutable version, SHA-256, normalized JSON, original Markdown blob key, creator, timestamp, active flag</td>
+</tr>
+<tr>
+<td><code>review</code></td>
+<td>document/segment IDs, predicted and corrected ranges/category, confidence, decision, reviewer Entra object ID, timestamps</td>
+</tr>
+<tr>
+<td><code>audit_event</code></td>
+<td>actor/service identity, action, object IDs, outcome, correlation ID, timestamp; never raw PHI or extracted values</td>
+</tr>
+<tr>
+<td><code>output_manifest</code></td>
+<td>document/attempt ID, immutable blob URI/version/ETag, SHA-256, media type, size, committed timestamp</td>
+</tr>
+<tr>
+<td><code>outbox_event</code></td>
+<td>unique event ID, aggregate/version, action, payload without PHI, publish status and attempts</td>
+</tr>
+</tbody>
+</table>
+<p>Use these statuses as the public contract:</p>
+<pre><code class="language-text">uploaded -&gt; scanning -&gt; queued -&gt; parsing -&gt; classifying
+         -&gt; needs_review -&gt; queued_for_extraction
+         -&gt; extracting -&gt; completed
+
+terminal alternatives: rejected, failed, cancelled
+</code></pre>
+<p>Derive the batch status from document jobs: <code>completed</code>, <code>completed_with_review</code>, <code>completed_with_failures</code>, <code>failed</code>, or <code>cancelled</code>. A failed or uncertain document must not stop unrelated documents.</p>
+<h3 id="3-make-queue-processing-idempotent">3. Make queue processing idempotent<a class="heading-anchor" href="#3-make-queue-processing-idempotent" title="Copy section link">#</a></h3>
+<p>Use <code>SHA256(source bytes + routing definition version + extraction definition versions + provider configuration version + parser release)</code> as the processing key. A repeated submission may reuse a completed result only when every component matches and policy permits reuse.</p>
+<p>Use <code>document-work</code> for <code>parse</code> and <code>extract</code> actions and <code>export-work</code> for ZIP creation; human review is PostgreSQL state, not a queue. Every message contains schema version, unique message ID, job ID, action, expected job version and correlation ID, but no PHI. Configure duplicate detection, a five-minute lock and <code>maxDeliveryCount=5</code>. The worker renews its lock while processing and updates a database heartbeat; the maximum renewal duration must exceed the measured 99th-percentile job time. Before each stage it atomically compares job version/status so a duplicate delivery cannot run the same transition twice.</p>
+<p>Blob Storage and PostgreSQL cannot participate in one atomic transaction. Use PostgreSQL as the visibility authority and a transactional outbox:</p>
+<ol>
+<li>write each output once to an immutable, attempt-specific blob key and record its version, ETag and SHA-256;</li>
+<li>in one PostgreSQL transaction, insert the <code>output_manifest</code>, advance the job version/status to <code>completed</code>, append the audit event and insert the outbox event;</li>
+<li>expose/download only blobs referenced by a committed <code>output_manifest</code> visible to the caller;</li>
+<li>complete the Service Bus message after that transaction commits;</li>
+<li>have an outbox publisher send follow-on events idempotently; and</li>
+<li>run a reconciler that removes unreferenced attempt blobs after a safety window and republishes unsent outbox rows.</li>
+</ol>
+<p>Move exhausted deliveries to the dead-letter queue and expose them in the admin UI. This protocol tolerates a crash after Blob upload, after database commit, or before queue completion without making an orphan visible or duplicating a committed result.</p>
+<p>Use deterministic error codes such as <code>malware_detected</code>, <code>invalid_pdf</code>, <code>encrypted_pdf</code>, <code>page_limit</code>, <code>ocr_failed</code>, <code>provider_failed</code>, <code>needs_review</code>, and <code>output_commit_failed</code>. Store safe diagnostic details separately from user-facing messages and exclude document text.</p>
+<h3 id="4-version-markdown-definitions">4. Version Markdown definitions<a class="heading-anchor" href="#4-version-markdown-definitions" title="Copy section link">#</a></h3>
+<p>Keep the existing Markdown formats for routing profiles and extraction schemas. Change persistence from mutable SQLite rows to immutable versions:</p>
+<ol>
+<li>an admin uploads <code>.md</code> in the UI;</li>
+<li>the existing parser validates and normalizes it;</li>
+<li>the original Markdown is stored in the trusted definition container;</li>
+<li>PostgreSQL stores its normalized JSON, SHA-256, logical name, and monotonically increasing version;</li>
+<li>activation changes which version is offered for new batches but never mutates existing jobs; and</li>
+<li>every batch stores exact routing and extraction definition IDs/versions.</li>
+</ol>
+<p>Reject a routing profile if an extractable category references a missing or inactive schema. Display a preflight summary before submission. Automated Blob batches reference the same immutable versions and cannot include arbitrary definitions.</p>
+<h3 id="5-add-the-batch-ui-and-uploaddownload-brokers">5. Add the batch UI and upload/download brokers<a class="heading-anchor" href="#5-add-the-batch-ui-and-uploaddownload-brokers" title="Copy section link">#</a></h3>
+<p>Keep the current single-document studio as a separate workflow. Add a batch workflow with:</p>
+<ul>
+<li>a Streamlit v2 component or companion browser control that selects a directory/multiple PDFs and uploads Block Blobs directly to DMZ storage;</li>
+<li>a maximum of 100 PDFs, 50 MiB per batch-uploaded PDF, and 1 GiB aggregate per submission;</li>
+<li>a recommendation to use Blob-drop intake for larger files/batches;</li>
+<li>routing profile/version and provider-mode summary;</li>
+<li>validation results before submission;</li>
+<li>a durable batch table showing queued, running, review, completed, rejected, and failed counts;</li>
+<li>filters and pagination rather than loading all outputs into session state;</li>
+<li>a review screen for page-range/category corrections and approval;</li>
+<li>retry/cancel controls authorized by role;</li>
+<li>per-document JSON/Markdown/annotated-PDF downloads; and</li>
+<li>a server-generated ZIP request that is built asynchronously and expires with the batch.</li>
+</ul>
+<p>Do not proxy a 100-file submission through Streamlit memory. An authenticated upload broker first authorizes the batch and issues a short-lived, HTTPS-only, write-only user-delegation SAS for one server-generated blob key. The browser uploads blocks directly, commits once, then calls finalize with its SHA-256. The broker records the resulting immutable version/ETag/hash and invalidates further application writes to that key. SAS lifetime is minutes, has no read/list/delete permission and is never logged. Configure DMZ Blob CORS for only the Application Gateway origin, only the required <code>PUT</code>/<code>OPTIONS</code> methods and headers, and no wildcard origins; apply a restrictive browser content-security policy.</p>
+<p>An uploaded file is untrusted even when its extension is <code>.pdf</code>. Assign an opaque display label such as <code>Document 001</code>. Never persist a supplied filename or use it as a filesystem or Blob path because filenames may contain PHI. Identity comes from UUID and hash. Native <code>st.file_uploader</code> with <code>accept_multiple_files="directory"</code> may remain a development convenience for small synthetic batches, but it is not the production bulk-transfer path.</p>
+<p>The web identity does not receive blanket trusted-output read access. A download broker checks the authenticated actor, application role, batch <code>access_scope_id</code>, document ownership/reviewer assignment and committed <code>output_manifest</code>, records an audit event, then returns a minutes-long read-only user-delegation SAS for exactly one blob. ZIP exports follow the same authorization and are never public.</p>
+<p>Native Streamlit upload filtering is best-effort, not a security boundary. The installed Streamlit version supports <code>accept_multiple_files="directory"</code>, but the application must enforce count, byte, PDF-signature, encryption, and page limits on the server.</p>
+<h3 id="6-support-automated-blob-batches">6. Support automated Blob batches<a class="heading-anchor" href="#6-support-automated-blob-batches" title="Copy section link">#</a></h3>
+<p>An upstream fax system uploads into this layout:</p>
+<pre><code class="language-text">dmz-incoming/&lt;organization&gt;/&lt;batch-id&gt;/documents/&lt;document-id&gt;.pdf
+dmz-incoming/&lt;organization&gt;/&lt;batch-id&gt;/batch-manifest.json
+</code></pre>
+<p>Upload the manifest last. It is the commit marker and contains no PHI beyond approved opaque identifiers:</p>
+<pre><code class="language-json">{
+  &quot;schema_version&quot;: &quot;1.0&quot;,
+  &quot;batch_id&quot;: &quot;UUID&quot;,
+  &quot;routing_definition&quot;: {&quot;id&quot;: &quot;UUID&quot;, &quot;version&quot;: 3},
+  &quot;documents&quot;: [
+    {&quot;document_id&quot;: &quot;UUID&quot;, &quot;blob_name&quot;: &quot;documents/UUID.pdf&quot;, &quot;sha256&quot;: &quot;HEX&quot;}
+  ]
+}
+</code></pre>
+<p>Validate the manifest schema and size, submitter/service-principal access scope, immutable definition versions, unique document IDs, exact blob prefix, declared hashes, 250 MiB per-file parser ceiling, 500-page ceiling, 100-document maximum and aggregate policy. The intake Function accepts only <code>Microsoft.Security.MalwareScanningResult</code> events from the configured topic/schema. It stores each event ID once to prevent replay and requires <code>No threats found</code>; <code>data.blobUri</code>, <code>data.eTag</code> and <code>data.scanResultDetails.sha256</code> must exactly match the finalized upload record and current immutable blob. It ignores Blob index tags as an authorization signal because Microsoft states they are not tamper-resistant.</p>
+<p>Events may arrive before or after the manifest and in any order. The database records manifest and scan evidence independently and schedules a batch only when all expected finalized blob identities have matching clean evidence. A periodic reconciler marks missing/timeout/error evidence for review, retries trusted-copy/outbox failures idempotently and removes abandoned partial uploads after the approved DMZ retention window. A malicious, timed-out, unscanned, overwritten or scan-error file is never opened by a worker. Send clean files to a separate trusted storage account; quarantine or delete malicious content according to incident policy. Microsoft recommends a DMZ storage pattern and Event Grid/Function remediation for this workflow; see <a href="https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-configure-malware-scan">Defender for Storage malware remediation</a>.</p>
+<h3 id="7-add-a-provider-factory">7. Add a provider factory<a class="heading-anchor" href="#7-add-a-provider-factory" title="Copy section link">#</a></h3>
+<p>The current gateway requires <code>OPENAI_API_KEY</code>, constructs the official <code>OpenAI</code> client, and hardcodes <code>gpt-5.6-luna</code>. Replace that startup contract with administrator-owned configuration:</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DOCPARSE_AI_PROVIDER</code></td>
+<td><code>azure_openai</code> or <code>openai</code>; immutable for a running deployment</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_REASONING_MODEL</code></td>
+<td>Azure deployment name or approved OpenAI model identifier</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_AZURE_OPENAI_ENDPOINT</code></td>
+<td>Private Azure resource endpoint; Azure mode only</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_AZURE_OPENAI_API_VERSION</code></td>
+<td>Tested API version; Azure mode only</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_OPENAI_BASE_URL</code></td>
+<td>Exact approved official OpenAI project endpoint; OpenAI mode only</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_OPENAI_KEY_SECRET_URI</code></td>
+<td>Key Vault secret reference; OpenAI mode only</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_PROVIDER_CONFIG_VERSION</code></td>
+<td>Immutable non-secret provider snapshot version included in job idempotency/audit metadata</td>
+</tr>
+</tbody>
+</table>
+<p>Azure mode uses <code>DefaultAzureCredential</code>/managed identity and grants only the required Foundry inference role. Disable local API-key fallback. OpenAI mode lets only worker identities read the versioned Key Vault secret and never shows or logs it. Store the complete non-secret endpoint/model/API-version/retention-policy snapshot under <code>DOCPARSE_PROVIDER_CONFIG_VERSION</code>. Fail closed when configuration is incomplete, when the configured hostname is not allowlisted, or when a required compliance approval flag is absent.</p>
+<p>Before approving a model/deployment, run contract tests for the Responses API behavior, Pydantic structured output, image input, maximum context/output, rate limits, and every agentic stage. Do not assume an Azure deployment is interchangeable with the hardcoded current model. Azure states that prompts/completions for models sold by Azure are not available to model providers and are not used to train foundation models without permission, but abuse-monitoring and deployment geography still require review. See <a href="https://learn.microsoft.com/azure/foundry/responsible-ai/openai/data-privacy">Azure Foundry data privacy</a>.</p>
+<p>For the official OpenAI API, PHI is prohibited until the organization has an OpenAI BAA that covers the API services and the organization/project is provisioned with the required retention controls. Confirm the exact endpoint and model are eligible. OpenAI documents the current requirements in <a href="https://help.openai.com/en/articles/8660679-how-can-i-get-a-business-associate-agreement-baa-with-openai/">How to request an API BAA</a> and <a href="https://help.openai.com/en/articles/20001069-hipaa-eligible-products-and-functionality">HIPAA-eligible functionality</a>. Keep <code>store=false</code>; do not enable tools or endpoints outside the approved scope.</p>
+<h2 id="azure-resource-contract">Azure resource contract<a class="heading-anchor" href="#azure-resource-contract" title="Copy section link">#</a></h2>
+<p>Create Bicep modules rather than one monolithic template. The eventual implementation should contain modules equivalent to the following contract.</p>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Required resources and controls</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>network</code></td>
+<td>VNet, the eight named subnets, NSGs/UDRs, Azure Firewall Premium, Azure DNS Private Resolver, private DNS zones/links and DDoS Network Protection</td>
+</tr>
+<tr>
+<td><code>identity</code></td>
+<td>User-assigned identities for web, intake Function, and worker; least-privilege Entra/RBAC assignments</td>
+</tr>
+<tr>
+<td><code>edge</code></td>
+<td>Application Gateway WAF v2, WAF policy, HTTPS listener, Key Vault certificate identity, health probe</td>
+</tr>
+<tr>
+<td><code>web</code></td>
+<td>Linux App Service Plan and Web App custom container, dedicated user-assigned identity, VNet integration, private endpoint, Entra authentication, public access denied</td>
+</tr>
+<tr>
+<td><code>registry</code></td>
+<td>Premium ACR, public access denied, private endpoint, image-pull roles, content trust/signing policy</td>
+</tr>
+<tr>
+<td><code>storage-dmz</code></td>
+<td>GPv2 Blob account, Defender on-upload scan, no shared-key access, TLS 1.2+, private endpoint, Event Grid scan results, limited retention</td>
+</tr>
+<tr>
+<td><code>storage-trusted</code></td>
+<td>GPv2 Blob account for clean inputs, definitions, outputs and exports; versioning/soft-delete policy aligned with PHI deletion; private endpoint</td>
+</tr>
+<tr>
+<td><code>messaging</code></td>
+<td>Service Bus Premium namespace, document-work/export-work queues, duplicate detection, DLQs, private endpoint, managed-identity roles</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td>Zone-redundant PostgreSQL Flexible Server, private networking, Entra administrator, PITR backup, hourly encrypted logical DR snapshots, no public access</td>
+</tr>
+<tr>
+<td><code>intake</code></td>
+<td>Function Apps for upload/download brokering, manifest/scan events, outbox/reconciliation and exports; private integration, managed identities, Event Grid subscriptions</td>
+</tr>
+<tr>
+<td><code>ai</code></td>
+<td>Optional Azure OpenAI/Foundry resource, approved regional or data-zone deployment, private endpoint, managed-identity role</td>
+</tr>
+<tr>
+<td><code>gpu-image</code></td>
+<td>Azure Compute Gallery and image definition/version containing the validated worker runtime and pinned models</td>
+</tr>
+<tr>
+<td><code>workers</code></td>
+<td>Flexible VMSS from the gallery image, <code>Standard_NC8as_T4_v3</code>, zones where supported, system health extension, min/default 2 and max 5</td>
+</tr>
+<tr>
+<td><code>operations</code></td>
+<td>Log Analytics, Application Insights/OpenTelemetry destination, diagnostic settings, alerts, action group, budgets, Defender plans</td>
+</tr>
+</tbody>
+</table>
+<p>Use Bicep parameters for environment, location, resource-name prefix, Entra group object IDs, custom domain, certificate secret URI, retention days, GPU SKU, worker bounds, provider mode, Azure OpenAI deployment name, and alert recipients. Never put keys, connection strings, passwords, source documents, or extracted data in Bicep parameters or deployment outputs.</p>
+<h3 id="required-roles">Required roles<a class="heading-anchor" href="#required-roles" title="Copy section link">#</a></h3>
+<p>Assign at the narrowest resource/container scope that supports the operation:</p>
+<table>
+<thead>
+<tr>
+<th>Identity</th>
+<th>Minimum data-plane access</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web app</td>
+<td>Service Bus sender and scoped database web role; no provider secret, DMZ-data or trusted-output data role</td>
+</tr>
+<tr>
+<td>Upload/download broker</td>
+<td>Storage Blob Delegator plus narrowly scoped DMZ write or committed-output read role, database authorization/audit role</td>
+</tr>
+<tr>
+<td>Intake Function</td>
+<td>DMZ reader, trusted Blob contributor, Service Bus sender, database intake/outbox role</td>
+</tr>
+<tr>
+<td>GPU worker</td>
+<td>Trusted input/definition reader, trusted output contributor, Service Bus receiver, database worker role, Azure OpenAI inference role when enabled</td>
+</tr>
+<tr>
+<td>Export worker</td>
+<td>Output reader/writer for export container, Service Bus receiver, database export role</td>
+</tr>
+<tr>
+<td>Application Gateway</td>
+<td>Key Vault certificate-secret read only</td>
+</tr>
+</tbody>
+</table>
+<p>Do not grant <code>Owner</code>, <code>Contributor</code>, Storage Account Contributor, or subscription-wide data roles to runtime identities. Use one documented user-assigned identity per runtime component; App Service/Function/VMSS system identities are disabled to avoid ambiguity. Separate deployment identity from runtime identities.</p>
+<p>Every batch has an <code>access_scope_id</code>. For the initial single-scope deployment, use Entra groups <code>DocParse-Submitters</code>, <code>DocParse-Reviewers</code>, and <code>DocParse-Admins</code>: submitters may create batches and read only batches they created; reviewers may read/review batches in their assigned access scope; admins may manage definitions, retry/DLQ operations and access assignments but receive no routine clinical review permission. Enforce these rules in every database query and broker request, not only in the UI. Put admin membership behind Privileged Identity Management with approval/time limits, run quarterly access reviews, and apply conditional access/MFA. Automated Blob intake uses its own service principal/managed identity mapped to one access scope and exact DMZ prefix.</p>
+<h2 id="build-and-deployment-procedure">Build and deployment procedure<a class="heading-anchor" href="#build-and-deployment-procedure" title="Copy section link">#</a></h2>
+<p>Commands below are the operator contract for the future Bicep and image implementation. They assume Bash in Azure Cloud Shell and are not executable until the named files exist.</p>
+<h3 id="1-select-the-subscription-and-region">1. Select the subscription and region<a class="heading-anchor" href="#1-select-the-subscription-and-region" title="Copy section link">#</a></h3>
+<pre><code class="language-bash">az login
+az account set --subscription &quot;&lt;subscription-id&gt;&quot;
+az account show --query '{subscription:id,tenant:tenantId,name:name}' -o table
+az vm list-usage --location &lt;region&gt; -o table
+az vm list-skus --location &lt;region&gt; --size Standard_NC8as_T4_v3 \
+  --all --query '[?restrictions==`[]`].[name,locations]' -o table
+</code></pre>
+<p>Request sufficient regional NCasT4_v3 vCPU quota for five <code>Standard_NC8as_T4_v3</code> workers plus rollout headroom. Verify the chosen region supports the VM SKU, availability zones if required, Defender malware scanning, App Service, Service Bus Premium, PostgreSQL, and the selected Azure OpenAI model/deployment type. Do not substitute a GPU SKU without rerunning OCR correctness, throughput, memory, and cold-start tests.</p>
+<h3 id="2-prepare-deployment-parameters">2. Prepare deployment parameters<a class="heading-anchor" href="#2-prepare-deployment-parameters" title="Copy section link">#</a></h3>
+<p>Use a non-secret parameter file such as <code>infra/environments/prod.bicepparam</code>. Record resource names, region, subnet CIDRs, Entra group object IDs, retention, GPU bounds, custom domain, and provider mode. Reference the Key Vault certificate by resource ID/secret URI; do not place certificate contents in the file.</p>
+<p>Validate before deployment:</p>
+<pre><code class="language-bash">az bicep upgrade
+az deployment sub validate \
+  --location &lt;region&gt; \
+  --template-file infra/main.bicep \
+  --parameters infra/environments/prod.bicepparam
+
+az deployment sub what-if \
+  --location &lt;region&gt; \
+  --template-file infra/main.bicep \
+  --parameters infra/environments/prod.bicepparam
+</code></pre>
+<p>Security and the resource owner must review <code>what-if</code>, provider egress, RBAC, public-network flags, retention, and estimated cost before creation.</p>
+<h3 id="3-deploy-shared-infrastructure">3. Deploy shared infrastructure<a class="heading-anchor" href="#3-deploy-shared-infrastructure" title="Copy section link">#</a></h3>
+<pre><code class="language-bash">az deployment sub create \
+  --name docparse-prod-$(date -u +%Y%m%d%H%M%S) \
+  --location &lt;region&gt; \
+  --template-file infra/main.bicep \
+  --parameters infra/environments/prod.bicepparam
+</code></pre>
+<p>Capture only non-secret deployment outputs. Verify private DNS from an authorized VNet host before disabling public access. Confirm Application Gateway cannot yet route to the application until the web health probe passes.</p>
+<h3 id="4-build-and-validate-the-gpu-image">4. Build and validate the GPU image<a class="heading-anchor" href="#4-build-and-validate-the-gpu-image" title="Copy section link">#</a></h3>
+<p>Build an Ubuntu 24.04 image in an isolated image-build resource group. Install Azure-supported NVIDIA CUDA drivers, <code>uv</code>, Python 3.12.10, the locked project with the <code>local-ocr</code> extra, and systemd units for vLLM and the queue worker. Download the exact pinned GLM-OCR and PP-DocLayoutV3 snapshots during image build, materialize the runtime configuration, then force <code>HF_HUB_OFFLINE=1</code> and <code>TRANSFORMERS_OFFLINE=1</code> at runtime.</p>
+<p>The image must not contain secrets, documents, results, logs, database credentials, or provider keys. Generalize it only after these checks pass:</p>
+<pre><code class="language-bash">nvidia-smi
+uv run python -c &quot;import glmocr, torch, transformers, vllm&quot;
+uv run python scripts/wsl/check-glmocr-api.py
+uv run pytest -q
+</code></pre>
+<p>Publish an immutable Compute Gallery version. Pin the VMSS to that version; never deploy <code>latest</code>. Each VM runs vLLM on <code>127.0.0.1:8080</code> and the worker without a public IP. A health check must validate model discovery and a real synthetic image-recognition request before the instance receives queue work. Microsoft documents supported GPU driver installation in <a href="https://learn.microsoft.com/azure/virtual-machines/linux/n-series-driver-setup">N-series Linux driver setup</a>.</p>
+<h3 id="5-build-and-publish-application-images">5. Build and publish application images<a class="heading-anchor" href="#5-build-and-publish-application-images" title="Copy section link">#</a></h3>
+<p>Create separate web, intake, and worker artifacts even if they share a Python package. Build from the locked dependency graph, run tests, generate an SBOM, scan dependencies/container layers, sign the image, and push an immutable digest to ACR. Deploy by digest, not a mutable tag. The web image exposes only Streamlit port <code>8501</code>; set App Service <code>WEBSITES_PORT=8501</code>.</p>
+<h3 id="6-run-database-migrations">6. Run database migrations<a class="heading-anchor" href="#6-run-database-migrations" title="Copy section link">#</a></h3>
+<p>Run migrations as a one-off deployment job using a dedicated migration identity/role. The web and workers must not create or alter production tables at startup. Back up the database, test downgrade/forward compatibility, apply the migration, then deploy code that requires it.</p>
+<h3 id="7-configure-the-ai-provider">7. Configure the AI provider<a class="heading-anchor" href="#7-configure-the-ai-provider" title="Copy section link">#</a></h3>
+<p>For Azure OpenAI:</p>
+<ol>
+<li>deploy an approved model in the chosen region/data zone;</li>
+<li>disable public access and approve the private endpoint;</li>
+<li>assign the worker managed identity the inference role;</li>
+<li>set provider, endpoint, API version, deployment name, and config version as App Service/VMSS settings; and</li>
+<li>run the structured-output/image/limit contract suite from the worker subnet.</li>
+</ol>
+<p>For official OpenAI:</p>
+<ol>
+<li>obtain and record approval of the OpenAI BAA and eligible API configuration;</li>
+<li>create a dedicated OpenAI project and least-privilege key;</li>
+<li>place the key in Key Vault through an approved secret-entry channel;</li>
+<li>grant only the worker identity access to that secret;</li>
+<li>allowlist the exact official hostname through controlled egress; and</li>
+<li>verify retention controls, <code>store=false</code>, model eligibility, and audit evidence before enabling PHI.</li>
+</ol>
+<p>Do not configure both credentials in the same deployment. A provider switch is a maintenance event: pause intake, drain all parse/extract jobs and reviews under the old provider, verify no active leases, remove the old credential, deploy the new provider snapshot/config version, run synthetic contract tests, then reopen intake. Jobs may not cross that boundary. Historical records retain the non-secret snapshot and Key Vault secret-version identifier for audit, but the application never keeps both providers usable at once.</p>
+<h3 id="8-enable-ingress-last">8. Enable ingress last<a class="heading-anchor" href="#8-enable-ingress-last" title="Copy section link">#</a></h3>
+<p>Enable Entra authentication with unauthenticated requests rejected, assign the three application groups, validate role mapping, then enable the Application Gateway listener. Configure the App Service custom domain, allowed redirect URLs and forwarded host handling so authentication always returns through the public Application Gateway hostname. Public access remains disabled on App Service; the gateway reaches its private endpoint. Require HTTPS, modern TLS, WAF prevention mode after tuning, secure cookies, short session lifetime, and organization-approved conditional-access/MFA policy. Run one web instance initially; before web scale-out, validate Streamlit WebSocket affinity and prove all authoritative state remains outside the process.</p>
+<h2 id="runtime-configuration">Runtime configuration<a class="heading-anchor" href="#runtime-configuration" title="Copy section link">#</a></h2>
+<p>Continue to use the parser variables in <a href="setup.html">SETUP.md</a>, with values benchmarked for the production image. Add the following deployment settings:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Production value/policy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DOCPARSE_ENVIRONMENT</code></td>
+<td><code>production</code></td>
+</tr>
+<tr>
+<td><code>DOCPARSE_AI_PROVIDER</code></td>
+<td>Exactly <code>azure_openai</code> or <code>openai</code></td>
+</tr>
+<tr>
+<td><code>DOCPARSE_REASONING_MODEL</code></td>
+<td>Approved deployment/model identifier</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_PROVIDER_CONFIG_VERSION</code></td>
+<td>Monotonic release-controlled value</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_DATABASE_DSN</code></td>
+<td>Managed-identity/Entra-capable PostgreSQL configuration; never plaintext password</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_SERVICE_BUS_NAMESPACE</code></td>
+<td>Fully qualified private namespace</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_WORK_QUEUE</code></td>
+<td>Production work queue name</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_STORAGE_ACCOUNT</code></td>
+<td>Trusted storage account URL</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_DMZ_STORAGE_ACCOUNT</code></td>
+<td>DMZ storage account URL</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_INPUT_CONTAINER</code></td>
+<td>Clean input container</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_OUTPUT_CONTAINER</code></td>
+<td>Result container</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_DEFINITION_CONTAINER</code></td>
+<td>Immutable definitions container</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_EXPORT_CONTAINER</code></td>
+<td>Expiring ZIP exports container</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_BATCH_MAX_FILES</code></td>
+<td><code>100</code></td>
+</tr>
+<tr>
+<td><code>DOCPARSE_BATCH_MAX_FILE_BYTES</code></td>
+<td><code>52428800</code> (50 MiB)</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_BATCH_MAX_TOTAL_BYTES</code></td>
+<td><code>1073741824</code> (1 GiB)</td>
+</tr>
+<tr>
+<td><code>DOCPARSE_RESULT_RETENTION_DAYS</code></td>
+<td><code>30</code></td>
+</tr>
+<tr>
+<td><code>DOCPARSE_CLASSIFICATION_THRESHOLD</code></td>
+<td><code>0.85</code></td>
+</tr>
+<tr>
+<td><code>DOCPARSE_LOG_LEVEL</code></td>
+<td><code>INFO</code>; debug disabled in production</td>
+</tr>
+</tbody>
+</table>
+<p>Keep the parser's 250 MiB hard document limit as defense in depth for Blob intake, while the browser batch path uses the lower 50 MiB limit. Keep <code>DOCPARSE_MAX_PAGES=500</code> unless a lower organizational limit is approved. Worker-local temporary directories must use encrypted OS/temporary disks where supported and be removed after every job; startup cleanup removes abandoned job directories without logging their names.</p>
+<h2 id="security-and-phi-controls">Security and PHI controls<a class="heading-anchor" href="#security-and-phi-controls" title="Copy section link">#</a></h2>
+<h3 id="data-minimization-and-logging">Data minimization and logging<a class="heading-anchor" href="#data-minimization-and-logging" title="Copy section link">#</a></h3>
+<p>Log correlation IDs, batch/document UUIDs, definition versions, provider/model name, prompt version, stage, status, duration, token counts, retry counts, worker ID, and safe error code. Do not log filenames when they contain patient data, raw prompts, OCR text, extracted fields, images, PDFs, access tokens, SAS URLs, keys, connection strings, or full provider error bodies. Configure diagnostics so HTTP query strings and headers containing credentials are not captured.</p>
+<p>Use opaque Blob names. Encrypt in transit and at rest. Decide with security whether platform-managed keys or customer-managed keys are required; test key rotation and recovery. Disable Storage shared-key authorization and unrestricted SAS. Prefer managed identity. If a short-lived user-delegation SAS is required for a download, scope it to one blob, read-only, HTTPS-only, and minutes rather than hours.</p>
+<h3 id="retention-and-deletion">Retention and deletion<a class="heading-anchor" href="#retention-and-deletion" title="Copy section link">#</a></h3>
+<p>Apply these baseline active-data schedules unless legal policy requires a documented hold or different period:</p>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Active retention and disposal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Incomplete DMZ upload</td>
+<td>Delete after 24 hours</td>
+</tr>
+<tr>
+<td>Clean DMZ source after trusted copy</td>
+<td>Delete immediately after copy/hash verification and intake commit</td>
+</tr>
+<tr>
+<td>Malicious, scan-error or timed-out DMZ source</td>
+<td>Quarantine for seven days with security-only access, then delete unless incident/legal hold applies</td>
+</tr>
+<tr>
+<td>Trusted source PDF and document outputs</td>
+<td>Delete 30 days after terminal batch completion</td>
+</tr>
+<tr>
+<td>Generated ZIP export</td>
+<td>Delete after 24 hours</td>
+</tr>
+<tr>
+<td>PostgreSQL review corrections, routing segments, output manifests and PHI linkage</td>
+<td>Purge or irreversibly de-identify 30 days after terminal batch completion, after referenced blobs are deleted</td>
+</tr>
+<tr>
+<td>Batch/document operational shell</td>
+<td>Retain only opaque IDs, terminal status, definition/config versions and non-PHI audit linkage for the approved audit period</td>
+</tr>
+</tbody>
+</table>
+<p>A daily retention worker selects eligible records under a database lease, writes a non-PHI deletion audit event, deletes current Blob versions, waits for confirmation, then transactionally purges/de-identifies PHI columns and records a tombstone. It retries idempotently and alerts on anything overdue by 24 hours. Legal/incident holds are explicit records with owner, reason, approval and expiry; ordinary users cannot set them.</p>
+<p>Use seven-day Blob soft delete/version recovery and 35-day PostgreSQL backup retention for the baseline; document that these create residual recovery windows, so active-data deletion is not immediate physical erasure from every backup. Align final values with legal policy and the BAA before launch. Platform-managed encryption is the baseline; enable customer-managed keys only when organizational policy requires them, then add and test key rotation/recovery before launch.</p>
+<p>Definitions and non-PHI operational audit records may use a longer approved retention. Sources, OCR, outputs, review records, filenames received at ingress, form categories, page boundaries and linkage metadata are all treated as PHI. Privacy/legal owners decide whether any output belongs to a designated record set and define amendment/disclosure procedures before production.</p>
+<h3 id="availability-and-disaster-recovery">Availability and disaster recovery<a class="heading-anchor" href="#availability-and-disaster-recovery" title="Copy section link">#</a></h3>
+<p>The baseline target is 99.5% monthly application availability, primary-region RPO of 15 minutes and RTO of four hours, and regional-disaster RPO of one hour and RTO of 24 hours. These are engineering objectives, not an Azure or product SLA, and must be replaced if the business impact analysis requires stricter values.</p>
+<p>Use zone-redundant Application Gateway, Service Bus Premium and PostgreSQL where the region supports them; keep at least two workers across zones. Require RA-GZRS for PHI/definition/recovery Blob data so exact versions are readable in the secondary region. Use PostgreSQL PITR backups for primary-region recovery, ACR geo-replication, replicated Compute Gallery image versions, versioned Bicep/parameters and a preapproved secondary region inside the required data geography. Service Bus messages are reconstructible from PostgreSQL/outbox state; after failover, reconcile and requeue every nonterminal job rather than assuming queue messages replicated. Rehearse regional recovery with synthetic data twice yearly and record achieved RPO/RTO. If RA-GZRS or the approved secondary-region posture is unavailable, production approval must formally accept that a regional outage can exceed the targets.</p>
+<p>Create an hourly <code>dr_checkpoint</code> with this explicit protocol:</p>
+<ol>
+<li>open a repeatable-read PostgreSQL transaction, call <code>pg_export_snapshot()</code> and capture aggregate sequence <code>N</code>;</li>
+<li>create an encrypted logical database dump with <code>pg_dump --snapshot=&lt;exported-id&gt;</code> while the exporting transaction remains open;</li>
+<li>upload the dump to the RA-GZRS recovery container with immutable version, ETag and SHA-256;</li>
+<li>verify the dump and every committed input/output/definition blob referenced through sequence <code>N</code> are readable through the secondary endpoint with their exact versions/ETags/hashes; and</li>
+<li>write a recovery manifest containing checkpoint ID, sequence, UTC time, dump version/hash, Blob inventory hash and provider/config versions, sign its canonical bytes with a dedicated Key Vault asymmetric key, and store the manifest/signature in the secondary-readable recovery container.</li>
+</ol>
+<p>The checkpoint is valid only after all five steps succeed. Logical DR snapshots contain PHI, use the same access/encryption controls as source documents, retain the latest 35 days and are never application-downloadable. This verified checkpoint—not Flexible Server geo-restore or wall-clock guesswork—is the latest permissible coordinated regional recovery point.</p>
+<p>Regional failover follows this order:</p>
+<ol>
+<li>declare the incident, block new intake and fence primary-region web, broker, Function and worker identities;</li>
+<li>select the newest verified <code>dr_checkpoint</code> available in the secondary region;</li>
+<li>deploy/validate the secondary infrastructure from the approved Bicep and immutable image versions;</li>
+<li>create/validate PostgreSQL in the secondary region and restore the exact logical dump named by the checkpoint manifest, then select the matching replicated Blob versions;</li>
+<li>run reconciliation: every committed manifest must resolve to the recorded version/ETag/hash, unreferenced blobs remain invisible, and records newer than the checkpoint are treated as RPO loss rather than guessed/replayed;</li>
+<li>reconstruct Service Bus work/outbox messages for every nonterminal committed job, preserving job versions and idempotency keys;</li>
+<li>run synthetic authentication, malware-intake, OCR, provider, authorization and download tests;</li>
+<li>switch the controlled DNS/Application Gateway entry point and reopen intake after incident-command approval; and</li>
+<li>publish achieved RPO/RTO and affected batch IDs through the approved incident process without PHI in general logs.</li>
+</ol>
+<p>For failback, keep the recovered region authoritative, drain intake/work, create and verify a new checkpoint replicated to the repaired primary, restore and reconcile there, run the same smoke tests, switch traffic once, then retire the temporary authority. Never accept writes in both regions concurrently.</p>
+<h3 id="network-and-host-controls">Network and host controls<a class="heading-anchor" href="#network-and-host-controls" title="Copy section link">#</a></h3>
+<ul>
+<li>No public IPs on GPU workers, PostgreSQL, Storage, Service Bus, Key Vault, ACR, or Azure OpenAI.</li>
+<li>Never expose vLLM port <code>8080</code>; bind it to loopback on each worker.</li>
+<li>Restrict NSGs by subnet and service tag; deny lateral access not required by the data flow.</li>
+<li>Use Azure Bastion or approved just-in-time access for emergency administration; disable routine SSH.</li>
+<li>Apply OS security updates through a tested image replacement, not manual drift.</li>
+<li>Send Defender, WAF, identity, database, storage and VMSS alerts to the incident-response action group.</li>
+<li>Use Azure Policy to deny public access, unapproved regions/SKUs, missing diagnostics, and resources without required tags.</li>
+</ul>
+<p>Use this default address/routing contract unless it overlaps an approved enterprise network; any replacement must preserve subnet separation and be documented in environment parameters:</p>
+<table>
+<thead>
+<tr>
+<th>Subnet</th>
+<th>Baseline CIDR</th>
+<th>Delegation/use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ApplicationGatewaySubnet</code></td>
+<td><code>10.40.0.0/24</code></td>
+<td>Application Gateway only</td>
+</tr>
+<tr>
+<td><code>AzureFirewallSubnet</code></td>
+<td><code>10.40.1.0/26</code></td>
+<td>Azure Firewall only</td>
+</tr>
+<tr>
+<td><code>AzureBastionSubnet</code></td>
+<td><code>10.40.1.64/26</code></td>
+<td>Azure Bastion only</td>
+</tr>
+<tr>
+<td><code>snet-web-integration</code></td>
+<td><code>10.40.2.0/24</code></td>
+<td>Delegated to <code>Microsoft.Web/serverFarms</code></td>
+</tr>
+<tr>
+<td><code>snet-function-integration</code></td>
+<td><code>10.40.3.0/24</code></td>
+<td>Delegated to <code>Microsoft.Web/serverFarms</code></td>
+</tr>
+<tr>
+<td><code>snet-workers</code></td>
+<td><code>10.40.4.0/24</code></td>
+<td>GPU VMSS; no public IP</td>
+</tr>
+<tr>
+<td><code>snet-private-endpoints</code></td>
+<td><code>10.40.5.0/24</code></td>
+<td>Private endpoints only; private-endpoint network policies configured as required</td>
+</tr>
+<tr>
+<td><code>snet-image-build</code></td>
+<td><code>10.40.6.0/24</code></td>
+<td>Ephemeral image builder; separate identity/UDR</td>
+</tr>
+</tbody>
+</table>
+<p>Apply default-deny NSGs and UDRs. Permit only this application traffic; Azure platform/health traffic required by a service must be added from its current first-party documentation and captured in Bicep tests:</p>
+<table>
+<thead>
+<tr>
+<th>Source</th>
+<th>Destination</th>
+<th style="text-align: right;">Ports</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Internet/corporate edge</td>
+<td>Application Gateway public frontend</td>
+<td style="text-align: right;">TCP 443</td>
+<td>Authenticated UI only; WAF/TLS termination</td>
+</tr>
+<tr>
+<td>Application Gateway</td>
+<td>App Service private endpoint</td>
+<td style="text-align: right;">TCP 443</td>
+<td>Streamlit/WebSocket backend</td>
+</tr>
+<tr>
+<td>Web integration subnet</td>
+<td>Upload/download broker, PostgreSQL and Service Bus private endpoints</td>
+<td style="text-align: right;">TCP 443, 5432, 5671</td>
+<td>UI APIs, durable state and enqueue</td>
+</tr>
+<tr>
+<td>Function integration subnet</td>
+<td>Storage, PostgreSQL, Service Bus, Key Vault private endpoints</td>
+<td style="text-align: right;">TCP 443, 5432, 5671</td>
+<td>Intake, brokers, outbox, reconciliation and exports</td>
+</tr>
+<tr>
+<td>Worker subnet</td>
+<td>Storage, PostgreSQL, Service Bus and Azure OpenAI private endpoints</td>
+<td style="text-align: right;">TCP 443, 5432, 5671</td>
+<td>Job input/state/output and Azure provider calls</td>
+</tr>
+<tr>
+<td>Worker subnet</td>
+<td>Azure Firewall</td>
+<td style="text-align: right;">TCP 443</td>
+<td>Official OpenAI only; firewall allows the approved API hostname and denies other Internet egress</td>
+</tr>
+<tr>
+<td>Bastion subnet</td>
+<td>Worker/image-build subnet</td>
+<td style="text-align: right;">TCP 22</td>
+<td>Approved just-in-time emergency administration</td>
+</tr>
+<tr>
+<td>All application subnets</td>
+<td>Azure DNS Private Resolver</td>
+<td style="text-align: right;">UDP/TCP 53</td>
+<td>Name resolution</td>
+</tr>
+<tr>
+<td>Approved components</td>
+<td>Azure Monitor/Entra/Key Vault service endpoints through Firewall</td>
+<td style="text-align: right;">TCP 443</td>
+<td>Telemetry, identity and secret resolution</td>
+</tr>
+<tr>
+<td>Image-build subnet</td>
+<td>Approved ACR, package/model source allowlist through Firewall</td>
+<td style="text-align: right;">TCP 443</td>
+<td>Build time only; runtime workers remain model-cache offline</td>
+</tr>
+</tbody>
+</table>
+<p>Route <code>0.0.0.0/0</code> from web, Function, worker and image-build subnets to Azure Firewall; do not create direct Internet routes or public IPs. Use explicit firewall application rules for official OpenAI, Entra, Azure Monitor and approved build sources, and network rules only where FQDN rules cannot work. Private DNS zones must include <code>privatelink.blob.core.windows.net</code>, <code>privatelink.servicebus.windows.net</code>, <code>privatelink.vaultcore.azure.net</code>, <code>privatelink.postgres.database.azure.com</code>, <code>privatelink.azurecr.io</code>, the App Service private-link zone and the Azure OpenAI/Foundry private-link zone documented for the deployed resource. Link them only to approved VNets and test that public names resolve to private addresses from each runtime subnet.</p>
+<h2 id="autoscaling-and-capacity">Autoscaling and capacity<a class="heading-anchor" href="#autoscaling-and-capacity" title="Copy section link">#</a></h2>
+<p>Autoscale the VMSS from two to five instances using Service Bus <code>ActiveMessageCount</code>, while maintaining one active document per worker. Start with these rules and tune only from measured production-like synthetic load:</p>
+<ul>
+<li>scale out by one when active messages exceed two per running instance for five minutes;</li>
+<li>use a ten-minute scale-out cooldown to avoid repeated model cold starts;</li>
+<li>scale in by one when no active messages exist for 30 minutes and no worker owns a lease;</li>
+<li>use a 30-minute scale-in cooldown; and</li>
+<li>never remove an instance until its worker drains, releases no job lease, and passes a termination check.</li>
+</ul>
+<p>Azure Monitor can autoscale VMSS instances from Service Bus queue metrics; see <a href="https://learn.microsoft.com/azure/azure-monitor/autoscale/autoscale-common-metrics">Azure Monitor autoscale metrics</a>. GPU capacity is not guaranteed merely because quota exists. Reserve capacity for the two baseline workers when the chosen SKU/region supports reservations; otherwise production approval must explicitly accept allocation risk. Treat workers three through five as on-demand burst capacity and alert when scale-out allocation fails.</p>
+<p>Do not publish a throughput promise before benchmarking representative fax page counts, resolution, classification frequency, extraction schemas, provider rate limits, and review rates. Track pages/minute, documents/hour, queue age, stage latency, GPU utilization/memory, provider tokens/cost, retry rate, failure rate, and review rate.</p>
+<h2 id="operations">Operations<a class="heading-anchor" href="#operations" title="Copy section link">#</a></h2>
+<h3 id="normal-batch-flow">Normal batch flow<a class="heading-anchor" href="#normal-batch-flow" title="Copy section link">#</a></h3>
+<ol>
+<li>Submitter chooses an active routing definition and uploads/selects a folder of PDFs, or an upstream system commits a Blob manifest.</li>
+<li>Files remain untrusted in the DMZ until malware results are available.</li>
+<li>Clean files move to trusted storage and one job message is sent per PDF.</li>
+<li>Workers parse and classify independently.</li>
+<li>High-confidence eligible forms continue to extraction.</li>
+<li>Only uncertain documents enter <code>needs_review</code>; the rest of the batch continues.</li>
+<li>Reviewer corrects/approves routing; a new extraction message resumes that document without repeating OCR.</li>
+<li>Results are written durably and appear in the batch UI.</li>
+<li>An optional asynchronous export job creates an expiring ZIP.</li>
+</ol>
+<h3 id="alert-baseline">Alert baseline<a class="heading-anchor" href="#alert-baseline" title="Copy section link">#</a></h3>
+<p>Create actionable alerts for:</p>
+<ul>
+<li>oldest active message age over 15 minutes;</li>
+<li>DLQ message count above zero;</li>
+<li>no healthy GPU workers;</li>
+<li>VMSS allocation or image health failure;</li>
+<li>vLLM synthetic health probe failure;</li>
+<li>document failure rate above 5% for 15 minutes;</li>
+<li>provider HTTP 429/5xx or content-filter spike;</li>
+<li>malware detection or scan errors/timeouts;</li>
+<li>WAF blocks/authentication anomalies;</li>
+<li>PostgreSQL storage, connection or replica/backup failure;</li>
+<li>Blob lifecycle or Event Grid delivery failure;</li>
+<li>Key Vault access anomalies; and</li>
+<li>spending thresholds at 50%, 75%, 90%, and 100% of the monthly budget.</li>
+</ul>
+<h3 id="retry-and-recovery">Retry and recovery<a class="heading-anchor" href="#retry-and-recovery" title="Copy section link">#</a></h3>
+<ul>
+<li>Operator retry creates an audit event and a new attempt; it never overwrites prior error evidence.</li>
+<li>Parser/provider transient failures use bounded exponential backoff, then Service Bus redelivery.</li>
+<li>A worker crash is recovered by message lock expiry and idempotent stage checks.</li>
+<li>A provider outage leaves OCR results durable and resumes only the failed optional stage.</li>
+<li>A review correction preserves predicted and corrected routing values and reviewer identity.</li>
+<li>Primary-region recovery may use PostgreSQL PITR; regional recovery must use a verified logical <code>dr_checkpoint</code> and matching RA-GZRS Blob versions. Rehearse both paths quarterly with synthetic data.</li>
+<li>Deployments use rolling replacement with at least two healthy workers. Roll back web/worker image digests and database-compatible code; never amend a released image.</li>
+</ul>
+<h2 id="pre-production-acceptance-gates">Pre-production acceptance gates<a class="heading-anchor" href="#pre-production-acceptance-gates" title="Copy section link">#</a></h2>
+<p>Use only synthetic or formally approved de-identified documents until every gate passes.</p>
+<h3 id="functional">Functional<a class="heading-anchor" href="#functional" title="Copy section link">#</a></h3>
+<ul>
+<li>Submit 100 PDFs through UI folder selection and through a Blob manifest.</li>
+<li>Verify unique jobs, per-file progress, partial failures, pagination and result download.</li>
+<li>Verify routing profile and extraction schema versions are immutable and reproduced in outputs.</li>
+<li>Verify adjacent same-category forms remain separate unless evidence supports a boundary merge.</li>
+<li>Verify confidence below <code>0.85</code> pauses only the affected document.</li>
+<li>Correct a segment, approve it and confirm extraction resumes without rerunning OCR.</li>
+<li>Generate and expire a batch ZIP.</li>
+</ul>
+<h3 id="input-and-failure-handling">Input and failure handling<a class="heading-anchor" href="#input-and-failure-handling" title="Copy section link">#</a></h3>
+<ul>
+<li>Reject a non-PDF renamed <code>.pdf</code>, malformed PDF, encrypted PDF, oversized file, over-page-limit PDF, duplicate manifest/document ID and hash mismatch.</li>
+<li>Confirm clean files alone reach trusted storage/workers.</li>
+<li>Confirm malicious, unscanned, timed-out and scan-error files never execute and create alerts.</li>
+<li>Kill a worker during OCR and confirm exactly one durable result after recovery.</li>
+<li>Deliver the same queue message repeatedly and confirm no duplicate processing/output.</li>
+<li>Exhaust retries and confirm the message, safe error and admin action appear in the DLQ workflow.</li>
+</ul>
+<h3 id="ai-providers">AI providers<a class="heading-anchor" href="#ai-providers" title="Copy section link">#</a></h3>
+<ul>
+<li>Run the full structured-output and image-input contract suite for the selected Azure OpenAI deployment.</li>
+<li>Repeat for an approved official OpenAI project before that mode is separately released.</li>
+<li>Confirm <code>store=false</code>, expected endpoint hostname, provider/model/config version and token usage in safe audit metadata.</li>
+<li>Confirm no direct OpenAI key exists in Azure mode and no Azure credential fallback exists in OpenAI mode.</li>
+<li>Simulate rate limits, timeouts, invalid schemas, content filtering and endpoint DNS/TLS failure.</li>
+</ul>
+<h3 id="security-and-compliance">Security and compliance<a class="heading-anchor" href="#security-and-compliance" title="Copy section link">#</a></h3>
+<ul>
+<li>Confirm anonymous users, submitters attempting review/admin actions and reviewers attempting administration are denied.</li>
+<li>Confirm data services and workers have no public network path.</li>
+<li>Confirm WAF/TLS, private DNS, managed identities and least-privilege roles from a clean deployment.</li>
+<li>Search logs, traces, alerts and deployment outputs for synthetic patient markers and secret canaries; the result must be empty.</li>
+<li>Prove DMZ cleanup, 30-day Blob expiry, 24-hour export expiry, PostgreSQL PHI purge/de-identification, tombstones and legal-hold exceptions in a shortened test environment.</li>
+<li>Create a coordinated DR checkpoint, fail over from matching PostgreSQL/Blob versions, reconcile/requeue nonterminal jobs, fail back and document achieved RPO/RTO.</li>
+<li>Obtain written security, privacy, compliance, model-risk and operational approval.</li>
+</ul>
+<p>Production launch is blocked by any failed gate.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="heading-anchor" href="#troubleshooting" title="Copy section link">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Checks and action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU VMSS will not scale</td>
+<td>Check regional NCasT4_v3 quota, SKU restrictions, capacity, image version and subnet address space</td>
+</tr>
+<tr>
+<td>Worker is healthy but jobs remain queued</td>
+<td>Check Service Bus receiver role, private DNS, lock acquisition, worker drain flag and queue name</td>
+</tr>
+<tr>
+<td>vLLM model list works but OCR fails</td>
+<td>Run the synthetic image probe, inspect safe worker/vLLM diagnostics, confirm pinned model/config and GPU memory</td>
+</tr>
+<tr>
+<td>Every upload stays in scanning</td>
+<td>Check Defender plan, scan-result Event Grid delivery, Function identity, supported region and scan status</td>
+</tr>
+<tr>
+<td>File was scanned but not processed</td>
+<td>Require <code>No threats found</code>; compare manifest hash/path and trusted-storage copy transaction</td>
+</tr>
+<tr>
+<td>Batch repeats documents</td>
+<td>Inspect idempotency key, database unique constraint, Service Bus duplicate window and message completion order</td>
+</tr>
+<tr>
+<td>Review approval does not resume</td>
+<td>Check review transaction, immutable definition versions, extraction enqueue event and document version conflict</td>
+</tr>
+<tr>
+<td>Azure OpenAI returns auth failure</td>
+<td>Check private DNS, managed identity role propagation, deployment name/API version and public-access setting</td>
+</tr>
+<tr>
+<td>Official OpenAI is unreachable</td>
+<td>Check approved hostname, NAT/Firewall egress, Key Vault access and project/key status; do not bypass the allowlist</td>
+</tr>
+<tr>
+<td>UI loses progress after refresh</td>
+<td>The UI must reload PostgreSQL state by batch ID; session state is not authoritative</td>
+</tr>
+<tr>
+<td>PHI appears in logs</td>
+<td>Disable affected logging/export immediately, preserve incident evidence securely, rotate exposed credentials if applicable and invoke incident response</td>
+</tr>
+</tbody>
+</table>
+<h2 id="deployment-evidence-and-handoff">Deployment evidence and handoff<a class="heading-anchor" href="#deployment-evidence-and-handoff" title="Copy section link">#</a></h2>
+<p>Before handoff, store these non-PHI artifacts in the organization-approved evidence repository:</p>
+<ul>
+<li>approved architecture and data-flow diagram;</li>
+<li>Bicep source, parameter hashes, <code>what-if</code> review and deployment IDs;</li>
+<li>image digests, SBOMs, signatures, vulnerability reports and pinned model revisions;</li>
+<li>Entra groups, managed identities and reviewed RBAC export;</li>
+<li>private endpoint/DNS and public-access verification;</li>
+<li>WAF, Defender, retention, backup and alert configuration evidence;</li>
+<li>AI provider contract/eligibility approval and configuration version;</li>
+<li>synthetic acceptance and load-test reports;</li>
+<li>recovery exercise results; and</li>
+<li>named service owner, security owner, incident contacts and review date.</li>
+</ul>
+<p>Revalidate the runbook after any model, provider API version, dependency lock, GPU image, retention rule, network boundary, identity policy or data-flow change. Review first-party service documentation and contractual scope at every production release; cloud capabilities and eligibility change over time.</p>
+<h2 id="first-party-references">First-party references<a class="heading-anchor" href="#first-party-references" title="Copy section link">#</a></h2>
+<ul>
+<li><a href="https://learn.microsoft.com/compliance/regulatory/offering-hipaa-hitech">Microsoft HIPAA/HITECH offering and shared responsibility</a></li>
+<li><a href="https://learn.microsoft.com/azure/foundry/responsible-ai/openai/data-privacy">Data, privacy and security for models sold by Azure</a></li>
+<li><a href="https://learn.microsoft.com/azure/security/fundamentals/ai-security-best-practices">Azure AI security best practices</a></li>
+<li><a href="https://learn.microsoft.com/azure/app-service/tutorial-auth-aad">App Service authentication with Microsoft Entra ID</a></li>
+<li><a href="https://learn.microsoft.com/azure/app-service/configure-custom-container">App Service custom containers</a></li>
+<li><a href="https://learn.microsoft.com/azure/private-link/private-endpoint-overview">Azure private endpoints</a></li>
+<li><a href="https://learn.microsoft.com/azure/virtual-machines/sizes/gpu-accelerated/ncast4v3-series">NCasT4_v3 GPU VM sizes</a></li>
+<li><a href="https://learn.microsoft.com/azure/virtual-machines/linux/n-series-driver-setup">NVIDIA drivers on Azure N-series Linux VMs</a></li>
+<li><a href="https://learn.microsoft.com/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-autoscale-overview">VMSS autoscaling</a></li>
+<li><a href="https://learn.microsoft.com/azure/service-bus-messaging/service-bus-queues-topics-subscriptions">Service Bus queues, topics and subscriptions</a></li>
+<li><a href="https://learn.microsoft.com/azure/defender-for-cloud/introduction-malware-scanning">Defender for Storage malware scanning</a></li>
+<li><a href="https://learn.microsoft.com/azure/defender-for-cloud/advanced-configurations-for-malware-scanning">Defender malware scan-result Event Grid configuration and schema</a></li>
+<li><a href="https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-configure-malware-scan">Automated malware remediation and DMZ storage</a></li>
+<li><a href="https://learn.microsoft.com/azure/storage/blobs/lifecycle-management-overview">Azure Storage lifecycle management</a></li>
+<li><a href="https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview">Managed identities for Azure resources</a></li>
+<li><a href="https://platform.openai.com/docs/models/default-usage-policies-by-endpoint">OpenAI API data controls</a></li>
+<li><a href="https://help.openai.com/en/articles/8660679-how-can-i-get-a-business-associate-agreement-baa-with-openai/">OpenAI API BAA requests</a></li>
+<li><a href="https://help.openai.com/en/articles/20001069-hipaa-eligible-products-and-functionality">OpenAI HIPAA-eligible products and API functionality</a></li>
+</ul></div>
+        <nav class="document-pager" aria-label="Previous and next documents"><a class="pager-link previous" href="local-glmocr.html"><span>Previous</span><strong>Local GLM-OCR runtime</strong></a><a class="pager-link next" href="architecture.html"><span>Next</span><strong>Architecture</strong></a></nav>
+      </article>
+    </main>
+    <aside class="page-outline" aria-label="On this page">
+      <p>On this page</p>
+      <div class="outline-scroll"><div class="toc">
+<ul>
+<li><a href="#purpose-and-readiness-warning">Purpose and readiness warning</a></li>
+<li><a href="#chosen-production-baseline">Chosen production baseline</a></li>
+<li><a href="#reference-architecture">Reference architecture</a></li>
+<li><a href="#required-application-changes">Required application changes</a><ul>
+<li><a href="#1-separate-the-web-process-from-document-processing">1. Separate the web process from document processing</a></li>
+<li><a href="#2-add-durable-batch-and-document-state">2. Add durable batch and document state</a></li>
+<li><a href="#3-make-queue-processing-idempotent">3. Make queue processing idempotent</a></li>
+<li><a href="#4-version-markdown-definitions">4. Version Markdown definitions</a></li>
+<li><a href="#5-add-the-batch-ui-and-uploaddownload-brokers">5. Add the batch UI and upload/download brokers</a></li>
+<li><a href="#6-support-automated-blob-batches">6. Support automated Blob batches</a></li>
+<li><a href="#7-add-a-provider-factory">7. Add a provider factory</a></li>
+</ul>
+</li>
+<li><a href="#azure-resource-contract">Azure resource contract</a><ul>
+<li><a href="#required-roles">Required roles</a></li>
+</ul>
+</li>
+<li><a href="#build-and-deployment-procedure">Build and deployment procedure</a><ul>
+<li><a href="#1-select-the-subscription-and-region">1. Select the subscription and region</a></li>
+<li><a href="#2-prepare-deployment-parameters">2. Prepare deployment parameters</a></li>
+<li><a href="#3-deploy-shared-infrastructure">3. Deploy shared infrastructure</a></li>
+<li><a href="#4-build-and-validate-the-gpu-image">4. Build and validate the GPU image</a></li>
+<li><a href="#5-build-and-publish-application-images">5. Build and publish application images</a></li>
+<li><a href="#6-run-database-migrations">6. Run database migrations</a></li>
+<li><a href="#7-configure-the-ai-provider">7. Configure the AI provider</a></li>
+<li><a href="#8-enable-ingress-last">8. Enable ingress last</a></li>
+</ul>
+</li>
+<li><a href="#runtime-configuration">Runtime configuration</a></li>
+<li><a href="#security-and-phi-controls">Security and PHI controls</a><ul>
+<li><a href="#data-minimization-and-logging">Data minimization and logging</a></li>
+<li><a href="#retention-and-deletion">Retention and deletion</a></li>
+<li><a href="#availability-and-disaster-recovery">Availability and disaster recovery</a></li>
+<li><a href="#network-and-host-controls">Network and host controls</a></li>
+</ul>
+</li>
+<li><a href="#autoscaling-and-capacity">Autoscaling and capacity</a></li>
+<li><a href="#operations">Operations</a><ul>
+<li><a href="#normal-batch-flow">Normal batch flow</a></li>
+<li><a href="#alert-baseline">Alert baseline</a></li>
+<li><a href="#retry-and-recovery">Retry and recovery</a></li>
+</ul>
+</li>
+<li><a href="#pre-production-acceptance-gates">Pre-production acceptance gates</a><ul>
+<li><a href="#functional">Functional</a></li>
+<li><a href="#input-and-failure-handling">Input and failure handling</a></li>
+<li><a href="#ai-providers">AI providers</a></li>
+<li><a href="#security-and-compliance">Security and compliance</a></li>
+</ul>
+</li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#deployment-evidence-and-handoff">Deployment evidence and handoff</a></li>
+<li><a href="#first-party-references">First-party references</a></li>
+</ul>
+</div>
+</div>
+      <a class="back-to-top" href="#content">Back to top ↑</a>
+    </aside>
+  </div>
+</body>
+</html>
