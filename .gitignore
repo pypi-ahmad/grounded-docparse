@@ -33,3 +33,6 @@ ownership-map-out/
 *.log
 .DS_Store
 *.py[cod]
+
+security_best_practices_report.md
+grounded-docparse-threat-model.md
