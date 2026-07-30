@@ -16,6 +16,10 @@ upload
   -> optional Luna refinement, classification, TOC, extraction, and chat
 ```
 
+## Application preview
+
+![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
+
 Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. The parser processes ordered windows of 16 pages with up to eight page workers by default. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
 
 ## Install and set up
@@ -75,18 +79,38 @@ The supported runtime requires Windows 11, WSL2 with Ubuntu 24.04, an NVIDIA Win
 5. Review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
 6. Download the Markdown, annotated PDF, extraction JSON, or full grounded JSON required by the downstream workflow.
 
-Extraction is always on demand after parsing. Create, import, or load a scalar schema in the Extract tab, then select **Run extraction**. Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the GLM-owned box.
+Extraction is always on demand after parsing. Create, import, or load a scalar schema in the Extract tab, then select **Run extraction**. Schema JSON imports keep their existing saved-schema behavior. A Markdown (`.md`) import populates the editable draft without saving or running extraction; review it and select **Save schema** if it should be reusable. Markdown schemas support a table or bullet list (not both), with an optional H1 schema name and optional type (`string` by default):
+
+```markdown
+# Invoice
+| Field name | Description | Type |
+| --- | --- | --- |
+| invoice_number | Official invoice ID | string |
+| total_amount | Final payable amount | number |
+```
+
+```markdown
+# Invoice
+- invoice_number: Official invoice ID
+- total_amount (number): Final payable amount
+```
+
+Supported types are `string`, `number`, `integer`, `boolean`, and `date`. Without an H1, the filename becomes the schema name.
+
+For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. Luna classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
+
+Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the GLM-owned box.
 
 ## Outputs
 
 - Refined Markdown plus grounded `base_markdown`
 - Parse JSON v4.4.0 with normalized elements, page/block evidence, provenance, correction history, parse usage/trace, empty agentic placeholders, and recovery log
-- Full JSON v4.4.0 using the same envelope with current classification, sections, extraction, combined usage/trace, and feature statuses populated
+- Full JSON v4.5.0 using the same envelope with current classification, sections, legacy extraction, custom form routing, per-form extraction, combined usage/trace, and feature statuses populated
 - Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and GLM-owned normalized boxes
 - Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes
 - Run metadata including GLM, Luna recovery, and Luna agentic timing
 
-Annotated PDF bytes are downloaded separately and are not embedded in JSON. Reusable extraction schemas persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
+Annotated PDF bytes are downloaded separately and are not embedded in JSON. Reusable extraction schemas and routing profiles persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
 
 ## Public Python API
 
@@ -138,11 +162,14 @@ full_json = render_combined_result(result, analysis)
 | [Setup](SETUP.md) | Supported Windows/WSL installation, runtime configuration, and troubleshooting |
 | [Run locally](docs/run.md) | Launcher behavior, manual service commands, and shutdown steps |
 | [Tutorial](docs/tutorial.md) | End-user walkthrough of parsing, extraction, chat, and downloads |
+| [Complete user guide](docs/complete-user-guide.md) | In-depth feature and workflow guide for business users, reviewers, and technical operators |
+| [Zero-to-hero technical tutorial](docs/zero-to-hero-tutorial.md) | First-principles setup, usage, Python integration, internals, testing, and production boundaries |
 | [Business extraction workflow](docs/business-user-extraction-workflow.md) | Non-technical workflow for large reusable field sets |
 | [Architecture](docs/architecture.md) | Components, ownership rules, pipeline stages, and failure boundaries |
 | [Python API](docs/api.md) | Exported names, signatures, schemas, and result contracts |
 | [Product specification](docs/spec.md) | Required behavior, public interfaces, and non-goals |
 | [Local GLM-OCR](docs/local-glmocr.md) | Locked GLM-OCR/vLLM runtime and evaluation path |
+| [Azure bulk medical fax deployment](docs/azure-bulk-fax-deployment.md) | Production design and operations runbook for secure bulk medical-fax processing on Azure |
 | [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, and retention |
 
 ## Development
