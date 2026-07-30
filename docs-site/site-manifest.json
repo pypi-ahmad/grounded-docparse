@@ -12,6 +12,8 @@
     "docs/local-glmocr.md",
     "docs/azure-bulk-fax-deployment.md",
     "docs/architecture.md",
+    "docs/how-grounded-docparse-is-agentic.md",
+    "docs/agentic-document-extraction-comparison.md",
     "docs/spec.md",
     "docs/api.md",
     "docs/research.md",
@@ -19,7 +21,8 @@
     "CONTRIBUTING.md",
     "CHANGELOG.md",
     ".github/ISSUE_TEMPLATE/bug_report.md",
-    ".github/ISSUE_TEMPLATE/feature_request.md"
+    ".github/ISSUE_TEMPLATE/feature_request.md",
+    "presentations/grounded-docparse-video-demo-script.md"
   ],
   "excluded_count": 3,
   "pages": [
@@ -35,6 +38,8 @@
     "local-glmocr.html",
     "azure-bulk-fax-deployment.html",
     "architecture.html",
+    "how-grounded-docparse-is-agentic.html",
+    "agentic-document-extraction-comparison.html",
     "spec.html",
     "api.html",
     "research.html",
@@ -42,6 +47,7 @@
     "contributing.html",
     "changelog.html",
     "issue-template--bug-report.html",
-    "issue-template--feature-request.html"
+    "issue-template--feature-request.html",
+    "presentations--grounded-docparse-video-demo-script.html"
   ]
 }
