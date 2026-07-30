@@ -9,7 +9,7 @@ The process has two goals:
 1. Make the document readable and navigable while preserving its original page locations.
 2. Extract the requested business fields and show where each value came from.
 
-The app processes one uploaded document and one extraction schema at a time. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas. Teams should validate the complete schema against their configured endpoint and divide it into stable business groups when provider limits or reviewability require multiple extraction runs.
+The app processes one uploaded document at a time. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
 
 ## The Workflow at a Glance
 

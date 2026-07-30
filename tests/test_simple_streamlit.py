@@ -15,9 +15,12 @@ from grounded_docparse.models import (
     ParseResult,
     ProgressEvent,
     RunUsage,
+    SchemaField,
+    StoredSchema,
     VerificationState,
 )
 from grounded_docparse.render import build_elements, render_agentic_document
+from grounded_docparse.schema_store import SchemaStore
 
 
 def test_studio_allows_glm_without_openai_environment(
@@ -67,7 +70,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
-    assert app.session_state["result_version"] == "4.4.0"
+    assert app.session_state["result_version"] == "4.5.0"
 
 
 def test_studio_shows_default_luna_destination(monkeypatch) -> None:
@@ -126,8 +129,10 @@ def test_ade_presets_default_fast_and_allow_full_or_custom(monkeypatch) -> None:
 
 
 def test_studio_shows_results_and_only_requested_tools(
-    monkeypatch, simple_pdf: bytes
+    monkeypatch, simple_pdf: bytes, tmp_path
 ) -> None:
+    schema_database = tmp_path / "studio.sqlite3"
+    monkeypatch.setenv("DOCPARSE_STUDIO_DB_PATH", str(schema_database))
     document = Document(
         source_name="notice.pdf",
         source_sha256="a" * 64,
@@ -241,6 +246,67 @@ def test_studio_shows_results_and_only_requested_tools(
     assert not app.exception
     assert any("Define the field keys" in item.value for item in app.get("caption"))
     assert any(button.label == "Run extraction" for button in app.button) is False
+
+    markdown_uploader = next(
+        item for item in app.file_uploader if item.label == "Import schema Markdown"
+    )
+    markdown_uploader.upload(
+        "invoice.md",
+        b"# Invoice\n- invoice_number: Official invoice ID",
+        "text/markdown",
+    )
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    assert not app.exception
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    assert not app.exception
+    assert app.session_state["schema_draft_name"] == "Invoice"
+    assert app.session_state["schema_draft_fields"] == [
+        {
+            "name": "invoice_number",
+            "description": "Official invoice ID",
+            "type": "string",
+        }
+    ]
+    assert any(button.label == "Run extraction" for button in app.button)
+    assert SchemaStore(schema_database).list() == []
+
+    SchemaStore(schema_database).save(
+        StoredSchema(
+            name="Invoice",
+            fields=[
+                SchemaField(
+                    name="invoice_number",
+                    description="Official invoice ID",
+                )
+            ],
+        )
+    )
+    app.session_state["use_custom_routing"] = True
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    routing_uploader = next(
+        item
+        for item in app.file_uploader
+        if item.label == "Import routing profile Markdown"
+    )
+    routing_uploader.upload(
+        "medical-routing.md",
+        (
+            b"# Medical routing\n"
+            b"- newauth [extract=Invoice]: Initial authorization request"
+        ),
+        "text/markdown",
+    )
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    assert not app.exception
+    assert app.session_state["classifier_draft_name"] == "Medical routing"
+    assert app.session_state["classifier_draft_categories"][0]["key"] == "newauth"
+    assert any(button.label == "Classify forms" for button in app.button)
 
     app.session_state["studio_tab"] = "Layout Tree"
     app = app.run(timeout=20)

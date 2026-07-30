@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
 import time
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import SequenceMatcher
@@ -20,14 +21,19 @@ from .models import (
     Block,
     ChatAnswer,
     ChatSource,
+    ClassifierProfile,
     Document,
     DocumentClassification,
     Element,
     ExtractedField,
     ExtractionResult,
+    FormClassificationResult,
+    FormSegment,
     NodeType,
     ParseResult,
+    RoutedExtractionResult,
     RunUsage,
+    SegmentExtraction,
     TableOfContents,
     TocSection,
     VerificationState,
@@ -51,6 +57,101 @@ class PreparedDocumentContext:
     page_markdown: dict[int, str]
     contexts: tuple[AgenticContext, ...]
     elements: tuple[Element, ...]
+
+
+def _profile_fingerprint(profile: ClassifierProfile) -> str:
+    payload = profile.model_dump_json(exclude_none=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _category_map(profile: ClassifierProfile) -> dict[str, object]:
+    return {category.key: category for category in profile.categories}
+
+
+def _validate_segmentation(
+    raw_segments,
+    context: AgenticContext,
+    profile: ClassifierProfile,
+) -> list[str]:
+    issues: list[str] = []
+    expected_pages = list(context.page_numbers)
+    category_keys = {category.key for category in profile.categories} | {"other"}
+    element_pages = {item["id"]: item["page"] for item in context.layout}
+    covered: list[int] = []
+    previous_end = expected_pages[0] - 1 if expected_pages else 0
+    for index, segment in enumerate(raw_segments):
+        if segment.start_page > segment.end_page:
+            issues.append(f"segment {index} has an inverted page range")
+            continue
+        if segment.start_page != previous_end + 1:
+            issues.append(f"segment {index} does not start after the previous segment")
+        previous_end = segment.end_page
+        covered.extend(range(segment.start_page, segment.end_page + 1))
+        if segment.category not in category_keys:
+            issues.append(f"segment {index} uses unknown category {segment.category!r}")
+        if segment.category != "other" and not segment.evidence_element_ids:
+            issues.append(f"segment {index} has no grounded evidence")
+        for element_id in segment.evidence_element_ids:
+            page = element_pages.get(element_id)
+            if page is None:
+                issues.append(f"segment {index} cites unknown element {element_id!r}")
+            elif not segment.start_page <= page <= segment.end_page:
+                issues.append(f"segment {index} cites evidence outside its page range")
+    if covered != expected_pages:
+        issues.append("segments must cover every supplied page exactly once")
+    return issues
+
+
+def _validate_effective_segments(
+    result: FormClassificationResult,
+    parse_result: ParseResult,
+) -> None:
+    if result.profile_fingerprint != _profile_fingerprint(result.profile):
+        raise ValueError("classifier profile changed after classification")
+    pages = [page.number for page in parse_result.document.pages]
+    covered = [
+        page
+        for segment in sorted(result.segments, key=lambda item: item.start_page)
+        for page in range(segment.start_page, segment.end_page + 1)
+    ]
+    if covered != pages:
+        raise ValueError("reviewed form segments must cover every page exactly once")
+    categories = _category_map(result.profile)
+    for segment in result.segments:
+        if not segment.approved:
+            raise ValueError(f"form segment {segment.id} requires review")
+        if segment.category != "other" and segment.category not in categories:
+            raise ValueError(f"form segment {segment.id} has an unknown category")
+        expected = categories.get(segment.category)
+        expected_eligible = bool(expected and expected.extract)
+        expected_schema = expected.schema_name if expected_eligible else None
+        if segment.eligible != expected_eligible or segment.schema_name != expected_schema:
+            raise ValueError(f"form segment {segment.id} routing metadata is stale")
+
+
+def _segment_extraction_payload(item: SegmentExtraction) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "segment_id": item.segment_id,
+        "category": item.category,
+        "start_page": item.start_page,
+        "end_page": item.end_page,
+        "schema_name": item.schema_name,
+        "status": item.status,
+        "error": item.error,
+    }
+    if item.extraction is not None:
+        payload.update(
+            {
+                "data": item.extraction.data,
+                "evidence": item.extraction.evidence,
+                "fields": {
+                    name: field.model_dump(mode="json")
+                    for name, field in item.extraction.fields.items()
+                },
+                "warnings": item.extraction.warnings,
+            }
+        )
+    return payload
 
 
 def _walk(blocks: Iterable[Block]) -> Iterable[Block]:
@@ -385,6 +486,251 @@ class DocumentAgent:
             classification=classification,
             toc=toc,
             features=features,
+            usage=usage,
+            trace=trace,
+        )
+
+    def classify_forms(
+        self,
+        parse_result: ParseResult,
+        profile: ClassifierProfile,
+        *,
+        prepared_context: PreparedDocumentContext | None = None,
+        confidence_threshold: float = 0.85,
+    ) -> FormClassificationResult:
+        if not 0 <= confidence_threshold <= 1:
+            raise ValueError("confidence threshold must be between 0 and 1")
+        prepared = prepared_context or self.prepare(parse_result)
+        gateway = self.gateway_factory(self.config)
+        profile_payload = {
+            "name": profile.name,
+            "instructions": profile.instructions,
+            "categories": [
+                {"key": category.key, "description": category.description}
+                for category in profile.categories
+            ]
+            + [{"key": "other", "description": "No supplied category applies."}],
+        }
+        predicted = []
+        boundary_pages: set[int] = set()
+        warnings: list[str] = []
+        previous_context: AgenticContext | None = None
+        for target_context in prepared.contexts:
+            context = target_context
+            if previous_context is not None and target_context.page_numbers:
+                candidate = previous_context.page_numbers[-1]
+                if candidate not in target_context.page_numbers:
+                    boundary_pages.add(target_context.page_numbers[0])
+                    overlap_layout = [
+                        item for item in previous_context.layout if item["page"] == candidate
+                    ]
+                    context = AgenticContext(
+                        page_numbers=(candidate, *target_context.page_numbers),
+                        markdown=(
+                            prepared.page_markdown.get(candidate, "")
+                            + "\n\n<!-- PAGE BREAK -->\n\n"
+                            + target_context.markdown
+                        ),
+                        layout=[*overlap_layout, *target_context.layout],
+                    )
+            issues: list[str] = []
+            raw = None
+            for attempt in range(2):
+                raw = gateway.classify_forms(
+                    context.markdown,
+                    context.layout,
+                    profile_payload,
+                    issues=issues or None,
+                )
+                issues = _validate_segmentation(raw.segments, context, profile)
+                if not issues:
+                    break
+            if raw is None or issues:
+                detail = "; ".join(issues) or "classifier returned no result"
+                raise ValueError(f"custom form classification failed validation: {detail}")
+            element_pages = {item["id"]: item["page"] for item in context.layout}
+            for segment in raw.segments:
+                start_page = max(segment.start_page, target_context.page_numbers[0])
+                end_page = min(segment.end_page, target_context.page_numbers[-1])
+                if start_page > end_page:
+                    continue
+                evidence = [
+                    element_id
+                    for element_id in segment.evidence_element_ids
+                    if start_page <= element_pages.get(element_id, -1) <= end_page
+                ]
+                confidence = segment.confidence
+                if segment.category != "other" and not evidence:
+                    confidence = 0
+                    warnings.append(
+                        f"Segment {start_page}-{end_page} lost grounded evidence while "
+                        "reconciling a classifier window and requires review."
+                    )
+                predicted.append(
+                    segment.model_copy(
+                        update={
+                            "start_page": start_page,
+                            "end_page": end_page,
+                            "confidence": confidence,
+                            "evidence_element_ids": evidence,
+                        }
+                    )
+                )
+            previous_context = target_context
+
+        category_by_key = _category_map(profile)
+        segments: list[FormSegment] = []
+        for raw in predicted:
+            boundary_review = False
+            if (
+                segments
+                and raw.start_page in boundary_pages
+                and segments[-1].end_page + 1 == raw.start_page
+                and segments[-1].category == raw.category
+            ):
+                previous = segments.pop()
+                raw = raw.model_copy(
+                    update={
+                        "start_page": previous.start_page,
+                        "confidence": min(previous.confidence, raw.confidence),
+                        "reasoning": (
+                            f"{previous.reasoning} {raw.reasoning}"
+                        ).strip(),
+                        "evidence_element_ids": list(
+                            dict.fromkeys(
+                                [*previous.evidence_element_ids, *raw.evidence_element_ids]
+                            )
+                        ),
+                    }
+                )
+                boundary_review = True
+                warnings.append(
+                    f"Merged category {raw.category} across a classifier window boundary; "
+                    "review the page range."
+                )
+            category = category_by_key.get(raw.category)
+            eligible = bool(category and category.extract)
+            auto_approved = raw.confidence >= confidence_threshold and not boundary_review
+            segments.append(
+                FormSegment(
+                    id="pending",
+                    predicted_start_page=raw.start_page,
+                    predicted_end_page=raw.end_page,
+                    predicted_category=raw.category,
+                    start_page=raw.start_page,
+                    end_page=raw.end_page,
+                    category=raw.category,
+                    confidence=raw.confidence,
+                    reasoning=raw.reasoning,
+                    evidence_element_ids=raw.evidence_element_ids,
+                    approved=auto_approved,
+                    review_status="auto_approved" if auto_approved else "needs_review",
+                    eligible=eligible,
+                    schema_name=category.schema_name if eligible else None,
+                )
+            )
+        for index, segment in enumerate(segments, start=1):
+            segment.id = f"form-{index:03d}"
+
+        usage = getattr(gateway, "usage", RunUsage()).model_copy(deep=True)
+        trace = list(getattr(gateway, "trace", []))
+        return FormClassificationResult(
+            profile=profile,
+            profile_fingerprint=_profile_fingerprint(profile),
+            confidence_threshold=confidence_threshold,
+            predicted_segments=predicted,
+            segments=segments,
+            warnings=warnings,
+            usage=usage,
+            trace=trace,
+        )
+
+    def extract_forms(
+        self,
+        parse_result: ParseResult,
+        classification: FormClassificationResult,
+        schemas_by_name: Mapping[str, dict[str, Any]],
+    ) -> RoutedExtractionResult:
+        _validate_effective_segments(classification, parse_result)
+        pages = {page.number: page for page in parse_result.document.pages}
+        source_elements = parse_result.elements or build_elements(parse_result.document)
+        forms: list[SegmentExtraction] = []
+        usage = classification.usage.model_copy(deep=True)
+        trace = list(classification.trace)
+
+        for segment in classification.segments:
+            if not segment.eligible or not segment.schema_name:
+                continue
+            schema = schemas_by_name.get(segment.schema_name)
+            if schema is None:
+                raise ValueError(
+                    f"missing extraction schema {segment.schema_name!r} for {segment.category}"
+                )
+            document = Document(
+                source_name=parse_result.document.source_name,
+                source_sha256=parse_result.document.source_sha256,
+                pages=[
+                    pages[number].model_copy(deep=True)
+                    for number in range(segment.start_page, segment.end_page + 1)
+                ],
+            )
+            rendered = render_agentic_document(document)
+            subset = ParseResult(
+                document=document,
+                markdown=rendered.markdown,
+                base_markdown=rendered.markdown,
+                json=rendered.json,
+                input_tokens=0,
+                output_tokens=0,
+                annotated_pdf=b"",
+                elements=[
+                    element.model_copy(deep=True)
+                    for element in source_elements
+                    if segment.start_page <= element.page <= segment.end_page
+                ],
+            )
+            try:
+                extracted = self.extract(subset, schema)
+            except Exception as exc:  # noqa: BLE001 - batch failures remain isolated
+                forms.append(
+                    SegmentExtraction(
+                        segment_id=segment.id,
+                        category=segment.category,
+                        start_page=segment.start_page,
+                        end_page=segment.end_page,
+                        schema_name=segment.schema_name,
+                        status="failed",
+                        error=f"{type(exc).__name__}: {exc}",
+                    )
+                )
+                continue
+            usage.calls.extend(extracted.usage.calls)
+            trace.extend(extracted.trace)
+            forms.append(
+                SegmentExtraction(
+                    segment_id=segment.id,
+                    category=segment.category,
+                    start_page=segment.start_page,
+                    end_page=segment.end_page,
+                    schema_name=segment.schema_name,
+                    status="succeeded",
+                    extraction=extracted,
+                )
+            )
+
+        payload = {
+            "schema_version": "2.0.0",
+            "custom_classification": classification.model_dump(mode="json"),
+            "forms": [_segment_extraction_payload(item) for item in forms],
+            "metadata": {
+                "usage": usage.model_dump(mode="json"),
+                "trace": [item.model_dump(mode="json") for item in trace],
+            },
+        }
+        return RoutedExtractionResult(
+            classification=classification,
+            forms=forms,
+            json=json.dumps(payload, ensure_ascii=False, indent=2),
             usage=usage,
             trace=trace,
         )

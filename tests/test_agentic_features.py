@@ -194,7 +194,7 @@ def test_chat_maps_only_element_ids_to_grounded_citations() -> None:
     assert answer.trace[0].reasoning_effort == "medium"
 
 
-def test_combined_result_uses_additive_flat_v44_contract() -> None:
+def test_combined_result_uses_additive_flat_v45_contract() -> None:
     result = _result()
     analysis = DocumentAgent(gateway_factory=FeatureGateway).analyze(result)
     extraction = ExtractionResult(
@@ -220,7 +220,9 @@ def test_combined_result_uses_additive_flat_v44_contract() -> None:
 
     payload = json.loads(render_combined_result(result, analysis, extraction))
 
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
+    assert payload["custom_classification"] is None
+    assert payload["form_extractions"] == []
     assert payload["document_type"]["primary_type"] == "Report"
     assert payload["sections"][0]["element_id"] == "p1-heading"
     assert payload["extracted_fields"]["detail"]["element_id"] == "p1-text"
