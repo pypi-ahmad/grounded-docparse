@@ -2,9 +2,9 @@
 
 Report vulnerabilities privately through the repository's [GitHub Security Advisory form](https://github.com/pypi-ahmad/grounded-docparse/security/advisories/new). Do not include real documents, credentials, or personal data in a public issue.
 
-The application is intended for a trusted local workstation and has no multi-user authentication or tenant isolation. The launch scripts do not enforce a loopback `server.address`; protect ports `8501` and `8080` with host/network controls and do not expose them to an untrusted network.
+The application is intended for a trusted local workstation and has no multi-user authentication or tenant isolation. The launch scripts bind Streamlit and vLLM to `127.0.0.1`; do not override that boundary or expose ports `8501` and `8080` to an untrusted network.
 
-Keep `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in environment variables. A custom base URL receives the same crop images and document context that would otherwise go to OpenAI; trust it before use. Never commit `.env`, `.docparse/`, source documents, or result bundles. Uploaded documents, model output, filenames, schemas, and PDFs are untrusted inputs.
+Keep `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in environment variables. A custom base URL receives the same crop images and document context that would otherwise go to OpenAI; trust the destination host shown in the UI before use. Never commit `.env`, `.docparse/`, source documents, or result bundles. Uploaded documents, model output, filenames, schemas, and PDFs are untrusted inputs.
 
 With a key present, Fast mode performs classification and visual recovery defaults on. Selecting **Parse document** may therefore send selected crops and recognized context remotely. Disable all Luna toggles for GLM-only processing.
 
