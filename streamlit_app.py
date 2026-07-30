@@ -15,19 +15,30 @@ from PIL import Image, ImageSequence
 from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.local_ocr import get_glmocr_runtime
-from grounded_docparse.models import Element, SchemaField, StoredSchema
+from grounded_docparse.models import (
+    ClassifierCategory,
+    ClassifierProfile,
+    Element,
+    FormClassificationResult,
+    FormSegment,
+    SchemaField,
+    StoredSchema,
+)
 from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
     render_combined_result,
 )
 from grounded_docparse.schema_store import (
+    ClassifierProfileStore,
     SchemaStore,
     compile_json_schema,
+    parse_markdown_classifier_profile,
+    parse_markdown_schema,
 )
 
 SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
-RESULT_VERSION = "4.4.0"
+RESULT_VERSION = "4.5.0"
 THUMBNAILS_PER_GROUP = 12
 ADE_PRESETS = {
     "Fast": {
@@ -83,8 +94,18 @@ def reset_document_state() -> None:
     st.session_state.agentic_analysis = None
     st.session_state.agentic_source_hash = None
     st.session_state.extraction_result = None
+    st.session_state.custom_classification = None
+    st.session_state.routed_extraction_result = None
+    st.session_state.routing_review_rows = None
     st.session_state.chat_history = []
     st.session_state.prepared_agentic_context = None
+
+
+def reset_extraction_mode_state() -> None:
+    st.session_state.extraction_result = None
+    st.session_state.custom_classification = None
+    st.session_state.routed_extraction_result = None
+    st.session_state.routing_review_rows = None
 
 
 def initialize_ade_mode() -> None:
@@ -234,9 +255,20 @@ def select_source(element_id: str, page: int) -> None:
 schema_store = SchemaStore(
     os.getenv("DOCPARSE_STUDIO_DB_PATH", "data/document_studio.sqlite3")
 )
+classifier_profile_store = ClassifierProfileStore(
+    os.getenv("DOCPARSE_STUDIO_DB_PATH", "data/document_studio.sqlite3")
+)
 
 
 def render_schema_builder() -> StoredSchema | None:
+    pending_draft = st.session_state.pop("pending_schema_draft", None)
+    if pending_draft is not None:
+        st.session_state.schema_draft_name = pending_draft["name"]
+        st.session_state.schema_draft_fields = pending_draft["fields"]
+        st.session_state.schema_draft_revision = (
+            st.session_state.get("schema_draft_revision", 0) + 1
+        )
+
     schemas = schema_store.list()
     names = [schema.name for schema in schemas]
     selected = st.selectbox(
@@ -251,6 +283,9 @@ def render_schema_builder() -> StoredSchema | None:
             st.session_state.schema_draft_fields = [
                 field.model_dump(mode="json") for field in loaded.fields
             ]
+            st.session_state.schema_draft_revision = (
+                st.session_state.get("schema_draft_revision", 0) + 1
+            )
             st.rerun()
 
     st.session_state.setdefault("schema_draft_name", "")
@@ -258,12 +293,17 @@ def render_schema_builder() -> StoredSchema | None:
         "schema_draft_fields",
         [{"name": "", "description": "", "type": "string"}],
     )
-    name = st.text_input("Schema name", key="schema_draft_name")
+    revision = st.session_state.setdefault("schema_draft_revision", 0)
+    name = st.text_input(
+        "Schema name",
+        value=st.session_state.schema_draft_name,
+        key=f"schema_draft_name_editor_{revision}",
+    )
     fields = st.data_editor(
         st.session_state.schema_draft_fields,
         num_rows="dynamic",
         hide_index=True,
-        key="schema_fields_editor",
+        key=f"schema_fields_editor_{revision}",
         column_config={
             "name": st.column_config.TextColumn("Field name", required=True),
             "description": st.column_config.TextColumn("Description"),
@@ -274,9 +314,16 @@ def render_schema_builder() -> StoredSchema | None:
             ),
         },
     )
+    st.session_state.schema_draft_name = name
     st.session_state.schema_draft_fields = fields
 
     imported = st.file_uploader("Import schema JSON", type=["json"], key="schema_import")
+    imported_markdown = st.file_uploader(
+        "Import schema Markdown",
+        type=["md"],
+        key="schema_markdown_import",
+        max_upload_size=1,
+    )
     actions = st.columns(3)
     if actions[0].button("Save schema", type="primary"):
         try:
@@ -288,6 +335,7 @@ def render_schema_builder() -> StoredSchema | None:
             st.error(f"Schema is incomplete: {exc}")
         else:
             schema_store.save(schema)
+            st.session_state.routed_extraction_result = None
             st.toast(f"Saved schema {schema.name}")
             st.rerun()
     if actions[1].button("Load example"):
@@ -298,17 +346,47 @@ def render_schema_builder() -> StoredSchema | None:
             {"name": "due_date", "description": "Payment due date", "type": "date"},
             {"name": "vendor_name", "description": "Issuing company", "type": "string"},
         ]
+        st.session_state.schema_draft_revision += 1
         st.rerun()
     if actions[2].button("Clear"):
         st.session_state.schema_draft_name = ""
         st.session_state.schema_draft_fields = []
+        st.session_state.schema_draft_revision += 1
         st.rerun()
 
     if imported is not None and st.button("Import JSON"):
         schema = StoredSchema.model_validate_json(imported.getvalue())
         schema_store.save(schema)
+        st.session_state.routed_extraction_result = None
         st.toast(f"Imported schema {schema.name}")
         st.rerun()
+    if imported_markdown is not None:
+        markdown_bytes = imported_markdown.getvalue()
+        import_fingerprint = hashlib.sha256(
+            imported_markdown.name.encode("utf-8") + b"\0" + markdown_bytes
+        ).hexdigest()
+    else:
+        markdown_bytes = None
+        import_fingerprint = None
+    if (
+        markdown_bytes is not None
+        and st.session_state.get("schema_markdown_import_fingerprint")
+        != import_fingerprint
+    ):
+        try:
+            schema = parse_markdown_schema(markdown_bytes, imported_markdown.name)
+        except ValueError as exc:
+            st.error(f"Markdown schema is invalid: {exc}")
+        else:
+            st.session_state.schema_markdown_import_fingerprint = import_fingerprint
+            st.session_state.pending_schema_draft = {
+                "name": schema.name,
+                "fields": [
+                    field.model_dump(mode="json") for field in schema.fields
+                ],
+            }
+            st.toast(f"Loaded schema {schema.name}")
+            st.rerun()
     draft = None
     if name.strip() and fields:
         try:
@@ -327,6 +405,311 @@ def render_schema_builder() -> StoredSchema | None:
                 on_click="ignore",
             )
     return draft
+
+
+def _profile_rows(profile: ClassifierProfile) -> list[dict]:
+    return [
+        {
+            "key": category.key,
+            "description": category.description,
+            "extract": category.extract,
+            "schema_name": category.schema_name or "",
+        }
+        for category in profile.categories
+    ]
+
+
+def _profile_from_draft(name: str, instructions: str, rows: list[dict]) -> ClassifierProfile:
+    categories = []
+    for row in rows:
+        if not any(
+            str(row.get(key) or "").strip()
+            for key in ("key", "description", "schema_name")
+        ) and not bool(row.get("extract")):
+            continue
+        schema_name = str(row.get("schema_name") or "").strip() or None
+        categories.append(
+            ClassifierCategory(
+                key=str(row.get("key") or "").strip(),
+                description=str(row.get("description") or "").strip(),
+                extract=bool(row.get("extract")),
+                schema_name=schema_name,
+            )
+        )
+    return ClassifierProfile(
+        name=name.strip(),
+        instructions=instructions.strip(),
+        categories=categories,
+    )
+
+
+def _missing_profile_schemas(profile: ClassifierProfile) -> list[str]:
+    available = {schema.name.casefold() for schema in schema_store.list()}
+    return sorted(
+        {
+            category.schema_name
+            for category in profile.categories
+            if category.extract
+            and category.schema_name
+            and category.schema_name.casefold() not in available
+        }
+    )
+
+
+def render_classifier_profile_builder() -> ClassifierProfile | None:
+    pending = st.session_state.pop("pending_classifier_profile", None)
+    if pending is not None:
+        st.session_state.classifier_draft_name = pending.name
+        st.session_state.classifier_draft_instructions = pending.instructions
+        st.session_state.classifier_draft_categories = _profile_rows(pending)
+        st.session_state.classifier_draft_revision = (
+            st.session_state.get("classifier_draft_revision", 0) + 1
+        )
+
+    profiles = classifier_profile_store.list()
+    profile_names = [profile.name for profile in profiles]
+    selected = st.selectbox(
+        "Saved routing profile",
+        ["New routing profile", *profile_names],
+        key="classifier_profile_selection",
+    )
+    if selected != "New routing profile" and st.button("Load routing profile"):
+        loaded = classifier_profile_store.get(selected)
+        if loaded is not None:
+            st.session_state.pending_classifier_profile = loaded
+            st.rerun()
+
+    st.session_state.setdefault("classifier_draft_name", "")
+    st.session_state.setdefault("classifier_draft_instructions", "")
+    st.session_state.setdefault(
+        "classifier_draft_categories",
+        [{"key": "", "description": "", "extract": False, "schema_name": ""}],
+    )
+    revision = st.session_state.setdefault("classifier_draft_revision", 0)
+    name = st.text_input(
+        "Routing profile name",
+        value=st.session_state.classifier_draft_name,
+        key=f"classifier_name_{revision}",
+    )
+    instructions = st.text_area(
+        "Optional routing instructions",
+        value=st.session_state.classifier_draft_instructions,
+        key=f"classifier_instructions_{revision}",
+        placeholder="Example: Treat fax cover sheets as part of the following form.",
+    )
+    schema_names = [schema.name for schema in schema_store.list()]
+    categories = st.data_editor(
+        st.session_state.classifier_draft_categories,
+        num_rows="dynamic",
+        hide_index=True,
+        key=f"classifier_categories_{revision}",
+        column_config={
+            "key": st.column_config.TextColumn("Category", required=True),
+            "description": st.column_config.TextColumn("Description", required=True),
+            "extract": st.column_config.CheckboxColumn("Extract"),
+            "schema_name": st.column_config.SelectboxColumn(
+                "Extraction schema", options=["", *schema_names]
+            ),
+        },
+    )
+    st.session_state.classifier_draft_name = name
+    st.session_state.classifier_draft_instructions = instructions
+    st.session_state.classifier_draft_categories = categories
+    st.caption("`other` is always included as a non-extractable fallback category.")
+
+    imported_json = st.file_uploader(
+        "Import routing profile JSON", type=["json"], key="classifier_json_import"
+    )
+    imported_markdown = st.file_uploader(
+        "Import routing profile Markdown",
+        type=["md"],
+        key="classifier_markdown_import",
+        max_upload_size=1,
+    )
+    actions = st.columns(3)
+    if actions[0].button("Save routing profile", type="primary"):
+        try:
+            profile = _profile_from_draft(name, instructions, categories)
+            missing = _missing_profile_schemas(profile)
+            if missing:
+                raise ValueError(f"missing saved extraction schemas: {', '.join(missing)}")
+        except ValueError as exc:
+            st.error(f"Routing profile is incomplete: {exc}")
+        else:
+            classifier_profile_store.save(profile)
+            st.toast(f"Saved routing profile {profile.name}")
+            st.rerun()
+    if actions[1].button("Load routing example"):
+        default_schema = "New Authorization" if "New Authorization" in schema_names else ""
+        st.session_state.pending_classifier_profile = ClassifierProfile(
+            name="Medical fax routing",
+            instructions="Treat fax cover sheets as part of the following form.",
+            categories=[
+                ClassifierCategory(
+                    key="newauth",
+                    description="Initial request for a new authorization",
+                    extract=bool(default_schema),
+                    schema_name=default_schema or None,
+                ),
+                ClassifierCategory(
+                    key="authupdate",
+                    description="Update to an existing authorization",
+                ),
+                ClassifierCategory(
+                    key="medical_records",
+                    description="Medical records without an authorization request",
+                ),
+            ],
+        )
+        st.rerun()
+    if actions[2].button("Clear routing profile"):
+        st.session_state.pending_classifier_profile = ClassifierProfile(
+            name="New profile",
+            categories=[ClassifierCategory(key="category", description="Describe category")],
+        )
+        st.rerun()
+
+    if imported_json is not None and st.button("Import routing JSON"):
+        try:
+            profile = ClassifierProfile.model_validate_json(imported_json.getvalue())
+            missing = _missing_profile_schemas(profile)
+            if missing:
+                raise ValueError(f"missing saved extraction schemas: {', '.join(missing)}")
+        except ValueError as exc:
+            st.error(f"Routing profile JSON is invalid: {exc}")
+        else:
+            classifier_profile_store.save(profile)
+            st.toast(f"Imported routing profile {profile.name}")
+            st.rerun()
+
+    if imported_markdown is not None:
+        markdown_bytes = imported_markdown.getvalue()
+        fingerprint = hashlib.sha256(
+            imported_markdown.name.encode("utf-8") + b"\0" + markdown_bytes
+        ).hexdigest()
+        if st.session_state.get("classifier_markdown_fingerprint") != fingerprint:
+            try:
+                profile = parse_markdown_classifier_profile(
+                    markdown_bytes, imported_markdown.name
+                )
+            except ValueError as exc:
+                st.error(f"Routing profile Markdown is invalid: {exc}")
+            else:
+                st.session_state.classifier_markdown_fingerprint = fingerprint
+                st.session_state.pending_classifier_profile = profile
+                st.toast(f"Loaded routing profile {profile.name}")
+                st.rerun()
+
+    try:
+        draft = _profile_from_draft(name, instructions, categories)
+    except ValueError:
+        return None
+    missing = _missing_profile_schemas(draft)
+    if missing:
+        st.warning(f"Missing saved extraction schemas: {', '.join(missing)}")
+        return None
+    st.download_button(
+        "Export routing profile JSON",
+        draft.model_dump_json(indent=2),
+        file_name=f"{draft.name}.routing.json",
+        mime="application/json",
+        on_click="ignore",
+    )
+    return draft
+
+
+def _classification_rows(classification: FormClassificationResult) -> list[dict]:
+    return [
+        {
+            "id": segment.id,
+            "start_page": segment.start_page,
+            "end_page": segment.end_page,
+            "category": segment.category,
+            "confidence": segment.confidence,
+            "reasoning": segment.reasoning,
+            "approved": segment.approved,
+            "eligible": segment.eligible,
+            "schema_name": segment.schema_name or "",
+        }
+        for segment in classification.segments
+    ]
+
+
+def _apply_routing_review(
+    classification: FormClassificationResult,
+    rows: list[dict],
+    page_count: int,
+) -> FormClassificationResult:
+    category_by_key = {
+        category.key: category for category in classification.profile.categories
+    }
+    original_by_id = {segment.id: segment for segment in classification.segments}
+    segments: list[FormSegment] = []
+    for index, row in enumerate(rows, start=1):
+        start_page = int(row["start_page"])
+        end_page = int(row["end_page"])
+        category_key = str(row["category"])
+        if category_key != "other" and category_key not in category_by_key:
+            raise ValueError(f"unknown category {category_key!r}")
+        if not 1 <= start_page <= end_page <= page_count:
+            raise ValueError(f"invalid page range {start_page}-{end_page}")
+        segment_id = str(row.get("id") or f"form-{index:03d}")
+        original = original_by_id.get(segment_id)
+        changed = original is None or (
+            start_page,
+            end_page,
+            category_key,
+        ) != (original.start_page, original.end_page, original.category)
+        approved = bool(row.get("approved"))
+        category = category_by_key.get(category_key)
+        eligible = bool(category and category.extract)
+        if approved:
+            review_status = (
+                "user_corrected"
+                if changed
+                else "auto_approved"
+                if original and original.review_status == "auto_approved"
+                else "user_confirmed"
+            )
+        else:
+            review_status = "needs_review"
+        segments.append(
+            FormSegment(
+                id=segment_id,
+                predicted_start_page=(
+                    original.predicted_start_page if original else start_page
+                ),
+                predicted_end_page=original.predicted_end_page if original else end_page,
+                predicted_category=(
+                    original.predicted_category if original else category_key
+                ),
+                start_page=start_page,
+                end_page=end_page,
+                category=category_key,
+                confidence=(
+                    original.confidence
+                    if original
+                    else float(row.get("confidence") or 0)
+                ),
+                reasoning=original.reasoning if original else "User-created segment",
+                evidence_element_ids=(original.evidence_element_ids if original else []),
+                approved=approved,
+                review_status=review_status,
+                eligible=eligible,
+                schema_name=category.schema_name if eligible else None,
+            )
+        )
+    segments.sort(key=lambda item: (item.start_page, item.end_page))
+    covered = [
+        page
+        for segment in segments
+        for page in range(segment.start_page, segment.end_page + 1)
+    ]
+    if covered != list(range(1, page_count + 1)):
+        raise ValueError("segments must cover every page exactly once without gaps")
+    for index, segment in enumerate(segments, start=1):
+        segment.id = f"form-{index:03d}"
+    return classification.model_copy(update={"segments": segments}, deep=True)
 
 
 st.set_page_config(
@@ -610,6 +993,8 @@ result = st.session_state.get("result")
 parsed_source = st.session_state.get("parsed_source")
 analysis = st.session_state.get("agentic_analysis")
 extraction_result = st.session_state.get("extraction_result")
+custom_classification = st.session_state.get("custom_classification")
+routed_extraction_result = st.session_state.get("routed_extraction_result")
 has_result = (
     result is not None
     and parsed_source is not None
@@ -634,6 +1019,8 @@ if has_result:
         or bool(result.usage and result.usage.calls)
         or bool(analysis and analysis.usage.calls)
         or bool(extraction_result and extraction_result.usage.calls)
+        or bool(custom_classification and custom_classification.usage.calls)
+        or bool(routed_extraction_result and routed_extraction_result.usage.calls)
         or any(turn.get("confidence") for turn in st.session_state.chat_history)
     )
     if has_luna_output:
@@ -829,17 +1216,189 @@ else:
     extract_tab = tab_by_name["Extract"]
     if extract_tab.open:
         with extract_tab:
-            st.caption("Define the field keys to extract, then run Luna on demand.")
+            st.caption(
+                "Define the field keys to extract and optionally route multi-form documents."
+            )
             if not has_environment:
                 st.info("Set OPENAI_API_KEY to use schema extraction.")
                 extraction_schema = None
+                routing_profile = None
             else:
-                with st.expander("Extraction keys", expanded=True):
+                use_custom_routing = st.toggle(
+                    "Use custom form routing",
+                    key="use_custom_routing",
+                    help="Classify page ranges and extract only eligible categories.",
+                    on_change=reset_extraction_mode_state,
+                )
+                with st.expander(
+                    "Extraction schemas", expanded=not use_custom_routing
+                ):
                     extraction_schema = render_schema_builder()
-            if extraction_schema is not None and st.button(
-                "Run extraction",
-                type="primary",
-                icon=":material/data_object:",
+                routing_profile = None
+                if use_custom_routing:
+                    with st.expander("Routing profile", expanded=True):
+                        routing_profile = render_classifier_profile_builder()
+
+            if has_environment and use_custom_routing:
+                if routing_profile is not None and st.button(
+                    "Classify forms",
+                    type="primary",
+                    icon=":material/account_tree:",
+                ):
+                    try:
+                        with st.spinner("Classifying and segmenting forms..."):
+                            custom_classification = DocumentAgent().classify_forms(
+                                result,
+                                routing_profile,
+                                prepared_context=st.session_state.prepared_agentic_context,
+                            )
+                        st.session_state.custom_classification = custom_classification
+                        st.session_state.extraction_result = None
+                        st.session_state.routing_review_rows = _classification_rows(
+                            custom_classification
+                        )
+                        st.session_state.routed_extraction_result = None
+                    except Exception as exc:  # noqa: BLE001 - isolated feature error
+                        st.error(f"Classification failed: {type(exc).__name__}: {exc}")
+
+                custom_classification = st.session_state.get("custom_classification")
+                if custom_classification is not None:
+                    if routing_profile != custom_classification.profile:
+                        st.session_state.routed_extraction_result = None
+                        st.warning(
+                            "The routing profile changed. Rerun classification before extraction."
+                        )
+                    for warning in custom_classification.warnings:
+                        st.warning(warning)
+                    st.subheader("Classified form segments")
+                    category_keys = [
+                        category.key
+                        for category in custom_classification.profile.categories
+                    ] + ["other"]
+                    rows = st.session_state.get("routing_review_rows") or _classification_rows(
+                        custom_classification
+                    )
+                    with st.form("routing_review_form"):
+                        edited_rows = st.data_editor(
+                            rows,
+                            num_rows="dynamic",
+                            hide_index=True,
+                            key="routing_review_editor",
+                            column_config={
+                                "id": st.column_config.TextColumn("Segment", disabled=True),
+                                "start_page": st.column_config.NumberColumn(
+                                    "Start page", min_value=1, max_value=parsed_pages, required=True
+                                ),
+                                "end_page": st.column_config.NumberColumn(
+                                    "End page", min_value=1, max_value=parsed_pages, required=True
+                                ),
+                                "category": st.column_config.SelectboxColumn(
+                                    "Category", options=category_keys, required=True
+                                ),
+                                "confidence": st.column_config.NumberColumn(
+                                    "Confidence", format="percent", disabled=True
+                                ),
+                                "reasoning": st.column_config.TextColumn(
+                                    "Reasoning", disabled=True
+                                ),
+                                "approved": st.column_config.CheckboxColumn("Approved"),
+                                "eligible": st.column_config.CheckboxColumn(
+                                    "Eligible", disabled=True
+                                ),
+                                "schema_name": st.column_config.TextColumn(
+                                    "Extraction schema", disabled=True
+                                ),
+                            },
+                        )
+                        apply_review = st.form_submit_button(
+                            "Apply routing review", icon=":material/check:"
+                        )
+                    if apply_review:
+                        try:
+                            custom_classification = _apply_routing_review(
+                                custom_classification, edited_rows, parsed_pages
+                            )
+                        except (TypeError, ValueError) as exc:
+                            st.error(f"Routing review is invalid: {exc}")
+                        else:
+                            st.session_state.custom_classification = custom_classification
+                            st.session_state.routing_review_rows = _classification_rows(
+                                custom_classification
+                            )
+                            st.session_state.routed_extraction_result = None
+                            st.toast("Applied routing review")
+                            st.rerun()
+
+                    unapproved = [
+                        segment.id
+                        for segment in custom_classification.segments
+                        if not segment.approved
+                    ]
+                    eligible = [
+                        segment
+                        for segment in custom_classification.segments
+                        if segment.eligible
+                    ]
+                    st.caption(
+                        f"{len(eligible)} eligible segment(s) · "
+                        f"{len(unapproved)} awaiting review"
+                    )
+                    routing_ready = (
+                        not unapproved
+                        and bool(eligible)
+                        and routing_profile == custom_classification.profile
+                    )
+                    if st.button(
+                        "Extract eligible forms",
+                        type="primary",
+                        icon=":material/data_object:",
+                        disabled=not routing_ready,
+                    ):
+                        schemas_by_name = {}
+                        for segment in eligible:
+                            stored = schema_store.get(segment.schema_name or "")
+                            if stored is not None:
+                                schemas_by_name[segment.schema_name] = compile_json_schema(
+                                    stored
+                                )
+                        try:
+                            with st.spinner("Extracting eligible forms..."):
+                                routed_extraction_result = DocumentAgent().extract_forms(
+                                    result,
+                                    custom_classification,
+                                    schemas_by_name,
+                                )
+                            st.session_state.routed_extraction_result = (
+                                routed_extraction_result
+                            )
+                        except Exception as exc:  # noqa: BLE001 - isolated feature error
+                            st.error(f"Routed extraction failed: {type(exc).__name__}: {exc}")
+
+                routed_extraction_result = st.session_state.get(
+                    "routed_extraction_result"
+                )
+                if routed_extraction_result is not None:
+                    for form in routed_extraction_result.forms:
+                        with st.container(border=True):
+                            st.markdown(
+                                f"**{form.segment_id} · {form.category}** · pages "
+                                f"{form.start_page}-{form.end_page} · `{form.status}`"
+                            )
+                            if form.error:
+                                st.error(form.error)
+                            if form.extraction is not None:
+                                for name, field in form.extraction.fields.items():
+                                    st.markdown(f"**{name}** · `{field.confidence}`")
+                                    st.write(field.value)
+                                    if field.element_id and field.page:
+                                        st.button(
+                                            "Show source",
+                                            key=f"routed-source-{form.segment_id}-{name}",
+                                            on_click=select_source,
+                                            args=(field.element_id, field.page),
+                                        )
+            elif has_environment and extraction_schema is not None and st.button(
+                "Run extraction", type="primary", icon=":material/data_object:"
             ):
                 try:
                     with st.spinner("Extracting grounded fields..."):
@@ -849,23 +1408,26 @@ else:
                             prepared_context=st.session_state.prepared_agentic_context,
                         )
                     st.session_state.extraction_result = extraction_result
+                    st.session_state.custom_classification = None
+                    st.session_state.routed_extraction_result = None
                 except Exception as exc:  # noqa: BLE001 - isolated feature error
                     st.error(f"Extraction failed: {type(exc).__name__}: {exc}")
-            extraction_result = st.session_state.get("extraction_result")
-            if extraction_result is not None:
-                for name, field in extraction_result.fields.items():
-                    with st.container(border=True):
-                        st.markdown(f"**{name}** · `{field.confidence}`")
-                        st.write(field.value)
-                        if field.element_id and field.page:
-                            st.button(
-                                "Show source",
-                                key=f"extract-source-{name}",
-                                on_click=select_source,
-                                args=(field.element_id, field.page),
-                            )
-                for warning in extraction_result.warnings:
-                    st.warning(warning)
+            if not st.session_state.get("use_custom_routing", False):
+                extraction_result = st.session_state.get("extraction_result")
+                if extraction_result is not None:
+                    for name, field in extraction_result.fields.items():
+                        with st.container(border=True):
+                            st.markdown(f"**{name}** · `{field.confidence}`")
+                            st.write(field.value)
+                            if field.element_id and field.page:
+                                st.button(
+                                    "Show source",
+                                    key=f"extract-source-{name}",
+                                    on_click=select_source,
+                                    args=(field.element_id, field.page),
+                                )
+                    for warning in extraction_result.warnings:
+                        st.warning(warning)
 
     if enable_chat:
         chat_tab = tab_by_name["Chat"]
@@ -986,10 +1548,17 @@ else:
                 key="download-annotated-pdf",
                 on_click="ignore",
             )
-            if extraction_result is not None:
+            routed_extraction_result = st.session_state.get("routed_extraction_result")
+            custom_classification = st.session_state.get("custom_classification")
+            if extraction_result is not None or routed_extraction_result is not None:
+                extraction_json = (
+                    routed_extraction_result.json
+                    if routed_extraction_result is not None
+                    else extraction_result.json
+                )
                 st.download_button(
                     "Download Extract JSON",
-                    extraction_result.json,
+                    extraction_json,
                     file_name=f"{stem}.extract.json",
                     mime="application/json",
                     icon=":material/download:",
@@ -998,7 +1567,13 @@ else:
                 )
             st.download_button(
                 "Download Full JSON",
-                render_combined_result(result, analysis, extraction_result),
+                render_combined_result(
+                    result,
+                    analysis,
+                    extraction_result,
+                    custom_classification=custom_classification,
+                    routed_extraction=routed_extraction_result,
+                ),
                 file_name=f"{stem}.full.json",
                 mime="application/json",
                 icon=":material/download:",
@@ -1010,9 +1585,14 @@ else:
             if analysis is not None
             else 0
         )
+        routing_activity = routed_extraction_result or custom_classification
         extraction_ms = (
             sum(event.duration_ms for event in extraction_result.trace)
             if extraction_result is not None
+            else 0
+        ) + (
+            sum(event.duration_ms for event in routing_activity.trace)
+            if routing_activity is not None
             else 0
         )
         luna_agentic_time = (
@@ -1023,6 +1603,8 @@ else:
         analysis_output = analysis.usage.output_tokens if analysis is not None else 0
         extract_input = extraction_result.input_tokens if extraction_result else 0
         extract_output = extraction_result.output_tokens if extraction_result else 0
+        routing_input = routing_activity.usage.input_tokens if routing_activity else 0
+        routing_output = routing_activity.usage.output_tokens if routing_activity else 0
         recovery_status = (
             "off"
             if not result.metadata.visual_recovery_enabled
@@ -1037,7 +1619,7 @@ else:
             f"{luna_agentic_time:.1f}s · Pages: {parsed_pages} · "
             f"Visual recovery: {recovery_status} · "
             f"Luna input tokens: "
-            f"{result.input_tokens + analysis_input + extract_input:,} · "
+            f"{result.input_tokens + analysis_input + extract_input + routing_input:,} · "
             f"Luna output tokens: "
-            f"{result.output_tokens + analysis_output + extract_output:,}"
+            f"{result.output_tokens + analysis_output + extract_output + routing_output:,}"
         )

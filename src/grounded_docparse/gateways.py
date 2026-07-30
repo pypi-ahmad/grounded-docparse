@@ -21,6 +21,7 @@ from .models import (
     ChatAnswerWire,
     CropInspectionRequest,
     DocumentClassification,
+    FormSegmentationWire,
     MarkdownPresentationPlan,
     PageDraft,
     PageInspection,
@@ -34,6 +35,7 @@ from .prompts import (
     CHAT_PROMPT,
     CLASSIFICATION_PROMPT,
     EXTRACTION_PROMPT,
+    FORM_CLASSIFICATION_PROMPT,
     MARKDOWN_REFINEMENT_PROMPT,
     PROMPT_VERSION,
     SCHEMA_REPAIR_INSTRUCTION,
@@ -653,6 +655,30 @@ class OpenAIDocumentGateway:
             system_prompt=CLASSIFICATION_PROMPT,
             payload={"document_markdown": markdown, "layout_tree": layout},
             max_output_tokens=min(2_000, self.config.luna_max_output_tokens),
+        )
+
+    def classify_forms(
+        self,
+        markdown: str,
+        layout: list[dict[str, Any]],
+        profile: dict[str, Any],
+        *,
+        issues: list[str] | None = None,
+    ) -> FormSegmentationWire:
+        payload = {
+            "routing_profile": profile,
+            "document_markdown": markdown,
+            "layout_tree": layout,
+        }
+        if issues:
+            payload["validation_issues"] = issues
+        return self._structured_document_request(
+            FormSegmentationWire,
+            agent="custom_form_classifier",
+            stage="custom_form_classification",
+            system_prompt=FORM_CLASSIFICATION_PROMPT,
+            payload=payload,
+            max_output_tokens=min(8_000, self.config.luna_max_output_tokens),
         )
 
     def generate_toc(

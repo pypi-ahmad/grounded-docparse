@@ -10,6 +10,8 @@ The package requires Python 3.12–3.14. Install the locked project environment 
 AgenticAnalysis
 ChatAnswer
 ChatSource
+ClassifierCategory
+ClassifierProfile
 Document
 DocumentAgent
 DocumentExtractor
@@ -17,11 +19,15 @@ DocumentParser
 Element
 EnhancementMetadata
 ExtractionResult
+FormClassificationResult
+FormSegment
 ParseMetadata
 ParseResult
 ParserConfig
 PreparedDocumentContext
 SchemaProposal
+RoutedExtractionResult
+SegmentExtraction
 StoredSchema
 VisualRecoveryResult
 render_combined_result
@@ -104,6 +110,18 @@ DocumentAgent.extract(
     *,
     prepared_context: PreparedDocumentContext | None = None,
 ) -> ExtractionResult
+DocumentAgent.classify_forms(
+    parse_result: ParseResult,
+    profile: ClassifierProfile,
+    *,
+    prepared_context: PreparedDocumentContext | None = None,
+    confidence_threshold: float = 0.85,
+) -> FormClassificationResult
+DocumentAgent.extract_forms(
+    parse_result: ParseResult,
+    classification: FormClassificationResult,
+    schemas_by_name: Mapping[str, dict[str, Any]],
+) -> RoutedExtractionResult
 DocumentAgent.chat(
     parse_result: ParseResult,
     question: str,
@@ -156,7 +174,7 @@ answer = agent.chat(
 
 `history` is required and may be an empty list. Only the last eight user/assistant turn pairs are sent. `DocumentAgent.extract` always enables deterministic inferred grounding after the evidence-repair attempt; use direct `DocumentExtractor.extract(..., allow_inferred=False)` when unresolved leaves must become `null` instead.
 
-`AgenticAnalysis` contains optional `classification`, optional `toc`, per-feature status metadata, usage, and trace. `ChatAnswer` contains `answer`, validated `sources`, `confidence` (`high`, `medium`, or `low`), per-call `usage`, and `trace`. `PreparedDocumentContext` contains page Markdown, one or more compact contexts, and active elements.
+`AgenticAnalysis` contains optional `classification`, optional `toc`, per-feature status metadata, usage, and trace. `DocumentAgent.classify_forms` accepts a `ClassifierProfile` and returns grounded contiguous `FormSegment` records. `DocumentAgent.extract_forms` accepts reviewed routing plus compiled schemas by saved name and returns per-segment results; ineligible segments are never extracted.
 
 ## Direct schema proposal and extraction
 
@@ -233,6 +251,9 @@ render_combined_result(
     parse_result: ParseResult,
     analysis: AgenticAnalysis | None = None,
     extraction: ExtractionResult | None = None,
+    *,
+    custom_classification: FormClassificationResult | None = None,
+    routed_extraction: RoutedExtractionResult | None = None,
 ) -> str
 ```
 
@@ -246,16 +267,18 @@ full_json = render_combined_result(
 )
 ```
 
-The returned string is JSON v4.4.0:
+The returned string is Full JSON v4.5.0 (parse JSON remains v4.4.0):
 
 ```json
 {
-  "schema_version": "4.4.0",
+  "schema_version": "4.5.0",
   "markdown": "...",
   "base_markdown": "...",
   "document_type": null,
   "sections": [],
   "extracted_fields": {},
+  "custom_classification": null,
+  "form_extractions": [],
   "recovery_log": [],
   "metadata": {},
   "elements": [],
@@ -279,7 +302,7 @@ Extraction serialization uses schema version `1.1.0`:
 }
 ```
 
-These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for v4.4.0 or extraction v1.1.0; the Pydantic models in `src/grounded_docparse/models.py` and the named schema version are authoritative for nested fields. Consumers that require generated validation schemas should derive and pin them to the installed package version.
+These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for Full JSON v4.5.0, extraction v1.1.0, or routed extraction v2.0.0; the Pydantic models and named versions are authoritative.
 
 ## Configuration and test doubles
 
