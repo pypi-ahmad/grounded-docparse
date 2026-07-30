@@ -21,8 +21,7 @@
     "CONTRIBUTING.md",
     "CHANGELOG.md",
     ".github/ISSUE_TEMPLATE/bug_report.md",
-    ".github/ISSUE_TEMPLATE/feature_request.md",
-    "presentations/grounded-docparse-video-demo-script.md"
+    ".github/ISSUE_TEMPLATE/feature_request.md"
   ],
   "excluded_count": 3,
   "pages": [
@@ -47,7 +46,6 @@
     "contributing.html",
     "changelog.html",
     "issue-template--bug-report.html",
-    "issue-template--feature-request.html",
-    "presentations--grounded-docparse-video-demo-script.html"
+    "issue-template--feature-request.html"
   ]
 }
