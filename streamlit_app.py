@@ -6,6 +6,7 @@ import json
 import math
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pymupdf
 import streamlit as st
@@ -50,6 +51,26 @@ STAGE_LABELS = (
     ("classify", "Document classification"),
     ("toc", "Table of contents"),
 )
+LUNA_REVIEW_WARNING = (
+    "Luna output may be incorrect or influenced by instructions inside the document. "
+    "Review confidence and cited source regions before consequential use."
+)
+
+
+def luna_destination() -> str:
+    value = os.getenv("OPENAI_BASE_URL")
+    if not value:
+        return "OpenAI default endpoint"
+    try:
+        parsed = urlsplit(value)
+        hostname = parsed.hostname
+        port = parsed.port
+    except ValueError:
+        return "custom endpoint (invalid host)"
+    if not hostname:
+        return "custom endpoint (invalid host)"
+    host = f"[{hostname}]" if ":" in hostname else hostname
+    return f"{host}:{port}" if port is not None else host
 
 
 def reset_document_state() -> None:
@@ -342,6 +363,13 @@ if not has_environment:
         "OPENAI_API_KEY is not set. GLM-OCR parsing remains available; Luna visual "
         "recovery and Markdown refinement will be skipped."
     )
+elif os.getenv("OPENAI_BASE_URL"):
+    st.warning(
+        f"Luna requests will send document content to custom endpoint: "
+        f"`{luna_destination()}`."
+    )
+else:
+    st.caption(f"Luna destination: {luna_destination()}")
 if preload_error is not None:
     st.error(preload_error)
 
@@ -601,6 +629,15 @@ if has_result:
         for feature in analysis.features.values():
             for warning in feature.warnings:
                 st.warning(warning)
+    has_luna_output = (
+        result.metadata.visual_recovery_crops > 0
+        or bool(result.usage and result.usage.calls)
+        or bool(analysis and analysis.usage.calls)
+        or bool(extraction_result and extraction_result.usage.calls)
+        or any(turn.get("confidence") for turn in st.session_state.chat_history)
+    )
+    if has_luna_output:
+        st.warning(LUNA_REVIEW_WARNING)
 
 tab_labels = ["Overview", "Markdown", "Annotated PDF"]
 if has_result:
@@ -838,6 +875,8 @@ else:
                 for turn_index, turn in enumerate(history):
                     with st.chat_message(turn["role"]):
                         st.markdown(turn["content"])
+                        if turn.get("confidence"):
+                            st.caption(f"Confidence: {turn['confidence']}")
                         for citation in turn.get("sources", []):
                             st.button(
                                 f"Show source · page {citation['page']}",

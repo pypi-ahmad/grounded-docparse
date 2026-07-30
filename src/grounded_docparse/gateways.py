@@ -38,6 +38,7 @@ from .prompts import (
     PROMPT_VERSION,
     SCHEMA_REPAIR_INSTRUCTION,
     TOC_PROMPT,
+    secure_document_prompt,
 )
 from .runtime import ProviderRuntime
 
@@ -338,7 +339,7 @@ class OpenAIDocumentGateway:
         max_output_tokens: int,
     ) -> T:
         for attempt in range(2):
-            prompt = system_prompt
+            prompt = secure_document_prompt(system_prompt)
             if attempt:
                 prompt = f"{prompt}\n\n{SCHEMA_REPAIR_INSTRUCTION}"
             try:
@@ -379,7 +380,7 @@ class OpenAIDocumentGateway:
             input=[
                 {
                     "role": "system",
-                    "content": (
+                    "content": secure_document_prompt(
                         "Extract every visible element in semantic reading order. Include complete "
                         "paragraphs; ordered and unordered lists with their literal markers; forms "
                         "and field values; tables and cells; checkboxes; headings; headers; footers; "
@@ -466,7 +467,7 @@ class OpenAIDocumentGateway:
             input=[
                 {
                     "role": "system",
-                    "content": (
+                    "content": secure_document_prompt(
                         f"Act as the {agent_role.value}. Verify each candidate against its "
                         "corresponding source crop. Accept, return a high-confidence text-only "
                         "correction, or mark the crop inconclusive. "
@@ -544,7 +545,7 @@ class OpenAIDocumentGateway:
             input=[
                 {
                     "role": "system",
-                    "content": (
+                    "content": secure_document_prompt(
                         "Verify each candidate against its corresponding high-resolution source crop. "
                         "Return exactly one accept, high-confidence text-only correction, or inconclusive "
                         "decision per crop. "
@@ -609,7 +610,7 @@ class OpenAIDocumentGateway:
             input=[
                 {
                     "role": "system",
-                    "content": (
+                    "content": secure_document_prompt(
                         "Resolve only each supplied uncertain literal against its matching crop. "
                         "When context_image_index is present, use that second image only to locate "
                         "and disambiguate the literal; the tight crop remains the repair target. "
@@ -705,7 +706,7 @@ class OpenAIDocumentGateway:
             input=[
                 {
                     "role": "system",
-                    "content": (
+                    "content": secure_document_prompt(
                         "Convert the user's extraction request into strict JSON Schema. "
                         "Return the schema as schema_text. The root must be an object, every "
                         "object must set additionalProperties to false and require every property, "
@@ -770,7 +771,7 @@ class OpenAIDocumentGateway:
                     model=model,
                 )
 
-            system_prompt = EXTRACTION_PROMPT
+            system_prompt = secure_document_prompt(EXTRACTION_PROMPT)
             if format_attempt:
                 system_prompt = f"{system_prompt}\n\n{SCHEMA_REPAIR_INSTRUCTION}"
             response = self._provider_request(
