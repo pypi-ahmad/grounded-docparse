@@ -23,6 +23,7 @@ RUNTIME_DIR = PROJECT_ROOT / ".runtime"
 RUNTIME_CONFIG = RUNTIME_DIR / "glmocr.yaml"
 MODEL_PATH_FILE = RUNTIME_DIR / "glmocr-model-path"
 MANIFEST_FILE = RUNTIME_DIR / "glmocr-models.json"
+BACKENDS = ("vllm", "ollama")
 
 
 def _positive_int(name: str, default: int) -> int:
@@ -75,27 +76,59 @@ def _atomic_write(path: Path, content: str) -> None:
         raise
 
 
-def _runtime_config(layout_path: Path, max_workers: int) -> dict[str, Any]:
+def _runtime_config(
+    layout_path: Path,
+    max_workers: int,
+    *,
+    backend: str = "vllm",
+) -> dict[str, Any]:
+    if backend not in BACKENDS:
+        raise ValueError(f"Unsupported OCR backend: {backend}")
     config = yaml.safe_load(SOURCE_CONFIG.read_text(encoding="utf-8"))
     pipeline = config["pipeline"]
     pipeline["max_workers"] = max_workers
     pipeline["layout"]["model_dir"] = str(layout_path)
+    if backend == "ollama":
+        pipeline["layout"]["device"] = "cpu"
+        pipeline["ocr_api"].update(
+            {
+                "api_port": 11434,
+                "api_mode": "ollama_generate",
+                "api_path": "/api/generate",
+                "model": "glm-ocr:bf16",
+                "connect_timeout": 120,
+                "request_timeout": 600,
+                "connection_pool_size": 1,
+            }
+        )
     return config
 
 
-def prepare(*, offline: bool) -> dict[str, str | int]:
+def prepare(*, offline: bool, backend: str = "vllm") -> dict[str, str | int]:
+    if backend not in BACKENDS:
+        raise ValueError(f"Unsupported OCR backend: {backend}")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
-    glm_path = _resolve_snapshot(GLMOCR_REPO, GLMOCR_REVISION, offline)
     layout_path = _resolve_snapshot(LAYOUT_REPO, LAYOUT_REVISION, offline)
-    max_workers = _positive_int("GLMOCR_SDK_MAX_WORKERS", 16)
+    max_workers = _positive_int(
+        "GLMOCR_SDK_MAX_WORKERS", 1 if backend == "ollama" else 16
+    )
+    glm_path = (
+        _resolve_snapshot(GLMOCR_REPO, GLMOCR_REVISION, offline)
+        if backend == "vllm"
+        else None
+    )
 
-    config = _runtime_config(layout_path, max_workers)
+    config = _runtime_config(layout_path, max_workers, backend=backend)
     _atomic_write(RUNTIME_CONFIG, yaml.safe_dump(config, sort_keys=False))
-    _atomic_write(MODEL_PATH_FILE, f"{glm_path}\n")
+    _atomic_write(
+        MODEL_PATH_FILE,
+        f"{glm_path}\n" if glm_path is not None else "glm-ocr:bf16\n",
+    )
     manifest: dict[str, str | int] = {
+        "backend": backend,
         "glmocr_repo": GLMOCR_REPO,
         "glmocr_revision": GLMOCR_REVISION,
-        "glmocr_path": str(glm_path),
+        "glmocr_path": str(glm_path) if glm_path is not None else "glm-ocr:bf16",
         "layout_repo": LAYOUT_REPO,
         "layout_revision": LAYOUT_REVISION,
         "layout_path": str(layout_path),
@@ -112,12 +145,18 @@ def main() -> int:
         action="store_true",
         help="Resolve both exact revisions from the local Hugging Face cache only.",
     )
+    parser.add_argument(
+        "--backend",
+        choices=BACKENDS,
+        default=os.environ.get("DOCPARSE_LOCAL_OCR_BACKEND", "vllm"),
+    )
     args = parser.parse_args()
-    manifest = prepare(offline=args.offline)
+    manifest = prepare(offline=args.offline, backend=args.backend)
     print(
         "Prepared GLM-OCR "
         f"{manifest['glmocr_revision']} and PP-DocLayoutV3 "
-        f"{manifest['layout_revision']} (workers={manifest['sdk_max_workers']})."
+        f"{manifest['layout_revision']} for {manifest['backend']} "
+        f"(workers={manifest['sdk_max_workers']})."
     )
     return 0
 

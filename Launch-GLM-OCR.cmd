@@ -39,6 +39,6 @@ exit /b 0
 
 :failed
 echo.
-echo Startup failed. Review .runtime\vllm.log and .runtime\streamlit.log.
+echo Startup failed. Review .runtime\vllm.log, .runtime\ollama.log, and .runtime\streamlit.log.
 pause
 exit /b 1

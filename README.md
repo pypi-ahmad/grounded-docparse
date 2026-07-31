@@ -24,7 +24,7 @@ Every PDF page is rendered to pixels. Selectable or embedded PDF text is not ext
 
 ## Install and set up
 
-The supported runtime requires Windows 11, WSL2 with Ubuntu 24.04, an NVIDIA Windows driver with WSL GPU passthrough, Git, enough disk space for the WSL environment and model cache, and network access for the first dependency and model download.
+The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, at least 16 GB RAM, 20 GB free disk, and network access during first setup. It installs or reuses WSL2, Ubuntu 24.04, Python, dependencies, and pinned models. NVIDIA CUDA uses vLLM; AMD uses Ollama acceleration when supported; every failed or unavailable GPU path falls back to Ollama CPU.
 
 1. Clone the repository from PowerShell:
 
@@ -33,15 +33,13 @@ The supported runtime requires Windows 11, WSL2 with Ubuntu 24.04, an NVIDIA Win
    Set-Location grounded-docparse
    ```
 
-2. Confirm WSL and the GPU are available:
+2. Run setup. It installs missing Windows/WSL dependencies and resumes after a required restart:
 
    ```powershell
-   wsl --install -d Ubuntu-24.04
-   wsl --update
-   wsl -d Ubuntu-24.04 -- nvidia-smi
+   .\Setup-GLM-OCR.cmd
    ```
 
-   Restart Windows and complete Ubuntu's first-login setup if requested.
+   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. Setup reuses a healthy Ubuntu user or securely prompts once for Linux credentials.
 
 3. Optional: enable Luna visual recovery and document reasoning by saving the OpenAI values in the Windows user environment. Skip this step for local GLM-only parsing.
 
@@ -51,15 +49,7 @@ The supported runtime requires Windows 11, WSL2 with Ubuntu 24.04, an NVIDIA Win
    # [Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://example.com/v1", "User")
    ```
 
-4. Run the first-time setup from the repository root:
-
-   ```powershell
-   .\Setup-GLM-OCR.cmd
-   ```
-
-   This creates the locked WSL environment, downloads the pinned GLM-OCR and PP-DocLayoutV3 snapshots, starts vLLM and Streamlit, validates a real OCR request, and opens <http://localhost:8501>.
-
-5. For later sessions, start or reuse the managed services with:
+4. For later sessions, start or reuse the managed services with:
 
    ```powershell
    .\Launch-GLM-OCR.cmd
