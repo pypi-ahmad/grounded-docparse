@@ -1,16 +1,15 @@
 # Setup
 
-> Last verified against this repository: 2026-07-30.
+> Last verified against this repository: 2026-07-31.
 
-The supported local runtime is Windows 11 with Ubuntu 24.04 under WSL2 and an NVIDIA GPU. GLM-OCR and PP-DocLayout run inside WSL; Streamlit is launched from the same locked Linux environment. Native Windows does not install the `local-ocr` dependency because its package markers are Linux-only.
+The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. NVIDIA CUDA uses vLLM. AMD uses Ollama ROCm when supported. Missing or failed GPU acceleration uses Ollama CPU. GLM-OCR, PP-DocLayout, and Streamlit stay inside the locked Linux environment.
 
 ## Prerequisites
 
-- Windows 11 with WSL support
-- NVIDIA Windows driver with WSL GPU passthrough
+- Windows 10 22H2 or Windows 11 x64 with AVX2
+- At least 16 GB RAM and 20 GB free disk
 - Network access during first setup for Python packages and model weights
-- Enough disk space for the WSL virtual environment and model cache
-- Git for obtaining the repository
+- Administrator approval when Windows must enable WSL2
 
 Obtain the repository from PowerShell:
 
@@ -19,16 +18,7 @@ git clone https://github.com/pypi-ahmad/grounded-docparse.git
 Set-Location grounded-docparse
 ```
 
-Check WSL and GPU visibility from PowerShell:
-
-```powershell
-wsl --install -d Ubuntu-24.04
-wsl --update
-wsl --list --verbose
-wsl -d Ubuntu-24.04 -- nvidia-smi
-```
-
-Restart Windows if WSL installation requests it. The first Ubuntu launch may ask for a UNIX username and password.
+The release installer bundles the application, so target computers do not need Git. Source checkouts still require Git.
 
 ## Automated Windows setup
 
@@ -38,16 +28,26 @@ From the repository root, run:
 .\Setup-GLM-OCR.cmd
 ```
 
-The script:
+The setup assistant:
 
-1. checks for `wsl.exe` and Ubuntu 24.04;
-2. requests elevation only when the distribution must be installed;
-3. verifies `nvidia-smi` inside WSL;
-4. refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from the Windows user environment, then passes them and the repository path into WSL;
-5. runs `scripts/wsl/launch-stack.sh`;
-6. opens <http://localhost:8501> after vLLM and Streamlit are healthy.
+1. validates Windows, AVX2, RAM, and disk;
+2. installs or reuses WSL2 and Ubuntu 24.04, resuming after restart when required;
+3. reuses the Ubuntu user or securely creates one without persisting its password;
+4. installs only missing or stale locked dependencies;
+5. tries NVIDIA CUDA, otherwise installs Ollama `glm-ocr:bf16`; supported AMD GPUs accelerate Ollama and unsupported GPUs use CPU;
+6. validates a real image request, starts Streamlit, and opens <http://localhost:8501>.
 
-If `uv` is not already available inside WSL, the first run installs `uv` 0.11.32 after verifying the installer checksum; otherwise it uses the existing executable. It then installs Python 3.12.10, creates `~/.local/share/grounded-docparse/.venv`, and runs `uv sync --locked --extra local-ocr`. Setup downloads exact GLM-OCR and PP-DocLayoutV3 revisions into the WSL Hugging Face cache and generates `.runtime/glmocr.yaml` with the resolved local layout-model path. Later launches are cache-only and fail instead of silently accessing the network.
+Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use `local-ocr`; CPU/AMD installs use `local-ocr-cpu`. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
+
+### Build the installer
+
+Install Inno Setup 6, then run:
+
+```powershell
+.\scripts\build-installer.ps1
+```
+
+The build creates `dist\GroundedDocParse-<version>-Setup.exe` and a SHA-256 file. The artifact is unsigned because no public-trusted signing certificate is configured; Windows SmartScreen may warn.
 
 For later sessions:
 
@@ -57,7 +57,7 @@ For later sessions:
 
 Both launchers reuse healthy processes. Runtime logs and PID files are stored under the ignored `.runtime/` directory.
 
-To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. The launcher enters WSL through `bash -lc`, so login-profile exports are inherited. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration; `DOCPARSE_GLMOCR_LAYOUT_DEVICE` remains overridable and defaults to `cuda:0`.
+To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration. Layout uses `cuda:0` with vLLM and `cpu` with Ollama.
 
 ## Manual WSL setup and launch
 
@@ -67,11 +67,19 @@ Run the following inside Ubuntu from the repository mounted under `/mnt/<drive>/
 bash scripts/wsl/setup-glmocr.sh
 ```
 
+Set `DOCPARSE_LOCAL_OCR_BACKEND=vllm` or `ollama` to force one backend. Without it, setup chooses vLLM only when `nvidia-smi` succeeds inside WSL.
+
 Then use two WSL terminals:
 
 ```bash
-# Terminal 1: vLLM on port 8080
+# Terminal 1a: vLLM on port 8080
 bash scripts/wsl/serve-glmocr.sh
+```
+
+For Ollama instead:
+
+```bash
+bash scripts/wsl/serve-ollama.sh
 ```
 
 ```bash

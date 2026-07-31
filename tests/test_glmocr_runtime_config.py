@@ -110,3 +110,23 @@ def test_runtime_config_uses_pinned_layout_path_and_worker_override() -> None:
     assert config["pipeline"]["max_workers"] == 24
     assert _PREPARE.GLMOCR_REVISION == "ca5d8b3e287e52589e37c28385d9655ee4372f9d"
     assert _PREPARE.LAYOUT_REVISION == "97d101e6db2642e162a1d05392d1b0231c91033e"
+
+
+def test_ollama_runtime_uses_cpu_layout_and_bf16_model() -> None:
+    layout_path = Path("/cache/pp-doclayout-v3")
+    config = _PREPARE._runtime_config(
+        layout_path, max_workers=1, backend="ollama"
+    )["pipeline"]
+
+    assert config["layout"]["device"] == "cpu"
+    assert config["max_workers"] == 1
+    assert config["ocr_api"] == {
+        **pipeline_config()["ocr_api"],
+        "api_port": 11434,
+        "api_mode": "ollama_generate",
+        "api_path": "/api/generate",
+        "model": "glm-ocr:bf16",
+        "connect_timeout": 120,
+        "request_timeout": 600,
+        "connection_pool_size": 1,
+    }
