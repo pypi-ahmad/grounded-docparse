@@ -4,7 +4,7 @@ A workstation-oriented Streamlit studio that parses PDFs and images with local G
 
 Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ahmad/grounded-docparse)
 
-GLM-OCR owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Image recovery uses high reasoning effort. Markdown refinement, classification, table-of-contents generation, extraction, and chat use medium effort.
+GLM-OCR owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
 
 ```text
 upload
@@ -21,6 +21,8 @@ upload
 ![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
 
 Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. The parser processes ordered windows of 16 pages with up to eight page workers by default. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
+
+Form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. It re-renders those regions at 450 DPI, preserves the primary HTML layout, emits `[?]` for unresolved controls, and never replaces conflicting primary text. Set `DOCPARSE_GLM_FORM_RECOVERY_ENABLED=false` to disable it without changing the primary GLM-OCR pass. Luna is not required for this recovery.
 
 ## Install and set up
 
@@ -64,7 +66,7 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
    - **Fast**: classification is the only preset-controlled Luna feature; visual recovery is a separate toggle and defaults on when a key is available.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
-3. Keep visual recovery enabled to inspect up to eight prioritized crops per document, capped at three crops per page.
+3. Keep visual recovery enabled to inspect prioritized hard regions. The Luna budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 4. Select **Parse document**.
 5. Review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
 6. Download the Markdown, annotated PDF, extraction JSON, or full grounded JSON required by the downstream workflow.

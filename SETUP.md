@@ -125,7 +125,7 @@ The Windows launcher reads user scope directly, so a newly saved value does not 
 | `DOCPARSE_MAX_PAGES` | `500` | Maximum pages or image frames |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Maximum rendered pixels per page |
 | `DOCPARSE_LUNA_MAX_OUTPUT_TOKENS` | `128000` | Upper bound used by Luna calls; individual stages apply smaller caps |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `8` | Document-wide recovery-crop limit |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit; cannot exceed batch size |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |

@@ -8,6 +8,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- Made Luna recovery scale from eight to 64 prioritized crops with document length while retaining the three-per-page guard.
+- Kept local GLM form recovery independent from the Luna crop budget and standardized every Luna request on medium reasoning effort.
+
 ## [0.5.0] - 2026-07-31
 
 ### Added

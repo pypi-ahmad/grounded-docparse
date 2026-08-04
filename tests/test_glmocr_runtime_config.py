@@ -5,6 +5,11 @@ from pathlib import Path
 
 import yaml
 
+from grounded_docparse.local_ocr import (
+    GLM_FORM_RECOVERY_MAX_PIXELS,
+    _form_recovery_config_path,
+)
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "config" / "glmocr.yaml"
 PREPARE_SCRIPT = PROJECT_ROOT / "scripts" / "wsl" / "prepare_glmocr_runtime.py"
@@ -100,6 +105,19 @@ def test_glmocr_config_uses_supported_retry_and_image_limits() -> None:
     assert loader["max_tokens"] == 8192
     assert loader["max_pixels"] == 1_003_520
     assert pipeline["region_maxsize"] == 800
+
+
+def test_form_recovery_config_is_isolated_and_higher_resolution() -> None:
+    recovery_path = _form_recovery_config_path(str(CONFIG_PATH))
+    recovery = yaml.safe_load(recovery_path.read_text(encoding="utf-8"))["pipeline"]
+    primary = pipeline_config()
+
+    assert recovery_path != CONFIG_PATH
+    assert primary["page_loader"]["image_format"] == "JPEG"
+    assert primary["page_loader"]["max_pixels"] == 1_003_520
+    assert recovery["page_loader"]["image_format"] == "PNG"
+    assert recovery["page_loader"]["max_pixels"] == GLM_FORM_RECOVERY_MAX_PIXELS
+    assert recovery["layout"] == primary["layout"]
 
 
 def test_runtime_config_uses_pinned_layout_path_and_worker_override() -> None:
