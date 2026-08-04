@@ -247,7 +247,7 @@ It does not replace the source text, change element locations, or reorder the ca
 
 ### 6.3 Enable visual recovery on hard regions
 
-Visual recovery inspects a small number of difficult source regions. The application can select at most eight crops per document and three per page by default.
+Visual recovery inspects difficult source regions after local GLM form recovery. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 
 Candidates can include:
 

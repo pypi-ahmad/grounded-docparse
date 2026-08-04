@@ -17,15 +17,15 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 - Render PDFs visually and never treat selectable PDF text as evidence.
 - Use GLM-OCR as the source of layout, identity, geometry, type, confidence, and reading order.
 - Process ordered 16-page windows with up to eight page workers by default.
-- Detect weak existing GLM regions deterministically and select at most eight recovery crops per document and three per page by default.
-- Use Luna high effort only for image recovery and apply only text corrections with confidence at least `0.85`.
+- Reprocess every eligible form region with local GLM first, capped at three crops per page.
+- Detect weak existing GLM regions deterministically and assign Luna an independent budget that scales from eight crops to the configured ceiling of 64 based on document length, capped at three per page.
+- Use medium Luna effort for every request and apply only image-recovery text corrections with confidence at least `0.85`.
 - Ignore Luna additions, rejections, geometry changes, order changes, type changes, confidence changes, and structural changes.
 - Stop before Luna when at least one page is nonblank and none of the nonblank pages contains a GLM layout region; preserve isolated page failures as partial output with warnings.
 - Optionally refine Markdown through presentation directives keyed by existing elements.
 - Optionally classify the document and generate a hierarchical, source-linked TOC.
 - Run extraction on demand with a strict nullable JSON Schema subset and existing-element evidence.
 - Run chat on demand and expose only citations to known elements.
-- Use medium Luna effort for refinement, classification, TOC, extraction, schema proposal, and chat.
 - Use strict Structured Outputs, one schema-format retry, `store=False`, and no application-supplied cache controls.
 - Keep Fast as classification-only, Full as refinement/classification/TOC, and Custom as any other toggle combination.
 - Keep visual recovery independently configurable and chat disabled by default.

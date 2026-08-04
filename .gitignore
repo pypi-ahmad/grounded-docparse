@@ -19,6 +19,7 @@ artifacts/
 *.pdf
 .ruff_cache/
 .claude/
+.codex/
 .remember/
 .superpowers/
 .codegraph/
@@ -30,6 +31,7 @@ ownership-map-out/
 .docparse/
 .worktrees/
 .runtime/
+tmp/
 *.log
 .DS_Store
 *.py[cod]

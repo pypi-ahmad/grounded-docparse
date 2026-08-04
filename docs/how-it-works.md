@@ -4,7 +4,7 @@
 2. Every PDF page or image frame is rasterized locally. Selectable PDF text is ignored.
 3. GLM-OCR runs layout and recognition in ordered windows of 16 pages. The process-wide SDK runtime serializes model access while the parser prepares and finalizes up to eight pages concurrently.
 4. Deterministic quality analysis scores GLM regions using OCR confidence, text density, garbage ratio, empty-region area, and table structure.
-5. When enabled and credentialed, the parser selects at most eight recovery crops per document and three per page. Luna inspects only those crops at high effort.
+5. Local GLM recovery first reprocesses every eligible form region, capped at three per page. When Luna recovery is enabled and credentialed, its independent medium-effort crop budget scales from eight to 64 with document length and remains capped at three per page.
 6. Deterministic code accepts only crop-backed text corrections with confidence at least `0.85`. It ignores Luna additions, rejections, geometry, types, confidence, order, and structure.
 7. Completed pages return to source order. The pipeline builds hierarchy, quality state, normalized elements, grounded `base_markdown`, JSON v4.4.0, and an annotated PDF.
 8. When enabled, text-only Luna returns presentation directives keyed by existing IDs. Deterministic rendering creates refined Markdown; grounding still targets `base_markdown`.

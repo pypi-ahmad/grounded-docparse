@@ -52,7 +52,7 @@ Browser
 3. Analyze GLM-OCR in ordered windows of 16 pages.
 4. Rank recovery candidates from GLM confidence and deterministic quality signals.
 5. Process up to eight pages concurrently within each ordered window.
-6. Send at most eight selected Luna crops per document and three per page.
+6. Run local GLM form recovery first, then send selected Luna crops using an independent adaptive budget of eight to 64 and a three-per-page limit.
 7. Apply only high-confidence textual corrections to existing elements.
 8. Restore source page order and build the cross-page hierarchy.
 9. Materialize quality, elements, base Markdown, and annotations.

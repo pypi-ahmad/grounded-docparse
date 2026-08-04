@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import pymupdf
-import pytest
 from streamlit.testing.v1 import AppTest
 
 from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
+from grounded_docparse.config import LUNA_MODEL
 from grounded_docparse.models import (
+    AgentUsage,
     AgenticAnalysis,
     Block,
     Document,
@@ -51,6 +52,11 @@ def test_studio_allows_glm_without_openai_environment(
         if toggle.label == "Enable visual recovery on hard regions"
     )
     assert recovery.disabled is True
+    assert recovery.help == (
+        "Uses medium-effort Luna vision on prioritized hard regions. The budget "
+        "scales from 8 to 64 crops by document length, with at most 3 per page; "
+        "local GLM recovery runs first."
+    )
     assert [tab.label for tab in app.tabs] == [
         "Overview",
         "Markdown",
@@ -65,12 +71,49 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
     app.session_state["result"] = object()
     app.session_state["result_source_hash"] = "old"
     app.session_state["result_version"] = "old-contract"
+    app.session_state["session_usage"] = RunUsage(
+        calls=[
+            AgentUsage(
+                agent="old",
+                model=LUNA_MODEL,
+                input_tokens=100,
+                output_tokens=10,
+            )
+        ]
+    )
 
     app.run(timeout=20)
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
     assert app.session_state["result_version"] == "4.5.0"
+    assert app.session_state["session_usage"].calls == []
+
+
+def test_legacy_session_usage_defaults_missing_cached_tokens_to_zero(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    class LegacyUsage:
+        calls = [
+            type(
+                "LegacyAgentUsage",
+                (),
+                {
+                    "model": LUNA_MODEL,
+                    "input_tokens": 100,
+                    "output_tokens": 10,
+                },
+            )()
+        ]
+
+    app.session_state["session_usage"] = LegacyUsage()
+    app = app.run(timeout=20)
+
+    assert not app.exception
+    metrics = {item.label: item.value for item in app.metric}
+    assert metrics["Cached input"] == "0"
+    assert metrics["Estimated cost"] == "$0.000032"
 
 
 def test_studio_shows_default_luna_destination(monkeypatch) -> None:
@@ -85,29 +128,14 @@ def test_studio_shows_default_luna_destination(monkeypatch) -> None:
     )
 
 
-@pytest.mark.parametrize(
-    ("base_url", "expected"),
-    [
-        (
-            "https://user:secret@proxy.example:8443/v1?token=hidden",
-            "proxy.example:8443",
-        ),
-        ("not a URL", "custom endpoint (invalid host)"),
-    ],
-)
-def test_studio_sanitizes_custom_luna_destination(
-    monkeypatch, base_url: str, expected: str
-) -> None:
+def test_studio_hides_custom_luna_destination(monkeypatch) -> None:
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    monkeypatch.setenv("OPENAI_BASE_URL", base_url)
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://us.api.openai.com/v1")
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
-    warning = next(item.value for item in app.warning if "custom endpoint" in item.value)
 
-    assert expected in warning
-    assert "user" not in warning
-    assert "secret" not in warning
-    assert "token" not in warning
+    assert not any("custom endpoint" in item.value for item in app.warning)
+    assert not any("Luna destination" in item.value for item in app.get("caption"))
 
 
 def test_ade_presets_default_fast_and_allow_full_or_custom(monkeypatch) -> None:
@@ -184,7 +212,17 @@ def test_studio_shows_results_and_only_requested_tools(
                 input_tokens=1_234,
                 output_tokens=56,
                 annotated_pdf=simple_pdf,
-                usage=RunUsage(),
+                usage=RunUsage(
+                    calls=[
+                        AgentUsage(
+                            agent="visual_recovery",
+                            model=LUNA_MODEL,
+                            input_tokens=1_234,
+                            cached_input_tokens=234,
+                            output_tokens=56,
+                        )
+                    ]
+                ),
                 trace=[],
                 elements=build_elements(document, {"p1-b1"}),
                 metadata=ParseMetadata(
@@ -215,23 +253,26 @@ def test_studio_shows_results_and_only_requested_tools(
         "Layout Tree",
     ]
     assert next(item for item in app.metric if item.label == "Recovered").value == "1"
-    assert [(item.label, item.value) for item in app.metric] == [
-        ("Pages", "1"),
-        ("Regions", "1"),
-        ("Tables", "0"),
-        ("Figures", "0"),
-        ("Time", "0.0s"),
-        ("Recovered", "1"),
-    ]
+    metrics = {item.label: item.value for item in app.metric}
+    assert metrics == {
+        "Input tokens": "1,234",
+        "Cached input": "234",
+        "Output tokens": "56",
+        "Estimated cost": "$0.000272",
+        "Pages": "1",
+        "Regions": "1",
+        "Tables": "0",
+        "Figures": "0",
+        "Time": "0.0s",
+        "Recovered": "1",
+    }
     assert not app.text_area
     assert [button.label for button in app.download_button] == [
         "Download Markdown",
         "Download annotated PDF",
         "Download Full JSON",
     ]
-    assert any(
-        "Luna input tokens: 1,234" in item.value for item in app.get("caption")
-    )
+    assert any("$0.02/M cached input" in item.value for item in app.get("caption"))
     assert any(
         "Review confidence and cited source regions" in item.value
         for item in app.warning
@@ -239,7 +280,9 @@ def test_studio_shows_results_and_only_requested_tools(
 
     app.session_state["studio_tab"] = "Markdown"
     app = app.run(timeout=20)
-    assert any("Public notice" in item.value for item in app.markdown)
+    assert app.session_state["session_usage"].input_tokens == 1_234
+    preview = next(item for item in app.markdown if "Public notice" in item.value)
+    assert preview.proto.allow_html is True
 
     app.session_state["studio_tab"] = "Extract"
     app = app.run(timeout=20)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import inspect
 import os
 import re
@@ -22,6 +23,7 @@ from .enhancement import (
 )
 from .gateways import OpenAIDocumentGateway
 from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
+from .local_ocr import GlmPageResult, get_glmocr_form_recovery_runtime
 from .models import (
     AgentRole,
     AgentTraceEvent,
@@ -41,6 +43,7 @@ from .models import (
     FormData,
     InspectionAction,
     InspectionDecision,
+    LayoutRegionEvidence,
     NodeType,
     Page,
     PageAnalysis,
@@ -82,6 +85,7 @@ from .runtime import ProviderRuntime
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
 MAX_VISUAL_RECOVERY_CROPS_PER_PAGE = 3
+MIN_VISUAL_RECOVERY_CROPS_PER_DOCUMENT = 8
 RECOVERY_OCR_CONFIDENCE_THRESHOLD = 0.55
 RECOVERY_LARGE_REGION_AREA = 0.02
 RECOVERY_MIN_CHARACTER_DENSITY = 50.0
@@ -126,8 +130,172 @@ CRITICAL_LITERAL_PATTERN = re.compile(
 AMBIGUOUS_LITERAL_PATTERN = re.compile(
     r"(?:#{2,}|(?i:\b(?:id|no|number)2(?=\s+[A-Z0-9][A-Z0-9_-]{2,}\b)))"
 )
+_HTML_CELL_PATTERN = re.compile(
+    r"(?is)<(?P<tag>td|th)(?P<attrs>\s[^>]*)?>(?P<body>.*?)</(?P=tag)>"
+)
+_CHECKBOX_PREFIX_PATTERN = re.compile(
+    r"^\s*(?:\[(?P<bracket>[xX ?])\]|(?P<glyph>[☑✓✔☐□])|(?P<x>[xX])(?=\s+))\s*"
+)
+_RAW_CHECKBOX_PREFIX_PATTERN = re.compile(
+    r"^\s*(?:\[[xX ?]\]|[☑✓✔☐□]|[xX](?=\s+))\s*"
+)
+_FORM_OPTION_LABELS = frozenset(
+    {
+        "participating",
+        "nonparticipating",
+        "outpatient",
+        "planned inpatient",
+        "emergent inpatient",
+        "skilled nursing facility",
+        "long-term services & supports/long-term care",
+        "home health",
+        "durable medical equipment",
+        "diagnostic study",
+        "hospice",
+        "office visit",
+        "personal care services",
+        "hospital",
+        "ambulatory surgery center",
+        "office",
+        "home",
+        "independent lab",
+        "nursing facility",
+    }
+)
 VISUAL_REGION_TYPES = {NodeType.FIGURE, NodeType.IMAGE, NodeType.CHART}
 INVALID_CONFIDENCE_EVIDENCE_REASON = "Invalid confidence evidence"
+
+
+@dataclass(frozen=True, slots=True)
+class _RawHTMLCell:
+    start: int
+    end: int
+    body: str
+    text: str
+
+
+def _visible_html(value: str) -> str:
+    with_breaks = re.sub(r"(?i)<br\s*/?>", "\n", value)
+    return " ".join(html.unescape(re.sub(r"(?s)<[^>]+>", " ", with_breaks)).split())
+
+
+def _raw_html_cells(value: str) -> list[_RawHTMLCell]:
+    return [
+        _RawHTMLCell(
+            start=match.start("body"),
+            end=match.end("body"),
+            body=match.group("body"),
+            text=_visible_html(match.group("body")),
+        )
+        for match in _HTML_CELL_PATTERN.finditer(value)
+    ]
+
+
+def _checkbox_state_and_label(value: str) -> tuple[str | None, str]:
+    match = _CHECKBOX_PREFIX_PATTERN.match(value)
+    state = None
+    if match is not None:
+        token = match.group("bracket") or match.group("glyph") or match.group("x")
+        if token in {"x", "X", "☑", "✓", "✔"}:
+            state = "checked"
+        elif token in {" ", "☐", "□"}:
+            state = "unchecked"
+        value = value[match.end() :]
+    return state, " ".join(value.casefold().rstrip(":").split())
+
+
+def _form_option(value: str) -> tuple[str | None, str | None]:
+    state, label = _checkbox_state_and_label(value)
+    return (state, label) if label in _FORM_OPTION_LABELS else (None, None)
+
+
+def _option_states(value: str) -> dict[tuple[str, int], str | None]:
+    counts: dict[str, int] = {}
+    states: dict[tuple[str, int], str | None] = {}
+    for cell in _raw_html_cells(value):
+        state, label = _form_option(cell.text)
+        if label is None:
+            continue
+        occurrence = counts.get(label, 0)
+        counts[label] = occurrence + 1
+        states[(label, occurrence)] = state
+    return states
+
+
+def _form_control_recovery_severity(value: str) -> int | None:
+    unresolved = sum(state is None for state in _option_states(value).values())
+    if unresolved >= 4:
+        return 0
+    if unresolved >= 2:
+        return 1
+    return 2 if unresolved else None
+
+
+def _merge_form_html(primary: str, recovered: str) -> tuple[str, str, int]:
+    """Add explicit control states and fill only structurally aligned blank cells."""
+
+    primary_cells = _raw_html_cells(primary)
+    if not primary_cells:
+        return primary, "unchanged", 0
+    recovered_cells = _raw_html_cells(recovered)
+    recovered_states = _option_states(recovered)
+    occurrences: dict[str, int] = {}
+    replacements: dict[int, str] = {}
+    resolved = unknown = conflicts = filled = 0
+
+    for index, cell in enumerate(primary_cells):
+        primary_state, label = _form_option(cell.text)
+        if label is not None:
+            occurrence = occurrences.get(label, 0)
+            occurrences[label] = occurrence + 1
+            recovery_state = recovered_states.get((label, occurrence))
+            if primary_state and recovery_state and primary_state != recovery_state:
+                state = None
+                conflicts += 1
+            else:
+                state = recovery_state or primary_state
+            marker = {"checked": "[x]", "unchecked": "[ ]"}.get(state, "[?]")
+            cleaned = _RAW_CHECKBOX_PREFIX_PATTERN.sub("", cell.body, count=1)
+            replacements[index] = f"{marker} {cleaned.lstrip()}"
+            if state is None:
+                unknown += 1
+            else:
+                resolved += 1
+            continue
+
+        if (
+            not cell.text
+            and index > 0
+            and index < len(recovered_cells)
+            and primary_cells[index - 1].text.rstrip().endswith(":")
+            and recovered_cells[index - 1].text.casefold()
+            == primary_cells[index - 1].text.casefold()
+            and recovered_cells[index].text
+        ):
+            replacements[index] = html.escape(recovered_cells[index].text)
+            filled += 1
+
+    if not replacements:
+        return primary, "unchanged", 0
+    pieces: list[str] = []
+    cursor = 0
+    for index, cell in enumerate(primary_cells):
+        replacement = replacements.get(index)
+        if replacement is None:
+            continue
+        pieces.extend((primary[cursor : cell.start], replacement))
+        cursor = cell.end
+    pieces.append(primary[cursor:])
+    status = (
+        "conflict"
+        if conflicts
+        else "partial"
+        if unknown and (resolved or filled)
+        else "ambiguous"
+        if unknown
+        else "resolved"
+    )
+    return "".join(pieces), status, resolved + filled
 
 
 def _clean_text(value: str | None) -> str | None:
@@ -730,14 +898,158 @@ class _RecoveryCandidate:
     reasons: tuple[str, ...] = ()
 
     @property
-    def rank(self) -> tuple[int, float, int, int, str]:
+    def rank(self) -> tuple[int, int, float, int, int, str]:
         return (
+            0 if "unresolved_form_controls" in self.reasons else 1,
             self.severity,
             self.confidence,
             self.page,
             self.reading_order,
             self.target_id,
         )
+
+
+@dataclass(slots=True)
+class _GlmFormRecovery:
+    statuses: dict[int, dict[RecoveryBoxKey, str]] = field(default_factory=dict)
+    candidate_count: int = 0
+    crops: int = 0
+    duration: float = 0.0
+    warnings: list[str] = field(default_factory=list)
+
+
+def _form_recovery_priority(region: LayoutRegionEvidence) -> int | None:
+    if region.type not in {AnalysisRegionType.TABLE, AnalysisRegionType.FORM}:
+        return None
+    option_count = sum(
+        _form_option(cell.text)[1] is not None for cell in _raw_html_cells(region.text)
+    )
+    if option_count >= 2:
+        return 0
+    if region.type is AnalysisRegionType.FORM:
+        return 1
+    if re.search(r"<table\b", region.text, re.IGNORECASE) and region.text.count(":") >= 4:
+        return 2
+    return None
+
+
+def _glm_recovery_content(result: GlmPageResult) -> str:
+    tables = [
+        region.content
+        for region in result.regions
+        if region.label.casefold() == "table" and region.content.strip()
+    ]
+    if tables:
+        return max(tables, key=len)
+    return "\n".join(
+        region.content for region in result.regions if region.content.strip()
+    )
+
+
+def _recover_glm_form_regions(
+    source: IngestedDocument,
+    pages: list[PageEvidence],
+    analyses: dict[int, PageAnalysis | None],
+    workdir: Path,
+    config: ParserConfig,
+) -> _GlmFormRecovery:
+    started = time.perf_counter()
+    outcome = _GlmFormRecovery()
+    if not config.glm_form_recovery_enabled or not config.local_ocr_enabled:
+        return outcome
+
+    candidates: list[tuple[int, int, PageEvidence, LayoutRegionEvidence]] = []
+    pages_by_number = {page.number: page for page in pages}
+    for page_number, analysis in analyses.items():
+        if analysis is None or analysis.quality.blank:
+            continue
+        for order, region in enumerate(analysis.regions):
+            priority = _form_recovery_priority(region)
+            if priority is not None:
+                candidates.append(
+                    (priority, order, pages_by_number[page_number], region)
+                )
+    outcome.candidate_count = len(candidates)
+    selected: list[tuple[PageEvidence, LayoutRegionEvidence]] = []
+    per_page: dict[int, int] = {}
+    for _priority, _order, page, region in sorted(
+        candidates, key=lambda item: (item[0], item[2].number, item[1])
+    ):
+        if per_page.get(page.number, 0) >= MAX_VISUAL_RECOVERY_CROPS_PER_PAGE:
+            continue
+        selected.append((page, region))
+        per_page[page.number] = per_page.get(page.number, 0) + 1
+    if not selected:
+        outcome.duration = time.perf_counter() - started
+        return outcome
+
+    requests: dict[Path, tuple[PageEvidence, LayoutRegionEvidence]] = {}
+    for index, (page, region) in enumerate(selected, start=1):
+        crop_path = workdir / "glm-form-recovery" / f"p{page.number}-{index}.png"
+        try:
+            render_region_crop(
+                source,
+                page,
+                region.bbox.normalized,
+                crop_path,
+                dpi=config.crop_dpi,
+                padding=config.crop_padding,
+            )
+        except Exception as exc:  # noqa: BLE001 - recovery must preserve first pass
+            outcome.warnings.append(
+                f"Page {page.number}: GLM form crop failed: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            continue
+        requests[crop_path.resolve()] = (page, region)
+    if not requests:
+        outcome.duration = time.perf_counter() - started
+        return outcome
+
+    try:
+        runtime = get_glmocr_form_recovery_runtime(
+            config.glmocr_config_path, config.glmocr_layout_device
+        )
+        if hasattr(runtime, "parse_many"):
+            results = runtime.parse_many(list(requests))
+        else:
+            results = (
+                GlmPageResult(path, runtime.parse(path)) for path in requests
+            )
+        for result in results:
+            target = requests.get(result.image_path.resolve())
+            if target is None:
+                continue
+            page, region = target
+            outcome.crops += 1
+            recovered = "" if result.error else _glm_recovery_content(result)
+            if not recovered:
+                outcome.warnings.append(
+                    f"Page {page.number}: GLM form recovery returned no usable text"
+                )
+                continue
+            merged, status, evidence_count = _merge_form_html(
+                region.text, recovered
+            )
+            if merged == region.text:
+                continue
+            region.text = merged
+            key = _recovery_box_key(region.bbox.normalized)
+            if key is not None:
+                outcome.statuses.setdefault(page.number, {})[key] = status
+            region_id = region.id
+            analysis = analyses.get(page.number)
+            if analysis is not None:
+                analysis.warnings.append(
+                    "GLM form recovery "
+                    f"{status} for {region_id} ({evidence_count} resolved value(s))"
+                )
+    except Exception as exc:  # noqa: BLE001 - recovery must preserve first pass
+        outcome.warnings.append(
+            f"GLM form recovery unavailable: {type(exc).__name__}: {exc}"
+        )
+    outcome.duration = time.perf_counter() - started
+    return outcome
 
 
 def _recovery_box_key(bbox: BoundingBox | None) -> RecoveryBoxKey | None:
@@ -791,12 +1103,12 @@ def _table_quality(block: Block) -> float:
     if block.type is not NodeType.TABLE or block.table is None or not block.table.cells:
         return 0.0
     cells = block.table.cells
-    rows = max(cell.row_index for cell in cells) + 1
-    columns = max(cell.column_index for cell in cells) + 1
+    rows = max(cell.row for cell in cells) + 1
+    columns = max(cell.column for cell in cells) + 1
     if rows < 2 or columns < 2:
         return 0.25
     nonempty = sum(bool(cell.text.strip()) for cell in cells) / len(cells)
-    rectangular = len({(cell.row_index, cell.column_index) for cell in cells}) / (
+    rectangular = len({(cell.row, cell.column) for cell in cells}) / (
         rows * columns
     )
     return (nonempty + rectangular) / 2
@@ -858,6 +1170,14 @@ def _page_recovery_candidates(
         if not text.strip() and area >= RECOVERY_LARGE_REGION_AREA:
             severity = 0
             reasons.append("empty_large_region")
+        form_control_severity = (
+            _form_control_recovery_severity(block.text)
+            if block.type is NodeType.TABLE
+            else None
+        )
+        if form_control_severity is not None:
+            severity = min(severity, form_control_severity)
+            reasons.append("unresolved_form_controls")
         if block.type is NodeType.TABLE and _table_quality(block) < RECOVERY_TABLE_QUALITY:
             severity = min(severity, 1)
             reasons.append("low_table_quality")
@@ -916,6 +1236,10 @@ class _VisualRecoveryPlan:
     allowed: dict[int, set[RecoveryBoxKey]] = field(default_factory=dict)
     deferred: dict[int, set[RecoveryBoxKey]] = field(default_factory=dict)
     candidate_count: int = 0
+
+
+def _visual_recovery_crop_budget(page_count: int, *, ceiling: int) -> int:
+    return min(ceiling, max(MIN_VISUAL_RECOVERY_CROPS_PER_DOCUMENT, page_count))
 
 
 def _visual_recovery_plan(
@@ -982,7 +1306,7 @@ def _build_recovery_log(
                 original_element_id=block.id,
                 recovered_text=semantic_text(block),
                 confidence="high",
-                notes=block.verification_reason or "Recovered by Luna",
+                notes=block.verification_reason or "Recovered by visual recovery",
             )
         )
     return records
@@ -1138,6 +1462,7 @@ class DocumentParser:
         visual_recovery: bool = True,
         allowed_recovery_boxes: set[RecoveryBoxKey] | None = None,
         deferred_recovery_boxes: set[RecoveryBoxKey] | None = None,
+        glm_recovery_statuses: dict[RecoveryBoxKey, str] | None = None,
     ) -> _ProcessedPage:
         recovery_available = visual_recovery and (
             self.gateway_factory is not OpenAIDocumentGateway
@@ -1203,6 +1528,35 @@ class DocumentParser:
             _block(region, page.number, index)
             for index, region in enumerate(draft.regions)
         ]
+        for block in blocks:
+            status = (glm_recovery_statuses or {}).get(
+                _recovery_box_key(block.bbox) or ()
+            )
+            if status is None:
+                continue
+            previous_state = block.verification
+            block.verification = (
+                VerificationState.VERIFIED
+                if status == "resolved"
+                else VerificationState.NEEDS_REVIEW
+            )
+            block.verification_reason = (
+                "GLM form recovery agreed with the primary structure"
+                if status == "resolved"
+                else f"GLM form recovery {status}; unresolved controls use [?]"
+            )
+            block.correction_lineage.append(
+                CorrectionLineage(
+                    original_id=block.id,
+                    replacement_id=block.id,
+                    provider_id="glm-ocr-form-recovery",
+                    reason=block.verification_reason,
+                    previous_state=previous_state,
+                    final_state=block.verification,
+                )
+            )
+            if status == "resolved":
+                recovered_region_ids.add(block.id)
         blocks_by_id = {block.id: block for block in blocks}
         try:
             with Image.open(page.image_path) as page_image:
@@ -2060,17 +2414,41 @@ class DocumentParser:
 
             glm_time = time.perf_counter() - started
 
+            effective_glm_form_recovery = (
+                visual_recovery and self.config.glm_form_recovery_enabled
+            )
+            glm_form_recovery = (
+                _recover_glm_form_regions(
+                    source,
+                    source.pages,
+                    analyses_by_page,
+                    workdir,
+                    self.config,
+                )
+                if effective_glm_form_recovery
+                else _GlmFormRecovery()
+            )
+            warnings.extend(glm_form_recovery.warnings)
+            visual_recovery_crops = glm_form_recovery.crops
+            luna_recovery_budget = _visual_recovery_crop_budget(
+                total,
+                ceiling=self.config.max_visual_recovery_crops,
+            )
+
             planning_applies = self.gateway_factory is OpenAIDocumentGateway
             if planning_applies:
                 recovery_plan = _visual_recovery_plan(
                     source.pages,
                     analyses_by_page,
                     enabled=effective_visual_recovery,
-                    limit=self.config.max_visual_recovery_crops,
+                    limit=luna_recovery_budget,
                 )
                 allowed_recovery = recovery_plan.allowed
                 deferred_recovery = recovery_plan.deferred
                 recovery_candidate_count = recovery_plan.candidate_count
+                for page_number, statuses in glm_form_recovery.statuses.items():
+                    if page_number in deferred_recovery:
+                        deferred_recovery[page_number].difference_update(statuses)
             else:
                 allowed_recovery, deferred_recovery, recovery_candidate_count = (
                     {},
@@ -2105,6 +2483,7 @@ class DocumentParser:
                             deferred_recovery.get(page.number, set())
                             if planning_applies
                             else None,
+                            glm_form_recovery.statuses.get(page.number, {}),
                         )
                         futures[future] = page.number
                     pending = set(futures)
@@ -2228,9 +2607,14 @@ class DocumentParser:
                 visual_recovery_request_time=sum(
                     event.duration_ms for event in trace if event.image_count
                 )
-                / 1000,
-                visual_recovery_enabled=effective_visual_recovery,
-                visual_recovery_candidates=recovery_candidate_count,
+                / 1000
+                + glm_form_recovery.duration,
+                visual_recovery_enabled=(
+                    effective_visual_recovery or effective_glm_form_recovery
+                ),
+                visual_recovery_candidates=(
+                    recovery_candidate_count + glm_form_recovery.candidate_count
+                ),
                 visual_recovery_crops=visual_recovery_crops,
                 visual_recovery_deferred=sum(
                     len(boxes) for boxes in deferred_recovery.values()

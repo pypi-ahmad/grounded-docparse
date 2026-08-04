@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "docs-site"
 ASSETS = OUTPUT / "assets"
 REPOSITORY_URL = "https://github.com/pypi-ahmad/grounded-docparse"
-SKIP_DIRECTORIES = {".git", ".venv", "docs-site", "graphify-out"}
+SKIP_DIRECTORIES = {".codex", ".git", ".venv", "docs-site", "graphify-out"}
 SECURITY_FILE_MARKERS = ("security", "threat-model", "threat_model")
 
 GROUP_ORDER = (

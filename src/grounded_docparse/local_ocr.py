@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import re
+import tempfile
 import threading
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
@@ -162,6 +165,34 @@ class GlmOcrRuntime:
 _instances: dict[tuple[str, str], GlmOcrRuntime] = {}
 _instances_lock = threading.Lock()
 
+GLM_FORM_RECOVERY_MAX_PIXELS = 4_014_080
+
+
+def _form_recovery_config_path(config_path: str) -> Path:
+    """Materialize a high-resolution variant without changing the primary config."""
+
+    source = Path(config_path).resolve()
+    content = source.read_text(encoding="utf-8")
+    image_pattern = re.compile(r"(?m)^(\s*image_format:\s*)\S+(\s*)$")
+    pixels_pattern = re.compile(r"(?m)^(\s*max_pixels:\s*)\d+(\s*)$")
+    recovered, image_changes = image_pattern.subn(r"\g<1>PNG\g<2>", content, count=1)
+    recovered, pixel_changes = pixels_pattern.subn(
+        rf"\g<1>{GLM_FORM_RECOVERY_MAX_PIXELS}\g<2>", recovered, count=1
+    )
+    if image_changes != 1 or pixel_changes != 1:
+        raise RuntimeError(
+            "GLM-OCR config must contain one image_format and one max_pixels setting"
+        )
+    digest = hashlib.sha256(f"{source}\0{recovered}".encode()).hexdigest()[:16]
+    target_dir = Path(tempfile.gettempdir()) / "grounded-docparse"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / f"glmocr-form-recovery-{digest}.yaml"
+    if not target.exists() or target.read_text(encoding="utf-8") != recovered:
+        temporary = target.with_suffix(".tmp")
+        temporary.write_text(recovered, encoding="utf-8", newline="\n")
+        temporary.replace(target)
+    return target
+
 
 def get_glmocr_runtime(config_path: str, layout_device: str) -> GlmOcrRuntime:
     key = (str(Path(config_path).resolve()), layout_device)
@@ -169,6 +200,14 @@ def get_glmocr_runtime(config_path: str, layout_device: str) -> GlmOcrRuntime:
         if key not in _instances:
             _instances[key] = GlmOcrRuntime(*key)
         return _instances[key]
+
+
+def get_glmocr_form_recovery_runtime(
+    config_path: str, layout_device: str
+) -> GlmOcrRuntime:
+    return get_glmocr_runtime(
+        str(_form_recovery_config_path(config_path)), layout_device
+    )
 
 
 def glmocr_version() -> str | None:
