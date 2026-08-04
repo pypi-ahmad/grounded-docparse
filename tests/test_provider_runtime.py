@@ -398,17 +398,20 @@ def test_parser_binds_one_runtime_without_changing_factory_signature(
 def test_runtime_config_defaults_environment_and_validation(monkeypatch) -> None:
     defaults = ParserConfig()
     assert defaults.provider_retry_attempts == 3
-    assert defaults.max_visual_recovery_crops == 8
+    assert defaults.max_visual_recovery_crops == 64
     assert defaults.crop_padding == 0.1
+    assert defaults.glm_form_recovery_enabled is True
 
     monkeypatch.setenv("DOCPARSE_PROVIDER_CONCURRENCY", "7")
     monkeypatch.setenv("DOCPARSE_PROVIDER_RETRY_ATTEMPTS", "4")
     monkeypatch.setenv("DOCPARSE_MAX_VISUAL_RECOVERY_CROPS", "6")
+    monkeypatch.setenv("DOCPARSE_GLM_FORM_RECOVERY_ENABLED", "false")
 
     config = ParserConfig.from_env()
     assert config.provider_concurrency == 7
     assert config.provider_retry_attempts == 4
     assert config.max_visual_recovery_crops == 6
+    assert config.glm_form_recovery_enabled is False
 
     with pytest.raises(ValueError, match="provider_retry_attempts"):
         ParserConfig(provider_retry_attempts=0)

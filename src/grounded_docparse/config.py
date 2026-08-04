@@ -4,6 +4,7 @@ import os
 from dataclasses import dataclass, field
 
 LUNA_MODEL = "gpt-5.6-luna"
+LUNA_REASONING_EFFORT = "medium"
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,7 +54,7 @@ class ParserConfig:
     max_pages: int = 500
     max_page_pixels: int = 20_000_000
     luna_max_output_tokens: int = 128_000
-    max_visual_recovery_crops: int = 8
+    max_visual_recovery_crops: int = 64
     page_batch_size: int = 16
     max_page_concurrency: int = 8
     provider_concurrency: int = 8
@@ -64,6 +65,7 @@ class ParserConfig:
     provider_success_window: int = 10
     full_page_fallback_fraction: float = 0.1
     local_ocr_enabled: bool = True
+    glm_form_recovery_enabled: bool = True
     glmocr_config_path: str = "config/glmocr.yaml"
     glmocr_layout_device: str = "cuda:0"
     analysis_thresholds: AnalysisThresholds = field(default_factory=AnalysisThresholds)
@@ -195,6 +197,10 @@ class ParserConfig:
                 )
             ),
             local_ocr_enabled=os.getenv("DOCPARSE_LOCAL_OCR_ENABLED", "true").casefold()
+            not in {"0", "false", "no"},
+            glm_form_recovery_enabled=os.getenv(
+                "DOCPARSE_GLM_FORM_RECOVERY_ENABLED", "true"
+            ).casefold()
             not in {"0", "false", "no"},
             glmocr_config_path=os.getenv(
                 "DOCPARSE_GLMOCR_CONFIG_PATH", defaults.glmocr_config_path

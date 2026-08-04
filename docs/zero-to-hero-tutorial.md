@@ -292,7 +292,7 @@ The exact parser flow is:
 3. Run GLM-OCR in ordered windows of 16 pages.
 4. Analyze OCR confidence, density, garbage, empty-region area, and table structure.
 5. Rank recovery candidates.
-6. Optionally send at most eight crops per document and three per page to Luna.
+6. Optionally send prioritized crops to Luna using an adaptive budget of eight to 64 and a three-per-page limit.
 7. Accept only crop-backed text corrections with confidence of at least `0.85`.
 8. Restore source page order and build document hierarchy.
 9. Generate elements, quality state, `base_markdown`, parse JSON, and annotations.
@@ -1105,7 +1105,7 @@ Constraints such as `pattern`, length/range bounds, conditional schemas, and com
 | `DOCPARSE_MAX_UPLOAD_BYTES` | `262144000` | Parser upload limit |
 | `DOCPARSE_MAX_PAGES` | `500` | Page/frame limit |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Per-page pixel limit |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `8` | Recovery crops per document |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |

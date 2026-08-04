@@ -233,6 +233,65 @@ def test_table_form_and_visual_complexity(tmp_path: Path) -> None:
     assert visual.complexity is PageComplexity.VISUAL_HEAVY
 
 
+def test_html_table_cells_preserve_spans_for_semantics(tmp_path: Path) -> None:
+    content = (
+        '<table><tr><th colspan="2">Member information</th></tr>'
+        '<tr><td rowspan="2">Name</td><td>Lori</td></tr>'
+        "<tr><td></td></tr></table>"
+    )
+    evidence = page(tmp_path)
+    analysis = analyze(
+        Runtime([GlmRegion(0, "table", content, (0, 125, 1000, 625))]),
+        evidence,
+        min_edge_variance=0,
+        min_contrast_range=0,
+        clipping_border_ratio=1,
+    )
+
+    draft = draft_from_analysis(analysis)
+
+    assert draft.regions[0].text == content
+    assert [
+        (
+            cell.row_index,
+            cell.column_index,
+            cell.row_span,
+            cell.column_span,
+            cell.text,
+        )
+        for cell in draft.regions[0].table_cells
+    ] == [
+        (0, 0, 1, 2, "Member information"),
+        (1, 0, 2, 1, "Name"),
+        (1, 1, 1, 1, "Lori"),
+        (2, 1, 1, 1, ""),
+    ]
+    assert not any(
+        "low_table_quality" in candidate.reasons
+        for candidate in _page_recovery_candidates(evidence, analysis)
+    )
+
+
+def test_unresolved_checkbox_grid_is_prioritized_for_recovery(tmp_path: Path) -> None:
+    content = (
+        "<table><tr><td>Type of service:</td><td>Outpatient</td>"
+        "<td>Office visit</td><td>Hospital</td><td>Office</td></tr></table>"
+    )
+    evidence = page(tmp_path)
+    analysis = analyze(
+        Runtime([GlmRegion(0, "table", content, (0, 125, 1000, 625))]),
+        evidence,
+        min_edge_variance=0,
+        min_contrast_range=0,
+        clipping_border_ratio=1,
+    )
+
+    candidates = _page_recovery_candidates(evidence, analysis)
+
+    assert candidates[0].severity == 0
+    assert "unresolved_form_controls" in candidates[0].reasons
+
+
 def test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels(tmp_path: Path) -> None:
     analysis = analyze(
         Runtime([GlmRegion(0, "text", "Grounded text", (100, 100, 900, 200))]),

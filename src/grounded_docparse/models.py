@@ -343,6 +343,7 @@ class AgentUsage(BaseModel):
     agent: str
     model: str
     input_tokens: int = Field(default=0, ge=0)
+    cached_input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
 
 
@@ -355,6 +356,11 @@ class RunUsage(BaseModel):
     @property
     def input_tokens(self) -> int:
         return sum(call.input_tokens for call in self.calls)
+
+    @computed_field
+    @property
+    def cached_input_tokens(self) -> int:
+        return sum(call.cached_input_tokens for call in self.calls)
 
     @computed_field
     @property

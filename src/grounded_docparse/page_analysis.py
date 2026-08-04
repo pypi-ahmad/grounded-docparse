@@ -4,6 +4,7 @@ import math
 import re
 import time
 from collections.abc import Callable
+from html.parser import HTMLParser
 from importlib.metadata import PackageNotFoundError, version
 from itertools import pairwise
 from pathlib import Path
@@ -681,6 +682,8 @@ def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
 
 
 def _markdown_table_cells(text: str) -> list[TableCellDraft]:
+    if re.search(r"<table\b", text, re.IGNORECASE):
+        return _html_table_cells(text)
     rows = [
         [cell.strip() for cell in line.strip().strip("|").split("|")]
         for line in text.splitlines()
@@ -702,3 +705,92 @@ def _markdown_table_cells(text: str) -> list[TableCellDraft]:
         for row_index, row in enumerate(rows)
         for column_index, cell in enumerate(row)
     ]
+
+
+class _TableHTMLParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.rows: list[list[tuple[str, int, int, bool]]] = []
+        self._row: list[tuple[str, int, int, bool]] | None = None
+        self._cell: list[str] | None = None
+        self._row_span = 1
+        self._column_span = 1
+        self._header = False
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        tag = tag.casefold()
+        if tag == "tr":
+            self._row = []
+        elif tag in {"td", "th"}:
+            if self._row is None:
+                self._row = []
+            attributes = {name.casefold(): value for name, value in attrs}
+            self._cell = []
+            self._row_span = _positive_span(attributes.get("rowspan"))
+            self._column_span = _positive_span(attributes.get("colspan"))
+            self._header = tag == "th"
+        elif tag == "br" and self._cell is not None:
+            self._cell.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.casefold()
+        if tag in {"td", "th"} and self._cell is not None:
+            assert self._row is not None
+            self._row.append(
+                (
+                    " ".join("".join(self._cell).split()),
+                    self._row_span,
+                    self._column_span,
+                    self._header,
+                )
+            )
+            self._cell = None
+        elif tag == "tr" and self._row is not None:
+            self.rows.append(self._row)
+            self._row = None
+
+
+def _positive_span(value: str | None) -> int:
+    try:
+        return max(1, int(value or "1"))
+    except ValueError:
+        return 1
+
+
+def _html_table_cells(text: str) -> list[TableCellDraft]:
+    parser = _TableHTMLParser()
+    try:
+        parser.feed(text)
+        parser.close()
+    except (AssertionError, ValueError):
+        return []
+    occupied: set[tuple[int, int]] = set()
+    cells: list[TableCellDraft] = []
+    for row_index, row in enumerate(parser.rows):
+        column_index = 0
+        for value, row_span, column_span, header in row:
+            while (row_index, column_index) in occupied:
+                column_index += 1
+            cells.append(
+                TableCellDraft(
+                    row_index=row_index,
+                    column_index=column_index,
+                    text=value,
+                    row_span=row_span,
+                    column_span=column_span,
+                    header=header,
+                )
+            )
+            for occupied_row in range(row_index, row_index + row_span):
+                for occupied_column in range(
+                    column_index, column_index + column_span
+                ):
+                    occupied.add((occupied_row, occupied_column))
+            column_index += column_span
+    return cells

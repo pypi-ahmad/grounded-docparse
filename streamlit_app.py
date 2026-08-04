@@ -6,7 +6,6 @@ import json
 import math
 import os
 from pathlib import Path
-from urllib.parse import urlsplit
 
 import pymupdf
 import streamlit as st
@@ -14,6 +13,7 @@ from PIL import Image, ImageSequence
 
 from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
+from grounded_docparse.config import LUNA_MODEL
 from grounded_docparse.local_ocr import get_glmocr_runtime
 from grounded_docparse.models import (
     ClassifierCategory,
@@ -21,6 +21,7 @@ from grounded_docparse.models import (
     Element,
     FormClassificationResult,
     FormSegment,
+    RunUsage,
     SchemaField,
     StoredSchema,
 )
@@ -28,6 +29,7 @@ from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
     render_combined_result,
+    sanitize_markdown_preview,
 )
 from grounded_docparse.schema_store import (
     ClassifierProfileStore,
@@ -66,22 +68,34 @@ LUNA_REVIEW_WARNING = (
     "Luna output may be incorrect or influenced by instructions inside the document. "
     "Review confidence and cited source regions before consequential use."
 )
+LUNA_INPUT_USD_PER_MILLION = 0.20
+LUNA_CACHED_INPUT_USD_PER_MILLION = 0.02
+LUNA_OUTPUT_USD_PER_MILLION = 1.20
 
 
-def luna_destination() -> str:
-    value = os.getenv("OPENAI_BASE_URL")
-    if not value:
-        return "OpenAI default endpoint"
-    try:
-        parsed = urlsplit(value)
-        hostname = parsed.hostname
-        port = parsed.port
-    except ValueError:
-        return "custom endpoint (invalid host)"
-    if not hostname:
-        return "custom endpoint (invalid host)"
-    host = f"[{hostname}]" if ":" in hostname else hostname
-    return f"{host}:{port}" if port is not None else host
+def append_session_usage(usage: RunUsage | None, *, skip_calls: int = 0) -> None:
+    if usage is None:
+        return
+    session_usage = st.session_state.setdefault("session_usage", RunUsage())
+    session_usage.calls.extend(
+        call.model_copy(deep=True) for call in usage.calls[skip_calls:]
+    )
+
+
+def luna_usage_summary(usage: RunUsage) -> tuple[int, int, int, float]:
+    calls = [call for call in usage.calls if call.model == LUNA_MODEL]
+    input_tokens = sum(call.input_tokens for call in calls)
+    cached_input_tokens = min(
+        sum(getattr(call, "cached_input_tokens", 0) for call in calls), input_tokens
+    )
+    output_tokens = sum(call.output_tokens for call in calls)
+    uncached_input_tokens = input_tokens - cached_input_tokens
+    cost = (
+        uncached_input_tokens * LUNA_INPUT_USD_PER_MILLION
+        + cached_input_tokens * LUNA_CACHED_INPUT_USD_PER_MILLION
+        + output_tokens * LUNA_OUTPUT_USD_PER_MILLION
+    ) / 1_000_000
+    return input_tokens, cached_input_tokens, output_tokens, cost
 
 
 def reset_document_state() -> None:
@@ -99,6 +113,7 @@ def reset_document_state() -> None:
     st.session_state.routing_review_rows = None
     st.session_state.chat_history = []
     st.session_state.prepared_agentic_context = None
+    st.session_state.session_usage = RunUsage()
 
 
 def reset_extraction_mode_state() -> None:
@@ -722,6 +737,7 @@ if st.session_state.get("result_version") != RESULT_VERSION:
     reset_document_state()
 st.session_state.result_version = RESULT_VERSION
 initialize_ade_mode()
+st.session_state.setdefault("session_usage", RunUsage())
 
 preload_error: str | None = None
 if os.getenv("DOCPARSE_PRELOAD_LOCAL_OCR", "false").casefold() in {"1", "true", "yes"}:
@@ -740,19 +756,15 @@ initial_status = "Ready" if preload_error is None else "Not ready"
 initial_color = "green" if initial_status == "Ready" else "red"
 header_status_slot = header_status.empty()
 header_status_slot.markdown(f"Status: :{initial_color}[● **{initial_status}**]")
+session_usage_slot = st.container()
 
 if not has_environment:
     st.warning(
         "OPENAI_API_KEY is not set. GLM-OCR parsing remains available; Luna visual "
         "recovery and Markdown refinement will be skipped."
     )
-elif os.getenv("OPENAI_BASE_URL"):
-    st.warning(
-        f"Luna requests will send document content to custom endpoint: "
-        f"`{luna_destination()}`."
-    )
-else:
-    st.caption(f"Luna destination: {luna_destination()}")
+elif not os.getenv("OPENAI_BASE_URL"):
+    st.caption("Luna destination: OpenAI default endpoint")
 if preload_error is not None:
     st.error(preload_error)
 
@@ -829,7 +841,11 @@ with st.sidebar:
         "Enable visual recovery on hard regions",
         key="visual_recovery",
         disabled=not has_environment,
-        help="Uses high-effort Luna vision on at most eight prioritized crops per document.",
+        help=(
+            "Uses medium-effort Luna vision on prioritized hard regions. The budget "
+            "scales from 8 to 64 crops by document length, with at most 3 per page; "
+            "local GLM recovery runs first."
+        ),
     )
     st.toggle(
         "Classify document type",
@@ -950,6 +966,7 @@ if parse_clicked and upload is not None and source is not None:
                 visual_recovery=visual_recovery,
             )
             st.session_state.result = result
+            append_session_usage(result.usage)
             st.session_state.result_source_hash = selection_key
             st.session_state.parsed_source = parsed_source
             st.session_state.selected_element_id = None
@@ -980,6 +997,7 @@ if parse_clicked and upload is not None and source is not None:
                 prepared_context=prepared_context,
             )
             st.session_state.agentic_analysis = analysis
+            append_session_usage(analysis.usage)
             st.session_state.agentic_source_hash = agentic_key
         progress_bar.progress(1.0, text="Parsing complete")
         stage_log.markdown(stage_markdown(None, {key for key, _ in STAGE_LABELS}))
@@ -1159,7 +1177,10 @@ else:
                 st.code(result.markdown, language="markdown", wrap_lines=True, height=650)
                 st.caption("Use the copy control in the code toolbar.")
             else:
-                st.markdown(result.markdown)
+                st.markdown(
+                    sanitize_markdown_preview(result.markdown),
+                    unsafe_allow_html=True,
+                )
 
     annotated_tab = tab_by_name["Annotated PDF"]
     if annotated_tab.open:
@@ -1253,6 +1274,7 @@ else:
                                 prepared_context=st.session_state.prepared_agentic_context,
                             )
                         st.session_state.custom_classification = custom_classification
+                        append_session_usage(custom_classification.usage)
                         st.session_state.extraction_result = None
                         st.session_state.routing_review_rows = _classification_rows(
                             custom_classification
@@ -1371,6 +1393,10 @@ else:
                             st.session_state.routed_extraction_result = (
                                 routed_extraction_result
                             )
+                            append_session_usage(
+                                routed_extraction_result.usage,
+                                skip_calls=len(custom_classification.usage.calls),
+                            )
                         except Exception as exc:  # noqa: BLE001 - isolated feature error
                             st.error(f"Routed extraction failed: {type(exc).__name__}: {exc}")
 
@@ -1408,6 +1434,7 @@ else:
                             prepared_context=st.session_state.prepared_agentic_context,
                         )
                     st.session_state.extraction_result = extraction_result
+                    append_session_usage(extraction_result.usage)
                     st.session_state.custom_classification = None
                     st.session_state.routed_extraction_result = None
                 except Exception as exc:  # noqa: BLE001 - isolated feature error
@@ -1457,6 +1484,7 @@ else:
                             history[:-1],
                             prepared_context=st.session_state.prepared_agentic_context,
                         )
+                        append_session_usage(answer.usage)
                         history.append(
                             {
                                 "role": "assistant",
@@ -1599,12 +1627,6 @@ else:
             result.metadata.luna_agentic_time
             + (analysis_ms + extraction_ms) / 1000
         )
-        analysis_input = analysis.usage.input_tokens if analysis is not None else 0
-        analysis_output = analysis.usage.output_tokens if analysis is not None else 0
-        extract_input = extraction_result.input_tokens if extraction_result else 0
-        extract_output = extraction_result.output_tokens if extraction_result else 0
-        routing_input = routing_activity.usage.input_tokens if routing_activity else 0
-        routing_output = routing_activity.usage.output_tokens if routing_activity else 0
         recovery_status = (
             "off"
             if not result.metadata.visual_recovery_enabled
@@ -1617,9 +1639,19 @@ else:
             f"GLM-OCR: {result.metadata.glm_time:.1f}s · Luna recovery: "
             f"{result.metadata.luna_recovery_time:.1f}s · Luna agentic: "
             f"{luna_agentic_time:.1f}s · Pages: {parsed_pages} · "
-            f"Visual recovery: {recovery_status} · "
-            f"Luna input tokens: "
-            f"{result.input_tokens + analysis_input + extract_input + routing_input:,} · "
-            f"Luna output tokens: "
-            f"{result.output_tokens + analysis_output + extract_output + routing_output:,}"
+            f"Visual recovery: {recovery_status}"
         )
+
+session_input, session_cached, session_output, session_cost = luna_usage_summary(
+    st.session_state.session_usage
+)
+with session_usage_slot:
+    usage_columns = st.columns(4)
+    usage_columns[0].metric("Input tokens", f"{session_input:,}")
+    usage_columns[1].metric("Cached input", f"{session_cached:,}")
+    usage_columns[2].metric("Output tokens", f"{session_output:,}")
+    usage_columns[3].metric("Estimated cost", f"${session_cost:.6f}")
+    st.caption(
+        "GPT-5.6 Luna rates: $0.20/M input · $0.02/M cached input · "
+        "$1.20/M output. Cached input is included in input tokens."
+    )

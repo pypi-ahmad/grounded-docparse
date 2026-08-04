@@ -7,7 +7,7 @@ The accuracy strategy is intentionally bounded:
 - rasterize every page and ignore selectable PDF text;
 - use GLM-OCR/PP-DocLayout for every element, box, and reading-order decision;
 - rank weak existing regions with deterministic quality signals;
-- send only selected crops to Luna for high-effort visual recovery;
+- send only selected crops to Luna for medium-effort visual recovery;
 - accept only high-confidence text corrections while preserving GLM structure;
 - constrain document features with typed Structured Outputs and deterministic citation checks; and
 - retain unresolved evidence as `needs_review` or `not_found` instead of inventing content.

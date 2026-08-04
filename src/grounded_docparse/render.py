@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import io
 import json
 import re
@@ -8,6 +9,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
+import nh3
 import pymupdf
 from PIL import Image, ImageOps, ImageSequence
 
@@ -42,6 +44,32 @@ ANNOTATION_COLORS = {
 RECOVERY_ANNOTATION_COLOR = (1.0, 0.55, 0.0)
 
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
+_MARKDOWN_TABLE_PATTERN = re.compile(
+    r"<table\b[^>]*>.*?</table\s*>", re.IGNORECASE | re.DOTALL
+)
+_RAW_HTML_PATTERN = re.compile(
+    r"<!--.*?-->|</?[A-Za-z][^>]*>", re.IGNORECASE | re.DOTALL
+)
+_PREVIEW_TABLE_TAGS = {
+    "table",
+    "thead",
+    "tbody",
+    "tfoot",
+    "tr",
+    "th",
+    "td",
+    "caption",
+    "colgroup",
+    "col",
+    "br",
+}
+_PREVIEW_TABLE_ATTRIBUTES = {
+    "table": {"border"},
+    "th": {"colspan", "rowspan", "scope"},
+    "td": {"colspan", "rowspan"},
+    "col": {"span"},
+}
+_PREVIEW_REMOVE_CONTENT_TAGS = {"script", "style", "iframe", "object", "svg", "math"}
 
 
 def _checkbox_marker(block: Block) -> str:
@@ -137,6 +165,8 @@ def _form_residual_lines(block: Block) -> list[str]:
 
 
 def _table(block: Block) -> str:
+    if re.match(r"\s*<table\b", block.text, re.IGNORECASE):
+        return block.text
     if block.table is None or not block.table.cells:
         return block.text
     rows: dict[int, list] = {}
@@ -401,6 +431,34 @@ def _render_with_emissions(document: Document) -> tuple[str, dict[str, _Emission
 def render_markdown(document: Document) -> str:
     markdown, _emissions = _render_with_emissions(document)
     return markdown
+
+
+def sanitize_markdown_preview(markdown: str) -> str:
+    """Allow safe table HTML without changing the surrounding Markdown."""
+
+    def safe_text(value: str) -> str:
+        def replace(match: re.Match[str]) -> str:
+            raw = match.group(0)
+            return "" if raw.startswith("<!--") else html.escape(raw, quote=False)
+
+        return _RAW_HTML_PATTERN.sub(replace, value)
+
+    parts: list[str] = []
+    cursor = 0
+    for match in _MARKDOWN_TABLE_PATTERN.finditer(markdown):
+        parts.append(safe_text(markdown[cursor : match.start()]))
+        parts.append(
+            nh3.clean(
+                match.group(0),
+                tags=_PREVIEW_TABLE_TAGS,
+                clean_content_tags=_PREVIEW_REMOVE_CONTENT_TAGS,
+                attributes=_PREVIEW_TABLE_ATTRIBUTES,
+                strip_comments=True,
+            )
+        )
+        cursor = match.end()
+    parts.append(safe_text(markdown[cursor:]))
+    return "".join(parts)
 
 
 @dataclass(frozen=True, slots=True)
