@@ -44,32 +44,20 @@ ANNOTATION_COLORS = {
 RECOVERY_ANNOTATION_COLOR = (1.0, 0.55, 0.0)
 
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
-_MARKDOWN_TABLE_PATTERN = re.compile(
-    r"<table\b[^>]*>.*?</table\s*>", re.IGNORECASE | re.DOTALL
+_MARKDOWN_PREVIEW_HTML_PATTERN = re.compile(
+    r"<(?P<tag>[A-Za-z][\w:-]*)\b[^>]*>.*?</(?P=tag)\s*>"
+    r"|<(?:img|br|hr)\b[^>]*?/?>",
+    re.IGNORECASE | re.DOTALL,
 )
 _RAW_HTML_PATTERN = re.compile(
     r"<!--.*?-->|</?[A-Za-z][^>]*>", re.IGNORECASE | re.DOTALL
 )
-_PREVIEW_TABLE_TAGS = {
-    "table",
-    "thead",
-    "tbody",
-    "tfoot",
-    "tr",
-    "th",
-    "td",
-    "caption",
-    "colgroup",
-    "col",
-    "br",
+_PREVIEW_HTML_TAGS = set(nh3.ALLOWED_TAGS) | {"tfoot"}
+_PREVIEW_HTML_ATTRIBUTES = {
+    tag: set(attributes) for tag, attributes in nh3.ALLOWED_ATTRIBUTES.items()
 }
-_PREVIEW_TABLE_ATTRIBUTES = {
-    "table": {"border"},
-    "th": {"colspan", "rowspan", "scope"},
-    "td": {"colspan", "rowspan"},
-    "col": {"span"},
-}
-_PREVIEW_REMOVE_CONTENT_TAGS = {"script", "style", "iframe", "object", "svg", "math"}
+_PREVIEW_HTML_ATTRIBUTES.setdefault("table", set()).add("border")
+_PREVIEW_HTML_ATTRIBUTES["*"] = {"style"}
 
 
 def _checkbox_marker(block: Block) -> str:
@@ -434,7 +422,7 @@ def render_markdown(document: Document) -> str:
 
 
 def sanitize_markdown_preview(markdown: str) -> str:
-    """Allow safe table HTML without changing the surrounding Markdown."""
+    """Allow safe table and figure HTML without changing surrounding Markdown."""
 
     def safe_text(value: str) -> str:
         def replace(match: re.Match[str]) -> str:
@@ -445,14 +433,16 @@ def sanitize_markdown_preview(markdown: str) -> str:
 
     parts: list[str] = []
     cursor = 0
-    for match in _MARKDOWN_TABLE_PATTERN.finditer(markdown):
+    for match in _MARKDOWN_PREVIEW_HTML_PATTERN.finditer(markdown):
         parts.append(safe_text(markdown[cursor : match.start()]))
         parts.append(
             nh3.clean(
                 match.group(0),
-                tags=_PREVIEW_TABLE_TAGS,
-                clean_content_tags=_PREVIEW_REMOVE_CONTENT_TAGS,
-                attributes=_PREVIEW_TABLE_ATTRIBUTES,
+                tags=_PREVIEW_HTML_TAGS,
+                clean_content_tags=set(),
+                attributes=_PREVIEW_HTML_ATTRIBUTES,
+                filter_style_properties={"text-align"},
+                url_schemes=set(),
                 strip_comments=True,
             )
         )
@@ -470,6 +460,7 @@ class RenderedAgenticDocument:
 def build_elements(
     document: Document,
     recovered_element_ids: set[str] | None = None,
+    local_source: str = "glm-ocr",
 ) -> list[Element]:
     """Flatten the canonical document into the public engine-neutral contract."""
 
@@ -493,7 +484,7 @@ def build_elements(
                     source=(
                         "luna-recovery"
                         if block.id in (recovered_element_ids or set())
-                        else "glm-ocr"
+                        else local_source
                     ),
                 )
             )

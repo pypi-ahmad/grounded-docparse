@@ -1,0 +1,14 @@
+[project]
+name = "grounded-docparse-paddle-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "paddleocr[doc-parser]==3.7.0",
+    "paddlepaddle==3.3.1",
+    "paddlex[genai-vllm-server,serving]==3.7.0; sys_platform == 'linux'",
+    "paddlex[serving]==3.7.0; sys_platform != 'linux'",
+    "pyyaml==6.0.2",
+]
+
+[tool.uv]
+package = false

@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
@@ -433,12 +433,21 @@ class SchemaField(BaseModel):
 class StoredSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    version: Literal[1] = 1
+    version: Literal[1, 2] = 1
     name: str = Field(min_length=1, max_length=100)
-    fields: list[SchemaField]
+    fields: list[SchemaField] = Field(default_factory=list)
+    json_schema: dict[str, Any] | None = None
 
     @model_validator(mode="after")
     def unique_fields(self) -> StoredSchema:
+        if self.version == 2:
+            if self.fields:
+                raise ValueError("raw JSON schemas cannot also define builder fields")
+            if self.json_schema is None:
+                raise ValueError("raw JSON schema is required for version 2")
+            return self
+        if self.json_schema is not None:
+            raise ValueError("version 1 schemas cannot define raw JSON schema")
         names = [field.name.casefold() for field in self.fields]
         if len(names) != len(set(names)):
             raise ValueError("schema field names must be unique")
@@ -933,7 +942,7 @@ class Element(BaseModel):
     text: str = ""
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
-    source: Literal["glm-ocr", "luna-recovery"] = "glm-ocr"
+    source: Literal["glm-ocr", "paddleocr-vl-1.6", "luna-recovery"] = "glm-ocr"
 
     @model_validator(mode="after")
     def validate_bbox(self) -> Element:

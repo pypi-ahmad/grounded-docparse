@@ -1,7 +1,7 @@
 """Grounded document parsing pipeline."""
 
 from .agentic import DocumentAgent, PreparedDocumentContext
-from .config import ParserConfig
+from .config import OcrEngine, ParserConfig
 from .extraction import DocumentExtractor
 from .models import (
     AgenticAnalysis,
@@ -41,6 +41,7 @@ __all__ = [
     "ExtractionResult",
     "FormClassificationResult",
     "FormSegment",
+    "OcrEngine",
     "ParseMetadata",
     "ParseResult",
     "ParserConfig",

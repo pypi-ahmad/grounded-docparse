@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import ClassVar
+
 import pymupdf
 from streamlit.testing.v1 import AppTest
 
@@ -7,8 +9,8 @@ from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.config import LUNA_MODEL
 from grounded_docparse.models import (
-    AgentUsage,
     AgenticAnalysis,
+    AgentUsage,
     Block,
     Document,
     Page,
@@ -41,6 +43,11 @@ def test_studio_allows_glm_without_openai_environment(
     parse = next(button for button in app.button if button.label == "Parse document")
     assert parse.disabled is False
     assert next(item for item in app.selectbox if item.label == "ADE mode").value == "Fast"
+    model = next(
+        item for item in app.selectbox if item.label == "Document extraction model"
+    )
+    assert model.options == ["GLM-OCR", "PaddleOCR-VL-1.6"]
+    assert model.value == "GLM-OCR"
     assert not next(
         toggle.value
         for toggle in app.toggle
@@ -86,7 +93,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
-    assert app.session_state["result_version"] == "4.5.0"
+    assert app.session_state["result_version"] == "4.6.0"
     assert app.session_state["session_usage"].calls == []
 
 
@@ -95,7 +102,7 @@ def test_legacy_session_usage_defaults_missing_cached_tokens_to_zero(monkeypatch
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
     class LegacyUsage:
-        calls = [
+        calls: ClassVar = [
             type(
                 "LegacyAgentUsage",
                 (),
@@ -124,6 +131,22 @@ def test_studio_shows_default_luna_destination(monkeypatch) -> None:
 
     assert any(
         "Luna destination: OpenAI default endpoint" in item.value
+        for item in app.get("caption")
+    )
+
+
+def test_ocr_model_selection_updates_the_active_ui_engine(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    model = next(
+        item for item in app.selectbox if item.label == "Document extraction model"
+    )
+    app = model.select("PaddleOCR-VL-1.6").run(timeout=20)
+
+    assert not app.exception
+    assert any(
+        "Powered by PaddleOCR-VL-1.6 + gpt-5.6-luna" in item.value
         for item in app.get("caption")
     )
 
@@ -183,6 +206,9 @@ def test_studio_shows_results_and_only_requested_tools(
     )
 
     class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
         def parse(
             self,
             _data,
@@ -271,6 +297,7 @@ def test_studio_shows_results_and_only_requested_tools(
         "Download Markdown",
         "Download annotated PDF",
         "Download Full JSON",
+        "Download all outputs",
     ]
     assert any("$0.02/M cached input" in item.value for item in app.get("caption"))
     assert any(
@@ -376,6 +403,9 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     captured_recovery: list[bool] = []
 
     class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
         def parse(
             self,
             data,
@@ -431,3 +461,161 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     assert captured_page_counts == [1]
     assert captured_recovery == [False]
     assert app.session_state.overview_page == 1
+
+
+def test_multiple_uploads_process_sequentially_and_only_process_new_files(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    parsed_names: list[str] = []
+
+    class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
+        def parse(self, data, name, **_kwargs):
+            parsed_names.append(name)
+            document = Document(
+                source_name=name,
+                source_sha256="c" * 64,
+                pages=[Page(number=1, width=612, height=792)],
+            )
+            rendered = render_agentic_document(document)
+            return ParseResult(
+                document=document,
+                markdown=rendered.markdown,
+                json=rendered.json,
+                input_tokens=10,
+                output_tokens=1,
+                annotated_pdf=data,
+                usage=RunUsage(
+                    calls=[
+                        AgentUsage(
+                            agent="visual_recovery",
+                            model=LUNA_MODEL,
+                            input_tokens=10,
+                            output_tokens=1,
+                        )
+                    ]
+                ),
+            )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
+    monkeypatch.setattr(
+        DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis()
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    uploader = app.file_uploader[0]
+    uploader.upload("first.pdf", simple_pdf, "application/pdf")
+    uploader.upload("second.pdf", simple_pdf + b"\n", "application/pdf")
+    app = uploader.run(timeout=20)
+
+    page_range = next(box for box in app.checkbox if box.label == "Page range")
+    assert page_range.disabled is True
+    app = next(
+        button for button in app.button if button.label == "Process 2 documents"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert parsed_names == ["first.pdf", "second.pdf"]
+    assert [
+        workspace["status"]
+        for workspace in app.session_state["batch_workspaces"].values()
+    ] == ["complete", "complete"]
+    assert app.session_state["session_usage"].input_tokens == 20
+    selector = next(
+        item for item in app.selectbox if item.label == "Document results"
+    )
+    app = selector.select("second.pdf").run(timeout=20)
+    assert app.session_state["result"].document.source_name == "second.pdf"
+
+    uploader = app.file_uploader[0]
+    uploader.set_value(
+        [
+            ("first.pdf", simple_pdf, "application/pdf"),
+            ("second.pdf", simple_pdf + b"\n", "application/pdf"),
+            ("third.pdf", simple_pdf + b"\n\n", "application/pdf"),
+        ]
+    )
+    app = uploader.run(timeout=20)
+    assert not app.exception
+    button_labels = [button.label for button in app.button]
+    assert "Process 3 documents" in button_labels, button_labels
+    app = next(
+        button for button in app.button if button.label == "Process 3 documents"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert parsed_names == ["first.pdf", "second.pdf", "third.pdf"]
+    assert app.session_state["session_usage"].input_tokens == 30
+    assert any(
+        button.label == "Download all outputs" for button in app.download_button
+    )
+
+
+def test_batch_continues_after_failure_and_retry_skips_completed_document(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    parsed_names: list[str] = []
+    bad_attempts = 0
+
+    class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
+        def parse(self, data, name, **_kwargs):
+            nonlocal bad_attempts
+            parsed_names.append(name)
+            if name == "bad.pdf":
+                bad_attempts += 1
+                if bad_attempts == 1:
+                    raise RuntimeError("simulated parse failure")
+            document = Document(
+                source_name=name,
+                source_sha256="d" * 64,
+                pages=[Page(number=1, width=612, height=792)],
+            )
+            rendered = render_agentic_document(document)
+            return ParseResult(
+                document=document,
+                markdown=rendered.markdown,
+                json=rendered.json,
+                input_tokens=0,
+                output_tokens=0,
+                annotated_pdf=data,
+            )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
+    monkeypatch.setattr(
+        DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis()
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    uploader = app.file_uploader[0]
+    uploader.upload("good.pdf", simple_pdf, "application/pdf")
+    uploader.upload("bad.pdf", simple_pdf + b"\n", "application/pdf")
+    app = uploader.run(timeout=20)
+    app = next(
+        button for button in app.button if button.label == "Process 2 documents"
+    ).click().run(timeout=20)
+
+    statuses = [
+        workspace["status"]
+        for workspace in app.session_state["batch_workspaces"].values()
+    ]
+    assert not app.exception
+    assert statuses == ["complete", "failed"]
+    assert parsed_names == ["good.pdf", "bad.pdf"]
+
+    app = next(
+        button for button in app.button if button.label == "Process 2 documents"
+    ).click().run(timeout=20)
+    statuses = [
+        workspace["status"]
+        for workspace in app.session_state["batch_workspaces"].values()
+    ]
+    assert not app.exception
+    assert statuses == ["complete", "complete"]
+    assert parsed_names == ["good.pdf", "bad.pdf", "bad.pdf"]

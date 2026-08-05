@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from PIL import Image, ImageDraw
 
-from grounded_docparse.config import AnalysisThresholds, ParserConfig
+from grounded_docparse.config import AnalysisThresholds, OcrEngine, ParserConfig
 from grounded_docparse.ingest import PageEvidence
 from grounded_docparse.local_ocr import GlmRegion, _regions
 from grounded_docparse.models import PageComplexity, ReadingOrderStatus
@@ -338,3 +338,64 @@ def test_recovery_uses_real_ocr_confidence_when_available(tmp_path: Path) -> Non
     result.regions[0].ocr_confidence = 0.54
     candidates = _page_recovery_candidates(evidence, result)
     assert any("low_ocr_confidence" in candidate.reasons for candidate in candidates)
+
+
+def test_paddle_uses_official_block_order_without_glm_column_ambiguity(
+    tmp_path: Path,
+) -> None:
+    regions = [
+        GlmRegion(1, "text", "Right alpha", (0.6, 0.1, 0.95, 0.2)),
+        GlmRegion(2, "text", "Left beta", (0.05, 0.3, 0.4, 0.4)),
+        GlmRegion(3, "text", "Right beta", (0.6, 0.3, 0.95, 0.4)),
+        GlmRegion(4, "text", "Left alpha", (0.05, 0.1, 0.4, 0.2)),
+    ]
+    config = ParserConfig(
+        ocr_engine=OcrEngine.PADDLEOCR_VL_1_6,
+        analysis_thresholds=AnalysisThresholds(
+            min_edge_variance=0,
+            min_contrast_range=0,
+            clipping_border_ratio=1,
+        ),
+    )
+    result = next(
+        PageAnalyzer(config, runtime_factory=lambda *_args: Runtime(regions)).analyze_window(
+            [page(tmp_path)]
+        )
+    )
+
+    assert result.reading_order.status is ReadingOrderStatus.CONFIDENT
+    assert result.reading_order.ordered_region_ids == [
+        "p1-analysis-1",
+        "p1-analysis-2",
+        "p1-analysis-3",
+        "p1-analysis-4",
+    ]
+    assert result.reading_order.basis == "PaddleOCR block_order"
+    assert result.engine.sdk == "paddleocr"
+
+
+def test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox(
+    tmp_path: Path,
+) -> None:
+    config = ParserConfig(
+        ocr_engine=OcrEngine.PADDLEOCR_VL_1_6,
+        analysis_thresholds=AnalysisThresholds(
+            min_edge_variance=0,
+            min_contrast_range=0,
+            clipping_border_ratio=1,
+        ),
+    )
+    analysis = next(
+        PageAnalyzer(
+            config,
+            runtime_factory=lambda *_args: Runtime(
+                [GlmRegion(1, "text", "[x] Nonparticipating", (0.1, 0.1, 0.9, 0.2))]
+            ),
+        ).analyze_window([page(tmp_path)])
+    )
+
+    draft = draft_from_analysis(analysis)
+
+    assert draft.regions[0].type.value == "checkbox"
+    assert draft.regions[0].checkbox_state.value == "checked"
+    assert draft.regions[0].text == "Nonparticipating"

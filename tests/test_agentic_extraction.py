@@ -7,6 +7,7 @@ from grounded_docparse.models import (
     AgentUsage,
     Block,
     BoundingBox,
+    CheckboxState,
     Document,
     Page,
     ParseResult,
@@ -24,6 +25,27 @@ SCHEMA = {
         }
     },
     "required": ["invoice_number"],
+    "additionalProperties": False,
+}
+
+CHECKBOX_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "field_name": {"type": ["string", "null"]},
+        "checkboxes": {
+            "type": ["array", "null"],
+            "items": {
+                "type": ["object", "null"],
+                "properties": {
+                    "label": {"type": ["string", "null"]},
+                    "selected": {"type": ["boolean", "null"]},
+                },
+                "required": ["label", "selected"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    "required": ["field_name", "checkboxes"],
     "additionalProperties": False,
 }
 
@@ -62,6 +84,51 @@ def _parse_result() -> ParseResult:
                         confidence=0.99,
                         verification=VerificationState.VERIFIED,
                     )
+                ],
+            )
+        ],
+    )
+    rendered = render_agentic_document(document)
+    return ParseResult(
+        document=document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+
+
+def _checkbox_parse_result() -> ParseResult:
+    document = Document(
+        source_name="form.pdf",
+        source_sha256="b" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=612,
+                height=792,
+                blocks=[
+                    Block(
+                        id="p1-b1",
+                        type="paragraph",
+                        text="Patient Smoker Status",
+                        reading_order=0,
+                    ),
+                    Block(
+                        id="p1-b2",
+                        type="checkbox",
+                        text="Yes",
+                        checkbox_state=CheckboxState.UNCHECKED,
+                        reading_order=1,
+                    ),
+                    Block(
+                        id="p1-b3",
+                        type="checkbox",
+                        text="No",
+                        checkbox_state=CheckboxState.CHECKED,
+                        reading_order=2,
+                    ),
                 ],
             )
         ],
@@ -148,6 +215,44 @@ def test_extract_returns_schema_data_with_resolved_evidence() -> None:
     assert result.input_tokens == 20
     assert result.output_tokens == 8
     assert json.loads(result.json)["data"] == result.data
+
+
+def test_extract_preserves_checkbox_labels_and_boolean_states() -> None:
+    class CheckboxGateway(ExtractionGateway):
+        def extract_document(self, _parse_payload, schema, **_kwargs):
+            assert schema == CHECKBOX_SCHEMA
+            return {
+                "data": {
+                    "field_name": "Patient Smoker Status",
+                    "checkboxes": [
+                        {"label": "Yes", "selected": False},
+                        {"label": "No", "selected": True},
+                    ],
+                },
+                "evidence": [
+                    {"pointer": "/field_name", "block_ids": ["p1-b1"]},
+                    {"pointer": "/checkboxes/0/label", "block_ids": ["p1-b2"]},
+                    {
+                        "pointer": "/checkboxes/0/selected",
+                        "block_ids": ["p1-b2"],
+                    },
+                    {"pointer": "/checkboxes/1/label", "block_ids": ["p1-b3"]},
+                    {
+                        "pointer": "/checkboxes/1/selected",
+                        "block_ids": ["p1-b3"],
+                    },
+                ],
+            }
+
+    result = DocumentExtractor(
+        gateway_factory=lambda _config: CheckboxGateway()
+    ).extract(_checkbox_parse_result(), CHECKBOX_SCHEMA)
+
+    assert result.data["checkboxes"] == [
+        {"label": "Yes", "selected": False},
+        {"label": "No", "selected": True},
+    ]
+    assert result.warnings == []
 
 
 class EnvelopePointerGateway(ExtractionGateway):

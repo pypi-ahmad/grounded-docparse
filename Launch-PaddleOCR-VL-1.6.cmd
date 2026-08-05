@@ -1,10 +1,10 @@
 @echo off
 setlocal EnableExtensions
-title GLM-OCR Launcher
+title PaddleOCR-VL-1.6 Launcher
 cd /d "%~dp0"
 
-echo Starting GLM-OCR...
-set "DOCPARSE_START_ENGINE=glm-ocr"
+echo Starting PaddleOCR-VL-1.6...
+set "DOCPARSE_START_ENGINE=paddleocr-vl-1.6"
 
 where wsl.exe >nul 2>&1
 if errorlevel 1 (
@@ -34,12 +34,12 @@ if not "%DOCPARSE_EXIT%"=="0" goto :failed
 
 start "" "http://localhost:8501"
 echo.
-echo GLM-OCR is ready. This window can be closed.
+echo PaddleOCR-VL-1.6 is ready. This window can be closed.
 ping 127.0.0.1 -n 4 >nul
 exit /b 0
 
 :failed
 echo.
-echo Startup failed. Review .runtime\vllm.log, .runtime\ollama.log, and .runtime\streamlit.log.
+echo Startup failed. Review .runtime\paddle-vllm.log, .runtime\paddle-api.log, and .runtime\streamlit.log.
 pause
 exit /b 1
