@@ -6,7 +6,7 @@ You do not need to understand AI or write code to use the application. Technical
 
 ## 1. Start here
 
-Grounded DocParse reads one PDF or image at a time and turns it into:
+Grounded DocParse reads PDFs and images and turns each one into:
 
 - readable Markdown;
 - structured document data;
@@ -19,7 +19,7 @@ Grounded DocParse reads one PDF or image at a time and turns it into:
 The basic workflow is:
 
 ```text
-Upload one document
+Upload one or more documents
   -> choose processing options
   -> parse the document
   -> review the source coverage
@@ -45,6 +45,7 @@ Upload one document
 Grounded DocParse can:
 
 - process PDF, PNG, JPEG, and TIFF documents;
+- process up to 20 files sequentially in one session;
 - handle multi-page PDFs and multi-frame images;
 - process an optional continuous page range from a PDF;
 - detect document regions such as text, headings, tables, forms, figures, formulas, and seals;
@@ -65,7 +66,7 @@ Grounded DocParse can:
 
 The current application does not provide:
 
-- multiple-file or folder processing in the UI;
+- folder upload;
 - a production batch queue;
 - durable document jobs that survive process restarts;
 - a public HTTP API;
@@ -77,13 +78,13 @@ The current application does not provide:
 - guaranteed recovery of a source region that OCR never detected; or
 - permission to use the output without business or regulatory review.
 
-It processes one uploaded document in the active Streamlit session. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes the changes required for production batch processing.
+It processes up to 20 uploaded files sequentially in the active Streamlit session, with per-file failure isolation and ZIP export. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes the changes required for durable production batch processing.
 
 ### 2.3 Core parsing versus optional AI features
 
 The application has two broad layers:
 
-1. **Local document parsing:** GLM-OCR reads page images, finds regions, and determines their order and location.
+1. **Local document parsing:** the selected GLM-OCR or PaddleOCR-VL-1.6 engine reads page images, finds regions, and determines their order and location.
 2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult crops or reason over recognized document content.
 
 Local parsing can run without an OpenAI key. The optional features require `OPENAI_API_KEY` and may send document content to the configured provider.
@@ -119,13 +120,13 @@ For later sessions:
 .\Launch-GLM-OCR.cmd
 ```
 
-The application normally opens at <http://localhost:8501>. The local GLM-OCR-compatible service runs on `127.0.0.1:8080`.
+The application normally opens at <http://localhost:8501>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
 ### 3.3 Optional Luna configuration
 
-GLM-OCR parsing does not need an OpenAI key. Optional visual recovery, Markdown enhancement, classification, TOC, routing, extraction, and chat do.
+Local OCR parsing does not need an OpenAI key. Optional visual recovery, Markdown enhancement, classification, TOC, routing, extraction, and chat do.
 
 An administrator can save the key in the Windows user environment:
 
@@ -143,8 +144,8 @@ This is important for business, privacy, and technical users.
 
 | Feature | Runs locally? | What may be sent remotely when enabled? |
 | --- | --- | --- |
-| GLM layout and OCR | Yes | Nothing to Luna |
-| Visual recovery | GLM selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
+| Local layout and OCR | Yes | Nothing to Luna |
+| Visual recovery | Candidate selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
 | Markdown enhancement | No | Grounded Markdown and compact layout information |
 | Document classification | No | Recognized content/layout from the first two parsed pages |
 | Table of contents | No | Recognized content/layout across the document |
@@ -156,7 +157,7 @@ The application displays the Luna destination near the top of the screen. Stop i
 
 **Important:** Fast mode is not automatically local-only. When a key is available, Fast enables document classification, and visual recovery normally starts enabled.
 
-For a local GLM-only run, turn off:
+For a local-only run with either OCR engine, turn off:
 
 - **Enhance with gpt-5.6-luna**;
 - **Enable visual recovery on hard regions**;
@@ -164,7 +165,7 @@ For a local GLM-only run, turn off:
 - **Generate table of contents**; and
 - **Enable document chat**.
 
-Do not run extraction or custom form routing in a GLM-only workflow because those features require Luna.
+Do not run extraction or custom form routing in a local-only workflow because those features require Luna.
 
 ## 5. Upload a document
 
@@ -177,7 +178,7 @@ Use the **Upload document** area in the left sidebar. Supported file types are:
 - JPEG (`.jpg` or `.jpeg`); and
 - TIFF (`.tif` or `.tiff`).
 
-The UI accepts one file at a time and limits an upload to 250 MB. Default parser limits are 500 pages/frames and 20,000,000 rendered pixels per page. Administrators can lower or raise parser limits through configuration, but the UI uploader still has its own 250 MB control. The parser also checks validity and password protection.
+The UI accepts up to 20 files, limits each file to 250 MB, and limits the batch to 1 GB. Files run sequentially. Default parser limits are 500 pages/frames and 20,000,000 rendered pixels per page. Administrators can lower or raise parser limits through configuration, but the UI uploader keeps its own limits. The parser also checks validity and password protection.
 
 For a safe practice run, use:
 
@@ -229,7 +230,7 @@ ADE mode is a group of presets for optional Luna features. It is not a connectio
 
 Changing one of the preset-controlled switches can move the mode to **Custom**.
 
-Every mode still runs the same core GLM-OCR parse.
+Every mode still runs the same selected local OCR parse.
 
 Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
@@ -247,7 +248,7 @@ It does not replace the source text, change element locations, or reorder the ca
 
 ### 6.3 Enable visual recovery on hard regions
 
-Visual recovery inspects difficult source regions after local GLM form recovery. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
+Visual recovery inspects difficult source regions. Engine-specific local recovery runs first: GLM-OCR revisits eligible form regions, while PaddleOCR-VL may recover missing checkbox states in PDFs only when 190 and 200 DPI parses agree. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 
 Candidates can include:
 
@@ -291,7 +292,7 @@ Use it for:
 - manuals; or
 - any long document with headings.
 
-If Luna TOC generation fails, the application may fall back to headings already found by GLM-OCR.
+If Luna TOC generation fails, the application may fall back to headings already found by local OCR.
 
 ### 6.6 Enable document chat
 
@@ -336,9 +337,9 @@ The parser never treats selectable PDF text as authoritative evidence. It reads 
 
 ### 7.2 What happens when an optional feature fails
 
-Optional Luna failures normally do not erase a successful GLM parse. The application displays warnings or an unavailable/failed feature status.
+Optional Luna failures normally do not erase a successful local OCR parse. The application displays warnings or an unavailable/failed feature status.
 
-Parsing can stop if the source is invalid, password protected, over a configured limit, or if all nonblank pages lack usable GLM regions. One failed page does not by itself trigger this document-wide empty-layout failure; isolated page failures can remain visible as warnings/partial output.
+Parsing can stop if the source is invalid, password protected, over a configured limit, or if all nonblank pages lack usable local OCR regions. One failed page does not by itself trigger this document-wide empty-layout failure; isolated page failures can remain visible as warnings/partial output.
 
 ### 7.3 Tab map
 
@@ -874,7 +875,7 @@ Treat every form as a separate business result. Confirm that the page range belo
 
 ## 14. Use document chat
 
-Enable **Enable document chat** before or after parsing. Changing the chat toggle does not rerun GLM parsing.
+Enable **Enable document chat** before or after parsing. Changing the chat toggle does not rerun local OCR parsing.
 
 In the **Chat** tab:
 
@@ -988,7 +989,7 @@ One person may perform several roles in a small team, but the responsibilities s
 
 1. Approve the field dictionary and routing categories before production use.
 2. Confirm the environment and provider destination.
-3. Upload one document and verify page completeness.
+3. Upload the documents and verify each document's page completeness.
 4. Parse with the approved feature settings.
 5. Review source coverage before extraction.
 6. For mixed packets, review every routing segment.
@@ -1026,7 +1027,7 @@ A successful run does not mean every requested value is populated. It means:
 
 ### 17.1 Source ownership
 
-GLM-OCR and deterministic code own:
+The selected local OCR engine and deterministic code own:
 
 - element IDs;
 - normalized bounding boxes;
@@ -1133,7 +1134,7 @@ Developers can use the Python package directly through:
 - `ParserConfig` for configuration; and
 - `render_combined_result` for Full JSON.
 
-Actual GLM parsing must run in the Linux/WSL environment containing the `local-ocr` dependency. The Python API is synchronous and does not provide a page-range argument.
+Actual parsing must run with the selected GLM-OCR or PaddleOCR-VL stack available in Linux/WSL. The Python API is synchronous and does not provide a page-range argument.
 
 Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-to-hero-tutorial.md) for examples.
 
@@ -1240,7 +1241,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 ### Does Fast mode mean no external API calls?
 
-No. Fast enables document classification, and visual recovery may also be enabled. Use Custom mode and disable all Luna options for a GLM-only run.
+No. Fast enables document classification, and visual recovery may also be enabled. Use Custom mode and disable all Luna options for a local-only run.
 
 ### Is extraction automatic after parsing?
 
@@ -1270,7 +1271,7 @@ No. Approval confirms the routing decision. Eligibility comes only from the save
 
 No. GLM/deterministic code owns element identity, location, type, and order.
 
-### Can the app recover a region GLM never found?
+### Can the app recover a region local OCR never found?
 
 Not in the default workflow. Visual recovery repairs text only on an existing region.
 
@@ -1280,7 +1281,7 @@ Follow the organization’s policy. Critical and regulated fields should still b
 
 ### Can the UI process 100 PDFs at once?
 
-No. The current UI processes one document. Production batch processing requires the architecture described in the Azure runbook.
+No. The current UI processes at most 20 files sequentially in session state. A 100-file durable production workflow requires the architecture described in the Azure runbook.
 
 ### Are schemas and results both saved?
 

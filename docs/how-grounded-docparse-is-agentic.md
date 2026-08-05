@@ -17,7 +17,7 @@ Grounded DocParse follows a controlled workflow:
 ```text
 Source document
     -> deterministic validation and rasterization
-    -> GLM-OCR document perception
+    -> selected local OCR document perception
     -> grounded Markdown, layout, element IDs, and bounding boxes
     -> optional specialized reasoning tasks
     -> schema and evidence validation
@@ -30,7 +30,7 @@ This is agentic because the system coordinates several goal-oriented reasoning r
 
 ## The deterministic foundation comes first
 
-The local GLM-OCR stage owns the document's observable structure:
+The selected local GLM-OCR or PaddleOCR-VL stage owns the document's observable structure:
 
 - recognized text;
 - page and reading order;
@@ -47,19 +47,19 @@ This separation matters. The language model is used for judgment where judgment 
 
 | Capability | Goal | Controlled input | Accepted result and boundary |
 |---|---|---|---|
-| Visual recovery | Recover difficult text from suspicious regions | Selected image crops from existing GLM regions | Text replacement is accepted only for the original region and only above the confidence threshold; geometry, type, order, additions, and deletions remain GLM-owned |
+| Visual recovery | Recover difficult text from suspicious regions | Selected image crops from existing local OCR regions | Text replacement is accepted only for the original region and only above the confidence threshold; geometry, type, order, additions, and deletions remain local-OCR-owned |
 | Markdown refinement | Improve presentation without changing evidence | Recognized Markdown and compact layout records | Rendering directives may change presentation, but cannot replace canonical text or alter source geometry |
 | Document classification | Describe the overall document | Grounded context from the first two pages | A structured classification result; failure does not invalidate the parse |
 | Table of contents | Organize document sections | Bounded Markdown/layout contexts | Sections must reference known elements and pages; grounded headings provide a fallback |
 | Custom form routing | Divide a mixed packet into business categories | User-defined categories plus grounded Markdown/layout | Contiguous, complete page segments with valid categories and evidence; uncertain segments require review |
-| Extraction | Populate a user-approved schema | Refined Markdown plus the GLM-owned layout tree and evidence IDs | Values must satisfy the schema and resolve to accepted source evidence; unsupported values are repaired once or downgraded |
+| Extraction | Populate a user-approved schema | Refined Markdown plus the local-OCR-owned layout tree and evidence IDs | Values must satisfy the schema and resolve to accepted source evidence; unsupported values are repaired once or downgraded |
 | Document chat | Answer questions about the parsed document | Relevant bounded document context and recent conversation | Only citations to known element IDs become clickable sources; uncited answers receive low confidence |
 
 These are roles within one orchestrated application, not independent services that act without supervision.
 
 ## How the application observes and prepares context
 
-`DocumentAgent.prepare` converts the successful parse into reusable agentic context. Rejected elements are removed, but active elements retain their GLM-owned identity. Each compact layout record includes its element ID, type, page, reading order, and text.
+`DocumentAgent.prepare` converts the successful parse into reusable agentic context. Rejected elements are removed, but active elements retain their local-OCR-owned identity. Each compact layout record includes its element ID, type, page, reading order, and text.
 
 Long documents are divided into bounded contexts rather than being placed into one unlimited prompt. A context is limited to eight pages and approximately 48,000 characters. Oversized pages and elements are split further. This gives the reasoning stages enough local evidence while limiting cost, latency, and uncontrolled context growth.
 
@@ -110,14 +110,14 @@ The routing profile is fingerprinted at classification time. If it changes after
 
 Consider a 20-page packet containing a cover sheet, a new request, an update form, and supporting records. The business wants structured data only from new requests.
 
-1. GLM-OCR parses every page and creates the grounded evidence layer.
+1. The selected local OCR engine parses every page and creates the grounded evidence layer.
 2. The user loads a routing profile defining `new_request`, `update`, `records`, and the automatic `other` fallback.
 3. The routing agent proposes contiguous page segments and cites the elements supporting each category.
 4. Deterministic validation checks complete page coverage, category names, ranges, and cited evidence.
 5. High-confidence segments may be auto-approved; uncertain or window-boundary decisions are held for review.
 6. The user reviews and corrects any held segments. Extraction remains blocked until every segment has an approved status, whether automatic or user-confirmed.
 7. The application extracts only approved `new_request` segments because only that category is marked eligible.
-8. Each extracted field is resolved back to existing evidence and its GLM-owned page and bounding box.
+8. Each extracted field is resolved back to existing evidence and its local-OCR-owned page and bounding box.
 9. A failed segment remains visible without deleting successful results from other eligible segments.
 
 The model contributes classification and extraction judgment, but the application controls routing rules, validation, eligibility, approval, evidence resolution, and failure handling. That combination is the core of the app's agentic design.
@@ -126,7 +126,7 @@ The model contributes classification and extraction judgment, but the applicatio
 
 The most important agentic constraint is that downstream reasoning must remain connected to the original parse.
 
-For extraction, the model receives document Markdown and an identifier-rich layout tree. It proposes values and evidence references, but the application resolves those references against the parse result. Page numbers and bounding boxes are copied from the GLM-owned source records; provider-supplied geometry is not trusted as a new source of truth.
+For extraction, the model receives document Markdown and an identifier-rich layout tree. It proposes values and evidence references, but the application resolves those references against the parse result. Page numbers and bounding boxes are copied from the local-OCR-owned source records; provider-supplied geometry is not trusted as a new source of truth.
 
 For chat, only citations that map to known element IDs are exposed. The UI can then open the cited annotated page and highlight the stored source box. The answer is therefore reviewable against the same evidence used by extraction and routing.
 
@@ -137,7 +137,7 @@ Grounding turns a model response from an unsupported assertion into a claim that
 Agentic features are optional enhancements around a completed parse. Their failures are isolated:
 
 - classification and TOC generation run concurrently and can fail independently;
-- TOC failure can fall back to grounded GLM headings;
+- TOC failure can fall back to grounded local OCR headings;
 - an unavailable key marks optional features unavailable without destroying the parse;
 - invalid routing blocks routed extraction rather than guessing;
 - an extraction failure for one eligible form does not remove successful form results; and

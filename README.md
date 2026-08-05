@@ -20,9 +20,9 @@ upload
 
 ![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
 
-Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. The parser processes ordered windows of 16 pages with up to eight page workers by default. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
+Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. GLM-OCR processes ordered windows of 16 pages with up to eight page workers by default; PaddleOCR-VL submits the full document to its local API. If at least one page is nonblank and none of the nonblank pages contains a local OCR layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
 
-When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. PaddleOCR-VL output instead flows directly into the same deterministic quality and optional Luna-recovery stages.
+When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. For PDFs parsed with PaddleOCR-VL, incomplete checkbox tables may receive a conservative local recovery pass; a state is accepted only when independent 190 and 200 DPI parses agree. Both engines then enter the same deterministic quality and optional Luna-recovery stages.
 
 ## Install and set up
 
@@ -43,7 +43,7 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
 
    On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. Setup reuses a healthy Ubuntu user or securely prompts once for Linux credentials.
 
-3. Optional: enable Luna visual recovery and document reasoning by saving the OpenAI values in the Windows user environment. Skip this step for local GLM-only parsing.
+3. Optional: enable Luna visual recovery and document reasoning by saving the OpenAI values in the Windows user environment. Skip this step for local-only parsing.
 
    ```powershell
    [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
@@ -102,7 +102,7 @@ Chat is off by default and sends no request until enabled and a question is subm
 - Refined Markdown plus grounded `base_markdown`
 - Parse JSON v4.4.0 with normalized elements, page/block evidence, provenance, correction history, parse usage/trace, empty agentic placeholders, and recovery log
 - Full JSON v4.5.0 using the same envelope with current classification, sections, legacy extraction, custom form routing, per-form extraction, combined usage/trace, and feature statuses populated
-- Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and GLM-owned normalized boxes
+- Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and local-OCR-owned normalized boxes
 - Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes
 - Run metadata including GLM, Luna recovery, and Luna agentic timing
 
@@ -130,7 +130,7 @@ analysis = agent.analyze(result, classify=True, generate_toc=False)
 full_json = render_combined_result(result, analysis)
 ```
 
-`DocumentParser.parse` is synchronous. Luna failures do not invalidate a successful GLM parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
+`DocumentParser.parse` is synchronous. Luna failures do not invalidate a successful local OCR parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
 
 ## Repository layout
 
@@ -167,6 +167,7 @@ full_json = render_combined_result(result, analysis)
 | [Python API](docs/api.md) | Exported names, signatures, schemas, and result contracts |
 | [Product specification](docs/spec.md) | Required behavior, public interfaces, and non-goals |
 | [Local GLM-OCR](docs/local-glmocr.md) | Locked GLM-OCR/vLLM runtime and evaluation path |
+| [Local PaddleOCR-VL-1.6](docs/local-paddleocr-vl.md) | Isolated Paddle runtime installation, health checks, and troubleshooting |
 | [Azure bulk medical fax deployment](docs/azure-bulk-fax-deployment.md) | Production design and operations runbook for secure bulk medical-fax processing on Azure |
 | [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, and retention |
 

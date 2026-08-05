@@ -59,8 +59,8 @@ Do not include API keys, bearer tokens, source documents, crops, local data, or 
 
 ## Architecture constraints
 
-- Models may propose typed evidence; deterministic code derives stable IDs from GLM regions and owns validation, hierarchy, and export policy.
-- GLM-OCR originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. Luna recovery may change only high-confidence text on existing elements.
+- Models may propose typed evidence; deterministic code derives stable IDs from local OCR regions and owns validation, hierarchy, and export policy.
+- Selected local OCR originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. Luna recovery may change only high-confidence text on existing elements.
 - Unsupported text must remain unresolved or rejected in strict outputs.
 - Every extracted leaf requires existing source-node citations.
 - New output-affecting configuration must be covered by public-contract tests.

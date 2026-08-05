@@ -2,12 +2,12 @@
 
 ## Goal
 
-Parse one PDF or image into grounded Markdown, structured JSON, and an annotated PDF through a GLM-OCR-first local workflow, with optional bounded Luna recovery and document reasoning.
+Parse PDFs and images into grounded Markdown, structured JSON, and annotated PDFs through a selectable local OCR workflow, with optional bounded Luna recovery and document reasoning.
 
 ## Inputs
 
-- One PDF, PNG, JPEG, or TIFF
-- Optional inclusive contiguous PDF page range
+- Up to 20 PDFs, PNGs, JPEGs, or TIFFs; 250 MB per file and 1 GB combined
+- Optional inclusive contiguous PDF page range when exactly one PDF is uploaded
 - Optional Luna feature toggles
 - Optional reusable scalar extraction schemas and custom form-routing profiles
 - Optional document-chat questions after parsing
@@ -15,13 +15,13 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 ## Required behavior
 
 - Render PDFs visually and never treat selectable PDF text as evidence.
-- Use GLM-OCR as the source of layout, identity, geometry, type, confidence, and reading order.
+- Use the selected GLM-OCR or PaddleOCR-VL-1.6 engine as the source of layout, identity, geometry, type, confidence, and reading order.
 - Process ordered 16-page windows with up to eight page workers by default.
-- Reprocess every eligible form region with local GLM first, capped at three crops per page.
-- Detect weak existing GLM regions deterministically and assign Luna an independent budget that scales from eight crops to the configured ceiling of 64 based on document length, capped at three per page.
+- When GLM-OCR is selected, reprocess every eligible form region with local GLM first, capped at three crops per page.
+- Detect weak existing local OCR regions deterministically and assign Luna an independent budget that scales from eight crops to the configured ceiling of 64 based on document length, capped at three per page.
 - Use medium Luna effort for every request and apply only image-recovery text corrections with confidence at least `0.85`.
 - Ignore Luna additions, rejections, geometry changes, order changes, type changes, confidence changes, and structural changes.
-- Stop before Luna when at least one page is nonblank and none of the nonblank pages contains a GLM layout region; preserve isolated page failures as partial output with warnings.
+- Stop before Luna when at least one page is nonblank and none of the nonblank pages contains a local OCR layout region; preserve isolated page failures as partial output with warnings.
 - Optionally refine Markdown through presentation directives keyed by existing elements.
 - Optionally classify the document and generate a hierarchical, source-linked TOC.
 - Run extraction on demand with a strict nullable JSON Schema subset and existing-element evidence.
@@ -33,10 +33,11 @@ Parse one PDF or image into grounded Markdown, structured JSON, and an annotated
 - Provide source highlighting from TOC, extraction, chat, page elements, and layout-tree selections.
 - Emit parse JSON v4.4.0 with refined Markdown, grounded base Markdown, elements/provenance, page/block evidence, correction history, recovery log, parse timing/usage/trace, and empty agentic placeholders.
 - Emit Full JSON v4.5.0 with the same envelope plus optional custom classification and per-form extraction, combined usage/trace/timing, and feature statuses.
-- Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and GLM-owned normalized boxes.
+- Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and local-OCR-owned normalized boxes.
 - Keep annotated PDF bytes outside JSON and offer them as a separate download.
 - Use SQLite only for intentional application-managed schema and routing-profile persistence; keep parse and routing results in temporary/process/session state.
-- Allow GLM-only parsing without `OPENAI_API_KEY`.
+- Process batch files sequentially, isolate per-file failures, skip unchanged completed files on rerun, and export a ZIP archive.
+- Allow local-only parsing without `OPENAI_API_KEY`.
 
 ## Public interfaces
 
@@ -56,7 +57,7 @@ Signatures, return-model summaries, schema rules, and envelope examples are in [
 
 ## Non-goals
 
-Document/chat persistence, jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review storage, cost estimation, durable or cross-session result caching, full-page Luna fallback, missing-region synthesis, and batch orchestration in the UI. Reuse inside the active Streamlit session is in scope.
+Document/chat persistence, durable jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review storage, cost estimation, durable or cross-session result caching, full-page Luna fallback, missing-region synthesis, and production batch orchestration. Session-scoped sequential batch processing is in scope.
 
 ## Done when
 

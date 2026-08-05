@@ -6,14 +6,14 @@ The short version is:
 
 ```text
 PDF or image
-  -> local GLM-OCR layout and recognition
+  -> selected local GLM-OCR or PaddleOCR-VL layout and recognition
   -> deterministic quality checks
   -> optional bounded Luna text recovery
   -> grounded document model, Markdown, JSON, and annotated PDF
   -> optional classification, form routing, extraction, TOC, and chat
 ```
 
-The most important design rule is that GLM-OCR and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
+The most important design rule is that the selected local OCR engine and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
 
 ## 1. Choose your path through this tutorial
 
@@ -38,7 +38,7 @@ Ordinary OCR answers “what text appears in this image?” A business document 
 
 Grounded DocParse converts one PDF or image into a structured, reviewable document representation. It is optimized for scanned and visually complex documents where source traceability matters.
 
-The current application is a workstation-oriented Streamlit studio. It processes one uploaded document at a time. It is not currently a batch service, REST API, multi-user system, or durable job processor.
+The current application is a workstation-oriented Streamlit studio. It processes up to 20 uploaded files sequentially in session state. It is not a durable batch service, REST API, multi-user system, or job processor.
 
 ### 2.1 Core outputs
 
@@ -68,7 +68,7 @@ Why this matters: hidden, stale, malformed, or adversarial PDF text cannot disag
 
 Layout analysis finds regions such as headings, paragraphs, tables, form areas, and images. OCR recognizes text inside those regions.
 
-GLM-OCR owns:
+The selected local OCR engine owns:
 
 - element identity;
 - normalized bounding boxes;
@@ -144,7 +144,7 @@ Browser
 
 There are two AI execution boundaries:
 
-1. **Local GLM-OCR:** layout and recognition run inside WSL against the local vLLM service.
+1. **Local OCR:** GLM-OCR or PaddleOCR-VL-1.6 layout and recognition run inside WSL against loopback-only services.
 2. **Optional Luna:** selected crops or recognized document context go to the configured OpenAI-compatible destination only when the associated feature is enabled and `OPENAI_API_KEY` is available.
 
 There is no open-ended agent loop. Optional features use bounded, typed requests followed by deterministic validation.
@@ -220,13 +220,13 @@ The setup process:
 7. validates a real image-recognition request; and
 8. opens <http://localhost:8501>.
 
-Later sessions use:
+Later sessions default to GLM-OCR:
 
 ```powershell
 .\Launch-GLM-OCR.cmd
 ```
 
-The launcher reuses healthy managed processes and refreshes the Windows user-scope OpenAI settings.
+Use `.\Launch-PaddleOCR-VL-1.6.cmd` to start with PaddleOCR-VL selected. Both launchers reuse healthy managed processes, refresh Windows user-scope OpenAI settings, and can switch the exclusive GPU backend from the app.
 
 ### 5.5 Manual WSL launch
 
@@ -264,7 +264,7 @@ Open <http://localhost:8501>, then follow this minimal path:
 
 ### 6.1 ADE modes
 
-“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same core GLM parse.
+“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same selected local OCR parse.
 
 | Mode | Markdown refinement | Document classification | TOC |
 | --- | --- | --- | --- |
@@ -274,7 +274,7 @@ Open <http://localhost:8501>, then follow this minimal path:
 
 Visual recovery and chat are separate toggles. Extraction is never automatically run by an ADE mode.
 
-If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a GLM-only run.
+If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a local-only run.
 
 ### 6.2 What happens after selecting Parse document?
 
@@ -289,7 +289,7 @@ The exact parser flow is:
 
 1. Validate extension, bytes, upload size, page count, and pixel limits.
 2. Rasterize every page or image frame.
-3. Run GLM-OCR in ordered windows of 16 pages.
+3. Run the selected local OCR engine: ordered 16-page windows for GLM-OCR or one full-document local API request for PaddleOCR-VL.
 4. Analyze OCR confidence, density, garbage, empty-region area, and table structure.
 5. Rank recovery candidates.
 6. Optionally send prioritized crops to Luna using an adaptive budget of eight to 64 and a three-per-page limit.
@@ -299,7 +299,7 @@ The exact parser flow is:
 10. Optionally apply Markdown presentation directives.
 11. Optionally classify the whole document and generate the TOC.
 
-Pages are prepared/finalized concurrently within ordered windows, while the process-wide GLM-OCR SDK runtime serializes model access. Default page concurrency is eight.
+For GLM-OCR, pages are prepared/finalized concurrently within ordered windows while the process-wide SDK runtime serializes model access. Default page concurrency is eight. PaddleOCR-VL submits the complete document to its local API.
 
 The UI implements a page range by creating a new subset PDF before parsing. Output page 1 therefore means the first selected page, not necessarily page 1 of the original PDF. If downstream users need original-file page numbers, retain the selected start-page offset or another explicit mapping outside the current result.
 
@@ -312,12 +312,12 @@ Luna recovery may replace text on an existing element. It may not change:
 - type;
 - hierarchy;
 - reading order;
-- GLM confidence; or
+- local OCR confidence; or
 - document structure.
 
-Luna additions, rejected regions, geometry changes, and structural changes are ignored. If GLM misses a source region entirely, the default recovery path does not synthesize it.
+Luna additions, rejected regions, geometry changes, and structural changes are ignored. If local OCR misses a source region entirely, the default recovery path does not synthesize it.
 
-If at least one page is nonblank but no nonblank page contains any GLM layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.
+If at least one page is nonblank but no nonblank page contains any local OCR layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.
 
 ## 7. Learn the Streamlit studio
 
@@ -518,7 +518,7 @@ schema validation
   -> deterministic exact/normalized/inferred/not-found decision
 ```
 
-Accepted evidence must point to existing parsed elements. The final box comes from the GLM-owned element, not from a new model-generated coordinate.
+Accepted evidence must point to existing parsed elements. The final box comes from the local-OCR-owned element, not from a new model-generated coordinate.
 
 The UI builder supports scalar schemas. The direct Python `DocumentExtractor` API also supports nested objects and arrays, but nested schemas use one direct extraction path rather than the long-document scalar partition/merge strategy.
 
@@ -1110,9 +1110,11 @@ Constraints such as `pattern`, length/range bounds, conditional schemas, and com
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |
 | `DOCPARSE_PROVIDER_RETRY_ATTEMPTS` | `3` | Total retryable attempts |
-| `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Local GLM analysis enabled |
+| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr` or `paddleocr-vl-1.6` |
+| `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Local OCR analysis enabled |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout device |
+| `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback PaddleX document-parser API |
 | `DOCPARSE_STUDIO_DB_PATH` | `data/document_studio.sqlite3` | Reusable-definition database |
 
 The managed vLLM profile uses a deliberate 32,768-token ceiling for the verified workstation rather than attempting the model’s theoretical maximum context. Change runtime limits only after measuring GPU memory, WSL memory, representative pages, and failure behavior.
@@ -1214,7 +1216,6 @@ The bundled corpus is a regression suite. It is not proof of broad production ac
 
 The repository intentionally does not currently provide:
 
-- batch processing in the UI;
 - a folder-upload workflow;
 - a CLI application entry point;
 - an HTTP application API;
@@ -1290,7 +1291,7 @@ You are ready to use the app when you can answer “yes” to these questions:
 - Can I classify a mixed packet, review every segment, and extract only eligible categories?
 - Can I trace an output value to an element and annotated source box?
 - Do I understand what persists and what disappears with the session?
-- Do I know the current single-document and trusted-workstation limits?
+- Do I know the current 20-file session-batch and trusted-workstation limits?
 - Can I run the offline verification suite before changing code?
 - Will I use the production runbook rather than exposing the local app directly?
 

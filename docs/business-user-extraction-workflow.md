@@ -9,7 +9,7 @@ The process has two goals:
 1. Make the document readable and navigable while preserving its original page locations.
 2. Extract the requested business fields and show where each value came from.
 
-The app processes one uploaded document at a time. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
+The app processes up to 20 uploaded documents sequentially in one session. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
 
 ## The Workflow at a Glance
 
@@ -52,7 +52,7 @@ For repeating information, decide in advance how the business wants it represent
 
 ## 2. Upload the Document
 
-Use **Upload document** to select one supported PDF or image. Multi-page PDFs and multi-frame image files are handled as one document.
+Use **Upload documents** to select up to 20 supported PDFs or images. Files run sequentially; multi-page PDFs and multi-frame images remain individual documents. A page range is available only for a single PDF.
 
 Before parsing:
 
@@ -67,11 +67,11 @@ A poor source can still be processed, but missing or unreadable content cannot a
 
 For a comprehensive first parse, use **Full** ADE mode. It produces refined Markdown, document classification, and a table of contents in addition to the core parse; it does not run schema extraction. **Fast** mode is useful when speed matters and the document pattern is already familiar. **Custom** mode allows the optional features to be selected individually.
 
-For scanned, faxed, blurred, or irregular documents, leave **Enable visual recovery on hard regions** turned on. The app first relies on GLM-OCR for the complete document. Luna is used only for selected existing GLM regions that show evidence of OCR difficulty, such as low confidence, an empty detected text box, broken structure, clipping, or a recognizable OCR ambiguity. Clean, high-confidence content is left untouched. Luna does not create a region that GLM-OCR failed to detect.
+For scanned, faxed, blurred, or irregular documents, leave **Enable visual recovery on hard regions** turned on. The app first relies on the selected local OCR engine for the complete document. Luna is used only for selected existing regions that show evidence of OCR difficulty, such as low confidence, an empty detected text box, broken structure, clipping, or a recognizable OCR ambiguity. Clean, high-confidence content is left untouched. Luna does not create a region that local OCR failed to detect.
 
 Visual recovery is not a second full-document OCR pass. It is a limited repair step for difficult regions.
 
-Visual recovery and field extraction are separate choices. Turning visual recovery off does not turn extraction off; it means extraction will use the GLM-OCR result without Luna image repair. Luna must still be available when the user later selects **Run extraction**.
+Visual recovery and field extraction are separate choices. Turning visual recovery off does not turn extraction off; it means extraction will use the selected local OCR result without Luna image repair. Luna must still be available when the user later selects **Run extraction**.
 
 ## 4. Parse the Document
 
