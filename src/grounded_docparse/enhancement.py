@@ -157,24 +157,21 @@ def render_chunk_plan(
         parts: list[str] = []
         for directive in directives:
             source = blocks[directive.element_id]
-            if not _compatible(source, directive.render_as):
-                raise ValueError(
-                    f"incompatible presentation role for {directive.element_id}"
-                )
+            compatible = _compatible(source, directive.render_as)
             block = source.model_copy(deep=True)
             block.children = []
-            if directive.render_as != "source":
+            if compatible and directive.render_as != "source":
                 block.type = role_types[directive.render_as]
-            if directive.heading_level is not None:
+            if compatible and directive.heading_level is not None:
                 block.heading_level = directive.heading_level
             body = _body(block)
-            if directive.list_depth:
+            if compatible and directive.list_depth:
                 body = "\n".join(
                     f"{'  ' * directive.list_depth}{line}" for line in body.splitlines()
                 )
             if not body:
                 continue
-            if directive.group_with_previous and parts:
+            if compatible and directive.group_with_previous and parts:
                 parts[-1] = f"{parts[-1].rstrip()} {body.lstrip()}"
             else:
                 parts.append(body)

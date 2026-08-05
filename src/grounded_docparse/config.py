@@ -2,9 +2,48 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from enum import StrEnum
+from urllib.parse import urlsplit
 
 LUNA_MODEL = "gpt-5.6-luna"
 LUNA_REASONING_EFFORT = "medium"
+
+
+class OcrEngine(StrEnum):
+    GLM_OCR = "glm-ocr"
+    PADDLEOCR_VL_1_6 = "paddleocr-vl-1.6"
+
+    @property
+    def label(self) -> str:
+        return (
+            "GLM-OCR"
+            if self is OcrEngine.GLM_OCR
+            else "PaddleOCR-VL-1.6"
+        )
+
+
+def validate_paddleocr_service_url(value: str) -> str:
+    parsed = urlsplit(value)
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(
+            "paddleocr_service_url must be an HTTP loopback origin with a valid port"
+        ) from exc
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or port is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path not in {"", "/"}
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError(
+            "paddleocr_service_url must be an HTTP loopback origin with an explicit port"
+        )
+    return value.rstrip("/")
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,6 +86,7 @@ class AnalysisThresholds:
 
 @dataclass(frozen=True, slots=True)
 class ParserConfig:
+    ocr_engine: OcrEngine = OcrEngine.GLM_OCR
     render_dpi: int = 200
     crop_dpi: int = 450
     crop_padding: float = 0.1
@@ -68,6 +108,8 @@ class ParserConfig:
     glm_form_recovery_enabled: bool = True
     glmocr_config_path: str = "config/glmocr.yaml"
     glmocr_layout_device: str = "cuda:0"
+    paddleocr_service_url: str = "http://127.0.0.1:8119"
+    paddleocr_timeout_seconds: float = 900.0
     analysis_thresholds: AnalysisThresholds = field(default_factory=AnalysisThresholds)
 
     def __post_init__(self) -> None:
@@ -104,6 +146,9 @@ class ParserConfig:
             )
         if not 0 < self.full_page_fallback_fraction <= 1:
             raise ValueError("full_page_fallback_fraction must be in (0,1]")
+        if self.paddleocr_timeout_seconds <= 0:
+            raise ValueError("paddleocr_timeout_seconds must be positive")
+        validate_paddleocr_service_url(self.paddleocr_service_url)
 
     @classmethod
     def from_env(cls) -> ParserConfig:
@@ -121,6 +166,9 @@ class ParserConfig:
             }
         )
         return cls(
+            ocr_engine=OcrEngine(
+                os.getenv("DOCPARSE_OCR_ENGINE", defaults.ocr_engine.value)
+            ),
             render_dpi=int(os.getenv("DOCPARSE_RENDER_DPI", str(defaults.render_dpi))),
             crop_dpi=int(os.getenv("DOCPARSE_CROP_DPI", str(defaults.crop_dpi))),
             crop_padding=float(
@@ -207,6 +255,15 @@ class ParserConfig:
             ),
             glmocr_layout_device=os.getenv(
                 "DOCPARSE_GLMOCR_LAYOUT_DEVICE", defaults.glmocr_layout_device
+            ),
+            paddleocr_service_url=os.getenv(
+                "DOCPARSE_PADDLEOCR_SERVICE_URL", defaults.paddleocr_service_url
+            ).rstrip("/"),
+            paddleocr_timeout_seconds=float(
+                os.getenv(
+                    "DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS",
+                    str(defaults.paddleocr_timeout_seconds),
+                )
             ),
             analysis_thresholds=thresholds,
         )

@@ -84,3 +84,40 @@ def test_plan_with_missing_element_fails_closed() -> None:
 
     with pytest.raises(ValueError, match="each eligible element"):
         render_chunk_plan(document, chunks[0], plan)
+
+
+def test_incompatible_nontext_role_preserves_source_without_failing_chunk() -> None:
+    document = _document()
+    document.pages[0].blocks.append(
+        Block(
+            id="p1-b3",
+            type="checkbox",
+            text="Letter sent to Michael S Rogers, MD",
+            checkbox_state="checked",
+            reading_order=2,
+        )
+    )
+    chunks, _skipped = build_enhancement_chunks(document)
+    plan = MarkdownPresentationPlan(
+        pages=[
+            PagePresentationPlan(
+                page=1,
+                elements=[
+                    PresentationDirective(
+                        element_id="p1-b1", render_as="heading", heading_level=1
+                    ),
+                    PresentationDirective(element_id="p1-b2"),
+                    PresentationDirective(
+                        element_id="p1-b3",
+                        render_as="paragraph",
+                        group_with_previous=True,
+                    ),
+                ],
+            )
+        ]
+    )
+
+    refined = render_chunk_plan(document, chunks[0], plan)
+
+    assert refined[1].startswith("# Public notice")
+    assert "\n\n[x] Letter sent to Michael S Rogers, MD\n" in refined[1]

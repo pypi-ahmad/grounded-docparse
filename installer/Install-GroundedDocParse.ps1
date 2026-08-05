@@ -283,6 +283,14 @@ function Install-Runtime {
     Invoke-WslShell -Command $launch -User $User | Out-Null
 }
 
+function Install-PaddleRuntime {
+    param([string]$User)
+    $projectRoot = Get-WslProjectRoot -User $User
+    Set-Step 'Installing isolated PaddleOCR-VL-1.6 runtime...'
+    $setup = "cd '$projectRoot' && bash scripts/wsl/setup-paddleocr.sh"
+    Invoke-WslShell -Command $setup -User $User | Out-Null
+}
+
 function Save-State {
     param([string]$Backend, [bool]$Amd)
     New-Item -ItemType Directory -Force -Path $DataRoot | Out-Null
@@ -311,6 +319,9 @@ function Invoke-Provision {
             Install-Runtime -User $user -Backend 'ollama' -Amd $mode.Amd
             $mode.Backend = 'ollama'
         }
+        if ($mode.Backend -eq 'vllm') {
+            Install-PaddleRuntime -User $user
+        }
         Save-State -Backend $mode.Backend -Amd $mode.Amd
         $script:Progress.Style = 'Continuous'
         $script:Progress.Value = 100
@@ -336,7 +347,7 @@ function Invoke-Uninstall {
 set -e
 data="$HOME/.local/share/grounded-docparse"
 case "$data" in "$HOME/.local/share/grounded-docparse") ;; *) exit 1 ;; esac
-for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/ollama.pid" "$PWD/.runtime/streamlit.pid"; do
+for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/ollama.pid" "$PWD/.runtime/paddle-vllm.pid" "$PWD/.runtime/paddle-api.pid" "$PWD/.runtime/streamlit.pid"; do
   [[ -f "$pid_file" ]] && kill "$(<"$pid_file")" 2>/dev/null || true
 done
 rm -rf -- "$data"

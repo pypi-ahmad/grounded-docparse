@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import gc
 import hashlib
 import json
 import re
+import sys
 import tempfile
 import threading
 from dataclasses import dataclass
@@ -12,7 +14,7 @@ from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
-class GlmRegion:
+class OcrRegion:
     index: int
     label: str
     content: str
@@ -24,10 +26,15 @@ class GlmRegion:
 
 
 @dataclass(frozen=True, slots=True)
-class GlmPageResult:
+class OcrPageResult:
     image_path: Path
-    regions: list[GlmRegion]
+    regions: list[OcrRegion]
     error: str | None = None
+
+
+# Backward-compatible names for callers and stored test fixtures.
+GlmRegion = OcrRegion
+GlmPageResult = OcrPageResult
 
 
 def _objects(value: Any) -> list[dict[str, Any]]:
@@ -63,13 +70,13 @@ def _bbox(item: dict[str, Any]) -> tuple[float, float, float, float] | None:
         return None
 
 
-def _regions(result: Any) -> list[GlmRegion]:
+def _regions(result: Any) -> list[OcrRegion]:
     formatted = _objects(getattr(result, "json_result", result))
     raw = _objects(getattr(result, "raw_json_result", {}))
     raw_by_index = {
         int(item.get("index", index)): item for index, item in enumerate(raw)
     }
-    output: list[GlmRegion] = []
+    output: list[OcrRegion] = []
     for position, item in enumerate(formatted):
         box = _bbox(item)
         if box is None:
@@ -93,7 +100,7 @@ def _regions(result: Any) -> list[GlmRegion]:
             else ()
         )
         output.append(
-            GlmRegion(
+            OcrRegion(
                 index=index,
                 label=str(item.get("native_label", item.get("label", "unknown"))),
                 content=str(item.get("content", item.get("text", "")) or ""),
@@ -208,6 +215,18 @@ def get_glmocr_form_recovery_runtime(
     return get_glmocr_runtime(
         str(_form_recovery_config_path(config_path)), layout_device
     )
+
+
+def clear_glmocr_runtimes() -> None:
+    """Release in-process GLM models before handing the GPU to PaddleOCR."""
+
+    with _instances_lock:
+        _instances.clear()
+    gc.collect()
+    torch = sys.modules.get("torch")
+    cuda = getattr(torch, "cuda", None)
+    if cuda is not None and callable(getattr(cuda, "empty_cache", None)):
+        cuda.empty_cache()
 
 
 def glmocr_version() -> str | None:

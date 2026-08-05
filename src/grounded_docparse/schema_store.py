@@ -239,10 +239,7 @@ class SchemaStore:
             rows = connection.execute(
                 "SELECT name, fields_json FROM schemas ORDER BY name COLLATE NOCASE"
             ).fetchall()
-        return [
-            StoredSchema(name=name, fields=json.loads(fields_json))
-            for name, fields_json in rows
-        ]
+        return [_stored_schema(name, fields_json) for name, fields_json in rows]
 
     def get(self, name: str) -> StoredSchema | None:
         with self._connect() as connection:
@@ -252,12 +249,17 @@ class SchemaStore:
             ).fetchone()
         if row is None:
             return None
-        return StoredSchema(name=row[0], fields=json.loads(row[1]))
+        return _stored_schema(row[0], row[1])
 
     def save(self, schema: StoredSchema) -> None:
         now = datetime.now(UTC).isoformat()
+        stored_payload = (
+            [field.model_dump(mode="json") for field in schema.fields]
+            if schema.version == 1
+            else schema.model_dump(mode="json", exclude={"name"})
+        )
         fields_json = json.dumps(
-            [field.model_dump(mode="json") for field in schema.fields],
+            stored_payload,
             ensure_ascii=False,
             separators=(",", ":"),
         )
@@ -325,7 +327,22 @@ class ClassifierProfileStore:
             )
 
 
+def _stored_schema(name: str, payload: str) -> StoredSchema:
+    value = json.loads(payload)
+    if isinstance(value, list):
+        return StoredSchema(name=name, fields=value)
+    if isinstance(value, dict):
+        return StoredSchema.model_validate({"name": name, **value})
+    raise ValueError(f"Stored schema {name!r} has an invalid payload")
+
+
 def compile_json_schema(schema: StoredSchema) -> dict:
+    if schema.version == 2:
+        from .extraction import validate_extraction_schema
+
+        compiled = json.loads(json.dumps(schema.json_schema))
+        validate_extraction_schema(compiled)
+        return compiled
     properties = {}
     for field in schema.fields:
         field_type = "string" if field.type == "date" else field.type

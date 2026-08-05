@@ -15,7 +15,7 @@ from queue import Empty, SimpleQueue
 
 from PIL import Image
 
-from .config import LUNA_MODEL, ParserConfig
+from .config import LUNA_MODEL, OcrEngine, ParserConfig
 from .enhancement import (
     build_enhancement_chunks,
     combine_page_markdown,
@@ -23,7 +23,7 @@ from .enhancement import (
 )
 from .gateways import OpenAIDocumentGateway
 from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
-from .local_ocr import GlmPageResult, get_glmocr_form_recovery_runtime
+from .local_ocr import GlmPageResult, OcrPageResult, get_glmocr_form_recovery_runtime
 from .models import (
     AgentRole,
     AgentTraceEvent,
@@ -66,6 +66,7 @@ from .models import (
     VisualRecoveryResult,
 )
 from .page_analysis import PageAnalyzer, draft_from_analysis
+from .paddle_ocr import get_paddleocr_runtime
 from .quality import (
     MAX_REPAIR_BLOCKS,
     literal_repair_candidates,
@@ -133,6 +134,7 @@ AMBIGUOUS_LITERAL_PATTERN = re.compile(
 _HTML_CELL_PATTERN = re.compile(
     r"(?is)<(?P<tag>td|th)(?P<attrs>\s[^>]*)?>(?P<body>.*?)</(?P=tag)>"
 )
+_HTML_ROW_PATTERN = re.compile(r"(?is)<tr(?:\s[^>]*)?>(?P<body>.*?)</tr>")
 _CHECKBOX_PREFIX_PATTERN = re.compile(
     r"^\s*(?:\[(?P<bracket>[xX ?])\]|(?P<glyph>[☑✓✔☐□])|(?P<x>[xX])(?=\s+))\s*"
 )
@@ -220,6 +222,91 @@ def _option_states(value: str) -> dict[tuple[str, int], str | None]:
         counts[label] = occurrence + 1
         states[(label, occurrence)] = state
     return states
+
+
+def _paddle_form_states(value: str) -> dict[tuple[str, int], str | None]:
+    """Read explicit and standalone Paddle checkbox markers within table rows."""
+
+    rows = [match.group("body") for match in _HTML_ROW_PATTERN.finditer(value)]
+    if not rows:
+        return _option_states(value)
+    checked_markers = {"x", "☒", "☑", "✓", "✔"}
+    unchecked_markers = {"☐", "□"}
+    counts: dict[str, int] = {}
+    states: dict[tuple[str, int], str | None] = {}
+    for row in rows:
+        pending: str | None = None
+        for cell in _raw_html_cells(row):
+            token = cell.text.strip().casefold()
+            if token in checked_markers:
+                pending = "checked"
+                continue
+            if token in unchecked_markers:
+                pending = "unchecked"
+                continue
+            state, label = _form_option(cell.text)
+            if label is None:
+                pending = None
+                continue
+            occurrence = counts.get(label, 0)
+            counts[label] = occurrence + 1
+            states[(label, occurrence)] = state or pending
+            pending = None
+
+    occurrences = {
+        occurrence
+        for label, occurrence in states
+        if label in {"participating", "nonparticipating"}
+    }
+    for occurrence in occurrences:
+        participating = ("participating", occurrence)
+        nonparticipating = ("nonparticipating", occurrence)
+        if participating not in states or nonparticipating not in states:
+            continue
+        if states[participating] == "checked" and states[nonparticipating] is None:
+            states[nonparticipating] = "unchecked"
+        elif (
+            states[nonparticipating] == "checked"
+            and states[participating] is None
+        ):
+            states[participating] = "unchecked"
+    return states
+
+
+def _merge_confirmed_form_states(
+    primary: str, confirmed: dict[tuple[str, int], str]
+) -> tuple[str, int]:
+    """Add only missing option states confirmed by independent Paddle passes."""
+
+    cells = _raw_html_cells(primary)
+    occurrences: dict[str, int] = {}
+    replacements: dict[int, str] = {}
+    for index, cell in enumerate(cells):
+        primary_state, label = _form_option(cell.text)
+        if label is None:
+            continue
+        occurrence = occurrences.get(label, 0)
+        occurrences[label] = occurrence + 1
+        state = confirmed.get((label, occurrence))
+        if state is None or primary_state is not None:
+            continue
+        marker = {"checked": "[x]", "unchecked": "[ ]"}.get(state)
+        if marker is None:
+            continue
+        cleaned = _RAW_CHECKBOX_PREFIX_PATTERN.sub("", cell.body, count=1)
+        replacements[index] = f"{marker} {cleaned.lstrip()}"
+    if not replacements:
+        return primary, 0
+    pieces: list[str] = []
+    cursor = 0
+    for index, cell in enumerate(cells):
+        replacement = replacements.get(index)
+        if replacement is None:
+            continue
+        pieces.extend((primary[cursor : cell.start], replacement))
+        cursor = cell.end
+    pieces.append(primary[cursor:])
+    return "".join(pieces), len(replacements)
 
 
 def _form_control_recovery_severity(value: str) -> int | None:
@@ -916,6 +1003,176 @@ class _GlmFormRecovery:
     crops: int = 0
     duration: float = 0.0
     warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class _PaddleFormRecovery:
+    attempts: int = 0
+    resolved: int = 0
+    duration: float = 0.0
+    warnings: list[str] = field(default_factory=list)
+
+
+def _paddle_table_anchor(value: str) -> str | None:
+    markers = {"x", "☒", "☑", "✓", "✔", "☐", "□"}
+    for cell in _raw_html_cells(value):
+        text = cell.text.strip()
+        if not text or text.casefold() in markers:
+            continue
+        _state, label = _form_option(text)
+        if label is None:
+            return " ".join(text.casefold().split())
+    return None
+
+
+def _paddle_recovery_content(result: OcrPageResult, anchor: str) -> str | None:
+    matches = [
+        region.content
+        for region in result.regions
+        if "<table" in region.content.casefold()
+        and _paddle_table_anchor(region.content) == anchor
+    ]
+    return matches[0] if len(matches) == 1 else None
+
+
+def _confirmed_paddle_states(
+    left: dict[tuple[str, int], str | None],
+    right: dict[tuple[str, int], str | None],
+) -> dict[tuple[str, int], str]:
+    return {
+        key: state
+        for key, state in left.items()
+        if state is not None and right.get(key) == state
+    }
+
+
+def _recover_paddle_form_regions(
+    source: IngestedDocument,
+    pages: list[PageEvidence],
+    analyses: dict[int, PageAnalysis | None],
+    workdir: Path,
+    config: ParserConfig,
+) -> _PaddleFormRecovery:
+    """Recover only missing Paddle form states confirmed at two render scales."""
+
+    started = time.perf_counter()
+    outcome = _PaddleFormRecovery()
+    if source.source_path.suffix.casefold() != ".pdf":
+        return outcome
+
+    candidates: dict[int, list[tuple[LayoutRegionEvidence, str]]] = {}
+    for page_number, analysis in analyses.items():
+        if analysis is None or analysis.quality.blank:
+            continue
+        for region in analysis.regions:
+            if region.type not in {AnalysisRegionType.TABLE, AnalysisRegionType.FORM}:
+                continue
+            states = _paddle_form_states(region.text)
+            anchor = _paddle_table_anchor(region.text)
+            if (
+                len(states) >= 2
+                and any(state is None for state in states.values())
+                and anchor
+            ):
+                candidates.setdefault(page_number, []).append((region, anchor))
+    if not candidates:
+        outcome.duration = time.perf_counter() - started
+        return outcome
+
+    pages_by_number = {page.number: page for page in pages}
+    page_limit = config.max_visual_recovery_crops // 2
+    selected_pages = sorted(candidates)[:page_limit]
+    if len(selected_pages) < len(candidates):
+        outcome.warnings.append(
+            "Paddle checkbox recovery deferred "
+            f"{len(candidates) - len(selected_pages)} page(s) due to the "
+            "visual recovery budget"
+        )
+    recovery_dir = workdir / "paddle-form-recovery"
+    recovery_dir.mkdir(parents=True, exist_ok=True)
+    full_page = BoundingBox(x0=0, y0=0, x1=1, y1=1)
+    runtime = get_paddleocr_runtime(
+        config.paddleocr_service_url, config.paddleocr_timeout_seconds
+    )
+
+    for page_number in selected_pages:
+        page = pages_by_number.get(page_number)
+        if page is None:
+            continue
+        anchor_counts: dict[str, int] = {}
+        for _region, anchor in candidates[page_number]:
+            anchor_counts[anchor] = anchor_counts.get(anchor, 0) + 1
+        unique_candidates = [
+            (region, anchor)
+            for region, anchor in candidates[page_number]
+            if anchor_counts[anchor] == 1
+        ]
+        if not unique_candidates:
+            outcome.warnings.append(
+                f"Page {page_number}: Paddle checkbox recovery skipped ambiguous tables"
+            )
+            continue
+
+        results: list[OcrPageResult] = []
+        try:
+            for dpi in (190, 200):
+                if (
+                    dpi == 200
+                    and page.effective_dpi == 200
+                    and page.image_path.exists()
+                ):
+                    image_path = page.image_path
+                else:
+                    image_path = recovery_dir / f"p{page_number}-{dpi}dpi.png"
+                    render_region_crop(
+                        source,
+                        page,
+                        full_page,
+                        image_path,
+                        dpi=dpi,
+                        padding=0,
+                    )
+                outcome.attempts += 1
+                results.append(runtime.parse_recovery_image(image_path))
+        except Exception as exc:  # noqa: BLE001 - first-pass output must survive
+            outcome.warnings.append(
+                f"Page {page_number}: Paddle checkbox recovery unavailable: "
+                f"{type(exc).__name__}: {exc}"
+            )
+            continue
+
+        for region, anchor in unique_candidates:
+            recovered = [
+                _paddle_recovery_content(result, anchor) for result in results
+            ]
+            if any(content is None for content in recovered):
+                outcome.warnings.append(
+                    f"Page {page_number}: Paddle checkbox recovery could not align "
+                    f"{region.id}"
+                )
+                continue
+            left, right = (  # narrowed by the guard above
+                _paddle_form_states(content or "") for content in recovered
+            )
+            confirmed = _confirmed_paddle_states(left, right)
+            merged, resolved = _merge_confirmed_form_states(region.text, confirmed)
+            if not resolved:
+                if left != right:
+                    outcome.warnings.append(
+                        f"Page {page_number}: Paddle checkbox recovery disagreed for "
+                        f"{region.id}"
+                    )
+                continue
+            region.text = merged
+            outcome.resolved += resolved
+            analysis = analyses.get(page_number)
+            if analysis is not None:
+                analysis.warnings.append(
+                    "Paddle checkbox recovery confirmed "
+                    f"{resolved} state(s) for {region.id} at 190/200 DPI"
+                )
+    outcome.duration = time.perf_counter() - started
+    return outcome
 
 
 def _form_recovery_priority(region: LayoutRegionEvidence) -> int | None:
@@ -2325,6 +2582,11 @@ class DocumentParser:
                 max_pages=self.config.max_pages,
                 max_page_pixels=self.config.max_page_pixels,
             )
+            if (
+                self.gateway_factory is OpenAIDocumentGateway
+                and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+            ):
+                analyzer.prepare_document(source.source_path, source.pages)
             pages: list[Page] = []
             warnings: list[str] = []
             sections: list[str] = []
@@ -2389,7 +2651,8 @@ class DocumentParser:
                 ]
                 if nonblank and all(not analysis.regions for analysis in nonblank):
                     raise RuntimeError(
-                        "GLM-OCR produced no usable elements for any nonblank page"
+                        f"{self.config.ocr_engine.label} produced no usable elements "
+                        "for any nonblank page"
                     )
                 ocr_regions = [
                     region
@@ -2414,8 +2677,22 @@ class DocumentParser:
 
             glm_time = time.perf_counter() - started
 
+            paddle_form_recovery = (
+                _recover_paddle_form_regions(
+                    source,
+                    source.pages,
+                    analyses_by_page,
+                    workdir,
+                    self.config,
+                )
+                if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+                else _PaddleFormRecovery()
+            )
+            warnings.extend(paddle_form_recovery.warnings)
             effective_glm_form_recovery = (
-                visual_recovery and self.config.glm_form_recovery_enabled
+                self.config.ocr_engine is OcrEngine.GLM_OCR
+                and visual_recovery
+                and self.config.glm_form_recovery_enabled
             )
             glm_form_recovery = (
                 _recover_glm_form_regions(
@@ -2429,7 +2706,9 @@ class DocumentParser:
                 else _GlmFormRecovery()
             )
             warnings.extend(glm_form_recovery.warnings)
-            visual_recovery_crops = glm_form_recovery.crops
+            visual_recovery_crops = (
+                glm_form_recovery.crops + paddle_form_recovery.attempts
+            )
             luna_recovery_budget = _visual_recovery_crop_budget(
                 total,
                 ceiling=self.config.max_visual_recovery_crops,
@@ -2547,7 +2826,11 @@ class DocumentParser:
                 1,
                 "Assembling Markdown and structured JSON",
             )
-            elements = build_elements(document, recovered_region_ids)
+            elements = build_elements(
+                document,
+                recovered_region_ids,
+                local_source=self.config.ocr_engine.value,
+            )
             base_markdown = render_agentic_document(document).markdown
             _emit(
                 progress_callback,
@@ -2598,7 +2881,9 @@ class DocumentParser:
             ) / 1000
             metadata = ParseMetadata(
                 engine=(
-                    "glm-ocr + gpt-5.6-luna" if trace else "glm-ocr"
+                    f"{self.config.ocr_engine.value} + gpt-5.6-luna"
+                    if trace
+                    else self.config.ocr_engine.value
                 ),
                 pages=len(document.pages),
                 processing_time=duration_ms / 1000,
@@ -2620,7 +2905,9 @@ class DocumentParser:
                     len(boxes) for boxes in deferred_recovery.values()
                 ),
                 visual_recovery_region_ids=sorted(recovered_region_ids),
-                glm_time=glm_time,
+                glm_time=(
+                    glm_time if self.config.ocr_engine is OcrEngine.GLM_OCR else 0.0
+                ),
                 luna_recovery_time=luna_recovery_time,
                 luna_agentic_time=luna_agentic_time,
                 luna_time=luna_recovery_time + luna_agentic_time,
