@@ -8,10 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- Selectable PaddleOCR-VL-1.6 local parsing with an isolated locked runtime, Windows launcher, loopback-only PaddleX API, and exclusive GPU service switching.
+- Session-scoped batches of up to 20 files with sequential processing, per-file failure isolation, retry/skip behavior, and ZIP export.
+
 ### Changed
 
 - Made Luna recovery scale from eight to 64 prioritized crops with document length while retaining the three-per-page guard.
 - Kept local GLM form recovery independent from the Luna crop budget and standardized every Luna request on medium reasoning effort.
+- Generalized evidence ownership and recovery quality gates across GLM-OCR and PaddleOCR-VL-1.6.
 
 ## [0.5.0] - 2026-07-31
 

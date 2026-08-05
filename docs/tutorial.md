@@ -7,7 +7,7 @@
    - **Fast**: classification only.
    - **Full**: Markdown refinement, classification, and TOC.
    - **Custom**: change individual refinement, classification, or TOC toggles.
-   “ADE mode” is only a preset selector for optional Luna features; every mode runs the same core GLM parse.
+   “ADE mode” is only a preset selector for optional Luna features; every mode runs the same selected local OCR parse.
 5. Leave **Enable visual recovery on hard regions** on to allow bounded Luna crop repair. Enable document chat only if needed.
 6. Select **Parse document** and wait for layout, recognition, recovery, assembly, annotation, enhancement, and analysis stages.
 7. Use Overview for type, metrics, TOC, thumbnails, and original pages. Use Markdown for rendered or raw output, Annotated PDF for boxes, and Layout Tree for grounded elements and Luna badges.

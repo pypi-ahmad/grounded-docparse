@@ -1,6 +1,6 @@
 # Python API
 
-The package requires Python 3.12–3.14. Install the locked project environment with `uv sync --locked`. Actual GLM parsing also requires the Linux-only local OCR extra and running GLM service described in [setup](../SETUP.md).
+The package requires Python 3.12–3.14. Install the locked project environment with `uv sync --locked`. Actual parsing also requires a running GLM-OCR or PaddleOCR-VL-1.6 stack described in [setup](../SETUP.md).
 
 ## Exported names
 
@@ -23,6 +23,7 @@ FormClassificationResult
 FormSegment
 ParseMetadata
 ParseResult
+OcrEngine
 ParserConfig
 PreparedDocumentContext
 SchemaProposal
@@ -62,7 +63,7 @@ result = DocumentParser().parse(
 )
 ```
 
-`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, the default parser raises `RuntimeError`. Optional Luna failures otherwise fall back to the successful GLM result or feature warning/status.
+`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and none of the nonblank pages contains a local OCR layout region, the default parser raises `RuntimeError`. Optional Luna failures otherwise fall back to the successful local OCR result or feature warning/status.
 
 The Python parse API has no page-range argument. Slice a PDF before calling it or use the Streamlit range control.
 
@@ -231,7 +232,7 @@ The most frequently consumed exported models have these fields:
 
 | Model | Fields |
 | --- | --- |
-| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional GLM `confidence`, `source` (`glm-ocr` or `luna-recovery`) |
+| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, or `luna-recovery`) |
 | `ChatSource` | `element_id`, `page`, `text` |
 | `ChatAnswer` | `answer`, `sources`, `confidence` (`high`, `medium`, `low`), `usage`, `trace` |
 | `SchemaProposal` | `instruction`, `json_schema`, `usage` |

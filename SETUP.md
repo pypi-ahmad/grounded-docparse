@@ -100,6 +100,8 @@ bash scripts/wsl/setup-paddleocr.sh
 DOCPARSE_START_ENGINE=paddleocr-vl-1.6 bash scripts/wsl/launch-stack.sh
 ```
 
+See [Local PaddleOCR-VL-1.6 runtime](docs/local-paddleocr-vl.md) for the dedicated installation guide, health checks, configuration, and troubleshooting.
+
 The official full pipeline runs PaddleOCR-VL-1.6-0.9B behind `paddleocr genai_server` on `127.0.0.1:8118`, and PP-DocLayoutV3 plus document parsing behind PaddleX on `127.0.0.1:8119`. PP-DocLayoutV3 runs on CPU so the 8 GB GPU remains available to vLLM. The first successful setup downloads the VLM, layout model, and required visualization font into `${PADDLE_PDX_CACHE_HOME:-~/.paddlex}`. Later starts validate those files and pass their local paths to both services with offline mode enabled, so they do not download again. Startup then requires API discovery and an end-to-end `/layout-parsing` probe.
 
 GLM-OCR declares 131072 maximum positions, but this 8GB workstation cannot provision one 128K request: at the verified 0.85 GPU fraction vLLM exposes about 62176 KV-cache tokens. The launcher therefore serves a deliberate 32768-token ceiling, which comfortably contains the SDK's 8192-token output allowance plus the cropped-region image/prompt tokens. Raising the server to 128K is unsupported on this profile.
