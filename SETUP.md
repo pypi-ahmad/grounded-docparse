@@ -1,13 +1,13 @@
 # Setup
 
-> Last verified against this repository: 2026-07-31.
+> Last verified against this repository: 2026-08-05.
 
-The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. NVIDIA CUDA uses vLLM. AMD uses Ollama ROCm when supported. Missing or failed GPU acceleration uses Ollama CPU. GLM-OCR, PP-DocLayout, and Streamlit stay inside the locked Linux environment.
+The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. GLM-OCR retains NVIDIA vLLM and Ollama fallback support. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer for its vLLM recognition service; it fails closed rather than silently using GLM. The two dependency stacks use separate locked environments.
 
 ## Prerequisites
 
 - Windows 10 22H2 or Windows 11 x64 with AVX2
-- At least 16 GB RAM and 20 GB free disk
+- At least 16 GB RAM and 20 GB free disk; 40 GB is recommended when both model caches are populated
 - Network access during first setup for Python packages and model weights
 - Administrator approval when Windows must enable WSL2
 
@@ -55,7 +55,7 @@ For later sessions:
 .\Launch-GLM-OCR.cmd
 ```
 
-Both launchers reuse healthy processes. Runtime logs and PID files are stored under the ignored `.runtime/` directory.
+Use `.\Launch-PaddleOCR-VL-1.6.cmd` to start with Paddle selected. Both launchers open the same app. The dropdown can switch engines later; the manager serializes transitions, refuses unmanaged port owners, stops the old GPU service, and starts the selected one. Only one VLM service is resident on the supported 8 GB workstation profile.
 
 To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration. Layout uses `cuda:0` with vLLM and `cpu` with Ollama.
 
@@ -92,6 +92,15 @@ Or start/reuse both detached services and wait for their health checks:
 ```bash
 bash scripts/wsl/launch-stack.sh
 ```
+
+For PaddleOCR-VL-1.6, provision its isolated runtime and select it at launch:
+
+```bash
+bash scripts/wsl/setup-paddleocr.sh
+DOCPARSE_START_ENGINE=paddleocr-vl-1.6 bash scripts/wsl/launch-stack.sh
+```
+
+The official full pipeline runs PaddleOCR-VL-1.6-0.9B behind `paddleocr genai_server` on `127.0.0.1:8118`, and PP-DocLayoutV3 plus document parsing behind PaddleX on `127.0.0.1:8119`. PP-DocLayoutV3 runs on CPU so the 8 GB GPU remains available to vLLM. The first successful setup downloads the VLM, layout model, and required visualization font into `${PADDLE_PDX_CACHE_HOME:-~/.paddlex}`. Later starts validate those files and pass their local paths to both services with offline mode enabled, so they do not download again. Startup then requires API discovery and an end-to-end `/layout-parsing` probe.
 
 GLM-OCR declares 131072 maximum positions, but this 8GB workstation cannot provision one 128K request: at the verified 0.85 GPU fraction vLLM exposes about 62176 KV-cache tokens. The launcher therefore serves a deliberate 32768-token ceiling, which comfortably contains the SDK's 8192-token output allowance plus the cropped-region image/prompt tokens. Raising the server to 128K is unsupported on this profile.
 
@@ -135,8 +144,14 @@ The Windows launcher reads user scope directly, so a newly saved value does not 
 | `DOCPARSE_PROVIDER_COOLDOWN_SECONDS` | `1.0` | Minimum cooldown after HTTP 429 |
 | `DOCPARSE_PROVIDER_SUCCESS_WINDOW` | `10` | Successes before reduced concurrency increases |
 | `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Enables local GLM analysis |
+| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr` or `paddleocr-vl-1.6` |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM-OCR SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout-model device |
+| `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback-only full PaddleX document-parser API; remote origins are rejected because document bytes are posted here |
+| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `900` | Local full-document request timeout |
+| `DOCPARSE_PADDLE_VLLM_PORT` | `8118` | Loopback port for PaddleOCR-VL recognition |
+| `DOCPARSE_PADDLE_API_PORT` | `8119` | Loopback port for the full PaddleX parser; launchers derive the service URL from it |
+| `PADDLE_PDX_CACHE_HOME` | `~/.paddlex` | Persistent Paddle model/font cache; keep this path stable to avoid downloading assets again |
 
 Additional application/runtime variables:
 
@@ -208,12 +223,14 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 | vLLM runs out of memory | Stop competing GPU processes and inspect `.runtime/vllm.log`; do not lower the 32768 context while `page_loader.max_tokens` remains 8192 |
 | `/v1/models` works but recognition fails | Run `scripts/wsl/check-glmocr-api.py`; `launch-stack.sh` automatically restarts a managed server that fails this inference check |
 | Port `8080` or `8501` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
+| Port `8118` or `8119` is occupied | Stop the unrelated listener; Paddle services are never adopted when ownership cannot be verified |
+| Paddle startup fails | Inspect `.runtime/paddle-vllm.log` and `.runtime/paddle-api.log`; confirm NVIDIA compute capability 8.0+ and CUDA 12.6+ |
 | GLM-OCR import fails | Rerun `scripts/wsl/setup-glmocr.sh`; do not use the native Windows environment for local OCR |
 | A pinned snapshot is missing in offline mode | Connect once and rerun `scripts/wsl/setup-glmocr.sh`; normal launch never falls back to a network download |
 | Luna controls are unavailable | Set `OPENAI_API_KEY` before starting Streamlit |
 | Startup times out | Inspect `.runtime/vllm.log` and `.runtime/streamlit.log` |
 
-Other serving backends and standalone PaddleOCR pipelines are not implemented or managed by this repository.
+Other Paddle recognition backends and standalone recognition-only modes are not implemented or managed by this repository.
 
 The repository does not claim a minimum GPU VRAM, RAM, disk footprint, or first-download duration. Validate the locked stack on the target workstation; reduce the documented vLLM settings if it does not fit.
 

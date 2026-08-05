@@ -5,6 +5,8 @@ import io
 import json
 import math
 import os
+import subprocess
+from dataclasses import replace
 from pathlib import Path
 
 import pymupdf
@@ -13,8 +15,14 @@ from PIL import Image, ImageSequence
 
 from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
-from grounded_docparse.config import LUNA_MODEL
-from grounded_docparse.local_ocr import get_glmocr_runtime
+from grounded_docparse.batch import (
+    BatchArchiveEntry,
+    BatchDocument,
+    build_batch_documents,
+    build_output_archive,
+)
+from grounded_docparse.config import LUNA_MODEL, OcrEngine, ParserConfig
+from grounded_docparse.local_ocr import clear_glmocr_runtimes, get_glmocr_runtime
 from grounded_docparse.models import (
     ClassifierCategory,
     ClassifierProfile,
@@ -40,7 +48,7 @@ from grounded_docparse.schema_store import (
 )
 
 SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
-RESULT_VERSION = "4.5.0"
+RESULT_VERSION = "4.6.0"
 THUMBNAILS_PER_GROUP = 12
 ADE_PRESETS = {
     "Fast": {
@@ -98,22 +106,80 @@ def luna_usage_summary(usage: RunUsage) -> tuple[int, int, int, float]:
     return input_tokens, cached_input_tokens, output_tokens, cost
 
 
-def reset_document_state() -> None:
-    st.session_state.result = None
-    st.session_state.result_source_hash = None
-    st.session_state.parsed_source = None
-    st.session_state.selected_element_id = None
-    st.session_state.overview_page = 1
-    st.session_state.annotated_page = 1
-    st.session_state.agentic_analysis = None
-    st.session_state.agentic_source_hash = None
-    st.session_state.extraction_result = None
-    st.session_state.custom_classification = None
-    st.session_state.routed_extraction_result = None
-    st.session_state.routing_review_rows = None
-    st.session_state.chat_history = []
-    st.session_state.prepared_agentic_context = None
-    st.session_state.session_usage = RunUsage()
+DOCUMENT_STATE_KEYS = (
+    "result",
+    "result_source_hash",
+    "parsed_source",
+    "selected_element_id",
+    "overview_page",
+    "annotated_page",
+    "agentic_analysis",
+    "agentic_source_hash",
+    "extraction_result",
+    "custom_classification",
+    "routed_extraction_result",
+    "routing_review_rows",
+    "chat_history",
+    "prepared_agentic_context",
+    "use_custom_routing",
+    "studio_tab",
+)
+
+
+def default_document_state() -> dict[str, object]:
+    return {
+        "result": None,
+        "result_source_hash": None,
+        "parsed_source": None,
+        "selected_element_id": None,
+        "overview_page": 1,
+        "annotated_page": 1,
+        "agentic_analysis": None,
+        "agentic_source_hash": None,
+        "extraction_result": None,
+        "custom_classification": None,
+        "routed_extraction_result": None,
+        "routing_review_rows": None,
+        "chat_history": [],
+        "prepared_agentic_context": None,
+        "use_custom_routing": False,
+        "studio_tab": "Overview",
+    }
+
+
+def reset_document_state(*, clear_session_usage: bool = False) -> None:
+    st.session_state.update(default_document_state())
+    if clear_session_usage:
+        st.session_state.session_usage = RunUsage()
+
+
+def capture_document_state() -> dict[str, object]:
+    defaults = default_document_state()
+    return {
+        key: st.session_state.get(key, defaults[key])
+        for key in DOCUMENT_STATE_KEYS
+    }
+
+
+def save_active_workspace() -> None:
+    document_id = st.session_state.get("active_document_id")
+    workspace = st.session_state.get("batch_workspaces", {}).get(document_id)
+    if workspace is not None:
+        workspace["state"] = capture_document_state()
+
+
+def load_workspace(document_id: str | None) -> None:
+    reset_document_state()
+    workspace = st.session_state.get("batch_workspaces", {}).get(document_id)
+    if workspace is not None:
+        st.session_state.update(workspace["state"])
+
+
+def switch_active_document() -> None:
+    save_active_workspace()
+    document_id = st.session_state.get("batch_document_selector")
+    st.session_state.active_document_id = document_id
+    load_workspace(document_id)
 
 
 def reset_extraction_mode_state() -> None:
@@ -157,6 +223,30 @@ def preload_local_ocr() -> object:
         os.getenv("DOCPARSE_GLMOCR_CONFIG_PATH", "config/glmocr.yaml"),
         os.getenv("DOCPARSE_GLMOCR_LAYOUT_DEVICE", "cuda:0"),
     )
+
+
+def ensure_ocr_engine(engine: OcrEngine) -> None:
+    if os.getenv("DOCPARSE_MANAGE_OCR_SERVICES", "false").casefold() not in {
+        "1",
+        "true",
+        "yes",
+    }:
+        return
+    if engine is OcrEngine.PADDLEOCR_VL_1_6:
+        preload_local_ocr.clear()
+        clear_glmocr_runtimes()
+    manager = Path(__file__).resolve().parent / "scripts" / "wsl" / "manage-ocr-stack.sh"
+    completed = subprocess.run(
+        ["bash", str(manager), "ensure", engine.value],
+        cwd=manager.parents[2],
+        capture_output=True,
+        text=True,
+        timeout=1800,
+        check=False,
+    )
+    if completed.returncode:
+        detail = (completed.stderr or completed.stdout).strip()[-2000:]
+        raise RuntimeError(f"Could not start {engine.label}: {detail}")
 
 
 @st.cache_data(max_entries=32)
@@ -236,6 +326,11 @@ def annotation_variant(
     )
 
 
+@st.cache_data(max_entries=8)
+def output_archive(entries: tuple[BatchArchiveEntry, ...]) -> bytes:
+    return build_output_archive(entries)
+
+
 def stage_markdown(active: str | None, completed: set[str]) -> str:
     lines = []
     for key, label in STAGE_LABELS:
@@ -279,7 +374,9 @@ def render_schema_builder() -> StoredSchema | None:
     pending_draft = st.session_state.pop("pending_schema_draft", None)
     if pending_draft is not None:
         st.session_state.schema_draft_name = pending_draft["name"]
-        st.session_state.schema_draft_fields = pending_draft["fields"]
+        st.session_state.schema_draft_mode = pending_draft.get("mode", "Field builder")
+        st.session_state.schema_draft_fields = pending_draft.get("fields", [])
+        st.session_state.schema_draft_raw = pending_draft.get("raw", "")
         st.session_state.schema_draft_revision = (
             st.session_state.get("schema_draft_revision", 0) + 1
         )
@@ -295,44 +392,79 @@ def render_schema_builder() -> StoredSchema | None:
         loaded = schema_store.get(selected)
         if loaded is not None:
             st.session_state.schema_draft_name = loaded.name
+            st.session_state.schema_draft_mode = (
+                "Raw JSON Schema" if loaded.version == 2 else "Field builder"
+            )
             st.session_state.schema_draft_fields = [
                 field.model_dump(mode="json") for field in loaded.fields
             ]
+            st.session_state.schema_draft_raw = (
+                json.dumps(loaded.json_schema, indent=2)
+                if loaded.json_schema is not None
+                else ""
+            )
             st.session_state.schema_draft_revision = (
                 st.session_state.get("schema_draft_revision", 0) + 1
             )
             st.rerun()
 
     st.session_state.setdefault("schema_draft_name", "")
+    st.session_state.setdefault("schema_draft_mode", "Field builder")
     st.session_state.setdefault(
         "schema_draft_fields",
         [{"name": "", "description": "", "type": "string"}],
     )
+    st.session_state.setdefault("schema_draft_raw", "")
     revision = st.session_state.setdefault("schema_draft_revision", 0)
     name = st.text_input(
         "Schema name",
         value=st.session_state.schema_draft_name,
         key=f"schema_draft_name_editor_{revision}",
     )
-    fields = st.data_editor(
-        st.session_state.schema_draft_fields,
-        num_rows="dynamic",
-        hide_index=True,
-        key=f"schema_fields_editor_{revision}",
-        column_config={
-            "name": st.column_config.TextColumn("Field name", required=True),
-            "description": st.column_config.TextColumn("Description"),
-            "type": st.column_config.SelectboxColumn(
-                "Type",
-                options=["string", "number", "integer", "boolean", "date"],
-                required=True,
-            ),
-        },
+    schema_mode = st.selectbox(
+        "Schema format",
+        ["Field builder", "Raw JSON Schema"],
+        index=0 if st.session_state.schema_draft_mode == "Field builder" else 1,
+        key=f"schema_draft_mode_editor_{revision}",
+        help="Raw mode supports nested objects, arrays, enums, and checkbox booleans.",
     )
+    fields = st.session_state.schema_draft_fields
+    raw_schema = st.session_state.schema_draft_raw
+    if schema_mode == "Field builder":
+        fields = st.data_editor(
+            fields,
+            num_rows="dynamic",
+            hide_index=True,
+            key=f"schema_fields_editor_{revision}",
+            column_config={
+                "name": st.column_config.TextColumn("Field name", required=True),
+                "description": st.column_config.TextColumn("Description"),
+                "type": st.column_config.SelectboxColumn(
+                    "Type",
+                    options=["string", "number", "integer", "boolean", "date"],
+                    required=True,
+                ),
+            },
+        )
+    else:
+        raw_schema = st.text_area(
+            "JSON Schema",
+            value=raw_schema,
+            height=360,
+            key=f"schema_raw_editor_{revision}",
+            help=(
+                "Use the strict extraction subset: closed objects, every property "
+                "required, and nullable values where the document may omit a field."
+            ),
+        )
     st.session_state.schema_draft_name = name
+    st.session_state.schema_draft_mode = schema_mode
     st.session_state.schema_draft_fields = fields
+    st.session_state.schema_draft_raw = raw_schema
 
-    imported = st.file_uploader("Import schema JSON", type=["json"], key="schema_import")
+    imported = st.file_uploader(
+        "Import schema JSON", type=["json"], key="schema_import", max_upload_size=1
+    )
     imported_markdown = st.file_uploader(
         "Import schema Markdown",
         type=["md"],
@@ -342,11 +474,20 @@ def render_schema_builder() -> StoredSchema | None:
     actions = st.columns(3)
     if actions[0].button("Save schema", type="primary"):
         try:
-            schema = StoredSchema(
-                name=name.strip(),
-                fields=[SchemaField.model_validate(field) for field in fields],
+            schema = (
+                StoredSchema(
+                    name=name.strip(),
+                    fields=[SchemaField.model_validate(field) for field in fields],
+                )
+                if schema_mode == "Field builder"
+                else StoredSchema(
+                    version=2,
+                    name=name.strip(),
+                    json_schema=json.loads(raw_schema),
+                )
             )
-        except ValueError as exc:
+            compile_json_schema(schema)
+        except (json.JSONDecodeError, ValueError) as exc:
             st.error(f"Schema is incomplete: {exc}")
         else:
             schema_store.save(schema)
@@ -354,27 +495,63 @@ def render_schema_builder() -> StoredSchema | None:
             st.toast(f"Saved schema {schema.name}")
             st.rerun()
     if actions[1].button("Load example"):
-        st.session_state.schema_draft_name = "Invoice"
-        st.session_state.schema_draft_fields = [
-            {"name": "invoice_number", "description": "Official invoice ID", "type": "string"},
-            {"name": "total_amount", "description": "Final amount payable", "type": "number"},
-            {"name": "due_date", "description": "Payment due date", "type": "date"},
-            {"name": "vendor_name", "description": "Issuing company", "type": "string"},
-        ]
+        if schema_mode == "Raw JSON Schema":
+            st.session_state.schema_draft_name = "Provider participation"
+            st.session_state.schema_draft_raw = json.dumps(
+                {
+                    "type": "object",
+                    "properties": {
+                        "servicing_facility": {
+                            "type": ["object", "null"],
+                            "properties": {
+                                "participating": {"type": ["boolean", "null"]},
+                                "nonparticipating": {"type": ["boolean", "null"]},
+                            },
+                            "required": ["participating", "nonparticipating"],
+                            "additionalProperties": False,
+                        }
+                    },
+                    "required": ["servicing_facility"],
+                    "additionalProperties": False,
+                },
+                indent=2,
+            )
+        else:
+            st.session_state.schema_draft_name = "Invoice"
+            st.session_state.schema_draft_fields = [
+                {"name": "invoice_number", "description": "Official invoice ID", "type": "string"},
+                {"name": "total_amount", "description": "Final amount payable", "type": "number"},
+                {"name": "due_date", "description": "Payment due date", "type": "date"},
+                {"name": "vendor_name", "description": "Issuing company", "type": "string"},
+            ]
         st.session_state.schema_draft_revision += 1
         st.rerun()
     if actions[2].button("Clear"):
         st.session_state.schema_draft_name = ""
         st.session_state.schema_draft_fields = []
+        st.session_state.schema_draft_raw = ""
         st.session_state.schema_draft_revision += 1
         st.rerun()
 
     if imported is not None and st.button("Import JSON"):
-        schema = StoredSchema.model_validate_json(imported.getvalue())
-        schema_store.save(schema)
-        st.session_state.routed_extraction_result = None
-        st.toast(f"Imported schema {schema.name}")
-        st.rerun()
+        try:
+            imported_value = json.loads(imported.getvalue())
+            if isinstance(imported_value, dict) and "name" in imported_value:
+                schema = StoredSchema.model_validate(imported_value)
+            else:
+                schema = StoredSchema(
+                    version=2,
+                    name=Path(imported.name).stem.removesuffix(".schema"),
+                    json_schema=imported_value,
+                )
+            compile_json_schema(schema)
+        except (json.JSONDecodeError, ValueError) as exc:
+            st.error(f"Schema JSON is invalid: {exc}")
+        else:
+            schema_store.save(schema)
+            st.session_state.routed_extraction_result = None
+            st.toast(f"Imported schema {schema.name}")
+            st.rerun()
     if imported_markdown is not None:
         markdown_bytes = imported_markdown.getvalue()
         import_fingerprint = hashlib.sha256(
@@ -396,6 +573,7 @@ def render_schema_builder() -> StoredSchema | None:
             st.session_state.schema_markdown_import_fingerprint = import_fingerprint
             st.session_state.pending_schema_draft = {
                 "name": schema.name,
+                "mode": "Field builder",
                 "fields": [
                     field.model_dump(mode="json") for field in schema.fields
                 ],
@@ -403,13 +581,22 @@ def render_schema_builder() -> StoredSchema | None:
             st.toast(f"Loaded schema {schema.name}")
             st.rerun()
     draft = None
-    if name.strip() and fields:
+    if name.strip() and (fields if schema_mode == "Field builder" else raw_schema.strip()):
         try:
-            draft = StoredSchema(
-                name=name.strip(),
-                fields=[SchemaField.model_validate(field) for field in fields],
+            draft = (
+                StoredSchema(
+                    name=name.strip(),
+                    fields=[SchemaField.model_validate(field) for field in fields],
+                )
+                if schema_mode == "Field builder"
+                else StoredSchema(
+                    version=2,
+                    name=name.strip(),
+                    json_schema=json.loads(raw_schema),
+                )
             )
-        except ValueError:
+            compile_json_schema(draft)
+        except (json.JSONDecodeError, ValueError):
             draft = None
         if draft is not None:
             st.download_button(
@@ -734,13 +921,38 @@ st.set_page_config(
 )
 
 if st.session_state.get("result_version") != RESULT_VERSION:
-    reset_document_state()
+    reset_document_state(clear_session_usage=True)
+    st.session_state.batch_workspaces = {}
+    st.session_state.active_document_id = None
+    st.session_state.pop("batch_document_selector", None)
 st.session_state.result_version = RESULT_VERSION
 initialize_ade_mode()
 st.session_state.setdefault("session_usage", RunUsage())
+st.session_state.setdefault("batch_workspaces", {})
+st.session_state.setdefault("active_document_id", None)
+try:
+    default_ocr_engine = OcrEngine(
+        os.getenv(
+            "DOCPARSE_START_ENGINE",
+            os.getenv("DOCPARSE_OCR_ENGINE", OcrEngine.GLM_OCR.value),
+        )
+    )
+except ValueError:
+    default_ocr_engine = OcrEngine.GLM_OCR
+st.session_state.setdefault("ocr_engine_label", default_ocr_engine.label)
+st.session_state.setdefault("active_ocr_engine", default_ocr_engine.value)
+ocr_engines = {engine.label: engine for engine in OcrEngine}
+selected_ocr_engine = ocr_engines.get(
+    st.session_state.ocr_engine_label, OcrEngine.GLM_OCR
+)
 
 preload_error: str | None = None
-if os.getenv("DOCPARSE_PRELOAD_LOCAL_OCR", "false").casefold() in {"1", "true", "yes"}:
+if (
+    selected_ocr_engine is OcrEngine.GLM_OCR
+    and st.session_state.active_ocr_engine == OcrEngine.GLM_OCR.value
+    and os.getenv("DOCPARSE_PRELOAD_LOCAL_OCR", "false").casefold()
+    in {"1", "true", "yes"}
+):
     try:
         preload_local_ocr()
     except Exception as exc:  # noqa: BLE001 - startup diagnostics belong in the UI
@@ -750,7 +962,7 @@ has_environment = bool(os.getenv("OPENAI_API_KEY"))
 header_title, header_status = st.columns([4, 1], vertical_alignment="center")
 with header_title:
     st.title("Document Parse Studio")
-    st.caption("Powered by GLM-OCR + gpt-5.6-luna")
+    st.caption(f"Powered by {selected_ocr_engine.label} + gpt-5.6-luna")
 
 initial_status = "Ready" if preload_error is None else "Not ready"
 initial_color = "green" if initial_status == "Ready" else "red"
@@ -760,8 +972,8 @@ session_usage_slot = st.container()
 
 if not has_environment:
     st.warning(
-        "OPENAI_API_KEY is not set. GLM-OCR parsing remains available; Luna visual "
-        "recovery and Markdown refinement will be skipped."
+        f"OPENAI_API_KEY is not set. {selected_ocr_engine.label} parsing remains "
+        "available; Luna visual recovery and Markdown refinement will be skipped."
     )
 elif not os.getenv("OPENAI_BASE_URL"):
     st.caption("Luna destination: OpenAI default endpoint")
@@ -769,34 +981,116 @@ if preload_error is not None:
     st.error(preload_error)
 
 with st.sidebar:
-    st.subheader("Upload document")
-    upload = st.file_uploader(
-        "Document",
+    st.subheader("Upload documents")
+    uploaded_files = st.file_uploader(
+        "Documents",
         type=SUPPORTED_TYPES,
-        accept_multiple_files=False,
+        accept_multiple_files=True,
         max_upload_size=250,
         label_visibility="collapsed",
     )
 
-source = upload.getvalue() if upload is not None else None
-source_hash = hashlib.sha256(source).hexdigest() if source is not None else None
-suffix = Path(upload.name).suffix.casefold() if upload is not None else ""
+batch_error: str | None = None
+try:
+    batch_documents = build_batch_documents(
+        [
+            (
+                item.name,
+                item.getvalue(),
+                item.type or "application/octet-stream",
+            )
+            for item in uploaded_files
+        ]
+    )
+except ValueError as exc:
+    batch_documents = []
+    batch_error = str(exc)
 
-if st.session_state.get("active_upload_hash") != source_hash:
-    reset_document_state()
-    st.session_state.active_upload_hash = source_hash
-    for key in ("range_start", "range_end", "thumbnail_group"):
-        st.session_state.pop(key, None)
+document_ids = [document.id for document in batch_documents]
+previous_ids = list(st.session_state.batch_workspaces)
+if batch_error is None and document_ids != previous_ids:
+    save_active_workspace()
+    existing_workspaces = st.session_state.batch_workspaces
+    st.session_state.batch_workspaces = {
+        document.id: existing_workspaces.get(
+            document.id,
+            {
+                "status": "pending",
+                "error": None,
+                "selection_key": None,
+                "state": default_document_state(),
+            },
+        )
+        for document in batch_documents
+    }
+    previous_active_id = st.session_state.get("active_document_id")
+    active_document_id = (
+        previous_active_id
+        if previous_active_id in st.session_state.batch_workspaces
+        else (document_ids[0] if document_ids else None)
+    )
+    st.session_state.active_document_id = active_document_id
+    st.session_state.batch_document_selector = active_document_id
+    if active_document_id != previous_active_id:
+        load_workspace(active_document_id)
+        for key in ("range_start", "range_end", "thumbnail_group"):
+            st.session_state.pop(key, None)
 
-total_source_pages = pdf_page_count(source) if source is not None and suffix == ".pdf" else 1
+documents_by_id = {document.id: document for document in batch_documents}
+active_document = documents_by_id.get(st.session_state.active_document_id)
+if len(batch_documents) > 1:
+    document_option_labels = {
+        document.id: document.display_name
+        for document in batch_documents
+    }
+    with st.sidebar:
+        st.selectbox(
+            "Document results",
+            document_ids,
+            key="batch_document_selector",
+            format_func=document_option_labels.__getitem__,
+            on_change=switch_active_document,
+        )
+
+upload = active_document
+source = active_document.source if active_document is not None else None
+source_hash = active_document.content_sha256 if active_document is not None else None
+suffix = active_document.suffix if active_document is not None else ""
+
+if batch_error is not None:
+    st.error(batch_error)
+
+if source is not None and suffix == ".pdf" and len(batch_documents) == 1:
+    try:
+        total_source_pages = pdf_page_count(source)
+    except Exception:  # noqa: BLE001 - parsing reports malformed input per document
+        total_source_pages = 1
+else:
+    total_source_pages = 1
 
 with st.sidebar:
     st.subheader("Options")
+    selected_ocr_label = st.selectbox(
+        "Document extraction model",
+        list(ocr_engines),
+        key="ocr_engine_label",
+        help=(
+            "PaddleOCR-VL-1.6 uses PP-DocLayoutV3 and its 0.9B region model through "
+            "the local vLLM service. Changing this selection switches the managed "
+            "GPU backend when parsing starts."
+        ),
+    )
+    selected_ocr_engine = ocr_engines[selected_ocr_label]
+    single_pdf = len(batch_documents) == 1 and suffix == ".pdf"
     use_page_range = st.checkbox(
         "Page range",
-        disabled=source is None or suffix != ".pdf",
-        help="Parse one inclusive, contiguous page range.",
+        disabled=not single_pdf,
+        help=(
+            "Parse one inclusive, contiguous page range. Multiple-file batches "
+            "always process every page."
+        ),
     )
+    use_page_range = bool(use_page_range and single_pdf)
     if use_page_range and source is not None:
         range_columns = st.columns(2)
         start_page = int(
@@ -844,7 +1138,11 @@ with st.sidebar:
         help=(
             "Uses medium-effort Luna vision on prioritized hard regions. The budget "
             "scales from 8 to 64 crops by document length, with at most 3 per page; "
-            "local GLM recovery runs first."
+            + (
+                "local GLM recovery runs first."
+                if selected_ocr_engine is OcrEngine.GLM_OCR
+                else "PaddleOCR output is used directly before Luna recovery."
+            )
         ),
     )
     st.toggle(
@@ -869,32 +1167,73 @@ with st.sidebar:
         disabled=not has_environment,
     )
     enable_chat = st.session_state.enable_chat
+    def document_selection_key(document: BatchDocument) -> str:
+        page_selection = (
+            f"{start_page}:{end_page}"
+            if use_page_range and document.id == st.session_state.active_document_id
+            else "all"
+        )
+        return (
+            f"{document.id}:{page_selection}:{refine_markdown}:"
+            f"{visual_recovery}:{has_environment}:{selected_ocr_engine.value}:"
+            f"{RESULT_VERSION}"
+        )
+
+    selection_keys = {
+        document.id: document_selection_key(document)
+        for document in batch_documents
+    }
     selection_key = (
-        f"{source_hash}:{start_page}:{end_page}:{refine_markdown}:"
-        f"{visual_recovery}:{has_environment}:"
-        f"{RESULT_VERSION}"
-        if source_hash is not None
-        else None
+        selection_keys.get(active_document.id) if active_document is not None else None
     )
-    if (
-        st.session_state.get("result") is not None
-        and st.session_state.get("result_source_hash") != selection_key
-    ):
-        reset_document_state()
+    save_active_workspace()
+    active_was_invalidated = False
+    for document in batch_documents:
+        workspace = st.session_state.batch_workspaces[document.id]
+        previous_selection_key = workspace.get("selection_key")
+        if previous_selection_key is not None and previous_selection_key != selection_keys[document.id]:
+            workspace.update(
+                status="pending",
+                error=None,
+                selection_key=None,
+                state=default_document_state(),
+            )
+            active_was_invalidated |= document.id == st.session_state.active_document_id
+    if active_was_invalidated:
+        load_workspace(st.session_state.active_document_id)
 
     parse_clicked = st.button(
-        "Parse document",
+        (
+            "Parse document"
+            if len(batch_documents) <= 1
+            else f"Process {len(batch_documents)} documents"
+        ),
         type="primary",
         icon=":material/document_scanner:",
-        disabled=source is None or preload_error is not None,
+        disabled=(
+            source is None
+            or batch_error is not None
+            or (
+                preload_error is not None
+                and selected_ocr_engine is OcrEngine.GLM_OCR
+            )
+        ),
         width="stretch",
     )
 
     st.divider()
     st.subheader("Progress")
-    cached_result_matches = (
-        st.session_state.get("result") is not None
+    expected_agentic_key = (
+        f"{selection_key}:{classify_document}:{generate_toc}"
+        if selection_key is not None
+        else None
+    )
+    cached_result_matches = bool(
+        active_document is not None
+        and st.session_state.batch_workspaces[active_document.id]["status"] == "complete"
+        and st.session_state.get("result") is not None
         and st.session_state.get("result_source_hash") == selection_key
+        and st.session_state.get("agentic_source_hash") == expected_agentic_key
     )
     progress_bar = st.progress(
         1.0 if cached_result_matches else 0,
@@ -908,104 +1247,260 @@ with st.sidebar:
         )
     )
 
-if parse_clicked and upload is not None and source is not None:
-    completed_stages: set[str] = set()
-    progress_state: dict[str, str | None] = {"active": None}
-    try:
-        header_status_slot.markdown("Status: :blue[● **Parsing**]")
-        parsed_source = (
-            select_pdf_pages(source, start_page, end_page)
-            if suffix == ".pdf" and use_page_range
-            else source
+if parse_clicked and batch_documents:
+    save_active_workspace()
+    documents_to_process = []
+    for document in batch_documents:
+        workspace = st.session_state.batch_workspaces[document.id]
+        expected_selection_key = selection_keys[document.id]
+        expected_analysis_key = (
+            f"{expected_selection_key}:{classify_document}:{generate_toc}"
         )
+        state = workspace["state"]
+        if not (
+            workspace["status"] == "complete"
+            and state.get("result") is not None
+            and state.get("result_source_hash") == expected_selection_key
+            and state.get("agentic_source_hash") == expected_analysis_key
+        ):
+            documents_to_process.append(document)
 
-        def show_progress(event) -> None:
-            stage = event.stage
-            if stage == "layout":
-                progress_state["active"] = "layout"
-                value = 0.30 * event.current / max(event.total, 1)
-            elif stage == "recognize":
-                completed_stages.add("layout")
-                progress_state["active"] = "recognize"
-                value = 0.30 + 0.42 * event.current / max(event.total, 1)
-            elif stage in {"verify", "delegate", "recover"}:
-                completed_stages.add("layout")
-                progress_state["active"] = "recover"
-                value = 0.76
-            elif stage == "assemble":
-                completed_stages.update({"layout", "recognize", "recover"})
-                progress_state["active"] = "assemble"
-                value = 0.82
-            elif stage == "annotate":
-                completed_stages.update({"layout", "recognize", "recover", "assemble"})
-                progress_state["active"] = "annotate"
-                value = 0.90
-            elif stage == "enhance":
-                completed_stages.update(
-                    {"layout", "recognize", "recover", "assemble", "annotate"}
-                )
-                progress_state["active"] = "enhance"
-                value = 0.96
-            elif stage == "complete":
-                completed_stages.update(key for key, _label in STAGE_LABELS)
-                progress_state["active"] = None
-                value = 1.0
-            else:
-                value = None
-            if value is not None:
-                progress_bar.progress(value, text=event.message)
-            stage_log.markdown(stage_markdown(progress_state["active"], completed_stages))
-
-        result = st.session_state.get("result") if cached_result_matches else None
-        if result is None:
-            result = pipeline.DocumentParser().parse(
-                parsed_source,
-                upload.name,
-                progress_callback=show_progress,
-                refine_markdown=refine_markdown,
-                visual_recovery=visual_recovery,
+    try:
+        if documents_to_process:
+            header_status_slot.markdown("Status: :blue[● **Parsing**]")
+            ensure_ocr_engine(selected_ocr_engine)
+            st.session_state.active_ocr_engine = selected_ocr_engine.value
+            parser_config = replace(
+                ParserConfig.from_env(), ocr_engine=selected_ocr_engine
             )
-            st.session_state.result = result
-            append_session_usage(result.usage)
-            st.session_state.result_source_hash = selection_key
-            st.session_state.parsed_source = parsed_source
-            st.session_state.selected_element_id = None
-            st.session_state.annotated_page = 1
-            st.session_state.extraction_result = None
-            st.session_state.chat_history = []
-            st.session_state.prepared_agentic_context = DocumentAgent.prepare(result)
-
-        prepared_context = st.session_state.get("prepared_agentic_context")
-        if prepared_context is None:
-            prepared_context = DocumentAgent.prepare(result)
-            st.session_state.prepared_agentic_context = prepared_context
-
-        agentic_key = f"{selection_key}:{classify_document}:{generate_toc}"
-        if st.session_state.get("agentic_source_hash") != agentic_key:
-            completed_stages.update(
-                {"layout", "recognize", "recover", "assemble", "annotate", "enhance"}
-            )
-            progress_state["active"] = "classify"
-            progress_bar.progress(0.97, text="Running Luna document analysis")
-            stage_log.markdown(
-                stage_markdown(progress_state["active"], completed_stages)
-            )
-            analysis = DocumentAgent().analyze(
-                result,
-                classify=classify_document,
-                generate_toc=generate_toc,
-                prepared_context=prepared_context,
-            )
-            st.session_state.agentic_analysis = analysis
-            append_session_usage(analysis.usage)
-            st.session_state.agentic_source_hash = agentic_key
-        progress_bar.progress(1.0, text="Parsing complete")
-        stage_log.markdown(stage_markdown(None, {key for key, _ in STAGE_LABELS}))
-        header_status_slot.markdown("Status: :green[● **Complete**]")
+            parser = pipeline.DocumentParser(parser_config)
+        else:
+            parser = None
     except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
-        progress_bar.progress(0, text="Parsing failed")
+        parser = None
+        progress_bar.progress(0, text="OCR service is unavailable")
         header_status_slot.markdown("Status: :red[● **Error**]")
-        st.error(f"{type(exc).__name__}: {str(exc)[:1000]}")
+        st.error(f"OCR service startup failed: {type(exc).__name__}: {str(exc)[:1000]}")
+    else:
+        total_documents = len(batch_documents)
+        for document_index, document in enumerate(batch_documents, start=1):
+            workspace = st.session_state.batch_workspaces[document.id]
+            expected_selection_key = selection_keys[document.id]
+            agentic_key = (
+                f"{expected_selection_key}:{classify_document}:{generate_toc}"
+            )
+            state = workspace["state"]
+            if (
+                workspace["status"] == "complete"
+                and state.get("result") is not None
+                and state.get("result_source_hash") == expected_selection_key
+                and state.get("agentic_source_hash") == agentic_key
+            ):
+                progress_bar.progress(
+                    document_index / total_documents,
+                    text=(
+                        f"{document_index}/{total_documents} "
+                        f"{document.display_name}: already complete"
+                    ),
+                )
+                continue
+
+            workspace.update(status="processing", error=None)
+            reset_document_state()
+            st.session_state.update(state)
+            completed_stages: set[str] = set()
+            progress_state: dict[str, str | None] = {"active": None}
+            parsed_document_source = (
+                select_pdf_pages(document.source, start_page, end_page)
+                if use_page_range and document.id == st.session_state.active_document_id
+                else document.source
+            )
+
+            def show_progress(
+                event,
+                *,
+                index=document_index,
+                item=document,
+                completed_stages=completed_stages,
+                progress_state=progress_state,
+            ) -> None:
+                stage = event.stage
+                if stage == "layout":
+                    progress_state["active"] = "layout"
+                    document_progress = 0.30 * event.current / max(event.total, 1)
+                elif stage == "recognize":
+                    completed_stages.add("layout")
+                    progress_state["active"] = "recognize"
+                    document_progress = (
+                        0.30 + 0.42 * event.current / max(event.total, 1)
+                    )
+                elif stage in {"verify", "delegate", "recover"}:
+                    completed_stages.add("layout")
+                    progress_state["active"] = "recover"
+                    document_progress = 0.76
+                elif stage == "assemble":
+                    completed_stages.update({"layout", "recognize", "recover"})
+                    progress_state["active"] = "assemble"
+                    document_progress = 0.82
+                elif stage == "annotate":
+                    completed_stages.update(
+                        {"layout", "recognize", "recover", "assemble"}
+                    )
+                    progress_state["active"] = "annotate"
+                    document_progress = 0.90
+                elif stage == "enhance":
+                    completed_stages.update(
+                        {"layout", "recognize", "recover", "assemble", "annotate"}
+                    )
+                    progress_state["active"] = "enhance"
+                    document_progress = 0.96
+                elif stage == "complete":
+                    completed_stages.update(key for key, _label in STAGE_LABELS)
+                    progress_state["active"] = None
+                    document_progress = 1.0
+                else:
+                    document_progress = None
+                if document_progress is not None:
+                    overall_progress = (
+                        index - 1 + document_progress
+                    ) / total_documents
+                    progress_bar.progress(
+                        overall_progress,
+                        text=(
+                            f"{index}/{total_documents} {item.display_name}: "
+                            f"{event.message}"
+                        ),
+                    )
+                stage_log.markdown(
+                    stage_markdown(progress_state["active"], completed_stages)
+                )
+
+            try:
+                result = (
+                    st.session_state.get("result")
+                    if st.session_state.get("result_source_hash")
+                    == expected_selection_key
+                    else None
+                )
+                if result is None:
+                    if parser is None:
+                        raise RuntimeError("OCR parser did not start")
+                    result = parser.parse(
+                        parsed_document_source,
+                        document.name,
+                        progress_callback=show_progress,
+                        refine_markdown=refine_markdown,
+                        visual_recovery=visual_recovery,
+                    )
+                    st.session_state.result = result
+                    append_session_usage(result.usage)
+                    st.session_state.result_source_hash = expected_selection_key
+                    st.session_state.parsed_source = parsed_document_source
+                    st.session_state.selected_element_id = None
+                    st.session_state.annotated_page = 1
+                    st.session_state.extraction_result = None
+                    st.session_state.chat_history = []
+                    st.session_state.prepared_agentic_context = DocumentAgent.prepare(
+                        result
+                    )
+
+                prepared_context = st.session_state.get("prepared_agentic_context")
+                if prepared_context is None:
+                    prepared_context = DocumentAgent.prepare(result)
+                    st.session_state.prepared_agentic_context = prepared_context
+
+                if st.session_state.get("agentic_source_hash") != agentic_key:
+                    completed_stages.update(
+                        {
+                            "layout",
+                            "recognize",
+                            "recover",
+                            "assemble",
+                            "annotate",
+                            "enhance",
+                        }
+                    )
+                    progress_state["active"] = "classify"
+                    progress_bar.progress(
+                        (document_index - 0.03) / total_documents,
+                        text=(
+                            f"{document_index}/{total_documents} "
+                            f"{document.display_name}: running Luna document analysis"
+                        ),
+                    )
+                    stage_log.markdown(
+                        stage_markdown(progress_state["active"], completed_stages)
+                    )
+                    analysis = DocumentAgent().analyze(
+                        result,
+                        classify=classify_document,
+                        generate_toc=generate_toc,
+                        prepared_context=prepared_context,
+                    )
+                    st.session_state.agentic_analysis = analysis
+                    append_session_usage(analysis.usage)
+                    st.session_state.agentic_source_hash = agentic_key
+
+                workspace.update(
+                    status="complete",
+                    error=None,
+                    selection_key=expected_selection_key,
+                    state=capture_document_state(),
+                )
+                progress_bar.progress(
+                    document_index / total_documents,
+                    text=(
+                        f"{document_index}/{total_documents} "
+                        f"{document.display_name}: complete"
+                    ),
+                )
+            except Exception as exc:  # noqa: BLE001 - isolate per-document failures
+                error = f"{type(exc).__name__}: {str(exc)[:1000]}"
+                workspace.update(
+                    status="failed",
+                    error=error,
+                    selection_key=expected_selection_key,
+                    state=capture_document_state(),
+                )
+                progress_bar.progress(
+                    document_index / total_documents,
+                    text=(
+                        f"{document_index}/{total_documents} "
+                        f"{document.display_name}: failed"
+                    ),
+                )
+
+        load_workspace(st.session_state.active_document_id)
+        statuses = [workspace["status"] for workspace in st.session_state.batch_workspaces.values()]
+        failed_count = statuses.count("failed")
+        if failed_count == 0:
+            stage_log.markdown(stage_markdown(None, {key for key, _ in STAGE_LABELS}))
+            header_status_slot.markdown("Status: :green[● **Complete**]")
+        elif failed_count < len(statuses):
+            header_status_slot.markdown("Status: :orange[● **Partial**]")
+            st.warning(
+                f"{failed_count} of {len(statuses)} documents failed. "
+                "Completed documents were kept; run the batch again to retry failures."
+            )
+        else:
+            header_status_slot.markdown("Status: :red[● **Error**]")
+            st.error("Every document failed. Run the batch again after resolving the errors.")
+
+if batch_documents:
+    with st.sidebar, st.expander("Batch status", expanded=len(batch_documents) > 1):
+        st.dataframe(
+            [
+                {
+                    "File": document.display_name,
+                    "Status": st.session_state.batch_workspaces[document.id]["status"],
+                    "Error": st.session_state.batch_workspaces[document.id]["error"]
+                    or "",
+                }
+                for document in batch_documents
+            ],
+            hide_index=True,
+            width="stretch",
+        )
 
 result = st.session_state.get("result")
 parsed_source = st.session_state.get("parsed_source")
@@ -1043,6 +1538,12 @@ if has_result:
     )
     if has_luna_output:
         st.warning(LUNA_REVIEW_WARNING)
+elif active_document is not None:
+    active_workspace = st.session_state.batch_workspaces[active_document.id]
+    if active_workspace["status"] == "failed":
+        st.error(
+            f"{active_document.display_name} failed: {active_workspace['error']}"
+        )
 
 tab_labels = ["Overview", "Markdown", "Annotated PDF"]
 if has_result:
@@ -1055,7 +1556,10 @@ tab_by_name = dict(zip(tab_labels, tabs, strict=True))
 
 if not has_result:
     with tab_by_name["Overview"]:
-        st.info("Upload a document and select Parse document to begin.")
+        st.info(
+            "Upload one or more documents and select Parse document or Process "
+            "documents to begin."
+        )
 else:
     elements = result.elements or build_elements(result.document)
     elements_by_id = {element.id: element for element in elements}
@@ -1172,7 +1676,10 @@ else:
     markdown_tab = tab_by_name["Markdown"]
     if markdown_tab.open:
         with markdown_tab:
-            show_raw_markdown = st.toggle("Show raw Markdown")
+            show_raw_markdown = st.toggle(
+                "Show raw Markdown",
+                key=f"show_raw_markdown_{active_document.id}",
+            )
             if show_raw_markdown:
                 st.code(result.markdown, language="markdown", wrap_lines=True, height=650)
                 st.caption("Use the copy control in the code toolbar.")
@@ -1185,7 +1692,11 @@ else:
     annotated_tab = tab_by_name["Annotated PDF"]
     if annotated_tab.open:
         with annotated_tab:
-            show_annotations = st.toggle("Show annotations", value=True)
+            show_annotations = st.toggle(
+                "Show annotations",
+                value=True,
+                key=f"show_annotations_{active_document.id}",
+            )
             st.markdown(
                 ":blue[■] Text / title · :green[■] Table / form · "
                 ":orange[■] Figure · :violet[■] Formula · :red[■] Seal · "
@@ -1300,12 +1811,12 @@ else:
                     rows = st.session_state.get("routing_review_rows") or _classification_rows(
                         custom_classification
                     )
-                    with st.form("routing_review_form"):
+                    with st.form(f"routing_review_form_{active_document.id}"):
                         edited_rows = st.data_editor(
                             rows,
                             num_rows="dynamic",
                             hide_index=True,
-                            key="routing_review_editor",
+                            key=f"routing_review_editor_{active_document.id}",
                             column_config={
                                 "id": st.column_config.TextColumn("Segment", disabled=True),
                                 "start_page": st.column_config.NumberColumn(
@@ -1377,28 +1888,39 @@ else:
                         disabled=not routing_ready,
                     ):
                         schemas_by_name = {}
-                        for segment in eligible:
-                            stored = schema_store.get(segment.schema_name or "")
-                            if stored is not None:
-                                schemas_by_name[segment.schema_name] = compile_json_schema(
-                                    stored
-                                )
                         try:
-                            with st.spinner("Extracting eligible forms..."):
-                                routed_extraction_result = DocumentAgent().extract_forms(
-                                    result,
-                                    custom_classification,
-                                    schemas_by_name,
+                            for segment in eligible:
+                                stored = schema_store.get(segment.schema_name or "")
+                                if stored is not None:
+                                    schemas_by_name[segment.schema_name] = (
+                                        compile_json_schema(stored)
+                                    )
+                        except (json.JSONDecodeError, ValueError) as exc:
+                            st.error(
+                                f"Schema validation failed: {type(exc).__name__}: {exc}"
+                            )
+                        else:
+                            try:
+                                with st.spinner("Extracting eligible forms..."):
+                                    routed_extraction_result = (
+                                        DocumentAgent().extract_forms(
+                                            result,
+                                            custom_classification,
+                                            schemas_by_name,
+                                        )
+                                    )
+                                st.session_state.routed_extraction_result = (
+                                    routed_extraction_result
                                 )
-                            st.session_state.routed_extraction_result = (
-                                routed_extraction_result
-                            )
-                            append_session_usage(
-                                routed_extraction_result.usage,
-                                skip_calls=len(custom_classification.usage.calls),
-                            )
-                        except Exception as exc:  # noqa: BLE001 - isolated feature error
-                            st.error(f"Routed extraction failed: {type(exc).__name__}: {exc}")
+                                append_session_usage(
+                                    routed_extraction_result.usage,
+                                    skip_calls=len(custom_classification.usage.calls),
+                                )
+                            except Exception as exc:  # noqa: BLE001 - isolated feature error
+                                st.error(
+                                    "Model extraction failed: "
+                                    f"{type(exc).__name__}: {exc}"
+                                )
 
                 routed_extraction_result = st.session_state.get(
                     "routed_extraction_result"
@@ -1411,7 +1933,7 @@ else:
                                 f"{form.start_page}-{form.end_page} · `{form.status}`"
                             )
                             if form.error:
-                                st.error(form.error)
+                                st.error(f"Model output validation failed: {form.error}")
                             if form.extraction is not None:
                                 for name, field in form.extraction.fields.items():
                                     st.markdown(f"**{name}** · `{field.confidence}`")
@@ -1427,18 +1949,27 @@ else:
                 "Run extraction", type="primary", icon=":material/data_object:"
             ):
                 try:
-                    with st.spinner("Extracting grounded fields..."):
-                        extraction_result = DocumentAgent().extract(
-                            result,
-                            compile_json_schema(extraction_schema),
-                            prepared_context=st.session_state.prepared_agentic_context,
+                    compiled_schema = compile_json_schema(extraction_schema)
+                except (json.JSONDecodeError, ValueError) as exc:
+                    st.error(f"Schema validation failed: {type(exc).__name__}: {exc}")
+                else:
+                    try:
+                        with st.spinner("Extracting grounded fields..."):
+                            extraction_result = DocumentAgent().extract(
+                                result,
+                                compiled_schema,
+                                prepared_context=(
+                                    st.session_state.prepared_agentic_context
+                                ),
+                            )
+                        st.session_state.extraction_result = extraction_result
+                        append_session_usage(extraction_result.usage)
+                        st.session_state.custom_classification = None
+                        st.session_state.routed_extraction_result = None
+                    except Exception as exc:  # noqa: BLE001 - isolated feature error
+                        st.error(
+                            f"Model extraction failed: {type(exc).__name__}: {exc}"
                         )
-                    st.session_state.extraction_result = extraction_result
-                    append_session_usage(extraction_result.usage)
-                    st.session_state.custom_classification = None
-                    st.session_state.routed_extraction_result = None
-                except Exception as exc:  # noqa: BLE001 - isolated feature error
-                    st.error(f"Extraction failed: {type(exc).__name__}: {exc}")
             if not st.session_state.get("use_custom_routing", False):
                 extraction_result = st.session_state.get("extraction_result")
                 if extraction_result is not None:
@@ -1454,7 +1985,7 @@ else:
                                     args=(field.element_id, field.page),
                                 )
                     for warning in extraction_result.warnings:
-                        st.warning(warning)
+                        st.warning(f"Validation/post-processing: {warning}")
 
     if enable_chat:
         chat_tab = tab_by_name["Chat"]
@@ -1641,6 +2172,104 @@ else:
             f"{luna_agentic_time:.1f}s · Pages: {parsed_pages} · "
             f"Visual recovery: {recovery_status}"
         )
+
+if batch_documents:
+    save_active_workspace()
+    archive_entries: list[BatchArchiveEntry] = []
+    try:
+        for document in batch_documents:
+            workspace = st.session_state.batch_workspaces[document.id]
+            workspace_status = workspace["status"]
+            entry_status = (
+                workspace_status
+                if workspace_status in {"complete", "failed"}
+                else "pending"
+            )
+            state = workspace["state"]
+            stored_result = state.get("result") if entry_status == "complete" else None
+            stored_source = state.get("parsed_source")
+            if stored_result is None or stored_source is None:
+                archive_entries.append(
+                    BatchArchiveEntry(
+                        name=document.name,
+                        source=document.source,
+                        status=entry_status,
+                        error=workspace.get("error"),
+                    )
+                )
+                continue
+
+            stored_elements = stored_result.elements or build_elements(
+                stored_result.document
+            )
+            stored_elements_json = json.dumps(
+                [element.model_dump(mode="json") for element in stored_elements],
+                ensure_ascii=False,
+            )
+            stored_recovered_ids_json = json.dumps(
+                [
+                    element.id
+                    for element in stored_elements
+                    if element.source == "luna-recovery"
+                ],
+                ensure_ascii=False,
+            )
+            stored_extraction = state.get("extraction_result")
+            stored_custom_classification = state.get("custom_classification")
+            stored_routed_extraction = state.get("routed_extraction_result")
+            archive_entries.append(
+                BatchArchiveEntry(
+                    name=document.name,
+                    source=document.source,
+                    status="complete",
+                    markdown=stored_result.markdown,
+                    annotated_pdf=annotation_variant(
+                        stored_source,
+                        document.name,
+                        stored_elements_json,
+                        len(stored_result.document.pages),
+                        True,
+                        show_reading_order,
+                        None,
+                        stored_recovered_ids_json,
+                    ),
+                    full_json=render_combined_result(
+                        stored_result,
+                        state.get("agentic_analysis"),
+                        stored_extraction,
+                        custom_classification=stored_custom_classification,
+                        routed_extraction=stored_routed_extraction,
+                    ),
+                    extraction_json=(
+                        stored_routed_extraction.json
+                        if stored_routed_extraction is not None
+                        else (
+                            stored_extraction.json
+                            if stored_extraction is not None
+                            else None
+                        )
+                    ),
+                )
+            )
+        archive_data = output_archive(tuple(archive_entries))
+    except Exception as exc:  # noqa: BLE001 - keep individual downloads available
+        st.error(f"Could not build output ZIP: {type(exc).__name__}: {exc}")
+    else:
+        archive_name = (
+            f"{Path(batch_documents[0].name).stem}.outputs.zip"
+            if len(batch_documents) == 1
+            else "document-batch.outputs.zip"
+        )
+        with st.container(border=True):
+            st.download_button(
+                "Download all outputs",
+                archive_data,
+                file_name=archive_name,
+                mime="application/zip",
+                icon=":material/folder_zip:",
+                key="download-all-outputs",
+                on_click="ignore",
+            )
 
 session_input, session_cached, session_output, session_cost = luna_usage_summary(
     st.session_state.session_usage

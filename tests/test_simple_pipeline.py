@@ -5,9 +5,9 @@ import pymupdf
 from PIL import Image
 
 from grounded_docparse import pipeline as pipeline_module
-from grounded_docparse.config import ParserConfig
+from grounded_docparse.config import OcrEngine, ParserConfig
 from grounded_docparse.ingest import IngestedDocument, PageEvidence
-from grounded_docparse.local_ocr import GlmRegion
+from grounded_docparse.local_ocr import GlmRegion, OcrPageResult, OcrRegion
 from grounded_docparse.models import (
     AgentRole,
     AnalysisRegionType,
@@ -22,7 +22,13 @@ from grounded_docparse.models import (
     TableCellDraft,
     VerificationState,
 )
-from grounded_docparse.pipeline import DocumentParser, _merge_form_html
+from grounded_docparse.pipeline import (
+    DocumentParser,
+    _merge_confirmed_form_states,
+    _merge_form_html,
+    _paddle_form_states,
+    _recover_paddle_form_regions,
+)
 from grounded_docparse.runtime import ProviderRuntime
 
 
@@ -206,7 +212,6 @@ def test_planner_approved_nonvisual_box_is_dispatched(tmp_path) -> None:
         source_height=200,
     )
 
-
     source = IngestedDocument(
         name="page.png",
         sha256="a" * 64,
@@ -232,6 +237,219 @@ def test_planner_approved_nonvisual_box_is_dispatched(tmp_path) -> None:
 
     assert gateway.inspected == ["p1-b1"]
     assert processed.visual_recovery_crops == 1
+
+
+def test_paddle_form_states_reads_standalone_marker_only_within_its_row() -> None:
+    recovered = (
+        "<table>"
+        "<tr><td>Referring provider</td><td>Participating</td>"
+        "<td>X</td><td>Nonparticipating</td></tr>"
+        "<tr><td>X</td></tr><tr><td>Office</td></tr>"
+        "</table>"
+    )
+
+    assert _paddle_form_states(recovered) == {
+        ("participating", 0): "unchecked",
+        ("nonparticipating", 0): "checked",
+        ("office", 0): None,
+    }
+
+
+def test_merge_confirmed_form_states_changes_only_confirmed_option_cells() -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr>"
+        "<tr><td colspan=\"3\">Full name: CHRISTOPHER J MCALLISTER, M.D.</td>"
+        "</tr></table>"
+    )
+
+    merged, count = _merge_confirmed_form_states(
+        primary,
+        {
+            ("participating", 0): "unchecked",
+            ("nonparticipating", 0): "checked",
+        },
+    )
+
+    assert merged == (
+        "<table><tr><td>Referring provider</td><td>[ ] Participating</td>"
+        "<td>[x] Nonparticipating</td></tr>"
+        "<tr><td colspan=\"3\">Full name: CHRISTOPHER J MCALLISTER, M.D.</td>"
+        "</tr></table>"
+    )
+    assert count == 2
+
+
+def test_paddle_form_recovery_merges_only_two_scale_consensus(
+    tmp_path, monkeypatch
+) -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr><tr><td>Full name: PATIENT</td>"
+        "</tr></table>"
+    )
+    working = (
+        "<table><tr><td>Servicing provider</td><td>Participating</td>"
+        "<td>X</td><td>Nonparticipating</td></tr></table>"
+    )
+    recovered = primary.replace(
+        "<td>Nonparticipating</td>", "<td>X</td><td>Nonparticipating</td>"
+    )
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (200, 300), "white").save(image_path)
+    source_path = tmp_path / "source.pdf"
+    source_path.write_bytes(b"%PDF-test")
+    page = PageEvidence(
+        number=1,
+        width=72,
+        height=108,
+        dpi=200,
+        image_path=image_path,
+        render_width_pixels=200,
+        render_height_pixels=300,
+        effective_dpi=200,
+        source_width=72,
+        source_height=108,
+        source_unit="pdf_points",
+    )
+    source = IngestedDocument("form.pdf", "a" * 64, source_path, [page])
+    referring = SimpleNamespace(
+        id="p1-r1", type=AnalysisRegionType.TABLE, text=primary
+    )
+    servicing = SimpleNamespace(
+        id="p1-r2", type=AnalysisRegionType.TABLE, text=working
+    )
+    analysis = SimpleNamespace(
+        quality=SimpleNamespace(blank=False),
+        regions=[referring, servicing],
+        warnings=[],
+    )
+    calls = []
+
+    class Runtime:
+        def parse_recovery_image(self, path):
+            calls.append(path)
+            return OcrPageResult(
+                path,
+                [
+                    OcrRegion(
+                        index=0,
+                        label="table",
+                        content=recovered,
+                        bbox=(0.1, 0.1, 0.9, 0.4),
+                    )
+                ],
+            )
+
+    def render_page(_source, _page, _bbox, output, **_kwargs):
+        Image.new("RGB", (190, 285), "white").save(output)
+        return output
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: Runtime()
+    )
+    monkeypatch.setattr(pipeline_module, "render_region_crop", render_page)
+
+    outcome = _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert len(calls) == 2
+    assert referring.text == primary.replace(
+        "<td>Participating</td><td>Nonparticipating</td>",
+        "<td>[ ] Participating</td><td>[x] Nonparticipating</td>",
+    )
+    assert servicing.text == working
+    assert outcome.attempts == 2
+
+
+def test_paddle_form_recovery_preserves_primary_when_scales_disagree(
+    tmp_path, monkeypatch
+) -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr></table>"
+    )
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (200, 300), "white").save(image_path)
+    source_path = tmp_path / "source.pdf"
+    source_path.write_bytes(b"%PDF-test")
+    page = PageEvidence(
+        number=1,
+        width=72,
+        height=108,
+        dpi=200,
+        image_path=image_path,
+        render_width_pixels=200,
+        render_height_pixels=300,
+        effective_dpi=200,
+        source_width=72,
+        source_height=108,
+        source_unit="pdf_points",
+    )
+    source = IngestedDocument("form.pdf", "a" * 64, source_path, [page])
+    region = SimpleNamespace(id="p1-r1", type=AnalysisRegionType.TABLE, text=primary)
+    analysis = SimpleNamespace(
+        quality=SimpleNamespace(blank=False), regions=[region], warnings=[]
+    )
+
+    class Runtime:
+        def __init__(self):
+            self.calls = 0
+
+        def parse_recovery_image(self, path):
+            self.calls += 1
+            selected = "Nonparticipating" if self.calls == 1 else "Participating"
+            content = primary.replace(
+                f"<td>{selected}</td>", f"<td>X</td><td>{selected}</td>"
+            )
+            return OcrPageResult(
+                path,
+                [OcrRegion(0, "table", content, (0.1, 0.1, 0.9, 0.4))],
+            )
+
+    runtime = Runtime()
+
+    def render_page(_source, _page, _bbox, output, **_kwargs):
+        Image.new("RGB", (190, 285), "white").save(output)
+        return output
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: runtime
+    )
+    monkeypatch.setattr(pipeline_module, "render_region_crop", render_page)
+
+    _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert region.text == primary
+
+    class FailingRuntime:
+        def parse_recovery_image(self, _path):
+            raise RuntimeError("service unavailable")
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: FailingRuntime()
+    )
+    outcome = _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert region.text == primary
+    assert any("service unavailable" in warning for warning in outcome.warnings)
 
 
 def test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls() -> None:

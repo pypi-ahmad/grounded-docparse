@@ -1,15 +1,15 @@
 # Grounded Document Parser
 
-A workstation-oriented Streamlit studio that parses PDFs and images with local GLM-OCR, then optionally sends selected crops or recognized document context to `gpt-5.6-luna` for bounded visual recovery and document-level reasoning.
+A workstation-oriented Streamlit studio that parses PDFs and images with selectable local GLM-OCR or PaddleOCR-VL-1.6, then optionally sends selected crops or recognized document context to `gpt-5.6-luna` for bounded visual recovery and document-level reasoning.
 
 Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ahmad/grounded-docparse)
 
-GLM-OCR owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
+The selected local OCR engine owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. PaddleOCR-VL-1.6 uses the full PP-DocLayoutV3 plus PaddleOCR-VL-1.6-0.9B pipeline with a local vLLM recognition backend. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
 
 ```text
 upload
   -> raster ingest
-  -> GLM-OCR layout and recognition
+  -> selected GLM-OCR or PaddleOCR-VL-1.6 layout and recognition
   -> deterministic quality analysis
   -> optional bounded Luna crop recovery
   -> grounded Markdown, elements, JSON v4.4.0, annotated PDF
@@ -22,7 +22,7 @@ upload
 
 Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. The parser processes ordered windows of 16 pages with up to eight page workers by default. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
 
-Form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. It re-renders those regions at 450 DPI, preserves the primary HTML layout, emits `[?]` for unresolved controls, and never replaces conflicting primary text. Set `DOCPARSE_GLM_FORM_RECOVERY_ENABLED=false` to disable it without changing the primary GLM-OCR pass. Luna is not required for this recovery.
+When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. PaddleOCR-VL output instead flows directly into the same deterministic quality and optional Luna-recovery stages.
 
 ## Install and set up
 
@@ -57,21 +57,25 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
    .\Launch-GLM-OCR.cmd
    ```
 
+   To start with PaddleOCR-VL-1.6 selected, use `Launch-PaddleOCR-VL-1.6.cmd`. Either launcher can switch the exclusive GPU backend later from the in-app model dropdown.
+
 `Launch-GLM-OCR.cmd` refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from Windows user scope each time. See [setup](SETUP.md) for manual WSL installation, configuration, security boundaries, and troubleshooting, or [run commands](docs/run.md) for service lifecycle commands.
 
 ## How to use the app
 
-1. Upload one PDF, PNG, JPEG, or TIFF. An optional inclusive page range is available for PDFs.
-2. Choose an **ADE mode**—the UI name for presets that control optional Luna features, not an external ADE integration. Every mode still runs the same GLM parse:
+1. Upload up to 20 PDFs, PNGs, JPEGs, or TIFFs (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only when one PDF is uploaded; batches process every page.
+2. Choose **GLM-OCR** or **PaddleOCR-VL-1.6** from **Document extraction model**, then choose an **ADE mode** for optional Luna features:
    - **Fast**: classification is the only preset-controlled Luna feature; visual recovery is a separate toggle and defaults on when a key is available.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
 3. Keep visual recovery enabled to inspect prioritized hard regions. The Luna budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
-4. Select **Parse document**.
-5. Review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
-6. Download the Markdown, annotated PDF, extraction JSON, or full grounded JSON required by the downstream workflow.
+4. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
+5. Choose a file from **Document results**, then review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
+6. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, and the generated Markdown, annotated PDF, full JSON, and extraction JSON when available.
 
-Extraction is always on demand after parsing. Create, import, or load a scalar schema in the Extract tab, then select **Run extraction**. Schema JSON imports keep their existing saved-schema behavior. A Markdown (`.md`) import populates the editable draft without saving or running extraction; review it and select **Save schema** if it should be reusable. Markdown schemas support a table or bullet list (not both), with an optional H1 schema name and optional type (`string` by default):
+Extraction is always on demand after parsing. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown imports continue to populate the flat field builder.
+
+Flat Markdown schemas support a table or bullet list (not both), with an optional H1 schema name and optional type (`string` by default):
 
 ```markdown
 # Invoice
@@ -91,7 +95,7 @@ Supported types are `string`, `number`, `integer`, `boolean`, and `date`. Withou
 
 For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. Luna classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
 
-Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the GLM-owned box.
+Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the local-OCR-owned box.
 
 ## Outputs
 
@@ -134,6 +138,8 @@ full_json = render_combined_result(result, analysis)
 .
 ├── Setup-GLM-OCR.cmd             # First-run Windows/WSL bootstrap and launch
 ├── Launch-GLM-OCR.cmd            # Subsequent Windows launcher
+├── Launch-PaddleOCR-VL-1.6.cmd   # Start with PaddleOCR selected
+├── paddle-runtime/               # Isolated locked Paddle/vLLM environment
 ├── streamlit_app.py              # Streamlit entry point
 ├── src/grounded_docparse/        # Parser, models, gateways, renderers, agentic layer
 ├── config/glmocr.yaml            # Source GLM-OCR SDK configuration

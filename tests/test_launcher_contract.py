@@ -34,6 +34,85 @@ def test_wsl_services_bind_to_loopback() -> None:
     assert 'OLLAMA_HOST="127.0.0.1:11434"' in serve_ollama
 
 
+def test_paddle_launcher_and_service_manager_use_official_full_pipeline() -> None:
+    launcher = (ROOT / "Launch-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8")
+    manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
+    runtime_config = (ROOT / "scripts/wsl/prepare_paddleocr_runtime.py").read_text(
+        encoding="utf-8"
+    )
+    backend_config = (ROOT / "config/paddle-vllm.yaml").read_text(encoding="utf-8")
+
+    assert "DOCPARSE_START_ENGINE=paddleocr-vl-1.6" in launcher
+    assert "PaddleOCR-VL-1.6-0.9B" in manager
+    assert "paddleocr genai_server" in manager
+    assert "--backend vllm" in manager
+    assert 'PADDLE_VLLM_PORT="${DOCPARSE_PADDLE_VLLM_PORT:-8118}"' in manager
+    assert 'PADDLE_API_PORT="${DOCPARSE_PADDLE_API_PORT:-8119}"' in manager
+    assert '--port "$PADDLE_VLLM_PORT"' in manager
+    assert '--backend_config "$PROJECT_ROOT/config/paddle-vllm.yaml"' in manager
+    assert "gpu-memory-utilization: 0.70" in backend_config
+    assert "no-enable-prefix-caching: true" in backend_config
+    assert "paddlex --serve" in manager
+    assert '--port "$PADDLE_API_PORT"' in manager
+    assert "/layout-parsing" in manager
+    assert "flock" in manager
+    assert "DOCPARSE_PADDLE_VLLM_PORT" in launcher
+    assert "DOCPARSE_PADDLE_API_PORT" in launcher
+    assert "DOCPARSE_PADDLE_VLLM_PORT" in runtime_config
+    setup = (ROOT / "scripts/wsl/setup-paddleocr.sh").read_text(encoding="utf-8")
+    assert "--get_pipeline_config PaddleOCR-VL-1.6" in setup
+
+
+def test_paddle_runtime_downloads_once_then_uses_local_cache_offline() -> None:
+    manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
+    setup = (ROOT / "scripts/wsl/setup-paddleocr.sh").read_text(encoding="utf-8")
+    paddle_runtime = manager.split("ensure_paddle()", maxsplit=1)[1]
+
+    assert "--ensure-assets" in setup
+    assert "--offline" in setup
+    assert "PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True" in paddle_runtime
+    assert "HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1" in paddle_runtime
+    assert '--model_dir "$PADDLE_MODEL_DIR"' in paddle_runtime
+    assert "PADDLE_PDX_LOCAL_FONT_FILE_PATH" in paddle_runtime
+
+
+def test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format() -> None:
+    manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
+
+    assert "CUDA (UMD )?Version:" in manager
+
+
+def test_detached_services_do_not_inherit_launcher_locks() -> None:
+    manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
+    launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
+
+    assert manager.count("9>&-") == 4
+    assert "manage-ocr-stack.sh ensure \"$START_ENGINE\" 8>&-" in launcher
+    assert "run-app.sh --server.headless true 8>&-" in launcher
+
+
+def test_paddle_readiness_probe_generates_its_png() -> None:
+    probe = (ROOT / "scripts/wsl/check-paddleocr-api.py").read_text(encoding="utf-8")
+
+    assert "Image.new" in probe
+    assert "base64.b64decode" not in probe
+
+
+def test_primary_launcher_defaults_to_glm_but_supports_runtime_switching() -> None:
+    launcher = (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8")
+    stack = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
+
+    assert "DOCPARSE_START_ENGINE=glm-ocr" in launcher
+    assert "manage-ocr-stack.sh" in stack
+    assert stack.index("Stopping Streamlit before switching OCR engines") < stack.index(
+        "manage-ocr-stack.sh"
+    )
+    run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
+    assert run_app.index("export DOCPARSE_GLMOCR_CONFIG_PATH") < run_app.index(
+        'if [[ "$DOCPARSE_OCR_ENGINE" == "glm-ocr" ]]'
+    )
+
+
 def test_installer_reuses_dependencies_and_has_cpu_fallback() -> None:
     setup = (ROOT / "scripts/wsl/setup-glmocr.sh").read_text(encoding="utf-8")
     installer = (

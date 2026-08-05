@@ -15,6 +15,26 @@ from grounded_docparse.schema_store import (
     parse_markdown_schema,
 )
 
+RAW_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "provider": {
+            "type": ["object", "null"],
+            "properties": {
+                "participating": {"type": ["boolean", "null"]},
+                "network": {
+                    "type": ["string", "null"],
+                    "enum": ["Participating", "Nonparticipating", None],
+                },
+            },
+            "required": ["participating", "network"],
+            "additionalProperties": False,
+        }
+    },
+    "required": ["provider"],
+    "additionalProperties": False,
+}
+
 
 def _schema() -> StoredSchema:
     return StoredSchema(
@@ -63,6 +83,25 @@ def test_schema_json_round_trip_and_validation() -> None:
     invalid["fields"].append(invalid["fields"][0])
     with pytest.raises(ValidationError, match="unique"):
         StoredSchema.model_validate_json(json.dumps(invalid))
+
+
+def test_raw_nested_json_schema_round_trip_and_compilation(tmp_path) -> None:
+    schema = StoredSchema(version=2, name="Provider status", json_schema=RAW_SCHEMA)
+    store = SchemaStore(tmp_path / "studio.sqlite3")
+
+    store.save(schema)
+    loaded = store.get("provider STATUS")
+
+    assert loaded == schema
+    assert compile_json_schema(loaded) == RAW_SCHEMA
+
+
+def test_schema_store_reads_legacy_v1_rows_after_v2_support(tmp_path) -> None:
+    store = SchemaStore(tmp_path / "studio.sqlite3")
+    store.save(_schema())
+    store.save(StoredSchema(version=2, name="Provider status", json_schema=RAW_SCHEMA))
+
+    assert [schema.version for schema in store.list()] == [1, 2]
 
 
 def test_parse_markdown_schema_table() -> None:
