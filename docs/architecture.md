@@ -2,13 +2,15 @@
 
 ## System boundary
 
-The application is one synchronous Streamlit process plus a local GLM-OCR/vLLM service. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication layer. Streamlit session state reuses a successful GLM parse when only agentic toggles change. SQLite persists reusable extraction schemas and routing profiles only.
+The application is one synchronous Streamlit process plus one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication layer. Streamlit session state keeps per-document workspaces for batches of up to 20 files and reuses successful local parses when only agentic toggles change. SQLite persists reusable extraction schemas and routing profiles only.
 
 ```text
 Browser
   -> Streamlit (`streamlit_app.py`)
      -> ingest and rasterization
-     -> GLM-OCR SDK -> local vLLM (`glm-ocr`, port 8080)
+     -> selected local OCR
+        -> GLM-OCR SDK -> vLLM/Ollama (`glm-ocr`, port 8080)
+        -> PaddleX API (port 8119) -> PaddleOCR-VL vLLM (port 8118)
      -> deterministic quality/recovery planning
      -> optional Luna crop recovery
      -> deterministic hierarchy, Markdown, JSON, and PDF annotations
@@ -20,13 +22,15 @@ Browser
 
 | Path | Responsibility |
 | --- | --- |
-| `Setup-GLM-OCR.cmd` / `Launch-GLM-OCR.cmd` | Windows bootstrap/launch entry points and user-scope OpenAI environment forwarding |
-| `streamlit_app.py` | Upload, modes, progress, tabs, schema UI, chat, downloads |
+| `Setup-GLM-OCR.cmd` / `Launch-*.cmd` | Windows bootstrap and engine-selecting launch entry points |
+| `streamlit_app.py` | Batch upload, engine selection, modes, progress, tabs, schema UI, chat, downloads |
+| `src/grounded_docparse/batch.py` | Upload limits, stable document identity, and batch archive records |
 | `src/grounded_docparse/__init__.py` | Package-root public exports |
 | `src/grounded_docparse/config.py` | `ParserConfig`, analysis thresholds, environment parsing, fixed Luna model |
 | `src/grounded_docparse/ingest.py` | Input validation, PDF/image rasterization, region rerendering |
 | `src/grounded_docparse/local_ocr.py` | Process-wide GLM-OCR runtime and SDK-result normalization |
-| `src/grounded_docparse/page_analysis.py` | Page quality signals and GLM region conversion |
+| `src/grounded_docparse/paddle_ocr.py` | PaddleX document-parser client and result normalization |
+| `src/grounded_docparse/page_analysis.py` | Page quality signals and selected-engine region conversion |
 | `src/grounded_docparse/quality.py` | Deterministic block quality, verification, and document quality aggregation |
 | `src/grounded_docparse/pipeline.py` | Parse orchestration, recovery selection, deterministic validation, hierarchy |
 | `src/grounded_docparse/gateways.py` | OpenAI Responses API calls, Structured Outputs, usage and trace collection |
@@ -40,6 +44,7 @@ Browser
 | `src/grounded_docparse/runtime.py` | Provider concurrency, retries, cooldown, usage, diagnostics |
 | `src/grounded_docparse/benchmark.py` | Corpus contracts and evaluation metrics |
 | `config/glmocr.yaml` | Source GLM-OCR SDK, layout, recognition, and formatter configuration |
+| `config/paddle-vllm.yaml` | PaddleOCR-VL vLLM serving configuration |
 | `scripts/wsl/prepare_glmocr_runtime.py` | Pinned model resolution and generated offline SDK configuration |
 | `scripts/wsl/*.sh` | Locked WSL environment setup, vLLM serving, Streamlit launch, health checks |
 | `scripts/evaluate_corpus.py` | Opt-in live/offline corpus evaluation and artifact export |
@@ -49,10 +54,10 @@ Browser
 ```text
 1. Validate bytes, extension, page count, and pixel limits.
 2. Render every page to PNG; never read selectable PDF text.
-3. Analyze GLM-OCR in ordered windows of 16 pages.
-4. Rank recovery candidates from GLM confidence and deterministic quality signals.
+3. Parse with the selected local OCR engine; GLM uses ordered windows of 16 pages, while Paddle submits the full document to its local API.
+4. Rank recovery candidates from local OCR confidence and deterministic quality signals.
 5. Process up to eight pages concurrently within each ordered window.
-6. Run local GLM form recovery first, then send selected Luna crops using an independent adaptive budget of eight to 64 and a three-per-page limit.
+6. Run engine-specific local form recovery: GLM revisits eligible risky regions, while Paddle PDF checkbox recovery accepts only states confirmed at both 190 and 200 DPI. For either engine, send selected Luna crops using an independent adaptive budget of eight to 64 and a three-per-page limit.
 7. Apply only high-confidence textual corrections to existing elements.
 8. Restore source page order and build the cross-page hierarchy.
 9. Materialize quality, elements, base Markdown, and annotations.
@@ -68,22 +73,22 @@ Worker progress is queued and replayed on the Streamlit caller thread. Pages are
 
 | Data | Owner | Luna recovery may change it? |
 | --- | --- | --- |
-| Element ID | GLM/deterministic pipeline | No |
-| Normalized bounding box | GLM | No |
-| Type and structure | GLM/deterministic pipeline | No |
-| Reading order | GLM/deterministic pipeline | No |
-| OCR confidence | GLM | No |
-| Existing element text | GLM initially | Yes, with a crop-backed confidence of at least `0.85` |
+| Element ID | Local OCR/deterministic pipeline | No |
+| Normalized bounding box | Local OCR | No |
+| Type and structure | Local OCR/deterministic pipeline | No |
+| Reading order | Local OCR/deterministic pipeline | No |
+| OCR confidence | Local OCR | No |
+| Existing element text | Local OCR initially | Yes, with a crop-backed confidence of at least `0.85` |
 | Refined Markdown presentation | Deterministic renderer from Luna directives | Yes, without changing grounded text |
 | Classification, TOC, extraction, chat | Luna plus deterministic validation | Feature-specific output only |
 
-Luna additions, rejections, geometry changes, structural changes, and order changes are ignored. The default application never asks Luna to synthesize a missing GLM region or replace a full page. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, parsing fails before recovery. An isolated failed page remains in partial output with warnings.
+Luna additions, rejections, geometry changes, structural changes, and order changes are ignored. The default application never asks Luna to synthesize a missing local OCR region or replace a full page. If at least one page is nonblank and none of the nonblank pages contains a layout region, parsing fails before recovery. An isolated failed page remains in partial output with warnings.
 
 Recovery candidates include OCR confidence below `0.55`, empty large regions, low character density, high garbage ratio, and weak table structure. Selection is document-wide and severity-ranked. Recovery is optional and unavailable without `OPENAI_API_KEY`.
 
 ## Agentic layer
 
-`DocumentAgent.prepare` builds compact Markdown/layout contexts from non-rejected elements. Each context is limited to 48,000 characters and eight pages; additional contexts cover the rest of a long document. Classification uses the first two pages. TOC and scalar extraction iterate all contexts. Classification and TOC run concurrently and fail independently; TOC failure falls back to grounded GLM headings.
+`DocumentAgent.prepare` builds compact Markdown/layout contexts from non-rejected elements. Each context is limited to 48,000 characters and eight pages; additional contexts cover the rest of a long document. Classification uses the first two pages. TOC and scalar extraction iterate all contexts. Classification and TOC run concurrently and fail independently; TOC failure falls back to grounded local OCR headings.
 
 Markdown presentation directives may select source, heading, paragraph, list-item, or caption rendering and may set heading level, list depth, or grouping. They contain no replacement document text and cannot modify canonical element order or geometry.
 
@@ -101,7 +106,7 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 Parse JSON remains schema version `4.4.0`. Full JSON is `4.5.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 
-Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain GLM-owned.
+Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain owned by the selected local OCR engine.
 
 ## Evaluation boundary
 
