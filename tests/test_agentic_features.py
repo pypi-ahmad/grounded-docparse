@@ -220,7 +220,7 @@ def test_combined_result_uses_additive_flat_v45_contract() -> None:
 
     payload = json.loads(render_combined_result(result, analysis, extraction))
 
-    assert payload["schema_version"] == "4.5.0"
+    assert payload["schema_version"] == "4.6.0"
     assert payload["custom_classification"] is None
     assert payload["form_extractions"] == []
     assert payload["document_type"]["primary_type"] == "Report"

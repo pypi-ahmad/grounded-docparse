@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grounded DocParse: IDP or ADE?</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --panel-2: #243044;
+      --text: #e8eef7;
+      --muted: #9aabbf;
+      --line: #334155;
+      --accent: #38bdf8;
+      --accent-2: #a78bfa;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --code: #0b1220;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+      --max: 980px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(56, 189, 248, 0.16), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(167, 139, 250, 0.14), transparent 50%),
+        var(--bg);
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+    header {
+      padding: 1.5rem 0 0.5rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 1.75rem;
+    }
+    .eyebrow {
+      display: inline-flex;
+      gap: 0.5rem;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.2;
+      margin: 0 0 0.75rem;
+      font-weight: 700;
+    }
+    .lede { color: var(--muted); font-size: 1.05rem; max-width: 52rem; margin: 0; }
+    .verdict {
+      margin: 1.75rem 0;
+      padding: 1.4rem 1.5rem;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.14), rgba(56, 189, 248, 0.1));
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      box-shadow: var(--shadow);
+    }
+    .verdict h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.35rem;
+      color: var(--good);
+    }
+    .verdict p { margin: 0.4rem 0; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.9rem 0 0.3rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.28rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .badge.ade { background: rgba(52, 211, 153, 0.15); color: var(--good); border-color: rgba(52, 211, 153, 0.35); }
+    .badge.idp { background: rgba(251, 191, 36, 0.12); color: var(--warn); border-color: rgba(251, 191, 36, 0.35); }
+    .badge.ocr { background: rgba(56, 189, 248, 0.12); color: var(--accent); border-color: rgba(56, 189, 248, 0.35); }
+    .badge.no { background: rgba(248, 113, 113, 0.12); color: var(--bad); border-color: rgba(248, 113, 113, 0.35); }
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(15, 20, 25, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      margin: 1.5rem 0 2rem;
+    }
+    nav.toc strong { display: block; margin-bottom: 0.4rem; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; gap: 1.5rem; }
+    nav.toc li { margin: 0.25rem 0; break-inside: avoid; }
+    @media (max-width: 720px) { nav.toc ol { columns: 1; } }
+    section {
+      margin: 2.25rem 0;
+      padding: 1.4rem 1.5rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    section h2 {
+      margin: 0 0 0.9rem;
+      font-size: 1.35rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--line);
+    }
+    section h3 { margin: 1.35rem 0 0.55rem; font-size: 1.05rem; color: #dbe7f7; }
+    p { margin: 0.65rem 0; }
+    ul, ol { margin: 0.5rem 0 0.75rem; padding-left: 1.25rem; }
+    li { margin: 0.35rem 0; }
+    .muted { color: var(--muted); }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+    }
+    .card h3 { margin-top: 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+      margin: 0.8rem 0 0.3rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.65rem 0.7rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: rgba(15, 20, 25, 0.55);
+      color: #d7e5f8;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td { background: rgba(255, 255, 255, 0.015); }
+    .yes { color: var(--good); font-weight: 600; }
+    .partial { color: var(--warn); font-weight: 600; }
+    .no { color: var(--bad); font-weight: 600; }
+    pre, code {
+      font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    pre {
+      background: var(--code);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      overflow-x: auto;
+      font-size: 0.84rem;
+      line-height: 1.45;
+      color: #d7e7ff;
+    }
+    code {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 5px;
+      padding: 0.05rem 0.35rem;
+      font-size: 0.9em;
+    }
+    pre code {
+      background: none;
+      border: 0;
+      padding: 0;
+      font-size: inherit;
+    }
+    .callout {
+      border-left: 4px solid var(--accent-2);
+      background: rgba(167, 139, 250, 0.08);
+      padding: 0.85rem 1rem;
+      border-radius: 0 10px 10px 0;
+      margin: 1rem 0;
+    }
+    .callout.warn {
+      border-left-color: var(--warn);
+      background: rgba(251, 191, 36, 0.08);
+    }
+    .flow-step {
+      display: grid;
+      grid-template-columns: 2.4rem 1fr;
+      gap: 0.75rem;
+      margin: 0.75rem 0;
+      align-items: start;
+    }
+    .n {
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--line);
+      padding-top: 1rem;
+    }
+    .evidence li code { word-break: break-all; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Grounded DocParse · Classification brief</div>
+      <h1>Is this repository IDP or ADE?</h1>
+      <p class="lede">
+        A grounded classification of <strong>grounded-docparse</strong> based on repository design docs,
+        workflow contracts, and source modules — not marketing labels.
+      </p>
+    </header>
+
+    <div class="verdict">
+      <h2>Verdict: primarily ADE (Agentic Document Extraction pattern)</h2>
+      <div class="badge-row">
+        <span class="badge ade">Primary: ADE / agentic document intelligence</span>
+        <span class="badge idp">Partial IDP capabilities</span>
+        <span class="badge ocr">Foundation: local OCR owns evidence</span>
+        <span class="badge no">Not classic enterprise IDP platform</span>
+      </div>
+      <p>
+        This repo implements a <strong>bounded, evidence-grounded agentic document system</strong>:
+        local visual parse first, then optional specialized reasoning tasks (classify, section, route, extract, chat),
+        with deterministic validation, finite repair, grounding to local OCR identity/geometry, and human review gates.
+      </p>
+      <p>
+        It is <strong>not</strong> a full enterprise IDP product (no RPA connectors, no multi-user BPM, no queue/workers,
+        no durable job store, no systems-of-record write-back). It does, however, deliver several IDP-like outcomes
+        (schema extraction, form routing, review, reusable profiles) inside an ADE-style architecture.
+      </p>
+      <p class="muted">
+        Package description in <code>pyproject.toml</code>:
+        “Grounded agentic document parser for structured Markdown and JSON.”
+      </p>
+    </div>
+
+    <nav class="toc" aria-label="Table of contents">
+      <strong>Contents</strong>
+      <ol>
+        <li><a href="#definitions">Definitions used here</a></li>
+        <li><a href="#scorecard">Scorecard: OCR / IDP / ADE</a></li>
+        <li><a href="#workflow">End-to-end workflow</a></li>
+        <li><a href="#design">Design principles</a></li>
+        <li><a href="#tech">Technical architecture</a></li>
+        <li><a href="#not-idp">Why not “just IDP”</a></li>
+        <li><a href="#ade-ui">What “ADE mode” means in the UI</a></li>
+        <li><a href="#example">Worked example: mixed packet</a></li>
+        <li><a href="#evidence">Evidence map</a></li>
+        <li><a href="#summary">One-sentence summary</a></li>
+      </ol>
+    </nav>
+
+    <section id="definitions">
+      <h2>1. Definitions used here</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>OCR</h3>
+          <p>Image/page → text regions, often with boxes and confidence. No business workflow by itself.</p>
+        </div>
+        <div class="card">
+          <h3>IDP (Intelligent Document Processing)</h3>
+          <p>
+            Enterprise category: classify + extract + validate + human-in-the-loop + route into business systems.
+            Often template/ML pipelines plus workflow integration.
+          </p>
+        </div>
+        <div class="card">
+          <h3>ADE (Agentic Document Extraction)</h3>
+          <p>
+            Modern document-intelligence pattern: visual/structural parse → grounded intermediate representation
+            (Markdown/JSON/elements) → goal-directed tasks (classify, split/section, extract, answer) with validation,
+            uncertainty, and source grounding. LandingAI brands a managed product “ADE”; this repo implements a related
+            <em>pattern</em>, not that product.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Important distinction</h3>
+          <p>
+            ADE is an architecture/pattern. IDP is often a product category. A system can be ADE-shaped while
+            only partially covering IDP outcomes — that is this repository.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="scorecard">
+      <h2>2. Scorecard: where Grounded DocParse fits</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>Classic OCR</th>
+            <th>Classic enterprise IDP</th>
+            <th>ADE pattern</th>
+            <th>This repo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Raster OCR / region text</td>
+            <td class="yes">Yes</td>
+            <td class="yes">Yes</td>
+            <td class="yes">Yes</td>
+            <td class="yes">Yes — GLM-OCR or PaddleOCR-VL-1.6 owns evidence</td>
+          </tr>
+          <tr>
+            <td>Layout-aware Markdown + hierarchy</td>
+            <td class="no">Rare</td>
+            <td class="partial">Sometimes</td>
+            <td class="yes">Core</td>
+            <td class="yes">Core parse output</td>
+          </tr>
+          <tr>
+            <td>Grounded element IDs + boxes</td>
+            <td class="partial">Boxes only</td>
+            <td class="partial">Field boxes</td>
+            <td class="yes">First-class</td>
+            <td class="yes">Local-OCR-owned IDs/geometry</td>
+          </tr>
+          <tr>
+            <td>Schema extraction</td>
+            <td class="no">No</td>
+            <td class="yes">Core</td>
+            <td class="yes">Core</td>
+            <td class="yes">On-demand, validated + evidence-resolved</td>
+          </tr>
+          <tr>
+            <td>Classify / section / route</td>
+            <td class="no">No</td>
+            <td class="yes">Common</td>
+            <td class="yes">Core</td>
+            <td class="yes">Optional Luna roles + review gates</td>
+          </tr>
+          <tr>
+            <td>Bounded repair / uncertainty</td>
+            <td class="no">No</td>
+            <td class="partial">Rules/HITL</td>
+            <td class="yes">Typical</td>
+            <td class="yes">Finite retries; null/not_found/inferred/review</td>
+          </tr>
+          <tr>
+            <td>Human review UI</td>
+            <td class="no">No</td>
+            <td class="yes">Core</td>
+            <td class="partial">Common</td>
+            <td class="yes">Streamlit review + annotated PDF highlight</td>
+          </tr>
+          <tr>
+            <td>Workflow into ERP/CRM/RPA</td>
+            <td class="no">No</td>
+            <td class="yes">Core</td>
+            <td class="partial">Optional</td>
+            <td class="no">Absent by design</td>
+          </tr>
+          <tr>
+            <td>Multi-tenant queue / workers / API service</td>
+            <td class="no">No</td>
+            <td class="yes">Typical</td>
+            <td class="partial">Product-dependent</td>
+            <td class="no">Single Streamlit process + local OCR services</td>
+          </tr>
+          <tr>
+            <td>Open-ended autonomous agent loop</td>
+            <td class="no">No</td>
+            <td class="no">No</td>
+            <td class="partial">Not required for ADE</td>
+            <td class="no">Explicitly rejected</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        <strong>Reading the scorecard:</strong> the strongest match is ADE-pattern document intelligence.
+        Overlap with IDP is real on extraction/routing/review, but the system boundary is a workstation ADE studio,
+        not an enterprise IDP platform.
+      </div>
+    </section>
+
+    <section id="workflow">
+      <h2>3. End-to-end workflow</h2>
+      <p class="muted">From <code>docs/architecture.md</code>, <code>docs/how-it-works.md</code>, and <code>README.md</code>.</p>
+      <pre><code>Browser
+  → Streamlit (`streamlit_app.py`)
+     → ingest + rasterization (no selectable PDF text)
+     → selected local OCR
+        → GLM-OCR / vLLM (or Ollama)  OR  PaddleOCR-VL-1.6 / PaddleX
+     → deterministic quality / recovery planning
+     → optional Luna crop recovery (text-only on existing regions)
+     → grounded Markdown + hierarchy + JSON + annotated PDF
+     → optional Luna document features:
+          refine | classify | TOC | form routing | extract | chat
+     → downloads + source highlighting</code></pre>
+
+      <h3>Ordered stages</h3>
+      <div class="flow-step"><div class="n">1</div><div><strong>Validate &amp; ingest</strong> — extension, bytes, page/pixel limits; rasterize every page to PNG.</div></div>
+      <div class="flow-step"><div class="n">2</div><div><strong>Local OCR perception</strong> — layout + recognition. This stage owns text, type, order, IDs, boxes, confidence.</div></div>
+      <div class="flow-step"><div class="n">3</div><div><strong>Deterministic quality</strong> — rank weak regions (low confidence, empty large regions, density/garbage, weak tables).</div></div>
+      <div class="flow-step"><div class="n">4</div><div><strong>Optional visual recovery</strong> — engine-local form recovery + optional Luna crops; only high-confidence text replacements (≥ 0.85) accepted.</div></div>
+      <div class="flow-step"><div class="n">5</div><div><strong>Materialize parse</strong> — hierarchy, base Markdown, refined Markdown (optional), parse JSON v4.4, annotated PDF.</div></div>
+      <div class="flow-step"><div class="n">6</div><div><strong>Optional agentic analysis</strong> — classification + TOC concurrently; failures isolated; TOC can fall back to grounded headings.</div></div>
+      <div class="flow-step"><div class="n">7</div><div><strong>On-demand extraction / routing / chat</strong> — user-triggered; schema/profile driven; citations must resolve to known evidence.</div></div>
+
+      <div class="callout warn">
+        Parsing remains useful without Luna or an API key. Agentic stages are optional enhancements around a completed local parse.
+      </div>
+    </section>
+
+    <section id="design">
+      <h2>4. Design principles (why this is ADE-shaped)</h2>
+      <ol>
+        <li>
+          <strong>Parse-then-reason split.</strong>
+          Local OCR establishes the evidence geometry first; models reason later over crops or compact structured context
+          (<code>docs/research.md</code>).
+        </li>
+        <li>
+          <strong>Evidence ownership is a control plane.</strong>
+          Local OCR owns element ID, normalized box, type, structure, reading order, and OCR confidence.
+          Luna recovery may change only existing-region text when crop confidence ≥ 0.85.
+          Additions, deletions, geometry, type, and order changes are ignored
+          (<code>docs/architecture.md</code> ownership table).
+        </li>
+        <li>
+          <strong>Specialized roles, not one free-form prompt.</strong>
+          Roles include visual recovery, Markdown refinement, classification, TOC, form routing, extraction, chat
+          (<code>docs/how-grounded-docparse-is-agentic.md</code>).
+        </li>
+        <li>
+          <strong>Deterministic validation after model proposals.</strong>
+          Categories must exist; segments must cover pages; extraction citations must map to active blocks/atoms;
+          cited source text must support the value; chat citations must be known element IDs.
+        </li>
+        <li>
+          <strong>Finite repair loops.</strong>
+          One schema-repair attempt for structured features; extraction may do one evidence-repair call; then stop,
+          warn, fall back, or return null/not_found — no infinite “prompt until it looks good.”
+        </li>
+        <li>
+          <strong>Human control and uncertainty.</strong>
+          Low-confidence / boundary-merged routing needs review. Extraction does not auto-run after parse.
+          Chat is off until enabled. Unresolved leaves stay explicit rather than invented.
+        </li>
+        <li>
+          <strong>Bounded autonomy only.</strong>
+          No self-invented goals, arbitrary tools, durable agent memory, or acting on external business systems.
+        </li>
+      </ol>
+
+      <h3>ADE capability map (vs LandingAI-style ADE surface)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ADE-style capability</th>
+            <th>Grounded DocParse</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Parse</td><td class="yes">Yes — grounded Markdown/JSON/elements/annotated PDF</td></tr>
+          <tr><td>Classify</td><td class="yes">Yes — whole-document + custom form routing categories</td></tr>
+          <tr><td>Section</td><td class="yes">Yes — hierarchical TOC with element/page references</td></tr>
+          <tr><td>Extract</td><td class="yes">Yes — schema-based with evidence resolution</td></tr>
+          <tr><td>Split</td><td class="partial">Partial — logical contiguous segments, not separate exported sub-documents</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">
+        Source: <code>docs/agentic-document-extraction-comparison.md</code>. The repo does not call or reproduce LandingAI ADE.
+      </p>
+    </section>
+
+    <section id="tech">
+      <h2>5. Technical architecture details</h2>
+
+      <h3>System boundary</h3>
+      <ul>
+        <li><strong>UI / orchestration:</strong> one synchronous Streamlit process (<code>streamlit_app.py</code>).</li>
+        <li><strong>Local OCR backends (exclusive GPU selection in launchers):</strong>
+          GLM-OCR via SDK → vLLM/Ollama, or PaddleOCR-VL-1.6 via PaddleX API → local vLLM.</li>
+        <li><strong>Optional cloud reasoning:</strong> OpenAI Responses API through <code>gateways.py</code>, fixed Luna model in config.</li>
+        <li><strong>Persistence:</strong> SQLite only for reusable extraction schemas and routing profiles
+          (<code>schema_store.py</code>, default <code>data/document_studio.sqlite3</code>).</li>
+        <li><strong>No:</strong> HTTP app API, queue, worker fleet, job store, artifact store, durable cross-session result cache, multi-user auth.</li>
+      </ul>
+
+      <h3>Key modules</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>pipeline.py</code> · <code>DocumentParser</code></td><td>Parse orchestration, recovery selection, hierarchy, parse result assembly</td></tr>
+          <tr><td><code>local_ocr.py</code> / <code>paddle_ocr.py</code></td><td>Engine clients and result normalization into shared region model</td></tr>
+          <tr><td><code>page_analysis.py</code> / <code>quality.py</code></td><td>Page/region quality signals; verification and aggregation</td></tr>
+          <tr><td><code>agentic.py</code> · <code>DocumentAgent</code></td><td>Prepared contexts; classify; TOC; routing/analysis orchestration; chat</td></tr>
+          <tr><td><code>extraction.py</code> · <code>DocumentExtractor</code></td><td>JSON Schema validation subset; extract; evidence resolve/repair</td></tr>
+          <tr><td><code>enhancement.py</code></td><td>Markdown presentation directives without rewriting canonical evidence text</td></tr>
+          <tr><td><code>gateways.py</code> / <code>prompts.py</code></td><td>OpenAI Structured Outputs, usage/trace, versioned prompts</td></tr>
+          <tr><td><code>models.py</code></td><td>Pydantic contracts for parse, agentic, extraction, routing results</td></tr>
+          <tr><td><code>render.py</code></td><td>Markdown/JSON/annotation rendering; combined result envelope</td></tr>
+          <tr><td><code>schema_store.py</code></td><td>SQLite CRUD for schemas and classifier/routing profiles</td></tr>
+          <tr><td><code>runtime.py</code></td><td>Provider concurrency, retries, cooldown, diagnostics</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Public Python surface</h3>
+      <p>
+        Package exports <code>DocumentParser</code>, <code>DocumentAgent</code>, <code>DocumentExtractor</code>,
+        <code>ParserConfig</code>, result models, and <code>render_combined_result</code>
+        (<code>src/grounded_docparse/__init__.py</code>).
+      </p>
+
+      <h3>Ownership contract (critical technical detail)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Owner</th>
+            <th>Luna recovery may change?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Element ID</td><td>Local OCR / deterministic pipeline</td><td class="no">No</td></tr>
+          <tr><td>Normalized bounding box</td><td>Local OCR</td><td class="no">No</td></tr>
+          <tr><td>Type / structure / reading order / OCR confidence</td><td>Local OCR / deterministic pipeline</td><td class="no">No</td></tr>
+          <tr><td>Existing element text</td><td>Local OCR initially</td><td class="yes">Yes, crop-backed confidence ≥ 0.85</td></tr>
+          <tr><td>Refined Markdown presentation</td><td>Deterministic renderer from directives</td><td class="yes">Presentation only</td></tr>
+          <tr><td>Classification / TOC / extraction / chat</td><td>Luna + deterministic validation</td><td>Feature-specific output only</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Agentic context limits</h3>
+      <ul>
+        <li><code>DocumentAgent.prepare</code> builds compact Markdown + layout records from non-rejected elements.</li>
+        <li>Each context: up to ~48,000 characters and 8 pages; long documents span multiple contexts.</li>
+        <li>Classification uses first two pages; TOC/scalar extraction iterate contexts.</li>
+        <li>Chat uses full context when it fits; otherwise deterministic retrieval of up to ~40 elements + neighbors.</li>
+        <li>Structured text features: medium reasoning effort, one schema-invalid retry; visual recovery: high effort on original-detail crops.</li>
+        <li>OpenAI requests set <code>store=False</code>.</li>
+      </ul>
+
+      <h3>Result contracts</h3>
+      <ul>
+        <li><code>ParseResult</code>: document, refined markdown, grounded base_markdown, parse JSON, elements, annotated PDF, usage, trace, metadata, recovery log.</li>
+        <li>Parse JSON schema version <strong>4.4.0</strong>; full combined JSON <strong>4.5.0</strong>.</li>
+        <li>Legacy extraction JSON <strong>1.1.0</strong>; routed multi-form extraction JSON <strong>2.0.0</strong>.</li>
+        <li>Markdown source spans target <code>base_markdown</code>, not presentation-refined Markdown.</li>
+      </ul>
+
+      <h3>Stack snapshot</h3>
+      <ul>
+        <li>Python ≥ 3.12, package version 0.5.0</li>
+        <li>Core deps: Streamlit, Pydantic, Pillow, PyMuPDF, OpenAI SDK, nh3</li>
+        <li>Local OCR extras (Linux/WSL): glmocr, torch, vLLM, transformers</li>
+        <li>Dev: pytest</li>
+      </ul>
+    </section>
+
+    <section id="not-idp">
+      <h2>6. Why this is not “just IDP”</h2>
+      <p>
+        Industry IDP usually implies an operations platform: ingestion connectors, classification taxonomies at scale,
+        extraction models/templates, validation rules engines, human review queues, and export into ERP/CRM/RPA.
+      </p>
+      <p>Grounded DocParse shares the <em>document understanding middle</em> of that story, but stops short of the platform edge:</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Typical enterprise IDP piece</th>
+            <th>This repo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Email / SFTP / ECM connectors</td><td class="no">Manual upload only (batch ≤ 20 files)</td></tr>
+          <tr><td>Multi-user review queues</td><td class="no">Single workstation Streamlit session</td></tr>
+          <tr><td>Business process automation / RPA handoff</td><td class="no">Downloads / local review only</td></tr>
+          <tr><td>Central model ops &amp; fleet orchestration</td><td class="partial">Local WSL services + optional OpenAI</td></tr>
+          <tr><td>Template training UI for fixed forms</td><td class="partial">Schema/profile authoring, not classic template training</td></tr>
+          <tr><td>Schema extraction + HITL</td><td class="yes">Present (IDP-like outcome)</td></tr>
+          <tr><td>Form routing / packet segmentation</td><td class="yes">Present (IDP-like outcome)</td></tr>
+        </tbody>
+      </table>
+      <p>
+        So if someone asks “is it IDP?” a precise answer is:
+        <strong>it implements IDP-like extraction/routing/review features, but its product shape and architecture are ADE-first workstation document intelligence.</strong>
+      </p>
+    </section>
+
+    <section id="ade-ui">
+      <h2>7. What “ADE mode” means in this app</h2>
+      <p>
+        In the Streamlit UI, <strong>ADE mode</strong> is only a preset group for optional Luna features
+        (Fast / Full / Custom). It is <strong>not</strong> a connection to LandingAI ADE or any external ADE product.
+      </p>
+      <ul>
+        <li><strong>Fast:</strong> classification is the main preset-controlled Luna feature; visual recovery is a separate toggle (defaults on when key available).</li>
+        <li><strong>Full:</strong> Markdown refinement + classification + TOC.</li>
+        <li><strong>Custom:</strong> pick those toggles individually.</li>
+        <li>Extraction and chat remain on-demand, not “mode auto-run.”</li>
+      </ul>
+      <p class="muted">Evidence: README, <code>docs/complete-user-guide.md</code>, <code>docs/agentic-document-extraction-comparison.md</code>.</p>
+    </section>
+
+    <section id="example">
+      <h2>8. Worked example: mixed-form business packet</h2>
+      <p class="muted">Condensed from <code>docs/how-grounded-docparse-is-agentic.md</code>.</p>
+      <ol>
+        <li>Local OCR parses every page into grounded evidence (text, IDs, boxes, order).</li>
+        <li>User loads a routing profile: categories such as <code>new_request</code>, <code>update</code>, <code>records</code>, plus non-extractable <code>other</code>.</li>
+        <li>Routing agent proposes contiguous page segments with cited supporting elements.</li>
+        <li>Deterministic validation checks page coverage, category names, ranges, and evidence IDs.</li>
+        <li>High-confidence segments may auto-approve; low-confidence / boundary-merged segments require human review.</li>
+        <li>Extraction stays blocked until every segment is approved.</li>
+        <li>Only approved, extractable categories run their assigned schemas against in-memory parse subsets.</li>
+        <li>Each extracted field resolves back to local-OCR-owned page/box/source text.</li>
+        <li>A failed segment does not erase successful results from other eligible segments.</li>
+      </ol>
+      <p>
+        This orchestration — specialized goals over shared grounded state, with validation and review — is the practical
+        definition of ADE used by this repository.
+      </p>
+    </section>
+
+    <section id="evidence">
+      <h2>9. Evidence map</h2>
+      <ul class="evidence">
+        <li><code>README.md</code> — product overview, ADE mode presets, workflow summary</li>
+        <li><code>pyproject.toml</code> — “Grounded agentic document parser…”</li>
+        <li><code>docs/architecture.md</code> — system boundary, pipeline, ownership, agentic layer</li>
+        <li><code>docs/how-it-works.md</code> — numbered end-to-end stages</li>
+        <li><code>docs/how-grounded-docparse-is-agentic.md</code> — agentic roles, bounds, grounding control plane</li>
+        <li><code>docs/agentic-document-extraction-comparison.md</code> — ADE capability mapping vs LandingAI ADE</li>
+        <li><code>docs/research.md</code> — parse-then-reason design basis; no ADE product equivalence claims</li>
+        <li><code>src/grounded_docparse/pipeline.py</code> — <code>DocumentParser</code></li>
+        <li><code>src/grounded_docparse/agentic.py</code> — <code>DocumentAgent</code></li>
+        <li><code>src/grounded_docparse/extraction.py</code> — <code>DocumentExtractor</code></li>
+        <li><code>src/grounded_docparse/__init__.py</code> — public exports</li>
+      </ul>
+      <div class="callout">
+        Accuracy note from repo design: evaluation artifacts are regression evidence, not claims of equivalence with
+        LandingAI ADE or other external benchmarks.
+      </div>
+    </section>
+
+    <section id="summary">
+      <h2>10. One-sentence summary</h2>
+      <p>
+        <strong>Grounded DocParse is an ADE-pattern workstation document intelligence system</strong>
+        (local OCR evidence ownership + optional bounded Luna agentic tasks + deterministic grounding/validation/review),
+        with <strong>partial IDP-like outcomes</strong> (schemas, routing, HITL) but without the full enterprise IDP platform surface.
+      </p>
+      <pre><code>OCR foundation
+   └─ ADE architecture (primary)
+        ├─ grounded parse (Markdown / JSON / elements / boxes)
+        ├─ goal-directed roles (classify / section / route / extract / chat)
+        ├─ validation · finite repair · uncertainty · review
+        └─ IDP-like features (partial outcomes, not full IDP product)</code></pre>
+    </section>
+
+    <footer>
+      Generated for review inside the grounded-docparse repository.
+      Classification is based on repository files as of the current working tree on branch
+      <code>PaddleOCR-VL-1.6</code>. Open this file in any browser.
+    </footer>
+  </div>
+</body>
+</html>

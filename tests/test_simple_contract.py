@@ -421,7 +421,7 @@ def test_schema_version_and_list_marker_are_preserved_in_json() -> None:
 
     json_text = render_agentic_document(document).json
 
-    assert '"schema_version": "4.4.0"' in json_text
+    assert '"schema_version": "4.5.0"' in json_text
     assert '"list_marker": "1."' in json_text
 
 

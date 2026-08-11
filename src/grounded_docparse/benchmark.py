@@ -12,9 +12,16 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .models import Block, Document, VerificationState
+from .models import (
+    Block,
+    Document,
+    DocumentClassification,
+    DocumentType,
+    VerificationState,
+)
 
-CORPUS_SCHEMA_VERSION = "1.0"
+CORPUS_SCHEMA_VERSION = "1.1"
+SUPPORTED_CORPUS_SCHEMA_VERSIONS = {"1.0", CORPUS_SCHEMA_VERSION}
 ANNOTATION_SCHEMA_VERSION = "1.1"
 
 
@@ -107,6 +114,7 @@ class CorpusDocument(BaseModel):
     annotation_path: str | None = None
     features: list[str] = Field(default_factory=list)
     synthetic: bool
+    expected_document_type: DocumentType | None = None
     annotation: CorpusAnnotation | None = Field(default=None, exclude=True)
     source_path: Path | None = Field(default=None, exclude=True)
 
@@ -121,9 +129,20 @@ class CorpusManifest(BaseModel):
 
     @model_validator(mode="after")
     def validate_versions_and_ids(self) -> CorpusManifest:
-        if self.schema_version != CORPUS_SCHEMA_VERSION:
+        if self.schema_version not in SUPPORTED_CORPUS_SCHEMA_VERSIONS:
             raise ValueError(
                 f"unsupported manifest schema version: {self.schema_version}"
+            )
+        if self.schema_version == "1.0" and any(
+            document.expected_document_type is not None for document in self.documents
+        ):
+            raise ValueError(
+                "expected_document_type requires manifest schema version 1.1"
+            )
+        if self.annotation_schema_version != ANNOTATION_SCHEMA_VERSION:
+            raise ValueError(
+                "unsupported annotation schema version: "
+                f"{self.annotation_schema_version}"
             )
         ids = [document.id for document in self.documents]
         if len(ids) != len(set(ids)):
@@ -143,6 +162,40 @@ class ModelRateCard(BaseModel):
 
     schema_version: str
     models: dict[str, ModelRate]
+
+
+class RegressionRule(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1)
+    path: str = Field(pattern=r"^/")
+    direction: Literal["higher_is_better", "lower_is_better"]
+    minimum: float | None = None
+    maximum: float | None = None
+    max_regression: float | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def require_constraint(self) -> RegressionRule:
+        if (
+            self.minimum is None
+            and self.maximum is None
+            and self.max_regression is None
+        ):
+            raise ValueError("regression rule requires at least one constraint")
+        if (
+            self.minimum is not None
+            and self.maximum is not None
+            and self.minimum > self.maximum
+        ):
+            raise ValueError("regression rule minimum cannot exceed maximum")
+        return self
+
+
+class RegressionPolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["1.0"]
+    rules: list[RegressionRule] = Field(min_length=1)
 
 
 def _repository_path(repository_root: Path, value: str) -> Path:
@@ -652,6 +705,9 @@ def summarize_telemetry(
             float(record.get("full_page_equivalents", 0.0)) for record in records
         ),
         "repair_calls": sum(int(record.get("repair_calls", 0)) for record in records),
+        "ocr_comparison_crops": sum(int(record.get("ocr_comparison_crops", 0)) for record in records),
+        "ocr_comparison_disagreements": sum(int(record.get("ocr_comparison_disagreements", 0)) for record in records),
+        "ocr_comparison_unavailable": sum(int(record.get("ocr_comparison_unavailable", 0)) for record in records),
         "repaired_target_rate": (
             sum(int(record.get("repaired_targets", 0)) for record in records)
             / sum(int(record.get("blocks", 0)) for record in records)
@@ -725,12 +781,203 @@ def _group_metrics(documents: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _ocr_review_summary(documents: list[dict[str, Any]]) -> dict[str, Any]:
+    outcomes = [
+        document.get("metrics", {}).get("review_outcomes", {})
+        for document in documents
+    ]
+    block_count = sum(int(item.get("block_count", 0)) for item in outcomes)
+    needs_review_count = sum(
+        int(item.get("needs_review_count", 0)) for item in outcomes
+    )
+    rejected_count = sum(int(item.get("rejected_count", 0)) for item in outcomes)
+    return {
+        "block_count": block_count,
+        "needs_review_count": needs_review_count,
+        "rejected_count": rejected_count,
+        "review_rate": needs_review_count / block_count if block_count else 0.0,
+        "rejection_rate": rejected_count / block_count if block_count else 0.0,
+    }
+
+
+def _classification_summary(
+    documents: list[dict[str, Any]], *, review_threshold: float
+) -> dict[str, Any]:
+    labeled = [
+        document
+        for document in documents
+        if document.get("expected_document_type") is not None
+    ]
+    scored = [
+        document
+        for document in labeled
+        if isinstance(document.get("classification"), dict)
+        and document["classification"].get("predicted_type") is not None
+        and isinstance(document["classification"].get("confidence"), (int, float))
+    ]
+    records = [
+        {
+            "expected": document["expected_document_type"],
+            "predicted": document["classification"]["predicted_type"],
+            "confidence": float(document["classification"]["confidence"]),
+        }
+        for document in scored
+    ]
+    for record in records:
+        record["correct"] = record["expected"] == record["predicted"]
+
+    expected_types = sorted({str(record["expected"]) for record in records})
+    per_type: dict[str, Any] = {}
+    confusion: dict[str, dict[str, int]] = {}
+    for expected_type in expected_types:
+        true_positive = sum(
+            record["expected"] == expected_type
+            and record["predicted"] == expected_type
+            for record in records
+        )
+        false_positive = sum(
+            record["expected"] != expected_type
+            and record["predicted"] == expected_type
+            for record in records
+        )
+        false_negative = sum(
+            record["expected"] == expected_type
+            and record["predicted"] != expected_type
+            for record in records
+        )
+        support = true_positive + false_negative
+        precision = (
+            true_positive / (true_positive + false_positive)
+            if true_positive + false_positive
+            else 0.0
+        )
+        recall = true_positive / support if support else 0.0
+        f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+        type_records = [
+            record for record in records if record["expected"] == expected_type
+        ]
+        per_type[expected_type] = {
+            "support": support,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "mean_confidence": statistics.fmean(
+                float(record["confidence"]) for record in type_records
+            ),
+            "review_rate": sum(
+                float(record["confidence"]) < review_threshold
+                for record in type_records
+            )
+            / support,
+        }
+        confusion[expected_type] = {}
+        for record in type_records:
+            predicted = str(record["predicted"])
+            confusion[expected_type][predicted] = (
+                confusion[expected_type].get(predicted, 0) + 1
+            )
+
+    bins: list[dict[str, Any]] = []
+    calibration_error = 0.0
+    for index in range(10):
+        lower = index / 10
+        upper = (index + 1) / 10
+        members = [
+            record
+            for record in records
+            if lower <= float(record["confidence"])
+            and (float(record["confidence"]) < upper or index == 9)
+        ]
+        mean_confidence = (
+            statistics.fmean(float(record["confidence"]) for record in members)
+            if members
+            else None
+        )
+        accuracy = (
+            sum(bool(record["correct"]) for record in members) / len(members)
+            if members
+            else None
+        )
+        gap = (
+            abs(float(mean_confidence) - float(accuracy))
+            if mean_confidence is not None and accuracy is not None
+            else None
+        )
+        if gap is not None and records:
+            calibration_error += gap * len(members) / len(records)
+        bins.append(
+            {
+                "lower": lower,
+                "upper": upper,
+                "count": len(members),
+                "mean_confidence": mean_confidence,
+                "accuracy": accuracy,
+                "gap": gap,
+            }
+        )
+
+    review_count = sum(
+        float(record["confidence"]) < review_threshold for record in records
+    )
+    auto_approved = [
+        record
+        for record in records
+        if float(record["confidence"]) >= review_threshold
+    ]
+    return {
+        "labeled_documents": len(labeled),
+        "unlabeled_documents": len(documents) - len(labeled),
+        "scored_documents": len(records),
+        "accuracy": sum(bool(record["correct"]) for record in records) / len(records)
+        if records
+        else None,
+        "macro_precision": statistics.fmean(
+            value["precision"] for value in per_type.values()
+        )
+        if per_type
+        else None,
+        "macro_recall": statistics.fmean(value["recall"] for value in per_type.values())
+        if per_type
+        else None,
+        "macro_f1": statistics.fmean(value["f1"] for value in per_type.values())
+        if per_type
+        else None,
+        "per_type": per_type,
+        "confusion_matrix": confusion,
+        "calibration": {
+            "top_label_brier_score": statistics.fmean(
+                (float(record["confidence"]) - int(bool(record["correct"]))) ** 2
+                for record in records
+            )
+            if records
+            else None,
+            "expected_calibration_error": calibration_error if records else None,
+            "bins": bins,
+        },
+        "review": {
+            "threshold": review_threshold,
+            "review_count": review_count,
+            "review_rate": review_count / len(records) if records else None,
+            "auto_approved_count": len(auto_approved),
+            "auto_approved_accuracy": sum(
+                bool(record["correct"]) for record in auto_approved
+            )
+            / len(auto_approved)
+            if auto_approved
+            else None,
+        },
+    }
+
+
 def build_live_report(
     *,
     corpus_id: str,
     documents: list[dict[str, Any]],
     rate_card: dict[str, Any] | None,
+    review_threshold: float = 0.85,
 ) -> dict[str, Any]:
+    if not 0 <= review_threshold <= 1:
+        raise ValueError("review threshold must be between 0 and 1")
     classes: dict[str, Any] = {}
     features = sorted(
         {feature for document in documents for feature in document.get("features", [])}
@@ -745,6 +992,24 @@ def build_live_report(
             "document_ids": [document["id"] for document in members],
             "metrics": _group_metrics(members),
         }
+    document_types: dict[str, Any] = {}
+    for document_type in sorted(
+        {
+            str(document["expected_document_type"])
+            for document in documents
+            if document.get("expected_document_type") is not None
+        }
+    ):
+        members = [
+            document
+            for document in documents
+            if document.get("expected_document_type") == document_type
+        ]
+        document_types[document_type] = {
+            "document_ids": [document["id"] for document in members],
+            "metrics": _group_metrics(members),
+            "review": {"ocr_blocks": _ocr_review_summary(members)},
+        }
     telemetry_records = [document["telemetry"] for document in documents]
     return {
         "schema_version": CORPUS_SCHEMA_VERSION,
@@ -754,6 +1019,11 @@ def build_live_report(
         "aggregation": "macro mean by document",
         "documents": documents,
         "classes": classes,
+        "document_types": document_types,
+        "classification": _classification_summary(
+            documents, review_threshold=review_threshold
+        ),
+        "review": {"ocr_blocks": _ocr_review_summary(documents)},
         "aggregate": {"metrics": _group_metrics(documents)},
         "telemetry": summarize_telemetry(telemetry_records, rate_card=rate_card),
         "runtime": {
@@ -832,6 +1102,7 @@ def evaluate_live_document(
     document: Document,
     *,
     telemetry: dict[str, Any],
+    classification: DocumentClassification | None = None,
     extraction_data: dict[str, Any] | None = None,
     reference_text: str | None = None,
     reference_is_markdown: bool = False,
@@ -968,24 +1239,31 @@ def evaluate_live_document(
             accepted_block_ids=[block.id for block in active_blocks],
         )
     total_blocks = len(all_blocks)
+    rejected_count = sum(
+        block.verification is VerificationState.REJECTED for block in all_blocks
+    )
+    needs_review_count = sum(
+        block.verification is VerificationState.NEEDS_REVIEW for block in all_blocks
+    )
     metrics["review_outcomes"] = {
         "block_count": total_blocks,
-        "rejection_rate": sum(
-            block.verification is VerificationState.REJECTED for block in all_blocks
-        )
-        / total_blocks
-        if total_blocks
-        else 0.0,
-        "review_rate": sum(
-            block.verification is VerificationState.NEEDS_REVIEW for block in all_blocks
-        )
-        / total_blocks
-        if total_blocks
-        else 0.0,
+        "needs_review_count": needs_review_count,
+        "rejected_count": rejected_count,
+        "review_rate": needs_review_count / total_blocks if total_blocks else 0.0,
+        "rejection_rate": rejected_count / total_blocks if total_blocks else 0.0,
     }
     return {
         "id": corpus_document.id,
         "features": corpus_document.features,
+        "expected_document_type": corpus_document.expected_document_type,
+        "classification": (
+            {
+                "predicted_type": classification.primary_type,
+                "confidence": classification.confidence,
+            }
+            if classification is not None
+            else None
+        ),
         "pages": len(document.pages),
         "metrics": metrics,
         "telemetry": telemetry,
@@ -993,13 +1271,121 @@ def evaluate_live_document(
     }
 
 
+_MISSING = object()
+
+
+def _json_pointer(document: Any, path: str) -> Any:
+    value = document
+    for raw_part in path.split("/")[1:]:
+        part = raw_part.replace("~1", "/").replace("~0", "~")
+        if isinstance(value, dict) and part in value:
+            value = value[part]
+        else:
+            return _MISSING
+    return value
+
+
+def evaluate_regression_policy(
+    report: dict[str, Any],
+    policy: RegressionPolicy | dict[str, Any],
+    *,
+    baseline: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    validated = (
+        policy
+        if isinstance(policy, RegressionPolicy)
+        else RegressionPolicy.model_validate(policy)
+    )
+    if baseline is not None:
+        for field in ("corpus_id", "evaluation_mode"):
+            if baseline.get(field) != report.get(field):
+                raise ValueError(f"baseline {field} does not match candidate report")
+        candidate_threshold = _json_pointer(
+            report, "/classification/review/threshold"
+        )
+        baseline_threshold = _json_pointer(
+            baseline, "/classification/review/threshold"
+        )
+        if candidate_threshold is _MISSING or baseline_threshold is _MISSING:
+            raise ValueError("baseline and candidate must include a review threshold")
+        if candidate_threshold != baseline_threshold:
+            raise ValueError("baseline review threshold does not match candidate report")
+
+    rule_results: list[dict[str, Any]] = []
+    violations: list[dict[str, str]] = []
+    for rule in validated.rules:
+        candidate = _json_pointer(report, rule.path)
+        baseline_value = (
+            _json_pointer(baseline, rule.path) if baseline is not None else _MISSING
+        )
+        reason: str | None = None
+        absolute_passed = True
+        regression_passed: bool | None = None
+        if candidate is _MISSING:
+            reason = "candidate metric is missing"
+        elif isinstance(candidate, bool) or not isinstance(candidate, (int, float)):
+            reason = "candidate metric is not numeric"
+        else:
+            numeric_candidate = float(candidate)
+            absolute_passed = (
+                (rule.minimum is None or numeric_candidate >= rule.minimum)
+                and (rule.maximum is None or numeric_candidate <= rule.maximum)
+            )
+            if rule.max_regression is not None:
+                if baseline_value is _MISSING:
+                    regression_passed = False
+                    reason = "baseline metric is missing"
+                elif isinstance(baseline_value, bool) or not isinstance(
+                    baseline_value, (int, float)
+                ):
+                    regression_passed = False
+                    reason = "baseline metric is not numeric"
+                elif rule.direction == "higher_is_better":
+                    regression_passed = numeric_candidate >= (
+                        float(baseline_value) - rule.max_regression
+                    )
+                else:
+                    regression_passed = numeric_candidate <= (
+                        float(baseline_value) + rule.max_regression
+                    )
+            if reason is None and not absolute_passed and regression_passed is False:
+                reason = "absolute threshold and baseline regression failed"
+            elif reason is None and not absolute_passed:
+                reason = "absolute threshold failed"
+            elif reason is None and regression_passed is False:
+                reason = "baseline regression exceeded"
+        passed = reason is None
+        result = {
+            "name": rule.name,
+            "path": rule.path,
+            "candidate": None if candidate is _MISSING else candidate,
+            "baseline": None if baseline_value is _MISSING else baseline_value,
+            "absolute_passed": absolute_passed,
+            "regression_passed": regression_passed,
+            "passed": passed,
+        }
+        if reason is not None:
+            result["reason"] = reason
+            violations.append({"rule": rule.name, "path": rule.path, "reason": reason})
+        rule_results.append(result)
+    return {
+        "passed": not violations,
+        "evaluated_rules": len(rule_results),
+        "violations": violations,
+        "rules": rule_results,
+    }
+
+
 def live_telemetry_record(
     parse_result: Any,
     *,
     latency_seconds: float,
+    analysis_result: Any | None = None,
     extraction_result: Any | None = None,
 ) -> dict[str, Any]:
     calls = list(parse_result.usage.calls if parse_result.usage is not None else [])
+    if analysis_result is not None and analysis_result.usage is not None:
+        calls.extend(analysis_result.usage.calls)
     if extraction_result is not None and extraction_result.usage is not None:
         calls.extend(extraction_result.usage.calls)
     model_usage: dict[str, dict[str, int]] = {}
@@ -1029,6 +1415,7 @@ def live_telemetry_record(
     blocks = [
         block for page in parse_result.document.pages for block in _flatten(page.blocks)
     ]
+    metadata = getattr(parse_result, "metadata", None)
     return {
         "latency_seconds": latency_seconds,
         "pages": len(parse_result.document.pages),
@@ -1057,6 +1444,13 @@ def live_telemetry_record(
             if trace.source_page_pixels
         ),
         "repair_calls": len(repair_traces),
+        "ocr_comparison_crops": getattr(metadata, "ocr_comparison_crops", 0),
+        "ocr_comparison_disagreements": getattr(
+            metadata, "ocr_comparison_disagreements", 0
+        ),
+        "ocr_comparison_unavailable": getattr(
+            metadata, "ocr_comparison_unavailable", 0
+        ),
         "repaired_targets": len(repaired_targets),
         "model_usage": model_usage,
         "retries": diagnostics.retries if diagnostics is not None else 0,

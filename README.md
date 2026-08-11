@@ -12,7 +12,7 @@ upload
   -> selected GLM-OCR or PaddleOCR-VL-1.6 layout and recognition
   -> deterministic quality analysis
   -> optional bounded Luna crop recovery
-  -> grounded Markdown, elements, JSON v4.4.0, annotated PDF
+  -> grounded Markdown, elements, JSON v4.5.0, annotated PDF
   -> optional Luna refinement, classification, TOC, extraction, and chat
 ```
 
@@ -73,9 +73,13 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
 5. Choose a file from **Document results**, then review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
 6. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, and the generated Markdown, annotated PDF, full JSON, and extraction JSON when available.
 
-Extraction is always on demand after parsing. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown imports continue to populate the flat field builder.
+The latest batch is saved locally and restored after an app restart. Sources, parse results, document analysis, failures, progress, settings, and usage survive; interrupted documents resume from the last completed parse checkpoint when **Resume batch** is selected. Use **Clear saved workspace** to remove the durable batch. Extraction, routing review, and chat remain session-only.
 
-Flat Markdown schemas support a table or bullet list (not both), with an optional H1 schema name and optional type (`string` by default):
+Extraction is always on demand after parsing. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown, CSV, and XLSX imports populate the flat field builder.
+
+Flat field schemas can be imported from Markdown, CSV, or XLSX. CSV and the first XLSX worksheet use `Field name`, `Description`, and `Type` columns. The filename becomes the schema name, and an empty type defaults to `string`.
+
+Markdown supports a table or bullet list (not both), with an optional H1 schema name and optional type (`string` by default):
 
 ```markdown
 # Invoice
@@ -91,17 +95,28 @@ Flat Markdown schemas support a table or bullet list (not both), with an optiona
 - total_amount (number): Final payable amount
 ```
 
-Supported types are `string`, `number`, `integer`, `boolean`, and `date`. Without an H1, the filename becomes the schema name.
+Supported types are `string`, `number`, `integer`, `boolean`, and `date`. Imports populate an editable draft and do not save automatically. Without a Markdown H1, the filename becomes the schema name.
 
-For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. Luna classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
+For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. Luna classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. After all segments are approved, **Download split documents** exports every segment as separate PDF, Markdown, and JSON files in a dedicated ZIP. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
 
 Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the local-OCR-owned box.
+
+## CLI batch parsing
+
+The installed package provides a synchronous batch command for explicit files or non-recursive directories:
+
+```powershell
+grounded-docparse parse input.pdf --schema invoice.json --output results
+grounded-docparse parse .\incoming --schema invoice.md --output results --overwrite
+```
+
+`--schema` is optional and applies one JSON or Markdown extraction schema to every input. Each document gets a deterministic output folder containing Markdown, annotated PDF, Full JSON, and extraction JSON when requested. The root `manifest.json` records successes and failures. Processing continues after individual failures and returns exit code `1` if any document fails. A non-empty output directory requires `--overwrite`; unrelated files are preserved.
 
 ## Outputs
 
 - Refined Markdown plus grounded `base_markdown`
-- Parse JSON v4.4.0 with normalized elements, page/block evidence, provenance, correction history, parse usage/trace, empty agentic placeholders, and recovery log
-- Full JSON v4.5.0 using the same envelope with current classification, sections, legacy extraction, custom form routing, per-form extraction, combined usage/trace, and feature statuses populated
+- Parse JSON v4.5.0 with normalized elements, page/block evidence, provenance, correction history, usage/trace, recovery log, and optional OCR-comparison evidence
+- Full JSON v4.6.0 using the same envelope with current classification, sections, legacy extraction, custom form routing, per-form extraction, combined usage/trace, and feature statuses populated
 - Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and local-OCR-owned normalized boxes
 - Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes
 - Run metadata including GLM, Luna recovery, and Luna agentic timing
@@ -165,6 +180,7 @@ full_json = render_combined_result(result, analysis)
 | [Business extraction workflow](docs/business-user-extraction-workflow.md) | Non-technical workflow for large reusable field sets |
 | [Architecture](docs/architecture.md) | Components, ownership rules, pipeline stages, and failure boundaries |
 | [Python API](docs/api.md) | Exported names, signatures, schemas, and result contracts |
+| [Private evaluation](docs/private-evaluation.md) | Confidence calibration, review-rate tracking, and regression gates |
 | [Product specification](docs/spec.md) | Required behavior, public interfaces, and non-goals |
 | [Local GLM-OCR](docs/local-glmocr.md) | Locked GLM-OCR/vLLM runtime and evaluation path |
 | [Local PaddleOCR-VL-1.6](docs/local-paddleocr-vl.md) | Isolated Paddle runtime installation, health checks, and troubleshooting |
@@ -192,5 +208,10 @@ python scripts/evaluate_corpus.py --live --glm-only \
 ```
 
 The bundled public/synthetic corpus is a regression suite, not evidence of broad production accuracy or equivalence with an external product. See [extraction quality research](docs/extraction-quality-research.md), [architecture](docs/architecture.md), and [specification](docs/spec.md).
+
+For document-type accuracy, confidence calibration, review-rate tracking, and
+absolute/baseline regression gates, use the
+[private evaluation workflow](docs/private-evaluation.md). Private calibration
+and locked holdout documents remain outside the repository.
 
 Licensed under the [MIT License](LICENSE).

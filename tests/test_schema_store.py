@@ -1,18 +1,22 @@
 from __future__ import annotations
 
 import json
+from io import BytesIO
 
 import pytest
+from openpyxl import Workbook
 from pydantic import ValidationError
 
 from grounded_docparse.models import ClassifierProfile, SchemaField, StoredSchema
 from grounded_docparse.schema_store import (
     MAX_MARKDOWN_SCHEMA_BYTES,
+    MAX_TABULAR_SCHEMA_BYTES,
     ClassifierProfileStore,
     SchemaStore,
     compile_json_schema,
     parse_markdown_classifier_profile,
     parse_markdown_schema,
+    parse_tabular_schema,
 )
 
 RAW_SCHEMA = {
@@ -141,6 +145,87 @@ def test_parse_markdown_schema_bullets_uses_filename_fallback() -> None:
     assert schema.name == "invoice-fields"
     assert [field.type for field in schema.fields] == ["string", "date"]
     assert schema.fields[0].description == "Official invoice ID: printed near the top"
+
+
+def test_parse_tabular_schema_csv() -> None:
+    schema = parse_tabular_schema(
+        b"Field name,Description,Type\n"
+        b"invoice_number,Official invoice ID,\n"
+        b"total_amount,Final amount payable,number\n",
+        "Invoice.csv",
+    )
+
+    assert schema.name == "Invoice"
+    assert [field.model_dump() for field in schema.fields] == [
+        {
+            "name": "invoice_number",
+            "description": "Official invoice ID",
+            "type": "string",
+        },
+        {
+            "name": "total_amount",
+            "description": "Final amount payable",
+            "type": "number",
+        },
+    ]
+
+
+def test_parse_tabular_schema_xlsx_uses_first_worksheet() -> None:
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.append(["Field name", "Description", "Type"])
+    worksheet.append(["invoice_number", "Official invoice ID", "string"])
+    workbook.create_sheet("Ignored").append(["not", "a", "schema"])
+    output = BytesIO()
+    workbook.save(output)
+
+    schema = parse_tabular_schema(output.getvalue(), "Invoice.xlsx")
+
+    assert schema.name == "Invoice"
+    assert [field.model_dump() for field in schema.fields] == [
+        {
+            "name": "invoice_number",
+            "description": "Official invoice ID",
+            "type": "string",
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    "content, message",
+    [
+        (b"Name,Description,Type\nname,Value,string\n", "headers"),
+        (
+            b"Field name,Description,Type\nname,First,string\nNAME,Second,string\n",
+            "unique",
+        ),
+        (
+            b"Field name,Description,Type\namount,Total,currency\n",
+            "Unsupported field type",
+        ),
+        (
+            b"Field name,Description,Type\nname,Value,string,extra\n",
+            "exactly three columns",
+        ),
+        (b"Field name,Description,Type\n", "contains no fields"),
+    ],
+)
+def test_parse_tabular_schema_rejects_invalid_rows(
+    content: bytes, message: str
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        parse_tabular_schema(content, "fields.csv")
+
+
+def test_parse_tabular_schema_rejects_invalid_file_input() -> None:
+    with pytest.raises(ValueError, match="UTF-8"):
+        parse_tabular_schema(b"\xff", "fields.csv")
+    with pytest.raises(ValueError, match=".csv or .xlsx extension"):
+        parse_tabular_schema(b"", "fields.xls")
+    with pytest.raises(ValueError, match="exceeds 1 MB"):
+        parse_tabular_schema(b"x" * (MAX_TABULAR_SCHEMA_BYTES + 1), "fields.csv")
+    with pytest.raises(ValueError, match="XLSX schema is malformed"):
+        parse_tabular_schema(b"not a workbook", "fields.xlsx")
 
 
 @pytest.mark.parametrize(

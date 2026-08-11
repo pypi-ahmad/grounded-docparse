@@ -20,6 +20,7 @@ from grounded_docparse.batch import (
     BatchDocument,
     build_batch_documents,
     build_output_archive,
+    build_split_archive,
 )
 from grounded_docparse.config import LUNA_MODEL, OcrEngine, ParserConfig
 from grounded_docparse.local_ocr import clear_glmocr_runtimes, get_glmocr_runtime
@@ -29,6 +30,7 @@ from grounded_docparse.models import (
     Element,
     FormClassificationResult,
     FormSegment,
+    ParseResult,
     RunUsage,
     SchemaField,
     StoredSchema,
@@ -45,11 +47,24 @@ from grounded_docparse.schema_store import (
     compile_json_schema,
     parse_markdown_classifier_profile,
     parse_markdown_schema,
+    parse_tabular_schema,
 )
+from grounded_docparse.workspace_store import WorkspaceStore
 
 SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
 RESULT_VERSION = "4.6.0"
 THUMBNAILS_PER_GROUP = 12
+WORKSPACE_SETTING_KEYS = (
+    "ade_mode",
+    "refine_markdown",
+    "classify_document",
+    "generate_toc",
+    "visual_recovery",
+    "ocr_engine_label",
+    "use_page_range",
+    "range_start",
+    "range_end",
+)
 ADE_PRESETS = {
     "Fast": {
         "refine_markdown": False,
@@ -66,6 +81,7 @@ STAGE_LABELS = (
     ("layout", "Layout detection"),
     ("recognize", "Region recognition"),
     ("recover", "Luna visual recovery"),
+    ("cross_check", "Local OCR cross-check"),
     ("assemble", "Base Markdown"),
     ("annotate", "Annotated PDF"),
     ("enhance", "Luna Markdown refinement"),
@@ -182,6 +198,14 @@ def switch_active_document() -> None:
     load_workspace(document_id)
 
 
+def workspace_settings() -> dict[str, object]:
+    return {
+        key: st.session_state[key]
+        for key in WORKSPACE_SETTING_KEYS
+        if key in st.session_state
+    }
+
+
 def reset_extraction_mode_state() -> None:
     st.session_state.extraction_result = None
     st.session_state.custom_classification = None
@@ -196,6 +220,7 @@ def initialize_ade_mode() -> None:
         st.session_state.setdefault(key, value)
     st.session_state.setdefault("enable_chat", False)
     st.session_state.setdefault("visual_recovery", True)
+    st.session_state.setdefault("ocr_disagreement", False)
 
 
 def apply_ade_preset() -> None:
@@ -331,6 +356,16 @@ def output_archive(entries: tuple[BatchArchiveEntry, ...]) -> bytes:
     return build_output_archive(entries)
 
 
+@st.cache_data(max_entries=8)
+def split_output_archive(
+    source: bytes,
+    source_name: str,
+    result: ParseResult,
+    classification: FormClassificationResult,
+) -> bytes:
+    return build_split_archive(source, source_name, result, classification)
+
+
 def stage_markdown(active: str | None, completed: set[str]) -> str:
     lines = []
     for key, label in STAGE_LABELS:
@@ -362,12 +397,12 @@ def select_source(element_id: str, page: int) -> None:
     st.session_state.studio_tab = "Annotated PDF"
 
 
-schema_store = SchemaStore(
-    os.getenv("DOCPARSE_STUDIO_DB_PATH", "data/document_studio.sqlite3")
+studio_database_path = os.getenv(
+    "DOCPARSE_STUDIO_DB_PATH", "data/document_studio.sqlite3"
 )
-classifier_profile_store = ClassifierProfileStore(
-    os.getenv("DOCPARSE_STUDIO_DB_PATH", "data/document_studio.sqlite3")
-)
+schema_store = SchemaStore(studio_database_path)
+classifier_profile_store = ClassifierProfileStore(studio_database_path)
+workspace_store = WorkspaceStore(studio_database_path)
 
 
 def render_schema_builder() -> StoredSchema | None:
@@ -465,10 +500,10 @@ def render_schema_builder() -> StoredSchema | None:
     imported = st.file_uploader(
         "Import schema JSON", type=["json"], key="schema_import", max_upload_size=1
     )
-    imported_markdown = st.file_uploader(
-        "Import schema Markdown",
-        type=["md"],
-        key="schema_markdown_import",
+    imported_fields = st.file_uploader(
+        "Import schema Markdown, CSV, or XLSX",
+        type=["md", "csv", "xlsx"],
+        key="schema_field_import",
         max_upload_size=1,
     )
     actions = st.columns(3)
@@ -552,25 +587,29 @@ def render_schema_builder() -> StoredSchema | None:
             st.session_state.routed_extraction_result = None
             st.toast(f"Imported schema {schema.name}")
             st.rerun()
-    if imported_markdown is not None:
-        markdown_bytes = imported_markdown.getvalue()
+    if imported_fields is not None:
+        field_bytes = imported_fields.getvalue()
         import_fingerprint = hashlib.sha256(
-            imported_markdown.name.encode("utf-8") + b"\0" + markdown_bytes
+            imported_fields.name.encode("utf-8") + b"\0" + field_bytes
         ).hexdigest()
     else:
-        markdown_bytes = None
+        field_bytes = None
         import_fingerprint = None
     if (
-        markdown_bytes is not None
-        and st.session_state.get("schema_markdown_import_fingerprint")
+        field_bytes is not None
+        and st.session_state.get("schema_field_import_fingerprint")
         != import_fingerprint
     ):
         try:
-            schema = parse_markdown_schema(markdown_bytes, imported_markdown.name)
+            schema = (
+                parse_markdown_schema(field_bytes, imported_fields.name)
+                if Path(imported_fields.name).suffix.casefold() == ".md"
+                else parse_tabular_schema(field_bytes, imported_fields.name)
+            )
         except ValueError as exc:
-            st.error(f"Markdown schema is invalid: {exc}")
+            st.error(f"Schema file is invalid: {exc}")
         else:
-            st.session_state.schema_markdown_import_fingerprint = import_fingerprint
+            st.session_state.schema_field_import_fingerprint = import_fingerprint
             st.session_state.pending_schema_draft = {
                 "name": schema.name,
                 "mode": "Field builder",
@@ -930,6 +969,46 @@ initialize_ade_mode()
 st.session_state.setdefault("session_usage", RunUsage())
 st.session_state.setdefault("batch_workspaces", {})
 st.session_state.setdefault("active_document_id", None)
+st.session_state.setdefault("workspace_upload_revision", 0)
+if not st.session_state.get("durable_workspace_loaded"):
+    try:
+        durable_workspace = workspace_store.load(result_version=RESULT_VERSION)
+    except Exception as exc:  # noqa: BLE001 - corrupt local state must not block startup
+        durable_workspace = None
+        st.session_state.workspace_restore_error = (
+            f"Could not restore the saved workspace: {type(exc).__name__}: {exc}"
+        )
+    if durable_workspace is not None:
+        for key, value in durable_workspace.settings.items():
+            if key in WORKSPACE_SETTING_KEYS:
+                st.session_state[key] = value
+        st.session_state.session_usage = durable_workspace.usage
+        st.session_state.restored_batch_documents = [
+            item.document for item in durable_workspace.documents
+        ]
+        st.session_state.batch_workspaces = {
+            item.document.id: {
+                "status": item.status,
+                "error": item.error,
+                "selection_key": item.selection_key,
+                "progress": item.progress,
+                "state": {
+                    **default_document_state(),
+                    "result": item.result,
+                    "result_source_hash": item.selection_key,
+                    "parsed_source": item.parsed_source,
+                    "agentic_analysis": item.analysis,
+                    "agentic_source_hash": item.analysis_key,
+                },
+            }
+            for item in durable_workspace.documents
+        }
+        first_document_id = durable_workspace.documents[0].document.id
+        st.session_state.active_document_id = first_document_id
+        st.session_state.batch_document_selector = first_document_id
+        load_workspace(first_document_id)
+        st.session_state.workspace_restored_at = durable_workspace.updated_at
+    st.session_state.durable_workspace_loaded = True
 try:
     default_ocr_engine = OcrEngine(
         os.getenv(
@@ -979,6 +1058,8 @@ elif not os.getenv("OPENAI_BASE_URL"):
     st.caption("Luna destination: OpenAI default endpoint")
 if preload_error is not None:
     st.error(preload_error)
+if st.session_state.get("workspace_restore_error"):
+    st.error(st.session_state.workspace_restore_error)
 
 with st.sidebar:
     st.subheader("Upload documents")
@@ -988,19 +1069,45 @@ with st.sidebar:
         accept_multiple_files=True,
         max_upload_size=250,
         label_visibility="collapsed",
+        key=f"documents-upload-{st.session_state.workspace_upload_revision}",
     )
+    restored_documents = st.session_state.get("restored_batch_documents", [])
+    if restored_documents and not uploaded_files:
+        st.caption(f"Restored {len(restored_documents)} document(s) from local storage.")
+    confirm_clear_workspace = st.checkbox(
+        "Confirm clearing saved workspace",
+        key="confirm_clear_workspace",
+        disabled=not bool(restored_documents),
+    )
+    if st.button(
+        "Clear saved workspace",
+        disabled=not (restored_documents and confirm_clear_workspace),
+        icon=":material/delete:",
+    ):
+        workspace_store.clear()
+        st.session_state.restored_batch_documents = []
+        st.session_state.batch_workspaces = {}
+        st.session_state.active_document_id = None
+        st.session_state.pop("batch_document_selector", None)
+        st.session_state.workspace_upload_revision += 1
+        reset_document_state(clear_session_usage=True)
+        st.rerun()
 
 batch_error: str | None = None
 try:
-    batch_documents = build_batch_documents(
-        [
-            (
-                item.name,
-                item.getvalue(),
-                item.type or "application/octet-stream",
-            )
-            for item in uploaded_files
-        ]
+    batch_documents = (
+        build_batch_documents(
+            [
+                (
+                    item.name,
+                    item.getvalue(),
+                    item.type or "application/octet-stream",
+                )
+                for item in uploaded_files
+            ]
+        )
+        if uploaded_files
+        else list(st.session_state.get("restored_batch_documents", []))
     )
 except ValueError as exc:
     batch_documents = []
@@ -1018,11 +1125,22 @@ if batch_error is None and document_ids != previous_ids:
                 "status": "pending",
                 "error": None,
                 "selection_key": None,
+                "progress": None,
                 "state": default_document_state(),
             },
         )
         for document in batch_documents
     }
+    try:
+        workspace_store.sync_documents(
+            batch_documents,
+            settings=workspace_settings(),
+            result_version=RESULT_VERSION,
+        )
+    except Exception as exc:  # noqa: BLE001 - persistence failure is user-facing
+        batch_error = f"Could not save the batch workspace: {type(exc).__name__}: {exc}"
+    else:
+        st.session_state.restored_batch_documents = list(batch_documents)
     previous_active_id = st.session_state.get("active_document_id")
     active_document_id = (
         previous_active_id
@@ -1146,6 +1264,14 @@ with st.sidebar:
         ),
     )
     st.toggle(
+        "Cross-check uncertain regions with alternate local OCR",
+        key="ocr_disagreement",
+        help=(
+            "Audits at most 16 uncertain crops (2 per page). Disagreements are "
+            "flagged for review; primary OCR text is never replaced."
+        ),
+    )
+    st.toggle(
         "Classify document type",
         key="classify_document",
         on_change=mark_ade_custom,
@@ -1196,17 +1322,31 @@ with st.sidebar:
                 status="pending",
                 error=None,
                 selection_key=None,
+                progress=None,
                 state=default_document_state(),
             )
+            workspace_store.save_document(document.id, status="pending")
             active_was_invalidated |= document.id == st.session_state.active_document_id
     if active_was_invalidated:
         load_workspace(st.session_state.active_document_id)
+    if batch_error is None and isinstance(st.session_state.session_usage, RunUsage):
+        workspace_store.save_workspace(
+            settings=workspace_settings(),
+            usage=st.session_state.session_usage,
+        )
 
     parse_clicked = st.button(
         (
-            "Parse document"
-            if len(batch_documents) <= 1
-            else f"Process {len(batch_documents)} documents"
+            "Resume batch"
+            if any(
+                workspace["status"] == "interrupted"
+                for workspace in st.session_state.batch_workspaces.values()
+            )
+            else (
+                "Parse document"
+                if len(batch_documents) <= 1
+                else f"Process {len(batch_documents)} documents"
+            )
         ),
         type="primary",
         icon=":material/document_scanner:",
@@ -1235,9 +1375,27 @@ with st.sidebar:
         and st.session_state.get("result_source_hash") == selection_key
         and st.session_state.get("agentic_source_hash") == expected_agentic_key
     )
+    active_workspace = (
+        st.session_state.batch_workspaces.get(active_document.id)
+        if active_document is not None
+        else None
+    )
+    retained_progress = active_workspace.get("progress") if active_workspace else None
+    retained_fraction = (
+        retained_progress.get("current", 0) / max(retained_progress.get("total", 1), 1)
+        if retained_progress
+        else 0
+    )
+    retained_text = (
+        f"Interrupted at {retained_progress.get('message', retained_progress.get('stage', 'processing'))}; resume the batch"
+        if active_workspace
+        and active_workspace.get("status") == "interrupted"
+        and retained_progress
+        else "Waiting for a document"
+    )
     progress_bar = st.progress(
-        1.0 if cached_result_matches else 0,
-        text="Parsing complete" if cached_result_matches else "Waiting for a document",
+        1.0 if cached_result_matches else retained_fraction,
+        text="Parsing complete" if cached_result_matches else retained_text,
     )
     stage_log = st.empty()
     stage_log.markdown(
@@ -1271,7 +1429,9 @@ if parse_clicked and batch_documents:
             ensure_ocr_engine(selected_ocr_engine)
             st.session_state.active_ocr_engine = selected_ocr_engine.value
             parser_config = replace(
-                ParserConfig.from_env(), ocr_engine=selected_ocr_engine
+                ParserConfig.from_env(),
+                ocr_engine=selected_ocr_engine,
+                ocr_disagreement_enabled=bool(st.session_state.ocr_disagreement),
             )
             parser = pipeline.DocumentParser(parser_config)
         else:
@@ -1305,7 +1465,22 @@ if parse_clicked and batch_documents:
                 )
                 continue
 
-            workspace.update(status="processing", error=None)
+            initial_progress = {
+                "stage": "layout",
+                "current": 0,
+                "total": 1,
+                "message": "Starting document",
+            }
+            workspace.update(
+                status="processing",
+                error=None,
+                progress=initial_progress,
+            )
+            workspace_store.save_progress(
+                document.id,
+                status="processing",
+                progress=initial_progress,
+            )
             reset_document_state()
             st.session_state.update(state)
             completed_stages: set[str] = set()
@@ -1323,6 +1498,7 @@ if parse_clicked and batch_documents:
                 item=document,
                 completed_stages=completed_stages,
                 progress_state=progress_state,
+                workspace=workspace,
             ) -> None:
                 stage = event.stage
                 if stage == "layout":
@@ -1371,6 +1547,18 @@ if parse_clicked and batch_documents:
                             f"{event.message}"
                         ),
                     )
+                    durable_progress = {
+                        "stage": stage,
+                        "current": event.current,
+                        "total": event.total,
+                        "message": event.message,
+                    }
+                    workspace["progress"] = durable_progress
+                    workspace_store.save_progress(
+                        item.id,
+                        status="processing",
+                        progress=durable_progress,
+                    )
                 stage_log.markdown(
                     stage_markdown(progress_state["active"], completed_stages)
                 )
@@ -1403,6 +1591,15 @@ if parse_clicked and batch_documents:
                     st.session_state.prepared_agentic_context = DocumentAgent.prepare(
                         result
                     )
+                    workspace["state"] = capture_document_state()
+                    workspace_store.save_document(
+                        document.id,
+                        status="processing",
+                        selection_key=expected_selection_key,
+                        parsed_source=parsed_document_source,
+                        result=result,
+                        progress=workspace.get("progress"),
+                    )
 
                 prepared_context = st.session_state.get("prepared_agentic_context")
                 if prepared_context is None:
@@ -1421,6 +1618,18 @@ if parse_clicked and batch_documents:
                         }
                     )
                     progress_state["active"] = "classify"
+                    analysis_progress = {
+                        "stage": "classify",
+                        "current": 0,
+                        "total": 1,
+                        "message": "Running Luna document analysis",
+                    }
+                    workspace["progress"] = analysis_progress
+                    workspace_store.save_progress(
+                        document.id,
+                        status="processing",
+                        progress=analysis_progress,
+                    )
                     progress_bar.progress(
                         (document_index - 0.03) / total_documents,
                         text=(
@@ -1445,7 +1654,27 @@ if parse_clicked and batch_documents:
                     status="complete",
                     error=None,
                     selection_key=expected_selection_key,
+                    progress={
+                        "stage": "complete",
+                        "current": 1,
+                        "total": 1,
+                        "message": "Parsing complete",
+                    },
                     state=capture_document_state(),
+                )
+                workspace_store.save_document(
+                    document.id,
+                    status="complete",
+                    selection_key=expected_selection_key,
+                    analysis_key=agentic_key,
+                    progress=workspace["progress"],
+                    parsed_source=st.session_state.parsed_source,
+                    result=st.session_state.result,
+                    analysis=st.session_state.agentic_analysis,
+                )
+                workspace_store.save_workspace(
+                    settings=workspace_settings(),
+                    usage=st.session_state.session_usage,
                 )
                 progress_bar.progress(
                     document_index / total_documents,
@@ -1460,7 +1689,23 @@ if parse_clicked and batch_documents:
                     status="failed",
                     error=error,
                     selection_key=expected_selection_key,
+                    progress=workspace.get("progress"),
                     state=capture_document_state(),
+                )
+                workspace_store.save_document(
+                    document.id,
+                    status="failed",
+                    error=error,
+                    selection_key=expected_selection_key,
+                    analysis_key=st.session_state.get("agentic_source_hash"),
+                    progress=workspace.get("progress"),
+                    parsed_source=st.session_state.get("parsed_source"),
+                    result=st.session_state.get("result"),
+                    analysis=st.session_state.get("agentic_analysis"),
+                )
+                workspace_store.save_workspace(
+                    settings=workspace_settings(),
+                    usage=st.session_state.session_usage,
                 )
                 progress_bar.progress(
                     document_index / total_documents,
@@ -1493,6 +1738,12 @@ if batch_documents:
                 {
                     "File": document.display_name,
                     "Status": st.session_state.batch_workspaces[document.id]["status"],
+                    "Progress": (
+                        (
+                            st.session_state.batch_workspaces[document.id].get("progress")
+                            or {}
+                        ).get("message", "")
+                    ),
                     "Error": st.session_state.batch_workspaces[document.id]["error"]
                     or "",
                 }
@@ -1598,6 +1849,26 @@ else:
                 "Recovered",
                 f"{len(recovered_element_ids):,}",
             )
+
+            if result.ocr_comparisons:
+                st.subheader("Local OCR cross-check")
+                st.dataframe(
+                    [
+                        {
+                            "Page": item.page,
+                            "Block": item.block_id or "—",
+                            "Status": item.status,
+                            "Similarity": item.similarity,
+                            "Primary engine": item.primary_engine,
+                            "Primary text": item.primary_text,
+                            "Alternate engine": item.secondary_engine,
+                            "Alternate text": item.secondary_text or "",
+                        }
+                        for item in result.ocr_comparisons
+                    ],
+                    hide_index=True,
+                    use_container_width=True,
+                )
 
             if analysis is not None and analysis.classification is not None:
                 st.subheader("Document type")
@@ -1881,6 +2152,33 @@ else:
                         and bool(eligible)
                         and routing_profile == custom_classification.profile
                     )
+                    split_ready = (
+                        not unapproved
+                        and routing_profile == custom_classification.profile
+                    )
+                    if split_ready:
+                        try:
+                            split_archive = split_output_archive(
+                                parsed_source,
+                                upload.name,
+                                result,
+                                custom_classification,
+                            )
+                        except Exception as exc:  # noqa: BLE001 - isolated export error
+                            st.error(
+                                "Could not build split ZIP: "
+                                f"{type(exc).__name__}: {exc}"
+                            )
+                        else:
+                            st.download_button(
+                                "Download split documents",
+                                data=split_archive,
+                                file_name=f"{stem}.segments.zip",
+                                mime="application/zip",
+                                icon=":material/folder_zip:",
+                                on_click="ignore",
+                                key="download-split-documents",
+                            )
                     if st.button(
                         "Extract eligible forms",
                         type="primary",

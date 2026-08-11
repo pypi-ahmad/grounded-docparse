@@ -1,0 +1,548 @@
+
+=== DIRECTORY TREE (max depth 3, source files only) ===
+.claude
+.claude\settings.local.json
+.code-review-graph
+.code-review-graph\.gitignore
+.code-review-graph\graph.db
+.codegraph
+.codegraph\.gitignore
+.codegraph\codegraph.db
+.codegraph\codegraph.db-shm
+.codegraph\codegraph.db-wal
+.codegraph\daemon.log
+.codegraph\daemon.pid
+.codex
+.codex\better-harness
+.codex\better-harness\20260804-normal
+.codex\better-harness\20260804-normal\findings.json
+.codex\better-harness\20260804-normal\report.html
+.codex\better-harness\20260804-normal\report.md
+.codex\better-harness\run-20260805-0545
+.codex\better-harness\run-20260805-0545\findings.json
+.codex\better-harness\run-20260805-0545\report.html
+.codex\better-harness\run-20260805-0545\report.md
+.docparse
+.docparse\artifacts
+.docparse\artifacts\jobs
+.docparse\artifacts\jobs\job-59b93fb2f40c4b9ca56c35fb79e36cc9
+.docparse\artifacts\jobs\job-de937429e8444763a4ea8f8f19c7371a
+.docparse\glmocr-install.log
+.docparse\jobs.db
+.docparse\jobs.db-shm
+.docparse\jobs.db-wal
+.docparse\research-pdf
+.docparse\research-pdf\amerigroup-p03-200dpi.png
+.docparse\research-pdf\amerigroup-p04-200dpi.png
+.docparse\research-pdf\amerigroup-p08-200dpi.png
+.docparse\research-pdf\amerigroup-p11-200dpi.png
+.docparse\research-pdf\amerigroup-p32-200dpi.png
+.docparse\research-pdf\contact-sheet.png
+.docparse\research-pdf\water-p04-200dpi.png
+.docparse\research-pdf\water-p05-200dpi.png
+.docparse\research-pdf\water-p06-200dpi.png
+.docparse\run-f8o1z37z
+.docparse\run-f8o1z37z\pages
+.docparse\run-f8o1z37z\pages\page-0001.png
+.docparse\run-f8o1z37z\source.pdf
+.docparse\venv-wsl-incomplete
+.docparse\venv-wsl-incomplete\lib64
+.docparse\venv-wsl-incomplete\pyvenv.cfg
+.env
+.env.example
+.gitattributes
+.github
+.github\ISSUE_TEMPLATE
+.github\ISSUE_TEMPLATE\bug_report.md
+.github\ISSUE_TEMPLATE\feature_request.md
+.gitignore
+.playwright-cli
+.playwright-cli\console-2026-07-26T13-33-48-443Z.log
+.playwright-cli\console-2026-07-26T13-34-06-552Z.log
+.playwright-cli\console-2026-07-26T13-34-36-035Z.log
+.playwright-cli\console-2026-07-26T13-38-28-661Z.log
+.playwright-cli\console-2026-07-26T13-38-30-453Z.log
+.playwright-cli\console-2026-07-26T13-39-04-235Z.log
+.playwright-cli\console-2026-07-26T13-39-04-273Z.log
+.playwright-cli\console-2026-07-26T13-39-04-274Z.log
+.playwright-cli\console-2026-07-30T10-29-22-564Z.log
+.playwright-cli\console-2026-07-30T10-33-27-576Z.log
+.playwright-cli\page-2026-07-26T13-33-53-921Z.yml
+.playwright-cli\page-2026-07-26T13-34-13-763Z.yml
+.playwright-cli\page-2026-07-26T13-34-37-039Z.yml
+.playwright-cli\page-2026-07-26T13-37-13-902Z.yml
+.playwright-cli\page-2026-07-26T13-39-11-590Z.yml
+.playwright-cli\page-2026-07-26T13-40-32-435Z.yml
+.playwright-cli\page-2026-07-30T10-29-23-057Z.yml
+.playwright-cli\page-2026-07-30T10-29-37-841Z.yml
+.playwright-cli\page-2026-07-30T10-30-16-273Z.yml
+.playwright-cli\page-2026-07-30T10-31-44-300Z.yml
+.playwright-cli\page-2026-07-30T10-32-06-830Z.yml
+.playwright-cli\page-2026-07-30T10-32-20-715Z.png
+.playwright-cli\page-2026-07-30T10-32-27-862Z.yml
+.playwright-cli\page-2026-07-30T10-32-29-714Z.png
+.playwright-cli\page-2026-07-30T10-33-29-439Z.yml
+.playwright-cli\page-2026-07-30T10-33-47-212Z.yml
+.playwright-cli\page-2026-07-30T10-34-45-085Z.yml
+.playwright-cli\page-2026-07-30T10-35-43-441Z.yml
+.pytest_cache
+.pytest_cache\.gitignore
+.pytest_cache\CACHEDIR.TAG
+.pytest_cache\README.md
+.pytest_cache\v
+.pytest_cache\v\cache
+.pytest_cache\v\cache\lastfailed
+.pytest_cache\v\cache\nodeids
+.remember
+.remember\.gitignore
+.remember\archive.md
+.remember\logs
+.remember\logs\autonomous
+.remember\logs\autonomous\save-214913.log
+.remember\logs\autonomous\save-215121.log
+.remember\logs\autonomous\save-215440.log
+.remember\logs\autonomous\save-215859.log
+.remember\logs\autonomous\save-223522.log
+.remember\logs\autonomous\save-224218.log
+.remember\logs\autonomous\save-224709.log
+.remember\logs\hook-errors.log
+.remember\logs\memory-2026-07-27.log
+.remember\logs\memory-2026-07-28.log
+.remember\logs\memory-2026-07-29.log
+.remember\logs\memory-2026-07-30.log
+.remember\now.md
+.remember\recent.md
+.remember\remember.md
+.remember\tmp
+.remember\tmp\capture-alive
+.remember\tmp\capture-alive.d
+.remember\tmp\capture-alive.d\6867a91a-e335-4495-a878-57855eeb5f67
+.remember\tmp\capture-gap-reported
+.remember\tmp\last-ndc.ts
+.remember\tmp\last-save-ts
+.remember\tmp\last-save.json
+.remember\tmp\now-day
+.remember\tmp\post-tool-ran
+.remember\tmp\save-session.pid
+.remember\today-2026-07-27.done.md
+.remember\today-2026-07-28.done.md
+.remember\today-2026-07-28.md
+.ruff_cache
+.ruff_cache\.gitignore
+.ruff_cache\0.16.0
+.ruff_cache\0.16.0\10310167753961080741
+.ruff_cache\0.16.0\10916080280439826718
+.ruff_cache\0.16.0\12168072595730179402
+.ruff_cache\0.16.0\13401616150440792177
+.ruff_cache\0.16.0\13851053786316458198
+.ruff_cache\0.16.0\14804610322486825852
+.ruff_cache\0.16.0\15373246664623062951
+.ruff_cache\0.16.0\1555340755195345501
+.ruff_cache\0.16.0\173789284842497990
+.ruff_cache\0.16.0\17849332150909051599
+.ruff_cache\0.16.0\2635997073008282123
+.ruff_cache\0.16.0\3775709180966438813
+.ruff_cache\0.16.0\3813906764548925663
+.ruff_cache\0.16.0\6258333173213203131
+.ruff_cache\0.16.0\8297817809667165185
+.ruff_cache\0.16.1
+.ruff_cache\0.16.1\12302484236572376444
+.ruff_cache\0.16.1\13401616150440792177
+.ruff_cache\0.16.1\13851053786316458198
+.ruff_cache\0.16.1\2635997073008282123
+.ruff_cache\0.16.1\6258333173213203131
+.ruff_cache\0.16.1\6772055705993051906
+.ruff_cache\0.16.1\7606441889573816701
+.ruff_cache\0.16.1\7900920437450366725
+.ruff_cache\0.16.1\821078419300307793
+.ruff_cache\0.16.1\8297817809667165185
+.ruff_cache\CACHEDIR.TAG
+.runtime
+.runtime\active-ocr-engine
+.runtime\amerigroup-page1.eval.json
+.runtime\amerigroup-pages1-5.eval.json
+.runtime\eval-amerigroup
+.runtime\eval-amerigroup\checkboxes.md
+.runtime\eval-amerigroup\checkboxes.parse.json
+.runtime\eval-amerigroup\checkboxes.run.json
+.runtime\eval-amerigroup\cross-page-table.md
+.runtime\eval-amerigroup\cross-page-table.parse.json
+.runtime\eval-amerigroup\cross-page-table.run.json
+.runtime\eval-amerigroup\degraded-scan.md
+.runtime\eval-amerigroup\degraded-scan.parse.json
+.runtime\eval-amerigroup\degraded-scan.run.json
+.runtime\eval-amerigroup\figure-chart.md
+.runtime\eval-amerigroup\figure-chart.parse.json
+.runtime\eval-amerigroup\figure-chart.run.json
+.runtime\eval-amerigroup\form.md
+.runtime\eval-amerigroup\form.parse.json
+.runtime\eval-amerigroup\form.run.json
+.runtime\eval-amerigroup\lists.md
+.runtime\eval-amerigroup\lists.parse.json
+.runtime\eval-amerigroup\lists.run.json
+.runtime\eval-amerigroup\multi-column.md
+.runtime\eval-amerigroup\multi-column.parse.json
+.runtime\eval-amerigroup\multi-column.run.json
+.runtime\eval-amerigroup\native-text.md
+.runtime\eval-amerigroup\native-text.parse.json
+.runtime\eval-amerigroup\native-text.run.json
+.runtime\eval-amerigroup\public-water-mass-mailing.md
+.runtime\eval-amerigroup\public-water-mass-mailing.parse.json
+.runtime\eval-amerigroup\public-water-mass-mailing.run.json
+.runtime\eval-amerigroup\synthetic-medical-fax.md
+.runtime\eval-amerigroup\synthetic-medical-fax.parse.json
+.runtime\eval-amerigroup\synthetic-medical-fax.run.json
+.runtime\eval-amerigroup\synthetic-report.md
+.runtime\eval-amerigroup\synthetic-report.parse.json
+.runtime\eval-amerigroup\synthetic-report.run.json
+.runtime\eval-amerigroup\tables.md
+.runtime\eval-amerigroup\tables.parse.json
+.runtime\eval-amerigroup\tables.run.json
+.runtime\eval-amerigroup\unicode-identifiers.md
+.runtime\eval-amerigroup\unicode-identifiers.parse.json
+
+=== STACK DETECTION (manifest files) ===
+
+--- pyproject.toml ---
+[project]
+name = "grounded-docparse"
+version = "0.5.0"
+description = "Grounded agentic document parser for structured Markdown and JSON"
+readme = "README.md"
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "nh3>=0.3.6,<0.4",
+    "openai>=2.0",
+    "pillow>=11.0",
+    "pydantic>=2.10",
+    "pymupdf>=1.25",
+    "streamlit[pdf]>=1.60,<2",
+]
+
+[project.optional-dependencies]
+local-ocr = [
+    "glmocr[selfhosted]==0.1.5; sys_platform == 'linux'",
+    "torch==2.10.0; sys_platform == 'linux'",
+    "torchvision==0.25.0; sys_platform == 'linux'",
+    "transformers>=5.3,<6; sys_platform == 'linux'",
+    "vllm==0.19.1; sys_platform == 'linux'",
+]
+local-ocr-cpu = [
+    "glmocr[selfhosted]==0.1.5; sys_platform == 'linux'",
+    "torch==2.10.0; sys_platform == 'linux'",
+    "torchvision==0.25.0; sys_platform == 'linux'",
+    "transformers>=5.3,<6; sys_platform == 'linux'",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv]
+conflicts = [[{ extra = "local-ocr" }, { extra = "local-ocr-cpu" }]]
+
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu128", extra = "local-ocr" },
+    { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+]
+torchvision = [
+    { index = "pytorch-cu128", extra = "local-ocr" },
+    { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pyyaml>=6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/grounded_docparse"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+--- uv.lock ---
+version = 1
+revision = 3
+requires-python = ">=3.12, <3.15"
+resolution-markers = [
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform == 'emscripten' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform == 'emscripten' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform == 'darwin' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform == 'darwin' and extra != 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version == '3.13.*' and sys_platform == 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.13' and sys_platform == 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version == '3.13.*' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.13' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform == 'emscripten' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version >= '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform == 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform == 'emscripten' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+    "python_full_version < '3.14' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-17-grounded-docparse-local-ocr' and extra != 'extra-17-grounded-docparse-local-ocr-cpu'",
+]
+conflicts = [[
+    { package = "grounded-docparse", extra = "local-ocr" },
+    { package = "grounded-docparse", extra = "local-ocr-cpu" },
+]]
+
+[[package]]
+name = "accelerate"
+version = "1.14.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "huggingface-hub", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "numpy", version = "2.5.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "packaging", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "psutil", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "pyyaml", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "safetensors", marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "torch", version = "2.10.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'darwin' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'emscripten' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu') or (sys_platform == 'win32' and extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+    { name = "torch", version = "2.10.0+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" }, marker = "(sys_platform != 'win32' and extra == 'extra-17-grounded-docparse-local-ocr') or (extra == 'extra-17-grounded-docparse-local-ocr' and extra == 'extra-17-grounded-docparse-local-ocr-cpu')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/75/94cd5d389649578aca399e5aa822637eec18319a1dadc400ffe2f9a7493f/accelerate-1.14.0.tar.gz", hash = "sha256:41b9c4377a54e0b460a959b0defa1b736e4ca0a2373252d9a539964c2afe3c8d", size = 412167, upload-time = "2026-06-11T13:45:52.326Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/db/253133d7e7cb40d3af384bb2f5c0b4a2b7fdcffbc95c688cc67a20a3c103/accelerate-1.14.0-py3-none-any.whl", hash = "sha256:e94390c2863b873be18f623f9df48a0d8fe5eff13ea7f1a00092b0a7904888c6", size = 389246, upload-time = "2026-06-11T13:45:50.477Z" },
+]
+
+[[package]]
+name = "aiohappyeyeballs"
+version = "2.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/f4/eec0465c2f67b2664688d0240b3212d5196fd89e741df67ddb81f8d35658/aiohappyeyeballs-2.7.1.tar.gz", hash = "sha256:065665c041c42a5938ed220bdcd7230f22527fbec085e1853d2402c8a3615d9d", size = 24757, upload-time = "2026-07-01T17:11:55.501Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/43/1947f06babed6b3f1d7f38b0c767f52df66bfb2bc10b468c4a7de9eceff2/aiohappyeyeballs-2.7.1-py3-none-any.whl", hash = "sha256:9243213661e29250eb41368e5daa826fc017156c3b8a11440826b2e3ed376472", size = 15038, upload-time = "2026-07-01T17:11:54.055Z" },
+]
+
+[[package]]
+name = "aiohttp"
+version = "3.14.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohappyeyeballs", marker = "sys_platform != 'win32'" },
+    { name = "aiosignal", marker = "sys_platform != 'win32'" },
+    { name = "attrs", marker = "sys_platform != 'win32'" },
+    { name = "frozenlist", marker = "sys_platform != 'win32'" },
+    { name = "multidict", marker = "sys_platform != 'win32'" },
+    { name = "propcache", marker = "sys_platform != 'win32'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13' and sys_platform != 'win32'" },
+    { name = "yarl", marker = "sys_platform != 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/58/d9/22ce5786ac0c1653ae8b6c23bded02c1686d11f0dbb45b31ce128e0df985/aiohttp-3.14.3.tar.gz", hash = "sha256:9491196535a88924a60afd5b5f434b5b203b6cc616250878dbdb223a8f7844bc", size = 7971213, upload-time = "2026-07-23T01:57:27.037Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/18/d4/eb96299230e20acf2efae207cb8d69051f1f68e357e5ea5e479bf6fb097a/aiohttp-3.14.3-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:39aded8c7f3b935b54aab1d8d73c70ec0ee2d3ec3b943e0e86611bc150ba47f5", size = 754690, upload-time = "2026-07-23T01:53:47.332Z" },
+    { url = "https://files.pythonhosted.org/packages/88/11/e7a70a209eb9a067c0d3212b518a0134e3484f5178c7533878b6b514d469/aiohttp-3.14.3-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:5bcb6ff3fdab1258a192679ff1a05d44f59626430aa05cd1a9d2447423599228", size = 509484, upload-time = "2026-07-23T01:53:51.159Z" },
+    { url = "https://files.pythonhosted.org/packages/30/07/4bbc222cc8dbe31d4c3e8a5baad2286e4d42026ac0c570027b89afce6344/aiohttp-3.14.3-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:617105e2c3018ee38d0c8ce5ee3c84f621a6d8b9f723202aacaff28449ca91ee", size = 511949, upload-time = "2026-07-23T01:53:55.083Z" },
+    { url = "https://files.pythonhosted.org/packages/54/b9/42e74c46b7b7c794b995bbc1f573fb48950c38b19d8600c62a6804ee2d67/aiohttp-3.14.3-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:f631fe87a6f30df5fbe6d79640b25e4cffb38c31c7fb6f10871517b84b0f8c1a", size = 1765282, upload-time = "2026-07-23T01:53:59.662Z" },
+    { url = "https://files.pythonhosted.org/packages/6b/ed/62bc4d74363ad346d518e0720363a949f63e2e23439a79eb5813d4d29bb3/aiohttp-3.14.3-cp312-cp312-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:a94dbaae5ae27bd849c93570669bff91e0510f33a80805738e3de72a7be0447b", size = 1741511, upload-time = "2026-07-23T01:54:04.063Z" },
+
+[TRUNCATED] Showing first 80 of 4990 lines.
+
+=== ENTRY POINTS ===
+No common entry points found. Check 'main' or 'scripts.start' in manifest files above.
+
+=== LINTING AND FORMATTING CONFIG ===
+No linting or formatting config files found in project root.
+
+=== ENVIRONMENT VARIABLE TEMPLATES ===
+--- .env.example ---
+OPENAI_API_KEY=
+# Optional; omit to use the OpenAI default endpoint.
+OPENAI_BASE_URL=
+DOCPARSE_LUNA_MAX_OUTPUT_TOKENS=128000
+DOCPARSE_LOCAL_OCR_ENABLED=true
+DOCPARSE_GLMOCR_CONFIG_PATH=config/glmocr.yaml
+DOCPARSE_GLMOCR_LAYOUT_DEVICE=cuda:0
+DOCPARSE_PRELOAD_LOCAL_OCR=false
+GLMOCR_MAX_MODEL_LEN=32768
+GLMOCR_GPU_MEMORY_UTILIZATION=0.85
+GLMOCR_PERFORMANCE_MODE=throughput
+GLMOCR_MM_PROCESSOR_CACHE_GB=1
+GLMOCR_SDK_MAX_WORKERS=16
+DOCPARSE_STUDIO_DB_PATH=data/document_studio.sqlite3
+DOCPARSE_RENDER_DPI=200
+DOCPARSE_CROP_DPI=450
+DOCPARSE_CROP_PADDING=0.1
+DOCPARSE_MAX_UPLOAD_BYTES=262144000
+DOCPARSE_MAX_PAGES=500
+DOCPARSE_MAX_PAGE_PIXELS=20000000
+DOCPARSE_PAGE_BATCH_SIZE=16
+DOCPARSE_MAX_PAGE_CONCURRENCY=8
+DOCPARSE_PROVIDER_CONCURRENCY=8
+DOCPARSE_MAX_VISUAL_RECOVERY_CROPS=8
+# Legacy compatibility; the strict app path does not use full-page fallback.
+DOCPARSE_FULL_PAGE_FALLBACK_FRACTION=0.1
+DOCPARSE_PROVIDER_RETRY_ATTEMPTS=3
+DOCPARSE_PROVIDER_RETRY_BASE_SECONDS=0.5
+DOCPARSE_PROVIDER_RETRY_CAP_SECONDS=8.0
+DOCPARSE_PROVIDER_COOLDOWN_SECONDS=1.0
+DOCPARSE_PROVIDER_SUCCESS_WINDOW=10
+
+
+=== TODO / FIXME / HACK (production code only, test dirs excluded) ===
+.venv-wsl\lib\python3.12\site-packages\pynvml.py:1413: #     # TODO handle the error
+.venv-wsl\lib\python3.12\site-packages\typing_extensions.py:3457: # TODO: Use inspect.VALUE here, and make the annotations lazily evaluated
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:455: # TODO: Remove after deprecating tp_plugin
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:517: # TODO: S1ro - this is probably gonna be a problem with other fp8 backends too
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:779: # TODO: S1ro - this is a temporary solution until we figure out why `save_safe_file` is slow when not all processes
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:1470: # TODO: Look at enabling native TP training directly with a proper config
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:1807: # TODO: Look at enabling native TP training directly with a proper config
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:1884: # TODO: Look at enabling native TP training directly with a proper config
+.venv-wsl\lib\python3.12\site-packages\accelerate\accelerator.py:2937: # TODO: this unscales all optimizers where we should only unscale the one where parameters are.
+.venv-wsl\lib\python3.12\site-packages\accelerate\state.py:994: # TODO: Siro - remove when axolotl fixes their side
+.venv-wsl\lib\python3.12\site-packages\accelerate\test_utils\scripts\test_distributed_data_loop.py:256: # TODO: Maybe this should be implemented as __eq__ for AcceleratorState?
+.venv-wsl\lib\python3.12\site-packages\accelerate\test_utils\scripts\external_deps\test_performance.py:238: # TODO: skip saving of the model test for TP until the feature lands
+.venv-wsl\lib\python3.12\site-packages\accelerate\utils\dataclasses.py:2123: # TODO(s1ro1): `cast_forward_inputs` for FSDP2?
+.venv-wsl\lib\python3.12\site-packages\accelerate\utils\imports.py:490: # TODO: Remove this function once stateful_dataloader is a stable feature in torchdata.
+.venv-wsl\lib\python3.12\site-packages\accelerate\utils\imports.py:515: # TODO: Rework this into `utils.deepspeed` and migrate the "core" chunks into `accelerate.deepspeed`
+.venv-wsl\lib\python3.12\site-packages\accelerate\utils\modeling.py:1994: # TODO: group all errors and raise at the end.
+.venv-wsl\lib\python3.12\site-packages\aiohttp\client_exceptions.py:386: # TODO: If we require ssl in future, this can become ssl.CertificateError
+.venv-wsl\lib\python3.12\site-packages\aiohttp\client_proto.py:137: with suppress(Exception):  # FIXME: log this somehow?
+.venv-wsl\lib\python3.12\site-packages\aiohttp\client_proto.py:213: # TODO: actual types are:
+.venv-wsl\lib\python3.12\site-packages\aiohttp\client_reqrep.py:347: # TODO: Fix session=None in tests (see ClientRequest.__init__).
+.venv-wsl\lib\python3.12\site-packages\aiohttp\client_reqrep.py:889: # FIXME: session is None in tests only, need to fix tests
+.venv-wsl\lib\python3.12\site-packages\aiohttp\compression_utils.py:28: else:  # TODO(PY314): Remove mentions of backports.zstd across codebase
+.venv-wsl\lib\python3.12\site-packages\aiohttp\formdata.py:170: # FIXME cgi.FieldStorage doesn't likes body parts with
+.venv-wsl\lib\python3.12\site-packages\aiohttp\helpers.py:284: # TODO(PY311): username = login or account
+.venv-wsl\lib\python3.12\site-packages\aiohttp\helpers.py:290: # TODO(PY311): Remove this, as password will be empty string
+.venv-wsl\lib\python3.12\site-packages\aiohttp\streams.py:283: # TODO: size is ignored, remove the param later
+.venv-wsl\lib\python3.12\site-packages\aiohttp\streams.py:444: # TODO: should be `if` instead of `while`
+.venv-wsl\lib\python3.12\site-packages\aiohttp\streams.py:456: # TODO: should be `if` instead of `while`
+.venv-wsl\lib\python3.12\site-packages\aiohttp\streams.py:633: # TODO add async def readuntil
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web.py:309: **kwargs: Any,  # TODO(PY311): Use Unpack
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_exceptions.py:213: # FIXME: this should include a date or etag header
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_response.py:59: # TODO(py311): Convert to StrEnum for wider use
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_response.py:292: # TODO: do we need domain/path here?
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_urldispatcher.py:387: # TODO: implement all abstract methods
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_urldispatcher.py:526: # TODO: impl missing abstract methods
+.venv-wsl\lib\python3.12\site-packages\aiohttp\web_urldispatcher.py:600: # TODO cache file content
+.venv-wsl\lib\python3.12\site-packages\altair\theme.py:236: # HACK: See for `LiteralString` requirement in `name`
+.venv-wsl\lib\python3.12\site-packages\altair\datasets\_reader.py:244: # TODO: (Multiple)
+.venv-wsl\lib\python3.12\site-packages\altair\datasets\_reader.py:465: # FIXME: The order this is defined in makes splitting the module complicated
+.venv-wsl\lib\python3.12\site-packages\altair\datasets\_reader.py:471: FIXME: Works, but defining these in mixed shape functions seems off.
+.venv-wsl\lib\python3.12\site-packages\altair\utils\schemapi.py:492: # TODO @dangotbanned: Review after available (https://github.com/narwhals-dev/narwhals/pull/2110)
+.venv-wsl\lib\python3.12\site-packages\altair\utils\schemapi.py:1607: # TODO: handle schemas for additionalProperties/patternProperties
+.venv-wsl\lib\python3.12\site-packages\altair\utils\schemapi.py:1666: # TODO: use schema to validate
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\api.py:519: # TODO: Are there any special cases to consider for __getitem__?
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\api.py:1965: # TODO: update the docstring
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\api.py:2121: # TODO: following entries are added after validation. Should they be validated?
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\api.py:2523: # TODO: Can this be removed
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\api.py:4818: # TODO: check for conflicting interaction
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\data.py:26: # FIXME: `to_csv` cannot accept all `DataType` https://github.com/vega/altair/issues/3441
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\display.py:161: # FIXME: Caused by upstream # type: ignore[unreachable]
+.venv-wsl\lib\python3.12\site-packages\altair\vegalite\v6\theme.py:29: # HACK: See for `LiteralString` requirement in `name`
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:112: # TODO: make base page type vars covariant
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:215: # TODO: do we have to preprocess params here?
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:602: # TODO: report this error to httpx
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:618: # TODO: type ignore is required as stringify_items is well typed but we can't be
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:1714: # TODO(someday): support non asyncio runtimes here
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:2525: # TODO: untested
+.venv-wsl\lib\python3.12\site-packages\anthropic\_base_client.py:2532: # TODO: untested
+.venv-wsl\lib\python3.12\site-packages\anthropic\_compat.py:73: # TODO: provide an error message here?
+.venv-wsl\lib\python3.12\site-packages\anthropic\_models.py:512: # TODO
+
+=== GIT RECENT COMMITS (last 20) ===
+2c95dc4 docs: synchronize guides with PaddleOCR workflow
+671c4c0 feat: add PaddleOCR-VL 1.6 integration
+a548361 feat: improve OCR recovery and Luna observability
+5479b71 feat: add Windows installer with CPU fallback
+ff77e16 docs: remove internal video-script page and untrack contest/demo decks
+baae46b docs: add agentic comparison pages and presentation deck
+8e630e9 docs: publish searchable multipage documentation site
+eee7827 docs: add end-to-end user and deployment guides
+2780766 feat: route mixed forms to selected extraction schemas
+24154e6 fix: harden local security boundaries
+6076840 chore: ignore security reports
+ed1c42d feat: release grounded GLM-OCR workflow v0.4.0
+dcdaf88 feat: add grounded document intelligence pipeline
+1fb8ed9 feat: ship GLM-OCR document studio
+f65df45 Add shared provider runtime budgets
+c5a85d6 Rebase emitted confidence spans
+bc215e5 Add confidence evidence spans
+c06b3fa Merge fix/document-reliability into main
+290b759 fix: update requests dependency for security
+89c2cd5 docs: refresh security and ownership artifacts
+
+=== HIGH-CHURN FILES (last 90 days, top 20) ===
+  23 src/grounded_docparse/pipeline.py
+  23 src/grounded_docparse/render.py
+  17 src/grounded_docparse/models.py
+  17 tests/test_simple_pipeline.py
+  14 README.md
+  14 src/grounded_docparse/gateways.py
+  14 tests/test_openai_vision_gateway.py
+  14 src/grounded_docparse/extraction.py
+  14 tests/test_agentic_contract.py
+  13 CHANGELOG.md
+  13 docs/architecture.md
+  13 streamlit_app.py
+  13 tests/test_agentic_extraction.py
+  12 docs/spec.md
+  11 .gitignore
+  11 src/grounded_docparse/quality.py
+  11 tests/test_quality.py
+   9 docs/how-it-works.md
+   9 src/grounded_docparse/config.py
+   9 uv.lock
+
+=== MONOREPO SIGNALS ===
+No monorepo signals detected.
+
+=== CODE METRICS ===
+Total files scanned: 48507
+Total lines of code: 10327039
+
+Files by language:
+  Python: 20166
+  Other: 16292
+  C Header: 11330
+  JavaScript: 581
+  C++: 79
+  C: 58
+  TypeScript: 1
+
+Top 10 largest files:
+.venv-wsl\lib\python3.12\site-packages\nvidia\cublas\lib\libcublasLt.so.12: 734152.1KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cudnn\lib\libcudnn_engines_precompiled.so.9: 534553.8KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cusparselt\lib\libcusparseLt.so.0: 441387.2KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\nccl\lib\libnccl.so.2: 419558.9KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cusparse\lib\libcusparse.so.12: 378896.7KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cudnn\lib\libcudnn_adv.so.9: 278541.6KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cufft\lib\libcufft.so.11: 272387.7KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cusolver\lib\libcusolver.so.11: 237601.4KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\cusolver\lib\libcusolverMg.so.11: 157708.6KB
+.venv-wsl\lib\python3.12\site-packages\nvidia\nvshmem\lib\libnvshmem_host.so.3: 156564.7KB
+
+=== CI/CD PIPELINES ===
+No CI/CD pipelines detected.
+
+=== CONTAINERS & ORCHESTRATION ===
+No containerization configs detected.
+
+=== SECURITY & COMPLIANCE ===
+Security: SECURITY.md
+
+=== PERFORMANCE & TESTING ===
+No performance testing configs detected.
+
+=== SCAN COMPLETE ===

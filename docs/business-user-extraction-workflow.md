@@ -122,7 +122,7 @@ Add the approved field names, descriptions, and types. For a large schema:
 - Give similar fields descriptions that clearly state the expected person, organization, date, amount, or section.
 - Avoid asking one field to represent several different concepts.
 
-For the first large schema, the fields must be entered and reviewed in the schema builder unless an authorized exported schema JSON file already exists. The current app does not bulk-import a spreadsheet or CSV field list. Once a schema is complete, save it so this setup is not repeated for every document.
+For the first large schema, import an approved CSV or XLSX field list, then review it in the schema builder. Use the columns **Field name**, **Description**, and **Type** in that order. XLSX imports read the first worksheet. Once the schema is complete, save it so this setup is not repeated for every document.
 
 The current UI runs one schema at a time and keeps only the latest extraction result in the active session. For a field set that must be split, create stable schemas by business group—for example, member details, provider details, service lines, and financial totals. Run and download each group before starting the next one, then merge the approved outputs in the downstream business process. The repository does not perform that cross-schema merge.
 

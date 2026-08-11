@@ -95,6 +95,10 @@ class ParserConfig:
     max_page_pixels: int = 20_000_000
     luna_max_output_tokens: int = 128_000
     max_visual_recovery_crops: int = 64
+    ocr_disagreement_enabled: bool = False
+    ocr_disagreement_similarity_threshold: float = 0.90
+    max_ocr_disagreement_crops: int = 16
+    max_ocr_disagreement_crops_per_page: int = 2
     page_batch_size: int = 16
     max_page_concurrency: int = 8
     provider_concurrency: int = 8
@@ -121,6 +125,8 @@ class ParserConfig:
             "max_page_pixels",
             "luna_max_output_tokens",
             "max_visual_recovery_crops",
+            "max_ocr_disagreement_crops",
+            "max_ocr_disagreement_crops_per_page",
             "page_batch_size",
             "max_page_concurrency",
             "provider_concurrency",
@@ -131,6 +137,13 @@ class ParserConfig:
                 raise ValueError(f"{name} must be positive")
         if not 0 <= self.crop_padding <= 0.5:
             raise ValueError("crop_padding must be between 0 and 0.5")
+        if not 0 <= self.ocr_disagreement_similarity_threshold <= 1:
+            raise ValueError("ocr_disagreement_similarity_threshold must be between 0 and 1")
+        if self.max_ocr_disagreement_crops_per_page > self.max_ocr_disagreement_crops:
+            raise ValueError(
+                "max_ocr_disagreement_crops_per_page cannot exceed "
+                "max_ocr_disagreement_crops"
+            )
         if self.max_page_concurrency > self.page_batch_size:
             raise ValueError("max_page_concurrency cannot exceed page_batch_size")
         for name in (
@@ -191,6 +204,28 @@ class ParserConfig:
                 os.getenv(
                     "DOCPARSE_MAX_VISUAL_RECOVERY_CROPS",
                     str(defaults.max_visual_recovery_crops),
+                )
+            ),
+            ocr_disagreement_enabled=os.getenv(
+                "DOCPARSE_OCR_DISAGREEMENT_ENABLED", "false"
+            ).casefold()
+            not in {"0", "false", "no"},
+            ocr_disagreement_similarity_threshold=float(
+                os.getenv(
+                    "DOCPARSE_OCR_DISAGREEMENT_SIMILARITY_THRESHOLD",
+                    str(defaults.ocr_disagreement_similarity_threshold),
+                )
+            ),
+            max_ocr_disagreement_crops=int(
+                os.getenv(
+                    "DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS",
+                    str(defaults.max_ocr_disagreement_crops),
+                )
+            ),
+            max_ocr_disagreement_crops_per_page=int(
+                os.getenv(
+                    "DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS_PER_PAGE",
+                    str(defaults.max_ocr_disagreement_crops_per_page),
                 )
             ),
             page_batch_size=int(

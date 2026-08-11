@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+from io import BytesIO
 from typing import ClassVar
 
 import pymupdf
+import pytest
+from openpyxl import Workbook
 from streamlit.testing.v1 import AppTest
 
 from grounded_docparse import pipeline
 from grounded_docparse.agentic import DocumentAgent
+from grounded_docparse.batch import build_batch_documents
 from grounded_docparse.config import LUNA_MODEL
 from grounded_docparse.models import (
     AgenticAnalysis,
@@ -24,6 +28,12 @@ from grounded_docparse.models import (
 )
 from grounded_docparse.render import build_elements, render_agentic_document
 from grounded_docparse.schema_store import SchemaStore
+from grounded_docparse.workspace_store import WorkspaceStore
+
+
+@pytest.fixture(autouse=True)
+def isolated_studio_database(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("DOCPARSE_STUDIO_DB_PATH", str(tmp_path / "studio.sqlite3"))
 
 
 def test_studio_allows_glm_without_openai_environment(
@@ -317,10 +327,12 @@ def test_studio_shows_results_and_only_requested_tools(
     assert any("Define the field keys" in item.value for item in app.get("caption"))
     assert any(button.label == "Run extraction" for button in app.button) is False
 
-    markdown_uploader = next(
-        item for item in app.file_uploader if item.label == "Import schema Markdown"
+    schema_uploader = next(
+        item
+        for item in app.file_uploader
+        if item.label == "Import schema Markdown, CSV, or XLSX"
     )
-    markdown_uploader.upload(
+    schema_uploader.upload(
         "invoice.md",
         b"# Invoice\n- invoice_number: Official invoice ID",
         "text/markdown",
@@ -340,6 +352,48 @@ def test_studio_shows_results_and_only_requested_tools(
         }
     ]
     assert any(button.label == "Run extraction" for button in app.button)
+
+    schema_uploader = next(
+        item
+        for item in app.file_uploader
+        if item.label == "Import schema Markdown, CSV, or XLSX"
+    )
+    schema_uploader.upload(
+        "payments.csv",
+        (
+            b"Field name,Description,Type\n"
+            b"total_amount,Final amount payable,number\n"
+        ),
+        "text/csv",
+    )
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    assert app.session_state["schema_draft_name"] == "payments"
+    assert app.session_state["schema_draft_fields"][0]["name"] == "total_amount"
+
+    workbook = Workbook()
+    workbook.active.append(["Field name", "Description", "Type"])
+    workbook.active.append(["due_date", "Payment due date", "date"])
+    output = BytesIO()
+    workbook.save(output)
+    schema_uploader = next(
+        item
+        for item in app.file_uploader
+        if item.label == "Import schema Markdown, CSV, or XLSX"
+    )
+    schema_uploader.upload(
+        "dates.xlsx",
+        output.getvalue(),
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    app.session_state["studio_tab"] = "Extract"
+    app = app.run(timeout=20)
+    assert app.session_state["schema_draft_name"] == "dates"
+    assert app.session_state["schema_draft_fields"][0]["name"] == "due_date"
     assert SchemaStore(schema_database).list() == []
 
     SchemaStore(schema_database).save(
@@ -619,3 +673,140 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
     assert not app.exception
     assert statuses == ["complete", "complete"]
     assert parsed_names == ["good.pdf", "bad.pdf", "bad.pdf"]
+
+
+def test_completed_batch_restores_after_app_restart_without_reparsing(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    parse_calls = 0
+
+    class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
+        def parse(self, data, name, **_kwargs):
+            nonlocal parse_calls
+            parse_calls += 1
+            document = Document(
+                source_name=name,
+                source_sha256="e" * 64,
+                pages=[Page(number=1, width=612, height=792)],
+            )
+            rendered = render_agentic_document(document)
+            return ParseResult(
+                document=document,
+                markdown=rendered.markdown,
+                json=rendered.json,
+                input_tokens=0,
+                output_tokens=0,
+                annotated_pdf=data,
+            )
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
+    monkeypatch.setattr(
+        DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis()
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "notice.pdf", simple_pdf, "application/pdf"
+    ).run(timeout=20)
+    app = next(
+        button for button in app.button if button.label == "Parse document"
+    ).click().run(timeout=20)
+    assert not app.exception
+    assert parse_calls == 1
+
+    restarted = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    assert not restarted.exception
+    assert parse_calls == 1
+    assert restarted.session_state["result"].document.source_name == "notice.pdf"
+    assert restarted.session_state["batch_workspaces"][
+        restarted.session_state["active_document_id"]
+    ]["status"] == "complete"
+    assert any(
+        button.label == "Download Markdown" for button in restarted.download_button
+    )
+    assert any(
+        "Restored 1 document(s)" in item.value for item in restarted.get("caption")
+    )
+
+
+def test_interrupted_analysis_resumes_from_parse_checkpoint(
+    monkeypatch, simple_pdf: bytes, tmp_path
+) -> None:
+    database = tmp_path / "studio.sqlite3"
+    document = build_batch_documents(
+        [("notice.pdf", simple_pdf, "application/pdf")]
+    )[0]
+    parsed_document = Document(
+        source_name="notice.pdf",
+        source_sha256="f" * 64,
+        pages=[Page(number=1, width=612, height=792)],
+    )
+    rendered = render_agentic_document(parsed_document)
+    result = ParseResult(
+        document=parsed_document,
+        markdown=rendered.markdown,
+        json=rendered.json,
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=simple_pdf,
+    )
+    selection_key = (
+        f"{document.id}:all:False:True:True:glm-ocr:4.6.0"
+    )
+    store = WorkspaceStore(database)
+    store.sync_documents(
+        [document],
+        settings={
+            "ade_mode": "Fast",
+            "refine_markdown": False,
+            "classify_document": True,
+            "generate_toc": False,
+            "visual_recovery": True,
+            "ocr_engine_label": "GLM-OCR",
+        },
+        result_version="4.6.0",
+    )
+    store.save_document(
+        document.id,
+        status="processing",
+        selection_key=selection_key,
+        parsed_source=simple_pdf,
+        result=result,
+        progress={
+            "stage": "classify",
+            "current": 0,
+            "total": 1,
+            "message": "Running Luna document analysis",
+        },
+    )
+    analysis_calls = 0
+
+    class FakeParser:
+        def __init__(self, config=None):
+            assert config.ocr_engine.value == "glm-ocr"
+
+        def parse(self, *_args, **_kwargs):
+            raise AssertionError("OCR checkpoint should be reused")
+
+    def analyze(self, *args, **kwargs):
+        nonlocal analysis_calls
+        analysis_calls += 1
+        return AgenticAnalysis()
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
+    monkeypatch.setattr(DocumentAgent, "analyze", analyze)
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = next(
+        button for button in app.button if button.label == "Resume batch"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert analysis_calls == 1
+    assert app.session_state["batch_workspaces"][document.id]["status"] == "complete"

@@ -2,7 +2,7 @@
 
 ## System boundary
 
-The application is one synchronous Streamlit process plus one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. There is no HTTP application API, queue, worker service, job store, artifact store, durable/cross-session result cache, or multi-user authentication layer. Streamlit session state keeps per-document workspaces for batches of up to 20 files and reuses successful local parses when only agentic toggles change. SQLite persists reusable extraction schemas and routing profiles only.
+The application is one synchronous Streamlit process plus one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. There is no HTTP application API, queue, worker service, production job service, remote artifact store, or multi-user authentication layer. One active local batch workspace survives process restarts: SQLite stores metadata while sibling filesystem artifacts store sources and parse outputs. SQLite also persists reusable extraction schemas and routing profiles.
 
 ```text
 Browser
@@ -25,6 +25,8 @@ Browser
 | `Setup-GLM-OCR.cmd` / `Launch-*.cmd` | Windows bootstrap and engine-selecting launch entry points |
 | `streamlit_app.py` | Batch upload, engine selection, modes, progress, tabs, schema UI, chat, downloads |
 | `src/grounded_docparse/batch.py` | Upload limits, stable document identity, and batch archive records |
+| `src/grounded_docparse/cli.py` | Installed synchronous batch parsing, schema loading, manifests, and filesystem outputs |
+| `src/grounded_docparse/workspace_store.py` | Durable active-batch metadata, parse checkpoints, progress, and local artifacts |
 | `src/grounded_docparse/__init__.py` | Package-root public exports |
 | `src/grounded_docparse/config.py` | `ParserConfig`, analysis thresholds, environment parsing, fixed Luna model |
 | `src/grounded_docparse/ingest.py` | Input validation, PDF/image rasterization, region rerendering |
@@ -94,7 +96,7 @@ Markdown presentation directives may select source, heading, paragraph, list-ite
 
 Scalar extraction can run per context and merge the highest-confidence results; equal-rank conflicts are arbitrated over the implicated pages. Nested object/array schemas supported by the direct Python API use one direct extraction path and do not receive this per-context scalar merge. Every accepted field resolves to an existing block/atom. Invalid or missing evidence triggers one semantic repair; unresolved leaves become `null`/`not_found`, while on-demand agent extraction may expose a nearest cited region as `inferred`.
 
-Optional custom routing classifies grounded text/layout into contiguous form page ranges using a reusable profile. Long inputs use bounded windows with a boundary-page overlap. Invalid coverage, categories, or element citations receive one repair attempt; unresolved failures block extraction. Low-confidence or boundary-merged segments require review. Approved eligible ranges are converted to in-memory parse subsets that retain original page numbers, element IDs, and bounding boxes before their assigned schemas run sequentially.
+Optional custom routing classifies grounded text/layout into contiguous form page ranges using a reusable profile. Long inputs use bounded windows with a boundary-page overlap. Invalid coverage, categories, or element citations receive one repair attempt; unresolved failures block extraction. Low-confidence or boundary-merged segments require review. After all ranges are approved, every segment can be downloaded in a dedicated ZIP as a source-page PDF, Markdown, and canonical document JSON with a routing manifest. Approved eligible ranges are also converted to in-memory parse subsets that retain original page numbers, element IDs, and bounding boxes before their assigned schemas run sequentially.
 
 Chat sends the full prepared context when it fits. For long documents it deterministically retrieves up to 40 relevant elements plus neighbors. Only citations to known element IDs are exposed; an uncited answer receives low confidence.
 
@@ -104,10 +106,16 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 `DocumentParser.parse` returns `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log.
 
-Parse JSON remains schema version `4.4.0`. Full JSON is `4.5.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
+Parse JSON schema version is `4.5.0`. Full JSON is `4.6.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 
 Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain owned by the selected local OCR engine.
 
 ## Evaluation boundary
 
 `scripts/evaluate_corpus.py` performs opt-in live evaluation. `--glm-only` disables Luna recovery, refinement, and extraction, verifies zero Luna activity, and can write Markdown, parse JSON, and run-provenance artifacts with `--artifacts-dir`. Annotation schema v1.1 distinguishes `source_verified`, `synthetic_exact`, and `generated` references. Markdown references are scored as content after presentation syntax is removed. Generated references are diagnostics rather than primary accuracy evidence. The bundled corpus is a regression suite and does not establish equivalence with ADE, LandingAI, or another external benchmark.
+
+Labeled private manifests may add `expected_document_type`. Full live evaluation
+runs classification only for labeled documents, reports type accuracy,
+calibration, confidence-based review rates, and OCR block review rates, and can
+apply JSON regression policies with absolute and baseline-relative limits. The
+private calibration and locked holdout sets remain outside the repository.

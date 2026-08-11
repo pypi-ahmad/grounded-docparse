@@ -2,6 +2,16 @@
 
 The package requires Python 3.12–3.14. Install the locked project environment with `uv sync --locked`. Actual parsing also requires a running GLM-OCR or PaddleOCR-VL-1.6 stack described in [setup](../SETUP.md).
 
+## CLI batch command
+
+```text
+grounded-docparse parse INPUT [INPUT ...] --output DIR [--schema SCHEMA] [--overwrite]
+```
+
+Inputs may be supported document files or directories. Directory discovery is non-recursive and deterministic; duplicate resolved paths are processed once. The optional `.json` or `.md` schema applies to every document and requires `OPENAI_API_KEY`. JSON accepts either the strict extraction schema itself or an exported `StoredSchema` envelope.
+
+Each document receives a `<stem>-<sha256-prefix>` folder with Markdown, annotated PDF, Full JSON, and optional extraction JSON. `manifest.json` reports the source hash, generated files, status, failed stage, and safe error. The command continues after document failures and returns `0` for complete success, `1` for partial/total document failure, or `2` for argument and preflight errors.
+
 ## Exported names
 
 `grounded_docparse.__all__` exports:
@@ -268,11 +278,11 @@ full_json = render_combined_result(
 )
 ```
 
-The returned string is Full JSON v4.5.0 (parse JSON remains v4.4.0):
+The returned string is Full JSON v4.6.0 (parse JSON is v4.5.0):
 
 ```json
 {
-  "schema_version": "4.5.0",
+  "schema_version": "4.6.0",
   "markdown": "...",
   "base_markdown": "...",
   "document_type": null,
@@ -303,7 +313,7 @@ Extraction serialization uses schema version `1.1.0`:
 }
 ```
 
-These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for Full JSON v4.5.0, extraction v1.1.0, or routed extraction v2.0.0; the Pydantic models and named versions are authoritative.
+These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for Full JSON v4.6.0, extraction v1.1.0, or routed extraction v2.0.0; the Pydantic models and named versions are authoritative.
 
 ## Configuration and test doubles
 

@@ -11,6 +11,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+import pymupdf
+
+from .models import Document, FormClassificationResult, ParseResult
+from .render import render_agentic_document, render_annotated_pdf
+
 MAX_BATCH_FILES = 20
 MAX_BATCH_BYTES = 1024 * 1024 * 1024
 
@@ -118,6 +123,90 @@ def build_output_archive(entries: Sequence[BatchArchiveEntry]) -> bytes:
                     "error": entry.error,
                     "folder": folder,
                     "files": outputs,
+                }
+            )
+        bundle.writestr(
+            "manifest.json",
+            json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+        )
+    return output.getvalue()
+
+
+def _pdf_range(source: bytes, start_page: int, end_page: int) -> bytes:
+    with pymupdf.open(stream=source, filetype="pdf") as document:
+        output = pymupdf.open()
+        output.insert_pdf(document, from_page=start_page - 1, to_page=end_page - 1)
+        try:
+            return output.tobytes(garbage=3, deflate=True)
+        finally:
+            output.close()
+
+
+def build_split_archive(
+    source: bytes,
+    source_name: str,
+    parse_result: ParseResult,
+    classification: FormClassificationResult,
+) -> bytes:
+    segments = sorted(
+        classification.segments,
+        key=lambda segment: (segment.start_page, segment.end_page, segment.id),
+    )
+    if any(not segment.approved for segment in segments):
+        raise ValueError("all form segments must be approved before split export")
+    covered = [
+        page
+        for segment in segments
+        for page in range(segment.start_page, segment.end_page + 1)
+    ]
+    if covered != [page.number for page in parse_result.document.pages]:
+        raise ValueError("form segments must cover every parsed page exactly once")
+
+    source_pdf = render_annotated_pdf(
+        source,
+        source_name,
+        [],
+        page_count=len(parse_result.document.pages),
+        show_reading_order=False,
+    )
+    pages = {page.number: page for page in parse_result.document.pages}
+    output = io.BytesIO()
+    manifest = {
+        "version": 1,
+        "source": {
+            "name": source_name,
+            "sha256": hashlib.sha256(source).hexdigest(),
+        },
+        "segments": [],
+    }
+    with zipfile.ZipFile(output, mode="w", compression=zipfile.ZIP_DEFLATED) as bundle:
+        for index, segment in enumerate(segments, start=1):
+            document = Document(
+                source_name=parse_result.document.source_name,
+                source_sha256=parse_result.document.source_sha256,
+                pages=[
+                    pages[number].model_copy(deep=True)
+                    for number in range(segment.start_page, segment.end_page + 1)
+                ],
+            )
+            rendered = render_agentic_document(document)
+            segment_id = _safe_name(segment.id, f"form-{index:03d}").replace(" ", "_")
+            category = _safe_name(segment.category, "other").replace(" ", "_")
+            stem = (
+                f"{index:03d}-{segment_id}-{category}-pages-"
+                f"{segment.start_page:03d}-{segment.end_page:03d}"
+            )
+            files = [f"{stem}.pdf", f"{stem}.md", f"{stem}.json"]
+            bundle.writestr(
+                files[0],
+                _pdf_range(source_pdf, segment.start_page, segment.end_page),
+            )
+            bundle.writestr(files[1], rendered.markdown)
+            bundle.writestr(files[2], rendered.json)
+            manifest["segments"].append(
+                {
+                    "segment": segment.model_dump(mode="json"),
+                    "files": files,
                 }
             )
         bundle.writestr(

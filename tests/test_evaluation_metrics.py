@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pytest
 
 from grounded_docparse.benchmark import (
@@ -11,6 +13,7 @@ from grounded_docparse.benchmark import (
     evaluate_live_document,
     grounding_metrics,
     hallucination_metrics,
+    live_telemetry_record,
     reading_order_metrics,
     schema_leaf_metrics,
     semantic_text_metrics,
@@ -20,12 +23,16 @@ from grounded_docparse.benchmark import (
     table_cell_metrics,
 )
 from grounded_docparse.models import (
+    AgenticAnalysis,
+    AgentUsage,
     AtomicEvidence,
     Block,
     BoundingBox,
     Document,
+    DocumentClassification,
     NodeType,
     Page,
+    RunUsage,
     TableCell,
     TableData,
     VerificationState,
@@ -181,6 +188,65 @@ def test_live_metrics_separate_verified_and_generated_references() -> None:
         generated["metrics"]["legacy_reference_agreement"]["reference_basis"]
         == "generated"
     )
+
+
+def test_live_document_records_expected_classification_and_review_counts() -> None:
+    document = Document(
+        source_name="invoice.pdf",
+        source_sha256="a" * 64,
+        pages=[
+            Page(
+                number=1,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id="p1-b1",
+                        type=NodeType.PARAGRAPH,
+                        text="Invoice",
+                        reading_order=0,
+                        verification=VerificationState.NEEDS_REVIEW,
+                    ),
+                    Block(
+                        id="p1-b2",
+                        type=NodeType.PARAGRAPH,
+                        text="Noise",
+                        reading_order=1,
+                        verification=VerificationState.REJECTED,
+                    ),
+                ],
+            )
+        ],
+    )
+    corpus_document = CorpusDocument(
+        id="invoice",
+        source=CorpusSource(kind="external", path="invoice.pdf"),
+        features=["invoice"],
+        synthetic=False,
+        expected_document_type="Invoice",
+    )
+
+    result = evaluate_live_document(
+        corpus_document,
+        document,
+        telemetry={},
+        classification=DocumentClassification(
+            primary_type="Invoice", confidence=0.91
+        ),
+    )
+
+    assert result["expected_document_type"] == "Invoice"
+    assert result["classification"] == {
+        "predicted_type": "Invoice",
+        "confidence": 0.91,
+    }
+    assert result["metrics"]["review_outcomes"] == {
+        "block_count": 2,
+        "needs_review_count": 1,
+        "rejected_count": 1,
+        "review_rate": 0.5,
+        "rejection_rate": 0.5,
+    }
 
 
 def test_markdown_reference_scores_all_text_after_removing_presentation_syntax() -> (
@@ -403,3 +469,47 @@ def test_telemetry_cost_aggregates_luna_usage_per_page() -> None:
     assert metrics["model_calls"] == 3
     assert metrics["cost_per_page"] == pytest.approx(0.0005)
     assert metrics["cost_unavailable_reason"] is None
+
+
+def test_live_telemetry_includes_document_classification_usage() -> None:
+    document = Document(
+        source_name="fixture.pdf",
+        source_sha256="a" * 64,
+        pages=[Page(number=1, width=100, height=100)],
+    )
+    parse_result = SimpleNamespace(
+        usage=RunUsage(
+            calls=[
+                AgentUsage(
+                    agent="parser", model="local", input_tokens=10, output_tokens=2
+                )
+            ]
+        ),
+        runtime_diagnostics=None,
+        trace=[],
+        document=document,
+    )
+    analysis = AgenticAnalysis(
+        usage=RunUsage(
+            calls=[
+                AgentUsage(
+                    agent="classification",
+                    model="luna",
+                    input_tokens=20,
+                    output_tokens=4,
+                )
+            ]
+        )
+    )
+
+    telemetry = live_telemetry_record(
+        parse_result, latency_seconds=1.0, analysis_result=analysis
+    )
+
+    assert telemetry["input_tokens"] == 30
+    assert telemetry["output_tokens"] == 6
+    assert telemetry["model_usage"]["luna"] == {
+        "calls": 1,
+        "input_tokens": 20,
+        "output_tokens": 4,
+    }

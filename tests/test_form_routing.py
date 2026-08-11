@@ -263,7 +263,7 @@ def test_routed_extraction_processes_only_approved_eligible_segments(monkeypatch
             routed_extraction=routed,
         )
     )
-    assert combined["schema_version"] == "4.5.0"
+    assert combined["schema_version"] == "4.6.0"
     assert combined["custom_classification"]["profile"]["name"] == (
         "Medical fax routing"
     )

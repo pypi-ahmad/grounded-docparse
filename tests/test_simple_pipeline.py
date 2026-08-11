@@ -108,7 +108,7 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
     assert heading.children[0].section_path == ["Public notice"]
     assert "# Public notice" in result.markdown
     payload = json.loads(result.json)
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert payload["metadata"]["source_name"] == "notice.pdf"
     assert payload["metadata"]["usage"]["input_tokens"] == 23
     assert getattr(result, "input_tokens", None) == 23
