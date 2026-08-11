@@ -1,0 +1,85 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "src/grounded_docparse/ingest.py",
+      "language": "python",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/local_ocr.py",
+      "language": "python",
+      "sizeLines": 236,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_services.py",
+      "language": "python",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/page_analysis.py",
+      "language": "python",
+      "sizeLines": 861,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/pipeline.py",
+      "language": "python",
+      "sizeLines": 3140,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/grounded_docparse/ingest.py": [
+      "src/grounded_docparse/models.py"
+    ],
+    "src/grounded_docparse/local_ocr.py": [],
+    "src/grounded_docparse/ocr_disagreement.py": [],
+    "src/grounded_docparse/ocr_services.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/local_ocr.py"
+    ],
+    "src/grounded_docparse/paddle_ocr.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/ingest.py",
+      "src/grounded_docparse/local_ocr.py"
+    ],
+    "src/grounded_docparse/page_analysis.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/ingest.py",
+      "src/grounded_docparse/local_ocr.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/paddle_ocr.py"
+    ],
+    "src/grounded_docparse/pipeline.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/enhancement.py",
+      "src/grounded_docparse/gateways.py",
+      "src/grounded_docparse/ingest.py",
+      "src/grounded_docparse/local_ocr.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/ocr_disagreement.py",
+      "src/grounded_docparse/ocr_services.py",
+      "src/grounded_docparse/paddle_ocr.py",
+      "src/grounded_docparse/page_analysis.py",
+      "src/grounded_docparse/quality.py",
+      "src/grounded_docparse/render.py",
+      "src/grounded_docparse/runtime.py"
+    ]
+  }
+}

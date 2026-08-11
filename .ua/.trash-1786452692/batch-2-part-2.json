@@ -1,0 +1,252 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/gateways.py",
+      "type": "file",
+      "name": "gateways.py",
+      "filePath": "src/grounded_docparse/gateways.py",
+      "summary": "Provides the OpenAI-backed document gateway for structured multimodal requests, response validation, usage tracking, and agent operations.",
+      "tags": [
+        "gateway",
+        "openai",
+        "multimodal",
+        "provider"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/gateways.py:_is_schema_failure",
+      "type": "function",
+      "name": "_is_schema_failure",
+      "filePath": "src/grounded_docparse/gateways.py",
+      "lineRange": [
+        51,
+        53
+      ],
+      "summary": "Provides the _is_schema_failure helper used by the gateways module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/gateways.py:OpenAIDocumentGateway",
+      "type": "class",
+      "name": "OpenAIDocumentGateway",
+      "filePath": "src/grounded_docparse/gateways.py",
+      "lineRange": [
+        56,
+        901
+      ],
+      "summary": "Adapts OpenAI Responses API calls into typed document-analysis, extraction, and chat operations.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/prompts.py",
+      "type": "file",
+      "name": "prompts.py",
+      "filePath": "src/grounded_docparse/prompts.py",
+      "summary": "Centralizes security instructions that constrain document-processing prompts used by provider requests.",
+      "tags": [
+        "prompts",
+        "security",
+        "provider",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/prompts.py:secure_document_prompt",
+      "type": "function",
+      "name": "secure_document_prompt",
+      "filePath": "src/grounded_docparse/prompts.py",
+      "lineRange": [
+        15,
+        16
+      ],
+      "summary": "Provides the secure_document_prompt helper used by the prompts module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/runtime.py",
+      "type": "file",
+      "name": "runtime.py",
+      "filePath": "src/grounded_docparse/runtime.py",
+      "summary": "Manages provider concurrency, retry behavior, request budgets, and diagnostics for document-processing calls.",
+      "tags": [
+        "runtime",
+        "rate-limiting",
+        "retries",
+        "provider"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/runtime.py:BudgetExceeded",
+      "type": "class",
+      "name": "BudgetExceeded",
+      "filePath": "src/grounded_docparse/runtime.py",
+      "lineRange": [
+        20,
+        24
+      ],
+      "summary": "Signals that the provider runtime cannot allocate another budgeted fallback request.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/runtime.py:ProviderRuntime",
+      "type": "class",
+      "name": "ProviderRuntime",
+      "filePath": "src/grounded_docparse/runtime.py",
+      "lineRange": [
+        27,
+        232
+      ],
+      "summary": "Coordinates rate limits, retries, quotas, and usage diagnostics around provider requests.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "function:src/grounded_docparse/gateways.py:_is_schema_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "class:src/grounded_docparse/gateways.py:OpenAIDocumentGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "function:src/grounded_docparse/gateways.py:_is_schema_failure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "class:src/grounded_docparse/gateways.py:OpenAIDocumentGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/prompts.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/prompts.py",
+      "target": "function:src/grounded_docparse/prompts.py:secure_document_prompt",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/prompts.py",
+      "target": "function:src/grounded_docparse/prompts.py:secure_document_prompt",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "class:src/grounded_docparse/runtime.py:BudgetExceeded",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "class:src/grounded_docparse/runtime.py:ProviderRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "class:src/grounded_docparse/runtime.py:BudgetExceeded",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "class:src/grounded_docparse/runtime.py:ProviderRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

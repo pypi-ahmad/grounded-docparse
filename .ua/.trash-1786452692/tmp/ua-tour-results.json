@@ -1,0 +1,1049 @@
+{
+  "scriptCompleted": true,
+  "entryPointCandidates": [
+    {
+      "id": "file:docs-site/assets/app.js",
+      "score": 4,
+      "name": "app.js",
+      "summary": "Provides documentation-site navigation, filtering, search, reading-progress, outline, clipboard, and external-link behavior."
+    },
+    {
+      "id": "file:.gitattributes",
+      "score": 2,
+      "name": ".gitattributes",
+      "summary": "Defines repository Git attribute handling rules."
+    },
+    {
+      "id": "file:.ua/.understandignore",
+      "score": 2,
+      "name": ".understandignore",
+      "summary": "Defines paths and patterns excluded from Understand Anything codebase analysis."
+    },
+    {
+      "id": "file:docs-site/agentic-document-extraction-comparison.html",
+      "score": 2,
+      "name": "agentic-document-extraction-comparison.html",
+      "summary": "Documentation page comparing Grounded DocParse with LandingAI ADE for agentic document extraction."
+    },
+    {
+      "id": "file:docs-site/api.html",
+      "score": 2,
+      "name": "api.html",
+      "summary": "Documentation page describing the public Python API for Grounded DocParse."
+    }
+  ],
+  "fanInRanking": [
+    {
+      "id": "file:src/grounded_docparse/models.py",
+      "fanIn": 16,
+      "name": "models.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/config.py",
+      "fanIn": 10,
+      "name": "config.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/render.py",
+      "fanIn": 6,
+      "name": "render.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/ingest.py",
+      "fanIn": 5,
+      "name": "ingest.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/local_ocr.py",
+      "fanIn": 4,
+      "name": "local_ocr.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/gateways.py",
+      "fanIn": 3,
+      "name": "gateways.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/agentic.py",
+      "fanIn": 2,
+      "name": "agentic.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/extraction.py",
+      "fanIn": 2,
+      "name": "extraction.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/paddle_ocr.py",
+      "fanIn": 2,
+      "name": "paddle_ocr.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/pipeline.py",
+      "fanIn": 2,
+      "name": "pipeline.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/quality.py",
+      "fanIn": 2,
+      "name": "quality.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/runtime.py",
+      "fanIn": 2,
+      "name": "runtime.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/batch.py",
+      "fanIn": 1,
+      "name": "batch.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/enhancement.py",
+      "fanIn": 1,
+      "name": "enhancement.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_disagreement.py",
+      "fanIn": 1,
+      "name": "ocr_disagreement.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_services.py",
+      "fanIn": 1,
+      "name": "ocr_services.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/page_analysis.py",
+      "fanIn": 1,
+      "name": "page_analysis.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/prompts.py",
+      "fanIn": 1,
+      "name": "prompts.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/schema_store.py",
+      "fanIn": 1,
+      "name": "schema_store.py"
+    },
+    {
+      "id": "file:.gitattributes",
+      "fanIn": 0,
+      "name": ".gitattributes"
+    }
+  ],
+  "fanOutRanking": [
+    {
+      "id": "file:src/grounded_docparse/pipeline.py",
+      "fanOut": 13,
+      "name": "pipeline.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/__init__.py",
+      "fanOut": 6,
+      "name": "__init__.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/cli.py",
+      "fanOut": 6,
+      "name": "cli.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/agentic.py",
+      "fanOut": 5,
+      "name": "agentic.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/gateways.py",
+      "fanOut": 5,
+      "name": "gateways.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/page_analysis.py",
+      "fanOut": 5,
+      "name": "page_analysis.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/extraction.py",
+      "fanOut": 3,
+      "name": "extraction.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/paddle_ocr.py",
+      "fanOut": 3,
+      "name": "paddle_ocr.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/batch.py",
+      "fanOut": 2,
+      "name": "batch.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/enhancement.py",
+      "fanOut": 2,
+      "name": "enhancement.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_services.py",
+      "fanOut": 2,
+      "name": "ocr_services.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/quality.py",
+      "fanOut": 2,
+      "name": "quality.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/render.py",
+      "fanOut": 2,
+      "name": "render.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/runtime.py",
+      "fanOut": 2,
+      "name": "runtime.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/workspace_store.py",
+      "fanOut": 2,
+      "name": "workspace_store.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/benchmark.py",
+      "fanOut": 1,
+      "name": "benchmark.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/ingest.py",
+      "fanOut": 1,
+      "name": "ingest.py"
+    },
+    {
+      "id": "file:src/grounded_docparse/schema_store.py",
+      "fanOut": 1,
+      "name": "schema_store.py"
+    },
+    {
+      "id": "file:.gitattributes",
+      "fanOut": 0,
+      "name": ".gitattributes"
+    },
+    {
+      "id": "file:.ua/.understandignore",
+      "fanOut": 0,
+      "name": ".understandignore"
+    }
+  ],
+  "bfsTraversal": {
+    "startNode": "file:docs-site/assets/app.js",
+    "order": [
+      "file:docs-site/assets/app.js"
+    ],
+    "depthMap": {
+      "file:docs-site/assets/app.js": 0
+    },
+    "byDepth": {
+      "0": [
+        "file:docs-site/assets/app.js"
+      ]
+    }
+  },
+  "nonCodeFiles": {
+    "documentation": [],
+    "infrastructure": [],
+    "data": [],
+    "config": []
+  },
+  "clusters": [],
+  "layers": {
+    "count": 6,
+    "list": [
+      {
+        "id": "layer:core-document-processing",
+        "name": "Core Document Processing",
+        "description": "The grounded Python library that ingests, analyzes, recovers, extracts, renders, and persists structured document results.",
+        "nodeIds": [
+          "file:src/grounded_docparse/__init__.py",
+          "file:src/grounded_docparse/agentic.py",
+          "file:src/grounded_docparse/batch.py",
+          "file:src/grounded_docparse/benchmark.py",
+          "file:src/grounded_docparse/cli.py",
+          "file:src/grounded_docparse/config.py",
+          "file:src/grounded_docparse/enhancement.py",
+          "file:src/grounded_docparse/extraction.py",
+          "file:src/grounded_docparse/gateways.py",
+          "file:src/grounded_docparse/ingest.py",
+          "file:src/grounded_docparse/local_ocr.py",
+          "file:src/grounded_docparse/models.py",
+          "file:src/grounded_docparse/ocr_disagreement.py",
+          "file:src/grounded_docparse/ocr_services.py",
+          "file:src/grounded_docparse/paddle_ocr.py",
+          "file:src/grounded_docparse/page_analysis.py",
+          "file:src/grounded_docparse/pipeline.py",
+          "file:src/grounded_docparse/prompts.py",
+          "file:src/grounded_docparse/quality.py",
+          "file:src/grounded_docparse/render.py",
+          "file:src/grounded_docparse/runtime.py",
+          "file:src/grounded_docparse/schema_store.py",
+          "file:src/grounded_docparse/workspace_store.py"
+        ]
+      },
+      {
+        "id": "layer:streamlit-interface",
+        "name": "Streamlit Interface",
+        "description": "The Streamlit application entry point that exposes document parsing, review, and agentic workflows to workstation users.",
+        "nodeIds": [
+          "file:streamlit_app.py"
+        ]
+      },
+      {
+        "id": "layer:testing",
+        "name": "Testing",
+        "description": "Pytest fixtures and contract tests that verify parser, OCR, provider, UI, recovery, and persistence behavior.",
+        "nodeIds": [
+          "file:tests/conftest.py",
+          "file:tests/test_agentic_contract.py",
+          "file:tests/test_agentic_extraction.py",
+          "file:tests/test_agentic_features.py",
+          "file:tests/test_batch.py",
+          "file:tests/test_cli.py",
+          "file:tests/test_confidence_spans.py",
+          "file:tests/test_corpus_manifest.py",
+          "file:tests/test_evaluation_calibration.py",
+          "file:tests/test_evaluation_cli.py",
+          "file:tests/test_evaluation_metrics.py",
+          "file:tests/test_evaluation_report.py",
+          "file:tests/test_form_routing.py",
+          "file:tests/test_glmocr_runtime_config.py",
+          "file:tests/test_ingest.py",
+          "file:tests/test_launcher_contract.py",
+          "file:tests/test_markdown_enhancement.py",
+          "file:tests/test_ocr_disagreement.py",
+          "file:tests/test_openai_vision_gateway.py",
+          "file:tests/test_paddle_ocr.py",
+          "file:tests/test_paddle_runtime_config.py",
+          "file:tests/test_page_analysis.py",
+          "file:tests/test_parallel_pages.py",
+          "file:tests/test_provider_runtime.py",
+          "file:tests/test_quality.py",
+          "file:tests/test_regression_policy.py",
+          "file:tests/test_schema_store.py",
+          "file:tests/test_simple_contract.py",
+          "file:tests/test_simple_pipeline.py",
+          "file:tests/test_simple_streamlit.py",
+          "file:tests/test_strict_recovery_contract.py",
+          "file:tests/test_windows_installer.py",
+          "file:tests/test_workspace_store.py"
+        ]
+      },
+      {
+        "id": "layer:evaluation-data",
+        "name": "Evaluation Data",
+        "description": "Benchmark corpus annotations, manifests, schemas, baselines, policies, and rate cards used to evaluate grounded extraction quality.",
+        "nodeIds": [
+          "config:benchmarks/baselines/offline-native-v1.json",
+          "config:benchmarks/corpus-v1/annotations/checkboxes.json",
+          "config:benchmarks/corpus-v1/annotations/cross-page-table.json",
+          "config:benchmarks/corpus-v1/annotations/degraded-scan.json",
+          "config:benchmarks/corpus-v1/annotations/figure-chart.json",
+          "config:benchmarks/corpus-v1/annotations/form.json",
+          "config:benchmarks/corpus-v1/annotations/lists.json",
+          "config:benchmarks/corpus-v1/annotations/multi-column.json",
+          "config:benchmarks/corpus-v1/annotations/native-text.json",
+          "config:benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+          "config:benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+          "config:benchmarks/corpus-v1/annotations/synthetic-report.json",
+          "config:benchmarks/corpus-v1/annotations/tables.json",
+          "config:benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+          "config:benchmarks/corpus-v1/manifest.json",
+          "config:benchmarks/policies/live-evaluation.example.json",
+          "config:benchmarks/rate-cards/openai-standard-2026-07-28.json",
+          "config:benchmarks/schemas/annotation-v1.1.schema.json",
+          "config:benchmarks/schemas/manifest-v1.1.schema.json",
+          "config:benchmarks/schemas/manifest-v1.schema.json",
+          "config:benchmarks/schemas/regression-policy-v1.schema.json"
+        ]
+      },
+      {
+        "id": "layer:documentation",
+        "name": "Documentation",
+        "description": "User guides, architecture references, security material, generated static documentation, issue templates, and presentations for the project.",
+        "nodeIds": [
+          "config:docs-site/site-manifest.json",
+          "document:.github/ISSUE_TEMPLATE/bug_report.md",
+          "document:.github/ISSUE_TEMPLATE/feature_request.md",
+          "document:CHANGELOG.md",
+          "document:CONTRIBUTING.md",
+          "document:docs/agentic-document-extraction-comparison.md",
+          "document:docs/api.md",
+          "document:docs/architecture.md",
+          "document:docs/azure-bulk-fax-deployment.md",
+          "document:docs/business-user-extraction-workflow.md",
+          "document:docs/codebase/.codebase-scan.txt",
+          "document:docs/codebase/ARCHITECTURE.md",
+          "document:docs/codebase/CONCERNS.md",
+          "document:docs/codebase/CONVENTIONS.md",
+          "document:docs/codebase/INTEGRATIONS.md",
+          "document:docs/codebase/STACK.md",
+          "document:docs/codebase/STRUCTURE.md",
+          "document:docs/codebase/TESTING.md",
+          "document:docs/complete-user-guide.md",
+          "document:docs/extraction-quality-research.md",
+          "document:docs/how-grounded-docparse-is-agentic.md",
+          "document:docs/how-it-works.md",
+          "document:docs/layout-aware-large-field-extraction-workflow.md",
+          "document:docs/local-glmocr.md",
+          "document:docs/local-paddleocr-vl.md",
+          "document:docs/private-evaluation.md",
+          "document:docs/research.md",
+          "document:docs/run.md",
+          "document:docs/spec.md",
+          "document:docs/tutorial.md",
+          "document:docs/zero-to-hero-tutorial.md",
+          "document:grounded-docparse-threat-model.md",
+          "document:README.md",
+          "document:security_best_practices_report.md",
+          "document:SECURITY.md",
+          "document:SETUP.md",
+          "file:docs-site/agentic-document-extraction-comparison.html",
+          "file:docs-site/api.html",
+          "file:docs-site/architecture.html",
+          "file:docs-site/assets/app.js",
+          "file:docs-site/assets/styles.css",
+          "file:docs-site/azure-bulk-fax-deployment.html",
+          "file:docs-site/business-user-extraction-workflow.html",
+          "file:docs-site/changelog.html",
+          "file:docs-site/complete-user-guide.html",
+          "file:docs-site/contributing.html",
+          "file:docs-site/extraction-quality-research.html",
+          "file:docs-site/how-grounded-docparse-is-agentic.html",
+          "file:docs-site/how-it-works.html",
+          "file:docs-site/index.html",
+          "file:docs-site/issue-template--bug-report.html",
+          "file:docs-site/issue-template--feature-request.html",
+          "file:docs-site/layout-aware-large-field-extraction-workflow.html",
+          "file:docs-site/local-glmocr.html",
+          "file:docs-site/local-paddleocr-vl.html",
+          "file:docs-site/research.html",
+          "file:docs-site/run.html",
+          "file:docs-site/security-content-excluded.html",
+          "file:docs-site/setup.html",
+          "file:docs-site/spec.html",
+          "file:docs-site/tutorial.html",
+          "file:docs-site/zero-to-hero-tutorial.html",
+          "file:docs/idp-vs-ade-classification.html",
+          "file:presentations/grounded-docparse-business.pptx",
+          "file:presentations/grounded-docparse-github-overview.pptx",
+          "file:presentations/grounded-docparse-technical.pptx"
+        ]
+      },
+      {
+        "id": "layer:operations-configuration",
+        "name": "Operations And Configuration",
+        "description": "Runtime configuration, launchers, installers, automation scripts, OCR service management, packaging, and repository-analysis settings.",
+        "nodeIds": [
+          "config:.env.example",
+          "config:.streamlit/config.toml",
+          "config:.ua/config.json",
+          "config:.ua/domain-graph.json",
+          "config:config/glmocr.yaml",
+          "config:config/paddle-vllm.yaml",
+          "config:examples/schemas/invoice.schema.json",
+          "config:paddle-runtime/pyproject.toml",
+          "config:pyproject.toml",
+          "file:.gitattributes",
+          "file:.ua/.understandignore",
+          "file:installer/GroundedDocParse.iss",
+          "file:installer/Install-GroundedDocParse.ps1",
+          "file:Launch-GLM-OCR.cmd",
+          "file:Launch-PaddleOCR-VL-1.6.cmd",
+          "file:scripts/build_docs_site.py",
+          "file:scripts/build-installer.ps1",
+          "file:scripts/evaluate_corpus.py",
+          "file:scripts/generate_evaluation_corpus.py",
+          "file:scripts/generate_examples.py",
+          "file:scripts/wsl/benchmark_glmocr.py",
+          "file:scripts/wsl/check-glmocr-api.py",
+          "file:scripts/wsl/check-paddleocr-api.py",
+          "file:scripts/wsl/launch-stack.sh",
+          "file:scripts/wsl/manage-ocr-stack.sh",
+          "file:scripts/wsl/prepare_glmocr_runtime.py",
+          "file:scripts/wsl/prepare_paddleocr_runtime.py",
+          "file:scripts/wsl/run-app.sh",
+          "file:scripts/wsl/serve-glmocr.sh",
+          "file:scripts/wsl/serve-ollama.sh",
+          "file:scripts/wsl/setup-glmocr.sh",
+          "file:scripts/wsl/setup-ollama.sh",
+          "file:scripts/wsl/setup-paddleocr.sh",
+          "file:Setup-GLM-OCR.cmd"
+        ]
+      }
+    ]
+  },
+  "nodeSummaryIndex": {
+    "file:src/grounded_docparse/batch.py": {
+      "name": "batch.py",
+      "type": "file",
+      "summary": "Builds per-document batch outputs and downloadable archives from parser results."
+    },
+    "file:src/grounded_docparse/benchmark.py": {
+      "name": "benchmark.py",
+      "type": "file",
+      "summary": "Defines corpus evaluation models, metrics, live reports, and regression-policy checks for parser quality."
+    },
+    "file:src/grounded_docparse/cli.py": {
+      "name": "cli.py",
+      "type": "file",
+      "summary": "Provides the command-line interface for parsing files, loading schemas, and writing output artifacts."
+    },
+    "file:src/grounded_docparse/enhancement.py": {
+      "name": "enhancement.py",
+      "type": "file",
+      "summary": "Builds compatible page chunks and combines enhancement output into document Markdown."
+    },
+    "file:src/grounded_docparse/models.py": {
+      "name": "models.py",
+      "type": "file",
+      "summary": "Defines the shared typed data models for document evidence, analysis, extraction, and parsing results."
+    },
+    "file:src/grounded_docparse/quality.py": {
+      "name": "quality.py",
+      "type": "file",
+      "summary": "Evaluates page content quality and selects evidence-based recovery or repair candidates."
+    },
+    "file:src/grounded_docparse/render.py": {
+      "name": "render.py",
+      "type": "file",
+      "summary": "Renders parsed document structures to Markdown, structured elements, and annotated PDF output."
+    },
+    "file:src/grounded_docparse/schema_store.py": {
+      "name": "schema_store.py",
+      "type": "file",
+      "summary": "Parses, compiles, and persists reusable extraction schemas and classifier profiles."
+    },
+    "file:src/grounded_docparse/workspace_store.py": {
+      "name": "workspace_store.py",
+      "type": "file",
+      "summary": "Persists parser workspaces and reconstructs stored parse results."
+    },
+    "file:src/grounded_docparse/__init__.py": {
+      "name": "__init__.py",
+      "type": "file",
+      "summary": "Exposes the public parsing, configuration, extraction, rendering, and agentic APIs for the grounded document parser package."
+    },
+    "file:src/grounded_docparse/agentic.py": {
+      "name": "agentic.py",
+      "type": "file",
+      "summary": "Coordinates agentic document analysis, form routing, schema-guided extraction, table-of-contents generation, and grounded document chat."
+    },
+    "file:src/grounded_docparse/config.py": {
+      "name": "config.py",
+      "type": "file",
+      "summary": "Defines validated parser and OCR runtime configuration, including environment-based defaults for provider, quality, and recovery controls."
+    },
+    "file:src/grounded_docparse/extraction.py": {
+      "name": "extraction.py",
+      "type": "file",
+      "summary": "Implements schema validation and grounded field extraction with citation resolution, evidence checks, and structured result construction."
+    },
+    "file:src/grounded_docparse/gateways.py": {
+      "name": "gateways.py",
+      "type": "file",
+      "summary": "Provides the OpenAI-backed document gateway for structured multimodal requests, response validation, usage tracking, and agent operations."
+    },
+    "file:src/grounded_docparse/prompts.py": {
+      "name": "prompts.py",
+      "type": "file",
+      "summary": "Centralizes security instructions that constrain document-processing prompts used by provider requests."
+    },
+    "file:src/grounded_docparse/runtime.py": {
+      "name": "runtime.py",
+      "type": "file",
+      "summary": "Manages provider concurrency, retry behavior, request budgets, and diagnostics for document-processing calls."
+    },
+    "file:src/grounded_docparse/ingest.py": {
+      "name": "ingest.py",
+      "type": "file",
+      "summary": "Ingests PDF and image uploads into normalized, rendered page evidence for downstream document analysis."
+    },
+    "file:src/grounded_docparse/local_ocr.py": {
+      "name": "local_ocr.py",
+      "type": "file",
+      "summary": "Provides the serialized local GLM-OCR runtime and converts its responses into normalized OCR page regions."
+    },
+    "file:src/grounded_docparse/ocr_disagreement.py": {
+      "name": "ocr_disagreement.py",
+      "type": "file",
+      "summary": "Measures token-level agreement between OCR outputs to identify uncertain recognition results."
+    },
+    "file:src/grounded_docparse/ocr_services.py": {
+      "name": "ocr_services.py",
+      "type": "file",
+      "summary": "Selects and activates the managed local OCR engine required by the parser configuration."
+    },
+    "file:src/grounded_docparse/paddle_ocr.py": {
+      "name": "paddle_ocr.py",
+      "type": "file",
+      "summary": "Implements the PaddleOCR-VL service client and normalizes its document-parsing output into OCR regions."
+    },
+    "file:src/grounded_docparse/page_analysis.py": {
+      "name": "page_analysis.py",
+      "type": "file",
+      "summary": "Analyzes page layout, OCR, reading order, and visual features to construct grounded page drafts."
+    },
+    "file:src/grounded_docparse/pipeline.py": {
+      "name": "pipeline.py",
+      "type": "file",
+      "summary": "Coordinates ingestion, page analysis, multi-engine recovery, quality verification, rendering, and optional refinement for document parsing."
+    },
+    "file:Launch-GLM-OCR.cmd": {
+      "name": "Launch-GLM-OCR.cmd",
+      "type": "file",
+      "summary": "Windows launcher that selects the GLM-OCR engine, forwards optional OpenAI settings into WSL, starts the OCR stack, and opens the Streamlit application."
+    },
+    "file:Launch-PaddleOCR-VL-1.6.cmd": {
+      "name": "Launch-PaddleOCR-VL-1.6.cmd",
+      "type": "file",
+      "summary": "Windows launcher that selects PaddleOCR-VL-1.6, forwards optional OpenAI settings into WSL, starts the OCR stack, and opens the Streamlit application."
+    },
+    "file:Setup-GLM-OCR.cmd": {
+      "name": "Setup-GLM-OCR.cmd",
+      "type": "file",
+      "summary": "Windows bootstrap wrapper that invokes the PowerShell installer in provisioning mode for the repository installation root."
+    },
+    "file:docs-site/agentic-document-extraction-comparison.html": {
+      "name": "agentic-document-extraction-comparison.html",
+      "type": "file",
+      "summary": "Documentation page comparing Grounded DocParse with LandingAI ADE for agentic document extraction."
+    },
+    "file:docs-site/api.html": {
+      "name": "api.html",
+      "type": "file",
+      "summary": "Documentation page describing the public Python API for Grounded DocParse."
+    },
+    "file:docs-site/architecture.html": {
+      "name": "architecture.html",
+      "type": "file",
+      "summary": "Documentation page explaining the system architecture and major parser components."
+    },
+    "file:docs-site/azure-bulk-fax-deployment.html": {
+      "name": "azure-bulk-fax-deployment.html",
+      "type": "file",
+      "summary": "Deployment guide for processing bulk medical faxes with Grounded DocParse on Azure."
+    },
+    "file:docs-site/business-user-extraction-workflow.html": {
+      "name": "business-user-extraction-workflow.html",
+      "type": "file",
+      "summary": "Workflow guide for business users extracting large structured field sets from documents."
+    },
+    "file:docs-site/changelog.html": {
+      "name": "changelog.html",
+      "type": "file",
+      "summary": "Published changelog page tracking user-visible project releases and changes."
+    },
+    "file:docs-site/complete-user-guide.html": {
+      "name": "complete-user-guide.html",
+      "type": "file",
+      "summary": "Comprehensive documentation covering installation, configuration, workflows, and parser use."
+    },
+    "file:docs-site/contributing.html": {
+      "name": "contributing.html",
+      "type": "file",
+      "summary": "Contributor documentation covering how to participate in project development."
+    },
+    "file:docs-site/extraction-quality-research.html": {
+      "name": "extraction-quality-research.html",
+      "type": "file",
+      "summary": "Research documentation on extraction quality methods and evaluation findings."
+    },
+    "file:docs-site/how-grounded-docparse-is-agentic.html": {
+      "name": "how-grounded-docparse-is-agentic.html",
+      "type": "file",
+      "summary": "Documentation explaining the project’s agentic document-parsing behavior and evidence model."
+    },
+    "file:docs-site/how-it-works.html": {
+      "name": "how-it-works.html",
+      "type": "file",
+      "summary": "High-level explanation of the document parsing workflow and its outputs."
+    },
+    "file:docs-site/index.html": {
+      "name": "index.html",
+      "type": "file",
+      "summary": "Documentation-site landing page introducing Grounded DocParse and its evidence-driven parsing approach."
+    },
+    "file:docs-site/issue-template--bug-report.html": {
+      "name": "issue-template--bug-report.html",
+      "type": "file",
+      "summary": "Rendered documentation page for the bug-report issue template."
+    },
+    "file:docs-site/issue-template--feature-request.html": {
+      "name": "issue-template--feature-request.html",
+      "type": "file",
+      "summary": "Rendered documentation page for the feature-request issue template."
+    },
+    "file:docs-site/layout-aware-large-field-extraction-workflow.html": {
+      "name": "layout-aware-large-field-extraction-workflow.html",
+      "type": "file",
+      "summary": "Workflow guide for layout-aware extraction of large structured field sets."
+    },
+    "file:docs-site/local-glmocr.html": {
+      "name": "local-glmocr.html",
+      "type": "file",
+      "summary": "Setup documentation for running the local GLM-OCR runtime."
+    },
+    "file:docs-site/local-paddleocr-vl.html": {
+      "name": "local-paddleocr-vl.html",
+      "type": "file",
+      "summary": "Setup documentation for running the local PaddleOCR-VL runtime."
+    },
+    "file:docs-site/research.html": {
+      "name": "research.html",
+      "type": "file",
+      "summary": "Documentation page describing the design basis and research informing the parser."
+    },
+    "file:docs-site/run.html": {
+      "name": "run.html",
+      "type": "file",
+      "summary": "Local execution guide for running Grounded DocParse."
+    },
+    "file:docs-site/security-content-excluded.html": {
+      "name": "security-content-excluded.html",
+      "type": "file",
+      "summary": "Documentation notice identifying content intentionally excluded for security reasons."
+    },
+    "file:docs-site/setup.html": {
+      "name": "setup.html",
+      "type": "file",
+      "summary": "Static documentation page rendering setup instructions for prerequisites, Windows installation, WSL operation, Luna configuration, verification, and troubleshooting."
+    },
+    "file:docs-site/spec.html": {
+      "name": "spec.html",
+      "type": "file",
+      "summary": "Static documentation page presenting the product specification, including goals, inputs, required behavior, public interfaces, non-goals, and completion criteria."
+    },
+    "file:docs-site/tutorial.html": {
+      "name": "tutorial.html",
+      "type": "file",
+      "summary": "Static documentation page providing a concise tutorial for using Grounded DocParse."
+    },
+    "file:docs-site/zero-to-hero-tutorial.html": {
+      "name": "zero-to-hero-tutorial.html",
+      "type": "file",
+      "summary": "Comprehensive static tutorial that explains document parsing concepts, setup, Streamlit workflows, extraction and routing, APIs, architecture, safety, testing, and troubleshooting."
+    },
+    "file:docs/idp-vs-ade-classification.html": {
+      "name": "idp-vs-ade-classification.html",
+      "type": "file",
+      "summary": "Presents an HTML comparison of document-processing classification approaches."
+    },
+    "file:scripts/wsl/launch-stack.sh": {
+      "name": "launch-stack.sh",
+      "type": "file",
+      "summary": "Starts the requested local OCR engine and the Streamlit application with health checks and process locking."
+    },
+    "file:scripts/wsl/manage-ocr-stack.sh": {
+      "name": "manage-ocr-stack.sh",
+      "type": "file",
+      "summary": "Ensures exactly one managed local OCR service stack is running in WSL."
+    },
+    "file:scripts/wsl/run-app.sh": {
+      "name": "run-app.sh",
+      "type": "file",
+      "summary": "Activates the WSL runtime, prepares the configured local OCR backend, and launches the application."
+    },
+    "file:scripts/wsl/serve-glmocr.sh": {
+      "name": "serve-glmocr.sh",
+      "type": "file",
+      "summary": "Starts the GLM-OCR service using the prepared local runtime."
+    },
+    "file:scripts/wsl/serve-ollama.sh": {
+      "name": "serve-ollama.sh",
+      "type": "file",
+      "summary": "Starts the Ollama service used as a local OCR backend."
+    },
+    "file:scripts/wsl/setup-glmocr.sh": {
+      "name": "setup-glmocr.sh",
+      "type": "file",
+      "summary": "Creates and configures the WSL environment for the local GLM-OCR runtime."
+    },
+    "file:scripts/wsl/setup-ollama.sh": {
+      "name": "setup-ollama.sh",
+      "type": "file",
+      "summary": "Installs and configures Ollama for local OCR inference in WSL."
+    },
+    "file:scripts/wsl/setup-paddleocr.sh": {
+      "name": "setup-paddleocr.sh",
+      "type": "file",
+      "summary": "Creates the PaddleOCR WSL environment and prepares its runtime dependencies."
+    },
+    "file:.gitattributes": {
+      "name": ".gitattributes",
+      "type": "file",
+      "summary": "Defines repository Git attribute handling rules."
+    },
+    "file:.ua/.understandignore": {
+      "name": ".understandignore",
+      "type": "file",
+      "summary": "Defines paths and patterns excluded from Understand Anything codebase analysis."
+    },
+    "file:docs-site/assets/app.js": {
+      "name": "app.js",
+      "type": "file",
+      "summary": "Provides documentation-site navigation, filtering, search, reading-progress, outline, clipboard, and external-link behavior."
+    },
+    "file:docs-site/assets/styles.css": {
+      "name": "styles.css",
+      "type": "file",
+      "summary": "Defines the responsive visual system and component styling for the generated documentation site."
+    },
+    "file:installer/GroundedDocParse.iss": {
+      "name": "GroundedDocParse.iss",
+      "type": "file",
+      "summary": "Inno Setup definition that packages the Windows launcher, application source, WSL scripts, configuration, and provisioning step."
+    },
+    "file:installer/Install-GroundedDocParse.ps1": {
+      "name": "Install-GroundedDocParse.ps1",
+      "type": "file",
+      "summary": "Windows installer that provisions WSL, runtime dependencies, local OCR services, and application launch or uninstall behavior."
+    },
+    "file:presentations/grounded-docparse-business.pptx": {
+      "name": "grounded-docparse-business.pptx",
+      "type": "file",
+      "summary": "Business-oriented presentation deck for Grounded DocParse."
+    },
+    "file:presentations/grounded-docparse-github-overview.pptx": {
+      "name": "grounded-docparse-github-overview.pptx",
+      "type": "file",
+      "summary": "Presentation deck providing a GitHub-oriented overview of Grounded DocParse."
+    },
+    "file:presentations/grounded-docparse-technical.pptx": {
+      "name": "grounded-docparse-technical.pptx",
+      "type": "file",
+      "summary": "Technical presentation deck describing Grounded DocParse."
+    },
+    "file:scripts/build-installer.ps1": {
+      "name": "build-installer.ps1",
+      "type": "file",
+      "summary": "Builds and validates the Windows installer, rejects forbidden payload paths, and writes a SHA-256 checksum."
+    },
+    "file:scripts/build_docs_site.py": {
+      "name": "build_docs_site.py",
+      "type": "file",
+      "summary": "Builds the static documentation site by discovering Markdown, rendering pages, copying images, constructing navigation, and emitting manifests."
+    },
+    "file:scripts/evaluate_corpus.py": {
+      "name": "evaluate_corpus.py",
+      "type": "file",
+      "summary": "CLI script that evaluates corpus parsing results, handles subsets and references, writes artifacts, and reports live evaluation metrics."
+    },
+    "file:scripts/generate_evaluation_corpus.py": {
+      "name": "generate_evaluation_corpus.py",
+      "type": "file",
+      "summary": "Generates the document evaluation corpus and associated reference artifacts."
+    },
+    "file:scripts/generate_examples.py": {
+      "name": "generate_examples.py",
+      "type": "file",
+      "summary": "Generates example documents for project demonstrations."
+    },
+    "file:scripts/wsl/benchmark_glmocr.py": {
+      "name": "benchmark_glmocr.py",
+      "type": "file",
+      "summary": "Runs GLM-OCR benchmark operations in the WSL environment."
+    },
+    "file:scripts/wsl/check-glmocr-api.py": {
+      "name": "check-glmocr-api.py",
+      "type": "file",
+      "summary": "Checks availability of the GLM-OCR API runtime."
+    },
+    "file:scripts/wsl/check-paddleocr-api.py": {
+      "name": "check-paddleocr-api.py",
+      "type": "file",
+      "summary": "Checks availability of the PaddleOCR API runtime."
+    },
+    "file:scripts/wsl/prepare_glmocr_runtime.py": {
+      "name": "prepare_glmocr_runtime.py",
+      "type": "file",
+      "summary": "Prepares the local GLM-OCR runtime for WSL execution."
+    },
+    "file:scripts/wsl/prepare_paddleocr_runtime.py": {
+      "name": "prepare_paddleocr_runtime.py",
+      "type": "file",
+      "summary": "Prepares the local PaddleOCR runtime for WSL execution."
+    },
+    "file:streamlit_app.py": {
+      "name": "streamlit_app.py",
+      "type": "file",
+      "summary": "Main Streamlit application for grounded document parsing, review, and extraction workflows."
+    },
+    "file:tests/conftest.py": {
+      "name": "conftest.py",
+      "type": "file",
+      "summary": "Provides shared pytest configuration and fixtures."
+    },
+    "file:tests/test_agentic_contract.py": {
+      "name": "test_agentic_contract.py",
+      "type": "file",
+      "summary": "Tests agentic parsing contract behavior."
+    },
+    "file:tests/test_agentic_extraction.py": {
+      "name": "test_agentic_extraction.py",
+      "type": "file",
+      "summary": "Tests agentic extraction workflows and outputs."
+    },
+    "file:tests/test_agentic_features.py": {
+      "name": "test_agentic_features.py",
+      "type": "file",
+      "summary": "Tests optional agentic feature behavior."
+    },
+    "file:tests/test_batch.py": {
+      "name": "test_batch.py",
+      "type": "file",
+      "summary": "Tests batch document parsing operations."
+    },
+    "file:tests/test_cli.py": {
+      "name": "test_cli.py",
+      "type": "file",
+      "summary": "Tests command-line interface behavior."
+    },
+    "file:tests/test_confidence_spans.py": {
+      "name": "test_confidence_spans.py",
+      "type": "file",
+      "summary": "Tests confidence-span generation and handling."
+    },
+    "file:tests/test_corpus_manifest.py": {
+      "name": "test_corpus_manifest.py",
+      "type": "file",
+      "summary": "Tests evaluation corpus manifest validation."
+    },
+    "file:tests/test_evaluation_calibration.py": {
+      "name": "test_evaluation_calibration.py",
+      "type": "file",
+      "summary": "Tests evaluation calibration behavior."
+    },
+    "file:tests/test_evaluation_cli.py": {
+      "name": "test_evaluation_cli.py",
+      "type": "file",
+      "summary": "Tests evaluation command-line behavior."
+    },
+    "file:tests/test_evaluation_metrics.py": {
+      "name": "test_evaluation_metrics.py",
+      "type": "file",
+      "summary": "Tests benchmark evaluation metric calculations."
+    },
+    "file:tests/test_evaluation_report.py": {
+      "name": "test_evaluation_report.py",
+      "type": "file",
+      "summary": "Tests evaluation report generation."
+    },
+    "file:tests/test_form_routing.py": {
+      "name": "test_form_routing.py",
+      "type": "file",
+      "summary": "Tests custom form routing workflows."
+    },
+    "file:tests/test_glmocr_runtime_config.py": {
+      "name": "test_glmocr_runtime_config.py",
+      "type": "file",
+      "summary": "Tests GLM-OCR runtime configuration behavior."
+    },
+    "file:tests/test_ingest.py": {
+      "name": "test_ingest.py",
+      "type": "file",
+      "summary": "Tests document ingestion behavior."
+    },
+    "file:tests/test_launcher_contract.py": {
+      "name": "test_launcher_contract.py",
+      "type": "file",
+      "summary": "Tests application launcher contracts."
+    },
+    "file:tests/test_markdown_enhancement.py": {
+      "name": "test_markdown_enhancement.py",
+      "type": "file",
+      "summary": "Tests Markdown enhancement behavior."
+    },
+    "file:tests/test_ocr_disagreement.py": {
+      "name": "test_ocr_disagreement.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for ocr disagreement behavior in the grounded document parser."
+    },
+    "file:tests/test_openai_vision_gateway.py": {
+      "name": "test_openai_vision_gateway.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for openai vision gateway behavior in the grounded document parser."
+    },
+    "file:tests/test_paddle_ocr.py": {
+      "name": "test_paddle_ocr.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for paddle ocr behavior in the grounded document parser."
+    },
+    "file:tests/test_paddle_runtime_config.py": {
+      "name": "test_paddle_runtime_config.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for paddle runtime config behavior in the grounded document parser."
+    },
+    "file:tests/test_page_analysis.py": {
+      "name": "test_page_analysis.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for page analysis behavior in the grounded document parser."
+    },
+    "file:tests/test_parallel_pages.py": {
+      "name": "test_parallel_pages.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for parallel pages behavior in the grounded document parser."
+    },
+    "file:tests/test_provider_runtime.py": {
+      "name": "test_provider_runtime.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for provider runtime behavior in the grounded document parser."
+    },
+    "file:tests/test_quality.py": {
+      "name": "test_quality.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for quality behavior in the grounded document parser."
+    },
+    "file:tests/test_regression_policy.py": {
+      "name": "test_regression_policy.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for regression policy behavior in the grounded document parser."
+    },
+    "file:tests/test_schema_store.py": {
+      "name": "test_schema_store.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for schema store behavior in the grounded document parser."
+    },
+    "file:tests/test_simple_contract.py": {
+      "name": "test_simple_contract.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for simple contract behavior in the grounded document parser."
+    },
+    "file:tests/test_simple_pipeline.py": {
+      "name": "test_simple_pipeline.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for simple pipeline behavior in the grounded document parser."
+    },
+    "file:tests/test_simple_streamlit.py": {
+      "name": "test_simple_streamlit.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for simple streamlit behavior in the grounded document parser."
+    },
+    "file:tests/test_strict_recovery_contract.py": {
+      "name": "test_strict_recovery_contract.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for strict recovery contract behavior in the grounded document parser."
+    },
+    "file:tests/test_windows_installer.py": {
+      "name": "test_windows_installer.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for windows installer behavior in the grounded document parser."
+    },
+    "file:tests/test_workspace_store.py": {
+      "name": "test_workspace_store.py",
+      "type": "file",
+      "summary": "Contains pytest coverage for workspace store behavior in the grounded document parser."
+    }
+  },
+  "totalNodes": 112,
+  "totalEdges": 63
+}

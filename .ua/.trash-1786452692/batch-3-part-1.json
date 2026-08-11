@@ -1,0 +1,734 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/ingest.py",
+      "type": "file",
+      "name": "ingest.py",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "summary": "Ingests PDF and image uploads into normalized, rendered page evidence for downstream document analysis.",
+      "tags": [
+        "document-ingestion",
+        "pdf",
+        "image-processing",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/grounded_docparse/ingest.py:PageEvidence",
+      "type": "class",
+      "name": "PageEvidence",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        17,
+        30
+      ],
+      "summary": "Represents rendered source-page metadata and evidence needed for layout-aware processing.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/ingest.py:IngestedDocument",
+      "type": "class",
+      "name": "IngestedDocument",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        34,
+        38
+      ],
+      "summary": "Represents the persisted upload and its normalized rendered pages.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/ingest.py:render_region_crop",
+      "type": "function",
+      "name": "render_region_crop",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        41,
+        101
+      ],
+      "summary": "Renders a padded image crop for a bounded source-page region.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/ingest.py:_validate_input",
+      "type": "function",
+      "name": "_validate_input",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        104,
+        120
+      ],
+      "summary": "Validates upload size, filename type, and image or PDF contents before ingestion.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/ingest.py:ingest_document",
+      "type": "function",
+      "name": "ingest_document",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        123,
+        147
+      ],
+      "summary": "Persists an upload and dispatches PDF or image ingestion to create page evidence.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/ingest.py:_ingest_pdf",
+      "type": "function",
+      "name": "_ingest_pdf",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        150,
+        186
+      ],
+      "summary": "Renders PDF pages while enforcing configured page and pixel limits.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/ingest.py:_ingest_image",
+      "type": "function",
+      "name": "_ingest_image",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "lineRange": [
+        189,
+        218
+      ],
+      "summary": "Normalizes supported image frames into rendered page evidence.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/local_ocr.py",
+      "type": "file",
+      "name": "local_ocr.py",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "summary": "Provides the serialized local GLM-OCR runtime and converts its responses into normalized OCR page regions.",
+      "tags": [
+        "ocr",
+        "runtime",
+        "glm-ocr",
+        "normalization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/local_ocr.py:OcrRegion",
+      "type": "class",
+      "name": "OcrRegion",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        17,
+        25
+      ],
+      "summary": "Represents one normalized OCR region with geometry, confidence, and recognition status.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/local_ocr.py:OcrPageResult",
+      "type": "class",
+      "name": "OcrPageResult",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        29,
+        32
+      ],
+      "summary": "Represents the OCR result or failure state for a single page image.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/local_ocr.py:GlmOcrRuntime",
+      "type": "class",
+      "name": "GlmOcrRuntime",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        117,
+        169
+      ],
+      "summary": "Maintains a serialized process-wide GLM-OCR model instance and exposes page parsing operations.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:_objects",
+      "type": "function",
+      "name": "_objects",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        40,
+        58
+      ],
+      "summary": "Recursively extracts mapping-like OCR payload objects from nested response data.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:_bbox",
+      "type": "function",
+      "name": "_bbox",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        61,
+        70
+      ],
+      "summary": "Normalizes a bounding-box value from an OCR payload item.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:_regions",
+      "type": "function",
+      "name": "_regions",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        73,
+        114
+      ],
+      "summary": "Converts raw OCR result objects into normalized OCR regions.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:_form_recovery_config_path",
+      "type": "function",
+      "name": "_form_recovery_config_path",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        178,
+        201
+      ],
+      "summary": "Creates a higher-resolution GLM-OCR configuration for form recovery.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:get_glmocr_runtime",
+      "type": "function",
+      "name": "get_glmocr_runtime",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        204,
+        209
+      ],
+      "summary": "Returns the cached primary GLM-OCR runtime for a configuration.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:get_glmocr_form_recovery_runtime",
+      "type": "function",
+      "name": "get_glmocr_form_recovery_runtime",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        212,
+        217
+      ],
+      "summary": "Returns the cached high-resolution GLM-OCR form-recovery runtime.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:clear_glmocr_runtimes",
+      "type": "function",
+      "name": "clear_glmocr_runtimes",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        220,
+        229
+      ],
+      "summary": "Releases cached GLM-OCR models so another engine can use the GPU.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/local_ocr.py:glmocr_version",
+      "type": "function",
+      "name": "glmocr_version",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "lineRange": [
+        232,
+        236
+      ],
+      "summary": "Reports the installed GLM-OCR version when available.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_disagreement.py",
+      "type": "file",
+      "name": "ocr_disagreement.py",
+      "filePath": "src/grounded_docparse/ocr_disagreement.py",
+      "summary": "Measures token-level agreement between OCR outputs to identify uncertain recognition results.",
+      "tags": [
+        "ocr",
+        "similarity",
+        "quality",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/ocr_disagreement.py:_tokens",
+      "type": "function",
+      "name": "_tokens",
+      "filePath": "src/grounded_docparse/ocr_disagreement.py",
+      "lineRange": [
+        7,
+        9
+      ],
+      "summary": "Internal helper that implements tokens for the ocr disagreement workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/ocr_disagreement.py:token_edit_similarity",
+      "type": "function",
+      "name": "token_edit_similarity",
+      "filePath": "src/grounded_docparse/ocr_disagreement.py",
+      "lineRange": [
+        12,
+        30
+      ],
+      "summary": "Computes normalized Levenshtein similarity over OCR word tokens.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_services.py",
+      "type": "file",
+      "name": "ocr_services.py",
+      "filePath": "src/grounded_docparse/ocr_services.py",
+      "summary": "Selects and activates the managed local OCR engine required by the parser configuration.",
+      "tags": [
+        "ocr",
+        "service-management",
+        "configuration",
+        "runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/ocr_services.py:ensure_managed_ocr_engine",
+      "type": "function",
+      "name": "ensure_managed_ocr_engine",
+      "filePath": "src/grounded_docparse/ocr_services.py",
+      "lineRange": [
+        11,
+        29
+      ],
+      "summary": "Ensures the configured managed OCR service is active before parsing.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "class:src/grounded_docparse/ingest.py:PageEvidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "class:src/grounded_docparse/ingest.py:PageEvidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "class:src/grounded_docparse/ingest.py:IngestedDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "class:src/grounded_docparse/ingest.py:IngestedDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:render_region_crop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:render_region_crop",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_validate_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_validate_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:ingest_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:ingest_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_ingest_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_ingest_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_ingest_image",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "function:src/grounded_docparse/ingest.py:_ingest_image",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:OcrRegion",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:OcrRegion",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:OcrPageResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:OcrPageResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:GlmOcrRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "class:src/grounded_docparse/local_ocr.py:GlmOcrRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_objects",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_objects",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_bbox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_bbox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_form_recovery_config_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:_form_recovery_config_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:get_glmocr_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:get_glmocr_runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:get_glmocr_form_recovery_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:get_glmocr_form_recovery_runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:clear_glmocr_runtimes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:clear_glmocr_runtimes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:glmocr_version",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/local_ocr.py",
+      "target": "function:src/grounded_docparse/local_ocr.py:glmocr_version",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_disagreement.py",
+      "target": "function:src/grounded_docparse/ocr_disagreement.py:_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_disagreement.py",
+      "target": "function:src/grounded_docparse/ocr_disagreement.py:_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_disagreement.py",
+      "target": "function:src/grounded_docparse/ocr_disagreement.py:token_edit_similarity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_disagreement.py",
+      "target": "function:src/grounded_docparse/ocr_disagreement.py:token_edit_similarity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "function:src/grounded_docparse/ocr_services.py:ensure_managed_ocr_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "function:src/grounded_docparse/ocr_services.py:ensure_managed_ocr_engine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

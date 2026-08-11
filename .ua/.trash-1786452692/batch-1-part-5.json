@@ -1,0 +1,1140 @@
+{
+  "nodes": [
+    {
+      "id": "function:src/grounded_docparse/render.py:_page_quality_reasons",
+      "type": "function",
+      "name": "_page_quality_reasons",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        651,
+        699
+      ],
+      "summary": "Implements page quality reasons for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_computed_page_quality",
+      "type": "function",
+      "name": "_computed_page_quality",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        702,
+        718
+      ],
+      "summary": "Implements computed page quality for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:materialize_document_quality",
+      "type": "function",
+      "name": "materialize_document_quality",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        721,
+        727
+      ],
+      "summary": "Implements materialize document quality for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:render_agentic_document",
+      "type": "function",
+      "name": "render_agentic_document",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        730,
+        900
+      ],
+      "summary": "Implements render agentic document for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:render_combined_result",
+      "type": "function",
+      "name": "render_combined_result",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        903,
+        1031
+      ],
+      "summary": "Implements render combined result for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_source",
+      "type": "function",
+      "name": "_source",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1034,
+        1041
+      ],
+      "summary": "Implements source for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_atom_values",
+      "type": "function",
+      "name": "_atom_values",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1044,
+        1088
+      ],
+      "summary": "Implements atom values for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_table_cell_atom_text",
+      "type": "function",
+      "name": "_table_cell_atom_text",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1091,
+        1092
+      ],
+      "summary": "Implements table cell atom text for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_emitted_confidence_spans",
+      "type": "function",
+      "name": "_emitted_confidence_spans",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1095,
+        1142
+      ],
+      "summary": "Implements emitted confidence spans for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_visual_agentic_atoms",
+      "type": "function",
+      "name": "_visual_agentic_atoms",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1145,
+        1183
+      ],
+      "summary": "Implements visual agentic atoms for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_agentic_atoms",
+      "type": "function",
+      "name": "_agentic_atoms",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1186,
+        1248
+      ],
+      "summary": "Implements agentic atoms for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_semantic_payload",
+      "type": "function",
+      "name": "_semantic_payload",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1251,
+        1288
+      ],
+      "summary": "Implements semantic payload for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_as_pdf",
+      "type": "function",
+      "name": "_as_pdf",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1291,
+        1302
+      ],
+      "summary": "Implements as pdf for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_walk_blocks",
+      "type": "function",
+      "name": "_walk_blocks",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1305,
+        1308
+      ],
+      "summary": "Implements walk blocks for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_annotation_group",
+      "type": "function",
+      "name": "_annotation_group",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1311,
+        1322
+      ],
+      "summary": "Implements annotation group for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_annotation_label",
+      "type": "function",
+      "name": "_annotation_label",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1325,
+        1341
+      ],
+      "summary": "Implements annotation label for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:render_annotated_pdf",
+      "type": "function",
+      "name": "render_annotated_pdf",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        1344,
+        1425
+      ],
+      "summary": "Implements render annotated pdf for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/schema_store.py",
+      "type": "file",
+      "name": "schema_store.py",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "summary": "Parses, compiles, and persists reusable extraction schemas and classifier profiles.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/schema_store.py:SchemaStore",
+      "type": "class",
+      "name": "SchemaStore",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        273,
+        333
+      ],
+      "summary": "Data model or service type supporting the schema store workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/grounded_docparse/schema_store.py:ClassifierProfileStore",
+      "type": "class",
+      "name": "ClassifierProfileStore",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        336,
+        384
+      ],
+      "summary": "Data model or service type supporting the schema store workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_table_cells",
+      "type": "function",
+      "name": "_table_cells",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        36,
+        56
+      ],
+      "summary": "Implements table cells for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_field",
+      "type": "function",
+      "name": "_field",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        59,
+        67
+      ],
+      "summary": "Implements field for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:parse_markdown_schema",
+      "type": "function",
+      "name": "parse_markdown_schema",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        70,
+        134
+      ],
+      "summary": "Implements parse markdown schema for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_tabular_schema",
+      "type": "function",
+      "name": "_tabular_schema",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        137,
+        157
+      ],
+      "summary": "Implements tabular schema for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:parse_tabular_schema",
+      "type": "function",
+      "name": "parse_tabular_schema",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        160,
+        182
+      ],
+      "summary": "Implements parse tabular schema for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_markdown_text",
+      "type": "function",
+      "name": "_markdown_text",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        185,
+        199
+      ],
+      "summary": "Implements markdown text for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_routing_category",
+      "type": "function",
+      "name": "_routing_category",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        202,
+        215
+      ],
+      "summary": "Implements routing category for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:parse_markdown_classifier_profile",
+      "type": "function",
+      "name": "parse_markdown_classifier_profile",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        218,
+        270
+      ],
+      "summary": "Implements parse markdown classifier profile for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:_stored_schema",
+      "type": "function",
+      "name": "_stored_schema",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        387,
+        393
+      ],
+      "summary": "Implements stored schema for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/schema_store.py:compile_json_schema",
+      "type": "function",
+      "name": "compile_json_schema",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "lineRange": [
+        396,
+        418
+      ],
+      "summary": "Implements compile json schema for the schema store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/workspace_store.py",
+      "type": "file",
+      "name": "workspace_store.py",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "summary": "Persists parser workspaces and reconstructs stored parse results.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/workspace_store.py:StoredWorkspaceDocument",
+      "type": "class",
+      "name": "StoredWorkspaceDocument",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        31,
+        40
+      ],
+      "summary": "Data model or service type supporting the workspace store workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/workspace_store.py:StoredWorkspace",
+      "type": "class",
+      "name": "StoredWorkspace",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        44,
+        48
+      ],
+      "summary": "Data model or service type supporting the workspace store workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/workspace_store.py:WorkspaceStore",
+      "type": "class",
+      "name": "WorkspaceStore",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        112,
+        451
+      ],
+      "summary": "Data model or service type supporting the workspace store workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/workspace_store.py:_now",
+      "type": "function",
+      "name": "_now",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        51,
+        52
+      ],
+      "summary": "Implements now for the workspace store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/workspace_store.py:_parse_result_payload",
+      "type": "function",
+      "name": "_parse_result_payload",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        55,
+        80
+      ],
+      "summary": "Implements parse result payload for the workspace store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/workspace_store.py:_parse_result",
+      "type": "function",
+      "name": "_parse_result",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "lineRange": [
+        83,
+        109
+      ],
+      "summary": "Implements parse result for the workspace store workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_page_quality_reasons",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_page_quality_reasons",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_computed_page_quality",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_computed_page_quality",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:materialize_document_quality",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:materialize_document_quality",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_agentic_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_agentic_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_combined_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_combined_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_source",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_atom_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_atom_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_cell_atom_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_cell_atom_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_emitted_confidence_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_emitted_confidence_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual_agentic_atoms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual_agentic_atoms",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_agentic_atoms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_agentic_atoms",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_as_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_as_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_walk_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_walk_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_annotation_group",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_annotation_group",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_annotation_label",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_annotation_label",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_annotated_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_annotated_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "class:src/grounded_docparse/schema_store.py:SchemaStore",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "class:src/grounded_docparse/schema_store.py:SchemaStore",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "class:src/grounded_docparse/schema_store.py:ClassifierProfileStore",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "class:src/grounded_docparse/schema_store.py:ClassifierProfileStore",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_table_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_table_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_field",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_field",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_markdown_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_markdown_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_tabular_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_tabular_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_tabular_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_tabular_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_markdown_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_markdown_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_routing_category",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_routing_category",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_markdown_classifier_profile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:parse_markdown_classifier_profile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_stored_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:_stored_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:compile_json_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "function:src/grounded_docparse/schema_store.py:compile_json_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:StoredWorkspaceDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:StoredWorkspaceDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:StoredWorkspace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:StoredWorkspace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:WorkspaceStore",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "class:src/grounded_docparse/workspace_store.py:WorkspaceStore",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_now",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_now",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_parse_result_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_parse_result_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_parse_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "function:src/grounded_docparse/workspace_store.py:_parse_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/batch.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 0,
+  "filesSkipped": [
+    "docs-site/agentic-document-extraction-comparison.html",
+    "docs-site/api.html",
+    "docs-site/architecture.html",
+    "docs-site/azure-bulk-fax-deployment.html",
+    "docs-site/business-user-extraction-workflow.html",
+    "docs-site/changelog.html",
+    "docs-site/complete-user-guide.html",
+    "docs-site/contributing.html",
+    "docs-site/extraction-quality-research.html",
+    "docs-site/how-grounded-docparse-is-agentic.html",
+    "docs-site/how-it-works.html",
+    "docs-site/index.html",
+    "docs-site/issue-template--bug-report.html",
+    "docs-site/issue-template--feature-request.html",
+    "docs-site/layout-aware-large-field-extraction-workflow.html",
+    "docs-site/local-glmocr.html",
+    "docs-site/local-paddleocr-vl.html",
+    "docs-site/research.html",
+    "docs-site/run.html",
+    "docs-site/security-content-excluded.html"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 0,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": []
+}

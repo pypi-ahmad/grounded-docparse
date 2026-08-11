@@ -1,0 +1,2458 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "file",
+      "name": "paddle_ocr.py",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "summary": "Implements the PaddleOCR-VL service client and normalizes its document-parsing output into OCR regions.",
+      "tags": [
+        "ocr",
+        "paddleocr",
+        "service-client",
+        "normalization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/paddle_ocr.py:PaddleOcrRuntime",
+      "type": "class",
+      "name": "PaddleOcrRuntime",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        106,
+        214
+      ],
+      "summary": "Client for the PaddleOCR-VL full document-parsing service, including batch and recovery requests.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:_find_blocks",
+      "type": "function",
+      "name": "_find_blocks",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        18,
+        32
+      ],
+      "summary": "Finds relevant block collections within a PaddleOCR response.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:_number",
+      "type": "function",
+      "name": "_number",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        35,
+        36
+      ],
+      "summary": "Converts an OCR value to a finite numeric value when possible.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:_bbox",
+      "type": "function",
+      "name": "_bbox",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        39,
+        47
+      ],
+      "summary": "Normalizes a bounding-box value from an OCR payload item.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:_normalized_point",
+      "type": "function",
+      "name": "_normalized_point",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        50,
+        59
+      ],
+      "summary": "Normalizes a coordinate point from PaddleOCR geometry.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:paddle_regions",
+      "type": "function",
+      "name": "paddle_regions",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        62,
+        103
+      ],
+      "summary": "Converts PaddleOCR response blocks into normalized OCR regions.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/paddle_ocr.py:get_paddleocr_runtime",
+      "type": "function",
+      "name": "get_paddleocr_runtime",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "lineRange": [
+        221,
+        228
+      ],
+      "summary": "Returns the cached PaddleOCR runtime for a parser configuration.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/page_analysis.py",
+      "type": "file",
+      "name": "page_analysis.py",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "summary": "Analyzes page layout, OCR, reading order, and visual features to construct grounded page drafts.",
+      "tags": [
+        "page-analysis",
+        "layout-analysis",
+        "ocr",
+        "document-parsing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/page_analysis.py:PageAnalyzer",
+      "type": "class",
+      "name": "PageAnalyzer",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        132,
+        642
+      ],
+      "summary": "Builds page-level analysis from layout, OCR, image features, and model evidence.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/grounded_docparse/page_analysis.py:_TableHTMLParser",
+      "type": "class",
+      "name": "_TableHTMLParser",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        775,
+        821
+      ],
+      "summary": "Parses HTML table markup into cell content for structured table recovery.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:_percentile",
+      "type": "function",
+      "name": "_percentile",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        68,
+        74
+      ],
+      "summary": "Computes an interpolated percentile for numeric analysis values.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:_dense_form_order",
+      "type": "function",
+      "name": "_dense_form_order",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        77,
+        129
+      ],
+      "summary": "Derives reading order for dense form fields from their geometry.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:draft_from_analysis",
+      "type": "function",
+      "name": "draft_from_analysis",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        653,
+        746
+      ],
+      "summary": "Converts page analysis evidence into an extraction-ready page draft.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:_markdown_table_cells",
+      "type": "function",
+      "name": "_markdown_table_cells",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        749,
+        772
+      ],
+      "summary": "Extracts table-cell drafts from Markdown table content.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:_positive_span",
+      "type": "function",
+      "name": "_positive_span",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        824,
+        828
+      ],
+      "summary": "Returns a valid positive text span from candidate bounds.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/page_analysis.py:_html_table_cells",
+      "type": "function",
+      "name": "_html_table_cells",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "lineRange": [
+        831,
+        861
+      ],
+      "summary": "Extracts table-cell drafts from HTML table content.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/pipeline.py",
+      "type": "file",
+      "name": "pipeline.py",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "summary": "Coordinates ingestion, page analysis, multi-engine recovery, quality verification, rendering, and optional refinement for document parsing.",
+      "tags": [
+        "document-parsing",
+        "orchestration",
+        "ocr",
+        "quality"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_UnavailableGateway",
+      "type": "class",
+      "name": "_UnavailableGateway",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        113,
+        128
+      ],
+      "summary": "Keeps local parsing available when the optional remote gateway cannot be initialized.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_RawHTMLCell",
+      "type": "class",
+      "name": "_RawHTMLCell",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        175,
+        179
+      ],
+      "summary": "Stores raw HTML table-cell content and structural attributes during form recovery.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_RecoveryCandidate",
+      "type": "class",
+      "name": "_RecoveryCandidate",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        981,
+        1000
+      ],
+      "summary": "Captures and ranks a candidate region for visual OCR recovery.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_GlmFormRecovery",
+      "type": "class",
+      "name": "_GlmFormRecovery",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1004,
+        1009
+      ],
+      "summary": "Tracks GLM-OCR form-recovery results and their statuses.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_PaddleFormRecovery",
+      "type": "class",
+      "name": "_PaddleFormRecovery",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1013,
+        1017
+      ],
+      "summary": "Tracks PaddleOCR form-recovery results and their statuses.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_VisualRecoveryPlan",
+      "type": "class",
+      "name": "_VisualRecoveryPlan",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1497,
+        1500
+      ],
+      "summary": "Describes selected visual-recovery crops and the available processing budget.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:_ProcessedPage",
+      "type": "class",
+      "name": "_ProcessedPage",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1695,
+        1701
+      ],
+      "summary": "Bundles a processed page with usage, warnings, trace data, and recovery details.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/pipeline.py:DocumentParser",
+      "type": "class",
+      "name": "DocumentParser",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1704,
+        3140
+      ],
+      "summary": "Orchestrates the end-to-end grounded document parsing workflow and produces structured results.",
+      "tags": [
+        "data-model",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_visible_html",
+      "type": "function",
+      "name": "_visible_html",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        182,
+        184
+      ],
+      "summary": "Internal helper that implements visible html for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_raw_html_cells",
+      "type": "function",
+      "name": "_raw_html_cells",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        187,
+        196
+      ],
+      "summary": "Internal helper that implements raw html cells for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_checkbox_state_and_label",
+      "type": "function",
+      "name": "_checkbox_state_and_label",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        199,
+        209
+      ],
+      "summary": "Internal helper that implements checkbox state and label for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_form_option",
+      "type": "function",
+      "name": "_form_option",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        212,
+        214
+      ],
+      "summary": "Internal helper that implements form option for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_option_states",
+      "type": "function",
+      "name": "_option_states",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        217,
+        227
+      ],
+      "summary": "Internal helper that implements option states for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_paddle_form_states",
+      "type": "function",
+      "name": "_paddle_form_states",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        230,
+        276
+      ],
+      "summary": "Internal helper that implements paddle form states for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_merge_confirmed_form_states",
+      "type": "function",
+      "name": "_merge_confirmed_form_states",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        279,
+        312
+      ],
+      "summary": "Internal helper that implements merge confirmed form states for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_form_control_recovery_severity",
+      "type": "function",
+      "name": "_form_control_recovery_severity",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        315,
+        321
+      ],
+      "summary": "Internal helper that implements form control recovery severity for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_merge_form_html",
+      "type": "function",
+      "name": "_merge_form_html",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        324,
+        388
+      ],
+      "summary": "Merges confirmed control states into structurally aligned form HTML.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_clean_text",
+      "type": "function",
+      "name": "_clean_text",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        391,
+        396
+      ],
+      "summary": "Internal helper that implements clean text for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_clean_form_data",
+      "type": "function",
+      "name": "_clean_form_data",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        402,
+        409
+      ],
+      "summary": "Internal helper that implements clean form data for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_emit",
+      "type": "function",
+      "name": "_emit",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        412,
+        422
+      ],
+      "summary": "Internal helper that implements emit for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_form",
+      "type": "function",
+      "name": "_form",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        425,
+        433
+      ],
+      "summary": "Internal helper that implements form for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_bbox",
+      "type": "function",
+      "name": "_bbox",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        436,
+        442
+      ],
+      "summary": "Normalizes a bounding-box value from an OCR payload item.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_valid_confidence_spans",
+      "type": "function",
+      "name": "_valid_confidence_spans",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        445,
+        450
+      ],
+      "summary": "Internal helper that implements valid confidence spans for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_clean_confidence_spans",
+      "type": "function",
+      "name": "_clean_confidence_spans",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        453,
+        499
+      ],
+      "summary": "Filters and normalizes confidence spans against emitted content.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_table",
+      "type": "function",
+      "name": "_table",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        502,
+        531
+      ],
+      "summary": "Internal helper that implements table for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_atoms",
+      "type": "function",
+      "name": "_atoms",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        534,
+        557
+      ],
+      "summary": "Internal helper that implements atoms for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_aggregated_confidence",
+      "type": "function",
+      "name": "_aggregated_confidence",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        560,
+        570
+      ],
+      "summary": "Internal helper that implements aggregated confidence for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_block",
+      "type": "function",
+      "name": "_block",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        573,
+        614
+      ],
+      "summary": "Internal helper that implements block for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_needs_verification",
+      "type": "function",
+      "name": "_needs_verification",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        617,
+        624
+      ],
+      "summary": "Internal helper that implements needs verification for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_apply_correction",
+      "type": "function",
+      "name": "_apply_correction",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        627,
+        684
+      ],
+      "summary": "Applies an inspection correction to a parsed block.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_apply_decision",
+      "type": "function",
+      "name": "_apply_decision",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        687,
+        720
+      ],
+      "summary": "Applies an inspection decision and region additions to page blocks.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_region_from_block",
+      "type": "function",
+      "name": "_region_from_block",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        723,
+        776
+      ],
+      "summary": "Internal helper that implements region from block for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_span_owner",
+      "type": "function",
+      "name": "_span_owner",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        779,
+        788
+      ],
+      "summary": "Internal helper that implements span owner for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_span_repair_target",
+      "type": "function",
+      "name": "_span_repair_target",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        791,
+        831
+      ],
+      "summary": "Internal helper that implements span repair target for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_rebase_owner_spans",
+      "type": "function",
+      "name": "_rebase_owner_spans",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        834,
+        862
+      ],
+      "summary": "Internal helper that implements rebase owner spans for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_apply_span_repairs",
+      "type": "function",
+      "name": "_apply_span_repairs",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        865,
+        963
+      ],
+      "summary": "Applies validated span-repair decisions to block ownership.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_proactive_crop_priority",
+      "type": "function",
+      "name": "_proactive_crop_priority",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        966,
+        974
+      ],
+      "summary": "Internal helper that implements proactive crop priority for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_paddle_table_anchor",
+      "type": "function",
+      "name": "_paddle_table_anchor",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1020,
+        1029
+      ],
+      "summary": "Internal helper that implements paddle table anchor for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_paddle_recovery_content",
+      "type": "function",
+      "name": "_paddle_recovery_content",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1032,
+        1039
+      ],
+      "summary": "Internal helper that implements paddle recovery content for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_confirmed_paddle_states",
+      "type": "function",
+      "name": "_confirmed_paddle_states",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1042,
+        1050
+      ],
+      "summary": "Internal helper that implements confirmed paddle states for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_recover_paddle_form_regions",
+      "type": "function",
+      "name": "_recover_paddle_form_regions",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1053,
+        1179
+      ],
+      "summary": "Recovers missing form states confirmed across PaddleOCR render scales.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_form_recovery_priority",
+      "type": "function",
+      "name": "_form_recovery_priority",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1182,
+        1194
+      ],
+      "summary": "Internal helper that implements form recovery priority for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_glm_recovery_content",
+      "type": "function",
+      "name": "_glm_recovery_content",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1197,
+        1207
+      ],
+      "summary": "Internal helper that implements glm recovery content for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_recover_glm_form_regions",
+      "type": "function",
+      "name": "_recover_glm_form_regions",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1210,
+        1313
+      ],
+      "summary": "Recovers missing form states with the GLM-OCR recovery runtime.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_recovery_box_key",
+      "type": "function",
+      "name": "_recovery_box_key",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1316,
+        1319
+      ],
+      "summary": "Internal helper that implements recovery box key for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_box_area",
+      "type": "function",
+      "name": "_box_area",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1322,
+        1323
+      ],
+      "summary": "Internal helper that implements box area for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_box_intersection",
+      "type": "function",
+      "name": "_box_intersection",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1326,
+        1329
+      ],
+      "summary": "Internal helper that implements box intersection for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_same_recovery_area",
+      "type": "function",
+      "name": "_same_recovery_area",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1332,
+        1341
+      ],
+      "summary": "Internal helper that implements same recovery area for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_visible_character_count",
+      "type": "function",
+      "name": "_visible_character_count",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1344,
+        1345
+      ],
+      "summary": "Internal helper that implements visible character count for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_garbage_ratio",
+      "type": "function",
+      "name": "_garbage_ratio",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1348,
+        1360
+      ],
+      "summary": "Internal helper that implements garbage ratio for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_table_quality",
+      "type": "function",
+      "name": "_table_quality",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1363,
+        1375
+      ],
+      "summary": "Internal helper that implements table quality for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_page_recovery_candidates",
+      "type": "function",
+      "name": "_page_recovery_candidates",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1378,
+        1493
+      ],
+      "summary": "Selects visually uncertain regions that qualify for OCR recovery.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_visual_recovery_crop_budget",
+      "type": "function",
+      "name": "_visual_recovery_crop_budget",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1503,
+        1504
+      ],
+      "summary": "Internal helper that implements visual recovery crop budget for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_visual_recovery_plan",
+      "type": "function",
+      "name": "_visual_recovery_plan",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1507,
+        1544
+      ],
+      "summary": "Builds a budgeted plan of crops for visual OCR recovery.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_build_recovery_log",
+      "type": "function",
+      "name": "_build_recovery_log",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1547,
+        1574
+      ],
+      "summary": "Internal helper that implements build recovery log for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_decision_issue",
+      "type": "function",
+      "name": "_decision_issue",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1577,
+        1594
+      ],
+      "summary": "Internal helper that implements decision issue for the pipeline workflow.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_validated_crop_decisions",
+      "type": "function",
+      "name": "_validated_crop_decisions",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1597,
+        1662
+      ],
+      "summary": "Validates crop-inspection responses before applying them.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/pipeline.py:_hierarchy",
+      "type": "function",
+      "name": "_hierarchy",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "lineRange": [
+        1665,
+        1691
+      ],
+      "summary": "Builds the nested document hierarchy from processed page blocks.",
+      "tags": [
+        "internal-helper",
+        "document-parsing",
+        "ocr"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "class:src/grounded_docparse/paddle_ocr.py:PaddleOcrRuntime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "class:src/grounded_docparse/paddle_ocr.py:PaddleOcrRuntime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_find_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_find_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_number",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_number",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_bbox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_bbox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_normalized_point",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:_normalized_point",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:paddle_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:paddle_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:get_paddleocr_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "function:src/grounded_docparse/paddle_ocr.py:get_paddleocr_runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "class:src/grounded_docparse/page_analysis.py:PageAnalyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "class:src/grounded_docparse/page_analysis.py:PageAnalyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "class:src/grounded_docparse/page_analysis.py:_TableHTMLParser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "class:src/grounded_docparse/page_analysis.py:_TableHTMLParser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_percentile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_percentile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_dense_form_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_dense_form_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:draft_from_analysis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:draft_from_analysis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_markdown_table_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_markdown_table_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_positive_span",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_positive_span",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_html_table_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "function:src/grounded_docparse/page_analysis.py:_html_table_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_UnavailableGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_UnavailableGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_RawHTMLCell",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_RawHTMLCell",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_RecoveryCandidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_RecoveryCandidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_GlmFormRecovery",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_GlmFormRecovery",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_PaddleFormRecovery",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_PaddleFormRecovery",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_VisualRecoveryPlan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_VisualRecoveryPlan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_ProcessedPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:_ProcessedPage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:DocumentParser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "class:src/grounded_docparse/pipeline.py:DocumentParser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visible_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visible_html",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_raw_html_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_raw_html_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_checkbox_state_and_label",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_checkbox_state_and_label",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_option",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_option",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_option_states",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_option_states",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_form_states",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_form_states",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_merge_confirmed_form_states",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_merge_confirmed_form_states",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_control_recovery_severity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_control_recovery_severity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_merge_form_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_merge_form_html",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_form_data",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_form_data",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_emit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_emit",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_bbox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_bbox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_valid_confidence_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_valid_confidence_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_confidence_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_clean_confidence_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_atoms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_atoms",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_aggregated_confidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_aggregated_confidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_block",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_block",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_needs_verification",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_needs_verification",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_correction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_correction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_decision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_decision",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_region_from_block",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_region_from_block",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_span_owner",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_span_owner",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_span_repair_target",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_span_repair_target",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_rebase_owner_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_rebase_owner_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_span_repairs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_apply_span_repairs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_proactive_crop_priority",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_proactive_crop_priority",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_table_anchor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_table_anchor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_recovery_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_paddle_recovery_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_confirmed_paddle_states",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_confirmed_paddle_states",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recover_paddle_form_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recover_paddle_form_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_recovery_priority",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_form_recovery_priority",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_glm_recovery_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_glm_recovery_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recover_glm_form_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recover_glm_form_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recovery_box_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_recovery_box_key",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_box_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_box_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_box_intersection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_box_intersection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_same_recovery_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_same_recovery_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visible_character_count",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visible_character_count",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_garbage_ratio",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_garbage_ratio",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_table_quality",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_table_quality",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_page_recovery_candidates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_page_recovery_candidates",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visual_recovery_crop_budget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visual_recovery_crop_budget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visual_recovery_plan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_visual_recovery_plan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_build_recovery_log",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_build_recovery_log",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_decision_issue",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_decision_issue",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_validated_crop_decisions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_validated_crop_decisions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_hierarchy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "function:src/grounded_docparse/pipeline.py:_hierarchy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/enhancement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_disagreement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_services.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/page_analysis.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}
