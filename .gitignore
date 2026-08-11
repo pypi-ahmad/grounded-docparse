@@ -31,10 +31,19 @@ ownership-map-out/
 .docparse/
 .worktrees/
 .runtime/
+.ua/
 tmp/
 *.log
 .DS_Store
 *.py[cod]
+
+# Generated parser result files (source docs, schemas, and fixtures stay tracked)
+*.annotated.pdf
+*.full.json
+*.extract.json
+*.parse.json
+*.run.json
+*.routing.json
 
 security_best_practices_report.md
 grounded-docparse-threat-model.md
