@@ -1,0 +1,119 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "tests/test_ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_openai_vision_gateway.py",
+      "language": "python",
+      "sizeLines": 650,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 204,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_runtime_config.py",
+      "language": "python",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_page_analysis.py",
+      "language": "python",
+      "sizeLines": 401,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_parallel_pages.py",
+      "language": "python",
+      "sizeLines": 244,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_provider_runtime.py",
+      "language": "python",
+      "sizeLines": 426,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_quality.py",
+      "language": "python",
+      "sizeLines": 634,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_regression_policy.py",
+      "language": "python",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_schema_store.py",
+      "language": "python",
+      "sizeLines": 327,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_contract.py",
+      "language": "python",
+      "sizeLines": 533,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_pipeline.py",
+      "language": "python",
+      "sizeLines": 2452,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_streamlit.py",
+      "language": "python",
+      "sizeLines": 812,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_strict_recovery_contract.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_windows_installer.py",
+      "language": "python",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_workspace_store.py",
+      "language": "python",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "tests/test_ocr_disagreement.py": [],
+    "tests/test_openai_vision_gateway.py": [],
+    "tests/test_paddle_ocr.py": [],
+    "tests/test_paddle_runtime_config.py": [],
+    "tests/test_page_analysis.py": [],
+    "tests/test_parallel_pages.py": [],
+    "tests/test_provider_runtime.py": [],
+    "tests/test_quality.py": [],
+    "tests/test_regression_policy.py": [],
+    "tests/test_schema_store.py": [],
+    "tests/test_simple_contract.py": [],
+    "tests/test_simple_pipeline.py": [],
+    "tests/test_simple_streamlit.py": [],
+    "tests/test_strict_recovery_contract.py": [],
+    "tests/test_windows_installer.py": [],
+    "tests/test_workspace_store.py": []
+  }
+}

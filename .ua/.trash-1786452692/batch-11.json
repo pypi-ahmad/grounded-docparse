@@ -1,0 +1,451 @@
+{
+  "nodes": [
+    {
+      "id": "file:scripts/wsl/launch-stack.sh",
+      "type": "file",
+      "name": "launch-stack.sh",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "summary": "Starts the requested local OCR engine and the Streamlit application with health checks and process locking.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:wait_for_url",
+      "type": "function",
+      "name": "wait_for_url",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        28,
+        37
+      ],
+      "summary": "Polls a service URL until it responds or reports a timed-out startup failure.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:stop_managed",
+      "type": "function",
+      "name": "stop_managed",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        39,
+        49
+      ],
+      "summary": "Stops a managed process after confirming its PID belongs to the expected command.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:streamlit_engine",
+      "type": "function",
+      "name": "streamlit_engine",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        51,
+        63
+      ],
+      "summary": "Returns the OCR engine associated with a running Streamlit process.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:streamlit_environment_matches",
+      "type": "function",
+      "name": "streamlit_environment_matches",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        79,
+        94
+      ],
+      "summary": "Checks whether the existing Streamlit process uses the expected runtime environment.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:start_streamlit",
+      "type": "function",
+      "name": "start_streamlit",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        96,
+        107
+      ],
+      "summary": "Starts Streamlit with the configured OCR engine and runtime environment.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/manage-ocr-stack.sh",
+      "type": "file",
+      "name": "manage-ocr-stack.sh",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "summary": "Ensures exactly one managed local OCR service stack is running in WSL.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:wait_for_url",
+      "type": "function",
+      "name": "wait_for_url",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        53,
+        62
+      ],
+      "summary": "Polls a service URL until it responds or reports a timed-out startup failure.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_managed",
+      "type": "function",
+      "name": "stop_managed",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        64,
+        84
+      ],
+      "summary": "Stops a managed process after confirming its PID belongs to the expected command.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:glm_backend",
+      "type": "function",
+      "name": "glm_backend",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        86,
+        95
+      ],
+      "summary": "Reads the configured local backend for the GLM-OCR service.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_glm",
+      "type": "function",
+      "name": "stop_glm",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        97,
+        106
+      ],
+      "summary": "Stops the managed GLM-OCR service process.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_paddle",
+      "type": "function",
+      "name": "stop_paddle",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        108,
+        117
+      ],
+      "summary": "Stops the managed PaddleOCR service processes.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:ensure_glm",
+      "type": "function",
+      "name": "ensure_glm",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        119,
+        163
+      ],
+      "summary": "Starts or reuses the GLM-OCR service and verifies its health endpoint.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:ensure_paddle",
+      "type": "function",
+      "name": "ensure_paddle",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        165,
+        238
+      ],
+      "summary": "Starts or reuses PaddleOCR service components and verifies their health endpoints.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/run-app.sh",
+      "type": "file",
+      "name": "run-app.sh",
+      "filePath": "scripts/wsl/run-app.sh",
+      "summary": "Activates the WSL runtime, prepares the configured local OCR backend, and launches the application.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/serve-glmocr.sh",
+      "type": "file",
+      "name": "serve-glmocr.sh",
+      "filePath": "scripts/wsl/serve-glmocr.sh",
+      "summary": "Starts the GLM-OCR service using the prepared local runtime.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/serve-ollama.sh",
+      "type": "file",
+      "name": "serve-ollama.sh",
+      "filePath": "scripts/wsl/serve-ollama.sh",
+      "summary": "Starts the Ollama service used as a local OCR backend.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/setup-glmocr.sh",
+      "type": "file",
+      "name": "setup-glmocr.sh",
+      "filePath": "scripts/wsl/setup-glmocr.sh",
+      "summary": "Creates and configures the WSL environment for the local GLM-OCR runtime.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/setup-ollama.sh",
+      "type": "file",
+      "name": "setup-ollama.sh",
+      "filePath": "scripts/wsl/setup-ollama.sh",
+      "summary": "Installs and configures Ollama for local OCR inference in WSL.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "function:scripts/wsl/setup-ollama.sh:download_and_extract",
+      "type": "function",
+      "name": "download_and_extract",
+      "filePath": "scripts/wsl/setup-ollama.sh",
+      "lineRange": [
+        12,
+        23
+      ],
+      "summary": "Downloads and extracts an archive used during the Ollama setup.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "service-management"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/setup-paddleocr.sh",
+      "type": "file",
+      "name": "setup-paddleocr.sh",
+      "filePath": "scripts/wsl/setup-paddleocr.sh",
+      "summary": "Creates the PaddleOCR WSL environment and prepares its runtime dependencies.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:wait_for_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:stop_managed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:streamlit_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:streamlit_environment_matches",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:start_streamlit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:wait_for_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_managed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:glm_backend",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_paddle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:ensure_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:ensure_paddle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/setup-ollama.sh",
+      "target": "function:scripts/wsl/setup-ollama.sh:download_and_extract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path":"docs-site/setup.html","language":"html","sizeLines":489,"fileCategory":"markup"},
+    {"path":"docs-site/site-manifest.json","language":"json","sizeLines":53,"fileCategory":"config"},
+    {"path":"docs-site/spec.html","language":"html","sizeLines":136,"fileCategory":"markup"},
+    {"path":"docs-site/tutorial.html","language":"html","sizeLines":88,"fileCategory":"markup"},
+    {"path":"docs-site/zero-to-hero-tutorial.html","language":"html","sizeLines":1554,"fileCategory":"markup"}
+  ],
+  "batchImportData": {"docs-site/setup.html":[],"docs-site/site-manifest.json":[],"docs-site/spec.html":[],"docs-site/tutorial.html":[],"docs-site/zero-to-hero-tutorial.html":[]}
+}

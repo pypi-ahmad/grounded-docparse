@@ -1,0 +1,1105 @@
+{
+  "scriptCompleted": true,
+  "contentDigest": "700c318fd743907103ebbf31b0efd10c73093ef8e63e96a8728e3cfc6e2ffb05",
+  "files": [
+    {
+      "path": ".env.example",
+      "language": "config",
+      "sizeLines": 31,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".gitattributes",
+      "language": "unknown",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "language": "markdown",
+      "sizeLines": 30,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "language": "toml",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.understandignore",
+      "language": "unknown",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/config.json",
+      "language": "json",
+      "sizeLines": 3,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/domain-graph.json",
+      "language": "json",
+      "sizeLines": 228,
+      "fileCategory": "config"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "sizeLines": 129,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Launch-GLM-OCR.cmd",
+      "language": "batch",
+      "sizeLines": 45,
+      "fileCategory": "script"
+    },
+    {
+      "path": "Launch-PaddleOCR-VL-1.6.cmd",
+      "language": "batch",
+      "sizeLines": 45,
+      "fileCategory": "script"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 217,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "SECURITY.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "SETUP.md",
+      "language": "markdown",
+      "sizeLines": 239,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Setup-GLM-OCR.cmd",
+      "language": "batch",
+      "sizeLines": 5,
+      "fileCategory": "script"
+    },
+    {
+      "path": "benchmarks/baselines/offline-native-v1.json",
+      "language": "json",
+      "sizeLines": 638,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "language": "json",
+      "sizeLines": 72,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/form.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/lists.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/native-text.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "language": "json",
+      "sizeLines": 99,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/tables.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/manifest.json",
+      "language": "json",
+      "sizeLines": 184,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/policies/live-evaluation.example.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/annotation-v1.1.schema.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "language": "json",
+      "sizeLines": 103,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/manifest-v1.schema.json",
+      "language": "json",
+      "sizeLines": 86,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "language": "json",
+      "sizeLines": 60,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/glmocr.yaml",
+      "language": "yaml",
+      "sizeLines": 165,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/paddle-vllm.yaml",
+      "language": "yaml",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs-site/agentic-document-extraction-comparison.html",
+      "language": "html",
+      "sizeLines": 331,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/api.html",
+      "language": "html",
+      "sizeLines": 366,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/architecture.html",
+      "language": "html",
+      "sizeLines": 288,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/assets/app.js",
+      "language": "javascript",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "docs-site/assets/styles.css",
+      "language": "css",
+      "sizeLines": 1380,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/azure-bulk-fax-deployment.html",
+      "language": "html",
+      "sizeLines": 1062,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/business-user-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 296,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/changelog.html",
+      "language": "html",
+      "sizeLines": 217,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/complete-user-guide.html",
+      "language": "html",
+      "sizeLines": 1636,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/contributing.html",
+      "language": "html",
+      "sizeLines": 132,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/extraction-quality-research.html",
+      "language": "html",
+      "sizeLines": 160,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-grounded-docparse-is-agentic.html",
+      "language": "html",
+      "sizeLines": 253,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-it-works.html",
+      "language": "html",
+      "sizeLines": 84,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/index.html",
+      "language": "html",
+      "sizeLines": 273,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--bug-report.html",
+      "language": "html",
+      "sizeLines": 105,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--feature-request.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 495,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-glmocr.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-paddleocr-vl.html",
+      "language": "html",
+      "sizeLines": 201,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/research.html",
+      "language": "html",
+      "sizeLines": 82,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/run.html",
+      "language": "html",
+      "sizeLines": 165,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/security-content-excluded.html",
+      "language": "html",
+      "sizeLines": 66,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/setup.html",
+      "language": "html",
+      "sizeLines": 489,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/site-manifest.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs-site/spec.html",
+      "language": "html",
+      "sizeLines": 136,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/tutorial.html",
+      "language": "html",
+      "sizeLines": 88,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/zero-to-hero-tutorial.html",
+      "language": "html",
+      "sizeLines": 1554,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/agentic-document-extraction-comparison.md",
+      "language": "markdown",
+      "sizeLines": 234,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/api.md",
+      "language": "markdown",
+      "sizeLines": 324,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/architecture.md",
+      "language": "markdown",
+      "sizeLines": 121,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/azure-bulk-fax-deployment.md",
+      "language": "markdown",
+      "sizeLines": 640,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/business-user-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 221,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/.codebase-scan.txt",
+      "language": "txt",
+      "sizeLines": 548,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/ARCHITECTURE.md",
+      "language": "markdown",
+      "sizeLines": 86,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/CONCERNS.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/CONVENTIONS.md",
+      "language": "markdown",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/INTEGRATIONS.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/STACK.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/STRUCTURE.md",
+      "language": "markdown",
+      "sizeLines": 52,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/TESTING.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/complete-user-guide.md",
+      "language": "markdown",
+      "sizeLines": 1363,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/extraction-quality-research.md",
+      "language": "markdown",
+      "sizeLines": 97,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-grounded-docparse-is-agentic.md",
+      "language": "markdown",
+      "sizeLines": 168,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-it-works.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/idp-vs-ade-classification.html",
+      "language": "html",
+      "sizeLines": 690,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/layout-aware-large-field-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 434,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-glmocr.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-paddleocr-vl.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/private-evaluation.md",
+      "language": "markdown",
+      "sizeLines": 105,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/run.md",
+      "language": "markdown",
+      "sizeLines": 93,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/spec.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/tutorial.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/zero-to-hero-tutorial.md",
+      "language": "markdown",
+      "sizeLines": 1322,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "examples/schemas/invoice.schema.json",
+      "language": "json",
+      "sizeLines": 50,
+      "fileCategory": "config"
+    },
+    {
+      "path": "grounded-docparse-threat-model.md",
+      "language": "markdown",
+      "sizeLines": 167,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "installer/GroundedDocParse.iss",
+      "language": "iss",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": "installer/Install-GroundedDocParse.ps1",
+      "language": "powershell",
+      "sizeLines": 371,
+      "fileCategory": "script"
+    },
+    {
+      "path": "paddle-runtime/pyproject.toml",
+      "language": "toml",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "presentations/grounded-docparse-business.pptx",
+      "language": "pptx",
+      "sizeLines": 619,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-github-overview.pptx",
+      "language": "pptx",
+      "sizeLines": 631,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-technical.pptx",
+      "language": "pptx",
+      "sizeLines": 630,
+      "fileCategory": "code"
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "sizeLines": 74,
+      "fileCategory": "config"
+    },
+    {
+      "path": "scripts/build-installer.ps1",
+      "language": "powershell",
+      "sizeLines": 46,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "language": "python",
+      "sizeLines": 566,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "language": "python",
+      "sizeLines": 444,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_evaluation_corpus.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_examples.py",
+      "language": "python",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/benchmark_glmocr.py",
+      "language": "python",
+      "sizeLines": 121,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-glmocr-api.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-paddleocr-api.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "language": "shell",
+      "sizeLines": 128,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "language": "shell",
+      "sizeLines": 265,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/prepare_glmocr_runtime.py",
+      "language": "python",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "language": "python",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "language": "shell",
+      "sizeLines": 28,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 24,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "language": "shell",
+      "sizeLines": 14,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 84,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "language": "shell",
+      "sizeLines": 63,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "language": "shell",
+      "sizeLines": 53,
+      "fileCategory": "script"
+    },
+    {
+      "path": "security_best_practices_report.md",
+      "language": "markdown",
+      "sizeLines": 59,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "src/grounded_docparse/__init__.py",
+      "language": "python",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/agentic.py",
+      "language": "python",
+      "sizeLines": 1002,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/batch.py",
+      "language": "python",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/benchmark.py",
+      "language": "python",
+      "sizeLines": 1500,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/cli.py",
+      "language": "python",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/config.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/enhancement.py",
+      "language": "python",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/extraction.py",
+      "language": "python",
+      "sizeLines": 758,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/gateways.py",
+      "language": "python",
+      "sizeLines": 901,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ingest.py",
+      "language": "python",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/local_ocr.py",
+      "language": "python",
+      "sizeLines": 236,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/models.py",
+      "language": "python",
+      "sizeLines": 1030,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_services.py",
+      "language": "python",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/page_analysis.py",
+      "language": "python",
+      "sizeLines": 861,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/pipeline.py",
+      "language": "python",
+      "sizeLines": 3140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/prompts.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/quality.py",
+      "language": "python",
+      "sizeLines": 514,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/render.py",
+      "language": "python",
+      "sizeLines": 1425,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/runtime.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/schema_store.py",
+      "language": "python",
+      "sizeLines": 418,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/workspace_store.py",
+      "language": "python",
+      "sizeLines": 451,
+      "fileCategory": "code"
+    },
+    {
+      "path": "streamlit_app.py",
+      "language": "python",
+      "sizeLines": 2584,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/conftest.py",
+      "language": "python",
+      "sizeLines": 15,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_contract.py",
+      "language": "python",
+      "sizeLines": 837,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_extraction.py",
+      "language": "python",
+      "sizeLines": 803,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_features.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_batch.py",
+      "language": "python",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_cli.py",
+      "language": "python",
+      "sizeLines": 375,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_confidence_spans.py",
+      "language": "python",
+      "sizeLines": 341,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_corpus_manifest.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_calibration.py",
+      "language": "python",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_cli.py",
+      "language": "python",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_metrics.py",
+      "language": "python",
+      "sizeLines": 515,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_report.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_form_routing.py",
+      "language": "python",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_glmocr_runtime_config.py",
+      "language": "python",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_ingest.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_launcher_contract.py",
+      "language": "python",
+      "sizeLines": 125,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_markdown_enhancement.py",
+      "language": "python",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_openai_vision_gateway.py",
+      "language": "python",
+      "sizeLines": 650,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 204,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_runtime_config.py",
+      "language": "python",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_page_analysis.py",
+      "language": "python",
+      "sizeLines": 401,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_parallel_pages.py",
+      "language": "python",
+      "sizeLines": 244,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_provider_runtime.py",
+      "language": "python",
+      "sizeLines": 426,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_quality.py",
+      "language": "python",
+      "sizeLines": 634,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_regression_policy.py",
+      "language": "python",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_schema_store.py",
+      "language": "python",
+      "sizeLines": 327,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_contract.py",
+      "language": "python",
+      "sizeLines": 533,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_pipeline.py",
+      "language": "python",
+      "sizeLines": 2452,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_streamlit.py",
+      "language": "python",
+      "sizeLines": 812,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_strict_recovery_contract.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_windows_installer.py",
+      "language": "python",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_workspace_store.py",
+      "language": "python",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 178,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "large",
+  "stats": {
+    "filesScanned": 178,
+    "byCategory": {
+      "config": 31,
+      "code": 73,
+      "docs": 35,
+      "script": 13,
+      "markup": 26
+    },
+    "byLanguage": {
+      "config": 1,
+      "unknown": 2,
+      "markdown": 34,
+      "toml": 3,
+      "json": 25,
+      "batch": 3,
+      "yaml": 2,
+      "html": 25,
+      "javascript": 1,
+      "css": 1,
+      "txt": 1,
+      "iss": 1,
+      "powershell": 2,
+      "pptx": 3,
+      "python": 66,
+      "shell": 8
+    }
+  }
+}

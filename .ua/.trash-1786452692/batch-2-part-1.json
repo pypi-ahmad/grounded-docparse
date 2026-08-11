@@ -1,0 +1,1585 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/grounded_docparse/__init__.py",
+      "summary": "Exposes the public parsing, configuration, extraction, rendering, and agentic APIs for the grounded document parser package.",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "public-api"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/agentic.py",
+      "type": "file",
+      "name": "agentic.py",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "summary": "Coordinates agentic document analysis, form routing, schema-guided extraction, table-of-contents generation, and grounded document chat.",
+      "tags": [
+        "agentic",
+        "orchestration",
+        "document-analysis",
+        "extraction"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_profile_fingerprint",
+      "type": "function",
+      "name": "_profile_fingerprint",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        62,
+        64
+      ],
+      "summary": "Provides the _profile_fingerprint helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_category_map",
+      "type": "function",
+      "name": "_category_map",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        67,
+        68
+      ],
+      "summary": "Provides the _category_map helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_validate_segmentation",
+      "type": "function",
+      "name": "_validate_segmentation",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        71,
+        102
+      ],
+      "summary": "Provides the _validate_segmentation helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_validate_effective_segments",
+      "type": "function",
+      "name": "_validate_effective_segments",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        105,
+        129
+      ],
+      "summary": "Provides the _validate_effective_segments helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_segment_extraction_payload",
+      "type": "function",
+      "name": "_segment_extraction_payload",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        132,
+        154
+      ],
+      "summary": "Provides the _segment_extraction_payload helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_walk",
+      "type": "function",
+      "name": "_walk",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        157,
+        160
+      ],
+      "summary": "Provides the _walk helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_active_elements",
+      "type": "function",
+      "name": "_active_elements",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        163,
+        171
+      ],
+      "summary": "Provides the _active_elements helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_page_markdown",
+      "type": "function",
+      "name": "_page_markdown",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        174,
+        191
+      ],
+      "summary": "Provides the _page_markdown helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_prepare_agentic_context",
+      "type": "function",
+      "name": "_prepare_agentic_context",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        194,
+        293
+      ],
+      "summary": "Provides the _prepare_agentic_context helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_flatten_sections",
+      "type": "function",
+      "name": "_flatten_sections",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        296,
+        301
+      ],
+      "summary": "Provides the _flatten_sections helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_nest_sections",
+      "type": "function",
+      "name": "_nest_sections",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        304,
+        316
+      ],
+      "summary": "Provides the _nest_sections helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_fallback_toc",
+      "type": "function",
+      "name": "_fallback_toc",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        319,
+        334
+      ],
+      "summary": "Provides the _fallback_toc helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_validate_toc",
+      "type": "function",
+      "name": "_validate_toc",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        337,
+        356
+      ],
+      "summary": "Provides the _validate_toc helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/agentic.py:_feature_error",
+      "type": "function",
+      "name": "_feature_error",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        359,
+        364
+      ],
+      "summary": "Provides the _feature_error helper used by the agentic module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/agentic.py:AgenticContext",
+      "type": "class",
+      "name": "AgenticContext",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        49,
+        52
+      ],
+      "summary": "Carries a bounded document segment and associated layout context for agentic model operations.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/agentic.py:PreparedDocumentContext",
+      "type": "class",
+      "name": "PreparedDocumentContext",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        56,
+        59
+      ],
+      "summary": "Bundles prepared agentic contexts with page markdown and element indexes for downstream operations.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/agentic.py:DocumentAgent",
+      "type": "class",
+      "name": "DocumentAgent",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "lineRange": [
+        367,
+        1002
+      ],
+      "summary": "Orchestrates agent-driven analysis, classification, extraction, and grounded chat over parsed documents.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/config.py",
+      "type": "file",
+      "name": "config.py",
+      "filePath": "src/grounded_docparse/config.py",
+      "summary": "Defines validated parser and OCR runtime configuration, including environment-based defaults for provider, quality, and recovery controls.",
+      "tags": [
+        "configuration",
+        "validation",
+        "runtime-settings",
+        "ocr"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "function",
+      "name": "validate_paddleocr_service_url",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        25,
+        46
+      ],
+      "summary": "Provides the validate_paddleocr_service_url helper used by the config module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "class",
+      "name": "OcrEngine",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        12,
+        22
+      ],
+      "summary": "Enumerates supported OCR engine selections and their display labels.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "class",
+      "name": "AnalysisThresholds",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        50,
+        84
+      ],
+      "summary": "Stores validated thresholds that control page-analysis and quality decisions.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "class",
+      "name": "ParserConfig",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        88,
+        304
+      ],
+      "summary": "Stores validated parser, OCR, provider, and recovery settings loaded from the environment.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/extraction.py",
+      "type": "file",
+      "name": "extraction.py",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "summary": "Implements schema validation and grounded field extraction with citation resolution, evidence checks, and structured result construction.",
+      "tags": [
+        "extraction",
+        "validation",
+        "grounding",
+        "schema"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:validate_extraction_schema",
+      "type": "function",
+      "name": "validate_extraction_schema",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        48,
+        53
+      ],
+      "summary": "Provides the validate_extraction_schema helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_validate_schema_node",
+      "type": "function",
+      "name": "_validate_schema_node",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        56,
+        97
+      ],
+      "summary": "Provides the _validate_schema_node helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_usage",
+      "type": "function",
+      "name": "_usage",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        241,
+        243
+      ],
+      "summary": "Provides the _usage helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_extraction_payload",
+      "type": "function",
+      "name": "_extraction_payload",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        246,
+        274
+      ],
+      "summary": "Provides the _extraction_payload helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_model_extraction_context",
+      "type": "function",
+      "name": "_model_extraction_context",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        277,
+        305
+      ],
+      "summary": "Provides the _model_extraction_context helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_validate_and_resolve",
+      "type": "function",
+      "name": "_validate_and_resolve",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        308,
+        387
+      ],
+      "summary": "Provides the _validate_and_resolve helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_active_blocks",
+      "type": "function",
+      "name": "_active_blocks",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        390,
+        396
+      ],
+      "summary": "Provides the _active_blocks helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_resolve_inferred_evidence",
+      "type": "function",
+      "name": "_resolve_inferred_evidence",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        399,
+        447
+      ],
+      "summary": "Provides the _resolve_inferred_evidence helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_bbox_tuple",
+      "type": "function",
+      "name": "_bbox_tuple",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        450,
+        456
+      ],
+      "summary": "Provides the _bbox_tuple helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_extracted_fields",
+      "type": "function",
+      "name": "_extracted_fields",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        459,
+        498
+      ],
+      "summary": "Provides the _extracted_fields helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_canonical_evidence_pointer",
+      "type": "function",
+      "name": "_canonical_evidence_pointer",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        501,
+        510
+      ],
+      "summary": "Provides the _canonical_evidence_pointer helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_pointer_value",
+      "type": "function",
+      "name": "_pointer_value",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        513,
+        517
+      ],
+      "summary": "Provides the _pointer_value helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_citations_contain_value",
+      "type": "function",
+      "name": "_citations_contain_value",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        520,
+        575
+      ],
+      "summary": "Provides the _citations_contain_value helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_strip_markdown_emphasis",
+      "type": "function",
+      "name": "_strip_markdown_emphasis",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        578,
+        590
+      ],
+      "summary": "Provides the _strip_markdown_emphasis helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_boolean_token",
+      "type": "function",
+      "name": "_boolean_token",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        593,
+        600
+      ],
+      "summary": "Provides the _boolean_token helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_markdown_table_cells",
+      "type": "function",
+      "name": "_markdown_table_cells",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        603,
+        623
+      ],
+      "summary": "Provides the _markdown_table_cells helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_separator_row",
+      "type": "function",
+      "name": "_separator_row",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        626,
+        629
+      ],
+      "summary": "Provides the _separator_row helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_evidence_contains_boolean",
+      "type": "function",
+      "name": "_evidence_contains_boolean",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        632,
+        674
+      ],
+      "summary": "Provides the _evidence_contains_boolean helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_validate_instance",
+      "type": "function",
+      "name": "_validate_instance",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        677,
+        707
+      ],
+      "summary": "Provides the _validate_instance helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_non_null_leaves",
+      "type": "function",
+      "name": "_non_null_leaves",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        710,
+        719
+      ],
+      "summary": "Provides the _non_null_leaves helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_pointer_parts",
+      "type": "function",
+      "name": "_pointer_parts",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        722,
+        729
+      ],
+      "summary": "Provides the _pointer_parts helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_pointer_exists",
+      "type": "function",
+      "name": "_pointer_exists",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        732,
+        739
+      ],
+      "summary": "Provides the _pointer_exists helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_set_pointer",
+      "type": "function",
+      "name": "_set_pointer",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        742,
+        753
+      ],
+      "summary": "Provides the _set_pointer helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/extraction.py:_issue_pointer",
+      "type": "function",
+      "name": "_issue_pointer",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        756,
+        758
+      ],
+      "summary": "Provides the _issue_pointer helper used by the extraction module's document-processing workflow.",
+      "tags": [
+        "internal-helper",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/extraction.py:DocumentExtractor",
+      "type": "class",
+      "name": "DocumentExtractor",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "lineRange": [
+        100,
+        238
+      ],
+      "summary": "Proposes schemas and extracts citation-backed structured fields from parsed documents.",
+      "tags": [
+        "data-model",
+        "document-processing",
+        "python"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_profile_fingerprint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_category_map",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_segmentation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_effective_segments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_segment_extraction_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_walk",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_active_elements",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_page_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_prepare_agentic_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_flatten_sections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_nest_sections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_fallback_toc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_toc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_feature_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:AgenticContext",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:PreparedDocumentContext",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:DocumentAgent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:AgenticContext",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:PreparedDocumentContext",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_profile_fingerprint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_category_map",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_segmentation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_effective_segments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_segment_extraction_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_walk",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_active_elements",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_page_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_prepare_agentic_context",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_flatten_sections",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_nest_sections",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_fallback_toc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_validate_toc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "function:src/grounded_docparse/agentic.py:_feature_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "class:src/grounded_docparse/agentic.py:DocumentAgent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:validate_extraction_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_schema_node",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_usage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_extraction_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_model_extraction_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_and_resolve",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_active_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_resolve_inferred_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_bbox_tuple",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_extracted_fields",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_canonical_evidence_pointer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_citations_contain_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_strip_markdown_emphasis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_boolean_token",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_markdown_table_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_separator_row",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_evidence_contains_boolean",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_instance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_non_null_leaves",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_parts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_exists",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_set_pointer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_issue_pointer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "class:src/grounded_docparse/extraction.py:DocumentExtractor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:validate_extraction_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_schema_node",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "class:src/grounded_docparse/extraction.py:DocumentExtractor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_usage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_extraction_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_model_extraction_context",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_and_resolve",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_active_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_resolve_inferred_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_bbox_tuple",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_extracted_fields",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_canonical_evidence_pointer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_value",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_citations_contain_value",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_strip_markdown_emphasis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_boolean_token",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_markdown_table_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_separator_row",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_evidence_contains_boolean",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_validate_instance",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_non_null_leaves",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_parts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_pointer_exists",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_set_pointer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "function:src/grounded_docparse/extraction.py:_issue_pointer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

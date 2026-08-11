@@ -1,0 +1,1860 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/quality.py",
+      "type": "file",
+      "name": "quality.py",
+      "filePath": "src/grounded_docparse/quality.py",
+      "summary": "Evaluates page content quality and selects evidence-based recovery or repair candidates.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "class",
+      "name": "LiteralRepairCandidate",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        54,
+        59
+      ],
+      "summary": "Data model or service type supporting the quality workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_tokens",
+      "type": "function",
+      "name": "_tokens",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        62,
+        63
+      ],
+      "summary": "Implements tokens for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_area",
+      "type": "function",
+      "name": "_area",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        66,
+        69
+      ],
+      "summary": "Implements area for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_intersection",
+      "type": "function",
+      "name": "_intersection",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        72,
+        77
+      ],
+      "summary": "Implements intersection for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:semantic_text",
+      "type": "function",
+      "name": "semantic_text",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        80,
+        88
+      ],
+      "summary": "Implements semantic text for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "function",
+      "name": "_spatial_recovery_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        91,
+        105
+      ],
+      "summary": "Implements spatial recovery blocks for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "function",
+      "name": "recovery_content_is_redundant",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        108,
+        119
+      ],
+      "summary": "Implements recovery content is redundant for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "function",
+      "name": "recovery_content_conflicts",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        122,
+        137
+      ],
+      "summary": "Implements recovery content conflicts for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_recovery_tokens",
+      "type": "function",
+      "name": "_recovery_tokens",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        140,
+        142
+      ],
+      "summary": "Implements recovery tokens for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_ordered_subsequence",
+      "type": "function",
+      "name": "_ordered_subsequence",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        145,
+        149
+      ],
+      "summary": "Implements ordered subsequence for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_scan_candidate",
+      "type": "function",
+      "name": "_scan_candidate",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        152,
+        159
+      ],
+      "summary": "Implements scan candidate for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:incomplete_table",
+      "type": "function",
+      "name": "incomplete_table",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        162,
+        167
+      ],
+      "summary": "Implements incomplete table for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_incomplete_structured_content",
+      "type": "function",
+      "name": "_incomplete_structured_content",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        170,
+        177
+      ],
+      "summary": "Implements incomplete structured content for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "function",
+      "name": "_rectangle_union_area",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        180,
+        214
+      ],
+      "summary": "Implements rectangle union area for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "function",
+      "name": "_covered_fraction",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        217,
+        231
+      ],
+      "summary": "Implements covered fraction for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "function",
+      "name": "_scan_probes",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        234,
+        266
+      ],
+      "summary": "Implements scan probes for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:find_missing_source_regions",
+      "type": "function",
+      "name": "find_missing_source_regions",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        269,
+        273
+      ],
+      "summary": "Implements find missing source regions for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_critical_values",
+      "type": "function",
+      "name": "_critical_values",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        276,
+        281
+      ],
+      "summary": "Implements critical values for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "function",
+      "name": "literal_repair_candidates",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        284,
+        337
+      ],
+      "summary": "Implements literal repair candidates for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:requires_region_repair",
+      "type": "function",
+      "name": "requires_region_repair",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        340,
+        342
+      ],
+      "summary": "Implements requires region repair for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "function",
+      "name": "_structured_repair_risks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        345,
+        367
+      ],
+      "summary": "Implements structured repair risks for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "function",
+      "name": "select_repair_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        370,
+        397
+      ],
+      "summary": "Implements select repair blocks for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "function",
+      "name": "_normalize_marker",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        400,
+        412
+      ],
+      "summary": "Implements normalize marker for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_fingerprint",
+      "type": "function",
+      "name": "_fingerprint",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        415,
+        416
+      ],
+      "summary": "Implements fingerprint for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_box_overlap",
+      "type": "function",
+      "name": "_box_overlap",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        419,
+        422
+      ],
+      "summary": "Implements box overlap for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_clipped",
+      "type": "function",
+      "name": "_clipped",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        425,
+        426
+      ],
+      "summary": "Implements clipped for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "function",
+      "name": "_duplicate",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        429,
+        449
+      ],
+      "summary": "Implements duplicate for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_quality",
+      "type": "function",
+      "name": "_quality",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        452,
+        459
+      ],
+      "summary": "Implements quality for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "function",
+      "name": "normalize_page_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        462,
+        514
+      ],
+      "summary": "Implements normalize page blocks for the quality workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/render.py",
+      "type": "file",
+      "name": "render.py",
+      "filePath": "src/grounded_docparse/render.py",
+      "summary": "Renders parsed document structures to Markdown, structured elements, and annotated PDF output.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/render.py:_VisualSegment",
+      "type": "class",
+      "name": "_VisualSegment",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        181,
+        188
+      ],
+      "summary": "Data model or service type supporting the render workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/render.py:_Emission",
+      "type": "class",
+      "name": "_Emission",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        318,
+        323
+      ],
+      "summary": "Data model or service type supporting the render workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/render.py:_MarkdownBuilder",
+      "type": "class",
+      "name": "_MarkdownBuilder",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        326,
+        371
+      ],
+      "summary": "Data model or service type supporting the render workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/render.py:RenderedAgenticDocument",
+      "type": "class",
+      "name": "RenderedAgenticDocument",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        456,
+        458
+      ],
+      "summary": "Data model or service type supporting the render workflow.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "document-parsing"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_checkbox_marker",
+      "type": "function",
+      "name": "_checkbox_marker",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        64,
+        65
+      ],
+      "summary": "Implements checkbox marker for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_has_equivalent_leading_marker",
+      "type": "function",
+      "name": "_has_equivalent_leading_marker",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        68,
+        71
+      ],
+      "summary": "Implements has equivalent leading marker for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_line_key",
+      "type": "function",
+      "name": "_line_key",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        74,
+        76
+      ],
+      "summary": "Implements line key for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_table_structure_lines",
+      "type": "function",
+      "name": "_table_structure_lines",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        79,
+        98
+      ],
+      "summary": "Implements table structure lines for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_table_residual_lines",
+      "type": "function",
+      "name": "_table_residual_lines",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        101,
+        110
+      ],
+      "summary": "Implements table residual lines for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_form_structure_lines",
+      "type": "function",
+      "name": "_form_structure_lines",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        113,
+        141
+      ],
+      "summary": "Implements form structure lines for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_form_residual_lines",
+      "type": "function",
+      "name": "_form_residual_lines",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        144,
+        153
+      ],
+      "summary": "Implements form residual lines for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_table",
+      "type": "function",
+      "name": "_table",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        156,
+        177
+      ],
+      "summary": "Implements table for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_visual_segments",
+      "type": "function",
+      "name": "_visual_segments",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        191,
+        266
+      ],
+      "summary": "Implements visual segments for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_visual",
+      "type": "function",
+      "name": "_visual",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        269,
+        272
+      ],
+      "summary": "Implements visual for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_bbox_key",
+      "type": "function",
+      "name": "_bbox_key",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        275,
+        278
+      ],
+      "summary": "Implements bbox key for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_body",
+      "type": "function",
+      "name": "_body",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        281,
+        314
+      ],
+      "summary": "Implements body for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_checkbox_text",
+      "type": "function",
+      "name": "_checkbox_text",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        374,
+        378
+      ],
+      "summary": "Implements checkbox text for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_render_block",
+      "type": "function",
+      "name": "_render_block",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        381,
+        383
+      ],
+      "summary": "Implements render block for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_render_blocks",
+      "type": "function",
+      "name": "_render_blocks",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        386,
+        408
+      ],
+      "summary": "Implements render blocks for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_render_with_emissions",
+      "type": "function",
+      "name": "_render_with_emissions",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        411,
+        417
+      ],
+      "summary": "Implements render with emissions for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:render_markdown",
+      "type": "function",
+      "name": "render_markdown",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        420,
+        422
+      ],
+      "summary": "Implements render markdown for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:sanitize_markdown_preview",
+      "type": "function",
+      "name": "sanitize_markdown_preview",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        425,
+        452
+      ],
+      "summary": "Implements sanitize markdown preview for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:build_elements",
+      "type": "function",
+      "name": "build_elements",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        461,
+        492
+      ],
+      "summary": "Implements build elements for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_semantic_fragments",
+      "type": "function",
+      "name": "_semantic_fragments",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        495,
+        544
+      ],
+      "summary": "Implements semantic fragments for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_token_counts",
+      "type": "function",
+      "name": "_token_counts",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        547,
+        548
+      ],
+      "summary": "Implements token counts for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_sum_token_counts",
+      "type": "function",
+      "name": "_sum_token_counts",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        551,
+        555
+      ],
+      "summary": "Implements sum token counts for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_semantic_tokens",
+      "type": "function",
+      "name": "_semantic_tokens",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        558,
+        621
+      ],
+      "summary": "Implements semantic tokens for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_incomplete_structure",
+      "type": "function",
+      "name": "_incomplete_structure",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        624,
+        635
+      ],
+      "summary": "Implements incomplete structure for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/render.py:_semantic_coverage",
+      "type": "function",
+      "name": "_semantic_coverage",
+      "filePath": "src/grounded_docparse/render.py",
+      "lineRange": [
+        638,
+        648
+      ],
+      "summary": "Implements semantic coverage for the render workflow.",
+      "tags": [
+        "utility",
+        "document-parsing",
+        "internal-helper"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_intersection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_intersection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:semantic_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:semantic_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_recovery_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_recovery_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_ordered_subsequence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_ordered_subsequence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_candidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_candidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:incomplete_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:incomplete_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_incomplete_structured_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_incomplete_structured_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:find_missing_source_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:find_missing_source_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_critical_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_critical_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:requires_region_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:requires_region_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_fingerprint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_fingerprint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_box_overlap",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_box_overlap",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_clipped",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_clipped",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_quality",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_quality",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_VisualSegment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_VisualSegment",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_Emission",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_Emission",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_MarkdownBuilder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:_MarkdownBuilder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:RenderedAgenticDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "class:src/grounded_docparse/render.py:RenderedAgenticDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_checkbox_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_checkbox_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_has_equivalent_leading_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_has_equivalent_leading_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_line_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_line_key",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_structure_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_structure_lines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_residual_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table_residual_lines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_form_structure_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_form_structure_lines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_form_residual_lines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_form_residual_lines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual_segments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual_segments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_visual",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_bbox_key",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_bbox_key",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_body",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_body",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_checkbox_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_checkbox_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_block",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_block",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_with_emissions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_render_with_emissions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:render_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:sanitize_markdown_preview",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:sanitize_markdown_preview",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:build_elements",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:build_elements",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_fragments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_fragments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_token_counts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_token_counts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_sum_token_counts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_sum_token_counts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_incomplete_structure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_incomplete_structure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_coverage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "function:src/grounded_docparse/render.py:_semantic_coverage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

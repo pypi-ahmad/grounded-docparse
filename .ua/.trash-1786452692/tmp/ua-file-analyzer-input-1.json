@@ -1,0 +1,96 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "src/grounded_docparse/batch.py",
+      "language": "python",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/benchmark.py",
+      "language": "python",
+      "sizeLines": 1500,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/cli.py",
+      "language": "python",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/enhancement.py",
+      "language": "python",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/models.py",
+      "language": "python",
+      "sizeLines": 1030,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/quality.py",
+      "language": "python",
+      "sizeLines": 514,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/render.py",
+      "language": "python",
+      "sizeLines": 1425,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/schema_store.py",
+      "language": "python",
+      "sizeLines": 418,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/workspace_store.py",
+      "language": "python",
+      "sizeLines": 451,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/grounded_docparse/batch.py": [
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/render.py"
+    ],
+    "src/grounded_docparse/benchmark.py": [
+      "src/grounded_docparse/models.py"
+    ],
+    "src/grounded_docparse/cli.py": [
+      "src/grounded_docparse/agentic.py",
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/pipeline.py",
+      "src/grounded_docparse/render.py",
+      "src/grounded_docparse/schema_store.py"
+    ],
+    "src/grounded_docparse/enhancement.py": [
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/render.py"
+    ],
+    "src/grounded_docparse/models.py": [],
+    "src/grounded_docparse/quality.py": [
+      "src/grounded_docparse/ingest.py",
+      "src/grounded_docparse/models.py"
+    ],
+    "src/grounded_docparse/render.py": [
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/quality.py"
+    ],
+    "src/grounded_docparse/schema_store.py": [
+      "src/grounded_docparse/models.py"
+    ],
+    "src/grounded_docparse/workspace_store.py": [
+      "src/grounded_docparse/batch.py",
+      "src/grounded_docparse/models.py"
+    ]
+  }
+}

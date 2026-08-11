@@ -1,5 +1,6 @@
 .venv/
 .venv-wsl/
+paddle-runtime/
 node_modules/
 *.egg-info/
 __pycache__/
