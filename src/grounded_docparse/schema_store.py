@@ -1,16 +1,25 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 import re
 import sqlite3
+from collections.abc import Iterable, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
+from zipfile import BadZipFile
+
+from openpyxl import load_workbook
+from openpyxl.utils.exceptions import InvalidFileException
 
 from .models import ClassifierCategory, ClassifierProfile, SchemaField, StoredSchema
 
 DEFAULT_DATABASE_PATH = Path("data/document_studio.sqlite3")
 MAX_MARKDOWN_SCHEMA_BYTES = 1024 * 1024
+MAX_TABULAR_SCHEMA_BYTES = 1024 * 1024
 SUPPORTED_FIELD_TYPES = {"string", "number", "integer", "boolean", "date"}
+_TABULAR_HEADERS = ["field name", "description", "type"]
 _HEADING = re.compile(r"^#\s+(.+?)\s*#*\s*$")
 _BULLET = re.compile(
     r"^\s*[-*+]\s+([A-Za-z_][A-Za-z0-9_]*)"
@@ -123,6 +132,54 @@ def parse_markdown_schema(data: bytes, filename: str) -> StoredSchema:
     if not fields:
         raise ValueError("Markdown schema contains no fields")
     return StoredSchema(name=schema_name, fields=fields)
+
+
+def _tabular_schema(
+    rows: Iterable[Sequence[object]], filename: str
+) -> StoredSchema:
+    iterator = iter(rows)
+    header = next(iterator, None)
+    normalized_header = [
+        "" if cell is None else str(cell).strip().casefold() for cell in header or []
+    ]
+    if normalized_header != _TABULAR_HEADERS:
+        raise ValueError("Tabular schema headers must be Field name, Description, Type")
+    fields: list[SchemaField] = []
+    for raw_row in iterator:
+        row = ["" if cell is None else str(cell).strip() for cell in raw_row]
+        if not any(row):
+            continue
+        if len(row) != 3:
+            raise ValueError("Tabular schema rows must contain exactly three columns")
+        fields.append(_field(row[0], row[1], row[2]))
+    if not fields:
+        raise ValueError("Tabular schema contains no fields")
+    return StoredSchema(name=Path(filename).stem.strip(), fields=fields)
+
+
+def parse_tabular_schema(data: bytes, filename: str) -> StoredSchema:
+    suffix = Path(filename).suffix.casefold()
+    if suffix not in {".csv", ".xlsx"}:
+        raise ValueError("Tabular schema must use the .csv or .xlsx extension")
+    if len(data) > MAX_TABULAR_SCHEMA_BYTES:
+        raise ValueError("Tabular schema exceeds 1 MB")
+    if suffix == ".csv":
+        try:
+            rows = csv.reader(io.StringIO(data.decode("utf-8-sig")))
+            return _tabular_schema(rows, filename)
+        except UnicodeDecodeError as exc:
+            raise ValueError("CSV schema must be UTF-8") from exc
+        except csv.Error as exc:
+            raise ValueError(f"CSV schema is malformed: {exc}") from exc
+
+    try:
+        workbook = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+    except (BadZipFile, InvalidFileException, KeyError, OSError, ValueError) as exc:
+        raise ValueError("XLSX schema is malformed") from exc
+    try:
+        return _tabular_schema(workbook.worksheets[0].iter_rows(values_only=True), filename)
+    finally:
+        workbook.close()
 
 
 def _markdown_text(data: bytes, filename: str, kind: str) -> tuple[list[str], str]:

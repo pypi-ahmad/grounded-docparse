@@ -45,7 +45,7 @@ Upload one or more documents
 Grounded DocParse can:
 
 - process PDF, PNG, JPEG, and TIFF documents;
-- process up to 20 files sequentially in one session;
+- process up to 20 files sequentially in one durable local workspace;
 - handle multi-page PDFs and multi-frame images;
 - process an optional continuous page range from a PDF;
 - detect document regions such as text, headings, tables, forms, figures, formulas, and seals;
@@ -68,9 +68,8 @@ The current application does not provide:
 
 - folder upload;
 - a production batch queue;
-- durable document jobs that survive process restarts;
+- a production job queue or unattended worker service;
 - a public HTTP API;
-- a command-line application;
 - multi-user authentication or tenant isolation;
 - automatic human-review audit records;
 - automatic merging of results from several schemas;
@@ -78,7 +77,7 @@ The current application does not provide:
 - guaranteed recovery of a source region that OCR never detected; or
 - permission to use the output without business or regulatory review.
 
-It processes up to 20 uploaded files sequentially in the active Streamlit session, with per-file failure isolation and ZIP export. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes the changes required for durable production batch processing.
+It processes up to 20 uploaded files sequentially in one active local workspace, with restart recovery, per-file failure isolation, and ZIP export. This is workstation recovery, not an unattended production queue. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes production bulk processing.
 
 ### 2.3 Core parsing versus optional AI features
 
@@ -625,11 +624,24 @@ Exact steps:
 
 Markdown upload does not automatically save the schema or run extraction. An H1 becomes the schema name; otherwise, the filename becomes the name. An omitted type defaults to `string`.
 
-### 12.6 Load a saved schema
+### 12.6 Import schema CSV or XLSX
+
+CSV and XLSX imports use these columns in order:
+
+```csv
+Field name,Description,Type
+invoice_number,Official invoice identifier,string
+total_amount,Final amount payable,number
+due_date,Payment due date,date
+```
+
+Use **Import schema Markdown, CSV, or XLSX** to choose the file. XLSX imports read the first worksheet. The filename becomes the schema name, and an empty type defaults to `string`. The fields load into the editable draft; review them before selecting **Save schema**.
+
+### 12.7 Load a saved schema
 
 Choose a name under **Saved schema**, then select **Load selected schema**. Saving the same name later updates that reusable definition.
 
-### 12.7 Review extraction results
+### 12.8 Review extraction results
 
 Each field displays:
 
@@ -649,7 +661,7 @@ Confidence meanings:
 
 The app does not fill a missing field merely because the schema requires it. Missing values remain `null`/`not_found`.
 
-### 12.8 Large field sets
+### 12.9 Large field sets
 
 The application can accept a large scalar schema, but it does not automatically split schemas. The UI runs one schema at a time and keeps the latest result in the active session.
 
@@ -842,6 +854,8 @@ To review:
 Every segment—including non-extractable `other` or `medical_records` segments—must be approved before routed extraction. Approval confirms the routing decision; it does not make an ineligible category extractable.
 
 Segment IDs are not durable business identifiers. Applying review sorts segments and can renumber them as `form-001`, `form-002`, and so on. Do not use them to join records across classification runs or substantial review edits.
+
+When every segment is approved and the routing profile is unchanged, select **Download split documents**. The dedicated `.segments.zip` contains a PDF, Markdown file, and canonical parsed-document JSON for every segment, including non-extractable and repeated categories. `manifest.json` records the source identity, full routing metadata, and generated paths. The PDF uses original source pages without annotations; Markdown and JSON retain parsed page numbers, element IDs, and bounding boxes.
 
 ### 13.8 Extract eligible forms
 
@@ -1062,8 +1076,8 @@ Current output versions are:
 
 | Result | Version |
 | --- | --- |
-| Parse JSON | `4.4.0` |
-| Full JSON | `4.5.0` |
+| Parse JSON | `4.5.0` |
+| Full JSON | `4.6.0` |
 | Whole-document extraction JSON | `1.1.0` |
 | Routed extraction JSON | `2.0.0` |
 
@@ -1073,7 +1087,7 @@ Consumers should use the version field instead of assuming every JSON file has t
 
 ### 18.1 What is saved by the app
 
-Reusable extraction schemas and routing profiles are intentionally stored in SQLite at:
+Reusable extraction schemas, routing profiles, and active-batch metadata are intentionally stored in SQLite at:
 
 ```text
 data/document_studio.sqlite3
@@ -1081,22 +1095,23 @@ data/document_studio.sqlite3
 
 An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
+The database's sibling `workspaces` directory stores the active batch's source bytes, selected-page source, annotated PDF, and parse checkpoint. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
+
 ### 18.2 What is session-only
 
-The current Streamlit app keeps these in process/session state:
+The current Streamlit app keeps these in process/session state only:
 
-- current parse result;
 - current whole-document extraction;
 - custom classification and routing review;
 - routed extraction;
 - chat history; and
 - current selected source region.
 
-These can disappear when the session or process ends. Download required outputs promptly.
+These can disappear when the session or process ends. Parse results remain in the active local workspace until it is replaced or explicitly cleared. Download required outputs promptly.
 
 Uploaded bytes and generated results may remain in the browser session and active Streamlit process while the workflow is open. The parser also uses temporary storage during processing and removes its normal temporary directory after successful completion. Abnormal termination and storage recovery are outside that cleanup guarantee.
 
-Do not treat closing a browser tab or refreshing the page as a verified deletion mechanism. Changing the uploaded file resets the current document state, while a process restart can remove session state. An administrator must define and verify deletion, browser, host-storage, backup, and retention procedures for sensitive documents.
+Do not treat closing a browser tab, refreshing, or restarting the app as deletion. Use **Clear saved workspace**, then apply the administrator's approved browser, host-storage, backup, and retention procedures for sensitive documents.
 
 The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. For a privacy cleanup boundary, the administrator must clear the relevant Streamlit cache or restart the managed Streamlit process, then handle host/storage remnants under the approved procedure.
 
@@ -1140,7 +1155,16 @@ Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-t
 
 ### 19.2 Current integration limits
 
-The repository has no installed CLI command, application HTTP API, worker process, job queue, or artifact store. Automation must call the Python library or add an approved application layer.
+The installed package includes a synchronous local batch command:
+
+```powershell
+grounded-docparse parse input.pdf --schema invoice.json --output results
+grounded-docparse parse .\incoming --schema invoice.md --output results --overwrite
+```
+
+It accepts files and non-recursive directories, applies one optional schema to every document, isolates per-document failures, and writes a root manifest plus per-document Markdown, annotated PDF, Full JSON, and optional extraction JSON. Exit code `1` means at least one document failed; exit code `2` means arguments or preflight validation failed. Existing non-empty output directories require `--overwrite`, which replaces matching generated paths without deleting unrelated files.
+
+The repository still has no application HTTP API, worker process, or production job queue. The CLI is synchronous workstation automation, not a durable unattended service.
 
 Do not create production batch processing by driving 100 files through one Streamlit session. A production design needs durable jobs, idempotency, per-document failure handling, secure storage, review state, and access control.
 
@@ -1228,7 +1252,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 | File is rejected | Invalid, unsupported, encrypted, oversized, or over configured limits | Use a valid supported source or reduce/split it outside the app |
 | Markdown has missing content | OCR missed or could not read a source region | Check annotated source and use a clearer scan |
 | Reading order is wrong | Complex layout or hierarchy problem | Inspect reading-order labels and Layout Tree |
-| Schema Markdown is invalid | Mixed formats, invalid type/name, encoding, or size | Use one supported format and UTF-8 `.md` under 1 MB |
+| Schema file is invalid | Wrong headers, invalid type/name, encoding, workbook, or size | Use a supported `.md`, `.csv`, or `.xlsx` file under 1 MB |
 | Routing profile is incomplete | Extractable category lacks a saved schema | Save the named extraction schema first |
 | Classify forms fails validation | Invalid page coverage/category/evidence remains after repair | Review profile and retry; escalate persistent failures |
 | Extract eligible forms is disabled | Unapproved segment, no eligible segment, or changed profile | Apply review to all segments or rerun classification |
@@ -1247,9 +1271,9 @@ No. Fast enables document classification, and visual recovery may also be enable
 
 No. Open Extract, define or load a schema, and explicitly run extraction.
 
-### Can I upload a Markdown field list?
+### Can I upload a field list?
 
-Yes. Use **Import schema Markdown**. The file populates an editable draft; review and save it before reuse.
+Yes. Use **Import schema Markdown, CSV, or XLSX**. The file populates an editable draft; review and save it before reuse.
 
 ### Can I upload a Markdown routing definition?
 
@@ -1281,11 +1305,11 @@ Follow the organization’s policy. Critical and regulated fields should still b
 
 ### Can the UI process 100 PDFs at once?
 
-No. The current UI processes at most 20 files sequentially in session state. A 100-file durable production workflow requires the architecture described in the Azure runbook.
+No. The current UI processes at most 20 files sequentially in one durable local workspace. A 100-file production workflow requires the architecture described in the Azure runbook.
 
 ### Are schemas and results both saved?
 
-Schemas and routing profiles are saved in SQLite. Parse, extraction, routing review, and chat results are session-only unless downloaded.
+Schemas and routing profiles are saved in SQLite. The active batch's sources, parse results, progress, analysis, failures, and usage are also saved locally. Extraction, routing review, and chat results remain session-only unless downloaded.
 
 ## 23. Glossary
 

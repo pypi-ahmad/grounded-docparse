@@ -117,13 +117,13 @@ Custom classification assigns categories to contiguous page ranges rather than r
 
 Unlike LandingAI Classify, our classification requires a completed local OCR parse because it reasons over the resulting Markdown and layout elements.
 
-### Split — partial: logical segmentation, not file splitting
+### Split — yes
 
 Custom form routing can separate a mixed packet into logical segments such as `new_request`, `update`, `records`, and `other`. Each segment has a page range, category, confidence, reasoning, evidence IDs, review status, extraction eligibility, and optional assigned schema.
 
-For eligible segments, the application creates an in-memory `ParseResult` subset containing the original pages and elements, then runs the assigned extraction schema. This is sufficient for selective extraction and per-form result reporting.
+After every segment is approved, **Download split documents** creates a dedicated ZIP. Every routed segment, including repeated and non-extractable categories, receives its own source-page PDF, Markdown, and canonical parsed-document JSON. A manifest records the source hash, routing metadata, and file paths. Page numbers, element IDs, and bounding boxes remain tied to the parsed source.
 
-The current application does **not** export each segment as a new PDF or standalone Markdown sub-document. It therefore has LandingAI-like logical splitting for routing, but not full separate-document output. LandingAI Split explicitly returns classified sub-documents with Markdown content. [LandingAI Split API](https://docs.landing.ai/api-reference/tools/ade-split)
+Eligible segments can also be extracted with their assigned schemas. Split export does not require a segment to be extractable. LandingAI Split similarly returns classified sub-documents with Markdown content. [LandingAI Split API](https://docs.landing.ai/api-reference/tools/ade-split)
 
 ### Section — yes
 

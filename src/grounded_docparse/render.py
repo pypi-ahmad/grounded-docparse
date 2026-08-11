@@ -22,6 +22,7 @@ from .models import (
     ExtractionResult,
     FormClassificationResult,
     NodeType,
+    OcrComparisonResult,
     PageQuality,
     ParseMetadata,
     ParseResult,
@@ -737,6 +738,7 @@ def render_agentic_document(
     parse_metadata: ParseMetadata | None = None,
     markdown_override: str | None = None,
     recovery_log: list[VisualRecoveryResult] | None = None,
+    ocr_comparisons: list[OcrComparisonResult] | None = None,
 ) -> RenderedAgenticDocument:
     """Render canonical Markdown together with its grounded v4 envelope."""
 
@@ -859,7 +861,7 @@ def render_agentic_document(
         processing_time=duration_ms / 1000,
     )
     payload = {
-        "schema_version": "4.4.0",
+        "schema_version": "4.5.0",
         "markdown": markdown,
         "base_markdown": base_markdown,
         "document_type": None,
@@ -867,6 +869,9 @@ def render_agentic_document(
         "extracted_fields": {},
         "recovery_log": [
             item.model_dump(mode="json") for item in (recovery_log or [])
+        ],
+        "ocr_comparisons": [
+            item.model_dump(mode="json") for item in (ocr_comparisons or [])
         ],
         "metadata": {
             **metadata.model_dump(mode="json"),
@@ -906,7 +911,7 @@ def render_combined_result(
     """Flatten optional agentic results into the canonical v4.5 envelope."""
 
     payload = parse_result.structured_json
-    payload["schema_version"] = "4.5.0"
+    payload["schema_version"] = "4.6.0"
     payload["document_type"] = (
         analysis.classification.model_dump(mode="json")
         if analysis and analysis.classification
@@ -958,6 +963,9 @@ def render_combined_result(
     )
     payload["recovery_log"] = [
         item.model_dump(mode="json") for item in parse_result.recovery_log
+    ]
+    payload["ocr_comparisons"] = [
+        item.model_dump(mode="json") for item in parse_result.ocr_comparisons
     ]
 
     metadata = payload["metadata"]

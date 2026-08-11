@@ -45,6 +45,7 @@ from .models import (
     InspectionDecision,
     LayoutRegionEvidence,
     NodeType,
+    OcrComparisonResult,
     Page,
     PageAnalysis,
     PageDraft,
@@ -65,8 +66,10 @@ from .models import (
     VerificationState,
     VisualRecoveryResult,
 )
-from .page_analysis import PageAnalyzer, draft_from_analysis
+from .ocr_disagreement import token_edit_similarity
+from .ocr_services import ensure_managed_ocr_engine
 from .paddle_ocr import get_paddleocr_runtime
+from .page_analysis import PageAnalyzer, draft_from_analysis
 from .quality import (
     MAX_REPAIR_BLOCKS,
     literal_repair_candidates,
@@ -983,6 +986,7 @@ class _RecoveryCandidate:
     reading_order: int
     target_id: str
     reasons: tuple[str, ...] = ()
+    primary_text: str = ""
 
     @property
     def rank(self) -> tuple[int, int, float, int, int, str]:
@@ -1408,6 +1412,7 @@ def _page_recovery_candidates(
             confidence=block.confidence if block.confidence is not None else 1.0,
             reading_order=block.reading_order,
             target_id=target_id or block.id,
+            primary_text=semantic_text(block),
             reasons=reasons,
         )
         existing = by_box.get(key)
@@ -1702,9 +1707,137 @@ class DocumentParser:
         config: ParserConfig | None = None,
         *,
         gateway_factory: Callable[[ParserConfig], object] = OpenAIDocumentGateway,
+        ocr_service_switcher: Callable[[OcrEngine], None] = ensure_managed_ocr_engine,
     ) -> None:
         self.config = config or ParserConfig.from_env()
         self.gateway_factory = gateway_factory
+        self.ocr_service_switcher = ocr_service_switcher
+
+    def _cross_check_uncertain_regions(
+        self,
+        source: IngestedDocument,
+        pages: list[PageEvidence],
+        analyses: dict[int, PageAnalysis | None],
+        workdir: Path,
+    ) -> tuple[list[OcrComparisonResult], int, float]:
+        if not self.config.ocr_disagreement_enabled:
+            return [], 0, 0.0
+        candidates = sorted(
+            (
+                item
+                for page in pages
+                for item in _page_recovery_candidates(page, analyses.get(page.number))
+            ),
+            key=lambda item: item.rank,
+        )
+        selected: list[_RecoveryCandidate] = []
+        per_page: dict[int, int] = {}
+        for candidate in candidates:
+            if len(selected) >= self.config.max_ocr_disagreement_crops:
+                break
+            if per_page.get(candidate.page, 0) >= self.config.max_ocr_disagreement_crops_per_page:
+                continue
+            selected.append(candidate)
+            per_page[candidate.page] = per_page.get(candidate.page, 0) + 1
+        if not selected:
+            return [], len(candidates), 0.0
+
+        started = time.perf_counter()
+        primary = self.config.ocr_engine
+        secondary = (
+            OcrEngine.PADDLEOCR_VL_1_6
+            if primary is OcrEngine.GLM_OCR
+            else OcrEngine.GLM_OCR
+        )
+        page_by_number = {page.number: page for page in pages}
+        results: list[OcrComparisonResult] = []
+        try:
+            self.ocr_service_switcher(secondary)
+            if secondary is OcrEngine.GLM_OCR:
+                runtime = get_glmocr_form_recovery_runtime(
+                    self.config.glmocr_config_path,
+                    self.config.glmocr_layout_device,
+                )
+            else:
+                runtime = get_paddleocr_runtime(
+                    self.config.paddleocr_service_url,
+                    self.config.paddleocr_timeout_seconds,
+                )
+            for index, candidate in enumerate(selected):
+                crop = render_region_crop(
+                    source,
+                    page_by_number[candidate.page],
+                    BoundingBox(
+                        x0=candidate.bbox[0],
+                        y0=candidate.bbox[1],
+                        x1=candidate.bbox[2],
+                        y1=candidate.bbox[3],
+                    ),
+                    workdir / "ocr-disagreement" / f"{candidate.page}-{index}.png",
+                    dpi=self.config.crop_dpi,
+                    padding=self.config.crop_padding,
+                )
+                parsed = (
+                    runtime.parse(crop)
+                    if secondary is OcrEngine.GLM_OCR
+                    else runtime.parse_recovery_image(crop).regions
+                )
+                texts = [region.content.strip() for region in parsed if region.content.strip()]
+                alternatives = [*texts, "\n".join(texts)] if texts else [""]
+                secondary_text = max(
+                    alternatives,
+                    key=lambda text: token_edit_similarity(candidate.primary_text, text),
+                )
+                similarity = token_edit_similarity(candidate.primary_text, secondary_text)
+                disagreed = similarity < self.config.ocr_disagreement_similarity_threshold
+                results.append(
+                    OcrComparisonResult(
+                        page=candidate.page,
+                        bbox=candidate.bbox,
+                        primary_engine=primary.value,
+                        secondary_engine=secondary.value,
+                        primary_text=candidate.primary_text,
+                        secondary_text=secondary_text,
+                        similarity=similarity,
+                        status="disagreed" if disagreed else "agreed",
+                        reason=(
+                            "Local OCR engines disagreed on uncertain region"
+                            if disagreed
+                            else "Local OCR engines agreed"
+                        ),
+                    )
+                )
+        except Exception as exc:  # noqa: BLE001 - comparison is audit-only
+            reason = f"Alternate OCR unavailable: {type(exc).__name__}: {exc}"
+            completed = {(item.page, item.bbox) for item in results}
+            for candidate in selected:
+                if (candidate.page, candidate.bbox) not in completed:
+                    results.append(
+                        OcrComparisonResult(
+                            page=candidate.page,
+                            bbox=candidate.bbox,
+                            primary_engine=primary.value,
+                            secondary_engine=secondary.value,
+                            primary_text=candidate.primary_text,
+                            status="unavailable",
+                            reason=reason,
+                        )
+                    )
+        finally:
+            try:
+                self.ocr_service_switcher(primary)
+            except Exception as exc:  # noqa: BLE001 - primary result remains authoritative
+                results.append(
+                    OcrComparisonResult(
+                        page=selected[0].page,
+                        primary_engine=primary.value,
+                        secondary_engine=secondary.value,
+                        primary_text="",
+                        status="unavailable",
+                        reason=f"Primary OCR restoration failed: {type(exc).__name__}: {exc}",
+                    )
+                )
+        return results, len(candidates), time.perf_counter() - started
 
     def _process_page(
         self,
@@ -1720,6 +1853,7 @@ class DocumentParser:
         allowed_recovery_boxes: set[RecoveryBoxKey] | None = None,
         deferred_recovery_boxes: set[RecoveryBoxKey] | None = None,
         glm_recovery_statuses: dict[RecoveryBoxKey, str] | None = None,
+        ocr_comparisons: dict[RecoveryBoxKey, OcrComparisonResult] | None = None,
     ) -> _ProcessedPage:
         recovery_available = visual_recovery and (
             self.gateway_factory is not OpenAIDocumentGateway
@@ -2406,6 +2540,18 @@ class DocumentParser:
                     "grounded quality corrections"
                 )
         blocks, normalization_warnings = normalize_page_blocks(blocks)
+        for block in blocks:
+            comparison = (ocr_comparisons or {}).get(_recovery_box_key(block.bbox) or ())
+            if comparison is None:
+                continue
+            comparison.block_id = block.id
+            if comparison.status == "disagreed":
+                block.verification = VerificationState.NEEDS_REVIEW
+                reason = "Local OCR engines disagreed on this uncertain region"
+                if block.verification_reason and reason not in block.verification_reason:
+                    block.verification_reason = f"{block.verification_reason}; {reason}"
+                else:
+                    block.verification_reason = block.verification_reason or reason
         warnings.extend(
             f"Page {page.number}: {warning}" for warning in normalization_warnings
         )
@@ -2582,6 +2728,8 @@ class DocumentParser:
                 max_pages=self.config.max_pages,
                 max_page_pixels=self.config.max_page_pixels,
             )
+            if self.config.ocr_disagreement_enabled:
+                self.ocr_service_switcher(self.config.ocr_engine)
             if (
                 self.gateway_factory is OpenAIDocumentGateway
                 and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
@@ -2709,6 +2857,27 @@ class DocumentParser:
             visual_recovery_crops = (
                 glm_form_recovery.crops + paddle_form_recovery.attempts
             )
+            if self.config.ocr_disagreement_enabled:
+                _emit(
+                    progress_callback,
+                    "cross_check",
+                    1,
+                    1,
+                    "Cross-checking uncertain regions with alternate local OCR",
+                )
+            ocr_comparisons, ocr_comparison_candidates, ocr_comparison_time = (
+                self._cross_check_uncertain_regions(
+                    source, source.pages, analyses_by_page, workdir
+                )
+            )
+            comparisons_by_page: dict[
+                int, dict[RecoveryBoxKey, OcrComparisonResult]
+            ] = {}
+            for comparison in ocr_comparisons:
+                if comparison.bbox is not None:
+                    comparisons_by_page.setdefault(comparison.page, {})[
+                        comparison.bbox
+                    ] = comparison
             luna_recovery_budget = _visual_recovery_crop_budget(
                 total,
                 ceiling=self.config.max_visual_recovery_crops,
@@ -2763,6 +2932,7 @@ class DocumentParser:
                             if planning_applies
                             else None,
                             glm_form_recovery.statuses.get(page.number, {}),
+                            comparisons_by_page.get(page.number, {}),
                         )
                         futures[future] = page.number
                     pending = set(futures)
@@ -2912,6 +3082,30 @@ class DocumentParser:
                 luna_agentic_time=luna_agentic_time,
                 luna_time=luna_recovery_time + luna_agentic_time,
                 recovered_regions=len(recovery_log),
+                ocr_comparison_enabled=self.config.ocr_disagreement_enabled,
+                ocr_comparison_candidates=ocr_comparison_candidates,
+                ocr_comparison_crops=sum(
+                    item.status != "unavailable" for item in ocr_comparisons
+                ),
+                ocr_comparison_disagreements=sum(
+                    item.status == "disagreed" for item in ocr_comparisons
+                ),
+                ocr_comparison_unavailable=sum(
+                    item.status == "unavailable" for item in ocr_comparisons
+                ),
+                ocr_comparison_deferred=max(
+                    0, ocr_comparison_candidates - len(ocr_comparisons)
+                ),
+                ocr_comparison_time=ocr_comparison_time,
+                ocr_comparison_secondary_engine=(
+                    (
+                        OcrEngine.PADDLEOCR_VL_1_6
+                        if self.config.ocr_engine is OcrEngine.GLM_OCR
+                        else OcrEngine.GLM_OCR
+                    ).value
+                    if self.config.ocr_disagreement_enabled
+                    else None
+                ),
                 model_versions=model_versions,
                 enhancement=enhancement,
             )
@@ -2925,6 +3119,7 @@ class DocumentParser:
                 parse_metadata=metadata,
                 markdown_override=final_markdown,
                 recovery_log=recovery_log,
+                ocr_comparisons=ocr_comparisons,
             )
             _emit(progress_callback, "complete", 1, 1, "Parsing complete")
             return ParseResult(
@@ -2941,4 +3136,5 @@ class DocumentParser:
                 elements=elements,
                 metadata=metadata,
                 recovery_log=recovery_log,
+                ocr_comparisons=ocr_comparisons,
             )

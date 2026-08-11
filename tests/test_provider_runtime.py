@@ -386,7 +386,7 @@ def test_parser_binds_one_runtime_without_changing_factory_signature(
     assert len({id(gateway.runtime) for gateway in gateways}) == 1
     assert responses.calls >= 2
     assert all(page.blocks for page in result.document.pages)
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert payload["metadata"]["runtime"]["http_attempts"] == responses.calls
     assert result.runtime_diagnostics is not None
     assert (

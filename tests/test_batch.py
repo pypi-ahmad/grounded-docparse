@@ -4,6 +4,7 @@ import io
 import json
 import zipfile
 
+import pymupdf
 import pytest
 
 from grounded_docparse.batch import (
@@ -12,6 +13,18 @@ from grounded_docparse.batch import (
     BatchArchiveEntry,
     build_batch_documents,
     build_output_archive,
+    build_split_archive,
+)
+from grounded_docparse.models import (
+    Block,
+    ClassifierCategory,
+    ClassifierProfile,
+    Document,
+    FormClassificationResult,
+    FormSegment,
+    Page,
+    ParseResult,
+    VerificationState,
 )
 
 
@@ -86,3 +99,110 @@ def test_output_archive_contains_originals_outputs_and_failure_manifest() -> Non
         "failed",
     ]
     assert manifest["documents"][1]["error"] == "OCR unavailable"
+
+
+def test_split_archive_exports_each_approved_segment() -> None:
+    with pymupdf.open() as source_document:
+        for _ in range(3):
+            source_document.new_page(width=100, height=100)
+        source = source_document.tobytes()
+    document = Document(
+        source_name="packet.pdf",
+        source_sha256="a" * 64,
+        pages=[
+            Page(
+                number=number,
+                width=100,
+                height=100,
+                blocks=[
+                    Block(
+                        id=f"p{number}-form",
+                        type="paragraph",
+                        text=text,
+                        reading_order=0,
+                        verification=VerificationState.VERIFIED,
+                    )
+                ],
+            )
+            for number, text in (
+                (1, "First request"),
+                (2, "Medical records"),
+                (3, "Second request"),
+            )
+        ],
+    )
+    result = ParseResult(
+        document=document,
+        markdown="",
+        json="{}",
+        input_tokens=0,
+        output_tokens=0,
+        annotated_pdf=b"",
+    )
+    profile = ClassifierProfile(
+        name="Routing",
+        categories=[
+            ClassifierCategory(
+                key="newauth",
+                description="New request",
+                extract=True,
+                schema_name="Authorization",
+            ),
+            ClassifierCategory(key="records", description="Medical records"),
+        ],
+    )
+    categories = ["newauth", "records", "newauth"]
+    classification = FormClassificationResult(
+        profile=profile,
+        profile_fingerprint="fingerprint",
+        segments=[
+            FormSegment(
+                id=f"form-{index:03d}",
+                predicted_start_page=index,
+                predicted_end_page=index,
+                predicted_category=category,
+                start_page=index,
+                end_page=index,
+                category=category,
+                confidence=0.95,
+                approved=True,
+                review_status="auto_approved",
+                eligible=category == "newauth",
+                schema_name="Authorization" if category == "newauth" else None,
+            )
+            for index, category in enumerate(categories, start=1)
+        ],
+    )
+
+    archive = build_split_archive(source, "packet.pdf", result, classification)
+
+    with zipfile.ZipFile(io.BytesIO(archive)) as bundle:
+        names = set(bundle.namelist())
+        expected_stem = "001-form-001-newauth-pages-001-001"
+        assert f"{expected_stem}.pdf" in names
+        assert f"{expected_stem}.md" in names
+        assert f"{expected_stem}.json" in names
+        assert len([name for name in names if name.endswith(".pdf")]) == 3
+        assert len([name for name in names if name.endswith(".md")]) == 3
+        assert len([name for name in names if name.endswith(".json")]) == 4
+        with pymupdf.open(stream=bundle.read(f"{expected_stem}.pdf"), filetype="pdf") as pdf:
+            assert pdf.page_count == 1
+        assert "First request" in bundle.read(f"{expected_stem}.md").decode()
+        segment_json = json.loads(bundle.read(f"{expected_stem}.json"))
+        assert segment_json["document"]["pages"][0]["number"] == 1
+        manifest = json.loads(bundle.read("manifest.json"))
+
+    assert manifest["version"] == 1
+    assert manifest["source"]["name"] == "packet.pdf"
+    assert [item["segment"]["category"] for item in manifest["segments"]] == categories
+    assert manifest["segments"][1]["segment"]["eligible"] is False
+
+    unapproved = classification.model_copy(deep=True)
+    unapproved.segments[0].approved = False
+    with pytest.raises(ValueError, match="approved"):
+        build_split_archive(source, "packet.pdf", result, unapproved)
+
+    incomplete = classification.model_copy(deep=True)
+    incomplete.segments = incomplete.segments[:-1]
+    with pytest.raises(ValueError, match="cover every parsed page exactly once"):
+        build_split_archive(source, "packet.pdf", result, incomplete)

@@ -38,7 +38,7 @@ Ordinary OCR answers “what text appears in this image?” A business document 
 
 Grounded DocParse converts one PDF or image into a structured, reviewable document representation. It is optimized for scanned and visually complex documents where source traceability matters.
 
-The current application is a workstation-oriented Streamlit studio. It processes up to 20 uploaded files sequentially in session state. It is not a durable batch service, REST API, multi-user system, or job processor.
+The current application is a workstation-oriented Streamlit studio. It processes up to 20 uploaded files sequentially and restores one active local batch after restart. It is not an unattended batch service, REST API, multi-user system, or production job processor.
 
 ### 2.1 Core outputs
 
@@ -48,8 +48,8 @@ A successful parse can produce:
 | --- | --- |
 | Refined Markdown | Human-readable reconstruction with optional presentation improvements |
 | Grounded `base_markdown` | Canonical Markdown to which source spans refer |
-| Parse JSON v4.4.0 | Parse structure, elements, quality, provenance, usage, and recovery information |
-| Full JSON v4.5.0 | Parse data plus optional analysis, routing, and extraction results |
+| Parse JSON v4.5.0 | Parse structure, elements, quality, provenance, usage, recovery, and OCR-comparison information |
+| Full JSON v4.6.0 | Parse data plus optional analysis, routing, and extraction results |
 | Extraction JSON v1.1.0 | One-schema scalar extraction with evidence and field confidence |
 | Routed extraction JSON v2.0.0 | Per-form extraction results for approved eligible segments |
 | Annotated PDF | Original pages with semantic boxes, reading order, and source highlighting |
@@ -437,9 +437,22 @@ The H1 becomes the schema name. Without an H1, the filename stem is used. An omi
 
 Uploading Markdown loads an editable draft. It does not automatically save the schema or run extraction. Review the rows, then select **Save schema** if the definition should be reusable.
 
-The exact click path is **Extract** → **Extraction schemas** → **Import schema Markdown** → choose the `.md` file. The upload itself populates the draft; there is no separate Markdown-import button.
+The exact click path is **Extract** → **Extraction schemas** → **Import schema Markdown, CSV, or XLSX** → choose the `.md` file. The upload itself populates the draft; there is no separate import button.
 
-### 8.4 Import or export JSON
+### 8.4 Import an extraction schema from CSV or XLSX
+
+CSV and XLSX files use the same flat field columns:
+
+```csv
+Field name,Description,Type
+patient_name,Full patient name,string
+date_of_birth,Patient date of birth,date
+urgent,Whether the request is marked urgent,boolean
+```
+
+The first XLSX worksheet is imported. The filename becomes the schema name, and an empty type defaults to `string`. Uploading the file loads an editable draft without saving it.
+
+### 8.5 Import or export JSON
 
 The UI’s schema import/export shape is an application definition, not compiled JSON Schema:
 
@@ -457,9 +470,9 @@ The UI’s schema import/export shape is an application definition, not compiled
 }
 ```
 
-Selecting **Import JSON** validates and immediately persists the definition. Markdown import only populates the draft. **Export schema JSON** downloads the current valid draft.
+Selecting **Import JSON** validates and immediately persists the definition. Markdown, CSV, and XLSX imports only populate the draft. **Export schema JSON** downloads the current valid draft.
 
-### 8.5 What the UI compiles
+### 8.6 What the UI compiles
 
 The application converts every scalar field to a required but nullable JSON Schema property. A date becomes a nullable string whose description asks for ISO 8601 output.
 
@@ -641,6 +654,8 @@ Review every uncertain segment and select **Apply routing review**. The UI enabl
 - the routing profile is unchanged since classification.
 
 Approving an ineligible `medical_records` or `other` segment confirms the routing decision; it does not make that segment extractable.
+
+Once every segment is approved and the profile is unchanged, select **Download split documents**. The `.segments.zip` exports every segment, including ineligible and repeated categories, as its own original-page PDF, Markdown, and canonical parsed-document JSON. `manifest.json` maps each segment's routing metadata to those files. Markdown and JSON keep parsed page numbers, element IDs, and source boxes.
 
 ### 11.6 Extract only eligible forms
 

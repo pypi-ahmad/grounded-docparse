@@ -31,8 +31,8 @@ Parse PDFs and images into grounded Markdown, structured JSON, and annotated PDF
 - Keep visual recovery independently configurable and chat disabled by default.
 - Provide Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree tabs.
 - Provide source highlighting from TOC, extraction, chat, page elements, and layout-tree selections.
-- Emit parse JSON v4.4.0 with refined Markdown, grounded base Markdown, elements/provenance, page/block evidence, correction history, recovery log, parse timing/usage/trace, and empty agentic placeholders.
-- Emit Full JSON v4.5.0 with the same envelope plus optional custom classification and per-form extraction, combined usage/trace/timing, and feature statuses.
+- Emit parse JSON v4.5.0 with refined Markdown, grounded base Markdown, elements/provenance, page/block evidence, correction history, recovery and OCR-comparison logs, parse timing/usage/trace, and empty agentic placeholders.
+- Emit Full JSON v4.6.0 with the same envelope plus optional custom classification and per-form extraction, combined usage/trace/timing, and feature statuses.
 - Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and local-OCR-owned normalized boxes.
 - Keep annotated PDF bytes outside JSON and offer them as a separate download.
 - Use SQLite only for intentional application-managed schema and routing-profile persistence; keep parse and routing results in temporary/process/session state.
@@ -52,8 +52,8 @@ Parse PDFs and images into grounded Markdown, structured JSON, and annotated PDF
 - Combined JSON: `render_combined_result(parse_result, analysis=None, extraction=None)`
 - Evaluation entry point: `scripts/evaluate_corpus.py`
 
-The project does not install a command-line application entry point.
-Signatures, return-model summaries, schema rules, and envelope examples are in [the Python API reference](api.md). The repository does not publish a standalone JSON Schema for every nested v4.5.0 domain object.
+The project installs `grounded-docparse parse` for synchronous local batch parsing. It accepts explicit files or non-recursive directories, writes per-document artifacts plus a manifest, and optionally applies one JSON or Markdown extraction schema to every input. It is not a durable job service or worker queue.
+Signatures, return-model summaries, schema rules, and envelope examples are in [the Python API reference](api.md). The repository does not publish a standalone JSON Schema for every nested v4.6.0 domain object.
 
 ## Non-goals
 

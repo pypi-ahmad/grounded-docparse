@@ -101,6 +101,39 @@ def test_load_manifest_accepts_reference_provenance(tmp_path: Path) -> None:
     assert annotation.reference_pages == {1: "Alpha beta"}
 
 
+def test_load_manifest_accepts_expected_document_type(tmp_path: Path) -> None:
+    manifest_path = _write_manifest(tmp_path)
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["schema_version"] = "1.1"
+    payload["documents"][0]["expected_document_type"] = "Invoice"
+    manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    manifest = load_corpus_manifest(manifest_path, repository_root=tmp_path)
+
+    assert manifest.documents[0].expected_document_type == "Invoice"
+
+
+def test_load_manifest_rejects_unknown_expected_document_type(tmp_path: Path) -> None:
+    manifest_path = _write_manifest(tmp_path)
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["schema_version"] = "1.1"
+    payload["documents"][0]["expected_document_type"] = "Receipt"
+    manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValidationError, match="expected_document_type"):
+        load_corpus_manifest(manifest_path, repository_root=tmp_path)
+
+
+def test_load_manifest_v1_rejects_document_type_label(tmp_path: Path) -> None:
+    manifest_path = _write_manifest(tmp_path)
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["documents"][0]["expected_document_type"] = "Invoice"
+    manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValidationError, match="requires manifest schema version 1.1"):
+        load_corpus_manifest(manifest_path, repository_root=tmp_path)
+
+
 def test_load_manifest_rejects_duplicate_document_ids(tmp_path: Path) -> None:
     source = tmp_path / "documents" / "sample.pdf"
     source.parent.mkdir(parents=True)
@@ -124,6 +157,19 @@ def test_load_manifest_rejects_duplicate_document_ids(tmp_path: Path) -> None:
             _write_manifest(tmp_path, documents=[entry, entry]),
             repository_root=tmp_path,
         )
+
+
+def test_load_manifest_rejects_unsupported_manifest_annotation_schema_version(
+    tmp_path: Path,
+) -> None:
+    manifest_path = _write_manifest(tmp_path)
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["annotation_schema_version"] = "999.0"
+    payload["documents"] = []
+    manifest_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ValidationError, match="unsupported annotation schema version"):
+        load_corpus_manifest(manifest_path, repository_root=tmp_path)
 
 
 @pytest.mark.parametrize(
