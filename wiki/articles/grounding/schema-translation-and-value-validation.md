@@ -1,7 +1,7 @@
 ---
 tags: schema, validation, extraction
 sources: src/grounded_docparse/native_extraction.py, src/grounded_docparse/schema_store.py
-snapshot: content-f8ca74d5deff
+snapshot: content-2ae93e3d37db
 status: feature-branch
 ---
 

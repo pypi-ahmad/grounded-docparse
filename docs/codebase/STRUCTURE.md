@@ -1,52 +1,63 @@
-# Structure
+# Codebase Structure
 
 ## Core Sections (Required)
 
-### 1) Top-level layout
+### 1) Top-Level Map
 
-| Path | Role |
-|------|------|
-| `streamlit_app.py` | Main UI entry |
-| `src/grounded_docparse/` | Core library (19 Python modules) |
-| `app_pages/` | Streamlit page modules |
-| `config/` | GLM/Paddle runtime YAML |
-| `scripts/wsl/` | WSL setup, serve, health checks |
-| `tests/` | Pytest suite (~26 test modules) |
-| `docs/` | Design and user docs |
-| `docs-site/` | Built HTML docs site |
-| `benchmarks/` | Corpus, schemas, baselines |
-| `data/` | Local DB path, sample PDFs/outputs (gitignored DB) |
-| `components/` | Streamlit grounding review component |
+| Path | Responsibility |
+|---|---|
+| `src/grounded_docparse/` | Installable parsing, OCR, native ingestion, evidence, extraction, and persistence package |
+| `streamlit_app.py` | Single-file Streamlit application and workflow orchestration |
+| `tests/` | 38 pytest modules covering contracts, pipelines, UI, CLI, persistence, and evaluation |
+| `benchmarks/` | Corpus manifests, annotations, schemas, and regression policies |
+| `scripts/` | Evaluation, corpus/example generation, docs/wiki refresh, installer build, and WSL runtime operations |
+| `installer/` | Windows PowerShell installer and Inno Setup definition |
+| `config/` | GLM-OCR and PaddleOCR runtime configuration |
+| `docs/`, `docs-site/` | Maintained Markdown documentation and generated static site |
+| `wiki/` | Repository knowledge wiki and its generated graph metadata |
+| `.ua/`, `.codegraph/`, `.code-review-graph/`, `graphify-out/` | Generated code/knowledge graph artifacts; do not treat these as application modules |
 
-### 2) Package modules (`src/grounded_docparse/`)
+### 2) Entry Points
 
-| File | Responsibility |
-|------|----------------|
-| `pipeline.py` | `DocumentParser` orchestration |
-| `agentic.py` | `DocumentAgent` prepare/analyze/route/chat |
-| `extraction.py` | `DocumentExtractor` schema extract + evidence resolve |
-| `local_ocr.py` / `paddle_ocr.py` | Engine clients |
-| `ingest.py` | Validation + rasterization |
-| `page_analysis.py` / `quality.py` | Quality signals |
-| `gateways.py` / `prompts.py` | OpenAI gateway + prompts |
-| `enhancement.py` | Markdown presentation plan |
-| `models.py` | Pydantic contracts |
-| `render.py` | Export rendering |
-| `schema_store.py` | SQLite schemas/profiles |
-| `config.py` | `ParserConfig`, engines |
-| `runtime.py` | Provider concurrency/retries |
-| `batch.py` | Batch limits/identity |
-| `benchmark.py` | Evaluation contracts |
+- `streamlit_app.py`: interactive upload, manual processing-type selection, mixed-PDF page review, parsing, extraction, and downloads.
+- `src/grounded_docparse/cli.py`: installed `grounded-docparse parse` and `grounded-docparse ingest` commands.
+- `Launch-GLM-OCR.cmd`, `Launch-PaddleOCR-VL-1.6.cmd`: Windows launchers for the app plus local OCR stack.
+- `scripts/wsl/launch-stack.sh`, `scripts/wsl/manage-ocr-stack.sh`: WSL service lifecycle.
+- `installer/Install-GroundedDocParse.ps1`: workstation installation entry point.
+- `scripts/evaluate_corpus.py`: offline/live evaluation and regression reporting.
 
-### 3) Entry points
+### 3) Module Boundaries
 
-- Windows: `Setup-GLM-OCR.cmd`, `Launch-GLM-OCR.cmd`, `Launch-PaddleOCR-VL-1.6.cmd`
-- App: `streamlit_app.py`
-- Public API: package exports in `__init__.py`
-- Eval: `scripts/evaluate_corpus.py`
+| Module group | Files | Boundary |
+|---|---|---|
+| Public API/config | `__init__.py`, `config.py`, `models.py`, `native.py` | Exported contracts, immutable evidence models, configuration, and versions |
+| Manual routing/native ingestion | `universal.py`, `native_parsers.py`, `docling_native.py` | File/container validation and exactly one explicitly selected parsing route |
+| OCR ingestion | `pipeline.py`, `ingest.py`, `page_analysis.py`, `local_ocr.py`, `paddle_ocr.py`, `ocr_services.py` | PDF/image rendering, local OCR, page analysis, and recovery |
+| Agent/provider layer | `gateways.py`, `runtime.py`, `agentic.py`, `enhancement.py` | OpenAI calls, bounded retries/concurrency, analysis, refinement, and chat |
+| Extraction/grounding | `extraction.py`, `native_extraction.py`, `quality.py`, `ocr_disagreement.py` | Schema extraction, source validation, quality checks, and OCR comparison |
+| Rendering/export | `render.py` | Markdown, JSON, annotated PDF, and combined output contracts |
+| Persistence/batch | `batch.py`, `schema_store.py`, `workspace_store.py` | Batch identity, SQLite schemas/profiles, durable results and artifacts |
+| Evaluation | `benchmark.py` | Corpus validation, metrics, calibration, and policy evaluation |
 
-### 4) Evidence
+The package currently contains 28 Python modules. Public imports are curated in `src/grounded_docparse/__init__.py`; UI-only state and presentation remain in `streamlit_app.py`.
 
-- Directory listing of repo root
-- `docs/architecture.md` repository map
+### 4) Naming and Organization Rules
+
+- Python modules, functions, parameters, and local variables use `snake_case`; classes and Pydantic models use `PascalCase`; constants use `UPPER_SNAKE_CASE`.
+- Tests mirror behavior areas as `tests/test_<area>.py` and use descriptive `test_<observable_behavior>` names.
+- Source-format adapters stay behind `UniversalDocumentParser`; provider behavior stays behind gateway/runtime classes.
+- Durable formats and public JSON include explicit version fields. New source nodes must retain stable IDs and source anchors.
+- Generated site/graph files live outside `src/`; application imports must not depend on them.
+
+### 5) Evidence
+
+- `pyproject.toml`
+- `streamlit_app.py`
 - `src/grounded_docparse/__init__.py`
+- `src/grounded_docparse/universal.py`
+- `src/grounded_docparse/native_parsers.py`
+- `src/grounded_docparse/workspace_store.py`
+- `tests/`
+- `scripts/`
+- `installer/`
+- `CONTRIBUTING.md`

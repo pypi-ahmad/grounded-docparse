@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f8ca74d5deff",
-    "base_commit": "d710a675fe58c644b10bf5524eb7d30b82219737",
+    "id": "content-2ae93e3d37db",
+    "base_commit": "1e720b7c95cd4b23efb3d7182ec043e5b5ad395a",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T08:52:56.282943+00:00",
+  "generated_at": "2026-08-12T13:38:42.347681+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
