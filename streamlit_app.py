@@ -35,6 +35,7 @@ from grounded_docparse.models import (
     SchemaField,
     StoredSchema,
 )
+from grounded_docparse.native import PageRoute, ProcessingType
 from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
@@ -49,9 +50,40 @@ from grounded_docparse.schema_store import (
     parse_markdown_schema,
     parse_tabular_schema,
 )
+from grounded_docparse.universal import UniversalDocumentParser, inspect_pdf_content
 from grounded_docparse.workspace_store import WorkspaceStore
 
-SUPPORTED_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff"]
+SUPPORTED_TYPES = [
+    "pdf",
+    "docx",
+    "pptx",
+    "xlsx",
+    "csv",
+    "odt",
+    "odp",
+    "ods",
+    "html",
+    "htm",
+    "md",
+    "markdown",
+    "epub",
+    "png",
+    "jpg",
+    "jpeg",
+    "tif",
+    "tiff",
+]
+PROCESSING_LABELS = {
+    "Native PDF": ProcessingType.NATIVE_PDF,
+    "Scanned PDF": ProcessingType.SCANNED_PDF,
+    "Mixed PDF": ProcessingType.MIXED_PDF,
+    "Word": ProcessingType.WORD,
+    "PowerPoint": ProcessingType.POWERPOINT,
+    "Excel": ProcessingType.EXCEL,
+    "CSV": ProcessingType.CSV,
+    "Image": ProcessingType.IMAGE,
+    "Other Native": ProcessingType.OTHER_NATIVE,
+}
 RESULT_VERSION = "4.6.0"
 THUMBNAILS_PER_GROUP = 12
 WORKSPACE_SETTING_KEYS = (
@@ -95,6 +127,31 @@ LUNA_REVIEW_WARNING = (
 LUNA_INPUT_USD_PER_MILLION = 0.20
 LUNA_CACHED_INPUT_USD_PER_MILLION = 0.02
 LUNA_OUTPUT_USD_PER_MILLION = 1.20
+
+
+def processing_labels_for(suffix: str) -> list[str]:
+    return {
+        ".pdf": ["Native PDF", "Scanned PDF", "Mixed PDF"],
+        ".docx": ["Word"],
+        ".pptx": ["PowerPoint"],
+        ".xlsx": ["Excel"],
+        ".csv": ["CSV"],
+        ".png": ["Image"],
+        ".jpg": ["Image"],
+        ".jpeg": ["Image"],
+        ".tif": ["Image"],
+        ".tiff": ["Image"],
+    }.get(suffix.casefold(), ["Other Native"])
+
+
+def processing_type_from_selection_key(selection_key: str | None) -> str | None:
+    if selection_key is None:
+        return None
+    parts = selection_key.split(":")
+    return next(
+        (item.value for item in ProcessingType if item.value in parts),
+        None,
+    )
 
 
 def append_session_usage(usage: RunUsage | None, *, skip_calls: int = 0) -> None:
@@ -990,6 +1047,9 @@ if not st.session_state.get("durable_workspace_loaded"):
             item.document.id: {
                 "status": item.status,
                 "error": item.error,
+                "processing_type": processing_type_from_selection_key(
+                    item.selection_key
+                ),
                 "selection_key": item.selection_key,
                 "progress": item.progress,
                 "state": {
@@ -1124,6 +1184,7 @@ if batch_error is None and document_ids != previous_ids:
             {
                 "status": "pending",
                 "error": None,
+                "processing_type": None,
                 "selection_key": None,
                 "progress": None,
                 "state": default_document_state(),
@@ -1131,6 +1192,8 @@ if batch_error is None and document_ids != previous_ids:
         )
         for document in batch_documents
     }
+    for workspace in st.session_state.batch_workspaces.values():
+        workspace.setdefault("processing_type", None)
     try:
         workspace_store.sync_documents(
             batch_documents,
@@ -1170,6 +1233,92 @@ if len(batch_documents) > 1:
             on_change=switch_active_document,
         )
 
+processing_types: dict[str, ProcessingType] = {}
+page_routes_by_document: dict[str, dict[int, PageRoute]] = {}
+processing_errors: list[str] = []
+if batch_documents:
+    with st.sidebar:
+        st.subheader("Processing types")
+        for document in batch_documents:
+            options = processing_labels_for(document.suffix)
+            selector_key = f"processing-type-{document.id}"
+            previous_value = st.session_state.batch_workspaces[document.id].get(
+                "processing_type"
+            )
+            previous = next(
+                (
+                    label
+                    for label, value in PROCESSING_LABELS.items()
+                    if value.value == previous_value and label in options
+                ),
+                None,
+            )
+            if selector_key not in st.session_state:
+                st.session_state[selector_key] = previous
+            selected_label = st.selectbox(
+                f"Processing type · {document.display_name}",
+                options,
+                index=None,
+                placeholder="Select processing type",
+                key=selector_key,
+            )
+            selected_type = (
+                PROCESSING_LABELS[selected_label] if selected_label is not None else None
+            )
+            st.session_state.batch_workspaces[document.id]["processing_type"] = (
+                selected_type.value if selected_type is not None else None
+            )
+            if selected_type is None:
+                continue
+            processing_types[document.id] = selected_type
+            if selected_type is not ProcessingType.MIXED_PDF:
+                continue
+            try:
+                inspection = inspect_pdf_content(document.source)
+            except Exception as exc:  # noqa: BLE001 - preflight is user-facing
+                processing_errors.append(
+                    f"{document.display_name}: PDF inspection failed: {exc}"
+                )
+                continue
+            if inspection.pdf_type != "mixed":
+                processing_errors.append(
+                    f"{document.display_name}: selected Mixed PDF, but pdf-inspector "
+                    f"classified it as {inspection.pdf_type}"
+                )
+                continue
+            routes: dict[int, PageRoute] = {}
+            st.caption(f"{document.display_name} page routes")
+            for page in range(1, inspection.page_count + 1):
+                route_label = st.selectbox(
+                    f"{document.display_name} · page {page}",
+                    ["Native", "OCR"],
+                    index=None,
+                    placeholder="Select page route",
+                    key=f"page-route-{document.id}-{page}",
+                )
+                if route_label is not None:
+                    routes[page] = (
+                        PageRoute.NATIVE if route_label == "Native" else PageRoute.OCR
+                    )
+            if len(routes) != inspection.page_count:
+                processing_errors.append(
+                    f"{document.display_name}: select a route for every page"
+                )
+            else:
+                incompatible = [
+                    page
+                    for page, route in routes.items()
+                    if (route is PageRoute.OCR)
+                    != (page in inspection.pages_needing_ocr)
+                ]
+                if incompatible:
+                    processing_errors.append(
+                        f"{document.display_name}: incompatible route for page(s) "
+                        + ", ".join(str(page) for page in incompatible)
+                    )
+                else:
+                    page_routes_by_document[document.id] = routes
+
 upload = active_document
 source = active_document.source if active_document is not None else None
 source_hash = active_document.content_sha256 if active_document is not None else None
@@ -1177,6 +1326,11 @@ suffix = active_document.suffix if active_document is not None else ""
 
 if batch_error is not None:
     st.error(batch_error)
+for error in processing_errors:
+    st.error(error)
+processing_ready = bool(batch_documents) and (
+    len(processing_types) == len(batch_documents) and not processing_errors
+)
 
 if source is not None and suffix == ".pdf" and len(batch_documents) == 1:
     try:
@@ -1199,7 +1353,12 @@ with st.sidebar:
         ),
     )
     selected_ocr_engine = ocr_engines[selected_ocr_label]
-    single_pdf = len(batch_documents) == 1 and suffix == ".pdf"
+    single_pdf = (
+        len(batch_documents) == 1
+        and suffix == ".pdf"
+        and active_document is not None
+        and processing_types.get(active_document.id) is ProcessingType.SCANNED_PDF
+    )
     use_page_range = st.checkbox(
         "Page range",
         disabled=not single_pdf,
@@ -1299,10 +1458,16 @@ with st.sidebar:
             if use_page_range and document.id == st.session_state.active_document_id
             else "all"
         )
+        processing_type = processing_types.get(document.id)
+        routes = page_routes_by_document.get(document.id, {})
+        route_key = ",".join(
+            f"{page}:{route.value}" for page, route in sorted(routes.items())
+        )
         return (
             f"{document.id}:{page_selection}:{refine_markdown}:"
             f"{visual_recovery}:{has_environment}:{selected_ocr_engine.value}:"
-            f"{RESULT_VERSION}"
+            f"{processing_type.value if processing_type else 'unselected'}:"
+            f"{route_key}:{RESULT_VERSION}"
         )
 
     selection_keys = {
@@ -1353,6 +1518,7 @@ with st.sidebar:
         disabled=(
             source is None
             or batch_error is not None
+            or not processing_ready
             or (
                 preload_error is not None
                 and selected_ocr_engine is OcrEngine.GLM_OCR
@@ -1426,14 +1592,27 @@ if parse_clicked and batch_documents:
     try:
         if documents_to_process:
             header_status_slot.markdown("Status: :blue[● **Parsing**]")
-            ensure_ocr_engine(selected_ocr_engine)
-            st.session_state.active_ocr_engine = selected_ocr_engine.value
+            requires_ocr = any(
+                processing_types[document.id]
+                in {
+                    ProcessingType.SCANNED_PDF,
+                    ProcessingType.MIXED_PDF,
+                    ProcessingType.IMAGE,
+                }
+                for document in documents_to_process
+            )
+            if requires_ocr:
+                ensure_ocr_engine(selected_ocr_engine)
+                st.session_state.active_ocr_engine = selected_ocr_engine.value
             parser_config = replace(
                 ParserConfig.from_env(),
                 ocr_engine=selected_ocr_engine,
                 ocr_disagreement_enabled=bool(st.session_state.ocr_disagreement),
             )
-            parser = pipeline.DocumentParser(parser_config)
+            parser = UniversalDocumentParser(
+                parser_config,
+                legacy_parser=pipeline.DocumentParser(parser_config),
+            )
         else:
             parser = None
     except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
@@ -1577,6 +1756,8 @@ if parse_clicked and batch_documents:
                         parsed_document_source,
                         document.name,
                         progress_callback=show_progress,
+                        processing_type=processing_types[document.id],
+                        page_routes=page_routes_by_document.get(document.id),
                         refine_markdown=refine_markdown,
                         visual_recovery=visual_recovery,
                     )

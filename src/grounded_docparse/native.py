@@ -135,13 +135,13 @@ class NativeElement(BaseModel):
 
 
 class NativeDocument(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
     source_name: str
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_format: SourceFormat
     requested_processing_type: ProcessingType
-    base_text: str
+    base_text: str = Field(frozen=True)
     units: list[SourceUnit]
     elements: list[NativeElement]
     warnings: list[str] = Field(default_factory=list)
@@ -161,6 +161,18 @@ class NativeDocument(BaseModel):
                 raise ValueError("source anchor references an unknown unit")
         return self
 
+    def source_spans_for(self, start: int, end: int) -> list[SourceSpan]:
+        if start < 0 or end <= start or end > len(self.base_text):
+            raise ValueError("source range must be within base_text")
+        return sorted(
+            (
+                element.source
+                for element in self.elements
+                if element.source.start < end and element.source.end > start
+            ),
+            key=lambda span: (span.start, span.end, span.element_id),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class PreviewArtifact:
@@ -173,6 +185,7 @@ class NativeParseResult:
     document: NativeDocument
     markdown: str
     json: str
+    annotated_pdf: bytes | None = None
     preview: PreviewArtifact | None = None
     input_tokens: int = 0
     output_tokens: int = 0

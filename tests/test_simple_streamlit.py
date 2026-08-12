@@ -8,7 +8,7 @@ import pytest
 from openpyxl import Workbook
 from streamlit.testing.v1 import AppTest
 
-from grounded_docparse import pipeline
+from grounded_docparse import pipeline, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
 from grounded_docparse.config import LUNA_MODEL
@@ -28,12 +28,30 @@ from grounded_docparse.models import (
 )
 from grounded_docparse.render import build_elements, render_agentic_document
 from grounded_docparse.schema_store import SchemaStore
+from grounded_docparse.universal import PdfInspection
 from grounded_docparse.workspace_store import WorkspaceStore
 
 
 @pytest.fixture(autouse=True)
 def isolated_studio_database(monkeypatch, tmp_path) -> None:
     monkeypatch.setenv("DOCPARSE_STUDIO_DB_PATH", str(tmp_path / "studio.sqlite3"))
+    monkeypatch.setattr(
+        universal,
+        "inspect_pdf_content",
+        lambda _data: PdfInspection(
+            pdf_type="scanned",
+            page_count=1,
+            pages_needing_ocr=frozenset({1}),
+        ),
+    )
+
+
+def _select_scanned(app: AppTest, filename: str) -> AppTest:
+    return next(
+        item
+        for item in app.selectbox
+        if item.label == f"Processing type · {filename}"
+    ).select("Scanned PDF").run(timeout=20)
 
 
 def test_studio_allows_glm_without_openai_environment(
@@ -50,6 +68,9 @@ def test_studio_allows_glm_without_openai_environment(
     app = app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
+    parse = next(button for button in app.button if button.label == "Parse document")
+    assert parse.disabled is True
+    app = _select_scanned(app, "notice.pdf")
     parse = next(button for button in app.button if button.label == "Parse document")
     assert parse.disabled is False
     assert next(item for item in app.selectbox if item.label == "ADE mode").value == "Fast"
@@ -276,6 +297,7 @@ def test_studio_shows_results_and_only_requested_tools(
     app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
+    app = _select_scanned(app, "notice.pdf")
     app = next(
         button for button in app.button if button.label == "Parse document"
     ).click().run(timeout=20)
@@ -496,6 +518,7 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     app.file_uploader[0].upload(
         "two-pages.pdf", source_bytes, "application/pdf"
     ).run(timeout=20)
+    app = _select_scanned(app, "two-pages.pdf")
     app = next(box for box in app.checkbox if box.label == "Page range").check().run(
         timeout=20
     )
@@ -564,6 +587,8 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
     uploader.upload("first.pdf", simple_pdf, "application/pdf")
     uploader.upload("second.pdf", simple_pdf + b"\n", "application/pdf")
     app = uploader.run(timeout=20)
+    app = _select_scanned(app, "first.pdf")
+    app = _select_scanned(app, "second.pdf")
 
     page_range = next(box for box in app.checkbox if box.label == "Page range")
     assert page_range.disabled is True
@@ -593,6 +618,7 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
         ]
     )
     app = uploader.run(timeout=20)
+    app = _select_scanned(app, "third.pdf")
     assert not app.exception
     button_labels = [button.label for button in app.button]
     assert "Process 3 documents" in button_labels, button_labels
@@ -651,6 +677,8 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
     uploader.upload("good.pdf", simple_pdf, "application/pdf")
     uploader.upload("bad.pdf", simple_pdf + b"\n", "application/pdf")
     app = uploader.run(timeout=20)
+    app = _select_scanned(app, "good.pdf")
+    app = _select_scanned(app, "bad.pdf")
     app = next(
         button for button in app.button if button.label == "Process 2 documents"
     ).click().run(timeout=20)
@@ -660,7 +688,10 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
         for workspace in app.session_state["batch_workspaces"].values()
     ]
     assert not app.exception
-    assert statuses == ["complete", "failed"]
+    assert statuses == ["complete", "failed"], [
+        workspace["error"]
+        for workspace in app.session_state["batch_workspaces"].values()
+    ]
     assert parsed_names == ["good.pdf", "bad.pdf"]
 
     app = next(
@@ -712,6 +743,7 @@ def test_completed_batch_restores_after_app_restart_without_reparsing(
     app = app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
+    app = _select_scanned(app, "notice.pdf")
     app = next(
         button for button in app.button if button.label == "Parse document"
     ).click().run(timeout=20)
@@ -756,7 +788,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
         annotated_pdf=simple_pdf,
     )
     selection_key = (
-        f"{document.id}:all:False:True:True:glm-ocr:4.6.0"
+        f"{document.id}:all:False:True:True:glm-ocr:scanned-pdf::4.6.0"
     )
     store = WorkspaceStore(database)
     store.sync_documents(

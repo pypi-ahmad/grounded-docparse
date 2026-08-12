@@ -6,9 +6,11 @@ from pydantic import ValidationError
 from grounded_docparse.native import (
     NativeDocument,
     NativeElement,
+    NativeParseResult,
     PageRoute,
     PdfSourceAnchor,
     ProcessingType,
+    SourceAnchor,
     SourceFormat,
     SourceSpan,
     SourceUnit,
@@ -92,3 +94,65 @@ def test_native_document_rejects_mismatched_element_id() -> None:
 
     with pytest.raises(ValidationError, match="element_id"):
         NativeDocument.model_validate(document)
+
+
+def test_processing_type_values_and_source_anchor_are_public() -> None:
+    assert [item.value for item in ProcessingType] == [
+        "native-pdf",
+        "scanned-pdf",
+        "mixed-pdf",
+        "word",
+        "powerpoint",
+        "excel",
+        "csv",
+        "image",
+        "other-native",
+    ]
+    assert SourceAnchor is not None
+
+
+def test_base_text_is_immutable() -> None:
+    document = _document()
+
+    with pytest.raises(ValidationError, match="Field is frozen"):
+        document.base_text = "changed"
+
+
+def test_character_range_maps_to_all_intersecting_source_spans() -> None:
+    document = _document()
+    second = NativeElement(
+        id="page-1-item-2",
+        type="text",
+        text="notice",
+        reading_order=1,
+        source=SourceSpan(
+            start=7,
+            end=13,
+            element_id="page-1-item-2",
+            anchor=PdfSourceAnchor(unit_id="page-1", page=1),
+        ),
+    )
+    document.elements.append(second)
+
+    assert [span.element_id for span in document.source_spans_for(6, 9)] == [
+        "page-1-item-1",
+        "page-1-item-2",
+    ]
+
+
+@pytest.mark.parametrize("start,end", [(-1, 1), (1, 1), (0, 99)])
+def test_character_range_rejects_invalid_bounds(start: int, end: int) -> None:
+    with pytest.raises(ValueError, match="within base_text"):
+        _document().source_spans_for(start, end)
+
+
+def test_annotated_pdf_is_optional_for_native_results() -> None:
+    rendered = render_native_document(_document(), markdown="Public notice")
+
+    result = NativeParseResult(
+        document=_document(),
+        markdown=rendered.markdown,
+        json=rendered.json,
+    )
+
+    assert result.annotated_pdf is None
