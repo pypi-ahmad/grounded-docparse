@@ -5,12 +5,12 @@ This tutorial explains the repository from first principles through day-to-day u
 The short version is:
 
 ```text
-PDF or image
-  -> selected local GLM-OCR or PaddleOCR-VL layout and recognition
-  -> deterministic quality checks
-  -> optional bounded Luna text recovery
-  -> grounded document model, Markdown, JSON, and annotated PDF
-  -> optional classification, form routing, extraction, TOC, and chat
+required per-file processing type
+  -> scanned PDF/image: selected local GLM-OCR or PaddleOCR-VL
+  -> Native PDF: pdf-inspector; Mixed PDF: reviewed page routes
+  -> Office/open formats: OCR-disabled Docling conversion
+  -> grounded OCR elements or immutable native source spans/anchors
+  -> Markdown, JSON, optional annotated PDF, and optional extraction/chat
 ```
 
 The most important design rule is that the selected local OCR engine and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
@@ -36,7 +36,7 @@ Ordinary OCR answers “what text appears in this image?” A business document 
 - Can an extracted field be rejected when its evidence is missing?
 - Can a mixed fax packet be split into form ranges before extraction?
 
-Grounded DocParse converts one PDF or image into a structured, reviewable document representation. It is optimized for scanned and visually complex documents where source traceability matters.
+Grounded DocParse converts native documents, scanned PDFs, and images into structured, reviewable document representations. It preserves source traceability for selectable text as well as visually complex scans.
 
 The current application is a workstation-oriented Streamlit studio. It processes up to 20 uploaded files sequentially and restores one active local batch after restart. It is not an unattended batch service, REST API, multi-user system, or production job processor.
 
@@ -53,6 +53,7 @@ A successful parse can produce:
 | Extraction JSON v1.1.0 | One-schema scalar extraction with evidence and field confidence |
 | Routed extraction JSON v2.0.0 | Per-form extraction results for approved eligible segments |
 | Annotated PDF | Original pages with semantic boxes, reading order, and source highlighting |
+| Native JSON v5.0.0 / combined v5.1.0 | Immutable `base_text`, source spans, anchors, and optional grounded extraction |
 
 ## 3. Essential concepts and vocabulary
 
@@ -60,9 +61,9 @@ Understanding these terms makes the rest of the repository much easier to follow
 
 ### 3.1 Rasterization
 
-Rasterization renders each PDF page into pixels. This project intentionally ignores selectable or embedded PDF text as extraction evidence. A visually scanned page and a digitally generated page therefore enter the same image-first pipeline.
+Rasterization renders scanned PDF pages and image frames into pixels. Native PDFs do not enter this image-first pipeline: `pdf-inspector` extracts their selectable text, layout, tables, and positions. Mixed PDFs explicitly combine both routes page by page.
 
-Why this matters: hidden, stale, malformed, or adversarial PDF text cannot disagree with what a reviewer sees and still become the authoritative source.
+Why this matters: the user explicitly selects the evidence route. Native PDF text is traceable through page/bounding-box anchors, while scanned-page evidence remains visual/OCR based. Mismatches are blocked rather than silently rerouted.
 
 ### 3.2 Layout analysis and OCR
 
@@ -255,12 +256,12 @@ Both managed services bind to loopback. Do not override that boundary on an untr
 
 Open <http://localhost:8501>, then follow this minimal path:
 
-1. Upload one PDF, PNG, JPEG, or TIFF. For a safe first run, use the bundled `examples/synthetic-report.pdf`.
-2. For a PDF, optionally enable **Page range** and choose an inclusive start/end range.
-3. Select an ADE mode.
-4. Decide whether visual recovery is allowed.
+1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
+2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
+3. For scanned PDFs and images, optionally enable **Page range**, select an OCR engine, then choose an ADE mode.
+4. Decide whether visual recovery is allowed for OCR routes.
 5. Select **Parse document**.
-6. Review the generated tabs before running extraction.
+6. Review Markdown, JSON, source structure, and any available annotated PDF before running extraction.
 
 ### 6.1 ADE modes
 
@@ -281,23 +282,18 @@ If an OpenAI key is present, Fast mode can still make remote requests because cl
 The progress UI reflects these major stages:
 
 ```text
-layout -> recognition -> recovery -> assembly -> annotation
-       -> optional enhancement -> optional document analysis
+selection -> validation -> selected native/OCR pipeline -> canonical evidence
+          -> optional enhancement -> optional document analysis/extraction
 ```
 
 The exact parser flow is:
 
-1. Validate extension, bytes, upload size, page count, and pixel limits.
-2. Rasterize every page or image frame.
-3. Run the selected local OCR engine: ordered 16-page windows for GLM-OCR or one full-document local API request for PaddleOCR-VL.
-4. Analyze OCR confidence, density, garbage, empty-region area, and table structure.
-5. Rank recovery candidates.
-6. Optionally send prioritized crops to Luna using an adaptive budget of eight to 64 and a three-per-page limit.
-7. Accept only crop-backed text corrections with confidence of at least `0.85`.
-8. Restore source page order and build document hierarchy.
-9. Generate elements, quality state, `base_markdown`, parse JSON, and annotations.
-10. Optionally apply Markdown presentation directives.
-11. Optionally classify the whole document and generate the TOC.
+1. Require a compatible processing type and validate file signatures/container structure.
+2. Route scanned PDFs/images to OCR, Native PDF to `pdf-inspector`, Mixed PDF to confirmed page routes, and Office/open formats to Docling without OCR.
+3. Apply local OCR quality/recovery only to OCR routes; native embedded images are recorded rather than OCRed.
+4. Merge Mixed PDF pages in original order and build OCR elements or immutable native `base_text`, character spans, and anchors.
+5. Generate Markdown, JSON, source structure, and an annotated PDF only when a visual artifact exists.
+6. Optionally apply refinement, classification, TOC, extraction, and chat. Native LangExtract values must have exact intervals that resolve to source anchors.
 
 For GLM-OCR, pages are prepared/finalized concurrently within ordered windows while the process-wide SDK runtime serializes model access. Default page concurrency is eight. PaddleOCR-VL submits the complete document to its local API.
 
@@ -699,7 +695,7 @@ The active UI keeps only the latest whole-document or routed extraction result. 
 
 ## 13. Use the public Python API
 
-The repository does not install a CLI entry point. Programmatic reuse is through the Python package.
+The repository installs `grounded-docparse`. Use `grounded-docparse ingest` for explicit native/OCR routing and `grounded-docparse parse` for legacy PDF/image OCR batches. Programmatic reuse is also available through the Python package.
 
 The snippets below are incremental: later examples assume the `result` produced in Section 13.1 unless they explicitly parse a different example. Save the combined imports and statements as `scratch.py` in the repository root.
 
@@ -710,7 +706,7 @@ source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/acti
 python scratch.py
 ```
 
-Native Windows `uv run python scratch.py` can import the core package but does not install the Linux-only local OCR runtime, so it is not the supported way to perform a real parse.
+Native Windows `uv run python scratch.py` can perform native parsing after `uv sync --locked --extra native`; Linux-only local OCR still requires the setup-created WSL runtime.
 
 ### 13.1 Parse a document
 
@@ -733,7 +729,7 @@ result_path = source.with_suffix(".annotated.pdf")
 result_path.write_bytes(result.annotated_pdf)
 ```
 
-`DocumentParser.parse` is synchronous. Supported extensions are `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, and `.tiff`.
+`DocumentParser.parse` is synchronous for legacy OCR. `UniversalDocumentParser.parse` is synchronous for manually selected native, scanned, mixed, and image routes.
 
 The Python parse API has no page-range parameter. Slice the PDF before calling it or use the Streamlit page-range control.
 
@@ -1232,7 +1228,6 @@ The bundled corpus is a regression suite. It is not proof of broad production ac
 The repository intentionally does not currently provide:
 
 - a folder-upload workflow;
-- a CLI application entry point;
 - an HTTP application API;
 - queues or workers;
 - durable job/artifact state;

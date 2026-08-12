@@ -1,26 +1,32 @@
 # Grounded Document Parser
 
-A workstation-oriented Streamlit studio that parses PDFs and images with selectable local GLM-OCR or PaddleOCR-VL-1.6, then optionally sends selected crops or recognized document context to `gpt-5.6-luna` for bounded visual recovery and document-level reasoning.
+A workstation-oriented Streamlit studio that parses native documents, scanned PDFs, and images with explicit per-file routing. Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, HTML, EPUB, and other supported native formats use Docling without OCR. Scanned PDFs and images retain the local GLM-OCR or PaddleOCR-VL-1.6 pipeline. Optional LangExtract extraction is grounded back to immutable source text and anchors.
 
 Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ahmad/grounded-docparse)
 
-The selected local OCR engine owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. PaddleOCR-VL-1.6 uses the full PP-DocLayoutV3 plus PaddleOCR-VL-1.6-0.9B pipeline with a local vLLM recognition backend. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
+For OCR inputs, the selected local OCR engine owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. PaddleOCR-VL-1.6 uses the full PP-DocLayoutV3 plus PaddleOCR-VL-1.6-0.9B pipeline with a local vLLM recognition backend. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
+
+Native inputs preserve their original structure. Each element has an immutable `base_text` span and a `SourceAnchor` that identifies its page, paragraph, slide, shape, sheet/cell, table, or CSV row/column. Embedded native-document images are recorded as assets and are not OCRed in v1.
 
 ```text
 upload
-  -> raster ingest
-  -> selected GLM-OCR or PaddleOCR-VL-1.6 layout and recognition
-  -> deterministic quality analysis
-  -> optional bounded Luna crop recovery
-  -> grounded Markdown, elements, JSON v4.5.0, annotated PDF
-  -> optional Luna refinement, classification, TOC, extraction, and chat
+  -> required processing-type selection for every file
+  -> signature/container validation
+  -> native PDF / mixed PDF / Docling / scanned-image pipeline
+  -> immutable base_text, source spans, and anchors
+  -> Markdown, JSON, and source-structure outputs
+  -> optional grounded LangExtract, classification, TOC, refinement, and chat
 ```
+
+Supported processing types are `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, and `other-native`. The UI and CLI require a compatible selection for each file; wrong selections are blocked and never silently rerouted.
 
 ## Application preview
 
 ![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
 
-Every PDF page is rendered to pixels. Selectable or embedded PDF text is not extraction evidence. GLM-OCR processes ordered windows of 16 pages with up to eight page workers by default; PaddleOCR-VL submits the full document to its local API. If at least one page is nonblank and none of the nonblank pages contains a local OCR layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
+Scanned PDFs and images are rendered to pixels. Native PDFs use `pdf-inspector` for native text, layout, tables, and positions; `pdf-inspector` never performs OCR. Docling handles supported native Office, CSV, HTML, EPUB, and related formats with OCR, VLM, remote services, plugins, and model enrichments disabled. If at least one scanned page is nonblank and none of the nonblank pages contains a local OCR layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
+
+For a Mixed PDF, `pdf-inspector` suggests a Native or OCR route per page. The user reviews the page table, may override suggestions, confirms every page, and receives the merged result in original page order. A Native PDF with unusable pages stops and suggests Mixed PDF instead of silently falling back.
 
 When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. For PDFs parsed with PaddleOCR-VL, incomplete checkbox tables may receive a conservative local recovery pass; a state is accepted only when independent 190 and 200 DPI parses agree. Both engines then enter the same deterministic quality and optional Luna-recovery stages.
 
@@ -61,21 +67,46 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
 
 `Launch-GLM-OCR.cmd` refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from Windows user scope each time. See [setup](SETUP.md) for manual WSL installation, configuration, security boundaries, and troubleshooting, or [run commands](docs/run.md) for service lifecycle commands.
 
+For a manual development install of native parsing and grounded extraction, use:
+
+```powershell
+uv sync --locked --extra native
+```
+
+The native extra provides `pdf-inspector`, Docling, and LangExtract. Native parsing itself does not OCR embedded images.
+
+## Supported inputs and routing
+
+Every uploaded file has its own required processing-type selector. Batch files may use different selections, but each selection must match the file's signature and container structure.
+
+| File | Required selection | Pipeline |
+| --- | --- | --- |
+| `invoice.pdf` | Native PDF / Scanned PDF / Mixed PDF | `pdf-inspector`, existing OCR, or reviewed per-page merge |
+| `report.docx` | Word | Docling native extraction |
+| `slides.pptx` | PowerPoint | Docling native extraction |
+| `accounts.xlsx` | Excel | Docling native extraction |
+| `records.csv` | CSV | Native CSV structure extraction |
+| `document.odt`, `document.odp`, `document.ods`, `document.html`, `document.md`, `document.epub` | Other Native | Docling/native structure extraction |
+| `scan.png`, `scan.jpg`, `scan.jpeg`, `scan.tif`, `scan.tiff` | Image | Existing OCR pipeline |
+
+Wrong combinations are blocked. For example, a DOCX cannot be selected as Native PDF, and a Native PDF with unusable pages cannot silently become Scanned PDF. Mixed PDF processing additionally requires a complete, confirmed Native/OCR route for every page.
+
 ## How to use the app
 
-1. Upload up to 20 PDFs, PNGs, JPEGs, or TIFFs (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only when one PDF is uploaded; batches process every page.
-2. Choose **GLM-OCR** or **PaddleOCR-VL-1.6** from **Document extraction model**, then choose an **ADE mode** for optional Luna features:
+1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only for one scanned PDF; native and mixed inputs process the selected document structure/pages.
+2. Select a processing type for every file in **Processing types**. For Mixed PDF, review the suggested page routes, override any page, and confirm the complete table before processing.
+3. For scanned PDFs and images, choose **GLM-OCR** or **PaddleOCR-VL-1.6** from **Document extraction model**, then choose an **ADE mode** for optional Luna features:
    - **Fast**: classification is the only preset-controlled Luna feature; visual recovery is a separate toggle and defaults on when a key is available.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
-3. Keep visual recovery enabled to inspect prioritized hard regions. The Luna budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
-4. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
-5. Choose a file from **Document results**, then review Overview, Markdown, Annotated PDF, Extract, optional Chat, and Layout Tree.
-6. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, and the generated Markdown, annotated PDF, full JSON, and extraction JSON when available.
+4. Keep visual recovery enabled to inspect prioritized hard regions. The Luna budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
+5. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
+6. Choose a file from **Document results**. Native results expose Overview, Markdown, JSON, source structure, Extract, optional Chat, and Layout Tree. Annotated PDF is shown only when the pipeline produces a visual artifact.
+7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
 
 The latest batch is saved locally and restored after an app restart. Sources, parse results, document analysis, failures, progress, settings, and usage survive; interrupted documents resume from the last completed parse checkpoint when **Resume batch** is selected. Use **Clear saved workspace** to remove the durable batch. Extraction, routing review, and chat remain session-only.
 
-Extraction is always on demand after parsing. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown, CSV, and XLSX imports populate the flat field builder.
+Extraction is always on demand after parsing. Native extraction sends immutable `base_text` to LangExtract, never refined Markdown. A returned value is accepted only when it includes a `char_interval` whose exact substring resolves through the native source spans to at least one `SourceAnchor`; ungrounded values are rejected. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown, CSV, and XLSX imports populate the flat field builder.
 
 Flat field schemas can be imported from Markdown, CSV, or XLSX. CSV and the first XLSX worksheet use `Field name`, `Description`, and `Type` columns. The filename becomes the schema name, and an empty type defaults to `string`.
 
@@ -103,42 +134,77 @@ Chat is off by default and sends no request until enabled and a question is subm
 
 ## CLI batch parsing
 
-Native ingestion accepts saved schemas with `--schema`. It sends only immutable `base_text` to LangExtract, using `gpt-5.6-luna` at medium reasoning effort. Set `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in the environment:
+Use `ingest` when you want explicit native/OCR routing. Every input requires one `--processing-type PATH=TYPE` assignment; assignments cannot be missing, duplicated, or supplied for an unknown input. File signatures and Office/container structure are still validated:
 
 ```powershell
-grounded-docparse ingest invoice.pdf --processing-type invoice.pdf=native-pdf --schema invoice.schema.json --output output
+grounded-docparse ingest invoice.pdf `
+  --processing-type invoice.pdf=native-pdf `
+  --schema invoice.schema.json `
+  --output output
 ```
 
-Only exact source substrings with a `char_interval` resolving through source spans are accepted. Numbers and literal `true`/`false` are parsed deterministically. Raw schemas support nested objects and one array level; nested arrays are rejected.
+Batch files keep independent selections:
 
-The installed package provides a synchronous batch command for explicit files or non-recursive directories:
+```powershell
+grounded-docparse ingest invoice.pdf scan.pdf report.docx accounts.xlsx records.csv `
+  --processing-type invoice.pdf=native-pdf `
+  --processing-type scan.pdf=scanned-pdf `
+  --processing-type report.docx=word `
+  --processing-type accounts.xlsx=excel `
+  --processing-type records.csv=csv `
+  --output output
+```
+
+Mixed PDF processing requires a route for every page. The UI displays the `pdf-inspector` suggestion and lets the user override it; the CLI supplies the confirmed routes explicitly:
+
+```powershell
+grounded-docparse ingest mixed.pdf `
+  --processing-type mixed.pdf=mixed-pdf `
+  --page-route mixed.pdf#1=native `
+  --page-route mixed.pdf#2=ocr `
+  --page-route mixed.pdf#3=native `
+  --output output
+```
+
+Native extraction accepts saved schemas with `--schema`. It sends only immutable `base_text` to LangExtract, using `gpt-5.6-luna` at medium reasoning effort. Set `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in the environment. Only exact source substrings with a `char_interval` resolving through source spans are accepted. Numbers and literal `true`/`false` are parsed deterministically. Raw schemas support nested objects and one array level; nested arrays are rejected.
+
+The legacy `parse` command remains the synchronous OCR batch command for PDFs and images:
 
 ```powershell
 grounded-docparse parse input.pdf --schema invoice.json --output results
 grounded-docparse parse .\incoming --schema invoice.md --output results --overwrite
 ```
 
-`--schema` is optional and applies one JSON or Markdown extraction schema to every input. Each document gets a deterministic output folder containing Markdown, annotated PDF, Full JSON, and extraction JSON when requested. The root `manifest.json` records successes and failures. Processing continues after individual failures and returns exit code `1` if any document fails. A non-empty output directory requires `--overwrite`; unrelated files are preserved.
+`--schema` is optional and applies one JSON or Markdown extraction schema to every input. `parse` writes Markdown, annotated PDF, Full JSON, and extraction JSON when requested. `ingest` writes Markdown and Full JSON/source structure, adds extraction JSON when requested, and writes an annotated PDF only when the selected pipeline produces one. Both commands use deterministic output folders and a root `manifest.json`; processing continues after individual failures and returns exit code `1` if any document fails. A non-empty output directory requires `--overwrite`; unrelated files are preserved.
 
 ## Outputs
 
-- Refined Markdown plus grounded `base_markdown`
+- Refined Markdown plus grounded `base_markdown` for the legacy OCR/refinement pipeline
+- Native Markdown plus immutable `base_text` and source-structure mappings
 - Parse JSON v4.5.0 with normalized elements, page/block evidence, provenance, correction history, usage/trace, recovery log, and optional OCR-comparison evidence
 - Full JSON v4.6.0 using the same envelope with current classification, sections, legacy extraction, custom form routing, per-form extraction, combined usage/trace, and feature statuses populated
+- Native document JSON schema 5.0.0, or combined native/extraction JSON schema 5.1.0, with units, elements, assets, source spans, `SourceAnchor` values, and requested/effective routes
 - Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and local-OCR-owned normalized boxes
-- Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes
+- Native extraction JSON with exact `char_interval` evidence and resolved source anchors
+- Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes when a visual artifact is available
 - Run metadata including GLM, Luna recovery, and Luna agentic timing
 
-Annotated PDF bytes are downloaded separately and are not embedded in JSON. Reusable extraction schemas and routing profiles persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
+Annotated PDF bytes are downloaded separately and are not embedded in JSON. Native nonvisual formats may have no annotated PDF at all. Reusable extraction schemas and routing profiles persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
 
 ## Public Python API
 
-The package exports `DocumentParser`, `DocumentAgent`, `DocumentExtractor`, `ParserConfig`, result models, and `render_combined_result`.
+The package exports `DocumentParser`, `UniversalDocumentParser`, `DocumentAgent`, `DocumentExtractor`, `ParserConfig`, `ProcessingType`, `SourceAnchor` models, result models, and native/legacy render helpers.
 
 ```python
 from pathlib import Path
 
-from grounded_docparse import DocumentAgent, DocumentParser, render_combined_result
+from grounded_docparse import (
+    DocumentAgent,
+    DocumentParser,
+    ProcessingType,
+    UniversalDocumentParser,
+    render_combined_result,
+)
 
 source = Path("invoice.pdf")
 result = DocumentParser().parse(
@@ -148,12 +214,18 @@ result = DocumentParser().parse(
     visual_recovery=True,
 )
 
+native_result = UniversalDocumentParser().parse(
+    source.read_bytes(),
+    source.name,
+    processing_type=ProcessingType.NATIVE_PDF,
+)
+
 agent = DocumentAgent()
 analysis = agent.analyze(result, classify=True, generate_toc=False)
 full_json = render_combined_result(result, analysis)
 ```
 
-`DocumentParser.parse` is synchronous. Luna failures do not invalidate a successful local OCR parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
+`DocumentParser.parse` is synchronous for the legacy OCR pipeline. `UniversalDocumentParser.parse` is synchronous for manually selected native, scanned, mixed, and image routes. Luna failures do not invalidate a successful local OCR parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
 
 ## Repository layout
 
@@ -164,7 +236,11 @@ full_json = render_combined_result(result, analysis)
 ├── Launch-PaddleOCR-VL-1.6.cmd   # Start with PaddleOCR selected
 ├── paddle-runtime/               # Isolated locked Paddle/vLLM environment
 ├── streamlit_app.py              # Streamlit entry point
-├── src/grounded_docparse/        # Parser, models, gateways, renderers, agentic layer
+├── src/grounded_docparse/        # OCR, native parsers, models, gateways, renderers, agentic layer
+│   ├── native.py                 # Processing types, source anchors, spans, and native result contracts
+│   ├── universal.py              # Signature validation and explicit format routing
+│   ├── native_parsers.py         # pdf-inspector and Docling native pipelines
+│   └── native_extraction.py      # Grounded LangExtract integration
 ├── config/glmocr.yaml            # Source GLM-OCR SDK configuration
 ├── scripts/wsl/                  # Locked WSL setup and launch scripts
 ├── scripts/                      # Corpus generation and evaluation utilities

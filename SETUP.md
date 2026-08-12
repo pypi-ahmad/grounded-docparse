@@ -1,8 +1,8 @@
 # Setup
 
-> Last verified against this repository: 2026-08-05.
+> Last verified against this repository: 2026-08-12.
 
-The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. GLM-OCR retains NVIDIA vLLM and Ollama fallback support. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer for its vLLM recognition service; it fails closed rather than silently using GLM. The two dependency stacks use separate locked environments.
+The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. GLM-OCR retains NVIDIA vLLM and Ollama fallback support. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer for its vLLM recognition service; it fails closed rather than silently using GLM. The two OCR dependency stacks use separate locked environments. Native document parsing is available with the `native` extra and does not require local OCR or a GPU.
 
 ## Prerequisites
 
@@ -33,11 +33,41 @@ The setup assistant:
 1. validates Windows, AVX2, RAM, and disk;
 2. installs or reuses WSL2 and Ubuntu 24.04, resuming after restart when required;
 3. reuses the Ubuntu user or securely creates one without persisting its password;
-4. installs only missing or stale locked dependencies;
+4. installs only missing or stale locked local-OCR and native-document dependencies;
 5. tries NVIDIA CUDA, otherwise installs Ollama `glm-ocr:bf16`; supported AMD GPUs accelerate Ollama and unsupported GPUs use CPU;
 6. validates a real image request, starts Streamlit, and opens <http://localhost:8501>.
 
-Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use `local-ocr`; CPU/AMD installs use `local-ocr-cpu`. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
+Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
+
+## Native document ingestion
+
+For local native-document development on Windows or WSL, install the native extra:
+
+```powershell
+uv sync --locked --extra native
+```
+
+Native parsing is local and non-OCR: `pdf-inspector` extracts selectable-text PDF structure, while Docling converts DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, and EPUB with OCR, VLM/model enrichments, remote services, and plugins disabled. Native embedded images are recorded as assets and are not OCRed. Optional LangExtract field extraction uses the OpenAI credentials described below.
+
+The Streamlit app requires a compatible selection for each uploaded file. The CLI exposes the same contract through `ingest`: PDFs use `native-pdf`, `scanned-pdf`, or `mixed-pdf`; Office and open formats use `word`, `powerpoint`, `excel`, `csv`, or `other-native`; images use `image`. File signatures and Office/container structure are validated after selection.
+
+```powershell
+uv run grounded-docparse ingest .\invoice.pdf `
+  --processing-type .\invoice.pdf=native-pdf `
+  --output .\output
+```
+
+Mixed PDFs require a route for every page. The app shows `pdf-inspector` suggestions for review; the CLI receives the confirmed routes explicitly:
+
+```powershell
+uv run grounded-docparse ingest .\mixed.pdf `
+  --processing-type .\mixed.pdf=mixed-pdf `
+  --page-route .\mixed.pdf#1=native `
+  --page-route .\mixed.pdf#2=ocr `
+  --output .\output
+```
+
+Native results contain immutable `base_text`, character-to-source spans, and source anchors. A native PDF with pages that need OCR stops and asks for Mixed PDF rather than falling back automatically. The legacy `grounded-docparse parse` command remains available for PDF/image OCR batches.
 
 ### Build the installer
 

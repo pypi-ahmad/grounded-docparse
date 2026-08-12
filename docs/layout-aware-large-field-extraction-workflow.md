@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio.
+This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio. It also applies to supported native PDFs and Office/open formats, which preserve source structure without OCR.
 
 A healthcare workflow might request Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same approach applies to invoices, contracts, bank statements, applications, onboarding packets, certificates, compliance forms, reports, and other document families.
 
@@ -14,12 +14,12 @@ The central principle is:
 
 | Capability | Status |
 | --- | --- |
-| Upload PDF, PNG, JPEG, or TIFF source documents | Implemented |
+| Upload PDF, Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, EPUB, PNG, JPEG, or TIFF source documents | Implemented |
 | Convert the source into grounded Markdown and structured layout elements | Implemented |
 | Define scalar fields in the Extract tab | Implemented |
 | Import and export reusable schema JSON | Implemented |
 | Extract structured values from parsed Markdown and layout context | Implemented |
-| Return page, element ID, source text, confidence, and normalized bounding box | Implemented when evidence can be grounded |
+| Return OCR page/element/box evidence or native character-span/source-anchor evidence | Implemented when evidence can be grounded |
 | Upload a Markdown file containing field descriptions | Proposed optional feature; not currently available in the UI |
 | Automatically split, run, and merge multiple schemas for 100+ fields | Proposed extension; not currently implemented |
 
@@ -29,14 +29,14 @@ Yes, a Markdown field-specification upload can be integrated cleanly as an optio
 
 The workflow has two conceptually different inputs:
 
-1. **Source document:** The PDF or image containing the facts to extract.
+1. **Source document:** The PDF, image, or supported native document containing the facts to extract.
 2. **Field specification:** The names, descriptions, types, and business rules describing what the user wants returned.
 
 The source document is evidence. The field specification is an instruction set. A field-specification Markdown file must never be treated as evidence for an extracted value.
 
 ### Plain-language terms
 
-- **Local OCR:** The selected GLM-OCR or PaddleOCR-VL system that detects page regions and reads the source document.
+- **Local OCR:** The selected GLM-OCR or PaddleOCR-VL system that detects page regions and reads scanned PDFs or images.
 - **Luna:** The optional model used for selected visual repair and document-level tasks such as extraction.
 - **Layout tree:** An ordered list of parsed document regions with their page, type, text, and identifier.
 - **Schema:** The approved list of output fields, descriptions, and data types.
@@ -48,6 +48,10 @@ The source document is evidence. The field specification is an instruction set. 
 PDF or image
   -> selected local OCR parse
   -> grounded Markdown + layout tree + element IDs + bounding boxes
+
+Native PDF or Office/open format
+  -> explicit native route (`pdf-inspector` or OCR-disabled Docling)
+  -> immutable base_text + character spans + SourceAnchor
 
 Field definitions
   -> approved extraction schema
@@ -95,7 +99,7 @@ The current app runs one extraction schema at a time and retains only the latest
 
 ### 3. Upload and parse the source document
 
-Upload one supported PDF or image. For PDFs, select an inclusive page range when only part of the document is relevant.
+Upload one supported document and select its required processing type. For scanned PDFs, select an inclusive page range when only part of the document is relevant. For Mixed PDF, confirm every Native/OCR page route.
 
 Choose the required OCR engine and parse options, then select **Parse document**. Local OCR reads the complete page layout and produces:
 
@@ -155,7 +159,7 @@ Extraction confidence describes the value-to-evidence relationship. It is distin
 
 ### 8. Export and use the result
 
-Download the extraction JSON for downstream processing and the annotated PDF for evidence review. Full JSON also contains the parse structure and current extraction result.
+Download the extraction JSON for downstream processing and an annotated PDF for evidence review when one exists. Native nonvisual formats use source anchors and source structure instead. Full JSON also contains the parse structure and current extraction result.
 
 The output should enter a business system only after the organization applies its normal validation, approval, privacy, and retention controls.
 

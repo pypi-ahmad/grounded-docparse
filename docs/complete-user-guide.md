@@ -44,7 +44,7 @@ Upload one or more documents
 
 Grounded DocParse can:
 
-- process PDF, PNG, JPEG, and TIFF documents;
+- process native, scanned, and mixed PDFs; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB documents; and PNG, JPEG, and TIFF images;
 - process up to 20 files sequentially in one durable local workspace;
 - handle multi-page PDFs and multi-frame images;
 - process an optional continuous page range from a PDF;
@@ -83,8 +83,8 @@ It processes up to 20 uploaded files sequentially in one active local workspace,
 
 The application has two broad layers:
 
-1. **Local document parsing:** the selected GLM-OCR or PaddleOCR-VL-1.6 engine reads page images, finds regions, and determines their order and location.
-2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult crops or reason over recognized document content.
+1. **Local document parsing:** the user selects one compatible processing type per file. Scanned PDFs and images use the selected GLM-OCR or PaddleOCR-VL-1.6 engine; native PDFs use `pdf-inspector`; structured native formats use Docling without OCR.
+2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult OCR crops or reason over parsed content. Native field extraction uses LangExtract over immutable source text.
 
 Local parsing can run without an OpenAI key. The optional features require `OPENAI_API_KEY` and may send document content to the configured provider.
 
@@ -143,13 +143,14 @@ This is important for business, privacy, and technical users.
 
 | Feature | Runs locally? | What may be sent remotely when enabled? |
 | --- | --- | --- |
-| Local layout and OCR | Yes | Nothing to Luna |
+| Native parsing and local layout/OCR | Yes | Nothing to Luna |
 | Visual recovery | Candidate selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
 | Markdown enhancement | No | Grounded Markdown and compact layout information |
 | Document classification | No | Recognized content/layout from the first two parsed pages |
 | Table of contents | No | Recognized content/layout across the document |
 | Custom form routing | No | Recognized content/layout plus routing categories/instructions |
-| Field extraction | No | Recognized content/layout plus the extraction schema |
+| OCR field extraction | No | Recognized content/layout plus the extraction schema |
+| Native field extraction | No | Immutable `base_text` plus the extraction schema |
 | Document chat | No | Question, recent chat history, and relevant document context |
 
 The application displays the Luna destination near the top of the screen. Stop if the destination is unexpected.
@@ -172,10 +173,10 @@ Do not run extraction or custom form routing in a local-only workflow because th
 
 Use the **Upload document** area in the left sidebar. Supported file types are:
 
-- PDF (`.pdf`);
-- PNG (`.png`);
-- JPEG (`.jpg` or `.jpeg`); and
-- TIFF (`.tif` or `.tiff`).
+- PDF (`.pdf`) as Native PDF, Scanned PDF, or Mixed PDF;
+- Word (`.docx`), PowerPoint (`.pptx`), Excel (`.xlsx`), and CSV (`.csv`);
+- OpenDocument, HTML, Markdown, and EPUB as Other Native; and
+- PNG (`.png`), JPEG (`.jpg` or `.jpeg`), and TIFF (`.tif` or `.tiff`) as Image.
 
 The UI accepts up to 20 files, limits each file to 250 MB, and limits the batch to 1 GB. Files run sequentially. Default parser limits are 500 pages/frames and 20,000,000 rendered pixels per page. Administrators can lower or raise parser limits through configuration, but the UI uploader keeps its own limits. The parser also checks validity and password protection.
 
@@ -217,7 +218,18 @@ Turn it off only when the labels make visual review difficult.
 
 ## 6. Choose processing options
 
-### 6.1 ADE mode
+### 6.1 Processing type
+
+Every uploaded file requires a compatible **Processing type**. This selection is authoritative; the application still validates the file signature and container structure, but it never silently changes the selected route.
+
+- **Native PDF** uses `pdf-inspector` for selectable text, layout, tables, and positions.
+- **Scanned PDF** and **Image** use the existing local OCR pipeline.
+- **Mixed PDF** shows a Native/OCR suggestion for every page. Review or override each route, then confirm the entire table before parsing.
+- **Word**, **PowerPoint**, **Excel**, **CSV**, and **Other Native** use Docling/native structure conversion with OCR disabled.
+
+A Native PDF with pages that need OCR stops and asks you to select Mixed PDF. Embedded images in native documents are recorded but are not OCRed.
+
+### 6.2 ADE mode
 
 ADE mode is a group of presets for optional Luna features. It is not a connection to an external ADE product.
 
@@ -229,11 +241,11 @@ ADE mode is a group of presets for optional Luna features. It is not a connectio
 
 Changing one of the preset-controlled switches can move the mode to **Custom**.
 
-Every mode still runs the same selected local OCR parse.
+For scanned PDFs and images, every mode still runs the same selected local OCR parse. Native routes preserve their selected native structure before optional document features run.
 
 Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
-### 6.2 Enhance with gpt-5.6-luna
+### 6.3 Enhance with gpt-5.6-luna
 
 This feature improves Markdown presentation. It can adjust how existing elements are presented as headings, paragraphs, list items, or captions.
 
@@ -245,7 +257,7 @@ Use it when:
 
 It does not replace the source text, change element locations, or reorder the canonical document.
 
-### 6.3 Enable visual recovery on hard regions
+### 6.4 Enable visual recovery on hard regions
 
 Visual recovery inspects difficult source regions. Engine-specific local recovery runs first: GLM-OCR revisits eligible form regions, while PaddleOCR-VL may recover missing checkbox states in PDFs only when 190 and 200 DPI parses agree. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 
@@ -271,7 +283,7 @@ It cannot change:
 
 Use it for scans, faxes, faint text, and irregular layouts. It is not a full second OCR pass.
 
-### 6.4 Classify document type
+### 6.5 Classify document type
 
 This feature predicts the overall document type from recognized content and layout on the first two parsed pages.
 
@@ -279,7 +291,7 @@ Use it when you need a quick label such as an invoice, report, or authorization 
 
 Do not use this single label to decide which pages to extract from a mixed packet. Use custom form routing for that task.
 
-### 6.5 Generate table of contents
+### 6.6 Generate table of contents
 
 This feature creates a hierarchical list of sections. When a section is linked to a known element, selecting it opens the corresponding highlighted source region.
 
@@ -293,7 +305,7 @@ Use it for:
 
 If Luna TOC generation fails, the application may fall back to headings already found by local OCR.
 
-### 6.6 Enable document chat
+### 6.7 Enable document chat
 
 This feature adds a **Chat** tab. Enabling the switch alone does not send a chat request; a request is sent only after a user submits a question.
 
@@ -301,15 +313,15 @@ Use chat for investigation, not controlled repeatable extraction. A saved extrac
 
 ## 7. Parse the document
 
-After selecting the options, choose **Parse document**.
+After selecting each file's processing type and any applicable options, choose **Parse document**.
 
-The progress area shows stages such as:
+For OCR routes, the progress area shows stages such as:
 
 1. Layout detection
 2. Region recognition
 3. Luna visual recovery
 4. Base Markdown
-5. Annotated PDF
+5. Annotated PDF when a visual artifact is available
 6. Luna Markdown refinement
 7. Document classification
 8. Table of contents
@@ -321,18 +333,16 @@ Features that are disabled may still appear in the stage list but do not make a 
 In simple terms:
 
 ```text
-Validate file
-  -> turn every page into an image
-  -> find page regions
-  -> read text in each region
-  -> check quality
-  -> optionally recover selected difficult text
-  -> restore page and reading order
-  -> build Markdown, JSON, and annotations
+Validate file and selected processing type
+  -> route to Native PDF, scanned/image OCR, Mixed PDF, or Docling
+  -> native: preserve base_text, spans, and source anchors
+  -> OCR: find/read page regions and optionally recover difficult text
+  -> Mixed PDF: merge confirmed Native/OCR page results in source order
+  -> build Markdown, JSON, and available visual artifacts
   -> run selected optional document features
 ```
 
-The parser never treats selectable PDF text as authoritative evidence. It reads the visible page image.
+Native PDFs preserve selectable-text evidence through page and bounding-box anchors. Scanned PDFs and images use visible page pixels as OCR evidence.
 
 ### 7.2 What happens when an optional feature fails
 
@@ -348,10 +358,11 @@ After a successful parse:
 | --- | --- |
 | Overview | Always |
 | Markdown | Always |
-| Annotated PDF | Always |
+| Annotated PDF | When the selected route produces a visual artifact |
 | Extract | After a successful parse |
 | Chat | Only when **Enable document chat** is on |
 | Layout Tree | Always |
+| Source Structure | Native results |
 
 The Extract tab switches between whole-document extraction and custom form routing based on **Use custom form routing**.
 
@@ -932,7 +943,7 @@ File name:
 <document-name>.annotated.pdf
 ```
 
-Use it for review, audit support, and source tracing. The downloaded file includes canonical annotations and reading-order labels according to the current reading-order option.
+Use it for review, audit support, and source tracing when available. Native nonvisual formats do not produce an annotated PDF; use their **Source Structure** view and source anchors instead.
 
 ### 15.3 Download Extract JSON
 
@@ -958,9 +969,9 @@ File name:
 
 Use Full JSON when technical consumers need the complete parse plus current optional results. It can include:
 
-- refined and base Markdown;
-- document structure;
-- elements and normalized boxes;
+- refined and base Markdown for OCR results, or immutable `base_text` and source spans for native results;
+- document structure and source anchors;
+- OCR elements and normalized boxes when the selected route has visual evidence;
 - quality and recovery information;
 - document classification and TOC;
 - whole-document extraction;
@@ -1041,7 +1052,7 @@ A successful run does not mean every requested value is populated. It means:
 
 ### 17.1 Source ownership
 
-The selected local OCR engine and deterministic code own:
+For scanned PDFs and images, the selected local OCR engine and deterministic code own:
 
 - element IDs;
 - normalized bounding boxes;
@@ -1050,13 +1061,13 @@ The selected local OCR engine and deterministic code own:
 - reading order; and
 - initial OCR confidence.
 
-Luna can reason about existing elements, but it does not own their geometry.
+Luna can reason about existing elements, but it does not own their geometry. For native results, immutable `base_text` and `SourceAnchor` values own the evidence: PDF page/bounding-box positions, document paragraphs/shapes, sheet cells, table cells, or CSV rows/columns.
 
 ### 17.2 Grounding
 
-Grounding connects a value or answer to an existing element. An element contains an ID, page, text, type, reading order, and optional box.
+Grounding connects a value or answer to existing source evidence. OCR evidence uses an element ID, page, text, type, reading order, and optional box. Native evidence uses an exact Unicode-codepoint interval in immutable `base_text`, mapped through source spans to one or more anchors.
 
-When **Show source** works, the app follows the element ID back to the annotated page.
+When **Show source** works, the app follows an OCR element ID back to an annotated page or shows the native source anchor and character interval.
 
 ### 17.3 Structured output and validation
 
@@ -1080,6 +1091,8 @@ Current output versions are:
 | Full JSON | `4.6.0` |
 | Whole-document extraction JSON | `1.1.0` |
 | Routed extraction JSON | `2.0.0` |
+| Native document JSON | `5.0.0` |
+| Combined native/extraction JSON | `5.1.0` |
 
 Consumers should use the version field instead of assuming every JSON file has the same shape.
 
@@ -1158,11 +1171,11 @@ Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-t
 The installed package includes a synchronous local batch command:
 
 ```powershell
-grounded-docparse parse input.pdf --schema invoice.json --output results
-grounded-docparse parse .\incoming --schema invoice.md --output results --overwrite
+grounded-docparse ingest input.pdf --processing-type input.pdf=native-pdf --schema invoice.json --output results
+grounded-docparse ingest report.docx --processing-type report.docx=word --schema invoice.md --output results --overwrite
 ```
 
-It accepts files and non-recursive directories, applies one optional schema to every document, isolates per-document failures, and writes a root manifest plus per-document Markdown, annotated PDF, Full JSON, and optional extraction JSON. Exit code `1` means at least one document failed; exit code `2` means arguments or preflight validation failed. Existing non-empty output directories require `--overwrite`, which replaces matching generated paths without deleting unrelated files.
+`ingest` accepts files and non-recursive directories, requires one processing type per discovered file, applies one optional schema to every document, isolates per-document failures, and writes a root manifest plus per-document Markdown, Full JSON, and optional extraction JSON. It writes an annotated PDF only for routes that produce one. Mixed PDFs additionally require a confirmed route for every page. `grounded-docparse parse` remains the legacy PDF/image OCR command. Exit code `1` means at least one document failed; exit code `2` means arguments or preflight validation failed. Existing non-empty output directories require `--overwrite`, which replaces matching generated paths without deleting unrelated files.
 
 The repository still has no application HTTP API, worker process, or production job queue. The CLI is synchronous workstation automation, not a durable unattended service.
 

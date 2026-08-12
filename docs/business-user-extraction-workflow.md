@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Document Parse Studio turns scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same workflow applies to invoices, contracts, bank statements, onboarding packets, certificates, reports, applications, compliance forms, and many other document types.
+Document Parse Studio turns native documents, scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same workflow applies to invoices, contracts, bank statements, onboarding packets, certificates, reports, applications, compliance forms, and many other document types.
 
 The process has two goals:
 
@@ -16,13 +16,13 @@ The app processes up to 20 uploaded documents sequentially in one session. It ca
 | Phase | What the user does | What the user receives |
 |---|---|---|
 | Prepare | Define the fields and their business meaning | An approved field dictionary |
-| Upload | Select a PDF or image and relevant options | A document ready for parsing |
-| Parse | Select **Parse document** | Searchable Markdown, page structure, and an annotated PDF |
+| Upload | Select a supported document and processing type | A validated document ready for parsing |
+| Parse | Select **Parse document** | Searchable Markdown, source structure, and an annotated PDF when the route produces one |
 | Review | Check document coverage and difficult regions | Confidence that the source was read correctly |
 | Configure | Build, import, or select the extraction schema | A reusable extraction template |
 | Extract | Select a schema and run extraction | Values linked to source pages and regions |
 | Validate | Review missing, inferred, and important values | An approved business result |
-| Export | Download the required outputs | Markdown, annotated PDF, extraction JSON, or full JSON |
+| Export | Download the required outputs | Markdown, source structure, extraction JSON, full JSON, and annotated PDF when available |
 
 ## 1. Define the Business Fields First
 
@@ -52,7 +52,7 @@ For repeating information, decide in advance how the business wants it represent
 
 ## 2. Upload the Document
 
-Use **Upload documents** to select up to 20 supported PDFs or images. Files run sequentially; multi-page PDFs and multi-frame images remain individual documents. A page range is available only for a single PDF.
+Use **Upload documents** to select up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images. Files run sequentially; multi-page PDFs and multi-frame images remain individual documents. A page range is available only for a single scanned PDF.
 
 Before parsing:
 
@@ -64,6 +64,8 @@ Before parsing:
 A poor source can still be processed, but missing or unreadable content cannot always be recovered reliably.
 
 ## 3. Choose the Processing Options
+
+First choose a compatible processing type for every file. Native PDFs use `pdf-inspector`; scanned PDFs and images use the selected OCR engine; Word, PowerPoint, Excel, CSV, and other native formats use Docling without OCR. For Mixed PDF, review the suggested Native/OCR route for every page and confirm the full table before parsing. Mismatched selections are blocked and never silently rerouted.
 
 For a comprehensive first parse, use **Full** ADE mode. It produces refined Markdown, document classification, and a table of contents in addition to the core parse; it does not run schema extraction. **Fast** mode is useful when speed matters and the document pattern is already familiar. **Custom** mode allows the optional features to be selected individually.
 
@@ -96,8 +98,9 @@ Use the available views:
 
 - **Overview**: Check the detected document type, page count, recovery count, summary statistics, and table of contents.
 - **Markdown**: Read the reconstructed document in a clean view. Use **Show raw Markdown** when the exact text representation matters.
-- **Annotated PDF**: Compare extracted regions with the original page and inspect highlighted source areas.
+- **Annotated PDF**: Compare OCR or visual PDF regions with the original page when this artifact is available.
 - **Layout Tree**: Review the page-by-page reading order and select individual regions to open their highlighted location.
+- **Source Structure**: For native results, trace text to PDF positions, paragraphs, shapes, cells, or CSV rows/columns.
 
 Look especially for:
 
@@ -134,7 +137,7 @@ Treat the saved schema as a business template. When requirements change, use a c
 
 Open **Extract**, select or load the schema, and choose **Run extraction**. If the approved field dictionary uses multiple schemas, complete and download each schema result separately.
 
-The app reviews the parsed Markdown and page structure for every requested field. It attempts to associate each non-empty value with the document region that supports it. The result is not just a list of values; it is a list of values with review information and, where available, a direct source location.
+The app reviews the parsed representation for every requested field. OCR extraction associates values with existing document regions; native extraction uses immutable `base_text` and accepts only exact character intervals that resolve through source spans to source anchors. The result is not just a list of values; it is a list of values with review information and direct source evidence where available.
 
 The fields may come from different pages, tables, headers, footers, or form sections. The user does not need to process each page separately.
 
@@ -172,7 +175,7 @@ Chat is useful for investigation and review. The saved schema remains the repeat
 After review, download the outputs needed by the business process:
 
 - **Download Markdown** for the readable reconstructed document
-- **Download annotated PDF** for visual review and source tracing
+- **Download annotated PDF** for visual review and source tracing when available
 - **Download Extract JSON** for the extracted field result
 - **Download Full JSON** for the combined parse, layout, grounding, metadata, and extraction result
 

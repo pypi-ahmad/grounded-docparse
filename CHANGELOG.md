@@ -10,7 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
-- Manual native-document ingestion for native, scanned, and mixed PDFs plus office and open formats, with explicit processing routes, page-level mixed review, non-OCR native parsing, immutable source anchors, and fail-closed LangExtract grounding.
+- Manual native-document ingestion through the Streamlit app, Python API, and `grounded-docparse ingest` CLI. Every file now has an explicit compatible processing type; incompatible selections, missing batch assignments, and incomplete Mixed PDF page routes are rejected instead of silently rerouted.
+- Native PDF parsing through `pdf-inspector` and reviewed Native/OCR page merging in original order. Native PDF pages that need OCR stop and direct the user to Mixed PDF.
+- OCR-disabled Docling conversion for Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB documents, with immutable `base_text`, character-to-source spans, and anchors for paragraphs, shapes, sheets/cells, tables, and rows/columns. Embedded images are recorded but not OCRed.
+- Fail-closed LangExtract native extraction: only exact `char_interval` values that resolve to `base_text` and `SourceAnchor` evidence are accepted; ungrounded values are rejected. Native nonvisual formats may omit an annotated PDF.
 - Opt-in selective local-OCR disagreement checks that audit only uncertain crops, preserve primary OCR output, persist evidence, and flag disagreements for review.
 - Document-type accuracy and confidence calibration, OCR and classification review-rate reporting, JSON regression gates, and an external private calibration/holdout workflow.
 - Selectable PaddleOCR-VL-1.6 local parsing with an isolated locked runtime, Windows launcher, loopback-only PaddleX API, and exclusive GPU service switching.

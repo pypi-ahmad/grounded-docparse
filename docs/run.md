@@ -2,7 +2,7 @@
 
 ## Recommended Windows launcher
 
-Run `Setup-GLM-OCR.cmd` once on a new Windows 11 machine. It validates WSL2 and GPU passthrough, creates the locked WSL environment, starts vLLM and Streamlit, waits for health checks, and opens <http://localhost:8501>.
+Run `Setup-GLM-OCR.cmd` once on a supported Windows 10 22H2 or Windows 11 machine. It validates WSL2 and available OCR capability, creates the locked WSL environment with the native-document extra, starts the selected local OCR stack and Streamlit, waits for health checks, and opens <http://localhost:8501>.
 
 Use `Launch-GLM-OCR.cmd` afterward, or `Launch-PaddleOCR-VL-1.6.cmd` to start with Paddle selected. Both open the same app and the in-app dropdown can switch the exclusive managed GPU backend. GLM lives in `.venv`; Paddle and its compatible vLLM stack live in `.paddle-venv`.
 
@@ -40,19 +40,22 @@ The ports must be distinct integers from 1 through 65535.
 
 With a key present, the default Fast preset performs remote classification and visual recovery is enabled. Selecting **Parse document** can therefore send selected recovery crops and recognized document context to the configured endpoint. Disable the corresponding toggles for GLM-only operation.
 
-The launch scripts do not set Streamlit's `server.address`, and the vLLM script does not pass an explicit host flag. Localhost URLs are displayed, but loopback-only binding is not enforced by this repository. Keep ports `8501` and `8080` blocked from untrusted networks. For an explicit loopback Streamlit process, run `scripts/wsl/run-app.sh --server.address=127.0.0.1` manually.
+The managed scripts bind Streamlit and OCR services to loopback. Do not expose ports `8501`, `8080`, `8118`, or `8119` to an untrusted network.
 
 ## Use the studio
 
-1. Upload one or more PDFs, PNGs, JPEGs, or TIFFs (up to 20 files, 250 MB each, and 1 GB combined).
-2. For one PDF, optionally select an inclusive contiguous page range. Multiple-file batches always process every page.
-3. Choose the document extraction model, then Fast, Full, or Custom mode and the visual-recovery/chat toggles.
-4. Select **Parse document** or **Process documents**. Batch files run sequentially and failures can be retried without rerunning completed files.
-5. Select each result for review, or download the all-outputs ZIP containing originals, a manifest, and available generated artifacts.
+1. Upload up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images (250 MB each and 1 GB combined).
+2. Choose a compatible **Processing type** for every file. Files are validated by signature and container structure; the app never silently changes a selection.
+3. For Mixed PDF, review the Native/OCR suggestion for each page, choose every page route, and confirm the table. For one scanned PDF, an inclusive contiguous page range remains available.
+4. For scanned PDFs and images, choose the OCR engine, then Fast, Full, or Custom mode and the visual-recovery/chat toggles.
+5. Select **Parse document** or **Process documents**. Batch files run sequentially and failures can be retried without rerunning completed files.
+6. Review Markdown, JSON, Extract, and source structure. An annotated PDF appears only when the selected route produces a visual artifact; the ZIP includes only available artifacts.
 
 Fast runs classification without Markdown refinement or TOC generation. Full enables refinement, classification, and TOC. Visual recovery is a separate toggle and defaults on when Luna is available. Extraction is configured and run inside the post-parse Extract tab. Chat appears only when enabled.
 
 “ADE mode” is the UI label for these Luna-feature presets; it does not connect to an external ADE service.
+
+Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB use Docling without OCR. Native extraction is optional and sends immutable `base_text`, never refined Markdown, to LangExtract. An accepted field must have an exact character interval that resolves to source anchors.
 
 ## Stop and restart
 
