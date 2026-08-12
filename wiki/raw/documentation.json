@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-2ae93e3d37db",
-    "base_commit": "1e720b7c95cd4b23efb3d7182ec043e5b5ad395a",
+    "id": "content-dde17504a128",
+    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T13:38:42.347681+00:00",
+  "generated_at": "2026-08-12T14:51:39.699041+00:00",
   "category": "documentation",
   "files": [
     {
@@ -21,23 +21,28 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "ef6d5d96bc6b0218ecde156e5b1ec73769a01a28f18a1a4803ff7a3ecdeff0e3",
-      "size": 9741
+      "sha256": "59e4bf3227c25b2bdf316f386cbfa1245da6bc0b1068769de0bb0c8fc9b0299a",
+      "size": 9993
+    },
+    {
+      "path": "CODE_OF_CONDUCT.md",
+      "sha256": "15a8d3f3c49799b52169ff252b6c42b9e0a8fb11f815d6553a7d57b539f6e3f9",
+      "size": 2083
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "ec2b447f801f254bf8b33a81c49e5fb58cf6c0bd32f7b9efceeaeeb6a584887c",
-      "size": 4520
+      "sha256": "350248aa36240fe2d6459d929a118241c8eadc3b095a73365398a36f66f23032",
+      "size": 4855
     },
     {
       "path": "README.md",
-      "sha256": "6ba7f373f565d4012efe2f4977c00a7498897d94f60b976307e2eea61eee5416",
-      "size": 21462
+      "sha256": "dbc5c34e0d6876b75c0a78513653e7a634511cf88a5a51b97923fbd9c917c85b",
+      "size": 21863
     },
     {
       "path": "SECURITY.md",
-      "sha256": "661cf5e8816f2d1bbcd64a33060609b8d43c3c1e367121c67fa3ae97e3d6b318",
-      "size": 2529
+      "sha256": "0c106373e4084f883f11131fa45fa9d098a4158832318f3e22c519ddc00fa9d3",
+      "size": 2938
     },
     {
       "path": "SETUP.md",
@@ -45,9 +50,19 @@
       "size": 16962
     },
     {
+      "path": "TECHNICAL.md",
+      "sha256": "4a9b8fec042742d08669243f359713e332cfe3270a192f43dad18e3c4aebf289",
+      "size": 4093
+    },
+    {
+      "path": "USAGE.md",
+      "sha256": "5691b4ddb8b30513eeb965f136c9c74d75c97627a9c0114caec46c9e61685ba0",
+      "size": 3860
+    },
+    {
       "path": "docs/ONBOARDING.md",
-      "sha256": "0d89f990511648a4ed60d83b5ab5f56d9dbae426dd5497ac30238d89ac084996",
-      "size": 6079
+      "sha256": "1820e06417bf725f0bea749fef26e161231f5203cf90b3f304824e43954dad9e",
+      "size": 5992
     },
     {
       "path": "docs/agentic-document-extraction-comparison.md",

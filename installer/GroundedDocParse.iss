@@ -30,7 +30,10 @@ Source: "..\pyproject.toml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\uv.lock"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Launch-GLM-OCR.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Launch-PaddleOCR-VL-1.6.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Setup-GLM-OCR.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\paddle-runtime\pyproject.toml"; DestDir: "{app}\paddle-runtime"; Flags: ignoreversion
+Source: "..\paddle-runtime\uv.lock"; DestDir: "{app}\paddle-runtime"; Flags: ignoreversion
 Source: "..\src\*"; DestDir: "{app}\src"; Excludes: "__pycache__\*,*.pyc,*.pyo"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\config\*"; DestDir: "{app}\config"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\scripts\wsl\*"; DestDir: "{app}\scripts\wsl"; Excludes: "__pycache__\*,*.pyc,*.pyo"; Flags: ignoreversion recursesubdirs createallsubdirs

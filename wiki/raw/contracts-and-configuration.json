@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-2ae93e3d37db",
-    "base_commit": "1e720b7c95cd4b23efb3d7182ec043e5b5ad395a",
+    "id": "content-dde17504a128",
+    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T13:38:42.347681+00:00",
+  "generated_at": "2026-08-12T14:51:39.699041+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
@@ -16,13 +16,13 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "3c1b5c2cecbe03a9771646113dc1d1c4d57b81ae5261382378e164db958e0927",
-      "size": 86
+      "sha256": "f7a08036cdc1eb1719ec58480ecee85a6ab2dfe3a0a0eed9e5d3aea3e94ce296",
+      "size": 113
     },
     {
       "path": ".gitignore",
-      "sha256": "5c08eb29d0f1486549b41c4402dca2f782af1cef1590849bf1661e6575ed5eb5",
-      "size": 1042
+      "sha256": "3a77dd61762bc796aa42035d958264a74497ec7683298ac57a77414378400831",
+      "size": 848
     },
     {
       "path": ".streamlit/config.toml",

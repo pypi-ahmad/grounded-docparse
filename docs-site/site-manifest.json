@@ -1,6 +1,7 @@
 {
   "included": [
     "README.md",
+    "USAGE.md",
     "docs/complete-user-guide.md",
     "docs/tutorial.md",
     "docs/zero-to-hero-tutorial.md",
@@ -12,6 +13,7 @@
     "docs/local-glmocr.md",
     "docs/local-paddleocr-vl.md",
     "docs/azure-bulk-fax-deployment.md",
+    "TECHNICAL.md",
     "docs/architecture.md",
     "docs/how-grounded-docparse-is-agentic.md",
     "docs/agentic-document-extraction-comparison.md",
@@ -20,6 +22,7 @@
     "docs/research.md",
     "docs/extraction-quality-research.md",
     "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
     "CHANGELOG.md",
     ".github/ISSUE_TEMPLATE/bug_report.md",
     ".github/ISSUE_TEMPLATE/feature_request.md",
@@ -62,6 +65,7 @@
   "excluded_count": 2,
   "pages": [
     "index.html",
+    "usage.html",
     "complete-user-guide.html",
     "tutorial.html",
     "zero-to-hero-tutorial.html",
@@ -73,6 +77,7 @@
     "local-glmocr.html",
     "local-paddleocr-vl.html",
     "azure-bulk-fax-deployment.html",
+    "technical.html",
     "architecture.html",
     "how-grounded-docparse-is-agentic.html",
     "agentic-document-extraction-comparison.html",
@@ -81,6 +86,7 @@
     "research.html",
     "extraction-quality-research.html",
     "contributing.html",
+    "code-of-conduct.html",
     "changelog.html",
     "issue-template--bug-report.html",
     "issue-template--feature-request.html",
