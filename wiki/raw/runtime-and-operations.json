@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "snapshot": {
+    "id": "content-f8ca74d5deff",
+    "base_commit": "d710a675fe58c644b10bf5524eb7d30b82219737",
+    "branch": "native-document-ingestion",
+    "dirty": true
+  },
+  "generated_at": "2026-08-12T08:52:56.282943+00:00",
+  "category": "runtime-and-operations",
+  "files": [
+    {
+      "path": "Launch-GLM-OCR.cmd",
+      "sha256": "351d531b6f5fadbf2c88533cec149230edb509a2075b0419a6152d21b734a1b1",
+      "size": 1668
+    },
+    {
+      "path": "Launch-PaddleOCR-VL-1.6.cmd",
+      "sha256": "56665f8954f0e46411a2bcb181625c598a58d263d952be39bb64be16aefff96d",
+      "size": 1715
+    },
+    {
+      "path": "Setup-GLM-OCR.cmd",
+      "sha256": "4a762fe88b2ffa4020dacdfce944f17b884c2d82aa019f34491c49fb7ec0c818",
+      "size": 210
+    },
+    {
+      "path": "installer/GroundedDocParse.iss",
+      "sha256": "28b7e5f5778bff4b0df074958f646ca047eb32ed6b9cfb84325e58f71996a611",
+      "size": 2657
+    },
+    {
+      "path": "installer/Install-GroundedDocParse.ps1",
+      "sha256": "00443302fd1f6d3d9fa5726e84b919bd8a23b7487d4c5a873848fcadd622f4c2",
+      "size": 16171
+    },
+    {
+      "path": "scripts/build-installer.ps1",
+      "sha256": "dd83e075b2b9cf931928aa40b4cee9ad2d0ce8bf849ca09bcb46f20e6130e9d0",
+      "size": 2008
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "sha256": "b7cebbdb57042cd871add5fc6a93a8d67a11b2e963f8a4e55b57d2c76d1a70f1",
+      "size": 22099
+    },
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "sha256": "8199e4ad1aa1d251888e72e94f6d9d82507332b1c9ad54934630b1a5d6879aab",
+      "size": 17102
+    },
+    {
+      "path": "scripts/generate_evaluation_corpus.py",
+      "sha256": "460d8c8a1822a8fcbc9ee8dddff88c97e8066c997ff3e24d4497480086db1b9f",
+      "size": 19716
+    },
+    {
+      "path": "scripts/generate_examples.py",
+      "sha256": "c8bcf8927cdfbf946004a89874ef876955a78d03127960fa7589675496661c6e",
+      "size": 2655
+    },
+    {
+      "path": "scripts/refresh_knowledge_wiki.py",
+      "sha256": "d7d93ace85b437934fc65194e1197dae7c5c90b234092a05cbc7f1303f35a32b",
+      "size": 11875
+    },
+    {
+      "path": "scripts/wsl/benchmark_glmocr.py",
+      "sha256": "a469ad5510da259ad4ff35e93816f6bbebbd41411de7a1f3c3e2daf56e2aec60",
+      "size": 4190
+    },
+    {
+      "path": "scripts/wsl/check-glmocr-api.py",
+      "sha256": "69ee45c34369ed3371913fbea88e771df914f036ce791037529509921c1971dd",
+      "size": 3142
+    },
+    {
+      "path": "scripts/wsl/check-paddleocr-api.py",
+      "sha256": "c795e5872e2efd8973a34f3b039fa39ead745d22630d8bd204ba9326b482566e",
+      "size": 1328
+    },
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "sha256": "721ccd8ed9f89530488009b4a03097ad8f0e715133d7b6838249acf9ae95aee0",
+      "size": 4413
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "sha256": "078593f6118f92a41c1a138a574e5a8f78ed78a50c458dbc27266e8cf1d7d974",
+      "size": 10988
+    },
+    {
+      "path": "scripts/wsl/prepare_glmocr_runtime.py",
+      "sha256": "9d5d693640181f37a4ad6dfaef5d80f9d0858683fd1c1b92f03b62b2427f4c3e",
+      "size": 5578
+    },
+    {
+      "path": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "sha256": "4de7c1064ae1d67ff8489770ec4856e405a6de932493c2b7dfd19f02f8e7dca8",
+      "size": 5178
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "sha256": "2aabe4096f50eb4daae304b84e08337dc7eb0e0a857c35ce605b0475ce5feade",
+      "size": 1487
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "sha256": "39414dbb928622f5505515cca5a01e9bf7a3307c3eb6fc64e3e2e6e6e8c2a33f",
+      "size": 1247
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "sha256": "585ebec5da071bd6d8e9130bc1a894ef4ecc121b4af9a3ff6a786b65e718edcf",
+      "size": 451
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "sha256": "4ec8371ee4198de4137993d5c4f0d7c8e6b0751357314fb1323c3bf54a4987e1",
+      "size": 3254
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "sha256": "e92f3b3c0ee7e383c947fbfe15eb89102d3d36e3753fda6113138a866908dd72",
+      "size": 2338
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "sha256": "76bcdf69e87b80f70c41f25387b6fe700e54ce81796575f7d701231b90ea5b4f",
+      "size": 2303
+    }
+  ]
+}

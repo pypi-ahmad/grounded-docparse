@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "snapshot": {
+    "id": "content-f8ca74d5deff",
+    "base_commit": "d710a675fe58c644b10bf5524eb7d30b82219737",
+    "branch": "native-document-ingestion",
+    "dirty": true
+  },
+  "generated_at": "2026-08-12T08:52:56.282943+00:00",
+  "category": "contracts-and-configuration",
+  "files": [
+    {
+      "path": ".env.example",
+      "sha256": "23b60b168ddce23fb42c674bed31bb57abcc5ffdb53b50100242b5104da8ac58",
+      "size": 1115
+    },
+    {
+      "path": ".gitattributes",
+      "sha256": "3c1b5c2cecbe03a9771646113dc1d1c4d57b81ae5261382378e164db958e0927",
+      "size": 86
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "5c08eb29d0f1486549b41c4402dca2f782af1cef1590849bf1661e6575ed5eb5",
+      "size": 1042
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "sha256": "cb49b0ead13263ff99cdbc46ea6d3d723f892e3a312bf46ec3797dcd31657708",
+      "size": 500
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "0ccd9579095b93e2e3e2e5e5a02a79c3cfc1c2391dd54a274ddc054ff9977117",
+      "size": 1091
+    },
+    {
+      "path": "config/glmocr.yaml",
+      "sha256": "327ce4b401e72a78e3f9f54515364f4dc10a1e08b215366ea97f65c8e42b31bf",
+      "size": 3821
+    },
+    {
+      "path": "config/paddle-vllm.yaml",
+      "sha256": "b9947df27a1c4923a1b4b06b31d3861ef1a2e3740661300ff8f2d32f03a389c5",
+      "size": 118
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "ea636181e26a0f1f7c6d5f71f5cfd67a7c1b93f59502e9a252b8956ba1eb5c9b",
+      "size": 2109
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "df820b87584b8f2833934a86e34fc0109b81625d212692fe0685e64ecb6469a4",
+      "size": 1205070
+    }
+  ]
+}
