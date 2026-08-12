@@ -7,7 +7,7 @@ Contributions should preserve source grounding, explicit uncertainty, and determ
 ```powershell
 git clone https://github.com/pypi-ahmad/grounded-docparse.git
 Set-Location grounded-docparse
-uv sync --python 3.12.10 --locked
+uv sync --python 3.12.10 --locked --extra native
 ```
 
 Do not install project dependencies with system `pip`. Keep `pyproject.toml` and `uv.lock` synchronized when an approved dependency changes.
@@ -29,10 +29,11 @@ Avoid unrelated refactors, generated artifacts, real documents, and live-provide
 uv run python -m pytest -q
 uvx ruff check src streamlit_app.py tests scripts
 uv run python -m compileall -q src streamlit_app.py tests scripts
+uv run grounded-docparse ingest --help
 git diff --check
 ```
 
-Automated tests use synthetic documents and fake OpenAI gateways. The project has no installed CLI entry point; use `streamlit_app.py` for the application and `scripts/evaluate_corpus.py` for evaluation. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment.
+Automated tests use synthetic documents and fake OpenAI gateways. The installed `grounded-docparse` command provides the explicit native/OCR `ingest` workflow; `streamlit_app.py` remains the application entry point and `scripts/evaluate_corpus.py` runs evaluation. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment. Local OCR development still requires the WSL runtime described in [SETUP.md](SETUP.md).
 
 For documentation changes, also verify that every relative Markdown link resolves and every fenced block has a language identifier and closing fence. The repository does not install a dedicated Markdown-link checker.
 
@@ -61,8 +62,11 @@ Do not include API keys, bearer tokens, source documents, crops, local data, or 
 
 - Models may propose typed evidence; deterministic code derives stable IDs from local OCR regions and owns validation, hierarchy, and export policy.
 - Selected local OCR originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. Luna recovery may change only high-confidence text on existing elements.
+- Native formats require an explicit compatible `ProcessingType`; preserve signature/container validation and never add a silent route or OCR fallback. Mixed PDFs require one reviewed route per page and retain original page order.
+- Native parsers must preserve immutable `base_text`, exact character spans, and `SourceAnchor` evidence. Docling native conversion must keep OCR, VLM/model enrichments, remote services, and external plugins disabled; embedded images are assets, not OCR input.
 - Unsupported text must remain unresolved or rejected in strict outputs.
 - Every extracted leaf requires existing source-node citations.
+- Native extraction accepts only exact `char_interval` values that map through source spans to anchors; do not ground values in refined Markdown or accept fuzzy/unanchored model output.
 - New output-affecting configuration must be covered by public-contract tests.
 - New persistence requires an explicit retention and deletion design.
 - Public schema changes require versioning, migrations where applicable, renderer updates, and compatibility tests.

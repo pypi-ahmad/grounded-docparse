@@ -4,9 +4,9 @@
 
 ## Project overview
 
-Grounded DocParse is a Python 3.12+ document parser that produces grounded Markdown, structured JSON, document elements, and annotated PDFs.
+Grounded DocParse is a Python 3.12+ document parser that produces grounded Markdown, structured JSON, OCR elements or native source anchors, and annotated PDFs when a visual artifact exists.
 
-Its main stack is Streamlit, Pydantic, and Pytest. Local OCR uses GLM-OCR or PaddleOCR-VL. Optional OpenAI processing performs bounded visual recovery and document-level analysis without replacing local layout evidence.
+Its main stack is Streamlit, Pydantic, and Pytest. Manual processing-type selection routes scanned PDFs/images to GLM-OCR or PaddleOCR-VL, Native PDFs to `pdf-inspector`, and Office/open formats to OCR-disabled Docling. Optional OpenAI processing performs bounded visual recovery, document analysis, and LangExtract grounding without replacing source evidence.
 
 ## Architecture layers
 
@@ -17,11 +17,12 @@ The main processing library lives under `src/grounded_docparse/`:
 - `models.py` defines shared evidence, document, extraction, and result contracts.
 - `config.py` validates parser, OCR, provider, and recovery settings.
 - `ingest.py` rasterizes PDFs and images into page evidence.
+- `universal.py`, `native.py`, `native_parsers.py`, and `docling_native.py` validate manual routes and preserve native source spans/anchors.
 - `local_ocr.py` and `paddle_ocr.py` adapt OCR engines into common models.
 - `page_analysis.py` handles layout, reading order, and visual analysis.
 - `quality.py` performs quality checks and selects recovery candidates.
 - `pipeline.py` coordinates the end-to-end workflow.
-- `render.py` produces Markdown, JSON, elements, and annotated PDFs.
+- `render.py` and `native.py` produce OCR/native Markdown, JSON, elements or anchors, and optional annotated PDFs.
 - `agentic.py` and `extraction.py` provide classification, extraction, TOC, and chat workflows.
 - `schema_store.py` and `workspace_store.py` persist reusable schemas and workspaces.
 
@@ -47,8 +48,9 @@ Root launchers, `scripts/`, `installer/`, runtime YAML files, and project manife
 
 ## Key concepts
 
-- Local OCR owns layout, geometry, element IDs, confidence, element types, and reading order.
-- PDFs become raster evidence; embedded PDF text is not trusted extraction evidence.
+- Local OCR owns layout, geometry, element IDs, confidence, element types, and reading order for scanned PDFs and images.
+- Native PDFs preserve selectable-text evidence through page/bounding-box anchors; Docling formats preserve exact structural anchors without OCR.
+- Every upload has a compatible manual processing type; validation blocks mismatches and no path silently reroutes.
 - Luna recovery may replace text only on an existing element above the confidence threshold.
 - Structural additions, deletions, geometry changes, type changes, and reading-order changes fail closed.
 - Pydantic models define contracts shared across pipeline stages.
@@ -63,7 +65,7 @@ Root launchers, `scripts/`, `installer/`, runtime YAML files, and project manife
 2. Read `streamlit_app.py` and `src/grounded_docparse/cli.py` for user entry points.
 3. Read `src/grounded_docparse/models.py` for shared contracts.
 4. Read `config.py` and `runtime.py` for settings and provider execution.
-5. Read `ingest.py`, `local_ocr.py`, and `paddle_ocr.py` for source conversion and OCR.
+5. Read `universal.py`, `native.py`, `native_parsers.py`, and `docling_native.py` for manual routing and native parsing; then read `ingest.py`, `local_ocr.py`, and `paddle_ocr.py` for OCR.
 6. Read `page_analysis.py` and `quality.py` for grounded layout and validation.
 7. Read `pipeline.py` for orchestration.
 8. Read `render.py`, `agentic.py`, and `extraction.py` for outputs and higher-level features.
@@ -73,9 +75,11 @@ Root launchers, `scripts/`, `installer/`, runtime YAML files, and project manife
 
 ```text
 streamlit_app.py / cli.py
-  pipeline.py
-    ingest.py
-    local_ocr.py / paddle_ocr.py
+  universal.py
+    native_parsers.py / docling_native.py
+    pipeline.py
+      ingest.py
+      local_ocr.py / paddle_ocr.py
     page_analysis.py
     quality.py
     gateways.py + runtime.py

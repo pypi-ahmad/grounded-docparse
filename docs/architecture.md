@@ -2,19 +2,20 @@
 
 ## System boundary
 
-The application is one synchronous Streamlit process plus one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. There is no HTTP application API, queue, worker service, production job service, remote artifact store, or multi-user authentication layer. One active local batch workspace survives process restarts: SQLite stores metadata while sibling filesystem artifacts store sources and parse outputs. SQLite also persists reusable extraction schemas and routing profiles.
+The application is one synchronous Streamlit process with explicit per-file document routing. Scanned PDFs and images use one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. Native PDFs use `pdf-inspector`; Office and open formats use Docling without OCR. There is no HTTP application API, queue, worker service, production job service, remote artifact store, or multi-user authentication layer. One active local batch workspace survives process restarts: SQLite stores metadata while sibling filesystem artifacts store sources and parse outputs. SQLite also persists reusable extraction schemas and routing profiles.
 
 ```text
 Browser
   -> Streamlit (`streamlit_app.py`)
-     -> ingest and rasterization
-     -> selected local OCR
+     -> required processing-type selection and signature/container validation
+     -> scanned PDF/image: rasterization -> selected local OCR
         -> GLM-OCR SDK -> vLLM/Ollama (`glm-ocr`, port 8080)
         -> PaddleX API (port 8119) -> PaddleOCR-VL vLLM (port 8118)
-     -> deterministic quality/recovery planning
-     -> optional Luna crop recovery
-     -> deterministic hierarchy, Markdown, JSON, and PDF annotations
-     -> optional Luna document features
+     -> native PDF: `pdf-inspector` text/layout/table positions
+     -> mixed PDF: confirmed per-page native/OCR merge
+     -> Office/open formats: Docling SimplePipeline without OCR or enrichments
+     -> immutable native source spans or OCR elements
+     -> optional Luna/LangExtract document features
   -> downloads and source highlighting
 ```
 
@@ -26,6 +27,9 @@ Browser
 | `streamlit_app.py` | Batch upload, engine selection, modes, progress, tabs, schema UI, chat, downloads |
 | `src/grounded_docparse/batch.py` | Upload limits, stable document identity, and batch archive records |
 | `src/grounded_docparse/cli.py` | Installed synchronous batch parsing, schema loading, manifests, and filesystem outputs |
+| `src/grounded_docparse/universal.py` | Signature/container validation and manual route selection |
+| `src/grounded_docparse/native.py` | Native processing types, source anchors/spans, and JSON v5 contracts |
+| `src/grounded_docparse/native_parsers.py` / `docling_native.py` | `pdf-inspector` and OCR-disabled Docling adapters |
 | `src/grounded_docparse/workspace_store.py` | Durable active-batch metadata, parse checkpoints, progress, and local artifacts |
 | `src/grounded_docparse/__init__.py` | Package-root public exports |
 | `src/grounded_docparse/config.py` | `ParserConfig`, analysis thresholds, environment parsing, fixed Luna model |
@@ -43,7 +47,7 @@ Browser
 | `src/grounded_docparse/native_extraction.py` | LangExtract over immutable `base_text` with fail-closed source-span grounding |
 | `src/grounded_docparse/models.py` | Pydantic domain contracts, API result records, progress events, diagnostics |
 | `src/grounded_docparse/schema_store.py` | SQLite schema/profile CRUD, Markdown import, and UI-schema compilation |
-| `src/grounded_docparse/render.py` | Markdown, JSON v4.4 parse/v4.5 full results, elements, quality, and annotations |
+| `src/grounded_docparse/render.py` | OCR Markdown, JSON v4.5 parse/v4.6 full results, elements, quality, and annotations |
 | `src/grounded_docparse/runtime.py` | Provider concurrency, retries, cooldown, usage, diagnostics |
 | `src/grounded_docparse/benchmark.py` | Corpus contracts and evaluation metrics |
 | `config/glmocr.yaml` | Source GLM-OCR SDK, layout, recognition, and formatter configuration |
@@ -55,19 +59,13 @@ Browser
 ## Parse pipeline
 
 ```text
-1. Validate bytes, extension, page count, and pixel limits.
-2. Render every page to PNG; never read selectable PDF text.
-3. Parse with the selected local OCR engine; GLM uses ordered windows of 16 pages, while Paddle submits the full document to its local API.
-4. Rank recovery candidates from local OCR confidence and deterministic quality signals.
-5. Process up to eight pages concurrently within each ordered window.
-6. Run engine-specific local form recovery: GLM revisits eligible risky regions, while Paddle PDF checkbox recovery accepts only states confirmed at both 190 and 200 DPI. For either engine, send selected Luna crops using an independent adaptive budget of eight to 64 and a three-per-page limit.
-7. Apply only high-confidence textual corrections to existing elements.
-8. Restore source page order and build the cross-page hierarchy.
-9. Materialize quality, elements, base Markdown, and annotations.
-10. Optionally refine Markdown with presentation directives.
-11. Render canonical JSON with grounded and refined Markdown.
-12. Optionally classify and generate the TOC concurrently.
-13. Run extraction and chat only when requested in the UI.
+1. Require a compatible `ProcessingType` for each file and validate its extension, bytes, signature, and container structure.
+2. Route exactly once: scanned PDF/image to OCR; Native PDF to `pdf-inspector`; Mixed PDF to confirmed Native/OCR page routes; Office/open formats to Docling.
+3. For OCR routes, render pages, parse with the selected local engine, rank recovery candidates, and apply only high-confidence crop-backed text corrections to existing elements.
+4. For Native PDF, stop if an unusable page requires Mixed PDF. For Mixed PDF, merge native and OCR pages in original order.
+5. For Docling formats, build source manifests, convert with remote services/plugins/OCR/VLM enrichments disabled, and fail if the converter cannot claim every source block.
+6. Materialize OCR elements or native immutable `base_text`, source units, character spans, and anchors; render Markdown, JSON, and an annotated PDF only when visual output exists.
+7. Optionally run refinement, classification, TOC, extraction, and chat. Native LangExtract receives `base_text` only and returns accepted values only through exact anchored intervals.
 ```
 
 Worker progress is queued and replayed on the Streamlit caller thread. Pages are sorted before hierarchy construction and export. Provider calls share a document-scoped runtime limiter. Retryable failures use bounded jittered exponential backoff; HTTP 429 responses reduce effective concurrency and apply `Retry-After` or the configured cooldown.
@@ -105,11 +103,13 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 ## Result contracts
 
-`DocumentParser.parse` returns `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log.
+`DocumentParser.parse` returns the legacy OCR `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log. `UniversalDocumentParser.parse` accepts an explicit `ProcessingType` and returns either that OCR result or a `NativeParseResult`.
 
 Parse JSON schema version is `4.5.0`. Full JSON is `4.6.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 
 Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain owned by the selected local OCR engine.
+
+Native JSON is schema version `5.0.0`; combined native/extraction JSON is `5.1.0`. Its canonical evidence is frozen `base_text`, with Unicode-codepoint source spans resolving to `SourceAnchor` values. Native nonvisual results do not contain annotated-PDF bytes.
 
 ## Evaluation boundary
 
