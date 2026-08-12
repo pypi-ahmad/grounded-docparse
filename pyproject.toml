@@ -19,6 +19,12 @@ dependencies = [
 grounded-docparse = "grounded_docparse.cli:main"
 
 [project.optional-dependencies]
+native = [
+    "docling>=2.119,<3",
+    "langextract[openai]>=1.6,<2",
+    "pdf-inspector>=1.14.1,<2",
+    "pywin32>=311; sys_platform == 'win32'",
+]
 local-ocr = [
     "glmocr[selfhosted]==0.1.5; sys_platform == 'linux'",
     "torch==2.10.0; sys_platform == 'linux'",

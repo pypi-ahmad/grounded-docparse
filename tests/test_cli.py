@@ -4,6 +4,7 @@ import hashlib
 import json
 import tomllib
 from pathlib import Path
+from types import SimpleNamespace
 
 from grounded_docparse.models import (
     Document,
@@ -14,6 +15,77 @@ from grounded_docparse.models import (
     RunUsage,
 )
 from grounded_docparse.render import render_agentic_document
+
+
+def test_ingest_command_binds_independent_processing_types(monkeypatch, tmp_path) -> None:
+    from grounded_docparse import cli
+
+    invoice = tmp_path / "invoice.pdf"
+    report = tmp_path / "report.docx"
+    invoice.write_bytes(b"%PDF-1.7\n")
+    report.write_bytes(b"docx")
+    output = tmp_path / "results"
+    calls = []
+
+    class FakeParser:
+        def parse(self, data, name, *, processing_type, page_routes=None):
+            calls.append((name, processing_type.value, page_routes))
+            return SimpleNamespace(
+                markdown=name,
+                json=json.dumps({"schema_version": "5.0.0"}),
+                annotated_pdf=None,
+            )
+
+    monkeypatch.setattr(cli, "UniversalDocumentParser", FakeParser)
+
+    exit_code = cli.main(
+        [
+            "ingest",
+            str(invoice),
+            str(report),
+            "--processing-type",
+            f"{invoice}=native-pdf",
+            "--processing-type",
+            f"{report}=word",
+            "--output",
+            str(output),
+        ]
+    )
+
+    assert exit_code == 0
+    assert calls == [
+        ("invoice.pdf", "native-pdf", None),
+        ("report.docx", "word", None),
+    ]
+    manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+    assert [item["processing_type"] for item in manifest["documents"]] == [
+        "native-pdf",
+        "word",
+    ]
+
+
+def test_ingest_command_blocks_missing_or_unused_processing_types(
+    capsys, tmp_path
+) -> None:
+    from grounded_docparse import cli
+
+    invoice = tmp_path / "invoice.pdf"
+    unknown = tmp_path / "unknown.pdf"
+    invoice.write_bytes(b"%PDF-1.7\n")
+
+    exit_code = cli.main(
+        [
+            "ingest",
+            str(invoice),
+            "--processing-type",
+            f"{unknown}=native-pdf",
+            "--output",
+            str(tmp_path / "results"),
+        ]
+    )
+
+    assert exit_code == 2
+    assert "missing processing type" in capsys.readouterr().err
 
 
 def test_parse_command_writes_standard_document_outputs(monkeypatch, tmp_path) -> None:

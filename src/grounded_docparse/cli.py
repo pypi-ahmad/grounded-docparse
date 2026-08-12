@@ -13,6 +13,7 @@ from pathlib import Path
 from .agentic import DocumentAgent
 from .config import ParserConfig
 from .models import StoredSchema
+from .native import PageRoute, ProcessingType
 from .pipeline import DocumentParser
 from .render import render_combined_result
 from .schema_store import (
@@ -20,8 +21,23 @@ from .schema_store import (
     compile_json_schema,
     parse_markdown_schema,
 )
+from .universal import UniversalDocumentParser
 
 SUPPORTED_SUFFIXES = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}
+UNIVERSAL_SUFFIXES = SUPPORTED_SUFFIXES | {
+    ".docx",
+    ".pptx",
+    ".xlsx",
+    ".csv",
+    ".odt",
+    ".odp",
+    ".ods",
+    ".html",
+    ".htm",
+    ".md",
+    ".markdown",
+    ".epub",
+}
 
 
 def _safe_stem(path: Path) -> str:
@@ -52,6 +68,24 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Cross-check only uncertain regions with the alternate local OCR engine",
     )
+    ingest = commands.add_parser(
+        "ingest", help="Parse manually classified native and OCR documents"
+    )
+    ingest.add_argument("inputs", nargs="+", type=Path)
+    ingest.add_argument(
+        "--processing-type",
+        action="append",
+        required=True,
+        metavar="PATH=TYPE",
+    )
+    ingest.add_argument(
+        "--page-route",
+        action="append",
+        default=[],
+        metavar="PATH#PAGE=ROUTE",
+    )
+    ingest.add_argument("--output", required=True, type=Path)
+    ingest.add_argument("--overwrite", action="store_true")
     return parser
 
 
@@ -76,7 +110,10 @@ def _load_schema(path: Path) -> tuple[StoredSchema, dict]:
     return stored, compile_json_schema(stored)
 
 
-def _discover(inputs: Sequence[Path]) -> list[Path]:
+def _discover(
+    inputs: Sequence[Path],
+    suffixes: set[str] = SUPPORTED_SUFFIXES,
+) -> list[Path]:
     discovered: list[Path] = []
     seen: set[Path] = set()
     for value in inputs:
@@ -87,11 +124,11 @@ def _discover(inputs: Sequence[Path]) -> list[Path]:
                 (
                     path
                     for path in value.iterdir()
-                    if path.is_file() and path.suffix.casefold() in SUPPORTED_SUFFIXES
+                    if path.is_file() and path.suffix.casefold() in suffixes
                 ),
                 key=lambda path: path.name.casefold(),
             )
-        elif value.suffix.casefold() not in SUPPORTED_SUFFIXES:
+        elif value.suffix.casefold() not in suffixes:
             raise ValueError(f"unsupported input type: {value}")
         else:
             candidates = [value]
@@ -103,6 +140,59 @@ def _discover(inputs: Sequence[Path]) -> list[Path]:
     if not discovered:
         raise ValueError("no supported documents were found")
     return discovered
+
+
+def _processing_types(
+    values: Sequence[str],
+    sources: Sequence[Path],
+) -> dict[Path, ProcessingType]:
+    assignments: dict[Path, ProcessingType] = {}
+    for value in values:
+        raw_path, separator, raw_type = value.rpartition("=")
+        if not separator or not raw_path or not raw_type:
+            raise ValueError("--processing-type must use PATH=TYPE")
+        path = Path(raw_path).resolve()
+        if path in assignments:
+            raise ValueError(f"duplicate processing type for {raw_path}")
+        try:
+            assignments[path] = ProcessingType(raw_type)
+        except ValueError as exc:
+            raise ValueError(f"unknown processing type: {raw_type}") from exc
+    expected = {path.resolve() for path in sources}
+    missing = expected - assignments.keys()
+    unused = assignments.keys() - expected
+    if missing:
+        raise ValueError(
+            "missing processing type for: "
+            + ", ".join(sorted(path.name for path in missing))
+        )
+    if unused:
+        raise ValueError(
+            "processing type provided for unknown input: "
+            + ", ".join(sorted(str(path) for path in unused))
+        )
+    return assignments
+
+
+def _page_routes(values: Sequence[str]) -> dict[Path, dict[int, PageRoute]]:
+    assignments: dict[Path, dict[int, PageRoute]] = {}
+    for value in values:
+        target, separator, raw_route = value.rpartition("=")
+        raw_path, page_separator, raw_page = target.rpartition("#")
+        if not separator or not page_separator or not raw_path:
+            raise ValueError("--page-route must use PATH#PAGE=ROUTE")
+        try:
+            page = int(raw_page)
+            route = PageRoute(raw_route)
+        except ValueError as exc:
+            raise ValueError(f"invalid page route: {value}") from exc
+        if page < 1:
+            raise ValueError("page route numbers must be positive")
+        routes = assignments.setdefault(Path(raw_path).resolve(), {})
+        if page in routes:
+            raise ValueError(f"duplicate page route for {raw_path} page {page}")
+        routes[page] = route
+    return assignments
 
 
 def _parse(args: argparse.Namespace) -> int:
@@ -214,21 +304,88 @@ def _parse(args: argparse.Namespace) -> int:
     return int(had_error)
 
 
+def _ingest(args: argparse.Namespace) -> int:
+    sources = _discover(args.inputs, UNIVERSAL_SUFFIXES)
+    processing_types = _processing_types(args.processing_type, sources)
+    page_routes = _page_routes(args.page_route)
+    unknown_routes = page_routes.keys() - {path.resolve() for path in sources}
+    if unknown_routes:
+        raise ValueError(
+            "page route provided for unknown input: "
+            + ", ".join(sorted(str(path) for path in unknown_routes))
+        )
+    parser = UniversalDocumentParser()
+    documents = []
+    had_error = False
+    for index, source_path in enumerate(sources, start=1):
+        source = source_path.read_bytes()
+        digest = hashlib.sha256(source).hexdigest()
+        stem = _safe_stem(source_path)
+        folder = args.output / f"{stem}-{digest[:8]}"
+        processing_type = processing_types[source_path.resolve()]
+        entry = {
+            "source": str(source_path),
+            "name": source_path.name,
+            "sha256": digest,
+            "processing_type": processing_type.value,
+            "status": "complete",
+            "failed_stage": None,
+            "error": None,
+            "folder": folder.name,
+            "files": [],
+        }
+        print(
+            f"[{index}/{len(sources)}] {source_path.name}: {processing_type.value}",
+            file=sys.stderr,
+        )
+        try:
+            result = parser.parse(
+                source,
+                source_path.name,
+                processing_type=processing_type,
+                page_routes=page_routes.get(source_path.resolve()),
+            )
+            files = [f"{folder.name}/{stem}.md", f"{folder.name}/{stem}.full.json"]
+            _write(folder / f"{stem}.md", result.markdown)
+            _write(folder / f"{stem}.full.json", result.json + "\n")
+            annotated_pdf = getattr(result, "annotated_pdf", None)
+            if annotated_pdf is not None:
+                files.append(f"{folder.name}/{stem}.annotated.pdf")
+                _write(folder / f"{stem}.annotated.pdf", annotated_pdf)
+            entry["files"] = files
+        except Exception as exc:  # noqa: BLE001 - isolate batch documents
+            error = f"{type(exc).__name__}: {str(exc)[:1000]}"
+            entry.update(status="failed", failed_stage="parse", error=error)
+            had_error = True
+            print(f"{source_path.name}: {error}", file=sys.stderr)
+        documents.append(entry)
+    manifest = {"version": 1, "command": "ingest", "documents": documents}
+    _write(args.output / "manifest.json", json.dumps(manifest, indent=2) + "\n")
+    return int(had_error)
+
+
+def _validate_output(args: argparse.Namespace) -> None:
+    if args.output.exists() and not args.output.is_dir():
+        raise ValueError("output path must be a directory")
+    if args.output.exists() and any(args.output.iterdir()) and not args.overwrite:
+        raise ValueError("output directory is not empty; use --overwrite")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "parse":
         try:
             if args.schema is not None and not os.getenv("OPENAI_API_KEY"):
                 raise ValueError("OPENAI_API_KEY is required when --schema is used")
-            if args.output.exists() and not args.output.is_dir():
-                raise ValueError("output path must be a directory")
-            if (
-                args.output.exists()
-                and any(args.output.iterdir())
-                and not args.overwrite
-            ):
-                raise ValueError("output directory is not empty; use --overwrite")
+            _validate_output(args)
             return _parse(args)
+        except (OSError, ValueError) as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 2
+    if args.command == "ingest":
+        try:
+            _validate_output(args)
+            return _ingest(args)
         except (OSError, ValueError) as exc:
             print(f"error: {exc}", file=sys.stderr)
             return 2
