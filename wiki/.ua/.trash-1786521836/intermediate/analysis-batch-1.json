@@ -1,0 +1,214 @@
+{
+  "nodes": [
+    {
+      "id": "entity:pdf-inspector",
+      "type": "entity",
+      "name": "PDF Inspector",
+      "summary": "Native PDF inspection component that extracts selectable text, layout, tables, and page geometry without OCR.",
+      "tags": ["entity", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:docling",
+      "type": "entity",
+      "name": "Docling",
+      "summary": "Document conversion library used for non-OCR normalization of supported native document formats.",
+      "tags": ["entity", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:glm-ocr",
+      "type": "entity",
+      "name": "GLM-OCR",
+      "summary": "Local OCR engine that owns recognized layout and geometry for scanned visual documents.",
+      "tags": ["entity", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:paddleocr-vl",
+      "type": "entity",
+      "name": "PaddleOCR-VL",
+      "summary": "Local OCR engine that can own layout, recognition, confidence, and reading order for scanned documents.",
+      "tags": ["entity", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:visual-recovery",
+      "type": "entity",
+      "name": "Visual recovery",
+      "summary": "Optional bounded OCR recovery mechanism that can replace text within existing recognized elements.",
+      "tags": ["entity", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:docling-native-conversion:deterministic-source-manifests",
+      "type": "claim",
+      "name": "Deterministic manifests retain Docling provenance",
+      "summary": "Docling conversion is grounded by claiming converted records against deterministic, format-specific source manifests rather than treating converted output as the source of truth.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:mixed-pdf-pipeline:user-confirms-page-routes",
+      "type": "claim",
+      "name": "Mixed-PDF page routes require confirmation",
+      "summary": "PDF Inspector may suggest native or OCR page routes, but users confirm or override every route and failures remain on the selected route.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+      "type": "claim",
+      "name": "Unusable native pages require Mixed PDF",
+      "summary": "A native-PDF run stops and recommends Mixed PDF when inspection finds unusable pages instead of silently rasterizing or invoking OCR.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:ocr-quality-and-recovery:recovery-preserves-geometry",
+      "type": "claim",
+      "name": "Visual recovery preserves OCR geometry",
+      "summary": "Optional visual recovery may only replace text within existing elements; it cannot create, delete, reorder, or alter their geometry or types.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:office-and-native-formats:embedded-media-is-not-ocred",
+      "type": "claim",
+      "name": "Embedded native-document media is recorded, not OCRed",
+      "summary": "Embedded media becomes recorded assets while native source units remain structural elements such as paragraphs, shapes, cells, tables, rows, and columns.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:scanned-pdf-and-image-pipeline:native-inspection-isolated",
+      "type": "claim",
+      "name": "Scanned processing excludes native PDF inspection",
+      "summary": "The scanned-PDF and image mode does not invoke native PDF inspection, preserving existing OCR provider selection and recovery semantics.",
+      "tags": ["claim", "processing-pipelines"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:grounding-and-evidence-contract:accepted-values-need-exact-evidence",
+      "type": "claim",
+      "name": "Accepted native values require exact evidence",
+      "summary": "An accepted value must exactly match immutable base text, have complete character-span coverage, and resolve to a source anchor; rendered Markdown is not extraction input.",
+      "tags": ["claim", "product-and-principles"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:processing-types-and-manual-routing:selection-controls-dispatch",
+      "type": "claim",
+      "name": "Manual selection controls exactly one pipeline",
+      "summary": "Each file has an independent authoritative processing selection, validated against signatures and containers, which reaches exactly one top-level pipeline with no automatic reinterpretation.",
+      "tags": ["claim", "product-and-principles"],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:product-capabilities-and-boundaries:no-native-library-ocr",
+      "type": "claim",
+      "name": "Native libraries do not perform OCR",
+      "summary": "The first native release excludes OCR inside PDF Inspector, Docling, and LangExtract to protect source traceability.",
+      "tags": ["claim", "product-and-principles"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "entity:docling",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article describes Docling as the normalized converter constrained by deterministic source manifests."
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "entity:pdf-inspector",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The native PDF workflow uses PDF Inspector for non-OCR text, layout, tables, and geometry extraction."
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "entity:pdf-inspector",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "PDF Inspector supplies the suggested native-or-OCR page routes in mixed documents."
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "entity:glm-ocr",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "GLM-OCR is named as an OCR engine that owns scanned-document recognition and geometry."
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "entity:paddleocr-vl",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "PaddleOCR-VL is named as an OCR engine that owns scanned-document recognition and geometry."
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "entity:visual-recovery",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article specifies the bounds of optional visual recovery."
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "Mixed-page review implements the product rule that user-selected routes are authoritative."
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "Native PDF stopping on unusable pages applies the no-silent-rerouting requirement."
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "Docling record claiming applies the product evidence contract to converted native content."
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "The recovery boundary is the OCR counterpart to evidence ownership and traceability."
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "article:articles/product/product-capabilities-and-boundaries",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "The format pipeline implements the declared scope and the no-OCR embedded-media boundary."
+    },
+    {
+      "source": "article:articles/product/system-overview",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "The system overview identifies evidence ownership as the central product boundary."
+    }
+  ]
+}
