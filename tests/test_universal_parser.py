@@ -5,6 +5,7 @@ import pytest
 
 from grounded_docparse.native import PageRoute, ProcessingType, SourceFormat
 from grounded_docparse.universal import (
+    NativePdfRequiresMixed,
     PdfInspection,
     ProcessingTypeMismatch,
     UniversalDocumentParser,
@@ -99,10 +100,8 @@ def test_scanned_pdf_delegates_to_legacy_parser() -> None:
 
     parser = UniversalDocumentParser(
         legacy_parser=LegacyParser(),
-        pdf_inspector=lambda _data: PdfInspection(
-            pdf_type="scanned",
-            page_count=1,
-            pages_needing_ocr=frozenset({1}),
+        pdf_inspector=lambda _data: (_ for _ in ()).throw(
+            AssertionError("pdf-inspector must not be called")
         ),
     )
 
@@ -116,7 +115,7 @@ def test_scanned_pdf_delegates_to_legacy_parser() -> None:
     )
 
 
-def test_wrong_pdf_selection_blocks_before_any_pipeline() -> None:
+def test_scanned_selection_trusts_user_without_content_classification() -> None:
     calls = []
 
     class Parser:
@@ -133,14 +132,13 @@ def test_wrong_pdf_selection_blocks_before_any_pipeline() -> None:
         ),
     )
 
-    with pytest.raises(ProcessingTypeMismatch, match="classified"):
-        parser.parse(
-            b"%PDF-1.7\n",
-            "scan.pdf",
-            processing_type=ProcessingType.SCANNED_PDF,
-        )
+    parser.parse(
+        b"%PDF-1.7\n",
+        "scan.pdf",
+        processing_type=ProcessingType.SCANNED_PDF,
+    )
 
-    assert calls == []
+    assert calls == ["called"]
 
 
 def test_native_pdf_reaches_only_native_pipeline() -> None:
@@ -176,10 +174,35 @@ def test_native_pdf_reaches_only_native_pipeline() -> None:
     assert calls == ["native"]
 
 
-def test_mixed_pdf_requires_complete_compatible_page_routes() -> None:
+def test_native_pdf_with_unusable_pages_stops_and_suggests_mixed() -> None:
     parser = UniversalDocumentParser(
         legacy_parser=object(),
         pdf_parser=object(),
+        pdf_inspector=lambda _data: PdfInspection(
+            pdf_type="mixed",
+            page_count=3,
+            pages_needing_ocr=frozenset({2}),
+        ),
+    )
+
+    with pytest.raises(NativePdfRequiresMixed, match="2; select Mixed PDF"):
+        parser.parse(
+            b"%PDF-1.7\n",
+            "native.pdf",
+            processing_type=ProcessingType.NATIVE_PDF,
+        )
+
+
+def test_mixed_pdf_requires_complete_routes_and_accepts_overrides() -> None:
+    calls = []
+
+    class MixedParser:
+        def parse(self, *_args, **kwargs):
+            calls.append(kwargs["page_routes"])
+
+    parser = UniversalDocumentParser(
+        legacy_parser=object(),
+        pdf_parser=MixedParser(),
         pdf_inspector=lambda _data: PdfInspection(
             pdf_type="mixed",
             page_count=2,
@@ -193,10 +216,11 @@ def test_mixed_pdf_requires_complete_compatible_page_routes() -> None:
             "mixed.pdf",
             processing_type=ProcessingType.MIXED_PDF,
         )
-    with pytest.raises(ProcessingTypeMismatch, match="conflicts"):
-        parser.parse(
-            b"%PDF-1.7\n",
-            "mixed.pdf",
-            processing_type=ProcessingType.MIXED_PDF,
-            page_routes={1: PageRoute.OCR, 2: PageRoute.NATIVE},
-        )
+    overrides = {1: PageRoute.OCR, 2: PageRoute.NATIVE}
+    parser.parse(
+        b"%PDF-1.7\n",
+        "mixed.pdf",
+        processing_type=ProcessingType.MIXED_PDF,
+        page_routes=overrides,
+    )
+    assert calls == [overrides]

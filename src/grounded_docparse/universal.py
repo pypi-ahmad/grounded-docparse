@@ -67,6 +67,41 @@ class PdfInspection:
     pdf_type: str
     page_count: int
     pages_needing_ocr: frozenset[int]
+    ocr_reasons_by_page: tuple[tuple[int, tuple[str, ...]], ...] = ()
+    pages_with_tables: frozenset[int] = frozenset()
+    pages_with_columns: frozenset[int] = frozenset()
+    confidence: float = 0.0
+
+    @property
+    def suggested_routes(self) -> dict[int, PageRoute]:
+        return {
+            page: (
+                PageRoute.OCR
+                if page in self.pages_needing_ocr
+                else PageRoute.NATIVE
+            )
+            for page in range(1, self.page_count + 1)
+        }
+
+
+class NativePdfRequiresMixed(ProcessingTypeMismatch):
+    def __init__(self, pages: set[int] | frozenset[int]) -> None:
+        self.pages = tuple(sorted(pages))
+        super().__init__(
+            "native PDF has unusable page(s) "
+            + ", ".join(str(page) for page in self.pages)
+            + "; select Mixed PDF"
+        )
+
+
+class MixedNativePageUnusable(ProcessingTypeMismatch):
+    def __init__(self, pages: set[int] | frozenset[int]) -> None:
+        self.pages = tuple(sorted(pages))
+        super().__init__(
+            "mixed PDF native route is unusable for page(s) "
+            + ", ".join(str(page) for page in self.pages)
+            + "; choose OCR for those pages"
+        )
 
 
 def inspect_pdf_content(data: bytes) -> PdfInspection:
@@ -81,6 +116,13 @@ def inspect_pdf_content(data: bytes) -> PdfInspection:
         pdf_type=result.pdf_type,
         page_count=result.page_count,
         pages_needing_ocr=frozenset(result.pages_needing_ocr),
+        ocr_reasons_by_page=tuple(
+            (item.page, tuple(item.reasons))
+            for item in result.ocr_reasons_by_page
+        ),
+        pages_with_tables=frozenset(result.pages_with_tables),
+        pages_with_columns=frozenset(result.pages_with_columns),
+        confidence=result.confidence,
     )
 
 
@@ -177,9 +219,15 @@ def validate_pdf_processing_type(
 ) -> None:
     expected_type = {
         ProcessingType.NATIVE_PDF: {"text_based"},
-        ProcessingType.SCANNED_PDF: {"scanned", "image_based"},
         ProcessingType.MIXED_PDF: {"mixed"},
-    }[processing_type]
+    }.get(processing_type)
+    if expected_type is None:
+        return
+    if (
+        processing_type is ProcessingType.NATIVE_PDF
+        and inspection.pages_needing_ocr
+    ):
+        raise NativePdfRequiresMixed(inspection.pages_needing_ocr)
     if inspection.pdf_type not in expected_type:
         raise ProcessingTypeMismatch(
             f"selected {processing_type.value}, but pdf-inspector classified "
@@ -191,16 +239,6 @@ def validate_pdf_processing_type(
     if page_routes is None or set(page_routes) != expected_pages:
         raise ProcessingTypeMismatch(
             "mixed PDF requires one explicit processing route for every page"
-        )
-    incompatible = [
-        page
-        for page, route in page_routes.items()
-        if (route is PageRoute.OCR) != (page in inspection.pages_needing_ocr)
-    ]
-    if incompatible:
-        raise ProcessingTypeMismatch(
-            "mixed PDF page route conflicts with pdf-inspector for page(s): "
-            + ", ".join(str(page) for page in sorted(incompatible))
         )
 
 
@@ -235,12 +273,6 @@ class UniversalDocumentParser:
             raise ValueError("document exceeds the configured upload limit")
         source_format = detect_source_format(data, filename)
         validate_processing_type(source_format, processing_type)
-        if source_format is SourceFormat.PDF:
-            validate_pdf_processing_type(
-                self.pdf_inspector(data),
-                processing_type,
-                page_routes,
-            )
         if processing_type in {ProcessingType.SCANNED_PDF, ProcessingType.IMAGE}:
             return self.legacy_parser.parse(
                 data,
@@ -248,6 +280,14 @@ class UniversalDocumentParser:
                 progress_callback=progress_callback,
                 refine_markdown=refine_markdown,
                 visual_recovery=visual_recovery,
+            )
+        inspection = None
+        if source_format is SourceFormat.PDF:
+            inspection = self.pdf_inspector(data)
+            validate_pdf_processing_type(
+                inspection,
+                processing_type,
+                page_routes,
             )
         if source_format is SourceFormat.PDF:
             if self.pdf_parser is None:
@@ -259,6 +299,10 @@ class UniversalDocumentParser:
                 filename,
                 processing_type=processing_type,
                 page_routes=page_routes,
+                inspection=inspection,
+                progress_callback=progress_callback,
+                refine_markdown=refine_markdown,
+                visual_recovery=visual_recovery,
             )
 
         if self.docling_parser is None:

@@ -42,6 +42,13 @@ from .native import (
 )
 from .pipeline import DocumentParser
 from .render import render_combined_result
+from .universal import (
+    MixedNativePageUnusable,
+    NativePdfRequiresMixed,
+    PdfInspection,
+    ProcessingTypeMismatch,
+    UniversalDocumentParser,
+)
 
 __all__ = [
     "AgenticAnalysis",
@@ -60,18 +67,22 @@ __all__ = [
     "ExtractionResult",
     "FormClassificationResult",
     "FormSegment",
+    "MixedNativePageUnusable",
     "NativeDocument",
     "NativeElement",
     "NativeParseResult",
+    "NativePdfRequiresMixed",
     "OcrEngine",
     "PageRoute",
     "ParseMetadata",
     "ParseResult",
     "ParserConfig",
+    "PdfInspection",
     "PdfSourceAnchor",
     "PreparedDocumentContext",
     "PreviewArtifact",
     "ProcessingType",
+    "ProcessingTypeMismatch",
     "RoutedExtractionResult",
     "SchemaProposal",
     "SegmentExtraction",
@@ -81,6 +92,7 @@ __all__ = [
     "SourceUnit",
     "StoredSchema",
     "StructuralSourceAnchor",
+    "UniversalDocumentParser",
     "VisualRecoveryResult",
     "render_combined_result",
     "render_native_document",

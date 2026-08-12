@@ -8,6 +8,14 @@ from grounded_docparse.models import (
     ParseResult,
     RunUsage,
 )
+from grounded_docparse.native import (
+    NativeDocument,
+    NativeParseResult,
+    PageRoute,
+    ProcessingType,
+    SourceFormat,
+    SourceUnit,
+)
 from grounded_docparse.workspace_store import WorkspaceStore
 
 
@@ -93,6 +101,55 @@ def test_processing_document_reopens_interrupted_with_progress(tmp_path) -> None
         "total": 10,
         "message": "Recognizing page 4",
     }
+
+
+def test_native_v5_result_round_trips(tmp_path) -> None:
+    database = tmp_path / "studio.sqlite3"
+    source = b"%PDF-native"
+    upload = build_batch_documents(
+        [("native.pdf", source, "application/pdf")]
+    )[0]
+    document = NativeDocument(
+        source_name="native.pdf",
+        source_sha256="a" * 64,
+        source_format=SourceFormat.PDF,
+        requested_processing_type=ProcessingType.NATIVE_PDF,
+        base_text="Notice",
+        units=[
+            SourceUnit(
+                id="page-1",
+                kind="page",
+                index=1,
+                requested_route=PageRoute.NATIVE,
+                effective_route=PageRoute.NATIVE,
+                parser="pdf-inspector",
+            )
+        ],
+        elements=[],
+    )
+    result = NativeParseResult(
+        document=document,
+        markdown="Notice",
+        json='{"schema_version":"5.0.0"}',
+        annotated_pdf=b"annotated",
+    )
+    store = WorkspaceStore(database)
+    store.sync_documents([upload], settings={}, result_version="5.0.0")
+    store.save_document(
+        upload.id,
+        status="complete",
+        selection_key="native-key",
+        parsed_source=source,
+        result=result,
+    )
+
+    restored = WorkspaceStore(database).load(result_version="5.0.0")
+
+    assert restored is not None
+    restored_result = restored.documents[0].result
+    assert isinstance(restored_result, NativeParseResult)
+    assert restored_result.document.base_text == "Notice"
+    assert restored_result.annotated_pdf == b"annotated"
 
 
 def test_result_version_change_keeps_source_and_invalidates_results(tmp_path) -> None:

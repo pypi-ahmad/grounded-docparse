@@ -35,7 +35,7 @@ from grounded_docparse.models import (
     SchemaField,
     StoredSchema,
 )
-from grounded_docparse.native import PageRoute, ProcessingType
+from grounded_docparse.native import NativeParseResult, PageRoute, ProcessingType
 from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
@@ -152,6 +152,37 @@ def processing_type_from_selection_key(selection_key: str | None) -> str | None:
         (item.value for item in ProcessingType if item.value in parts),
         None,
     )
+
+
+def page_routes_from_selection_key(
+    selection_key: str | None,
+) -> dict[int, PageRoute]:
+    if selection_key is None:
+        return {}
+    marker = f":{ProcessingType.MIXED_PDF.value}:"
+    _prefix, separator, tail = selection_key.partition(marker)
+    if not separator:
+        return {}
+    route_text, separator, _version = tail.rpartition(":")
+    if not separator:
+        return {}
+    routes: dict[int, PageRoute] = {}
+    for item in route_text.split(","):
+        if not item:
+            continue
+        page, separator, route = item.partition(":")
+        if not separator:
+            return {}
+        try:
+            routes[int(page)] = PageRoute(route)
+        except (ValueError, TypeError):
+            return {}
+    return routes
+
+
+@st.cache_data(max_entries=32)
+def cached_pdf_inspection(data: bytes):
+    return inspect_pdf_content(data)
 
 
 def append_session_usage(usage: RunUsage | None, *, skip_calls: int = 0) -> None:
@@ -1274,7 +1305,7 @@ if batch_documents:
             if selected_type is not ProcessingType.MIXED_PDF:
                 continue
             try:
-                inspection = inspect_pdf_content(document.source)
+                inspection = cached_pdf_inspection(document.source)
             except Exception as exc:  # noqa: BLE001 - preflight is user-facing
                 processing_errors.append(
                     f"{document.display_name}: PDF inspection failed: {exc}"
@@ -1286,38 +1317,74 @@ if batch_documents:
                     f"classified it as {inspection.pdf_type}"
                 )
                 continue
-            routes: dict[int, PageRoute] = {}
+            restored_routes = page_routes_from_selection_key(
+                st.session_state.batch_workspaces[document.id].get("selection_key")
+            )
             st.caption(f"{document.display_name} page routes")
-            for page in range(1, inspection.page_count + 1):
-                route_label = st.selectbox(
-                    f"{document.display_name} · page {page}",
-                    ["Native", "OCR"],
-                    index=None,
-                    placeholder="Select page route",
-                    key=f"page-route-{document.id}-{page}",
+            review = st.data_editor(
+                [
+                    {
+                        "Page": page,
+                        "Suggested": (
+                            "OCR"
+                            if page in inspection.pages_needing_ocr
+                            else "Native"
+                        ),
+                        "User selection": (
+                            "OCR"
+                            if restored_routes.get(page)
+                            is PageRoute.OCR
+                            else "Native"
+                            if restored_routes.get(page)
+                            is PageRoute.NATIVE
+                            else (
+                                "OCR"
+                                if page in inspection.pages_needing_ocr
+                                else "Native"
+                            )
+                        ),
+                    }
+                    for page in range(1, inspection.page_count + 1)
+                ],
+                column_config={
+                    "Page": st.column_config.NumberColumn("Page", disabled=True),
+                    "Suggested": st.column_config.TextColumn(
+                        "Suggested", disabled=True
+                    ),
+                    "User selection": st.column_config.SelectboxColumn(
+                        "User selection",
+                        options=["Native", "OCR"],
+                        required=True,
+                    ),
+                },
+                disabled=["Page", "Suggested"],
+                hide_index=True,
+                key=f"page-route-review-{document.id}",
+            )
+            routes = {
+                int(row["Page"]): (
+                    PageRoute.NATIVE
+                    if row["User selection"] == "Native"
+                    else PageRoute.OCR
                 )
-                if route_label is not None:
-                    routes[page] = (
-                        PageRoute.NATIVE if route_label == "Native" else PageRoute.OCR
-                    )
+                for row in review
+                if row.get("User selection") in {"Native", "OCR"}
+            }
+            confirmed = st.checkbox(
+                "Confirm page routes",
+                value=bool(restored_routes),
+                key=f"page-route-confirmed-{document.id}",
+            )
             if len(routes) != inspection.page_count:
                 processing_errors.append(
                     f"{document.display_name}: select a route for every page"
                 )
+            elif not confirmed:
+                processing_errors.append(
+                    f"{document.display_name}: confirm the reviewed page routes"
+                )
             else:
-                incompatible = [
-                    page
-                    for page, route in routes.items()
-                    if (route is PageRoute.OCR)
-                    != (page in inspection.pages_needing_ocr)
-                ]
-                if incompatible:
-                    processing_errors.append(
-                        f"{document.display_name}: incompatible route for page(s) "
-                        + ", ".join(str(page) for page in incompatible)
-                    )
-                else:
-                    page_routes_by_document[document.id] = routes
+                page_routes_by_document[document.id] = routes
 
 upload = active_document
 source = active_document.source if active_document is not None else None
@@ -1594,11 +1661,12 @@ if parse_clicked and batch_documents:
             header_status_slot.markdown("Status: :blue[● **Parsing**]")
             requires_ocr = any(
                 processing_types[document.id]
-                in {
-                    ProcessingType.SCANNED_PDF,
-                    ProcessingType.MIXED_PDF,
-                    ProcessingType.IMAGE,
-                }
+                in {ProcessingType.SCANNED_PDF, ProcessingType.IMAGE}
+                or (
+                    processing_types[document.id] is ProcessingType.MIXED_PDF
+                    and PageRoute.OCR
+                    in page_routes_by_document.get(document.id, {}).values()
+                )
                 for document in documents_to_process
             )
             if requires_ocr:
@@ -1769,8 +1837,10 @@ if parse_clicked and batch_documents:
                     st.session_state.annotated_page = 1
                     st.session_state.extraction_result = None
                     st.session_state.chat_history = []
-                    st.session_state.prepared_agentic_context = DocumentAgent.prepare(
-                        result
+                    st.session_state.prepared_agentic_context = (
+                        None
+                        if isinstance(result, NativeParseResult)
+                        else DocumentAgent.prepare(result)
                     )
                     workspace["state"] = capture_document_state()
                     workspace_store.save_document(
@@ -1783,11 +1853,16 @@ if parse_clicked and batch_documents:
                     )
 
                 prepared_context = st.session_state.get("prepared_agentic_context")
-                if prepared_context is None:
+                if prepared_context is None and not isinstance(
+                    result, NativeParseResult
+                ):
                     prepared_context = DocumentAgent.prepare(result)
                     st.session_state.prepared_agentic_context = prepared_context
 
-                if st.session_state.get("agentic_source_hash") != agentic_key:
+                if isinstance(result, NativeParseResult):
+                    st.session_state.agentic_analysis = None
+                    st.session_state.agentic_source_hash = agentic_key
+                elif st.session_state.get("agentic_source_hash") != agentic_key:
                     completed_stages.update(
                         {
                             "layout",
@@ -1944,7 +2019,75 @@ has_result = (
     result is not None
     and parsed_source is not None
     and st.session_state.get("result_source_hash") == selection_key
+    and not isinstance(result, NativeParseResult)
 )
+has_native_result = (
+    isinstance(result, NativeParseResult)
+    and parsed_source is not None
+    and st.session_state.get("result_source_hash") == selection_key
+)
+if has_native_result:
+    header_status_slot.markdown("Status: :green[● **Complete**]")
+    native_tabs = st.tabs(
+        ["Overview", "Markdown", "Annotated PDF", "Layout Tree"],
+        key="native_studio_tab",
+        on_change="rerun",
+    )
+    with native_tabs[0]:
+        native_count = sum(
+            unit.effective_route is PageRoute.NATIVE
+            for unit in result.document.units
+        )
+        ocr_count = len(result.document.units) - native_count
+        st.metric("Pages", len(result.document.units))
+        st.caption(f"Native pages: {native_count} · OCR pages: {ocr_count}")
+        for warning in result.document.warnings:
+            st.warning(warning)
+    with native_tabs[1]:
+        st.markdown(result.markdown)
+    with native_tabs[2]:
+        if result.annotated_pdf is not None:
+            st.pdf(result.annotated_pdf, height=900)
+        else:
+            st.info("No annotated PDF is available for this format.")
+    with native_tabs[3]:
+        st.dataframe(
+            [
+                {
+                    "Page": element.source.anchor.page,
+                    "Order": element.reading_order + 1,
+                    "Type": element.type,
+                    "Text": element.text,
+                    "Bounding box": element.source.anchor.bbox,
+                }
+                for element in result.document.elements
+            ],
+            hide_index=True,
+            width="stretch",
+        )
+    with st.container(border=True):
+        st.download_button(
+            "Download Markdown",
+            result.markdown,
+            file_name=f"{Path(upload.name).stem}.md",
+            mime="text/markdown",
+            on_click="ignore",
+        )
+        if result.annotated_pdf is not None:
+            st.download_button(
+                "Download annotated PDF",
+                result.annotated_pdf,
+                file_name=f"{Path(upload.name).stem}.annotated.pdf",
+                mime="application/pdf",
+                on_click="ignore",
+            )
+        st.download_button(
+            "Download Full JSON",
+            result.json,
+            file_name=f"{Path(upload.name).stem}.full.json",
+            mime="application/json",
+            on_click="ignore",
+        )
 if has_result:
     header_status_slot.markdown("Status: :green[● **Complete**]")
     for warning in result.metadata.enhancement.warnings:
@@ -2674,6 +2817,18 @@ if batch_documents:
                         source=document.source,
                         status=entry_status,
                         error=workspace.get("error"),
+                    )
+                )
+                continue
+            if isinstance(stored_result, NativeParseResult):
+                archive_entries.append(
+                    BatchArchiveEntry(
+                        name=document.name,
+                        source=document.source,
+                        status="complete",
+                        markdown=stored_result.markdown,
+                        annotated_pdf=stored_result.annotated_pdf,
+                        full_json=stored_result.json,
                     )
                 )
                 continue
