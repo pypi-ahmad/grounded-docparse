@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-dde17504a128",
-    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
+    "id": "content-6684c0091b62",
+    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T14:51:39.699041+00:00",
+  "generated_at": "2026-08-12T16:46:34.603348+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
@@ -26,8 +26,8 @@
     },
     {
       "path": ".streamlit/config.toml",
-      "sha256": "cb49b0ead13263ff99cdbc46ea6d3d723f892e3a312bf46ec3797dcd31657708",
-      "size": 500
+      "sha256": "545b82d1912205e5030112474e8e8d4b104ac672be0425cbcfb98b29b4b1e1e2",
+      "size": 510
     },
     {
       "path": "LICENSE",
@@ -46,12 +46,12 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "ea636181e26a0f1f7c6d5f71f5cfd67a7c1b93f59502e9a252b8956ba1eb5c9b",
-      "size": 2109
+      "sha256": "4aa693693e43b382ab25a016bac923127eca231cce6856c6bf3b65564d3c1b85",
+      "size": 2108
     },
     {
       "path": "uv.lock",
-      "sha256": "df820b87584b8f2833934a86e34fc0109b81625d212692fe0685e64ecb6469a4",
+      "sha256": "8e84d7ba06e8db6b3970cd73ebf7277b46276725c0982ad6fb5af343e2c97602",
       "size": 1205070
     }
   ]

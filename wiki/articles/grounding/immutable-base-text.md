@@ -1,7 +1,7 @@
 ---
 tags: base-text, immutability, extraction
 sources: src/grounded_docparse/native.py, src/grounded_docparse/native_parsers.py
-snapshot: content-dde17504a128
+snapshot: content-6684c0091b62
 status: feature-branch
 ---
 

@@ -2,7 +2,7 @@
 
 ## Recommended Windows launcher
 
-Run `Setup-GLM-OCR.cmd` once on a supported Windows 10 22H2 or Windows 11 machine. It validates WSL2 and available OCR capability, creates the locked WSL environment with the native-document extra, starts the selected local OCR stack and Streamlit, waits for health checks, and opens <http://localhost:8501>.
+Run `Setup-GLM-OCR.cmd` once on a supported Windows 10 22H2 or Windows 11 machine. It validates WSL2 and available OCR capability, creates the locked WSL environment with the native-document extra, starts the selected local OCR stack and Streamlit, waits for health checks, and opens <http://localhost:8600>.
 
 Use `Launch-GLM-OCR.cmd` afterward, or `Launch-PaddleOCR-VL-1.6.cmd` to start with Paddle selected. Both open the same app and the in-app dropdown can switch the exclusive managed GPU backend. GLM lives in `.venv`; Paddle and its compatible vLLM stack live in `.paddle-venv`.
 
@@ -30,7 +30,7 @@ The normal URLs are:
 - GLM-OCR-compatible vLLM endpoint: <http://127.0.0.1:8080>
 - PaddleOCR-VL vLLM endpoint: <http://127.0.0.1:8118>
 - PaddleX full document parser: <http://127.0.0.1:8119>
-- Streamlit: <http://localhost:8501>
+- Streamlit: <http://localhost:8600>
 
 Set Windows user variables `DOCPARSE_PADDLE_VLLM_PORT` and
 `DOCPARSE_PADDLE_API_PORT` before launching to override the two Paddle defaults.
@@ -40,7 +40,7 @@ The ports must be distinct integers from 1 through 65535.
 
 With a key present, the default Fast preset performs remote classification and visual recovery is enabled. Selecting **Parse document** can therefore send selected recovery crops and recognized document context to the configured endpoint. Disable the corresponding toggles for GLM-only operation.
 
-The managed scripts bind Streamlit and OCR services to loopback. Do not expose ports `8501`, `8080`, `8118`, or `8119` to an untrusted network.
+The managed scripts bind Streamlit and OCR services to loopback. Do not expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.
 
 ## Use the studio
 

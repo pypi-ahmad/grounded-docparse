@@ -8,7 +8,7 @@ import pytest
 from openpyxl import Workbook
 from streamlit.testing.v1 import AppTest
 
-from grounded_docparse import pipeline, universal
+from grounded_docparse import pipeline, runtime_control, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
 from grounded_docparse.config import LUNA_MODEL
@@ -106,9 +106,36 @@ def test_studio_allows_glm_without_openai_environment(
     assert [tab.label for tab in app.tabs] == [
         "Overview",
         "Markdown",
+        "HTML View",
         "Annotated PDF",
         "Layout Tree",
     ]
+    stop_app = next(button for button in app.button if button.label == "Stop app")
+    assert stop_app.disabled is True
+
+
+def test_managed_stop_button_requires_confirmation(monkeypatch) -> None:
+    shutdown_requests = []
+    monkeypatch.setenv("DOCPARSE_MANAGE_OCR_SERVICES", "true")
+    monkeypatch.setattr(
+        runtime_control,
+        "schedule_managed_shutdown",
+        lambda: shutdown_requests.append(True) or 123,
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    stop_app = next(button for button in app.button if button.label == "Stop app")
+    assert stop_app.disabled is False
+    assert shutdown_requests == []
+
+    app = stop_app.click().run(timeout=20)
+    stop_now = next(button for button in app.button if button.label == "Stop now")
+    assert shutdown_requests == []
+
+    app = stop_now.click().run(timeout=20)
+    assert not app.exception
+    assert shutdown_requests == [True]
+    assert app.session_state["shutdown_requested"] is True
 
 
 def test_stale_session_result_is_discarded(monkeypatch) -> None:
@@ -272,11 +299,12 @@ def test_studio_shows_results_and_only_requested_tools(
             rendered = render_agentic_document(document)
             return ParseResult(
                 document=document,
-                markdown=rendered.markdown,
+                markdown=f"{rendered.markdown}\n\nRefined-only text",
                 json=rendered.json,
                 input_tokens=1_234,
                 output_tokens=56,
                 annotated_pdf=simple_pdf,
+                base_markdown=rendered.markdown,
                 usage=RunUsage(
                     calls=[
                         AgentUsage(
@@ -314,6 +342,7 @@ def test_studio_shows_results_and_only_requested_tools(
     assert [tab.label for tab in app.tabs] == [
         "Overview",
         "Markdown",
+        "HTML View",
         "Annotated PDF",
         "Extract",
         "Layout Tree",
@@ -350,6 +379,18 @@ def test_studio_shows_results_and_only_requested_tools(
     assert app.session_state["session_usage"].input_tokens == 1_234
     preview = next(item for item in app.markdown if "Public notice" in item.value)
     assert preview.proto.allow_html is True
+
+    app.session_state["studio_tab"] = "HTML View"
+    app = app.run(timeout=20)
+    assert any("Public notice" in item.value for item in app.markdown)
+    assert not any("Refined-only text" in item.value for item in app.markdown)
+    assert any(
+        "grounded document content" in item.value.lower()
+        for item in app.get("caption")
+    )
+    html_styles = "\n".join(str(item.proto) for item in app.get("html"))
+    assert "background: #ffffff" in html_styles
+    assert "color: #111827" in html_styles
 
     app.session_state["studio_tab"] = "Extract"
     app = app.run(timeout=20)
@@ -809,9 +850,10 @@ def test_native_v5_result_uses_native_tabs_without_v4_agents(
     ).click().run(timeout=20)
 
     assert not app.exception
-    assert [tab.label for tab in app.tabs][-6:] == [
+    assert [tab.label for tab in app.tabs][-7:] == [
         "Overview",
         "Markdown",
+        "HTML View",
         "Annotated PDF",
         "Extract",
         "JSON",
@@ -875,6 +917,7 @@ def test_nonvisual_native_result_has_json_and_source_structure_without_pdf_tab(
     assert [tab.label for tab in app.tabs] == [
         "Overview",
         "Markdown",
+        "HTML View",
         "Extract",
         "JSON",
         "Source Structure",
