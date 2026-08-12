@@ -1,5 +1,6 @@
 .venv/
 .venv-wsl/
+paddle-runtime/
 node_modules/
 *.egg-info/
 __pycache__/
@@ -16,23 +17,29 @@ output/
 outputs/
 data/
 artifacts/
-*.pdf
 .ruff_cache/
 .claude/
+.codex/
 .remember/
 .superpowers/
-.codegraph/
-.code-review-graph/
-graphify-out/
 ownership-map-out/
 .streamlit/secrets.toml
 .env
 .docparse/
 .worktrees/
 .runtime/
+tmp/
 *.log
 .DS_Store
 *.py[cod]
+
+# Generated parser result files (source docs, schemas, and fixtures stay tracked)
+*.annotated.pdf
+*.full.json
+*.extract.json
+*.parse.json
+*.run.json
+*.routing.json
 
 security_best_practices_report.md
 grounded-docparse-threat-model.md
@@ -40,3 +47,13 @@ presentations/grounded-docparse-video-demo-script.md
 presentations/grounded-docparse-video-demo.pptx
 presentations/grounded-docparse-ai-contest-entry.pptx
 presentations/grounded-docparse-general-ai-contest-entry.pptx
+
+# Analysis directories are intentionally tracked
+!.codegraph/
+!.codegraph/**
+!.code-review-graph/
+!.code-review-graph/**
+!.ua/
+!.ua/**
+!graphify-out/
+!graphify-out/**
