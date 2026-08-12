@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f8ca74d5deff",
-    "base_commit": "d710a675fe58c644b10bf5524eb7d30b82219737",
+    "id": "content-2ae93e3d37db",
+    "base_commit": "1e720b7c95cd4b23efb3d7182ec043e5b5ad395a",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T08:52:56.282943+00:00",
+  "generated_at": "2026-08-12T13:38:42.347681+00:00",
   "category": "application-code",
   "files": [
     {
@@ -81,8 +81,8 @@
     },
     {
       "path": "src/grounded_docparse/native_extraction.py",
-      "sha256": "6c6366c8c5b0df04a6d5b2e5aa0b075471c067720174dbceba88bf40207ea44d",
-      "size": 20974
+      "sha256": "c0f94032034d837f9c2a67f87511e330b7c384995492687f759a4a8ebd378e30",
+      "size": 21404
     },
     {
       "path": "src/grounded_docparse/native_parsers.py",

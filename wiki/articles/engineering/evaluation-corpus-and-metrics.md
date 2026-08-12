@@ -1,7 +1,7 @@
 ---
 tags: evaluation, corpus, metrics
 sources: src/grounded_docparse/benchmark.py, benchmarks/corpus-v1/manifest.json, benchmarks/schemas/annotation-v1.1.schema.json, scripts/generate_evaluation_corpus.py
-snapshot: content-f8ca74d5deff
+snapshot: content-2ae93e3d37db
 status: feature-branch
 ---
 
