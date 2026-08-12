@@ -23,8 +23,6 @@ artifacts/
 .codex/
 .remember/
 .superpowers/
-.codegraph/
-.code-review-graph/
 graphify-out/
 ownership-map-out/
 .streamlit/secrets.toml
@@ -32,7 +30,6 @@ ownership-map-out/
 .docparse/
 .worktrees/
 .runtime/
-.ua/
 tmp/
 *.log
 .DS_Store
