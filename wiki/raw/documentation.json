@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-dde17504a128",
-    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
+    "id": "content-6684c0091b62",
+    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T14:51:39.699041+00:00",
+  "generated_at": "2026-08-12T16:46:34.603348+00:00",
   "category": "documentation",
   "files": [
     {
@@ -21,8 +21,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "59e4bf3227c25b2bdf316f386cbfa1245da6bc0b1068769de0bb0c8fc9b0299a",
-      "size": 9993
+      "sha256": "8f2cc65c7ce65db1003299d88d4ef99710d70733494de117d42b66fb20be113b",
+      "size": 10086
     },
     {
       "path": "CODE_OF_CONDUCT.md",
@@ -41,13 +41,13 @@
     },
     {
       "path": "SECURITY.md",
-      "sha256": "0c106373e4084f883f11131fa45fa9d098a4158832318f3e22c519ddc00fa9d3",
-      "size": 2938
+      "sha256": "b4bc6dcc6d14ebaa23830a879805a650f66133f51dd2c67ba8bff564d0c0b16c",
+      "size": 2937
     },
     {
       "path": "SETUP.md",
-      "sha256": "f3874cc1e286e01e1e2825c35d0f5fcb9b266178074d8eadf6a8bb3384333ed1",
-      "size": 16962
+      "sha256": "59ea536b31790abc4e7f88b55348be81bd5b061c32a9fdbf81899679adfe22ef",
+      "size": 16957
     },
     {
       "path": "TECHNICAL.md",
@@ -56,7 +56,7 @@
     },
     {
       "path": "USAGE.md",
-      "sha256": "5691b4ddb8b30513eeb965f136c9c74d75c97627a9c0114caec46c9e61685ba0",
+      "sha256": "62dc12850e10c978f6efd722c8e8c04ec9757addf45c46eddd1a99987452c3a6",
       "size": 3860
     },
     {
@@ -81,8 +81,8 @@
     },
     {
       "path": "docs/azure-bulk-fax-deployment.md",
-      "sha256": "7f4dda007d06f07b440d68e5f9c54c36776eca0cddefbe3a6f1cf0a4b34838bb",
-      "size": 56276
+      "sha256": "d95e28a6eaa954c99c6e48f2b2403ef31caa88b9684fe3e6493cc8c17aa53b57",
+      "size": 56274
     },
     {
       "path": "docs/business-user-extraction-workflow.md",
@@ -126,8 +126,8 @@
     },
     {
       "path": "docs/complete-user-guide.md",
-      "sha256": "5713b8ff703adfac97e961e81e77902814b5857f16985382a2c2499b37fca484",
-      "size": 58900
+      "sha256": "aad3500868b18b196f64b16e94a10110eb6b9b88b9c4f313aaac9d0e43da8acf",
+      "size": 58898
     },
     {
       "path": "docs/extraction-quality-research.md",
@@ -166,8 +166,8 @@
     },
     {
       "path": "docs/local-paddleocr-vl.md",
-      "sha256": "db780a314555c73d540cd88853db6058c8c06a3985d30f58199399a730fad127",
-      "size": 5871
+      "sha256": "2d30ab111d67e6dfb1dc5fe01718b811136fcaa3ef6800d4453f78a416577b93",
+      "size": 5868
     },
     {
       "path": "docs/native-document-ingestion.html",
@@ -191,8 +191,8 @@
     },
     {
       "path": "docs/run.md",
-      "sha256": "dd4a9269ff54c95b2b136f93f78fd3a32c2d10c554655dda57b52d0e72b56f22",
-      "size": 5435
+      "sha256": "0eee789336edf2faa234546d882c38b3a0d63a7a8df4aa8550d69de565a1228e",
+      "size": 5434
     },
     {
       "path": "docs/spec.md",
@@ -201,13 +201,13 @@
     },
     {
       "path": "docs/tutorial.md",
-      "sha256": "bec2811e16668b68014849d19596e37b9485096f0bcdaaf76c8318d449b4022f",
+      "sha256": "8ad4904bd77518eaa6a194caf4572a480b8568e9d78c352b3e5d8b1019ac26c7",
       "size": 2588
     },
     {
       "path": "docs/zero-to-hero-tutorial.md",
-      "sha256": "262eae8572a50644372a71e207b6f9397170ae2763682e5636a66edc35a17cc7",
-      "size": 55945
+      "sha256": "142d9871ef77eb2c5c38b13e33e7022fc8aa2ad9021037eb94e6d53b9b400365",
+      "size": 55940
     },
     {
       "path": "presentations/grounded-docparse-business.pptx",

@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-dde17504a128",
-    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
+    "id": "content-6684c0091b62",
+    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T14:51:39.699041+00:00",
+  "generated_at": "2026-08-12T16:46:34.603348+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
       "path": "Launch-GLM-OCR.cmd",
-      "sha256": "351d531b6f5fadbf2c88533cec149230edb509a2075b0419a6152d21b734a1b1",
-      "size": 1668
+      "sha256": "e44d3bee61cd07d0de4722a7082048dc206502ec0928b5ffca6bb6b57e73a014",
+      "size": 1667
     },
     {
       "path": "Launch-PaddleOCR-VL-1.6.cmd",
-      "sha256": "56665f8954f0e46411a2bcb181625c598a58d263d952be39bb64be16aefff96d",
-      "size": 1715
+      "sha256": "caa40ebb337ea5192ddd0f8a9115360b77a6809e5c91760522afb472f25e0910",
+      "size": 1714
     },
     {
       "path": "Setup-GLM-OCR.cmd",
@@ -31,8 +31,8 @@
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "00443302fd1f6d3d9fa5726e84b919bd8a23b7487d4c5a873848fcadd622f4c2",
-      "size": 16171
+      "sha256": "1076797c17a601243113d57b933e2d9d14e563b57ed2c13797fce562356bb892",
+      "size": 16170
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -91,13 +91,13 @@
     },
     {
       "path": "scripts/wsl/launch-stack.sh",
-      "sha256": "c10fd486e35404c4d7f5f8e4ae9c33df704fbbb3d0d73d881c1637777cdd52e6",
-      "size": 4285
+      "sha256": "87d4679044cf5ab6de49993f180900c048b84f8134df1be2c805083b66d9fde9",
+      "size": 5706
     },
     {
       "path": "scripts/wsl/manage-ocr-stack.sh",
-      "sha256": "497869104743165dbad77f2f9cdeaae3fa68877252e7e2904e0fadb3698a6e5a",
-      "size": 11091
+      "sha256": "681b1f5ebfe389c199d0d9000f75a6ca611b50bc0e104f5ab4b4a80fa68af236",
+      "size": 11579
     },
     {
       "path": "scripts/wsl/prepare_glmocr_runtime.py",
@@ -138,6 +138,11 @@
       "path": "scripts/wsl/setup-paddleocr.sh",
       "sha256": "040e72fa99634450daaaf3a003ac175a078404fd343305a4cb7e4e5eaf8ba6aa",
       "size": 2503
+    },
+    {
+      "path": "scripts/wsl/stop-stack.sh",
+      "sha256": "a14ef2770c48fe0db1317bfae3301149251a6aea2ce68275ff17f80d37babff8",
+      "size": 1861
     }
   ]
 }

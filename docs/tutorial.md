@@ -1,6 +1,6 @@
 # Tutorial
 
-1. Complete [setup](../SETUP.md) and open <http://localhost:8501>.
+1. Complete [setup](../SETUP.md) and open <http://localhost:8600>.
 2. Optionally set `OPENAI_API_KEY` in the Windows user environment before launch. The Windows launcher refreshes it and optional `OPENAI_BASE_URL` from user scope each time.
 3. Upload a supported PDF, Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, EPUB, or image file. Each file has its own required **Processing type** selection.
 4. Select **Native PDF**, **Scanned PDF**, or **Mixed PDF** for a PDF; select the matching Word, PowerPoint, Excel, CSV, Image, or Other Native type for every other file. The app validates the choice and blocks mismatches.

@@ -326,7 +326,7 @@ function Invoke-Provision {
         $script:Progress.Style = 'Continuous'
         $script:Progress.Value = 100
         Set-Step 'Installation complete. Opening Grounded DocParse...'
-        Start-Process 'http://localhost:8501'
+        Start-Process 'http://localhost:8600'
         [System.Windows.Forms.MessageBox]::Show('Grounded DocParse is installed and ready.', 'Setup complete') | Out-Null
     } catch {
         Write-InstallLog "ERROR: $($_.Exception.Message)"

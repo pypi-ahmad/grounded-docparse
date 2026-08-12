@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-12
+
 ### Added
 
 - Manual native-document ingestion through the Streamlit app, Python API, and `grounded-docparse ingest` CLI. Every file now has an explicit compatible processing type; incompatible selections, missing batch assignments, and incomplete Mixed PDF page routes are rejected instead of silently rerouted.
@@ -22,6 +24,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Moved the managed Streamlit UI from loopback port `8501` to `8600`.
 - Made Luna recovery scale from eight to 64 prioritized crops with document length while retaining the three-per-page guard.
 - Kept local GLM form recovery independent from the Luna crop budget and standardized every Luna request on medium reasoning effort.
 - Generalized evidence ownership and recovery quality gates across GLM-OCR and PaddleOCR-VL-1.6.

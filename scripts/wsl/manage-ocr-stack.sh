@@ -20,12 +20,16 @@ flock 9
 
 action="${1:-ensure}"
 engine="${2:-${DOCPARSE_START_ENGINE:-glm-ocr}}"
-if [[ "$action" != "ensure" ]]; then
-  echo "ERROR: Usage: manage-ocr-stack.sh ensure {glm-ocr|paddleocr-vl-1.6}" >&2
+if [[ "$action" != "ensure" && "$action" != "stop" ]]; then
+  echo "ERROR: Usage: manage-ocr-stack.sh ensure {glm-ocr|paddleocr-vl-1.6} | stop all" >&2
   exit 2
 fi
-if [[ "$engine" != "glm-ocr" && "$engine" != "paddleocr-vl-1.6" ]]; then
+if [[ "$action" == "ensure" && "$engine" != "glm-ocr" && "$engine" != "paddleocr-vl-1.6" ]]; then
   echo "ERROR: Unsupported OCR engine: $engine" >&2
+  exit 2
+fi
+if [[ "$action" == "stop" && "$engine" != "all" ]]; then
+  echo "ERROR: Usage: manage-ocr-stack.sh stop all" >&2
   exit 2
 fi
 for port in "$PADDLE_VLLM_PORT" "$PADDLE_API_PORT"; do
@@ -39,12 +43,18 @@ if [[ "$PADDLE_VLLM_PORT" == "$PADDLE_API_PORT" ]]; then
   exit 2
 fi
 
+process_is_running() {
+  local pid="$1"
+  [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] || return 1
+  [[ "$(awk '{print $3}' "/proc/$pid/stat")" != "Z" ]] || return 1
+  kill -0 "$pid" 2>/dev/null
+}
+
 pid_matches() {
   local pid_file="$1" expected="$2" pid
   [[ -f "$pid_file" ]] || return 1
   pid="$(<"$pid_file")"
-  [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] || return 1
-  [[ "$(awk '{print $3}' "/proc/$pid/stat")" != "Z" ]] || return 1
+  process_is_running "$pid" || return 1
   tr '\0' ' ' <"/proc/$pid/cmdline" | grep -Fq "$expected"
 }
 
@@ -66,7 +76,7 @@ stop_managed() {
   [[ -f "$pid_file" ]] || return 0
   if ! pid_matches "$pid_file" "$expected"; then
     pid="$(<"$pid_file")"
-    if [[ "$pid" =~ ^[0-9]+$ ]] && kill -0 "$pid" 2>/dev/null; then
+    if process_is_running "$pid"; then
       echo "ERROR: Refusing to stop $label: PID $pid is not the managed command." >&2
       return 1
     fi
@@ -76,7 +86,7 @@ stop_managed() {
   pid="$(<"$pid_file")"
   kill "$pid"
   for ((attempt = 1; attempt <= 30; attempt++)); do
-    kill -0 "$pid" 2>/dev/null || { rm -f "$pid_file"; return 0; }
+    process_is_running "$pid" || { rm -f "$pid_file"; return 0; }
     sleep 1
   done
   echo "ERROR: Managed $label process $pid did not stop within 30 seconds." >&2
@@ -247,6 +257,17 @@ ensure_paddle() {
     "$PADDLE_ENV/bin/python" scripts/wsl/check-paddleocr-api.py || return 1
   printf '%s\n' "paddleocr-vl-1.6" >"$ACTIVE_FILE"
 }
+
+if [[ "$action" == "stop" ]]; then
+  status=0
+  stop_glm || status=1
+  stop_paddle || status=1
+  rm -f "$ACTIVE_FILE"
+  if [[ "$status" -eq 0 ]]; then
+    echo "All managed OCR services stopped."
+  fi
+  exit "$status"
+fi
 
 previous=""
 [[ -f "$ACTIVE_FILE" ]] && previous="$(<"$ACTIVE_FILE")"

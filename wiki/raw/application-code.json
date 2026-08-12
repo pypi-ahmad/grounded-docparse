@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-dde17504a128",
-    "base_commit": "4322ef517968f022463d8d98c0f83fd6f958046a",
+    "id": "content-6684c0091b62",
+    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
     "branch": "native-document-ingestion",
     "dirty": true
   },
-  "generated_at": "2026-08-12T14:51:39.699041+00:00",
+  "generated_at": "2026-08-12T16:46:34.603348+00:00",
   "category": "application-code",
   "files": [
     {
@@ -41,8 +41,8 @@
     },
     {
       "path": "src/grounded_docparse/docling_native.py",
-      "sha256": "fcc76c0eab46dddf1af6b191ad2c470f1ea7797d075ac8bf1c254ad11bee0aa8",
-      "size": 24504
+      "sha256": "ca71d949ad261d672920ae28806ff24798dd14a1cabed354ad4615d96122a819",
+      "size": 25437
     },
     {
       "path": "src/grounded_docparse/enhancement.py",
@@ -135,6 +135,11 @@
       "size": 8754
     },
     {
+      "path": "src/grounded_docparse/runtime_control.py",
+      "sha256": "c0d5b6daa07ff448ca533bcb0fd4f36cb590da4ac4b1f98a4be988fc87320e5b",
+      "size": 1119
+    },
+    {
       "path": "src/grounded_docparse/schema_store.py",
       "sha256": "abeb6ea7b83d4014d91f14e9f16b3c812117b7c4058d3123b1292b5cd842be5b",
       "size": 15850
@@ -151,8 +156,8 @@
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "dc04715ca8b7b4f46baf75e1cb266982ae23df268893cb16c5f2a7c776934bf5",
-      "size": 125805
+      "sha256": "69a20742c0045f005e69a4234c5bd816c9bc65abee2824cbf6bbdf044bf745ea",
+      "size": 129579
     }
   ]
 }

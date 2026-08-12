@@ -55,6 +55,17 @@ def _pptx() -> bytes:
     return stream.getvalue()
 
 
+def _multi_paragraph_pptx() -> bytes:
+    presentation = Presentation()
+    slide = presentation.slides.add_slide(presentation.slide_layouts[5])
+    title = slide.shapes.title.text_frame
+    title.paragraphs[0].text = "Grounded DocParse"
+    title.add_paragraph().text = "GitHub Overview"
+    stream = BytesIO()
+    presentation.save(stream)
+    return stream.getvalue()
+
+
 def _xlsx() -> bytes:
     workbook = Workbook()
     sheet = workbook.active
@@ -161,6 +172,27 @@ def test_pptx_maps_text_to_slide_and_shape_id() -> None:
     assert result.document.units[0].kind == "slide"
     assert anchor.unit_id == "slide-1"
     assert anchor.path.startswith("/ppt/slides/slide[1]/shape[id=")
+
+
+def test_pptx_maps_each_shape_paragraph_to_its_exact_source_path() -> None:
+    result = _parse(
+        _multi_paragraph_pptx(),
+        "fixture.pptx",
+        SourceFormat.PPTX,
+        ProcessingType.POWERPOINT,
+    )
+
+    elements = {
+        item.text: item
+        for item in result.document.elements
+        if item.text in {"Grounded DocParse", "GitHub Overview"}
+    }
+    assert set(elements) == {"Grounded DocParse", "GitHub Overview"}
+    first_path = elements["Grounded DocParse"].source.anchor.path
+    second_path = elements["GitHub Overview"].source.anchor.path
+    assert first_path.endswith("/paragraph[1]")
+    assert second_path.endswith("/paragraph[2]")
+    assert first_path.rsplit("/paragraph", 1)[0] == second_path.rsplit("/paragraph", 1)[0]
 
 
 def test_xlsx_preserves_formula_and_maps_each_cell() -> None:

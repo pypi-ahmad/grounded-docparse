@@ -7,7 +7,7 @@ prefix the title with `Conduct report`, and follow
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Security reports are handled under
 this policy; conduct reports are handled under the code of conduct.
 
-The application is intended for a trusted local workstation and has no multi-user authentication or tenant isolation. The launch scripts bind Streamlit and OCR services to `127.0.0.1`; do not override that boundary or expose ports `8501`, `8080`, `8118`, or `8119` to an untrusted network.
+The application is intended for a trusted local workstation and has no multi-user authentication or tenant isolation. The launch scripts bind Streamlit and OCR services to `127.0.0.1`; do not override that boundary or expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.
 
 Keep `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in environment variables. A custom base URL receives the same crop images and document context that would otherwise go to OpenAI; trust the destination host shown in the UI before use. Never commit `.env`, `.docparse/`, source documents, or result bundles. Uploaded documents, model output, filenames, schemas, and PDFs are untrusted inputs.
 

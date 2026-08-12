@@ -35,7 +35,7 @@ The setup assistant:
 3. reuses the Ubuntu user or securely creates one without persisting its password;
 4. installs only missing or stale locked local-OCR and native-document dependencies;
 5. tries NVIDIA CUDA, otherwise installs Ollama `glm-ocr:bf16`; supported AMD GPUs accelerate Ollama and unsupported GPUs use CPU;
-6. validates a real image request, starts Streamlit, and opens <http://localhost:8501>.
+6. validates a real image request, starts Streamlit, and opens <http://localhost:8600>.
 
 Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
 
@@ -113,7 +113,7 @@ bash scripts/wsl/serve-ollama.sh
 ```
 
 ```bash
-# Terminal 2: Streamlit on port 8501
+# Terminal 2: Streamlit on port 8600
 bash scripts/wsl/run-app.sh
 ```
 
@@ -151,7 +151,7 @@ GLM parsing does not require an OpenAI credential. Set user-level values only wh
 .\Launch-GLM-OCR.cmd
 ```
 
-The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8501` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
+The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8600` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
 
 ## Configuration reference
 
@@ -227,7 +227,7 @@ Check the services:
 source ~/.local/share/grounded-docparse/.venv/bin/activate
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python scripts/wsl/prepare_glmocr_runtime.py --offline
 python scripts/wsl/check-glmocr-api.py
-curl --fail --silent http://127.0.0.1:8501/_stcore/health
+curl --fail --silent http://127.0.0.1:8600/_stcore/health
 ```
 
 Reproduce the warm page benchmark without Luna or model-load time:
@@ -254,7 +254,7 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 | `nvidia-smi` fails inside WSL | Update the Windows NVIDIA driver and WSL; do not install a separate Linux display driver inside WSL |
 | vLLM runs out of memory | Stop competing GPU processes and inspect `.runtime/vllm.log`; do not lower the 32768 context while `page_loader.max_tokens` remains 8192 |
 | `/v1/models` works but recognition fails | Run `scripts/wsl/check-glmocr-api.py`; `launch-stack.sh` automatically restarts a managed server that fails this inference check |
-| Port `8080` or `8501` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
+| Port `8080` or `8600` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
 | Port `8118` or `8119` is occupied | Stop the unrelated listener; Paddle services are never adopted when ownership cannot be verified |
 | Paddle startup fails | Inspect `.runtime/paddle-vllm.log` and `.runtime/paddle-api.log`; confirm NVIDIA compute capability 8.0+ and CUDA 12.6+ |
 | GLM-OCR import fails | Rerun `scripts/wsl/setup-glmocr.sh`; do not use the native Windows environment for local OCR |

@@ -119,7 +119,7 @@ For later sessions:
 .\Launch-GLM-OCR.cmd
 ```
 
-The application normally opens at <http://localhost:8501>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
+The application normally opens at <http://localhost:8600>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
@@ -1144,7 +1144,7 @@ Normal parsing removes temporary parser storage, but abnormal termination and st
 
 ### 18.4 Local-workstation boundary
 
-The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `8501` or `8080` to an untrusted network.
+The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `8600` or `8080` to an untrusted network.
 
 The application has no multi-user login or tenant isolation. It must not be published unchanged as a shared PHI or confidential-document service.
 

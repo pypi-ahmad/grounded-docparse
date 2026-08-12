@@ -32,7 +32,7 @@ set "WSLENV=%DOCPARSE_OLD_WSLENV%"
 
 if not "%DOCPARSE_EXIT%"=="0" goto :failed
 
-start "" "http://localhost:8501"
+start "" "http://localhost:8600"
 echo.
 echo PaddleOCR-VL-1.6 is ready. This window can be closed.
 ping 127.0.0.1 -n 4 >nul

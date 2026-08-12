@@ -1,7 +1,7 @@
 ---
 tags: streamlit, ui, workflow
 sources: streamlit_app.py, src/grounded_docparse/native.py
-snapshot: content-dde17504a128
+snapshot: content-6684c0091b62
 status: feature-branch
 ---
 

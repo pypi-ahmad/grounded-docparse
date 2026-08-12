@@ -24,12 +24,56 @@ def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
     assert "GetEnvironmentVariable('OPENAI_BASE_URL', 'User')" in installer
 
 
+def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
+    launchers = [
+        (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8"),
+        (ROOT / "Launch-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8"),
+    ]
+    stack = (ROOT / "scripts" / "wsl" / "launch-stack.sh").read_text(
+        encoding="utf-8"
+    )
+    config = (ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8")
+    installer = (
+        ROOT / "installer" / "Install-GroundedDocParse.ps1"
+    ).read_text(encoding="utf-8")
+
+    assert all("http://localhost:8600" in launcher for launcher in launchers)
+    assert "STREAMLIT_PORT=8600" in stack
+    assert '--server.port "$STREAMLIT_PORT"' in stack
+    assert "streamlit_uses_configured_port()" in stack
+    assert "port = 8600" in config
+    assert "http://localhost:8600" in installer
+
+
 def test_wsl_launcher_restarts_streamlit_on_luna_environment_drift() -> None:
     launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
 
     assert "streamlit_environment_matches" in launcher
     assert 'OPENAI_API_KEY' in launcher
     assert 'OPENAI_BASE_URL' in launcher
+
+
+def test_wsl_launcher_restarts_streamlit_on_application_source_drift() -> None:
+    launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
+
+    assert "streamlit_source_fingerprint" in launcher
+    assert "DOCPARSE_SOURCE_FINGERPRINT" in launcher
+    assert '"$PROJECT_ROOT/streamlit_app.py"' in launcher
+    assert '"$PROJECT_ROOT/src/grounded_docparse"' in launcher
+    assert '"$PROJECT_ROOT/uv.lock"' in launcher
+    assert 'process_is_running "$pid"' in launcher
+
+
+def test_managed_stack_has_a_safe_stop_all_command() -> None:
+    manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
+    stopper = (ROOT / "scripts/wsl/stop-stack.sh").read_text(encoding="utf-8")
+
+    assert 'manage-ocr-stack.sh" stop all' in stopper
+    assert '"streamlit run streamlit_app.py"' in stopper
+    assert 'readlink -f "/proc/$pid/cwd"' in stopper
+    assert '[[ "$action" == "stop"' in manager
+    assert "stop_glm" in manager
+    assert "stop_paddle" in manager
 
 
 def test_wsl_services_bind_to_loopback() -> None:
@@ -115,7 +159,10 @@ def test_detached_services_do_not_inherit_launcher_locks() -> None:
 
     assert manager.count("9>&-") == 4
     assert "manage-ocr-stack.sh ensure \"$START_ENGINE\" 8>&-" in launcher
-    assert "run-app.sh --server.headless true 8>&-" in launcher
+    assert (
+        'run-app.sh --server.headless true --server.port "$STREAMLIT_PORT" 8>&-'
+        in launcher
+    )
 
 
 def test_paddle_readiness_probe_generates_its_png() -> None:
@@ -131,9 +178,9 @@ def test_primary_launcher_defaults_to_glm_but_supports_runtime_switching() -> No
 
     assert "DOCPARSE_START_ENGINE=glm-ocr" in launcher
     assert "manage-ocr-stack.sh" in stack
-    assert stack.index("Stopping Streamlit before switching OCR engines") < stack.index(
-        "manage-ocr-stack.sh"
-    )
+    assert stack.index(
+        "Stopping Streamlit before applying runtime configuration"
+    ) < stack.index("manage-ocr-stack.sh")
     run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
     assert run_app.index("export DOCPARSE_GLMOCR_CONFIG_PATH") < run_app.index(
         'if [[ "$DOCPARSE_OCR_ENGINE" == "glm-ocr" ]]'

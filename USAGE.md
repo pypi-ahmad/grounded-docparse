@@ -29,7 +29,7 @@ Choose one launcher from the repository root:
 ```
 
 The launcher starts the selected local OCR stack and Streamlit, then opens
-<http://localhost:8501>. Both launchers use the same application; the selected
+<http://localhost:8600>. Both launchers use the same application; the selected
 OCR engine changes only scanned-PDF and image processing.
 
 ## Process a document
@@ -92,4 +92,4 @@ models.
 - PaddleOCR-VL runtime: [docs/local-paddleocr-vl.md](docs/local-paddleocr-vl.md)
 - Full UI and workflow help: [docs/complete-user-guide.md](docs/complete-user-guide.md)
 
-Do not expose ports `8501`, `8080`, `8118`, or `8119` to an untrusted network.
+Do not expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.

@@ -134,7 +134,7 @@ The supported local topology is deliberately small:
 
 ```text
 Browser
-  -> Streamlit studio on 127.0.0.1:8501
+  -> Streamlit studio on 127.0.0.1:8600
        -> ingest and rasterization
        -> GLM-OCR SDK
             -> local vLLM service on 127.0.0.1:8080
@@ -219,7 +219,7 @@ The setup process:
 5. writes the resolved runtime configuration under `.runtime/`;
 6. starts local vLLM and Streamlit;
 7. validates a real image-recognition request; and
-8. opens <http://localhost:8501>.
+8. opens <http://localhost:8600>.
 
 Later sessions default to GLM-OCR:
 
@@ -254,7 +254,7 @@ Both managed services bind to loopback. Do not override that boundary on an untr
 
 ## 6. Your first successful parse
 
-Open <http://localhost:8501>, then follow this minimal path:
+Open <http://localhost:8600>, then follow this minimal path:
 
 1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
 2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
@@ -1156,7 +1156,7 @@ Requests use `store=False`. This application setting does not replace contractua
 
 ### 17.3 Keep local services local
 
-The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `8501` or `8080` to an untrusted network.
+The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `8600` or `8080` to an untrusted network.
 
 ### 17.4 Know the residual data
 
@@ -1260,7 +1260,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8501>; inspect `.runtime/streamlit.log` |
+| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8600>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
 | Luna controls are disabled | `OPENAI_API_KEY` unavailable to Streamlit | Save it in Windows user scope and rerun `Launch-GLM-OCR.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |

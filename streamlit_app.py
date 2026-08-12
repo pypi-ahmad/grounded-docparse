@@ -13,7 +13,7 @@ import pymupdf
 import streamlit as st
 from PIL import Image, ImageSequence
 
-from grounded_docparse import pipeline
+from grounded_docparse import pipeline, runtime_control
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import (
     BatchArchiveEntry,
@@ -130,6 +130,38 @@ LUNA_REVIEW_WARNING = (
     "Luna output may be incorrect or influenced by instructions inside the document. "
     "Review confidence and cited source regions before consequential use."
 )
+HTML_PREVIEW_STYLES = """
+<style>
+.st-key-grounded-html-preview-native,
+.st-key-grounded-html-preview-ocr {
+    background: #ffffff;
+    color: #111827;
+    padding: clamp(1rem, 3vw, 2.5rem);
+}
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"],
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"],
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"] *,
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"] * {
+    color: #111827;
+}
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"] a,
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"] a {
+    color: #1d4ed8;
+}
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"] pre,
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"] pre,
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"] code,
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"] code {
+    background: #f3f4f6;
+}
+.st-key-grounded-html-preview-native [data-testid="stMarkdownContainer"] table,
+.st-key-grounded-html-preview-ocr [data-testid="stMarkdownContainer"] table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+</style>
+"""
 LUNA_INPUT_USD_PER_MILLION = 0.20
 LUNA_CACHED_INPUT_USD_PER_MILLION = 0.02
 LUNA_OUTPUT_USD_PER_MILLION = 1.20
@@ -371,6 +403,41 @@ def ensure_ocr_engine(engine: OcrEngine) -> None:
         raise RuntimeError(f"Could not start {engine.label}: {detail}")
 
 
+def request_managed_shutdown() -> None:
+    try:
+        runtime_control.schedule_managed_shutdown()
+    except RuntimeError as exc:
+        st.session_state.shutdown_error = str(exc)
+    else:
+        st.session_state.pop("shutdown_error", None)
+        st.session_state.shutdown_requested = True
+
+
+@st.dialog(
+    "Stop app and background services",
+    icon=":material/power_settings_new:",
+)
+def confirm_managed_shutdown() -> None:
+    if st.session_state.get("shutdown_requested"):
+        st.info("Stopping Grounded DocParse. You can close this browser tab.")
+        return
+    if st.session_state.get("shutdown_error"):
+        st.error(st.session_state.shutdown_error)
+    st.warning(
+        "This stops Streamlit and all GLM-OCR, PaddleOCR, vLLM, and Ollama "
+        "processes managed by this project."
+    )
+    st.caption("Saved workspace data is kept. Use either Windows launcher to restart.")
+    st.button(
+        "Stop now",
+        key="confirm-managed-shutdown",
+        type="primary",
+        icon=":material/power_settings_new:",
+        width="stretch",
+        on_click=request_managed_shutdown,
+    )
+
+
 @st.cache_data(max_entries=32)
 def pdf_page_count(data: bytes) -> int:
     with pymupdf.open(stream=data, filetype="pdf") as document:
@@ -469,6 +536,19 @@ def stage_markdown(active: str | None, completed: set[str]) -> str:
         marker = "✓" if key in completed else "→" if key == active else "○"
         lines.append(f"{marker} {label}")
     return "  \n".join(lines)
+
+
+def render_grounded_html_preview(markdown: str, *, key: str) -> None:
+    st.html(HTML_PREVIEW_STYLES)
+    st.caption(
+        "This HTML view renders grounded document content as a reflowed webpage "
+        "for manual comparison; it is not a pixel-perfect copy of the original."
+    )
+    with st.container(key=key, border=True):
+        st.markdown(
+            sanitize_markdown_preview(markdown),
+            unsafe_allow_html=True,
+        )
 
 
 def flattened_blocks(blocks, depth: int = 0):
@@ -1647,6 +1727,21 @@ with st.sidebar:
             {key for key, _label in STAGE_LABELS} if cached_result_matches else set(),
         )
     )
+    st.divider()
+    managed_shutdown = runtime_control.managed_shutdown_available()
+    if st.button(
+        "Stop app",
+        key="stop-managed-app",
+        icon=":material/power_settings_new:",
+        disabled=not managed_shutdown,
+        help=(
+            "Stop this app and its managed background services."
+            if managed_shutdown
+            else "Available when the app is started with a Windows launcher."
+        ),
+        width="stretch",
+    ):
+        confirm_managed_shutdown()
 
 if parse_clicked and batch_documents:
     save_active_workspace()
@@ -2041,7 +2136,7 @@ has_native_result = (
 )
 if has_native_result:
     header_status_slot.markdown("Status: :green[● **Complete**]")
-    native_tab_labels = ["Overview", "Markdown"]
+    native_tab_labels = ["Overview", "Markdown", "HTML View"]
     if result.annotated_pdf is not None:
         native_tab_labels.append("Annotated PDF")
     native_tab_labels.extend(["Extract", "JSON", "Source Structure"])
@@ -2068,6 +2163,11 @@ if has_native_result:
             st.warning(warning)
     with native_tab_by_name["Markdown"]:
         st.markdown(result.markdown)
+    with native_tab_by_name["HTML View"]:
+        render_grounded_html_preview(
+            result.markdown,
+            key="grounded-html-preview-native",
+        )
     if "Annotated PDF" in native_tab_by_name:
         with native_tab_by_name["Annotated PDF"]:
             st.pdf(result.annotated_pdf, height=900)
@@ -2217,7 +2317,7 @@ elif active_document is not None:
             f"{active_document.display_name} failed: {active_workspace['error']}"
         )
 
-tab_labels = ["Overview", "Markdown", "Annotated PDF"]
+tab_labels = ["Overview", "Markdown", "HTML View", "Annotated PDF"]
 if has_result:
     tab_labels.append("Extract")
 if enable_chat:
@@ -2380,6 +2480,14 @@ else:
                     sanitize_markdown_preview(result.markdown),
                     unsafe_allow_html=True,
                 )
+
+    html_tab = tab_by_name["HTML View"]
+    if html_tab.open:
+        with html_tab:
+            render_grounded_html_preview(
+                result.base_markdown or result.markdown,
+                key="grounded-html-preview-ocr",
+            )
 
     annotated_tab = tab_by_name["Annotated PDF"]
     if annotated_tab.open:

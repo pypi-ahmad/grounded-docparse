@@ -212,15 +212,39 @@ def _pptx(data: bytes) -> SourceManifest:
                 table_node = next(
                     (part for part in node.iter() if _local(part.tag) == "tbl"), None
                 )
-                value = _text(table_node if table_node is not None else node)
-                if value:
+                if table_node is not None:
+                    value = _text(table_node)
+                    if not value:
+                        continue
                     records.append(
                         SourceRecord(
                             value,
-                            "table" if table_node is not None else "text",
+                            "table",
                             StructuralSourceAnchor(
                                 unit_id=unit.id,
                                 path=f"/ppt/slides/slide[{slide_index}]/shape[id={shape_id}]",
+                            ),
+                        )
+                    )
+                    continue
+                paragraph_index = 0
+                for paragraph_node in (
+                    part for part in node.iter() if _local(part.tag) == "p"
+                ):
+                    paragraph_index += 1
+                    value = _text(paragraph_node)
+                    if not value:
+                        continue
+                    records.append(
+                        SourceRecord(
+                            value,
+                            "text",
+                            StructuralSourceAnchor(
+                                unit_id=unit.id,
+                                path=(
+                                    f"/ppt/slides/slide[{slide_index}]"
+                                    f"/shape[id={shape_id}]/paragraph[{paragraph_index}]"
+                                ),
                             ),
                         )
                     )
