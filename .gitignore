@@ -17,7 +17,6 @@ output/
 outputs/
 data/
 artifacts/
-*.pdf
 .ruff_cache/
 .claude/
 .codex/
