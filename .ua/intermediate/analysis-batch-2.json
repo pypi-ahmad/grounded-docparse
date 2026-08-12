@@ -1,0 +1,243 @@
+{
+  "nodes": [
+    {
+      "id": "entity:pdf-inspector",
+      "type": "entity",
+      "name": "PDF Inspector",
+      "summary": "Native PDF inspection tool used to extract selectable text, layout, tables, and page positions without OCR.",
+      "tags": [
+        "entity",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:docling",
+      "type": "entity",
+      "name": "Docling",
+      "summary": "Document conversion tool used with OCR, VLM, and model enrichments disabled.",
+      "tags": [
+        "entity",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:langextract",
+      "type": "entity",
+      "name": "LangExtract",
+      "summary": "Extraction component whose returned values require valid character intervals and exact source-text matches.",
+      "tags": [
+        "entity",
+        "grounding-and-extraction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:glm-ocr",
+      "type": "entity",
+      "name": "GLM-OCR",
+      "summary": "Existing local OCR engine that owns recognized layout and geometry for scanned documents.",
+      "tags": [
+        "entity",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:paddleocr-vl",
+      "type": "entity",
+      "name": "PaddleOCR-VL",
+      "summary": "Existing local OCR engine that owns recognized layout and geometry for scanned documents.",
+      "tags": [
+        "entity",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:streamlit",
+      "type": "entity",
+      "name": "Streamlit",
+      "summary": "Application framework providing per-file processing selection and Mixed-PDF route review.",
+      "tags": [
+        "entity",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:streamlit-workflow:per-file-selection-required",
+      "type": "claim",
+      "name": "Every upload requires an explicit processing selection",
+      "summary": "The UI requires a processing type for each uploaded file and accepts it only after file validation.",
+      "tags": [
+        "claim",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:workspace-persistence-and-exports:offsets-preserved-on-reload",
+      "type": "claim",
+      "name": "Persistence preserves evidence identity",
+      "summary": "Reloading native results must preserve character offsets and evidence identity instead of reconstructing them from Markdown.",
+      "tags": [
+        "claim",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:docling-native-conversion:non-ocr-conversion-only",
+      "type": "claim",
+      "name": "Docling conversion is non-OCR",
+      "summary": "Docling OCR, VLM processing, and model enrichments are disabled so converted text remains traceable to source structure.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:mixed-pdf-pipeline:reviewed-page-routes-no-fallback",
+      "type": "claim",
+      "name": "Mixed-PDF routing is reviewed and fail-closed",
+      "summary": "Users confirm or override each suggested page route, results retain original page order, and no silent route fallback occurs.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+      "type": "claim",
+      "name": "Unusable native pages require Mixed PDF",
+      "summary": "Native PDF processing stops and recommends Mixed PDF when inspection finds pages that cannot serve as native evidence.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:ocr-quality-and-recovery:recovery-cannot-alter-structure",
+      "type": "claim",
+      "name": "OCR recovery cannot alter document structure",
+      "summary": "Visual recovery may replace text within existing elements but cannot create, delete, reorder, or re-geometry elements.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:office-and-native-formats:structure-becomes-evidence",
+      "type": "claim",
+      "name": "Native structure becomes source evidence",
+      "summary": "Validated native formats map paragraphs, shapes, cells, tables, rows, and columns to source units and anchors; embedded media is recorded but not OCRed.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:grounding-and-evidence-contract:exact-evidence-required",
+      "type": "claim",
+      "name": "Accepted native values require exact evidence",
+      "summary": "A value is accepted only with a valid interval, exact source-text match, complete span coverage, and a resolvable anchor.",
+      "tags": [
+        "claim",
+        "product-and-principles"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:processing-types-and-manual-routing:selection-is-authoritative",
+      "type": "claim",
+      "name": "User selection controls exactly one pipeline",
+      "summary": "Each validated file selection reaches one top-level pipeline with no automatic reinterpretation after validation fails.",
+      "tags": [
+        "claim",
+        "product-and-principles"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "claim:streamlit-workflow:per-file-selection-required",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The Streamlit workflow concretely implements required per-file processing selection."
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "claim:workspace-persistence-and-exports:offsets-preserved-on-reload",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Workspace serialization and restoration exemplify preservation of grounded evidence identity."
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "claim:docling-native-conversion:non-ocr-conversion-only",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The Docling adapter implements the stated non-OCR conversion boundary."
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "claim:mixed-pdf-pipeline:reviewed-page-routes-no-fallback",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The mixed pipeline is the concrete reviewed-routing implementation."
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The native PDF parser enforces the unusable-page stop condition."
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "claim:ocr-quality-and-recovery:recovery-cannot-alter-structure",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The recovery path concretely applies the structural limits."
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "claim:office-and-native-formats:structure-becomes-evidence",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The supported format mapping is the concrete source-structure evidence design."
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "claim:grounding-and-evidence-contract:exact-evidence-required",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The product contract states the acceptance conditions for grounded values."
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "claim:processing-types-and-manual-routing:selection-is-authoritative",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The routing article defines the authoritative selection and single-pipeline behavior."
+    }
+  ]
+}

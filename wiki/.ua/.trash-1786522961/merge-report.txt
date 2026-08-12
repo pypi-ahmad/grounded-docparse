@@ -1,0 +1,4 @@
+[merge] Input: 35 scan nodes, 96 scan edges, 2 analysis batches
+[merge] Added: 7 entities, 18 claims, 32 edges (2 deduped entities, 0 dropped dangling edges)
+[merge] Output: 60 nodes, 128 edges, 6 layers, 5 tour steps
+[merge] Written: D:\AI\Github\grounded-docparse\.worktrees\native-document-ingestion\wiki\.ua\intermediate\assembled-graph.json
