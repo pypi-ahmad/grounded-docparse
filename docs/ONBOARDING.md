@@ -1,6 +1,6 @@
 # Grounded DocParse Onboarding
 
-> **Freshness note:** This guide was generated from the repository knowledge graph at commit `2c95dc4ab71dddfb134b0bb3555103dd5166c6cc`. The working tree contained source and documentation changes, so rerun `/understand` and refresh this guide after those changes are committed or stabilized.
+> **Freshness note:** This guide covers the native-document-ingestion architecture and its companion knowledge wiki. Refresh the structural graph and this guide after material code or documentation changes.
 
 ## Project overview
 
