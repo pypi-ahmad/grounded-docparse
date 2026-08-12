@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Grounded Native Document Ingestion",
+    "subtitle": "Manual routing, isolated OCR, immutable source text, and fail-closed evidence",
+    "animation": "none",
+    "visual_preset": "blueprint",
+    "quality_profile": "showcase",
+    "viewBox": [960, 1320]
+  },
+  "lanes": [
+    { "id": "uploadLane", "label": "Upload" },
+    { "id": "selectionLane", "label": "Manual Selection" },
+    { "id": "validationLane", "label": "Validation" },
+    { "id": "routingLane", "label": "Routing" },
+    { "id": "pipelineLane", "label": "Selected Pipeline" },
+    { "id": "canonicalLane", "label": "Canonical Source" },
+    { "id": "extractLane", "label": "Schema Extraction" },
+    { "id": "evidenceLane", "label": "Evidence Gate" },
+    { "id": "deliveryLane", "label": "Review + Export" }
+  ],
+  "phases": [
+    { "id": "intake", "label": "Manual intake", "fromCol": 0, "toCol": 1 },
+    { "id": "routing", "label": "Validate + route", "fromCol": 2, "toCol": 3, "variant": "security" },
+    { "id": "processing", "label": "Process + ground", "fromCol": 4, "toCol": 5, "variant": "emphasis" }
+  ],
+  "mainPath": [
+    "upload",
+    "selection",
+    "validation",
+    "router",
+    "pipeline",
+    "baseText",
+    "langextract",
+    "evidence",
+    "outputs"
+  ],
+  "nodes": [
+    { "id": "upload", "lane": "uploadLane", "col": 0, "type": "external", "label": "Upload", "sublabel": "PDF + native" },
+    { "id": "selection", "lane": "selectionLane", "col": 0, "type": "frontend", "label": "Select Type", "sublabel": "required / file", "tag": "manual" },
+    { "id": "validation", "lane": "validationLane", "col": 2, "type": "security", "label": "Validate", "sublabel": "sig + container", "tag": "block mismatch" },
+    { "id": "router", "lane": "routingLane", "col": 3, "type": "messagebus", "label": "Route Once", "sublabel": "one route only", "tag": "no fallback" },
+    { "id": "pipeline", "lane": "pipelineLane", "col": 4, "type": "backend", "label": "Pipeline", "sublabel": "selected engine", "tag": "manual mode" },
+    { "id": "baseText", "lane": "canonicalLane", "col": 5, "type": "database", "label": "Base Text", "sublabel": "ordered spans", "tag": "immutable" },
+    { "id": "langextract", "lane": "extractLane", "col": 5, "type": "backend", "label": "LangExtract", "sublabel": "base_text only", "tag": "no OCR" },
+    { "id": "evidence", "lane": "evidenceLane", "col": 5, "type": "security", "label": "Evidence", "sublabel": "exact span", "tag": "anchor required" },
+    { "id": "outputs", "lane": "deliveryLane", "col": 5, "type": "frontend", "label": "Review", "sublabel": "JSON + trace", "tag": "optional PDF" }
+  ],
+  "edges": [
+    { "id": "uploadSelection", "from": "upload", "to": "selection", "role": "main" },
+    { "id": "selectionValidation", "from": "selection", "to": "validation", "role": "main" },
+    { "id": "validationRoute", "from": "validation", "to": "router", "variant": "security", "role": "main" },
+    { "id": "routePipeline", "from": "router", "to": "pipeline", "variant": "emphasis", "role": "main" },
+    { "id": "pipelineBase", "from": "pipeline", "to": "baseText", "role": "main" },
+    { "id": "baseExtract", "from": "baseText", "to": "langextract", "variant": "emphasis", "role": "main" },
+    { "id": "extractEvidence", "from": "langextract", "to": "evidence", "variant": "security", "role": "main" },
+    { "id": "evidenceOutput", "from": "evidence", "to": "outputs", "variant": "emphasis", "role": "main" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Manual Routing",
+      "items": [
+        "Every file requires an independent processing selection",
+        "Signatures and container structures are validated",
+        "Wrong combinations stop; nothing is silently rerouted"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Selected Pipeline",
+      "items": [
+        "PDF Inspector: native PDFs and selected Mixed pages",
+        "GLM/Paddle: scans, images, and selected OCR pages",
+        "Docling: Office, CSV, HTML, EPUB, and OpenDocument"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "OCR Boundary",
+      "items": [
+        "Only the existing GLM/Paddle path performs OCR",
+        "PDF Inspector, Docling, and LangExtract never OCR",
+        "Embedded native images are recorded, not recognized"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Grounding Contract",
+      "items": [
+        "Mixed PDF pages merge in original source order",
+        "LangExtract reads immutable base_text, never Markdown",
+        "Exact intervals must resolve through SourceSpan to SourceAnchor"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fail Closed",
+      "items": [
+        "Unknown extraction classes are rejected",
+        "Missing, fuzzy, mismatched, or partial intervals are rejected",
+        "Every accepted value carries source evidence and trace"
+      ]
+    }
+  ]
+}

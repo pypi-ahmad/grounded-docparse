@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from grounded_docparse.native import (
+    NativeAsset,
     NativeDocument,
     NativeElement,
     NativeParseResult,
@@ -15,6 +16,7 @@ from grounded_docparse.native import (
     SourceSpan,
     SourceUnit,
     StructuralSourceAnchor,
+    TextSourceAnchor,
     render_native_document,
 )
 
@@ -156,3 +158,40 @@ def test_annotated_pdf_is_optional_for_native_results() -> None:
     )
 
     assert result.annotated_pdf is None
+
+
+def test_native_assets_are_non_ocr_metadata_with_grounded_anchors() -> None:
+    document = _document()
+    document.assets.append(
+        NativeAsset(
+            id="asset-1",
+            anchor=PdfSourceAnchor(unit_id="page-1", page=1),
+            media_type="image/png",
+            filename="chart.png",
+            sha256="b" * 64,
+        )
+    )
+
+    payload = json.loads(render_native_document(document, markdown="Public notice").json)
+
+    assert payload["assets"][0]["ocr_performed"] is False
+    assert payload["assets"][0]["anchor"]["page"] == 1
+
+
+def test_text_source_anchor_preserves_exact_line_and_column_range() -> None:
+    anchor = TextSourceAnchor(
+        unit_id="document-1",
+        start_line=2,
+        end_line=3,
+        start_column=1,
+        end_column=8,
+    )
+
+    assert anchor.model_dump(mode="json") == {
+        "kind": "text",
+        "unit_id": "document-1",
+        "start_line": 2,
+        "end_line": 3,
+        "start_column": 1,
+        "end_column": 8,
+    }

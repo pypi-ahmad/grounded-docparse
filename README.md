@@ -103,6 +103,14 @@ Chat is off by default and sends no request until enabled and a question is subm
 
 ## CLI batch parsing
 
+Native ingestion accepts saved schemas with `--schema`. It sends only immutable `base_text` to LangExtract, using `gpt-5.6-luna` at medium reasoning effort. Set `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` in the environment:
+
+```powershell
+grounded-docparse ingest invoice.pdf --processing-type invoice.pdf=native-pdf --schema invoice.schema.json --output output
+```
+
+Only exact source substrings with a `char_interval` resolving through source spans are accepted. Numbers and literal `true`/`false` are parsed deterministically. Raw schemas support nested objects and one array level; nested arrays are rejected.
+
 The installed package provides a synchronous batch command for explicit files or non-recursive directories:
 
 ```powershell

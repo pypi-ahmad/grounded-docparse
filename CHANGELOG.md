@@ -10,6 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Manual native-document ingestion for native, scanned, and mixed PDFs plus office and open formats, with explicit processing routes, page-level mixed review, non-OCR native parsing, immutable source anchors, and fail-closed LangExtract grounding.
 - Opt-in selective local-OCR disagreement checks that audit only uncertain crops, preserve primary OCR output, persist evidence, and flag disagreements for review.
 - Document-type accuracy and confidence calibration, OCR and classification review-rate reporting, JSON regression gates, and an external private calibration/holdout workflow.
 - Selectable PaddleOCR-VL-1.6 local parsing with an isolated locked runtime, Windows launcher, loopback-only PaddleX API, and exclusive GPU service switching.

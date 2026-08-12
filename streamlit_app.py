@@ -35,7 +35,13 @@ from grounded_docparse.models import (
     SchemaField,
     StoredSchema,
 )
-from grounded_docparse.native import NativeParseResult, PageRoute, ProcessingType
+from grounded_docparse.native import (
+    NativeParseResult,
+    PageRoute,
+    ProcessingType,
+    render_native_combined_result,
+)
+from grounded_docparse.native_extraction import LangExtractNativeExtractor
 from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
@@ -220,6 +226,7 @@ DOCUMENT_STATE_KEYS = (
     "agentic_analysis",
     "agentic_source_hash",
     "extraction_result",
+    "native_extraction_result",
     "custom_classification",
     "routed_extraction_result",
     "routing_review_rows",
@@ -241,6 +248,7 @@ def default_document_state() -> dict[str, object]:
         "agentic_analysis": None,
         "agentic_source_hash": None,
         "extraction_result": None,
+        "native_extraction_result": None,
         "custom_classification": None,
         "routed_extraction_result": None,
         "routing_review_rows": None,
@@ -296,6 +304,7 @@ def workspace_settings() -> dict[str, object]:
 
 def reset_extraction_mode_state() -> None:
     st.session_state.extraction_result = None
+    st.session_state.native_extraction_result = None
     st.session_state.custom_classification = None
     st.session_state.routed_extraction_result = None
     st.session_state.routing_review_rows = None
@@ -1090,6 +1099,7 @@ if not st.session_state.get("durable_workspace_loaded"):
                     "parsed_source": item.parsed_source,
                     "agentic_analysis": item.analysis,
                     "agentic_source_hash": item.analysis_key,
+                    "native_extraction_result": item.extraction,
                 },
             }
             for item in durable_workspace.documents
@@ -1836,6 +1846,7 @@ if parse_clicked and batch_documents:
                     st.session_state.selected_element_id = None
                     st.session_state.annotated_page = 1
                     st.session_state.extraction_result = None
+                    st.session_state.native_extraction_result = None
                     st.session_state.chat_history = []
                     st.session_state.prepared_agentic_context = (
                         None
@@ -1927,6 +1938,7 @@ if parse_clicked and batch_documents:
                     parsed_source=st.session_state.parsed_source,
                     result=st.session_state.result,
                     analysis=st.session_state.agentic_analysis,
+                    extraction=st.session_state.get("native_extraction_result"),
                 )
                 workspace_store.save_workspace(
                     settings=workspace_settings(),
@@ -1958,6 +1970,7 @@ if parse_clicked and batch_documents:
                     parsed_source=st.session_state.get("parsed_source"),
                     result=st.session_state.get("result"),
                     analysis=st.session_state.get("agentic_analysis"),
+                    extraction=st.session_state.get("native_extraction_result"),
                 )
                 workspace_store.save_workspace(
                     settings=workspace_settings(),
@@ -2028,44 +2041,119 @@ has_native_result = (
 )
 if has_native_result:
     header_status_slot.markdown("Status: :green[● **Complete**]")
+    native_tab_labels = ["Overview", "Markdown"]
+    if result.annotated_pdf is not None:
+        native_tab_labels.append("Annotated PDF")
+    native_tab_labels.extend(["Extract", "JSON", "Source Structure"])
     native_tabs = st.tabs(
-        ["Overview", "Markdown", "Annotated PDF", "Layout Tree"],
+        native_tab_labels,
         key="native_studio_tab",
         on_change="rerun",
     )
-    with native_tabs[0]:
+    native_tab_by_name = dict(zip(native_tab_labels, native_tabs, strict=True))
+    with native_tab_by_name["Overview"]:
         native_count = sum(
             unit.effective_route is PageRoute.NATIVE
             for unit in result.document.units
         )
         ocr_count = len(result.document.units) - native_count
-        st.metric("Pages", len(result.document.units))
-        st.caption(f"Native pages: {native_count} · OCR pages: {ocr_count}")
+        unit_label = "Pages" if result.document.source_format.value == "pdf" else "Source units"
+        st.metric(unit_label, len(result.document.units))
+        st.caption(f"Native units: {native_count} · OCR units: {ocr_count}")
+        if result.document.assets:
+            st.caption(
+                f"Embedded images: {len(result.document.assets)} · OCR performed: no"
+            )
         for warning in result.document.warnings:
             st.warning(warning)
-    with native_tabs[1]:
+    with native_tab_by_name["Markdown"]:
         st.markdown(result.markdown)
-    with native_tabs[2]:
-        if result.annotated_pdf is not None:
+    if "Annotated PDF" in native_tab_by_name:
+        with native_tab_by_name["Annotated PDF"]:
             st.pdf(result.annotated_pdf, height=900)
-        else:
-            st.info("No annotated PDF is available for this format.")
-    with native_tabs[3]:
+    with native_tab_by_name["Extract"]:
+        native_schema = render_schema_builder()
+        if st.button(
+            "Run grounded extraction",
+            type="primary",
+            disabled=native_schema is None,
+        ):
+            try:
+                with st.spinner("Extracting exact values from immutable source text"):
+                    native_extraction = LangExtractNativeExtractor().extract(
+                        result, native_schema
+                    )
+            except Exception as exc:  # noqa: BLE001 - present provider errors in UI
+                st.error(f"Extraction failed: {type(exc).__name__}: {exc}")
+            else:
+                st.session_state.native_extraction_result = native_extraction
+                append_session_usage(native_extraction.usage)
+                save_active_workspace()
+                if active_document is not None:
+                    active_state = st.session_state.batch_workspaces[
+                        active_document.id
+                    ]
+                    workspace_store.save_document(
+                        active_document.id,
+                        status=active_state["status"],
+                        selection_key=active_state.get("selection_key"),
+                        parsed_source=parsed_source,
+                        result=result,
+                        extraction=native_extraction,
+                    )
+                st.rerun()
+        native_extraction = st.session_state.get("native_extraction_result")
+        if native_extraction is not None:
+            st.json(native_extraction.data)
+            st.dataframe(
+                [
+                    {
+                        "Field": value.pointer,
+                        "Value": value.value,
+                        "Exact source": value.evidence.source_text,
+                        "Start": value.evidence.char_interval.start,
+                        "End": value.evidence.char_interval.end,
+                        "Anchor": value.evidence.source_spans[0].anchor.model_dump(
+                            mode="json"
+                        ),
+                    }
+                    for value in native_extraction.values
+                ],
+                hide_index=True,
+                width="stretch",
+            )
+            for warning in native_extraction.warnings:
+                st.warning(warning)
+    with native_tab_by_name["JSON"]:
+        st.code(result.json, language="json")
+    with native_tab_by_name["Source Structure"]:
         st.dataframe(
             [
                 {
-                    "Page": element.source.anchor.page,
+                    "Unit": element.source.anchor.unit_id,
                     "Order": element.reading_order + 1,
                     "Type": element.type,
                     "Text": element.text,
-                    "Bounding box": element.source.anchor.bbox,
+                    "Anchor": element.source.anchor.model_dump(mode="json"),
                 }
                 for element in result.document.elements
+            ]
+            + [
+                {
+                    "Unit": asset.anchor.unit_id,
+                    "Order": None,
+                    "Type": asset.type,
+                    "Text": asset.alt_text or asset.filename or asset.reference or "",
+                    "Anchor": asset.anchor.model_dump(mode="json"),
+                }
+                for asset in result.document.assets
             ],
             hide_index=True,
             width="stretch",
         )
     with st.container(border=True):
+        native_extraction = st.session_state.get("native_extraction_result")
+        full_json = render_native_combined_result(result, native_extraction)
         st.download_button(
             "Download Markdown",
             result.markdown,
@@ -2083,11 +2171,20 @@ if has_native_result:
             )
         st.download_button(
             "Download Full JSON",
-            result.json,
+            full_json,
             file_name=f"{Path(upload.name).stem}.full.json",
             mime="application/json",
             on_click="ignore",
         )
+        if native_extraction is not None:
+            st.download_button(
+                "Download extraction JSON",
+                native_extraction.json,
+                file_name=f"{Path(upload.name).stem}.extract.json",
+                mime="application/json",
+                on_click="ignore",
+            )
+    st.stop()
 if has_result:
     header_status_slot.markdown("Status: :green[● **Complete**]")
     for warning in result.metadata.enhancement.warnings:
@@ -2821,6 +2918,7 @@ if batch_documents:
                 )
                 continue
             if isinstance(stored_result, NativeParseResult):
+                stored_native_extraction = state.get("native_extraction_result")
                 archive_entries.append(
                     BatchArchiveEntry(
                         name=document.name,
@@ -2828,7 +2926,14 @@ if batch_documents:
                         status="complete",
                         markdown=stored_result.markdown,
                         annotated_pdf=stored_result.annotated_pdf,
-                        full_json=stored_result.json,
+                        full_json=render_native_combined_result(
+                            stored_result, stored_native_extraction
+                        ),
+                        extraction_json=(
+                            stored_native_extraction.json
+                            if stored_native_extraction is not None
+                            else None
+                        ),
                     )
                 )
                 continue

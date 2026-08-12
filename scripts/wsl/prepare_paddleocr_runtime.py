@@ -7,7 +7,6 @@ from pathlib import Path
 
 import yaml
 
-
 VLM_MODEL_NAME = "PaddleOCR-VL-1.6-0.9B"
 VLM_CACHE_DIR = Path("official_models/PaddleOCR-VL-1.6")
 LAYOUT_MODEL_NAME = "PP-DocLayoutV3"
@@ -120,7 +119,7 @@ def main() -> None:
         action="store_true",
         help="Require all PaddleOCR runtime assets to exist in the local cache.",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(sys.argv[1:])
     source, target = args.source, args.target
     config = yaml.safe_load(source.read_text(encoding="utf-8"))
     if not isinstance(config, dict):

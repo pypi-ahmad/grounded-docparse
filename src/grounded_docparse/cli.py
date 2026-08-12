@@ -13,7 +13,13 @@ from pathlib import Path
 from .agentic import DocumentAgent
 from .config import ParserConfig
 from .models import StoredSchema
-from .native import PageRoute, ProcessingType
+from .native import (
+    NativeParseResult,
+    PageRoute,
+    ProcessingType,
+    render_native_combined_result,
+)
+from .native_extraction import LangExtractNativeExtractor
 from .pipeline import DocumentParser
 from .render import render_combined_result
 from .schema_store import (
@@ -85,6 +91,7 @@ def _parser() -> argparse.ArgumentParser:
         metavar="PATH#PAGE=ROUTE",
     )
     ingest.add_argument("--output", required=True, type=Path)
+    ingest.add_argument("--schema", type=Path)
     ingest.add_argument("--overwrite", action="store_true")
     return parser
 
@@ -305,6 +312,10 @@ def _parse(args: argparse.Namespace) -> int:
 
 
 def _ingest(args: argparse.Namespace) -> int:
+    stored_schema = None
+    compiled_schema = None
+    if args.schema is not None:
+        stored_schema, compiled_schema = _load_schema(args.schema)
     sources = _discover(args.inputs, UNIVERSAL_SUFFIXES)
     processing_types = _processing_types(args.processing_type, sources)
     page_routes = _page_routes(args.page_route)
@@ -345,9 +356,24 @@ def _ingest(args: argparse.Namespace) -> int:
                 processing_type=processing_type,
                 page_routes=page_routes.get(source_path.resolve()),
             )
+            extraction = None
+            if stored_schema is not None:
+                if isinstance(result, NativeParseResult):
+                    extraction = LangExtractNativeExtractor().extract(
+                        result, stored_schema
+                    )
+                    full_json = render_native_combined_result(result, extraction)
+                else:
+                    extraction = DocumentAgent().extract(result, compiled_schema)
+                    full_json = render_combined_result(result, extraction=extraction)
+            else:
+                full_json = result.json
             files = [f"{folder.name}/{stem}.md", f"{folder.name}/{stem}.full.json"]
             _write(folder / f"{stem}.md", result.markdown)
-            _write(folder / f"{stem}.full.json", result.json + "\n")
+            _write(folder / f"{stem}.full.json", full_json + "\n")
+            if extraction is not None:
+                files.append(f"{folder.name}/{stem}.extract.json")
+                _write(folder / f"{stem}.extract.json", extraction.json + "\n")
             annotated_pdf = getattr(result, "annotated_pdf", None)
             if annotated_pdf is not None:
                 files.append(f"{folder.name}/{stem}.annotated.pdf")
@@ -359,7 +385,12 @@ def _ingest(args: argparse.Namespace) -> int:
             had_error = True
             print(f"{source_path.name}: {error}", file=sys.stderr)
         documents.append(entry)
-    manifest = {"version": 1, "command": "ingest", "documents": documents}
+    manifest = {
+        "version": 1,
+        "command": "ingest",
+        "schema": str(args.schema) if stored_schema is not None else None,
+        "documents": documents,
+    }
     _write(args.output / "manifest.json", json.dumps(manifest, indent=2) + "\n")
     return int(had_error)
 
@@ -384,6 +415,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
     if args.command == "ingest":
         try:
+            if args.schema is not None and not os.getenv("OPENAI_API_KEY"):
+                raise ValueError("OPENAI_API_KEY is required when --schema is used")
             _validate_output(args)
             return _ingest(args)
         except (OSError, ValueError) as exc:

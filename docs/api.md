@@ -4,6 +4,8 @@ The package requires Python 3.12–3.14. Install the locked project environment 
 
 ## CLI batch command
 
+`ingest` accepts `--schema PATH`. Native v5 results use `LangExtractNativeExtractor.extract(parse_result, stored_schema)` and emit extraction JSON plus combined Full JSON v5.1.0. `OPENAI_API_KEY` is required; optional `OPENAI_BASE_URL` is honored. Accepted values carry exact source text, Unicode-codepoint `char_interval`, and resolved `SourceSpan` anchors. Missing, fuzzy, mismatched, or unanchored intervals are rejected. Nested objects and one array level are supported; nested arrays are rejected.
+
 ```text
 grounded-docparse parse INPUT [INPUT ...] --output DIR [--schema SCHEMA] [--overwrite]
 ```

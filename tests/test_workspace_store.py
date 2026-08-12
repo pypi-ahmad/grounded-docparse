@@ -7,14 +7,23 @@ from grounded_docparse.models import (
     Page,
     ParseResult,
     RunUsage,
+    SchemaField,
+    StoredSchema,
 )
 from grounded_docparse.native import (
+    CharacterInterval,
     NativeDocument,
+    NativeElement,
+    NativeExtractedValue,
+    NativeExtractionEvidence,
+    NativeExtractionResult,
     NativeParseResult,
     PageRoute,
     ProcessingType,
     SourceFormat,
+    SourceSpan,
     SourceUnit,
+    TextSourceAnchor,
 )
 from grounded_docparse.workspace_store import WorkspaceStore
 
@@ -70,6 +79,92 @@ def test_completed_batch_round_trips_across_store_instances(tmp_path) -> None:
     assert item.result.markdown == "# Notice\n"
     assert item.result.annotated_pdf == b"annotated-pdf"
     assert item.analysis == AgenticAnalysis()
+
+
+def test_native_extraction_round_trips_with_exact_source_anchor(tmp_path) -> None:
+    database = tmp_path / "studio.sqlite3"
+    batch = build_batch_documents([("notice.html", b"42", "text/html")])[0]
+    span = SourceSpan(
+        start=0,
+        end=2,
+        element_id="text-1",
+        anchor=TextSourceAnchor(
+            unit_id="document-1",
+            start_line=1,
+            end_line=1,
+            start_column=1,
+            end_column=3,
+        ),
+    )
+    result = NativeParseResult(
+        document=NativeDocument(
+            source_name="notice.html",
+            source_sha256="a" * 64,
+            source_format=SourceFormat.HTML,
+            requested_processing_type=ProcessingType.OTHER_NATIVE,
+            base_text="42",
+            units=[
+                SourceUnit(
+                    id="document-1",
+                    kind="document",
+                    index=1,
+                    requested_route=PageRoute.NATIVE,
+                    effective_route=PageRoute.NATIVE,
+                    parser="docling",
+                )
+            ],
+            elements=[
+                NativeElement(
+                    id="text-1",
+                    type="text",
+                    text="42",
+                    reading_order=0,
+                    source=span,
+                )
+            ],
+        ),
+        markdown="42",
+        json="{}",
+    )
+    evidence = NativeExtractionEvidence(
+        source_text="42",
+        char_interval=CharacterInterval(start=0, end=2),
+        source_spans=[span],
+    )
+    extraction = NativeExtractionResult(
+        schema=StoredSchema(
+            name="number", fields=[SchemaField(name="number", type="integer")]
+        ),
+        schema_fingerprint="b" * 64,
+        data={"number": 42},
+        values=[
+            NativeExtractedValue(
+                pointer="/number",
+                extraction_class="field_0001",
+                value=42,
+                evidence=evidence,
+            )
+        ],
+        evidence={"/number": [evidence.model_dump(mode="json")]},
+        json='{"data":{"number":42}}',
+    )
+    store = WorkspaceStore(database)
+    store.sync_documents([batch], settings={}, result_version="4.6.0")
+    store.save_document(
+        batch.id,
+        status="complete",
+        parsed_source=b"42",
+        result=result,
+        extraction=extraction,
+    )
+
+    restored = WorkspaceStore(database).load(result_version="4.6.0")
+
+    assert restored is not None
+    saved = restored.documents[0].extraction
+    assert saved is not None
+    assert saved.values[0].evidence.source_text == "42"
+    assert saved.values[0].evidence.source_spans[0].anchor.unit_id == "document-1"
 
 
 def test_processing_document_reopens_interrupted_with_progress(tmp_path) -> None:

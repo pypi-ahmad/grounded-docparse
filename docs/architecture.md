@@ -40,6 +40,7 @@ Browser
 | `src/grounded_docparse/enhancement.py` | Bounded Markdown-refinement chunks and presentation-plan application |
 | `src/grounded_docparse/agentic.py` | Prepared contexts, classification, TOC, extraction orchestration, chat |
 | `src/grounded_docparse/extraction.py` | JSON Schema subset validation and evidence resolution |
+| `src/grounded_docparse/native_extraction.py` | LangExtract over immutable `base_text` with fail-closed source-span grounding |
 | `src/grounded_docparse/models.py` | Pydantic domain contracts, API result records, progress events, diagnostics |
 | `src/grounded_docparse/schema_store.py` | SQLite schema/profile CRUD, Markdown import, and UI-schema compilation |
 | `src/grounded_docparse/render.py` | Markdown, JSON v4.4 parse/v4.5 full results, elements, quality, and annotations |

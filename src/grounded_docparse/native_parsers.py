@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from collections import defaultdict
-from types import ModuleType
+from io import BytesIO
+from types import ModuleType, SimpleNamespace
 
 import pymupdf
 
 from .config import ParserConfig
 from .models import Element, RunUsage
 from .native import (
+    CellSourceAnchor,
+    CsvSourceAnchor,
     NativeDocument,
     NativeElement,
     NativeParseResult,
@@ -18,6 +22,7 @@ from .native import (
     SourceFormat,
     SourceSpan,
     SourceUnit,
+    StructuralSourceAnchor,
     render_native_document,
 )
 from .pipeline import DocumentParser
@@ -283,8 +288,281 @@ class PdfInspectorParser:
 
 
 class DoclingNativeParser:
-    def __init__(self, config: ParserConfig) -> None:
+    def __init__(self, config: ParserConfig, *, converter=None) -> None:
         self.config = config
+        self.converter = converter
 
-    def parse(self, *_args, **_kwargs):
-        raise NotImplementedError("Docling native parsing is implemented in a later slice")
+    def parse(
+        self,
+        data: bytes,
+        filename: str,
+        *,
+        source_format: SourceFormat,
+        processing_type: ProcessingType,
+    ) -> NativeParseResult:
+        from .docling_native import (
+            DOCLING_FORMAT_NAMES,
+            build_source_manifest,
+            claim_record,
+            make_docling_converter,
+        )
+
+        if source_format not in DOCLING_FORMAT_NAMES:
+            raise ValueError(f"Docling native parsing does not support {source_format.value}")
+        manifest = build_source_manifest(data, source_format)
+        converter = self.converter or make_docling_converter()
+        self.converter = converter
+        try:
+            from docling.datamodel.document import DocumentStream
+            from docling_core.types.doc import TableItem, TextItem
+        except ImportError as exc:
+            raise RuntimeError(
+                "native document parsing requires grounded-docparse[native]"
+            ) from exc
+        result = converter.convert(
+            DocumentStream(name=filename, stream=BytesIO(data)),
+            raises_on_error=True,
+            max_file_size=self.config.max_upload_bytes,
+        )
+        docling_document = result.document
+        base_parts: list[str] = []
+        elements: list[NativeElement] = []
+        base_length = 0
+
+        def append_text(value: str) -> tuple[int, int]:
+            nonlocal base_length
+            if base_parts:
+                base_parts.append("\n")
+                base_length += 1
+            start = base_length
+            base_parts.append(value)
+            base_length += len(value)
+            return start, base_length
+
+        def unit_for(item) -> str | None:
+            provenance = getattr(item, "prov", None) or []
+            if provenance and 1 <= provenance[0].page_no <= len(manifest.units):
+                return manifest.units[provenance[0].page_no - 1].id
+            return None
+
+        for item, _level in docling_document.iterate_items(with_groups=False):
+            if isinstance(item, TextItem):
+                parent_ref = getattr(getattr(item, "parent", None), "cref", "")
+                if str(parent_ref).startswith("#/tables/"):
+                    continue
+                value = item.text.strip()
+                if not value:
+                    continue
+                if any(
+                    value in {asset.alt_text, asset.caption}
+                    for asset in manifest.assets
+                ):
+                    continue
+                try:
+                    record = claim_record(
+                        manifest.records, value, unit_id=unit_for(item)
+                    )
+                except ValueError:
+                    matching_unit = next(
+                        (
+                            unit
+                            for unit in manifest.units
+                            if unit.label
+                            and " ".join(unit.label.split()).casefold()
+                            == " ".join(value.split()).casefold()
+                        ),
+                        None,
+                    )
+                    if source_format is not SourceFormat.ODP or matching_unit is None:
+                        raise
+                    record = SimpleNamespace(
+                        anchor=StructuralSourceAnchor(
+                            unit_id=matching_unit.id,
+                            path=(
+                                f"/office:presentation/draw:page[{matching_unit.index}]"
+                                "/@draw:name"
+                            ),
+                        )
+                    )
+                start, end = append_text(value)
+                element_id = f"element-{len(elements) + 1}"
+                elements.append(
+                    NativeElement(
+                        id=element_id,
+                        type=str(item.label.value),
+                        text=value,
+                        reading_order=len(elements),
+                        source=SourceSpan(
+                            start=start,
+                            end=end,
+                            element_id=element_id,
+                            anchor=record.anchor,
+                        ),
+                    )
+                )
+            elif isinstance(item, TableItem):
+                cells = sorted(
+                    item.data.table_cells,
+                    key=lambda cell: (
+                        cell.start_row_offset_idx,
+                        cell.start_col_offset_idx,
+                    ),
+                )
+                record = claim_record(
+                    manifest.records,
+                    " ".join(cell.text for cell in cells),
+                    unit_id=unit_for(item),
+                    record_type="table",
+                )
+                if record.cells is not None:
+                    cells = [
+                        SimpleNamespace(
+                            text=value,
+                            start_row_offset_idx=row,
+                            end_row_offset_idx=row + 1,
+                            start_col_offset_idx=column,
+                            end_col_offset_idx=column + 1,
+                        )
+                        for row, column, value in record.cells
+                    ]
+                    row_count = max((cell.start_row_offset_idx for cell in cells), default=-1) + 1
+                    column_count = max((cell.start_col_offset_idx for cell in cells), default=-1) + 1
+                else:
+                    row_count = item.data.num_rows
+                    column_count = item.data.num_cols
+                rows = [["" for _ in range(column_count)] for _ in range(row_count)]
+                for cell in cells:
+                    rows[cell.start_row_offset_idx][cell.start_col_offset_idx] = cell.text
+                table_text = "\n".join("\t".join(row) for row in rows)
+                start, end = append_text(table_text)
+                table_id = f"element-{len(elements) + 1}"
+                table_element = NativeElement(
+                    id=table_id,
+                    type="table",
+                    text=table_text,
+                    reading_order=len(elements),
+                    source=SourceSpan(
+                        start=start,
+                        end=end,
+                        element_id=table_id,
+                        anchor=record.anchor,
+                    ),
+                )
+                elements.append(table_element)
+                cursor = start
+                for cell in cells:
+                    value = cell.text
+                    if not value:
+                        continue
+                    cell_start = "".join(base_parts).find(value, cursor, end)
+                    if cell_start < 0:
+                        raise ValueError("table cell cannot be mapped into immutable base_text")
+                    cursor = cell_start + len(value)
+                    cell_id = f"element-{len(elements) + 1}"
+                    anchor = record.anchor
+                    if isinstance(anchor, CellSourceAnchor):
+                        match = re.match(r"([A-Z]+)(\d+)", anchor.cell_range)
+                        if match is None:
+                            raise ValueError("spreadsheet table has an invalid source range")
+                        from openpyxl.utils.cell import (
+                            column_index_from_string,
+                            get_column_letter,
+                        )
+
+                        base_column = column_index_from_string(match.group(1))
+                        base_row = int(match.group(2))
+                        cell_anchor = CellSourceAnchor(
+                            unit_id=anchor.unit_id,
+                            sheet=anchor.sheet,
+                            cell_range=(
+                                f"{get_column_letter(base_column + cell.start_col_offset_idx)}"
+                                f"{base_row + cell.start_row_offset_idx}"
+                            ),
+                        )
+                    elif isinstance(anchor, CsvSourceAnchor):
+                        cell_anchor = CsvSourceAnchor(
+                            unit_id=anchor.unit_id,
+                            row_start=anchor.row_start + cell.start_row_offset_idx,
+                            row_end=anchor.row_start + cell.end_row_offset_idx - 1,
+                            column_start=anchor.column_start + cell.start_col_offset_idx,
+                            column_end=anchor.column_start + cell.end_col_offset_idx - 1,
+                        )
+                    else:
+                        cell_anchor = StructuralSourceAnchor(
+                            unit_id=anchor.unit_id,
+                            path=(
+                                f"{anchor.path}/row[{cell.start_row_offset_idx + 1}]"
+                                f"/cell[{cell.start_col_offset_idx + 1}]"
+                            ),
+                            bbox=getattr(anchor, "bbox", None),
+                        )
+                    elements.append(
+                        NativeElement(
+                            id=cell_id,
+                            type="table_cell",
+                            text=value,
+                            reading_order=len(elements),
+                            source=SourceSpan(
+                                start=cell_start,
+                                end=cursor,
+                                element_id=cell_id,
+                                anchor=cell_anchor,
+                            ),
+                        )
+                    )
+                    table_element.children.append(cell_id)
+
+        unclaimed = [record for record in manifest.records if record.text and not record.claimed]
+        if unclaimed:
+            raise ValueError(
+                "Docling omitted source block(s): "
+                + ", ".join(record.anchor.model_dump_json() for record in unclaimed[:3])
+            )
+        document = NativeDocument(
+            source_name=filename,
+            source_sha256=hashlib.sha256(data).hexdigest(),
+            source_format=source_format,
+            requested_processing_type=processing_type,
+            base_text="".join(base_parts),
+            units=manifest.units,
+            elements=elements,
+            assets=manifest.assets,
+        )
+        child_ids = {child for element in elements for child in element.children}
+        markdown_parts = []
+        for element in elements:
+            if element.id in child_ids:
+                continue
+            if element.type == "table":
+                rows = [row.split("\t") for row in element.text.splitlines()]
+                width = max((len(row) for row in rows), default=0)
+                if width:
+                    normalized = [row + [""] * (width - len(row)) for row in rows]
+                    escape = lambda value: value.replace("|", "\\|").replace("\n", " ")
+                    markdown_parts.append(
+                        "\n".join(
+                            [
+                                "| " + " | ".join(escape(value) for value in normalized[0]) + " |",
+                                "| " + " | ".join("---" for _ in range(width)) + " |",
+                            ]
+                            + [
+                                "| " + " | ".join(escape(value) for value in row) + " |"
+                                for row in normalized[1:]
+                            ]
+                        )
+                    )
+            elif element.type == "title":
+                markdown_parts.append(f"# {element.text}")
+            elif element.type == "section_header":
+                markdown_parts.append(f"## {element.text}")
+            elif element.type == "list_item":
+                markdown_parts.append(f"- {element.text}")
+            else:
+                markdown_parts.append(element.text)
+        markdown = "\n\n".join(markdown_parts)
+        rendered = render_native_document(document, markdown=markdown)
+        return NativeParseResult(
+            document=document,
+            markdown=rendered.markdown,
+            json=rendered.json,
+        )
