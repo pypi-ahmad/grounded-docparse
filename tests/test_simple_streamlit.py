@@ -26,6 +26,14 @@ from grounded_docparse.models import (
     StoredSchema,
     VerificationState,
 )
+from grounded_docparse.native import (
+    NativeDocument,
+    NativeParseResult,
+    PageRoute,
+    ProcessingType,
+    SourceFormat,
+    SourceUnit,
+)
 from grounded_docparse.render import build_elements, render_agentic_document
 from grounded_docparse.schema_store import SchemaStore
 from grounded_docparse.universal import PdfInspection
@@ -704,6 +712,111 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
     assert not app.exception
     assert statuses == ["complete", "complete"]
     assert parsed_names == ["good.pdf", "bad.pdf", "bad.pdf"]
+
+
+def test_mixed_pdf_prefills_routes_and_requires_confirmation(monkeypatch) -> None:
+    source = pymupdf.open()
+    source.new_page().insert_text((72, 72), "Native")
+    source.new_page()
+    data = source.tobytes()
+    source.close()
+    monkeypatch.setattr(
+        universal,
+        "inspect_pdf_content",
+        lambda _data: PdfInspection(
+            pdf_type="mixed",
+            page_count=2,
+            pages_needing_ocr=frozenset({2}),
+        ),
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "mixed.pdf", data, "application/pdf"
+    ).run(timeout=20)
+    selector = next(
+        item
+        for item in app.selectbox
+        if item.label == "Processing type · mixed.pdf"
+    )
+    app = selector.select("Mixed PDF").run(timeout=20)
+
+    parse = next(button for button in app.button if button.label == "Parse document")
+    assert parse.disabled is True
+    confirmation = next(
+        item for item in app.checkbox if item.label == "Confirm page routes"
+    )
+    app = confirmation.check().run(timeout=20)
+    parse = next(button for button in app.button if button.label == "Parse document")
+    assert parse.disabled is False
+
+
+def test_native_v5_result_uses_native_tabs_without_v4_agents(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    result = NativeParseResult(
+        document=NativeDocument(
+            source_name="notice.pdf",
+            source_sha256="a" * 64,
+            source_format=SourceFormat.PDF,
+            requested_processing_type=ProcessingType.NATIVE_PDF,
+            base_text="Native notice",
+            units=[
+                SourceUnit(
+                    id="page-1",
+                    kind="page",
+                    index=1,
+                    requested_route=PageRoute.NATIVE,
+                    effective_route=PageRoute.NATIVE,
+                    parser="pdf-inspector",
+                )
+            ],
+            elements=[],
+        ),
+        markdown="Native notice",
+        json='{"schema_version":"5.0.0"}',
+        annotated_pdf=simple_pdf,
+    )
+
+    class FakeUniversalParser:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def parse(self, *_args, **_kwargs):
+            return result
+
+    monkeypatch.setattr(universal, "UniversalDocumentParser", FakeUniversalParser)
+    monkeypatch.setattr(
+        DocumentAgent,
+        "prepare",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("v4 agent must not receive v5 results")
+        ),
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "notice.pdf", simple_pdf, "application/pdf"
+    ).run(timeout=20)
+    selector = next(
+        item
+        for item in app.selectbox
+        if item.label == "Processing type · notice.pdf"
+    )
+    app = selector.select("Native PDF").run(timeout=20)
+    app = next(
+        button for button in app.button if button.label == "Parse document"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert [tab.label for tab in app.tabs][-4:] == [
+        "Overview",
+        "Markdown",
+        "Annotated PDF",
+        "Layout Tree",
+    ]
+    assert all(tab.label != "Extract" for tab in app.tabs)
+    assert app.session_state["result"] is result
 
 
 def test_completed_batch_restores_after_app_restart_without_reparsing(

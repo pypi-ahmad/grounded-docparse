@@ -23,6 +23,7 @@ from .models import (
     RunUsage,
     VisualRecoveryResult,
 )
+from .native import NativeDocument, NativeParseResult
 
 WorkspaceStatus = Literal["pending", "processing", "interrupted", "complete", "failed"]
 
@@ -36,7 +37,7 @@ class StoredWorkspaceDocument:
     analysis_key: str | None
     progress: dict | None
     parsed_source: bytes | None
-    result: ParseResult | None
+    result: ParseResult | NativeParseResult | None
     analysis: AgenticAnalysis | None
 
 
@@ -52,8 +53,22 @@ def _now() -> str:
     return datetime.now(UTC).isoformat()
 
 
-def _parse_result_payload(result: ParseResult) -> dict:
+def _parse_result_payload(result: ParseResult | NativeParseResult) -> dict:
+    if isinstance(result, NativeParseResult):
+        return {
+            "kind": "native-v5",
+            "document": result.document.model_dump(mode="json"),
+            "markdown": result.markdown,
+            "json": result.json,
+            "input_tokens": result.input_tokens,
+            "output_tokens": result.output_tokens,
+            "usage": result.usage.model_dump(
+                mode="json", exclude_computed_fields=True
+            ),
+            "trace": [item.model_dump(mode="json") for item in result.trace],
+        }
     return {
+        "kind": "legacy-v4",
         "document": result.document.model_dump(mode="json"),
         "markdown": result.markdown,
         "json": result.json,
@@ -80,7 +95,23 @@ def _parse_result_payload(result: ParseResult) -> dict:
     }
 
 
-def _parse_result(value: dict, annotated_pdf: bytes) -> ParseResult:
+def _parse_result(
+    value: dict, annotated_pdf: bytes
+) -> ParseResult | NativeParseResult:
+    if value.get("kind") == "native-v5":
+        return NativeParseResult(
+            document=NativeDocument.model_validate(value["document"]),
+            markdown=value["markdown"],
+            json=value["json"],
+            annotated_pdf=annotated_pdf,
+            input_tokens=value.get("input_tokens", 0),
+            output_tokens=value.get("output_tokens", 0),
+            usage=RunUsage.model_validate(value.get("usage", {})),
+            trace=[
+                AgentTraceEvent.model_validate(item)
+                for item in value.get("trace", [])
+            ],
+        )
     return ParseResult(
         document=Document.model_validate(value["document"]),
         markdown=value["markdown"],
@@ -244,13 +275,13 @@ class WorkspaceStore:
         analysis_key: str | None = None,
         progress: dict | None = None,
         parsed_source: bytes | None = None,
-        result: ParseResult | None = None,
+        result: ParseResult | NativeParseResult | None = None,
         analysis: AgenticAnalysis | None = None,
     ) -> None:
         directory = self._directory(document_id)
         if parsed_source is not None:
             self._write(directory / "parsed-source.bin", parsed_source)
-        if result is not None:
+        if result is not None and result.annotated_pdf is not None:
             self._write(directory / "annotated.pdf", result.annotated_pdf)
         with self._connect() as connection:
             connection.execute(
