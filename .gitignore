@@ -23,7 +23,6 @@ artifacts/
 .codex/
 .remember/
 .superpowers/
-graphify-out/
 ownership-map-out/
 .streamlit/secrets.toml
 .env
