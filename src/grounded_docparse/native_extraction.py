@@ -69,8 +69,9 @@ def _join_pointer(pointer: str, name: str) -> str:
     return f"{pointer}/{_escape_pointer(name)}"
 
 
-def translate_stored_schema(schema: StoredSchema) -> TranslatedExtractionSchema:
-    compiled = compile_json_schema(schema)
+def _collect_extraction_groups(
+    compiled: dict[str, Any],
+) -> list[ExtractionGroupSpec]:
     groups: list[ExtractionGroupSpec] = []
     counter = 0
 
@@ -159,7 +160,12 @@ def translate_stored_schema(schema: StoredSchema) -> TranslatedExtractionSchema:
     walk(compiled, "")
     if not groups:
         raise ValueError("native extraction schema has no extractable fields")
+    return groups
 
+
+def _build_extraction_contract(
+    groups: list[ExtractionGroupSpec],
+) -> tuple[dict[str, Any], dict[str, ExtractionFieldSpec], str]:
     item_schemas = []
     prompt_lines = [
         "Extract only literal text that appears verbatim in the source document.",
@@ -201,12 +207,19 @@ def translate_stored_schema(schema: StoredSchema) -> TranslatedExtractionSchema:
         "required": ["extractions"],
         "additionalProperties": False,
     }
+    return output_schema, fields_by_class, "\n".join(prompt_lines)
+
+
+def translate_stored_schema(schema: StoredSchema) -> TranslatedExtractionSchema:
+    compiled = compile_json_schema(schema)
+    groups = _collect_extraction_groups(compiled)
+    output_schema, fields_by_class, prompt = _build_extraction_contract(groups)
     return TranslatedExtractionSchema(
         source_schema=compiled,
         output_schema=output_schema,
         groups=tuple(groups),
         fields_by_class=fields_by_class,
-        prompt="\n".join(prompt_lines),
+        prompt=prompt,
     )
 
 
@@ -297,11 +310,158 @@ class _Accepted:
     field: ExtractionFieldSpec
     extraction_class: str
     value: Any
-    source_text: str
     start: int
     end: int
     group_index: int | None
     evidence: NativeExtractionEvidence
+
+
+def _grounded_candidates(
+    annotated: Any,
+    translated: TranslatedExtractionSchema,
+    parse_result: NativeParseResult,
+) -> tuple[list[_Accepted], list[str]]:
+    accepted: list[_Accepted] = []
+    warnings: list[str] = []
+    base_text = parse_result.document.base_text
+    for extraction in getattr(annotated, "extractions", []) or []:
+        extraction_class = str(getattr(extraction, "extraction_class", ""))
+        field = translated.fields_by_class.get(extraction_class)
+        if field is None:
+            warnings.append(f"rejected unknown extraction class {extraction_class!r}")
+            continue
+        interval = getattr(extraction, "char_interval", None)
+        start = getattr(interval, "start_pos", None)
+        end = getattr(interval, "end_pos", None)
+        source_text = str(getattr(extraction, "extraction_text", ""))
+        if (
+            not isinstance(start, int)
+            or not isinstance(end, int)
+            or start < 0
+            or end <= start
+            or end > len(base_text)
+        ):
+            warnings.append(
+                f"{field.pointer_template}: rejected missing or invalid char_interval"
+            )
+            continue
+        if base_text[start:end] != source_text:
+            warnings.append(f"{field.pointer_template}: rejected non-exact source text")
+            continue
+        spans = parse_result.document.source_spans_for(start, end)
+        if not spans or not _covered_by_spans(source_text, start, spans):
+            warnings.append(f"{field.pointer_template}: rejected unresolved source anchor")
+            continue
+        try:
+            value = _coerce(source_text, field)
+        except ValueError as exc:
+            warnings.append(f"{field.pointer_template}: rejected value that {exc}")
+            continue
+        evidence = NativeExtractionEvidence(
+            source_text=source_text,
+            char_interval=CharacterInterval(start=start, end=end),
+            source_spans=spans,
+        )
+        accepted.append(
+            _Accepted(
+                field=field,
+                extraction_class=extraction_class,
+                value=value,
+                start=start,
+                end=end,
+                group_index=getattr(extraction, "group_index", None),
+                evidence=evidence,
+            )
+        )
+    return accepted, warnings
+
+
+def _assemble_values(
+    translated: TranslatedExtractionSchema,
+    accepted: list[_Accepted],
+    warnings: list[str],
+) -> tuple[
+    dict[str, Any],
+    list[NativeExtractedValue],
+    dict[str, list[dict[str, Any]]],
+]:
+    data = _skeleton(translated.source_schema)
+    values: list[NativeExtractedValue] = []
+    evidence_by_pointer: dict[str, list[dict[str, Any]]] = defaultdict(list)
+
+    def add_value(item: _Accepted, pointer: str) -> None:
+        values.append(
+            NativeExtractedValue(
+                pointer=pointer,
+                extraction_class=item.extraction_class,
+                value=item.value,
+                evidence=item.evidence,
+            )
+        )
+        evidence_by_pointer[pointer].append(item.evidence.model_dump(mode="json"))
+
+    scalar_candidates: dict[str, list[_Accepted]] = defaultdict(list)
+    array_candidates: dict[str, list[_Accepted]] = defaultdict(list)
+    for item in accepted:
+        if item.field.array_pointer is None:
+            scalar_candidates[item.field.pointer_template].append(item)
+        else:
+            array_candidates[item.field.array_pointer].append(item)
+
+    for pointer, candidates in scalar_candidates.items():
+        candidates.sort(key=lambda item: (item.start, item.end))
+        chosen = candidates[0]
+        _set_pointer(data, pointer, chosen.value)
+        add_value(chosen, pointer)
+        if len(candidates) > 1:
+            warnings.append(f"{pointer}: ignored duplicate grounded values")
+
+    group_specs = {
+        group.array_pointer: group
+        for group in translated.groups
+        if group.array_pointer is not None
+    }
+    for array_pointer, candidates in array_candidates.items():
+        group_spec = group_specs[array_pointer]
+        if group_spec.item_schema is None:
+            raise RuntimeError(f"{array_pointer}: missing translated item schema")
+        item_schema = group_spec.item_schema
+        grouped: dict[tuple[str, int], list[_Accepted]] = defaultdict(list)
+        for sequence, item in enumerate(
+            sorted(candidates, key=lambda value: value.start)
+        ):
+            group_key = item.group_index if item.group_index is not None else sequence
+            grouped[(array_pointer, group_key)].append(item)
+        ordered_groups = sorted(
+            grouped.values(), key=lambda group: min(item.start for item in group)
+        )
+        target_array = _get_pointer(data, array_pointer)
+        for group in ordered_groups:
+            if _kind(item_schema) == "object":
+                target = _skeleton(item_schema)
+                relative_records: list[tuple[_Accepted, str]] = []
+                for item in sorted(group, key=lambda value: value.start):
+                    relative = item.field.pointer_template.removeprefix(
+                        f"{array_pointer}/*"
+                    )
+                    if any(path == relative for _old, path in relative_records):
+                        warnings.append(
+                            f"{item.field.pointer_template}: ignored duplicate grouped value"
+                        )
+                        continue
+                    _set_pointer(target, relative, item.value)
+                    relative_records.append((item, relative))
+                target_array.append(target)
+                index = len(target_array) - 1
+                for item, relative in relative_records:
+                    add_value(item, f"{array_pointer}/{index}{relative}")
+            else:
+                item = min(group, key=lambda value: value.start)
+                target_array.append(item.value)
+                add_value(item, f"{array_pointer}/{len(target_array) - 1}")
+
+    values.sort(key=lambda item: item.evidence.char_interval.start)
+    return data, values, dict(evidence_by_pointer)
 
 
 class LangExtractNativeExtractor:
@@ -323,6 +483,12 @@ class LangExtractNativeExtractor:
         if not api_key:
             raise ValueError("OPENAI_API_KEY is required for native extraction")
         translated = translate_stored_schema(schema)
+        provider_kwargs = {
+            "api_key": api_key,
+            "base_url": os.getenv("OPENAI_BASE_URL") or None,
+            "reasoning_effort": LUNA_REASONING_EFFORT,
+            "max_workers": self.config.provider_concurrency,
+        }
         if self.extract_func is None:
             try:
                 import langextract as lx
@@ -335,24 +501,14 @@ class LangExtractNativeExtractor:
             model_config = ModelConfig(
                 model_id=LUNA_MODEL,
                 provider="openai",
-                provider_kwargs={
-                    "api_key": api_key,
-                    "base_url": os.getenv("OPENAI_BASE_URL") or None,
-                    "reasoning_effort": LUNA_REASONING_EFFORT,
-                    "max_workers": self.config.provider_concurrency,
-                },
+                provider_kwargs=provider_kwargs,
             )
         else:
             extract_func = self.extract_func
             model_config = {
                 "model_id": LUNA_MODEL,
                 "provider": "openai",
-                "provider_kwargs": {
-                    "api_key": api_key,
-                    "base_url": os.getenv("OPENAI_BASE_URL") or None,
-                    "reasoning_effort": LUNA_REASONING_EFFORT,
-                    "max_workers": self.config.provider_concurrency,
-                },
+                "provider_kwargs": provider_kwargs,
             }
 
         started = time.perf_counter()
@@ -380,133 +536,16 @@ class LangExtractNativeExtractor:
                 raise ValueError("LangExtract returned an unexpected document count")
             annotated = annotated[0]
 
-        accepted: list[_Accepted] = []
-        warnings: list[str] = []
-        base_text = parse_result.document.base_text
-        for extraction in getattr(annotated, "extractions", []) or []:
-            extraction_class = str(getattr(extraction, "extraction_class", ""))
-            field = translated.fields_by_class.get(extraction_class)
-            if field is None:
-                warnings.append(f"rejected unknown extraction class {extraction_class!r}")
-                continue
-            interval = getattr(extraction, "char_interval", None)
-            start = getattr(interval, "start_pos", None)
-            end = getattr(interval, "end_pos", None)
-            source_text = str(getattr(extraction, "extraction_text", ""))
-            if (
-                not isinstance(start, int)
-                or not isinstance(end, int)
-                or start < 0
-                or end <= start
-                or end > len(base_text)
-            ):
-                warnings.append(f"{field.pointer_template}: rejected missing or invalid char_interval")
-                continue
-            if base_text[start:end] != source_text:
-                warnings.append(f"{field.pointer_template}: rejected non-exact source text")
-                continue
-            spans = parse_result.document.source_spans_for(start, end)
-            if not spans or not _covered_by_spans(source_text, start, spans):
-                warnings.append(f"{field.pointer_template}: rejected unresolved source anchor")
-                continue
-            try:
-                value = _coerce(source_text, field)
-            except ValueError as exc:
-                warnings.append(f"{field.pointer_template}: rejected value that {exc}")
-                continue
-            evidence = NativeExtractionEvidence(
-                source_text=source_text,
-                char_interval=CharacterInterval(start=start, end=end),
-                source_spans=spans,
-            )
-            accepted.append(
-                _Accepted(
-                    field=field,
-                    extraction_class=extraction_class,
-                    value=value,
-                    source_text=source_text,
-                    start=start,
-                    end=end,
-                    group_index=getattr(extraction, "group_index", None),
-                    evidence=evidence,
-                )
-            )
-
-        data = _skeleton(translated.source_schema)
-        values: list[NativeExtractedValue] = []
-        evidence_by_pointer: dict[str, list[dict[str, Any]]] = defaultdict(list)
-
-        scalar_candidates: dict[str, list[_Accepted]] = defaultdict(list)
-        array_candidates: dict[str, list[_Accepted]] = defaultdict(list)
-        for item in accepted:
-            if item.field.array_pointer is None:
-                scalar_candidates[item.field.pointer_template].append(item)
-            else:
-                array_candidates[item.field.array_pointer].append(item)
-
-        def add_value(item: _Accepted, pointer: str) -> None:
-            value = NativeExtractedValue(
-                pointer=pointer,
-                extraction_class=item.extraction_class,
-                value=item.value,
-                evidence=item.evidence,
-            )
-            values.append(value)
-            evidence_by_pointer[pointer].append(
-                item.evidence.model_dump(mode="json")
-            )
-
-        for pointer, candidates in scalar_candidates.items():
-            candidates.sort(key=lambda item: (item.start, item.end))
-            chosen = candidates[0]
-            _set_pointer(data, pointer, chosen.value)
-            add_value(chosen, pointer)
-            if len(candidates) > 1:
-                warnings.append(f"{pointer}: ignored duplicate grounded values")
-
-        group_specs = {
-            group.array_pointer: group
-            for group in translated.groups
-            if group.array_pointer is not None
-        }
-        for array_pointer, candidates in array_candidates.items():
-            group_spec = group_specs[array_pointer]
-            if group_spec.item_schema is None:
-                raise RuntimeError(f"{array_pointer}: missing translated item schema")
-            item_schema = group_spec.item_schema
-            grouped: dict[tuple[str, int], list[_Accepted]] = defaultdict(list)
-            for sequence, item in enumerate(sorted(candidates, key=lambda value: value.start)):
-                group_key = item.group_index if item.group_index is not None else sequence
-                grouped[(array_pointer, group_key)].append(item)
-            ordered_groups = sorted(
-                grouped.values(), key=lambda group: min(item.start for item in group)
-            )
-            target_array = _get_pointer(data, array_pointer)
-            for group in ordered_groups:
-                if _kind(item_schema) == "object":
-                    target = _skeleton(item_schema)
-                    relative_records: list[tuple[_Accepted, str]] = []
-                    for item in sorted(group, key=lambda value: value.start):
-                        relative = item.field.pointer_template.removeprefix(
-                            f"{array_pointer}/*"
-                        )
-                        if any(path == relative for _old, path in relative_records):
-                            warnings.append(
-                                f"{item.field.pointer_template}: ignored duplicate grouped value"
-                            )
-                            continue
-                        _set_pointer(target, relative, item.value)
-                        relative_records.append((item, relative))
-                    target_array.append(target)
-                    index = len(target_array) - 1
-                    for item, relative in relative_records:
-                        add_value(item, f"{array_pointer}/{index}{relative}")
-                else:
-                    item = min(group, key=lambda value: value.start)
-                    target_array.append(item.value)
-                    add_value(item, f"{array_pointer}/{len(target_array) - 1}")
-
-        values.sort(key=lambda item: item.evidence.char_interval.start)
+        accepted, warnings = _grounded_candidates(
+            annotated,
+            translated,
+            parse_result,
+        )
+        data, values, evidence_by_pointer = _assemble_values(
+            translated,
+            accepted,
+            warnings,
+        )
         fingerprint = _schema_fingerprint(schema)
         usage = RunUsage()
         trace = [
@@ -528,7 +567,7 @@ class LangExtractNativeExtractor:
             "schema_fingerprint": fingerprint,
             "data": data,
             "values": [item.model_dump(mode="json") for item in values],
-            "evidence": dict(evidence_by_pointer),
+            "evidence": evidence_by_pointer,
             "warnings": warnings,
             "metadata": {
                 "model": LUNA_MODEL,
@@ -544,7 +583,7 @@ class LangExtractNativeExtractor:
             schema_fingerprint=fingerprint,
             data=data,
             values=values,
-            evidence=dict(evidence_by_pointer),
+            evidence=evidence_by_pointer,
             json=json.dumps(payload, ensure_ascii=False, indent=2),
             warnings=warnings,
             usage=usage,
