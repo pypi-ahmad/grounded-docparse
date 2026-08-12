@@ -25,9 +25,14 @@ from .models import (
 )
 from .native import (
     CellSourceAnchor,
+    CharacterInterval,
     CsvSourceAnchor,
+    NativeAsset,
     NativeDocument,
     NativeElement,
+    NativeExtractedValue,
+    NativeExtractionEvidence,
+    NativeExtractionResult,
     NativeParseResult,
     PageRoute,
     PdfSourceAnchor,
@@ -38,8 +43,11 @@ from .native import (
     SourceSpan,
     SourceUnit,
     StructuralSourceAnchor,
+    TextSourceAnchor,
+    render_native_combined_result,
     render_native_document,
 )
+from .native_extraction import LangExtractNativeExtractor, translate_stored_schema
 from .pipeline import DocumentParser
 from .render import render_combined_result
 from .universal import (
@@ -53,6 +61,7 @@ from .universal import (
 __all__ = [
     "AgenticAnalysis",
     "CellSourceAnchor",
+    "CharacterInterval",
     "ChatAnswer",
     "ChatSource",
     "ClassifierCategory",
@@ -67,9 +76,14 @@ __all__ = [
     "ExtractionResult",
     "FormClassificationResult",
     "FormSegment",
+    "LangExtractNativeExtractor",
     "MixedNativePageUnusable",
+    "NativeAsset",
     "NativeDocument",
     "NativeElement",
+    "NativeExtractedValue",
+    "NativeExtractionEvidence",
+    "NativeExtractionResult",
     "NativeParseResult",
     "NativePdfRequiresMixed",
     "OcrEngine",
@@ -92,8 +106,11 @@ __all__ = [
     "SourceUnit",
     "StoredSchema",
     "StructuralSourceAnchor",
+    "TextSourceAnchor",
     "UniversalDocumentParser",
     "VisualRecoveryResult",
     "render_combined_result",
+    "render_native_combined_result",
     "render_native_document",
+    "translate_stored_schema",
 ]

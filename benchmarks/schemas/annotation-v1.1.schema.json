@@ -58,6 +58,9 @@
     },
     "rejected_block_ids": {
       "type": "array"
+    },
+    "native_extractions": {
+      "type": "array"
     }
   }
 }

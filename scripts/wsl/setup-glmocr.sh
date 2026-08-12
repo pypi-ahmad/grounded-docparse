@@ -56,9 +56,9 @@ LOCK_MARKER="$WSL_ENV/.docparse-lock-$BACKEND"
 if [[ -f "$WSL_ENV/.docparse-local-ocr-ready-$BACKEND" && \
   -f "$LOCK_MARKER" && "$(<"$LOCK_MARKER")" == "$LOCK_HASH" ]]; then
   if [[ "$BACKEND" == "vllm" ]]; then
-    "$WSL_ENV/bin/python" -c 'import glmocr, torch, transformers, vllm'
+    "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers, vllm'
   else
-    "$WSL_ENV/bin/python" -c 'import glmocr, torch, transformers'
+    "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers'
     bash scripts/wsl/setup-ollama.sh
   fi
   if HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
@@ -69,11 +69,11 @@ if [[ -f "$WSL_ENV/.docparse-local-ocr-ready-$BACKEND" && \
   fi
 fi
 if [[ "$BACKEND" == "vllm" ]]; then
-  "$UV_BIN" sync --locked --extra local-ocr
-  "$WSL_ENV/bin/python" -c 'import glmocr, torch, transformers, vllm'
+  "$UV_BIN" sync --locked --extra local-ocr --extra native
+  "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers, vllm'
 else
-  "$UV_BIN" sync --locked --extra local-ocr-cpu
-  "$WSL_ENV/bin/python" -c 'import glmocr, torch, transformers'
+  "$UV_BIN" sync --locked --extra local-ocr-cpu --extra native
+  "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers'
   bash scripts/wsl/setup-ollama.sh
 fi
 echo "Downloading and pinning GLM-OCR model snapshots..."

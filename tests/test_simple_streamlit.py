@@ -809,14 +809,77 @@ def test_native_v5_result_uses_native_tabs_without_v4_agents(
     ).click().run(timeout=20)
 
     assert not app.exception
-    assert [tab.label for tab in app.tabs][-4:] == [
+    assert [tab.label for tab in app.tabs][-6:] == [
         "Overview",
         "Markdown",
         "Annotated PDF",
-        "Layout Tree",
+        "Extract",
+        "JSON",
+        "Source Structure",
     ]
-    assert all(tab.label != "Extract" for tab in app.tabs)
+    assert any(tab.label == "Extract" for tab in app.tabs)
     assert app.session_state["result"] is result
+
+
+def test_nonvisual_native_result_has_json_and_source_structure_without_pdf_tab(
+    monkeypatch,
+) -> None:
+    source = b"<html><body><p>Native text</p></body></html>"
+    result = NativeParseResult(
+        document=NativeDocument(
+            source_name="notice.html",
+            source_sha256="b" * 64,
+            source_format=SourceFormat.HTML,
+            requested_processing_type=ProcessingType.OTHER_NATIVE,
+            base_text="Native text",
+            units=[
+                SourceUnit(
+                    id="document-1",
+                    kind="document",
+                    index=1,
+                    requested_route=PageRoute.NATIVE,
+                    effective_route=PageRoute.NATIVE,
+                    parser="docling",
+                )
+            ],
+            elements=[],
+        ),
+        markdown="Native text",
+        json='{"schema_version":"5.0.0"}',
+    )
+
+    class FakeUniversalParser:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def parse(self, *_args, **_kwargs):
+            return result
+
+    monkeypatch.setattr(universal, "UniversalDocumentParser", FakeUniversalParser)
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "notice.html", source, "text/html"
+    ).run(timeout=20)
+    selector = next(
+        item
+        for item in app.selectbox
+        if item.label == "Processing type · notice.html"
+    )
+    app = selector.select("Other Native").run(timeout=20)
+    app = next(
+        button for button in app.button if button.label == "Parse document"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert [tab.label for tab in app.tabs] == [
+        "Overview",
+        "Markdown",
+        "Extract",
+        "JSON",
+        "Source Structure",
+    ]
+    assert not any(button.label == "Download annotated PDF" for button in app.button)
 
 
 def test_completed_batch_restores_after_app_restart_without_reparsing(

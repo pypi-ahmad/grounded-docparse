@@ -60,6 +60,21 @@ class EvaluationTable(BaseModel):
     cells: list[EvaluationTableCell] = Field(default_factory=list)
 
 
+class EvaluationNativeExtraction(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    pointer: str = Field(pattern=r"^/")
+    source_text: str = Field(min_length=1)
+    char_interval: tuple[int, int]
+    anchor_id: str
+
+    @model_validator(mode="after")
+    def valid_interval(self) -> EvaluationNativeExtraction:
+        if self.char_interval[0] < 0 or self.char_interval[0] >= self.char_interval[1]:
+            raise ValueError("native extraction interval is invalid")
+        return self
+
+
 class CorpusAnnotation(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -77,6 +92,7 @@ class CorpusAnnotation(BaseModel):
     continuity_pairs: list[tuple[str, str]] = Field(default_factory=list)
     forbidden_literals: list[str] = Field(default_factory=list)
     rejected_block_ids: list[str] = Field(default_factory=list)
+    native_extractions: list[EvaluationNativeExtraction] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def reject_duplicate_anchor_ids(self) -> CorpusAnnotation:
@@ -89,6 +105,13 @@ class CorpusAnnotation(BaseModel):
             )
         if any(page < 1 for page in self.reference_pages):
             raise ValueError("reference page numbers must be positive")
+        anchor_ids = {anchor.id for anchor in self.anchors}
+        for extraction in self.native_extractions:
+            start, end = extraction.char_interval
+            if self.reference_text is None or self.reference_text[start:end] != extraction.source_text:
+                raise ValueError("native extraction must match exact reference text")
+            if extraction.anchor_id not in anchor_ids:
+                raise ValueError("native extraction must resolve to an evaluation anchor")
         return self
 
 

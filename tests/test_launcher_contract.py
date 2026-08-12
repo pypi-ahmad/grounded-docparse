@@ -121,5 +121,9 @@ def test_installer_reuses_dependencies_and_has_cpu_fallback() -> None:
 
     assert ".docparse-lock-$BACKEND" in setup
     assert "local-ocr-cpu" in setup
+    assert "--extra native" in setup
+    assert "import docling" in setup
+    assert "langextract" in setup
+    assert "pdf_inspector" in setup
     assert "NVIDIA runtime validation failed; switching to Ollama CPU fallback" in installer
     assert "DOCPARSE_AMD_GPU" in installer

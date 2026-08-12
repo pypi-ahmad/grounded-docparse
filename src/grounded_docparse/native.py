@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .models import AgentTraceEvent, RunUsage
+from .models import AgentTraceEvent, RunUsage, StoredSchema
 
 
 class ProcessingType(StrEnum):
@@ -85,11 +85,23 @@ class CsvSourceAnchor(BaseModel):
     column_end: int = Field(ge=1)
 
 
+class TextSourceAnchor(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["text"] = "text"
+    unit_id: str
+    start_line: int = Field(ge=1)
+    end_line: int = Field(ge=1)
+    start_column: int = Field(ge=1)
+    end_column: int = Field(ge=1)
+
+
 SourceAnchor = Annotated[
     PdfSourceAnchor
     | StructuralSourceAnchor
     | CellSourceAnchor
-    | CsvSourceAnchor,
+    | CsvSourceAnchor
+    | TextSourceAnchor,
     Field(discriminator="kind"),
 ]
 
@@ -134,6 +146,53 @@ class NativeElement(BaseModel):
     children: list[str] = Field(default_factory=list)
 
 
+class NativeAsset(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    type: Literal["embedded_image"] = "embedded_image"
+    anchor: SourceAnchor
+    media_type: str | None = None
+    filename: str | None = None
+    reference: str | None = None
+    sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    width: int | None = Field(default=None, gt=0)
+    height: int | None = Field(default=None, gt=0)
+    alt_text: str | None = None
+    caption: str | None = None
+    ocr_performed: Literal[False] = False
+
+
+class CharacterInterval(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def valid_range(self) -> CharacterInterval:
+        if self.start >= self.end:
+            raise ValueError("character interval start must be below end")
+        return self
+
+
+class NativeExtractionEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source_text: str
+    char_interval: CharacterInterval
+    source_spans: list[SourceSpan] = Field(min_length=1)
+
+
+class NativeExtractedValue(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    pointer: str = Field(pattern=r"^/")
+    extraction_class: str
+    value: Any
+    evidence: NativeExtractionEvidence
+
+
 class NativeDocument(BaseModel):
     model_config = ConfigDict(extra="forbid", validate_assignment=True)
 
@@ -144,14 +203,22 @@ class NativeDocument(BaseModel):
     base_text: str = Field(frozen=True)
     units: list[SourceUnit]
     elements: list[NativeElement]
+    assets: list[NativeAsset] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def valid_grounding(self) -> NativeDocument:
         unit_ids = {unit.id for unit in self.units}
         element_ids = {element.id for element in self.elements}
-        if len(unit_ids) != len(self.units) or len(element_ids) != len(self.elements):
-            raise ValueError("unit and element IDs must be unique")
+        asset_ids = {asset.id for asset in self.assets}
+        if (
+            len(unit_ids) != len(self.units)
+            or len(element_ids) != len(self.elements)
+            or len(asset_ids) != len(self.assets)
+        ):
+            raise ValueError("unit, element, and asset IDs must be unique")
+        if element_ids & asset_ids:
+            raise ValueError("element and asset IDs must not overlap")
         for element in self.elements:
             if element.source.element_id != element.id:
                 raise ValueError("source span element_id must match its element")
@@ -159,6 +226,9 @@ class NativeDocument(BaseModel):
                 raise ValueError("source span is outside base_text")
             if element.source.anchor.unit_id not in unit_ids:
                 raise ValueError("source anchor references an unknown unit")
+        for asset in self.assets:
+            if asset.anchor.unit_id not in unit_ids:
+                raise ValueError("asset anchor references an unknown unit")
         return self
 
     def source_spans_for(self, start: int, end: int) -> list[SourceSpan]:
@@ -193,6 +263,19 @@ class NativeParseResult:
     trace: list[AgentTraceEvent] = field(default_factory=list)
 
 
+@dataclass(slots=True)
+class NativeExtractionResult:
+    schema: StoredSchema
+    schema_fingerprint: str
+    data: dict[str, Any]
+    values: list[NativeExtractedValue]
+    evidence: dict[str, list[dict[str, Any]]]
+    json: str
+    warnings: list[str] = field(default_factory=list)
+    usage: RunUsage = field(default_factory=RunUsage)
+    trace: list[AgentTraceEvent] = field(default_factory=list)
+
+
 @dataclass(frozen=True, slots=True)
 class RenderedNativeDocument:
     markdown: str
@@ -218,6 +301,7 @@ def render_native_document(
             "warnings": document.warnings,
         },
         "elements": [element.model_dump(mode="json") for element in document.elements],
+        "assets": [asset.model_dump(mode="json") for asset in document.assets],
         "document": {
             "id": "document",
             "units": [unit.model_dump(mode="json") for unit in document.units],
@@ -227,3 +311,15 @@ def render_native_document(
         markdown=markdown,
         json=json.dumps(payload, ensure_ascii=False, indent=2),
     )
+
+
+def render_native_combined_result(
+    parse_result: NativeParseResult,
+    extraction: NativeExtractionResult | None = None,
+) -> str:
+    payload = json.loads(parse_result.json)
+    payload["schema_version"] = "5.1.0"
+    payload["extraction"] = (
+        json.loads(extraction.json) if extraction is not None else None
+    )
+    return json.dumps(payload, ensure_ascii=False, indent=2)

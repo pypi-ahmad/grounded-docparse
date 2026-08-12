@@ -25,6 +25,7 @@ Parse PDFs and images into grounded Markdown, structured JSON, and annotated PDF
 - Optionally refine Markdown through presentation directives keyed by existing elements.
 - Optionally classify the document and generate a hierarchical, source-linked TOC.
 - Run extraction on demand with a strict nullable JSON Schema subset and existing-element evidence.
+- Native v5 extraction uses immutable `base_text`, never refined Markdown, and accepts only exact `char_interval` values resolving to source anchors.
 - Run chat on demand and expose only citations to known elements.
 - Use strict Structured Outputs, one schema-format retry, `store=False`, and no application-supplied cache controls.
 - Keep Fast as classification-only, Full as refinement/classification/TOC, and Custom as any other toggle combination.

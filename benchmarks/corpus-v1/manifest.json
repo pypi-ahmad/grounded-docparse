@@ -12,7 +12,8 @@
       },
       "annotation_path": "benchmarks/corpus-v1/annotations/native-text.json",
       "features": [
-        "native_text"
+        "native_text",
+        "langextract_exact_grounding"
       ],
       "synthetic": true
     },

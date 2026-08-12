@@ -21,9 +21,15 @@ from .models import (
     ParseResult,
     RuntimeDiagnostics,
     RunUsage,
+    StoredSchema,
     VisualRecoveryResult,
 )
-from .native import NativeDocument, NativeParseResult
+from .native import (
+    NativeDocument,
+    NativeExtractedValue,
+    NativeExtractionResult,
+    NativeParseResult,
+)
 
 WorkspaceStatus = Literal["pending", "processing", "interrupted", "complete", "failed"]
 
@@ -39,6 +45,7 @@ class StoredWorkspaceDocument:
     parsed_source: bytes | None
     result: ParseResult | NativeParseResult | None
     analysis: AgenticAnalysis | None
+    extraction: NativeExtractionResult | None
 
 
 @dataclass(slots=True)
@@ -96,7 +103,7 @@ def _parse_result_payload(result: ParseResult | NativeParseResult) -> dict:
 
 
 def _parse_result(
-    value: dict, annotated_pdf: bytes
+    value: dict, annotated_pdf: bytes | None
 ) -> ParseResult | NativeParseResult:
     if value.get("kind") == "native-v5":
         return NativeParseResult(
@@ -140,6 +147,34 @@ def _parse_result(
     )
 
 
+def _native_extraction_payload(result: NativeExtractionResult) -> dict:
+    return {
+        "schema": result.schema.model_dump(mode="json"),
+        "schema_fingerprint": result.schema_fingerprint,
+        "data": result.data,
+        "values": [item.model_dump(mode="json") for item in result.values],
+        "evidence": result.evidence,
+        "json": result.json,
+        "warnings": result.warnings,
+        "usage": result.usage.model_dump(mode="json", exclude_computed_fields=True),
+        "trace": [item.model_dump(mode="json") for item in result.trace],
+    }
+
+
+def _native_extraction(value: dict) -> NativeExtractionResult:
+    return NativeExtractionResult(
+        schema=StoredSchema.model_validate(value["schema"]),
+        schema_fingerprint=value["schema_fingerprint"],
+        data=value["data"],
+        values=[NativeExtractedValue.model_validate(item) for item in value["values"]],
+        evidence=value["evidence"],
+        json=value["json"],
+        warnings=value.get("warnings", []),
+        usage=RunUsage.model_validate(value.get("usage", {})),
+        trace=[AgentTraceEvent.model_validate(item) for item in value.get("trace", [])],
+    )
+
+
 class WorkspaceStore:
     def __init__(self, database_path: str | Path) -> None:
         self.database_path = Path(database_path)
@@ -176,10 +211,19 @@ class WorkspaceStore:
                 progress_json TEXT,
                 result_json TEXT,
                 analysis_json TEXT,
+                extraction_json TEXT,
                 updated_at TEXT NOT NULL
             );
             """
         )
+        columns = {
+            row[1]
+            for row in connection.execute("PRAGMA table_info(batch_workspace_documents)")
+        }
+        if "extraction_json" not in columns:
+            connection.execute(
+                "ALTER TABLE batch_workspace_documents ADD COLUMN extraction_json TEXT"
+            )
         return connection
 
     def _directory(self, document_id: str) -> Path:
@@ -277,6 +321,7 @@ class WorkspaceStore:
         parsed_source: bytes | None = None,
         result: ParseResult | NativeParseResult | None = None,
         analysis: AgenticAnalysis | None = None,
+        extraction: NativeExtractionResult | None = None,
     ) -> None:
         directory = self._directory(document_id)
         if parsed_source is not None:
@@ -288,7 +333,8 @@ class WorkspaceStore:
                 """
                 UPDATE batch_workspace_documents SET
                     status=?, error=?, selection_key=?, analysis_key=?,
-                    progress_json=?, result_json=?, analysis_json=?, updated_at=?
+                    progress_json=?, result_json=?, analysis_json=?, extraction_json=?,
+                    updated_at=?
                 WHERE document_id=?
                 """,
                 (
@@ -301,6 +347,11 @@ class WorkspaceStore:
                     (
                         analysis.model_dump_json(exclude_computed_fields=True)
                         if analysis is not None
+                        else None
+                    ),
+                    (
+                        json.dumps(_native_extraction_payload(extraction))
+                        if extraction is not None
                         else None
                     ),
                     _now(),
@@ -376,7 +427,8 @@ class WorkspaceStore:
                     UPDATE batch_workspace_documents SET
                         status='pending', error=NULL, selection_key=NULL,
                         analysis_key=NULL, progress_json=NULL,
-                        result_json=NULL, analysis_json=NULL, updated_at=?
+                        result_json=NULL, analysis_json=NULL, extraction_json=NULL,
+                        updated_at=?
                     """,
                     (_now(),),
                 )
@@ -392,6 +444,7 @@ class WorkspaceStore:
             directory = self._directory(row["document_id"])
             source = (directory / "source.bin").read_bytes()
             result = None
+            extraction = None
             parsed_source = None
             restore_error = (
                 "Saved source is corrupt or incomplete"
@@ -405,10 +458,21 @@ class WorkspaceStore:
             ):
                 try:
                     parsed_source = (directory / "parsed-source.bin").read_bytes()
+                    annotated_path = directory / "annotated.pdf"
+                    result_payload = json.loads(row["result_json"])
+                    if (
+                        result_payload.get("kind") != "native-v5"
+                        and not annotated_path.exists()
+                    ):
+                        raise FileNotFoundError("missing annotated PDF")
                     result = _parse_result(
-                        json.loads(row["result_json"]),
-                        (directory / "annotated.pdf").read_bytes(),
+                        result_payload,
+                        annotated_path.read_bytes() if annotated_path.exists() else None,
                     )
+                    if row["extraction_json"] is not None:
+                        extraction = _native_extraction(
+                            json.loads(row["extraction_json"])
+                        )
                 except Exception:  # noqa: BLE001 - isolate corrupt local artifacts
                     parsed_source = None
                     result = None
@@ -419,7 +483,8 @@ class WorkspaceStore:
                         """
                         UPDATE batch_workspace_documents SET
                             status='failed', error=?, analysis_key=NULL,
-                            result_json=NULL, analysis_json=NULL, updated_at=?
+                            result_json=NULL, analysis_json=NULL, extraction_json=NULL,
+                            updated_at=?
                         WHERE document_id=?
                         """,
                         (restore_error, _now(), row["document_id"]),
@@ -472,6 +537,7 @@ class WorkspaceStore:
                         if row["analysis_json"] and result is not None
                         else None
                     ),
+                    extraction=extraction,
                 )
             )
         return StoredWorkspace(
