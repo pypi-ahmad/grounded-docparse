@@ -3,6 +3,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_wsl_shell_scripts_use_unix_line_endings() -> None:
+    for script in sorted((ROOT / "scripts" / "wsl").glob("*.sh")):
+        content = script.read_bytes()
+
+        assert content.startswith(b"#!/usr/bin/env bash\n"), script
+        assert b"\r\n" not in content, script
+
+
 def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
     launcher = (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8")
     installer = (
@@ -76,6 +84,25 @@ def test_paddle_runtime_downloads_once_then_uses_local_cache_offline() -> None:
     assert "PADDLE_PDX_LOCAL_FONT_FILE_PATH" in paddle_runtime
 
 
+def test_paddle_runtime_project_is_complete_and_packaged() -> None:
+    project = ROOT / "paddle-runtime"
+    setup = (ROOT / "scripts" / "wsl" / "setup-paddleocr.sh").read_text(
+        encoding="utf-8"
+    )
+    installer = (ROOT / "installer" / "GroundedDocParse.iss").read_text(
+        encoding="utf-8"
+    )
+
+    assert (project / "pyproject.toml").is_file()
+    assert (project / "uv.lock").is_file()
+    assert 'PADDLE_PROJECT="$PROJECT_ROOT/paddle-runtime"' in setup
+    assert 'sha256sum "$PADDLE_PROJECT/uv.lock"' in setup
+    assert '--project "$PADDLE_PROJECT" --locked' in setup
+    assert "Launch-PaddleOCR-VL-1.6.cmd" in installer
+    assert "paddle-runtime\\pyproject.toml" in installer
+    assert "paddle-runtime\\uv.lock" in installer
+
+
 def test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format() -> None:
     manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
 
@@ -111,6 +138,21 @@ def test_primary_launcher_defaults_to_glm_but_supports_runtime_switching() -> No
     assert run_app.index("export DOCPARSE_GLMOCR_CONFIG_PATH") < run_app.index(
         'if [[ "$DOCPARSE_OCR_ENGINE" == "glm-ocr" ]]'
     )
+
+
+def test_launchers_repair_shared_environment_and_use_current_worktree() -> None:
+    manager = (ROOT / "scripts" / "wsl" / "manage-ocr-stack.sh").read_text(
+        encoding="utf-8"
+    )
+    run_app = (ROOT / "scripts" / "wsl" / "run-app.sh").read_text(
+        encoding="utf-8"
+    )
+
+    assert "glm_environment_current()" in manager
+    assert 'sha256sum "$PROJECT_ROOT/uv.lock"' in manager
+    assert 'glm_environment_current "$backend"' in manager
+    assert "glm_environment_current vllm" in manager
+    assert 'export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"' in run_app
 
 
 def test_installer_reuses_dependencies_and_has_cpu_fallback() -> None:

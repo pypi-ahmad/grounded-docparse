@@ -94,6 +94,16 @@ glm_backend() {
   printf '%s' "$backend"
 }
 
+glm_environment_current() {
+  local backend="$1" lock_marker lock_hash
+  lock_marker="$WSL_ENV/.docparse-lock-$backend"
+  [[ -x "$WSL_ENV/bin/python" && \
+    -f "$WSL_ENV/.docparse-local-ocr-ready-$backend" && \
+    -f "$lock_marker" && -f "$PROJECT_ROOT/uv.lock" ]] || return 1
+  lock_hash="$(sha256sum "$PROJECT_ROOT/uv.lock" | cut -d' ' -f1)"
+  [[ "$(<"$lock_marker")" == "$lock_hash" ]]
+}
+
 stop_glm() {
   stop_managed "$RUNTIME_DIR/vllm.pid" "vllm serve" "GLM vLLM"
   stop_managed "$RUNTIME_DIR/ollama.pid" "ollama serve" "GLM Ollama"
@@ -124,7 +134,8 @@ ensure_glm() {
     return 1
   fi
   stop_paddle || return 1
-  if [[ ! -x "$WSL_ENV/bin/python" || ! -f "$WSL_ENV/.docparse-local-ocr-ready-$backend" ]]; then
+  if ! glm_environment_current "$backend"; then
+    stop_glm || return 1
     echo "Installing locked $backend GLM-OCR environment..."
     DOCPARSE_LOCAL_OCR_BACKEND="$backend" bash scripts/wsl/setup-glmocr.sh || return 1
   fi
@@ -186,11 +197,11 @@ ensure_paddle() {
   export PADDLE_PDX_CACHE_HOME="$PADDLE_CACHE_HOME"
   export PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
   export HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0
-  if [[ ! -x "$WSL_ENV/bin/python" ]]; then
+  stop_glm || return 1
+  if ! glm_environment_current vllm; then
     echo "Installing the main application and GLM-OCR environment..."
     DOCPARSE_LOCAL_OCR_BACKEND=vllm bash scripts/wsl/setup-glmocr.sh || return 1
   fi
-  stop_glm || return 1
   echo "Checking isolated PaddleOCR-VL-1.6 environment..."
   bash scripts/wsl/setup-paddleocr.sh || return 1
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1

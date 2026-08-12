@@ -5,12 +5,18 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUNTIME_DIR="$PROJECT_ROOT/.runtime"
 PADDLE_ENV="${DOCPARSE_PADDLE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.paddle-venv}"
 PADDLE_CACHE_HOME="${PADDLE_PDX_CACHE_HOME:-$HOME/.paddlex}"
+PADDLE_PROJECT="$PROJECT_ROOT/paddle-runtime"
 cd "$PROJECT_ROOT"
 mkdir -p "$RUNTIME_DIR" "$(dirname "$PADDLE_ENV")"
 export PADDLE_PDX_CACHE_HOME="$PADDLE_CACHE_HOME"
 export PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
 exec 8>"$RUNTIME_DIR/setup-paddle.lock"
 flock 8
+
+if [[ ! -f "$PADDLE_PROJECT/pyproject.toml" || ! -f "$PADDLE_PROJECT/uv.lock" ]]; then
+  echo "ERROR: Paddle runtime files are missing. Restore the complete application installation." >&2
+  exit 1
+fi
 
 UV_BIN="$(command -v uv || true)"
 [[ -n "$UV_BIN" ]] || UV_BIN="$HOME/.local/bin/uv"
@@ -23,7 +29,7 @@ if [[ ! -x "$PADDLE_ENV/bin/python" ]]; then
   "$UV_BIN" venv --python 3.12.10 "$PADDLE_ENV"
 fi
 export UV_PROJECT_ENVIRONMENT="$PADDLE_ENV"
-LOCK_HASH="$(sha256sum paddle-runtime/uv.lock | cut -d' ' -f1)"
+LOCK_HASH="$(sha256sum "$PADDLE_PROJECT/uv.lock" | cut -d' ' -f1)"
 LOCK_MARKER="$PADDLE_ENV/.docparse-paddle-lock"
 BASE_CONFIG="$RUNTIME_DIR/paddleocr-vl-base.yaml"
 TARGET_CONFIG="$RUNTIME_DIR/paddleocr-vl-1.6.yaml"
@@ -39,7 +45,7 @@ if [[ -f "$PADDLE_ENV/.docparse-paddle-ready" && \
   fi
   echo "PaddleOCR cache is incomplete; restoring missing assets..."
 fi
-"$UV_BIN" sync --project paddle-runtime --locked
+"$UV_BIN" sync --project "$PADDLE_PROJECT" --locked
 "$PADDLE_ENV/bin/python" -c 'import paddle, paddleocr, paddlex, vllm'
 
 if [[ ! -f "$BASE_CONFIG" ]] || \

@@ -5,6 +5,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 WSL_ENV="${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}"
 source "$WSL_ENV/bin/activate"
+export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 APP_DATA_DIR="${DOCPARSE_WSL_DATA:-$HOME/.local/share/grounded-docparse}"
 export HF_HOME="${HF_HOME:-$APP_DATA_DIR/huggingface}"
 export DOCPARSE_LOCAL_OCR_ENABLED=true

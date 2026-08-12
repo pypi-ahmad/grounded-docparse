@@ -1,7 +1,7 @@
 ---
 tags: architecture, repository, development
 sources: docs/architecture.md, docs/codebase/ARCHITECTURE.md, pyproject.toml
-snapshot: content-2ae93e3d37db
+snapshot: content-dde17504a128
 status: feature-branch
 ---
 

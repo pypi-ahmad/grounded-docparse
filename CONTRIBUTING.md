@@ -2,6 +2,11 @@
 
 Contributions should preserve source grounding, explicit uncertainty, and deterministic export behavior.
 
+By participating, you agree to follow the [code of conduct](CODE_OF_CONDUCT.md).
+Review the [technical overview](TECHNICAL.md), [usage guide](USAGE.md), and
+[security policy](SECURITY.md) before changing a public contract or trust
+boundary.
+
 ## Setup
 
 ```powershell
@@ -74,3 +79,5 @@ Do not include API keys, bearer tokens, source documents, crops, local data, or 
 ## Reporting security issues
 
 Do not open public issues for undisclosed vulnerabilities. Follow [SECURITY.md](SECURITY.md).
+Report conduct concerns through the private process in
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

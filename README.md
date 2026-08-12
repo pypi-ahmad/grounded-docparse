@@ -256,6 +256,7 @@ full_json = render_combined_result(result, analysis)
 
 | Guide | Purpose |
 | --- | --- |
+| [Usage](USAGE.md) | Quick-start launch, manual routing, CLI, outputs, and troubleshooting |
 | [Setup](SETUP.md) | Supported Windows/WSL installation, runtime configuration, and troubleshooting |
 | [Run locally](docs/run.md) | Launcher behavior, manual service commands, and shutdown steps |
 | [Tutorial](docs/tutorial.md) | End-user walkthrough of parsing, extraction, chat, and downloads |
@@ -263,6 +264,7 @@ full_json = render_combined_result(result, analysis)
 | [Zero-to-hero technical tutorial](docs/zero-to-hero-tutorial.md) | First-principles setup, usage, Python integration, internals, testing, and production boundaries |
 | [Business extraction workflow](docs/business-user-extraction-workflow.md) | Non-technical workflow for large reusable field sets |
 | [Architecture](docs/architecture.md) | Components, ownership rules, pipeline stages, and failure boundaries |
+| [Technical overview](TECHNICAL.md) | Engineering entry point for routing, evidence, persistence, and extension |
 | [Python API](docs/api.md) | Exported names, signatures, schemas, and result contracts |
 | [Private evaluation](docs/private-evaluation.md) | Confidence calibration, review-rate tracking, and regression gates |
 | [Product specification](docs/spec.md) | Required behavior, public interfaces, and non-goals |
@@ -270,6 +272,8 @@ full_json = render_combined_result(result, analysis)
 | [Local PaddleOCR-VL-1.6](docs/local-paddleocr-vl.md) | Isolated Paddle runtime installation, health checks, and troubleshooting |
 | [Azure bulk medical fax deployment](docs/azure-bulk-fax-deployment.md) | Production design and operations runbook for secure bulk medical-fax processing on Azure |
 | [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, and retention |
+| [Contributing](CONTRIBUTING.md) | Development workflow, verification, and architecture constraints |
+| [Code of conduct](CODE_OF_CONDUCT.md) | Community standards and private conduct reporting |
 
 ## Development
 

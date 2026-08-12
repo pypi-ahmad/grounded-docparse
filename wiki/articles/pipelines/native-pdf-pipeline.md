@@ -1,7 +1,7 @@
 ---
 tags: pdf, native, pdf-inspector
 sources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, docs/spec.md
-snapshot: content-2ae93e3d37db
+snapshot: content-dde17504a128
 status: feature-branch
 ---
 
