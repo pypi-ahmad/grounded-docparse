@@ -23,6 +23,22 @@ from .models import (
     StoredSchema,
     VisualRecoveryResult,
 )
+from .native import (
+    CellSourceAnchor,
+    CsvSourceAnchor,
+    NativeDocument,
+    NativeElement,
+    NativeParseResult,
+    PageRoute,
+    PdfSourceAnchor,
+    PreviewArtifact,
+    ProcessingType,
+    SourceFormat,
+    SourceSpan,
+    SourceUnit,
+    StructuralSourceAnchor,
+    render_native_document,
+)
 from .pipeline import DocumentParser
 from .render import render_combined_result
 
@@ -51,5 +67,19 @@ __all__ = [
     "SegmentExtraction",
     "StoredSchema",
     "VisualRecoveryResult",
+    "CellSourceAnchor",
+    "CsvSourceAnchor",
+    "NativeDocument",
+    "NativeElement",
+    "NativeParseResult",
+    "PageRoute",
+    "PdfSourceAnchor",
+    "PreviewArtifact",
+    "ProcessingType",
+    "SourceFormat",
+    "SourceSpan",
+    "SourceUnit",
+    "StructuralSourceAnchor",
+    "render_native_document",
     "render_combined_result",
 ]
