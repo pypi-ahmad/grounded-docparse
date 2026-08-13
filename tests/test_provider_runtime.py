@@ -11,7 +11,7 @@ import pytest
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
 from grounded_docparse import pipeline
-from grounded_docparse.config import ParserConfig
+from grounded_docparse.config import OcrEngine, ParserConfig
 from grounded_docparse.gateways import OpenAIDocumentGateway
 from grounded_docparse.ingest import IngestedDocument, PageEvidence
 from grounded_docparse.models import (
@@ -386,7 +386,7 @@ def test_parser_binds_one_runtime_without_changing_factory_signature(
     assert len({id(gateway.runtime) for gateway in gateways}) == 1
     assert responses.calls >= 2
     assert all(page.blocks for page in result.document.pages)
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert payload["metadata"]["runtime"]["http_attempts"] == responses.calls
     assert result.runtime_diagnostics is not None
     assert (
@@ -398,19 +398,29 @@ def test_parser_binds_one_runtime_without_changing_factory_signature(
 def test_runtime_config_defaults_environment_and_validation(monkeypatch) -> None:
     defaults = ParserConfig()
     assert defaults.provider_retry_attempts == 3
-    assert defaults.max_visual_recovery_crops == 8
+    assert defaults.max_visual_recovery_crops == 64
     assert defaults.crop_padding == 0.1
+    assert defaults.glm_form_recovery_enabled is True
+    assert defaults.ocr_engine is OcrEngine.GLM_OCR
 
     monkeypatch.setenv("DOCPARSE_PROVIDER_CONCURRENCY", "7")
     monkeypatch.setenv("DOCPARSE_PROVIDER_RETRY_ATTEMPTS", "4")
     monkeypatch.setenv("DOCPARSE_MAX_VISUAL_RECOVERY_CROPS", "6")
+    monkeypatch.setenv("DOCPARSE_GLM_FORM_RECOVERY_ENABLED", "false")
+    monkeypatch.setenv("DOCPARSE_OCR_ENGINE", "paddleocr-vl-1.6")
 
     config = ParserConfig.from_env()
     assert config.provider_concurrency == 7
     assert config.provider_retry_attempts == 4
     assert config.max_visual_recovery_crops == 6
+    assert config.glm_form_recovery_enabled is False
+    assert config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
 
     with pytest.raises(ValueError, match="provider_retry_attempts"):
         ParserConfig(provider_retry_attempts=0)
     with pytest.raises(ValueError, match="max_visual_recovery_crops"):
         ParserConfig(max_visual_recovery_crops=0)
+    with pytest.raises(ValueError, match="paddleocr_timeout_seconds"):
+        ParserConfig(paddleocr_timeout_seconds=0)
+    with pytest.raises(ValueError, match="HTTP loopback origin"):
+        ParserConfig(paddleocr_service_url="https://example.com:8119")

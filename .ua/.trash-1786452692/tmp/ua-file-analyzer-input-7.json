@@ -1,0 +1,147 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "docs-site/agentic-document-extraction-comparison.html",
+      "language": "html",
+      "sizeLines": 331,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/api.html",
+      "language": "html",
+      "sizeLines": 366,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/architecture.html",
+      "language": "html",
+      "sizeLines": 288,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/azure-bulk-fax-deployment.html",
+      "language": "html",
+      "sizeLines": 1062,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/business-user-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 296,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/changelog.html",
+      "language": "html",
+      "sizeLines": 217,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/complete-user-guide.html",
+      "language": "html",
+      "sizeLines": 1636,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/contributing.html",
+      "language": "html",
+      "sizeLines": 132,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/extraction-quality-research.html",
+      "language": "html",
+      "sizeLines": 160,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-grounded-docparse-is-agentic.html",
+      "language": "html",
+      "sizeLines": 253,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-it-works.html",
+      "language": "html",
+      "sizeLines": 84,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/index.html",
+      "language": "html",
+      "sizeLines": 273,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--bug-report.html",
+      "language": "html",
+      "sizeLines": 105,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--feature-request.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 495,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-glmocr.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-paddleocr-vl.html",
+      "language": "html",
+      "sizeLines": 201,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/research.html",
+      "language": "html",
+      "sizeLines": 82,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/run.html",
+      "language": "html",
+      "sizeLines": 165,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/security-content-excluded.html",
+      "language": "html",
+      "sizeLines": 66,
+      "fileCategory": "markup"
+    }
+  ],
+  "batchImportData": {
+    "docs-site/agentic-document-extraction-comparison.html": [],
+    "docs-site/api.html": [],
+    "docs-site/architecture.html": [],
+    "docs-site/azure-bulk-fax-deployment.html": [],
+    "docs-site/business-user-extraction-workflow.html": [],
+    "docs-site/changelog.html": [],
+    "docs-site/complete-user-guide.html": [],
+    "docs-site/contributing.html": [],
+    "docs-site/extraction-quality-research.html": [],
+    "docs-site/how-grounded-docparse-is-agentic.html": [],
+    "docs-site/how-it-works.html": [],
+    "docs-site/index.html": [],
+    "docs-site/issue-template--bug-report.html": [],
+    "docs-site/issue-template--feature-request.html": [],
+    "docs-site/layout-aware-large-field-extraction-workflow.html": [],
+    "docs-site/local-glmocr.html": [],
+    "docs-site/local-paddleocr-vl.html": [],
+    "docs-site/research.html": [],
+    "docs-site/run.html": [],
+    "docs-site/security-content-excluded.html": []
+  }
+}

@@ -1,6 +1,19 @@
 # Python API
 
-The package requires Python 3.12–3.14. Install the locked project environment with `uv sync --locked`. Actual GLM parsing also requires the Linux-only local OCR extra and running GLM service described in [setup](../SETUP.md).
+The package requires Python 3.12–3.14. Install native parsing with `uv sync --locked --extra native`. Scanned-PDF and image OCR additionally require the GLM-OCR or PaddleOCR-VL-1.6 stack described in [setup](../SETUP.md).
+
+## CLI batch command
+
+Use `ingest` for explicit native/OCR routing. It requires exactly one `--processing-type PATH=TYPE` assignment for every input and rejects missing, duplicate, unknown, or incompatible assignments. Mixed PDFs also require one `--page-route PATH#PAGE=ROUTE` assignment for every page.
+
+```text
+grounded-docparse ingest INPUT [INPUT ...] --processing-type PATH=TYPE [--processing-type PATH=TYPE ...] [--page-route PATH#PAGE=ROUTE ...] --output DIR [--schema SCHEMA] [--overwrite]
+grounded-docparse parse INPUT [INPUT ...] --output DIR [--schema SCHEMA] [--overwrite]
+```
+
+`ingest` supports PDFs, DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, EPUB, PNG, JPEG, and TIFF. Directory discovery is non-recursive and deterministic; duplicate resolved paths are processed once. `parse` remains the legacy OCR command for PDFs and images. The optional `.json` or `.md` schema applies to every document and requires `OPENAI_API_KEY`. JSON accepts either the strict extraction schema itself or an exported `StoredSchema` envelope.
+
+Each document receives a `<stem>-<sha256-prefix>` folder with Markdown, Full JSON, and optional extraction JSON. OCR routes add an annotated PDF; native nonvisual formats do not. Native v5 results use `LangExtractNativeExtractor.extract(parse_result, stored_schema)` and emit exact source text, Unicode-codepoint `char_interval`, and resolved `SourceSpan` anchors. Missing, fuzzy, mismatched, or unanchored intervals are rejected. `manifest.json` reports the source hash, generated files, status, failed stage, and safe error. The command continues after document failures and returns `0` for complete success, `1` for partial/total document failure, or `2` for argument and preflight errors.
 
 ## Exported names
 
@@ -16,6 +29,7 @@ Document
 DocumentAgent
 DocumentExtractor
 DocumentParser
+UniversalDocumentParser
 Element
 EnhancementMetadata
 ExtractionResult
@@ -23,14 +37,21 @@ FormClassificationResult
 FormSegment
 ParseMetadata
 ParseResult
+OcrEngine
+ProcessingType
+PageRoute
 ParserConfig
 PreparedDocumentContext
 SchemaProposal
 RoutedExtractionResult
 SegmentExtraction
 StoredSchema
+SourceAnchor
+SourceSpan
+NativeParseResult
 VisualRecoveryResult
 render_combined_result
+render_native_combined_result
 ```
 
 ## Parsing
@@ -62,9 +83,30 @@ result = DocumentParser().parse(
 )
 ```
 
-`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and none of the nonblank pages contains a GLM layout region, the default parser raises `RuntimeError`. Optional Luna failures otherwise fall back to the successful GLM result or feature warning/status.
+`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and none of the nonblank pages contains a local OCR layout region, the default parser raises `RuntimeError`. Optional Luna failures otherwise fall back to the successful local OCR result or feature warning/status.
 
 The Python parse API has no page-range argument. Slice a PDF before calling it or use the Streamlit range control.
+
+## Universal document parsing
+
+```text
+UniversalDocumentParser(config: ParserConfig | None = None, *, legacy_parser=None, pdf_parser=None, docling_parser=None, pdf_inspector=None)
+
+UniversalDocumentParser.parse(
+    data: bytes,
+    filename: str,
+    progress_callback: ProgressCallback | None = None,
+    *,
+    processing_type: ProcessingType,
+    page_routes: dict[int, PageRoute] | None = None,
+    refine_markdown: bool = True,
+    visual_recovery: bool = True,
+) -> ParseResult | NativeParseResult
+```
+
+`ProcessingType` is mandatory: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`. File signatures and container parts are checked before routing. Scanned PDFs and images go only to the existing OCR parser; Native PDFs use `pdf-inspector`; Mixed PDFs need every page route; supported non-PDF native formats use Docling with OCR, VLM/model enrichments, remote services, and external plugins disabled.
+
+`NativeParseResult` contains immutable `document.base_text`, native Markdown/JSON, source units, elements, character spans, and `SourceAnchor` values. `annotated_pdf` is optional. `render_native_combined_result` produces JSON v5.1.0 when optional native extraction has run.
 
 `ProgressCallback` is the structural type `Callable[[ProgressEvent], None]`. `ProgressEvent` has `stage: str`, `current: int`, `total: int`, and `message: str`. These annotation helpers live in `grounded_docparse.models` but are not package-root exports. Worker events are replayed on the caller thread. Callbacks should return quickly and should not raise.
 
@@ -231,7 +273,7 @@ The most frequently consumed exported models have these fields:
 
 | Model | Fields |
 | --- | --- |
-| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional GLM `confidence`, `source` (`glm-ocr` or `luna-recovery`) |
+| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, or `luna-recovery`) |
 | `ChatSource` | `element_id`, `page`, `text` |
 | `ChatAnswer` | `answer`, `sources`, `confidence` (`high`, `medium`, `low`), `usage`, `trace` |
 | `SchemaProposal` | `instruction`, `json_schema`, `usage` |
@@ -267,11 +309,11 @@ full_json = render_combined_result(
 )
 ```
 
-The returned string is Full JSON v4.5.0 (parse JSON remains v4.4.0):
+The returned string is Full JSON v4.6.0 (parse JSON is v4.5.0):
 
 ```json
 {
-  "schema_version": "4.5.0",
+  "schema_version": "4.6.0",
   "markdown": "...",
   "base_markdown": "...",
   "document_type": null,
@@ -302,7 +344,7 @@ Extraction serialization uses schema version `1.1.0`:
 }
 ```
 
-These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for Full JSON v4.5.0, extraction v1.1.0, or routed extraction v2.0.0; the Pydantic models and named versions are authoritative.
+These examples define the stable top-level envelopes, not complete JSON Schemas for every nested domain object. The repository currently publishes no standalone JSON Schema for Full JSON v4.6.0, extraction v1.1.0, or routed extraction v2.0.0; the Pydantic models and named versions are authoritative.
 
 ## Configuration and test doubles
 

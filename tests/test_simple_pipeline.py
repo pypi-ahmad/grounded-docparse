@@ -5,10 +5,13 @@ import pymupdf
 from PIL import Image
 
 from grounded_docparse import pipeline as pipeline_module
-from grounded_docparse.config import ParserConfig
+from grounded_docparse.config import OcrEngine, ParserConfig
 from grounded_docparse.ingest import IngestedDocument, PageEvidence
+from grounded_docparse.local_ocr import GlmRegion, OcrPageResult, OcrRegion
 from grounded_docparse.models import (
     AgentRole,
+    AnalysisRegionType,
+    BoundingBox,
     InspectionAction,
     InspectionDecision,
     InspectionRegionAddition,
@@ -19,7 +22,13 @@ from grounded_docparse.models import (
     TableCellDraft,
     VerificationState,
 )
-from grounded_docparse.pipeline import DocumentParser
+from grounded_docparse.pipeline import (
+    DocumentParser,
+    _merge_confirmed_form_states,
+    _merge_form_html,
+    _paddle_form_states,
+    _recover_paddle_form_regions,
+)
 from grounded_docparse.runtime import ProviderRuntime
 
 
@@ -99,7 +108,7 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
     assert heading.children[0].section_path == ["Public notice"]
     assert "# Public notice" in result.markdown
     payload = json.loads(result.json)
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert payload["metadata"]["source_name"] == "notice.pdf"
     assert payload["metadata"]["usage"]["input_tokens"] == 23
     assert getattr(result, "input_tokens", None) == 23
@@ -202,6 +211,7 @@ def test_planner_approved_nonvisual_box_is_dispatched(tmp_path) -> None:
         source_width=200,
         source_height=200,
     )
+
     source = IngestedDocument(
         name="page.png",
         sha256="a" * 64,
@@ -227,6 +237,441 @@ def test_planner_approved_nonvisual_box_is_dispatched(tmp_path) -> None:
 
     assert gateway.inspected == ["p1-b1"]
     assert processed.visual_recovery_crops == 1
+
+
+def test_paddle_form_states_reads_standalone_marker_only_within_its_row() -> None:
+    recovered = (
+        "<table>"
+        "<tr><td>Referring provider</td><td>Participating</td>"
+        "<td>X</td><td>Nonparticipating</td></tr>"
+        "<tr><td>X</td></tr><tr><td>Office</td></tr>"
+        "</table>"
+    )
+
+    assert _paddle_form_states(recovered) == {
+        ("participating", 0): "unchecked",
+        ("nonparticipating", 0): "checked",
+        ("office", 0): None,
+    }
+
+
+def test_merge_confirmed_form_states_changes_only_confirmed_option_cells() -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr>"
+        "<tr><td colspan=\"3\">Full name: CHRISTOPHER J MCALLISTER, M.D.</td>"
+        "</tr></table>"
+    )
+
+    merged, count = _merge_confirmed_form_states(
+        primary,
+        {
+            ("participating", 0): "unchecked",
+            ("nonparticipating", 0): "checked",
+        },
+    )
+
+    assert merged == (
+        "<table><tr><td>Referring provider</td><td>[ ] Participating</td>"
+        "<td>[x] Nonparticipating</td></tr>"
+        "<tr><td colspan=\"3\">Full name: CHRISTOPHER J MCALLISTER, M.D.</td>"
+        "</tr></table>"
+    )
+    assert count == 2
+
+
+def test_paddle_form_recovery_merges_only_two_scale_consensus(
+    tmp_path, monkeypatch
+) -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr><tr><td>Full name: PATIENT</td>"
+        "</tr></table>"
+    )
+    working = (
+        "<table><tr><td>Servicing provider</td><td>Participating</td>"
+        "<td>X</td><td>Nonparticipating</td></tr></table>"
+    )
+    recovered = primary.replace(
+        "<td>Nonparticipating</td>", "<td>X</td><td>Nonparticipating</td>"
+    )
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (200, 300), "white").save(image_path)
+    source_path = tmp_path / "source.pdf"
+    source_path.write_bytes(b"%PDF-test")
+    page = PageEvidence(
+        number=1,
+        width=72,
+        height=108,
+        dpi=200,
+        image_path=image_path,
+        render_width_pixels=200,
+        render_height_pixels=300,
+        effective_dpi=200,
+        source_width=72,
+        source_height=108,
+        source_unit="pdf_points",
+    )
+    source = IngestedDocument("form.pdf", "a" * 64, source_path, [page])
+    referring = SimpleNamespace(
+        id="p1-r1", type=AnalysisRegionType.TABLE, text=primary
+    )
+    servicing = SimpleNamespace(
+        id="p1-r2", type=AnalysisRegionType.TABLE, text=working
+    )
+    analysis = SimpleNamespace(
+        quality=SimpleNamespace(blank=False),
+        regions=[referring, servicing],
+        warnings=[],
+    )
+    calls = []
+
+    class Runtime:
+        def parse_recovery_image(self, path):
+            calls.append(path)
+            return OcrPageResult(
+                path,
+                [
+                    OcrRegion(
+                        index=0,
+                        label="table",
+                        content=recovered,
+                        bbox=(0.1, 0.1, 0.9, 0.4),
+                    )
+                ],
+            )
+
+    def render_page(_source, _page, _bbox, output, **_kwargs):
+        Image.new("RGB", (190, 285), "white").save(output)
+        return output
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: Runtime()
+    )
+    monkeypatch.setattr(pipeline_module, "render_region_crop", render_page)
+
+    outcome = _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert len(calls) == 2
+    assert referring.text == primary.replace(
+        "<td>Participating</td><td>Nonparticipating</td>",
+        "<td>[ ] Participating</td><td>[x] Nonparticipating</td>",
+    )
+    assert servicing.text == working
+    assert outcome.attempts == 2
+
+
+def test_paddle_form_recovery_preserves_primary_when_scales_disagree(
+    tmp_path, monkeypatch
+) -> None:
+    primary = (
+        "<table><tr><td>Referring provider</td><td>Participating</td>"
+        "<td>Nonparticipating</td></tr></table>"
+    )
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (200, 300), "white").save(image_path)
+    source_path = tmp_path / "source.pdf"
+    source_path.write_bytes(b"%PDF-test")
+    page = PageEvidence(
+        number=1,
+        width=72,
+        height=108,
+        dpi=200,
+        image_path=image_path,
+        render_width_pixels=200,
+        render_height_pixels=300,
+        effective_dpi=200,
+        source_width=72,
+        source_height=108,
+        source_unit="pdf_points",
+    )
+    source = IngestedDocument("form.pdf", "a" * 64, source_path, [page])
+    region = SimpleNamespace(id="p1-r1", type=AnalysisRegionType.TABLE, text=primary)
+    analysis = SimpleNamespace(
+        quality=SimpleNamespace(blank=False), regions=[region], warnings=[]
+    )
+
+    class Runtime:
+        def __init__(self):
+            self.calls = 0
+
+        def parse_recovery_image(self, path):
+            self.calls += 1
+            selected = "Nonparticipating" if self.calls == 1 else "Participating"
+            content = primary.replace(
+                f"<td>{selected}</td>", f"<td>X</td><td>{selected}</td>"
+            )
+            return OcrPageResult(
+                path,
+                [OcrRegion(0, "table", content, (0.1, 0.1, 0.9, 0.4))],
+            )
+
+    runtime = Runtime()
+
+    def render_page(_source, _page, _bbox, output, **_kwargs):
+        Image.new("RGB", (190, 285), "white").save(output)
+        return output
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: runtime
+    )
+    monkeypatch.setattr(pipeline_module, "render_region_crop", render_page)
+
+    _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert region.text == primary
+
+    class FailingRuntime:
+        def parse_recovery_image(self, _path):
+            raise RuntimeError("service unavailable")
+
+    monkeypatch.setattr(
+        pipeline_module, "get_paddleocr_runtime", lambda *_args: FailingRuntime()
+    )
+    outcome = _recover_paddle_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(ocr_engine=OcrEngine.PADDLEOCR_VL_1_6),
+    )
+
+    assert region.text == primary
+    assert any("service unavailable" in warning for warning in outcome.warnings)
+
+
+def test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls() -> None:
+    primary = (
+        "<table><tr><td>Participating</td><td>[x] Nonparticipating</td></tr>"
+        "<tr><td>Outpatient</td><td>Office visit</td></tr></table>"
+    )
+    recovered = (
+        "<table><tr><td>☑ Participating</td><td>□ Nonparticipating</td></tr>"
+        "<tr><td>Outpatient</td><td>✓ Office visit</td></tr></table>"
+    )
+
+    merged, status, evidence_count = _merge_form_html(primary, recovered)
+
+    assert "[x] Participating" in merged
+    assert "[?] Nonparticipating" in merged
+    assert "[?] Outpatient" in merged
+    assert "[x] Office visit" in merged
+    assert status == "conflict"
+    assert evidence_count == 2
+
+
+def test_form_control_recovery_severity_prioritizes_dense_unknown_groups() -> None:
+    assert (
+        pipeline_module._form_control_recovery_severity(
+            "<table><tr><td>Outpatient</td><td>Office visit</td>"
+            "<td>Hospital</td><td>Office</td></tr></table>"
+        )
+        == 0
+    )
+    assert (
+        pipeline_module._form_control_recovery_severity(
+            "<table><tr><td>Participating</td>"
+            "<td>Nonparticipating</td></tr></table>"
+        )
+        == 1
+    )
+    assert (
+        pipeline_module._form_control_recovery_severity(
+            "<table><tr><td>[x] Outpatient</td>"
+            "<td>[ ] Office visit</td></tr></table>"
+        )
+        is None
+    )
+
+
+def test_glm_form_merge_fills_only_aligned_blank_values() -> None:
+    primary = "<table><tr><td>Provider ID:</td><td></td><td>NPI:</td><td>123</td></tr></table>"
+    recovered = "<table><tr><td>Provider ID:</td><td>456</td><td>NPI:</td><td>999</td></tr></table>"
+
+    merged, status, evidence_count = _merge_form_html(primary, recovered)
+
+    assert "<td>456</td>" in merged
+    assert "<td>123</td>" in merged
+    assert "999" not in merged
+    assert status == "resolved"
+    assert evidence_count == 1
+
+
+def test_glm_form_recovery_uses_high_resolution_crop_without_luna(
+    tmp_path, monkeypatch
+) -> None:
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (1000, 1000), "white").save(image_path)
+    page = PageEvidence(
+        number=1,
+        width=1000,
+        height=1000,
+        dpi=200,
+        image_path=image_path,
+        render_width_pixels=1000,
+        render_height_pixels=1000,
+        source_width=1000,
+        source_height=1000,
+    )
+    source = IngestedDocument(
+        name="page.png",
+        sha256="a" * 64,
+        source_path=image_path,
+        pages=[page],
+    )
+    primary = (
+        "<table><tr><td>Participating</td><td>Nonparticipating</td></tr></table>"
+    )
+    region = SimpleNamespace(
+        id="p1-analysis-0",
+        type=AnalysisRegionType.TABLE,
+        text=primary,
+        bbox=SimpleNamespace(
+            normalized=BoundingBox(x0=0.1, y0=0.1, x1=0.9, y1=0.5)
+        ),
+    )
+    analysis = SimpleNamespace(
+        quality=SimpleNamespace(blank=False), regions=[region], warnings=[]
+    )
+
+    class RecoveryRuntime:
+        def parse_many(self, paths):
+            for path in paths:
+                yield pipeline_module.GlmPageResult(
+                    path,
+                    [
+                        GlmRegion(
+                            0,
+                            "table",
+                            "<table><tr><td>☑ Participating</td>"
+                            "<td>□ Nonparticipating</td></tr></table>",
+                            (0, 0, 1000, 1000),
+                        )
+                    ],
+                )
+
+    monkeypatch.setattr(
+        pipeline_module,
+        "get_glmocr_form_recovery_runtime",
+        lambda *_args: RecoveryRuntime(),
+    )
+
+    outcome = pipeline_module._recover_glm_form_regions(
+        source,
+        [page],
+        {1: analysis},
+        tmp_path,
+        ParserConfig(crop_dpi=450),
+    )
+
+    assert outcome.crops == 1
+    assert "[x] Participating" in region.text
+    assert "[ ] Nonparticipating" in region.text
+    assert outcome.statuses[1][(0.1, 0.1, 0.9, 0.5)] == "resolved"
+
+
+def test_glm_form_recovery_does_not_consume_luna_document_budget(
+    tmp_path, monkeypatch
+) -> None:
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (100, 100), "white").save(image_path)
+    pages = [
+        PageEvidence(
+            number=number,
+            width=100,
+            height=100,
+            dpi=200,
+            image_path=image_path,
+            render_width_pixels=100,
+            render_height_pixels=100,
+            source_width=100,
+            source_height=100,
+        )
+        for number in (1, 2)
+    ]
+    source = IngestedDocument(
+        name="page.png",
+        sha256="a" * 64,
+        source_path=image_path,
+        pages=pages,
+    )
+    analyses = {}
+    regions = []
+    for page in pages:
+        page_regions = [
+            SimpleNamespace(
+                id=f"p{page.number}-analysis-{index}",
+                type=AnalysisRegionType.TABLE,
+                text=(
+                    "<table><tr><td>Participating</td>"
+                    "<td>Nonparticipating</td></tr></table>"
+                ),
+                bbox=SimpleNamespace(
+                    normalized=BoundingBox(
+                        x0=0.1,
+                        y0=0.1 + index * 0.1,
+                        x1=0.9,
+                        y1=0.15 + index * 0.1,
+                    )
+                ),
+            )
+            for index in range(4 if page.number == 1 else 1)
+        ]
+        regions.extend(page_regions)
+        analyses[page.number] = SimpleNamespace(
+            quality=SimpleNamespace(blank=False), regions=page_regions, warnings=[]
+        )
+
+    def render_crop(_source, _page, _bbox, crop_path, **_kwargs) -> None:
+        crop_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.new("RGB", (100, 100), "white").save(crop_path)
+
+    class RecoveryRuntime:
+        def parse_many(self, paths):
+            for path in paths:
+                yield pipeline_module.GlmPageResult(
+                    path,
+                    [
+                        GlmRegion(
+                            0,
+                            "table",
+                            "<table><tr><td>☑ Participating</td>"
+                            "<td>□ Nonparticipating</td></tr></table>",
+                            (0, 0, 100, 100),
+                        )
+                    ],
+                )
+
+    monkeypatch.setattr(pipeline_module, "render_region_crop", render_crop)
+    monkeypatch.setattr(
+        pipeline_module,
+        "get_glmocr_form_recovery_runtime",
+        lambda *_args: RecoveryRuntime(),
+    )
+
+    outcome = pipeline_module._recover_glm_form_regions(
+        source,
+        pages,
+        analyses,
+        tmp_path,
+        ParserConfig(max_visual_recovery_crops=1),
+    )
+
+    assert outcome.candidate_count == 5
+    assert outcome.crops == 4
+    assert sum("[x] Participating" in region.text for region in regions) == 4
 
 
 def test_custom_gateway_without_analysis_does_not_synthesize_scan_probes() -> (
@@ -371,6 +816,42 @@ def test_visual_recovery_plan_prioritizes_failures_across_pages(monkeypatch) -> 
     assert disabled.candidate_count == 3
 
 
+def test_visual_recovery_plan_prioritizes_unresolved_form_controls(monkeypatch) -> None:
+    checkbox_table = pipeline_module._RecoveryCandidate(
+        1,
+        (0.1, 0.1, 0.9, 0.2),
+        1,
+        0.9,
+        1,
+        "facility-options",
+        ("unresolved_form_controls",),
+    )
+    missing_region = pipeline_module._RecoveryCandidate(
+        1,
+        (0.1, 0.3, 0.9, 0.8),
+        0,
+        0.1,
+        0,
+        "missing-region",
+        ("empty_large_region",),
+    )
+    monkeypatch.setattr(
+        pipeline_module,
+        "_page_recovery_candidates",
+        lambda _page, _analysis: [missing_region, checkbox_table],
+    )
+
+    plan = pipeline_module._visual_recovery_plan(
+        [SimpleNamespace(number=1)],
+        {1: None},
+        enabled=True,
+        limit=1,
+    )
+
+    assert plan.allowed == {1: {checkbox_table.bbox}}
+    assert plan.deferred == {1: {missing_region.bbox}}
+
+
 def test_visual_recovery_plan_enforces_document_and_page_limits(monkeypatch) -> None:
     candidates = {
         1: [
@@ -426,6 +907,14 @@ def test_visual_recovery_plan_enforces_document_and_page_limits(monkeypatch) -> 
         pages[:1], {1: analyses[1]}, enabled=True, limit=8
     )
     assert severe.allowed == {1: {candidate.bbox for candidate in candidates[1]}}
+
+
+def test_visual_recovery_crop_budget_scales_with_document_length() -> None:
+    assert pipeline_module._visual_recovery_crop_budget(1, ceiling=64) == 8
+    assert pipeline_module._visual_recovery_crop_budget(8, ceiling=64) == 8
+    assert pipeline_module._visual_recovery_crop_budget(20, ceiling=64) == 20
+    assert pipeline_module._visual_recovery_crop_budget(100, ceiling=64) == 64
+    assert pipeline_module._visual_recovery_crop_budget(100, ceiling=6) == 6
 
 
 def test_garbage_ratio_is_unicode_safe() -> None:

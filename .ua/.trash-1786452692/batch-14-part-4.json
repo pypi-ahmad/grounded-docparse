@@ -1,0 +1,944 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_simple_streamlit.py",
+      "type": "file",
+      "name": "test_simple_streamlit.py",
+      "filePath": "tests/test_simple_streamlit.py",
+      "summary": "Contains pytest coverage for simple streamlit behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:isolated_studio_database",
+      "type": "function",
+      "name": "isolated_studio_database",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        35,
+        36
+      ],
+      "summary": "Exercises isolated_studio_database behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_studio_allows_glm_without_openai_environment",
+      "type": "function",
+      "name": "test_studio_allows_glm_without_openai_environment",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        39,
+        82
+      ],
+      "summary": "Exercises test_studio_allows_glm_without_openai_environment behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_stale_session_result_is_discarded",
+      "type": "function",
+      "name": "test_stale_session_result_is_discarded",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        85,
+        107
+      ],
+      "summary": "Exercises test_stale_session_result_is_discarded behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_legacy_session_usage_defaults_missing_cached_tokens_to_zero",
+      "type": "function",
+      "name": "test_legacy_session_usage_defaults_missing_cached_tokens_to_zero",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        110,
+        133
+      ],
+      "summary": "Exercises test_legacy_session_usage_defaults_missing_cached_tokens_to_zero behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_studio_shows_default_luna_destination",
+      "type": "function",
+      "name": "test_studio_shows_default_luna_destination",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        136,
+        145
+      ],
+      "summary": "Exercises test_studio_shows_default_luna_destination behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_ocr_model_selection_updates_the_active_ui_engine",
+      "type": "function",
+      "name": "test_ocr_model_selection_updates_the_active_ui_engine",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        148,
+        161
+      ],
+      "summary": "Exercises test_ocr_model_selection_updates_the_active_ui_engine behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_studio_hides_custom_luna_destination",
+      "type": "function",
+      "name": "test_studio_hides_custom_luna_destination",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        164,
+        171
+      ],
+      "summary": "Exercises test_studio_hides_custom_luna_destination behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_ade_presets_default_fast_and_allow_full_or_custom",
+      "type": "function",
+      "name": "test_ade_presets_default_fast_and_allow_full_or_custom",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        174,
+        189
+      ],
+      "summary": "Exercises test_ade_presets_default_fast_and_allow_full_or_custom behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_studio_shows_results_and_only_requested_tools",
+      "type": "function",
+      "name": "test_studio_shows_results_and_only_requested_tools",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        192,
+        447
+      ],
+      "summary": "Exercises test_studio_shows_results_and_only_requested_tools behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_page_range_parses_a_renumbered_pdf_subset",
+      "type": "function",
+      "name": "test_page_range_parses_a_renumbered_pdf_subset",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        450,
+        517
+      ],
+      "summary": "Exercises test_page_range_parses_a_renumbered_pdf_subset behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_multiple_uploads_process_sequentially_and_only_process_new_files",
+      "type": "function",
+      "name": "test_multiple_uploads_process_sequentially_and_only_process_new_files",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        520,
+        608
+      ],
+      "summary": "Exercises test_multiple_uploads_process_sequentially_and_only_process_new_files behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_batch_continues_after_failure_and_retry_skips_completed_document",
+      "type": "function",
+      "name": "test_batch_continues_after_failure_and_retry_skips_completed_document",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        611,
+        675
+      ],
+      "summary": "Exercises test_batch_continues_after_failure_and_retry_skips_completed_document behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_completed_batch_restores_after_app_restart_without_reparsing",
+      "type": "function",
+      "name": "test_completed_batch_restores_after_app_restart_without_reparsing",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        678,
+        734
+      ],
+      "summary": "Exercises test_completed_batch_restores_after_app_restart_without_reparsing behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_streamlit.py:test_interrupted_analysis_resumes_from_parse_checkpoint",
+      "type": "function",
+      "name": "test_interrupted_analysis_resumes_from_parse_checkpoint",
+      "filePath": "tests/test_simple_streamlit.py",
+      "lineRange": [
+        737,
+        812
+      ],
+      "summary": "Exercises test_interrupted_analysis_resumes_from_parse_checkpoint behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_strict_recovery_contract.py",
+      "type": "file",
+      "name": "test_strict_recovery_contract.py",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "summary": "Contains pytest coverage for strict recovery contract behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "function",
+      "name": "_parse",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        109,
+        112
+      ],
+      "summary": "Exercises _parse behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "function",
+      "name": "test_high_confidence_recovery_changes_only_existing_text",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        115,
+        134
+      ],
+      "summary": "Exercises test_high_confidence_recovery_changes_only_existing_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "function",
+      "name": "test_sub_high_confidence_recovery_keeps_glm_text",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        137,
+        145
+      ],
+      "summary": "Exercises test_sub_high_confidence_recovery_keeps_glm_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "function",
+      "name": "test_luna_rejection_keeps_glm_text_visible",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        148,
+        155
+      ],
+      "summary": "Exercises test_luna_rejection_keeps_glm_text_visible behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "function",
+      "name": "test_mismatched_crop_evidence_fails_closed",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        158,
+        165
+      ],
+      "summary": "Exercises test_mismatched_crop_evidence_fails_closed behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "function",
+      "name": "test_duplicate_crop_decisions_fail_closed",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        168,
+        175
+      ],
+      "summary": "Exercises test_duplicate_crop_decisions_fail_closed behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "function",
+      "name": "test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        178,
+        211
+      ],
+      "summary": "Exercises test_glm_failure_on_all_nonblank_pages_stops_before_luna behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "function",
+      "name": "test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        214,
+        304
+      ],
+      "summary": "Exercises test_glm_recognition_failure_is_not_exported_as_an_image_only_success behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "class",
+      "name": "RecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        27,
+        83
+      ],
+      "summary": "Provides the RecoveryGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "class",
+      "name": "MismatchedEvidenceRecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        86,
+        90
+      ],
+      "summary": "Provides the MismatchedEvidenceRecoveryGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "class",
+      "name": "DuplicateRecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        93,
+        106
+      ],
+      "summary": "Provides the DuplicateRecoveryGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_windows_installer.py",
+      "type": "file",
+      "name": "test_windows_installer.py",
+      "filePath": "tests/test_windows_installer.py",
+      "summary": "Contains pytest coverage for windows installer behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "function",
+      "name": "test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        9,
+        25
+      ],
+      "summary": "Exercises test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "function",
+      "name": "test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        28,
+        40
+      ],
+      "summary": "Exercises test_installer_payload_is_allowlisted_and_excludes_secrets behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "function",
+      "name": "test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        43,
+        55
+      ],
+      "summary": "Exercises test_provisioner_handles_reboot_credentials_and_hardware_fallback behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "function",
+      "name": "test_ollama_downloads_are_versioned_and_verified",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        58,
+        67
+      ],
+      "summary": "Exercises test_ollama_downloads_are_versioned_and_verified behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:isolated_studio_database",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_allows_glm_without_openai_environment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_stale_session_result_is_discarded",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_legacy_session_usage_defaults_missing_cached_tokens_to_zero",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_shows_default_luna_destination",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_ocr_model_selection_updates_the_active_ui_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_hides_custom_luna_destination",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_ade_presets_default_fast_and_allow_full_or_custom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_shows_results_and_only_requested_tools",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_page_range_parses_a_renumbered_pdf_subset",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_multiple_uploads_process_sequentially_and_only_process_new_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_batch_continues_after_failure_and_retry_skips_completed_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_completed_batch_restores_after_app_restart_without_reparsing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_interrupted_analysis_resumes_from_parse_checkpoint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:isolated_studio_database",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_allows_glm_without_openai_environment",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_stale_session_result_is_discarded",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_legacy_session_usage_defaults_missing_cached_tokens_to_zero",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_shows_default_luna_destination",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_ocr_model_selection_updates_the_active_ui_engine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_hides_custom_luna_destination",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_ade_presets_default_fast_and_allow_full_or_custom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_studio_shows_results_and_only_requested_tools",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_page_range_parses_a_renumbered_pdf_subset",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_multiple_uploads_process_sequentially_and_only_process_new_files",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_batch_continues_after_failure_and_retry_skips_completed_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_completed_batch_restores_after_app_restart_without_reparsing",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_streamlit.py",
+      "target": "function:tests/test_simple_streamlit.py:test_interrupted_analysis_resumes_from_parse_checkpoint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

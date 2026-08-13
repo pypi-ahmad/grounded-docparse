@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "id": "config:benchmarks/schemas/annotation-v1.1.schema.json",
+      "type": "config",
+      "name": "annotation-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/annotation-v1.1.schema.json",
+      "summary": "Defines version 1.1 evaluation annotations, including grounded references, document anchors, tables, regions, and required document identity.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "grounding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "summary": "Defines version 1.1 evaluation corpus manifests, including document sources, annotation paths, features, synthetic status, and expected document types.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "corpus"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.schema.json",
+      "summary": "Defines the original evaluation corpus manifest format with versioned document sources, annotation paths, features, and synthetic markers.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "corpus"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/regression-policy-v1.schema.json",
+      "type": "config",
+      "name": "regression-policy-v1.schema.json",
+      "filePath": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "summary": "Defines regression-policy rules that constrain metric values by JSON Pointer, comparison direction, and minimum, maximum, or allowed regression limits.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "regression-policy"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

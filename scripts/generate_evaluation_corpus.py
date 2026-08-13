@@ -96,6 +96,7 @@ def _annotation(
         "continuity_pairs": values.pop("continuity_pairs", []),
         "forbidden_literals": values.pop("forbidden_literals", []),
         "rejected_block_ids": values.pop("rejected_block_ids", []),
+        "native_extractions": values.pop("native_extractions", []),
         **values,
     }
 
@@ -179,6 +180,7 @@ def _write_schemas(schema_dir: Path) -> None:
             "continuity_pairs": {"type": "array"},
             "forbidden_literals": {"type": "array"},
             "rejected_block_ids": {"type": "array"},
+            "native_extractions": {"type": "array"},
         },
     }
     (schema_dir / "manifest-v1.schema.json").write_text(
@@ -200,13 +202,28 @@ def generate_corpus(repository_root: Path) -> Path:
     fixtures: dict[str, dict[str, Any]] = {
         "native-text": {
             "pages": [[(54, 72, "Synthetic Native Text Fixture"), (54, 110, "Record NATIVE-001 is public test data."), (54, 135, "Status: complete")]],
-            "features": ["native_text"],
+            "features": ["native_text", "langextract_exact_grounding"],
             "annotation": _annotation(
                 "native-text",
                 "Synthetic Native Text Fixture Record NATIVE-001 is public test data. Status: complete",
                 anchors=[
                     {"id": "native-title", "text": "Synthetic Native Text Fixture"},
+                    {"id": "native-record", "text": "NATIVE-001"},
                     {"id": "native-status", "text": "Status: complete"},
+                ],
+                native_extractions=[
+                    {
+                        "pointer": "/record_id",
+                        "source_text": "NATIVE-001",
+                        "char_interval": [37, 47],
+                        "anchor_id": "native-record",
+                    },
+                    {
+                        "pointer": "/status",
+                        "source_text": "complete",
+                        "char_interval": [77, 85],
+                        "anchor_id": "native-status",
+                    },
                 ],
             ),
         },

@@ -2,7 +2,7 @@
 
 Agentic document extraction is more than OCR followed by a prompt. It is a controlled document-understanding workflow that can perceive visual structure, choose among specialized tasks, reason from user instructions, validate its outputs, preserve uncertainty, and connect results back to source evidence.
 
-LandingAI calls its managed platform **Agentic Document Extraction (ADE)**. Grounded DocParse implements a related pattern with local GLM-OCR, optional bounded Luna reasoning, deterministic validation, and review controls. The products are not connected, and their contracts are not identical, but comparing them helps clarify what “agentic” means in practical document processing.
+LandingAI calls its managed platform **Agentic Document Extraction (ADE)**. Grounded DocParse implements a related pattern with selectable local GLM-OCR or PaddleOCR-VL-1.6, optional bounded Luna reasoning, deterministic validation, and review controls. The products are not connected, and their contracts are not identical, but comparing them helps clarify what “agentic” means in practical document processing.
 
 > **Reference date:** LandingAI product descriptions in this page were verified against its official documentation on 30 July 2026. Product APIs can change; follow the linked LandingAI documentation for current behavior.
 
@@ -59,7 +59,7 @@ PDF or image
     -> cited result, warning, or safe failure
 ```
 
-GLM-OCR owns the canonical document evidence: text regions, element IDs, types, pages, reading order, confidence, and normalized bounding boxes. Optional Luna stages can interpret that evidence, but they cannot freely redefine its identity or geometry.
+The selected local OCR engine owns the canonical document evidence: text regions, element IDs, types, pages, reading order, confidence, and normalized bounding boxes. Optional Luna stages can interpret that evidence, but they cannot freely redefine its identity or geometry.
 
 The application coordinates several specialized goals:
 
@@ -78,14 +78,14 @@ For the implementation details and control boundaries, see [How Grounded DocPars
 | Area | LandingAI ADE | Grounded DocParse |
 |---|---|---|
 | Primary delivery model | Managed platform with APIs and client libraries | Workstation-oriented Streamlit application and Python package |
-| Visual parser | LandingAI parsing models exposed through ADE Parse | Local GLM-OCR service |
+| Visual parser | LandingAI parsing models exposed through ADE Parse | Selectable local GLM-OCR or PaddleOCR-VL-1.6 service |
 | Parse representation | Markdown, hierarchical JSON, chunks, pages, and coordinates | Base/refined Markdown, hierarchical JSON, blocks, atoms, elements, pages, and normalized boxes |
 | Classification | User-defined page classification can run independently of Parse | Whole-document classification and user-defined form segmentation run after the local parse |
 | Mixed packets | Split returns classified sub-documents and their Markdown | Form routing produces contiguous logical segments and runs assigned schemas against in-memory subsets |
 | Sectioning | Section API generates a hierarchical TOC with chunk references | Optional TOC generation produces nested sections with pages and known element references |
 | Extraction | Schema-based extraction from parsed or split content | Schema-based extraction from grounded Markdown/layout with deterministic evidence validation |
 | Chat | Playground chat is an example application rather than an ADE API | Optional document chat is built into the Streamlit application |
-| Grounding identity | LandingAI chunk ID, page, and coordinates | GLM-owned block/atom/element ID, page, source text, and normalized box |
+| Grounding identity | LandingAI chunk ID, page, and coordinates | Local-OCR-owned block/atom/element ID, page, source text, and normalized box |
 | Control model | Operations and validation are managed by the ADE platform | Explicit context limits, finite retries, confidence gates, review states, and failure isolation are visible in application code |
 
 The two systems use related concepts, but their nouns are not interchangeable. A LandingAI **chunk** and a Grounded DocParse **element** both identify grounded document content, yet they have different schemas and ownership rules.
@@ -115,15 +115,15 @@ Grounded DocParse provides two classification modes:
 
 Custom classification assigns categories to contiguous page ranges rather than returning unrelated independent labels for every page. The ranges collectively cover the packet, so every page belongs to one effective segment.
 
-Unlike LandingAI Classify, our classification requires a completed GLM parse because it reasons over the resulting Markdown and layout elements.
+Unlike LandingAI Classify, our classification requires a completed local OCR parse because it reasons over the resulting Markdown and layout elements.
 
-### Split — partial: logical segmentation, not file splitting
+### Split — yes
 
 Custom form routing can separate a mixed packet into logical segments such as `new_request`, `update`, `records`, and `other`. Each segment has a page range, category, confidence, reasoning, evidence IDs, review status, extraction eligibility, and optional assigned schema.
 
-For eligible segments, the application creates an in-memory `ParseResult` subset containing the original pages and elements, then runs the assigned extraction schema. This is sufficient for selective extraction and per-form result reporting.
+After every segment is approved, **Download split documents** creates a dedicated ZIP. Every routed segment, including repeated and non-extractable categories, receives its own source-page PDF, Markdown, and canonical parsed-document JSON. A manifest records the source hash, routing metadata, and file paths. Page numbers, element IDs, and bounding boxes remain tied to the parsed source.
 
-The current application does **not** export each segment as a new PDF or standalone Markdown sub-document. It therefore has LandingAI-like logical splitting for routing, but not full separate-document output. LandingAI Split explicitly returns classified sub-documents with Markdown content. [LandingAI Split API](https://docs.landing.ai/api-reference/tools/ade-split)
+Eligible segments can also be extracted with their assigned schemas. Split export does not require a segment to be extractable. LandingAI Split similarly returns classified sub-documents with Markdown content. [LandingAI Split API](https://docs.landing.ai/api-reference/tools/ade-split)
 
 ### Section — yes
 
@@ -133,7 +133,7 @@ Optional TOC generation creates hierarchical sections with titles, levels, pages
 
 Users can define fields and descriptions in the UI or import schema definitions from JSON or Markdown. The extraction stage receives refined document Markdown plus an identifier-rich layout tree.
 
-Every returned value must satisfy the schema. A verified value must resolve to supporting source evidence. When exact support cannot be confirmed, the on-demand extraction path may retain a candidate as `inferred` with a grounded location and warning; that state is kept distinct from verified evidence. The application copies page and bounding-box data from a GLM-owned block or atom rather than accepting newly invented provider geometry as the source of truth.
+Every returned value must satisfy the schema. A verified value must resolve to supporting source evidence. When exact support cannot be confirmed, the on-demand extraction path may retain a candidate as `inferred` with a grounded location and warning; that state is kept distinct from verified evidence. The application copies page and bounding-box data from a local-OCR-owned block or atom rather than accepting newly invented provider geometry as the source of truth.
 
 For mixed packets, only segments that have an approved status, are marked eligible, and have an assigned saved schema are extracted. Non-eligible categories remain classified but are not sent to extraction.
 
@@ -197,7 +197,7 @@ input validation
     -> downloads and metadata
 ```
 
-Optional failures remain isolated where possible. A failed classification, TOC, extraction, or chat operation does not retroactively erase a successful GLM parse.
+Optional failures remain isolated where possible. A failed classification, TOC, extraction, or chat operation does not retroactively erase a successful local OCR parse.
 
 ### 8. Controlled autonomy — yes
 

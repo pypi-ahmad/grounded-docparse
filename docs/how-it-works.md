@@ -1,17 +1,14 @@
 # How it works
 
-1. The app validates the extension, bytes, upload size, page count, and per-page pixel count.
-2. Every PDF page or image frame is rasterized locally. Selectable PDF text is ignored.
-3. GLM-OCR runs layout and recognition in ordered windows of 16 pages. The process-wide SDK runtime serializes model access while the parser prepares and finalizes up to eight pages concurrently.
-4. Deterministic quality analysis scores GLM regions using OCR confidence, text density, garbage ratio, empty-region area, and table structure.
-5. When enabled and credentialed, the parser selects at most eight recovery crops per document and three per page. Luna inspects only those crops at high effort.
-6. Deterministic code accepts only crop-backed text corrections with confidence at least `0.85`. It ignores Luna additions, rejections, geometry, types, confidence, order, and structure.
-7. Completed pages return to source order. The pipeline builds hierarchy, quality state, normalized elements, grounded `base_markdown`, JSON v4.4.0, and an annotated PDF.
-8. When enabled, text-only Luna returns presentation directives keyed by existing IDs. Deterministic rendering creates refined Markdown; grounding still targets `base_markdown`.
-9. Classification and hierarchical TOC generation run concurrently. Classification uses recognized Markdown/layout from the first two pages; TOC generation traverses every compact document context. A failed TOC call falls back to grounded headings; either feature can fail without losing parse output.
-10. Extraction runs on demand from a saved or imported scalar schema. Exact and normalized matches are grounded directly, cited approximations are marked `inferred`, and absent values remain `null`/`not_found`.
-11. Optional chat reuses prepared context. Long-document questions use deterministic element retrieval, and returned citations are filtered to known IDs before source highlighting is exposed.
-12. Structured Luna calls retry one schema-invalid response. Extraction additionally performs one evidence-repair call before deterministic fallback.
-13. The app downloads Markdown, full JSON, extraction JSON when present, and the annotated PDF. Usage, latency, recovery provenance, and feature statuses are included in result metadata.
+1. The app requires a processing type for every uploaded file, then validates its extension, signature, and Office/container structure. Invalid combinations stop; nothing is silently rerouted.
+2. **Scanned PDF** and **Image** use the existing local OCR path. Pages or image frames are rasterized, GLM-OCR uses ordered 16-page windows, and PaddleOCR-VL submits the document to its local API.
+3. **Native PDF** uses `pdf-inspector` for selectable text, layout, tables, and positions. A native PDF with unusable pages stops and asks the user to select Mixed PDF.
+4. **Mixed PDF** shows a Native/OCR suggestion for every page. The user confirms or overrides every route; native and OCR pages merge in original page order.
+5. **Word**, **PowerPoint**, **Excel**, **CSV**, and **Other Native** formats use Docling with OCR, VLM/model enrichments, remote services, and plugins disabled. Embedded images are assets, not OCR input.
+6. Native parsing produces immutable `base_text`, character spans, and `SourceAnchor` evidence. OCR parsing retains local-engine-owned elements, boxes, confidence, and reading order.
+7. Deterministic quality analysis and optional Luna crop recovery apply only to OCR routes. Recovery accepts only crop-backed text corrections with confidence at least `0.85` and never changes existing geometry, types, order, or structure.
+8. Optional classification, TOC, refinement, and chat use the parsed result. Their failures do not invalidate a successful parse.
+9. Native extraction sends immutable `base_text`, never refined Markdown, to LangExtract. An accepted value needs an exact `char_interval` that resolves through source spans to one or more anchors; fuzzy, mismatched, partial, and unanchored values are rejected.
+10. The app downloads Markdown, full JSON, extraction JSON when present, source structure for native results, and an annotated PDF only when a visual artifact exists.
 
-There is no open-ended autonomous loop. GLM parsing remains usable without Luna, and every optional Luna failure is isolated from the core parse.
+There is no open-ended autonomous loop. Native parsing and local OCR remain usable without Luna; every optional remote feature is isolated from the core parse.

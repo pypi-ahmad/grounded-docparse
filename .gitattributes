@@ -4,3 +4,4 @@
 *.jpeg binary
 *.tif binary
 *.tiff binary
+scripts/wsl/*.sh text eol=lf

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio.
+This guide explains how business and technical users can extract a large, predefined set of fields from scanned, faxed, multi-page, or structurally complex documents with Document Parse Studio. It also applies to supported native PDFs and Office/open formats, which preserve source structure without OCR.
 
 A healthcare workflow might request Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same approach applies to invoices, contracts, bank statements, applications, onboarding packets, certificates, compliance forms, reports, and other document families.
 
@@ -14,12 +14,12 @@ The central principle is:
 
 | Capability | Status |
 | --- | --- |
-| Upload PDF, PNG, JPEG, or TIFF source documents | Implemented |
+| Upload PDF, Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, EPUB, PNG, JPEG, or TIFF source documents | Implemented |
 | Convert the source into grounded Markdown and structured layout elements | Implemented |
 | Define scalar fields in the Extract tab | Implemented |
 | Import and export reusable schema JSON | Implemented |
 | Extract structured values from parsed Markdown and layout context | Implemented |
-| Return page, element ID, source text, confidence, and normalized bounding box | Implemented when evidence can be grounded |
+| Return OCR page/element/box evidence or native character-span/source-anchor evidence | Implemented when evidence can be grounded |
 | Upload a Markdown file containing field descriptions | Proposed optional feature; not currently available in the UI |
 | Automatically split, run, and merge multiple schemas for 100+ fields | Proposed extension; not currently implemented |
 
@@ -29,14 +29,14 @@ Yes, a Markdown field-specification upload can be integrated cleanly as an optio
 
 The workflow has two conceptually different inputs:
 
-1. **Source document:** The PDF or image containing the facts to extract.
+1. **Source document:** The PDF, image, or supported native document containing the facts to extract.
 2. **Field specification:** The names, descriptions, types, and business rules describing what the user wants returned.
 
 The source document is evidence. The field specification is an instruction set. A field-specification Markdown file must never be treated as evidence for an extracted value.
 
 ### Plain-language terms
 
-- **GLM-OCR:** The local system that detects page regions and reads the source document.
+- **Local OCR:** The selected GLM-OCR or PaddleOCR-VL system that detects page regions and reads scanned PDFs or images.
 - **Luna:** The optional model used for selected visual repair and document-level tasks such as extraction.
 - **Layout tree:** An ordered list of parsed document regions with their page, type, text, and identifier.
 - **Schema:** The approved list of output fields, descriptions, and data types.
@@ -46,8 +46,12 @@ The source document is evidence. The field specification is an instruction set. 
 
 ```text
 PDF or image
-  -> GLM-OCR parse
+  -> selected local OCR parse
   -> grounded Markdown + layout tree + element IDs + bounding boxes
+
+Native PDF or Office/open format
+  -> explicit native route (`pdf-inspector` or OCR-disabled Docling)
+  -> immutable base_text + character spans + SourceAnchor
 
 Field definitions
   -> approved extraction schema
@@ -95,9 +99,9 @@ The current app runs one extraction schema at a time and retains only the latest
 
 ### 3. Upload and parse the source document
 
-Upload one supported PDF or image. For PDFs, select an inclusive page range when only part of the document is relevant.
+Upload one supported document and select its required processing type. For scanned PDFs, select an inclusive page range when only part of the document is relevant. For Mixed PDF, confirm every Native/OCR page route.
 
-Choose the required parse options and select **Parse document**. GLM-OCR reads the complete page layout and produces:
+Choose the required OCR engine and parse options, then select **Parse document**. Local OCR reads the complete page layout and produces:
 
 - ordered document Markdown;
 - page and element structure;
@@ -106,7 +110,7 @@ Choose the required parse options and select **Parse document**. GLM-OCR reads t
 - OCR confidence and review state; and
 - an annotated PDF for visual inspection.
 
-Optional Luna visual recovery can inspect a limited number of weak existing GLM regions. It can repair eligible text but cannot create a missing region or alter canonical IDs, geometry, type, confidence, or reading order.
+Optional Luna visual recovery can inspect a limited number of weak existing local OCR regions. It can repair eligible text but cannot create a missing region or alter canonical IDs, geometry, type, confidence, or reading order.
 
 ### 4. Review the parse before extraction
 
@@ -151,11 +155,11 @@ Interpret each field according to its confidence and evidence:
 
 Use **Show source** when a result has a citation. A not-found field has no source to open. Review every inferred, medium-confidence, or not-found field, plus all high-impact identifiers, dates, totals, and compliance fields. These are recommended business controls; the application does not enforce completion of the review.
 
-Extraction confidence describes the value-to-evidence relationship. It is distinct from GLM-OCR confidence, which describes the original recognition result for a page region.
+Extraction confidence describes the value-to-evidence relationship. It is distinct from local OCR confidence, which describes the original recognition result for a page region.
 
 ### 8. Export and use the result
 
-Download the extraction JSON for downstream processing and the annotated PDF for evidence review. Full JSON also contains the parse structure and current extraction result.
+Download the extraction JSON for downstream processing and an annotated PDF for evidence review when one exists. Native nonvisual formats use source anchors and source structure instead. Full JSON also contains the parse structure and current extraction result.
 
 The output should enter a business system only after the organization applies its normal validation, approval, privacy, and retention controls.
 
@@ -163,13 +167,13 @@ The output should enter a business system only after the organization applies it
 
 ### Stage 1: Source ingestion and visual parsing
 
-The source PDF or image is validated and rasterized. PP-DocLayout supplies detected geometry and GLM-OCR supplies recognized region content within the local parse stage. Deterministic pipeline code normalizes the result, assigns block IDs, and may correct dense-form reading order. In this guide, “GLM-owned” means owned by this complete local parse stage rather than by Luna.
+The source PDF or image is validated and rasterized. The selected GLM-OCR or PaddleOCR-VL pipeline supplies detected geometry and recognized region content. Deterministic pipeline code normalizes the result, assigns block IDs, and may correct dense-form reading order. In this guide, “local-OCR-owned” means owned by this complete local parse stage rather than by Luna.
 
 The result is a `ParseResult` containing both presentation Markdown and grounded base Markdown, structured document pages and blocks, public elements, metadata, and annotated PDF bytes. Block IDs are canonical within that parse result. They are not durable business identifiers and are not guaranteed to remain unchanged after reparsing, selecting a different page range, or upgrading the parser.
 
 ### Stage 2: Optional bounded visual recovery
 
-Deterministic quality signals identify weak existing GLM regions. If enabled and credentialed, Luna receives only selected crops. Accepted recovery can replace text on an existing element, while geometry and identity remain GLM-owned.
+Deterministic quality signals identify weak existing local OCR regions. If enabled and credentialed, Luna receives only selected crops. Accepted recovery can replace text on an existing element, while geometry and identity remain local-OCR-owned.
 
 ### Stage 3: Extraction context preparation
 
@@ -381,7 +385,7 @@ For very large specifications, a later optional orchestration layer could:
 5. report per-group success, failure, token usage, and warnings; and
 6. allow failed groups to be retried without reparsing the document.
 
-This layer should orchestrate extraction only. It must not rerun GLM-OCR, modify canonical elements, or synthesize bounding boxes. A merged export should label incomplete groups and must not present partial data as a complete result. Group identity should be derived from the parse-result identity, approved schema content, and group name so retries do not duplicate fields or usage records. Conflicting field names should fail before provider calls. These concerns are intentionally deferred from the recommended single-schema first version.
+This layer should orchestrate extraction only. It must not rerun local OCR, modify canonical elements, or synthesize bounding boxes. A merged export should label incomplete groups and must not present partial data as a complete result. Group identity should be derived from the parse-result identity, approved schema content, and group name so retries do not duplicate fields or usage records. Conflicting field names should fail before provider calls. These concerns are intentionally deferred from the recommended single-schema first version.
 
 ## Safety and Governance Requirements
 
@@ -401,7 +405,7 @@ Visible source-document text can also contain instructions intended to manipulat
 
 For the proposed Markdown uploader, parse the file as UTF-8 field-definition text. Do not fetch remote links or embedded resources, and do not render raw HTML from the uploaded specification. Display a sanitized preview before schema approval.
 
-When Luna features are used, selected recovery crops or recognized Markdown/layout context leave the workstation for the configured OpenAI-compatible endpoint. Operators must use an approved endpoint and verify its retention, residency, and access policies. Application requests set `store=False`, but that setting does not control intermediary proxies or a custom endpoint. Provider timeout or credential failure should leave the completed GLM parse intact and mark the optional extraction attempt as failed rather than fabricating a result.
+When Luna features are used, selected recovery crops or recognized Markdown/layout context leave the workstation for the configured OpenAI-compatible endpoint. Operators must use an approved endpoint and verify its retention, residency, and access policies. Application requests set `store=False`, but that setting does not control intermediary proxies or a custom endpoint. Provider timeout or credential failure should leave the completed local OCR parse intact and mark the optional extraction attempt as failed rather than fabricating a result.
 
 ## General Applicability
 
@@ -426,7 +430,7 @@ Add Markdown field-specification upload as an optional post-parse schema-authori
 
 This design preserves the current architecture:
 
-- The local GLM-OCR/PP-DocLayout parse remains the source of document structure and geometry.
+- The selected local OCR parse remains the source of document structure and geometry.
 - Luna interprets the approved field requirements and extracts from structured text context.
 - Deterministic code validates evidence and supplies bounding boxes.
 - The source PDF or image is never reread during schema extraction.

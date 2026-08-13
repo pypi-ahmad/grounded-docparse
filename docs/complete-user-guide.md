@@ -6,7 +6,7 @@ You do not need to understand AI or write code to use the application. Technical
 
 ## 1. Start here
 
-Grounded DocParse reads one PDF or image at a time and turns it into:
+Grounded DocParse reads PDFs and images and turns each one into:
 
 - readable Markdown;
 - structured document data;
@@ -19,7 +19,7 @@ Grounded DocParse reads one PDF or image at a time and turns it into:
 The basic workflow is:
 
 ```text
-Upload one document
+Upload one or more documents
   -> choose processing options
   -> parse the document
   -> review the source coverage
@@ -44,7 +44,8 @@ Upload one document
 
 Grounded DocParse can:
 
-- process PDF, PNG, JPEG, and TIFF documents;
+- process native, scanned, and mixed PDFs; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB documents; and PNG, JPEG, and TIFF images;
+- process up to 20 files sequentially in one durable local workspace;
 - handle multi-page PDFs and multi-frame images;
 - process an optional continuous page range from a PDF;
 - detect document regions such as text, headings, tables, forms, figures, formulas, and seals;
@@ -65,11 +66,10 @@ Grounded DocParse can:
 
 The current application does not provide:
 
-- multiple-file or folder processing in the UI;
+- folder upload;
 - a production batch queue;
-- durable document jobs that survive process restarts;
+- a production job queue or unattended worker service;
 - a public HTTP API;
-- a command-line application;
 - multi-user authentication or tenant isolation;
 - automatic human-review audit records;
 - automatic merging of results from several schemas;
@@ -77,14 +77,14 @@ The current application does not provide:
 - guaranteed recovery of a source region that OCR never detected; or
 - permission to use the output without business or regulatory review.
 
-It processes one uploaded document in the active Streamlit session. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes the changes required for production batch processing.
+It processes up to 20 uploaded files sequentially in one active local workspace, with restart recovery, per-file failure isolation, and ZIP export. This is workstation recovery, not an unattended production queue. A separate [Azure bulk-fax deployment design](azure-bulk-fax-deployment.md) describes production bulk processing.
 
 ### 2.3 Core parsing versus optional AI features
 
 The application has two broad layers:
 
-1. **Local document parsing:** GLM-OCR reads page images, finds regions, and determines their order and location.
-2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult crops or reason over recognized document content.
+1. **Local document parsing:** the user selects one compatible processing type per file. Scanned PDFs and images use the selected GLM-OCR or PaddleOCR-VL-1.6 engine; native PDFs use `pdf-inspector`; structured native formats use Docling without OCR.
+2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult OCR crops or reason over parsed content. Native field extraction uses LangExtract over immutable source text.
 
 Local parsing can run without an OpenAI key. The optional features require `OPENAI_API_KEY` and may send document content to the configured provider.
 
@@ -119,13 +119,13 @@ For later sessions:
 .\Launch-GLM-OCR.cmd
 ```
 
-The application normally opens at <http://localhost:8501>. The local GLM-OCR-compatible service runs on `127.0.0.1:8080`.
+The application normally opens at <http://localhost:8600>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
 ### 3.3 Optional Luna configuration
 
-GLM-OCR parsing does not need an OpenAI key. Optional visual recovery, Markdown enhancement, classification, TOC, routing, extraction, and chat do.
+Local OCR parsing does not need an OpenAI key. Optional visual recovery, Markdown enhancement, classification, TOC, routing, extraction, and chat do.
 
 An administrator can save the key in the Windows user environment:
 
@@ -143,20 +143,21 @@ This is important for business, privacy, and technical users.
 
 | Feature | Runs locally? | What may be sent remotely when enabled? |
 | --- | --- | --- |
-| GLM layout and OCR | Yes | Nothing to Luna |
-| Visual recovery | GLM selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
+| Native parsing and local layout/OCR | Yes | Nothing to Luna |
+| Visual recovery | Candidate selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
 | Markdown enhancement | No | Grounded Markdown and compact layout information |
 | Document classification | No | Recognized content/layout from the first two parsed pages |
 | Table of contents | No | Recognized content/layout across the document |
 | Custom form routing | No | Recognized content/layout plus routing categories/instructions |
-| Field extraction | No | Recognized content/layout plus the extraction schema |
+| OCR field extraction | No | Recognized content/layout plus the extraction schema |
+| Native field extraction | No | Immutable `base_text` plus the extraction schema |
 | Document chat | No | Question, recent chat history, and relevant document context |
 
 The application displays the Luna destination near the top of the screen. Stop if the destination is unexpected.
 
 **Important:** Fast mode is not automatically local-only. When a key is available, Fast enables document classification, and visual recovery normally starts enabled.
 
-For a local GLM-only run, turn off:
+For a local-only run with either OCR engine, turn off:
 
 - **Enhance with gpt-5.6-luna**;
 - **Enable visual recovery on hard regions**;
@@ -164,7 +165,7 @@ For a local GLM-only run, turn off:
 - **Generate table of contents**; and
 - **Enable document chat**.
 
-Do not run extraction or custom form routing in a GLM-only workflow because those features require Luna.
+Do not run extraction or custom form routing in a local-only workflow because those features require Luna.
 
 ## 5. Upload a document
 
@@ -172,12 +173,12 @@ Do not run extraction or custom form routing in a GLM-only workflow because thos
 
 Use the **Upload document** area in the left sidebar. Supported file types are:
 
-- PDF (`.pdf`);
-- PNG (`.png`);
-- JPEG (`.jpg` or `.jpeg`); and
-- TIFF (`.tif` or `.tiff`).
+- PDF (`.pdf`) as Native PDF, Scanned PDF, or Mixed PDF;
+- Word (`.docx`), PowerPoint (`.pptx`), Excel (`.xlsx`), and CSV (`.csv`);
+- OpenDocument, HTML, Markdown, and EPUB as Other Native; and
+- PNG (`.png`), JPEG (`.jpg` or `.jpeg`), and TIFF (`.tif` or `.tiff`) as Image.
 
-The UI accepts one file at a time and limits an upload to 250 MB. Default parser limits are 500 pages/frames and 20,000,000 rendered pixels per page. Administrators can lower or raise parser limits through configuration, but the UI uploader still has its own 250 MB control. The parser also checks validity and password protection.
+The UI accepts up to 20 files, limits each file to 250 MB, and limits the batch to 1 GB. Files run sequentially. Default parser limits are 500 pages/frames and 20,000,000 rendered pixels per page. Administrators can lower or raise parser limits through configuration, but the UI uploader keeps its own limits. The parser also checks validity and password protection.
 
 For a safe practice run, use:
 
@@ -217,7 +218,18 @@ Turn it off only when the labels make visual review difficult.
 
 ## 6. Choose processing options
 
-### 6.1 ADE mode
+### 6.1 Processing type
+
+Every uploaded file requires a compatible **Processing type**. This selection is authoritative; the application still validates the file signature and container structure, but it never silently changes the selected route.
+
+- **Native PDF** uses `pdf-inspector` for selectable text, layout, tables, and positions.
+- **Scanned PDF** and **Image** use the existing local OCR pipeline.
+- **Mixed PDF** shows a Native/OCR suggestion for every page. Review or override each route, then confirm the entire table before parsing.
+- **Word**, **PowerPoint**, **Excel**, **CSV**, and **Other Native** use Docling/native structure conversion with OCR disabled.
+
+A Native PDF with pages that need OCR stops and asks you to select Mixed PDF. Embedded images in native documents are recorded but are not OCRed.
+
+### 6.2 ADE mode
 
 ADE mode is a group of presets for optional Luna features. It is not a connection to an external ADE product.
 
@@ -229,11 +241,11 @@ ADE mode is a group of presets for optional Luna features. It is not a connectio
 
 Changing one of the preset-controlled switches can move the mode to **Custom**.
 
-Every mode still runs the same core GLM-OCR parse.
+For scanned PDFs and images, every mode still runs the same selected local OCR parse. Native routes preserve their selected native structure before optional document features run.
 
 Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
-### 6.2 Enhance with gpt-5.6-luna
+### 6.3 Enhance with gpt-5.6-luna
 
 This feature improves Markdown presentation. It can adjust how existing elements are presented as headings, paragraphs, list items, or captions.
 
@@ -245,9 +257,9 @@ Use it when:
 
 It does not replace the source text, change element locations, or reorder the canonical document.
 
-### 6.3 Enable visual recovery on hard regions
+### 6.4 Enable visual recovery on hard regions
 
-Visual recovery inspects a small number of difficult source regions. The application can select at most eight crops per document and three per page by default.
+Visual recovery inspects difficult source regions. Engine-specific local recovery runs first: GLM-OCR revisits eligible form regions, while PaddleOCR-VL may recover missing checkbox states in PDFs only when 190 and 200 DPI parses agree. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 
 Candidates can include:
 
@@ -271,7 +283,7 @@ It cannot change:
 
 Use it for scans, faxes, faint text, and irregular layouts. It is not a full second OCR pass.
 
-### 6.4 Classify document type
+### 6.5 Classify document type
 
 This feature predicts the overall document type from recognized content and layout on the first two parsed pages.
 
@@ -279,7 +291,7 @@ Use it when you need a quick label such as an invoice, report, or authorization 
 
 Do not use this single label to decide which pages to extract from a mixed packet. Use custom form routing for that task.
 
-### 6.5 Generate table of contents
+### 6.6 Generate table of contents
 
 This feature creates a hierarchical list of sections. When a section is linked to a known element, selecting it opens the corresponding highlighted source region.
 
@@ -291,9 +303,9 @@ Use it for:
 - manuals; or
 - any long document with headings.
 
-If Luna TOC generation fails, the application may fall back to headings already found by GLM-OCR.
+If Luna TOC generation fails, the application may fall back to headings already found by local OCR.
 
-### 6.6 Enable document chat
+### 6.7 Enable document chat
 
 This feature adds a **Chat** tab. Enabling the switch alone does not send a chat request; a request is sent only after a user submits a question.
 
@@ -301,15 +313,15 @@ Use chat for investigation, not controlled repeatable extraction. A saved extrac
 
 ## 7. Parse the document
 
-After selecting the options, choose **Parse document**.
+After selecting each file's processing type and any applicable options, choose **Parse document**.
 
-The progress area shows stages such as:
+For OCR routes, the progress area shows stages such as:
 
 1. Layout detection
 2. Region recognition
 3. Luna visual recovery
 4. Base Markdown
-5. Annotated PDF
+5. Annotated PDF when a visual artifact is available
 6. Luna Markdown refinement
 7. Document classification
 8. Table of contents
@@ -321,24 +333,22 @@ Features that are disabled may still appear in the stage list but do not make a 
 In simple terms:
 
 ```text
-Validate file
-  -> turn every page into an image
-  -> find page regions
-  -> read text in each region
-  -> check quality
-  -> optionally recover selected difficult text
-  -> restore page and reading order
-  -> build Markdown, JSON, and annotations
+Validate file and selected processing type
+  -> route to Native PDF, scanned/image OCR, Mixed PDF, or Docling
+  -> native: preserve base_text, spans, and source anchors
+  -> OCR: find/read page regions and optionally recover difficult text
+  -> Mixed PDF: merge confirmed Native/OCR page results in source order
+  -> build Markdown, JSON, and available visual artifacts
   -> run selected optional document features
 ```
 
-The parser never treats selectable PDF text as authoritative evidence. It reads the visible page image.
+Native PDFs preserve selectable-text evidence through page and bounding-box anchors. Scanned PDFs and images use visible page pixels as OCR evidence.
 
 ### 7.2 What happens when an optional feature fails
 
-Optional Luna failures normally do not erase a successful GLM parse. The application displays warnings or an unavailable/failed feature status.
+Optional Luna failures normally do not erase a successful local OCR parse. The application displays warnings or an unavailable/failed feature status.
 
-Parsing can stop if the source is invalid, password protected, over a configured limit, or if all nonblank pages lack usable GLM regions. One failed page does not by itself trigger this document-wide empty-layout failure; isolated page failures can remain visible as warnings/partial output.
+Parsing can stop if the source is invalid, password protected, over a configured limit, or if all nonblank pages lack usable local OCR regions. One failed page does not by itself trigger this document-wide empty-layout failure; isolated page failures can remain visible as warnings/partial output.
 
 ### 7.3 Tab map
 
@@ -348,10 +358,11 @@ After a successful parse:
 | --- | --- |
 | Overview | Always |
 | Markdown | Always |
-| Annotated PDF | Always |
+| Annotated PDF | When the selected route produces a visual artifact |
 | Extract | After a successful parse |
 | Chat | Only when **Enable document chat** is on |
 | Layout Tree | Always |
+| Source Structure | Native results |
 
 The Extract tab switches between whole-document extraction and custom form routing based on **Use custom form routing**.
 
@@ -624,11 +635,24 @@ Exact steps:
 
 Markdown upload does not automatically save the schema or run extraction. An H1 becomes the schema name; otherwise, the filename becomes the name. An omitted type defaults to `string`.
 
-### 12.6 Load a saved schema
+### 12.6 Import schema CSV or XLSX
+
+CSV and XLSX imports use these columns in order:
+
+```csv
+Field name,Description,Type
+invoice_number,Official invoice identifier,string
+total_amount,Final amount payable,number
+due_date,Payment due date,date
+```
+
+Use **Import schema Markdown, CSV, or XLSX** to choose the file. XLSX imports read the first worksheet. The filename becomes the schema name, and an empty type defaults to `string`. The fields load into the editable draft; review them before selecting **Save schema**.
+
+### 12.7 Load a saved schema
 
 Choose a name under **Saved schema**, then select **Load selected schema**. Saving the same name later updates that reusable definition.
 
-### 12.7 Review extraction results
+### 12.8 Review extraction results
 
 Each field displays:
 
@@ -648,7 +672,7 @@ Confidence meanings:
 
 The app does not fill a missing field merely because the schema requires it. Missing values remain `null`/`not_found`.
 
-### 12.8 Large field sets
+### 12.9 Large field sets
 
 The application can accept a large scalar schema, but it does not automatically split schemas. The UI runs one schema at a time and keeps the latest result in the active session.
 
@@ -842,6 +866,8 @@ Every segment—including non-extractable `other` or `medical_records` segments�
 
 Segment IDs are not durable business identifiers. Applying review sorts segments and can renumber them as `form-001`, `form-002`, and so on. Do not use them to join records across classification runs or substantial review edits.
 
+When every segment is approved and the routing profile is unchanged, select **Download split documents**. The dedicated `.segments.zip` contains a PDF, Markdown file, and canonical parsed-document JSON for every segment, including non-extractable and repeated categories. `manifest.json` records the source identity, full routing metadata, and generated paths. The PDF uses original source pages without annotations; Markdown and JSON retain parsed page numbers, element IDs, and bounding boxes.
+
 ### 13.8 Extract eligible forms
 
 **Extract eligible forms** becomes available only when:
@@ -874,7 +900,7 @@ Treat every form as a separate business result. Confirm that the page range belo
 
 ## 14. Use document chat
 
-Enable **Enable document chat** before or after parsing. Changing the chat toggle does not rerun GLM parsing.
+Enable **Enable document chat** before or after parsing. Changing the chat toggle does not rerun local OCR parsing.
 
 In the **Chat** tab:
 
@@ -917,7 +943,7 @@ File name:
 <document-name>.annotated.pdf
 ```
 
-Use it for review, audit support, and source tracing. The downloaded file includes canonical annotations and reading-order labels according to the current reading-order option.
+Use it for review, audit support, and source tracing when available. Native nonvisual formats do not produce an annotated PDF; use their **Source Structure** view and source anchors instead.
 
 ### 15.3 Download Extract JSON
 
@@ -943,9 +969,9 @@ File name:
 
 Use Full JSON when technical consumers need the complete parse plus current optional results. It can include:
 
-- refined and base Markdown;
-- document structure;
-- elements and normalized boxes;
+- refined and base Markdown for OCR results, or immutable `base_text` and source spans for native results;
+- document structure and source anchors;
+- OCR elements and normalized boxes when the selected route has visual evidence;
 - quality and recovery information;
 - document classification and TOC;
 - whole-document extraction;
@@ -988,7 +1014,7 @@ One person may perform several roles in a small team, but the responsibilities s
 
 1. Approve the field dictionary and routing categories before production use.
 2. Confirm the environment and provider destination.
-3. Upload one document and verify page completeness.
+3. Upload the documents and verify each document's page completeness.
 4. Parse with the approved feature settings.
 5. Review source coverage before extraction.
 6. For mixed packets, review every routing segment.
@@ -1026,7 +1052,7 @@ A successful run does not mean every requested value is populated. It means:
 
 ### 17.1 Source ownership
 
-GLM-OCR and deterministic code own:
+For scanned PDFs and images, the selected local OCR engine and deterministic code own:
 
 - element IDs;
 - normalized bounding boxes;
@@ -1035,13 +1061,13 @@ GLM-OCR and deterministic code own:
 - reading order; and
 - initial OCR confidence.
 
-Luna can reason about existing elements, but it does not own their geometry.
+Luna can reason about existing elements, but it does not own their geometry. For native results, immutable `base_text` and `SourceAnchor` values own the evidence: PDF page/bounding-box positions, document paragraphs/shapes, sheet cells, table cells, or CSV rows/columns.
 
 ### 17.2 Grounding
 
-Grounding connects a value or answer to an existing element. An element contains an ID, page, text, type, reading order, and optional box.
+Grounding connects a value or answer to existing source evidence. OCR evidence uses an element ID, page, text, type, reading order, and optional box. Native evidence uses an exact Unicode-codepoint interval in immutable `base_text`, mapped through source spans to one or more anchors.
 
-When **Show source** works, the app follows the element ID back to the annotated page.
+When **Show source** works, the app follows an OCR element ID back to an annotated page or shows the native source anchor and character interval.
 
 ### 17.3 Structured output and validation
 
@@ -1061,10 +1087,12 @@ Current output versions are:
 
 | Result | Version |
 | --- | --- |
-| Parse JSON | `4.4.0` |
-| Full JSON | `4.5.0` |
+| Parse JSON | `4.5.0` |
+| Full JSON | `4.6.0` |
 | Whole-document extraction JSON | `1.1.0` |
 | Routed extraction JSON | `2.0.0` |
+| Native document JSON | `5.0.0` |
+| Combined native/extraction JSON | `5.1.0` |
 
 Consumers should use the version field instead of assuming every JSON file has the same shape.
 
@@ -1072,7 +1100,7 @@ Consumers should use the version field instead of assuming every JSON file has t
 
 ### 18.1 What is saved by the app
 
-Reusable extraction schemas and routing profiles are intentionally stored in SQLite at:
+Reusable extraction schemas, routing profiles, and active-batch metadata are intentionally stored in SQLite at:
 
 ```text
 data/document_studio.sqlite3
@@ -1080,22 +1108,23 @@ data/document_studio.sqlite3
 
 An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
+The database's sibling `workspaces` directory stores the active batch's source bytes, selected-page source, annotated PDF, and parse checkpoint. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
+
 ### 18.2 What is session-only
 
-The current Streamlit app keeps these in process/session state:
+The current Streamlit app keeps these in process/session state only:
 
-- current parse result;
 - current whole-document extraction;
 - custom classification and routing review;
 - routed extraction;
 - chat history; and
 - current selected source region.
 
-These can disappear when the session or process ends. Download required outputs promptly.
+These can disappear when the session or process ends. Parse results remain in the active local workspace until it is replaced or explicitly cleared. Download required outputs promptly.
 
 Uploaded bytes and generated results may remain in the browser session and active Streamlit process while the workflow is open. The parser also uses temporary storage during processing and removes its normal temporary directory after successful completion. Abnormal termination and storage recovery are outside that cleanup guarantee.
 
-Do not treat closing a browser tab or refreshing the page as a verified deletion mechanism. Changing the uploaded file resets the current document state, while a process restart can remove session state. An administrator must define and verify deletion, browser, host-storage, backup, and retention procedures for sensitive documents.
+Do not treat closing a browser tab, refreshing, or restarting the app as deletion. Use **Clear saved workspace**, then apply the administrator's approved browser, host-storage, backup, and retention procedures for sensitive documents.
 
 The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. For a privacy cleanup boundary, the administrator must clear the relevant Streamlit cache or restart the managed Streamlit process, then handle host/storage remnants under the approved procedure.
 
@@ -1115,7 +1144,7 @@ Normal parsing removes temporary parser storage, but abnormal termination and st
 
 ### 18.4 Local-workstation boundary
 
-The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `8501` or `8080` to an untrusted network.
+The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `8600` or `8080` to an untrusted network.
 
 The application has no multi-user login or tenant isolation. It must not be published unchanged as a shared PHI or confidential-document service.
 
@@ -1133,13 +1162,22 @@ Developers can use the Python package directly through:
 - `ParserConfig` for configuration; and
 - `render_combined_result` for Full JSON.
 
-Actual GLM parsing must run in the Linux/WSL environment containing the `local-ocr` dependency. The Python API is synchronous and does not provide a page-range argument.
+Actual parsing must run with the selected GLM-OCR or PaddleOCR-VL stack available in Linux/WSL. The Python API is synchronous and does not provide a page-range argument.
 
 Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-to-hero-tutorial.md) for examples.
 
 ### 19.2 Current integration limits
 
-The repository has no installed CLI command, application HTTP API, worker process, job queue, or artifact store. Automation must call the Python library or add an approved application layer.
+The installed package includes a synchronous local batch command:
+
+```powershell
+grounded-docparse ingest input.pdf --processing-type input.pdf=native-pdf --schema invoice.json --output results
+grounded-docparse ingest report.docx --processing-type report.docx=word --schema invoice.md --output results --overwrite
+```
+
+`ingest` accepts files and non-recursive directories, requires one processing type per discovered file, applies one optional schema to every document, isolates per-document failures, and writes a root manifest plus per-document Markdown, Full JSON, and optional extraction JSON. It writes an annotated PDF only for routes that produce one. Mixed PDFs additionally require a confirmed route for every page. `grounded-docparse parse` remains the legacy PDF/image OCR command. Exit code `1` means at least one document failed; exit code `2` means arguments or preflight validation failed. Existing non-empty output directories require `--overwrite`, which replaces matching generated paths without deleting unrelated files.
+
+The repository still has no application HTTP API, worker process, or production job queue. The CLI is synchronous workstation automation, not a durable unattended service.
 
 Do not create production batch processing by driving 100 files through one Streamlit session. A production design needs durable jobs, idempotency, per-document failure handling, secure storage, review state, and access control.
 
@@ -1227,7 +1265,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 | File is rejected | Invalid, unsupported, encrypted, oversized, or over configured limits | Use a valid supported source or reduce/split it outside the app |
 | Markdown has missing content | OCR missed or could not read a source region | Check annotated source and use a clearer scan |
 | Reading order is wrong | Complex layout or hierarchy problem | Inspect reading-order labels and Layout Tree |
-| Schema Markdown is invalid | Mixed formats, invalid type/name, encoding, or size | Use one supported format and UTF-8 `.md` under 1 MB |
+| Schema file is invalid | Wrong headers, invalid type/name, encoding, workbook, or size | Use a supported `.md`, `.csv`, or `.xlsx` file under 1 MB |
 | Routing profile is incomplete | Extractable category lacks a saved schema | Save the named extraction schema first |
 | Classify forms fails validation | Invalid page coverage/category/evidence remains after repair | Review profile and retry; escalate persistent failures |
 | Extract eligible forms is disabled | Unapproved segment, no eligible segment, or changed profile | Apply review to all segments or rerun classification |
@@ -1240,15 +1278,15 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 ### Does Fast mode mean no external API calls?
 
-No. Fast enables document classification, and visual recovery may also be enabled. Use Custom mode and disable all Luna options for a GLM-only run.
+No. Fast enables document classification, and visual recovery may also be enabled. Use Custom mode and disable all Luna options for a local-only run.
 
 ### Is extraction automatic after parsing?
 
 No. Open Extract, define or load a schema, and explicitly run extraction.
 
-### Can I upload a Markdown field list?
+### Can I upload a field list?
 
-Yes. Use **Import schema Markdown**. The file populates an editable draft; review and save it before reuse.
+Yes. Use **Import schema Markdown, CSV, or XLSX**. The file populates an editable draft; review and save it before reuse.
 
 ### Can I upload a Markdown routing definition?
 
@@ -1270,7 +1308,7 @@ No. Approval confirms the routing decision. Eligibility comes only from the save
 
 No. GLM/deterministic code owns element identity, location, type, and order.
 
-### Can the app recover a region GLM never found?
+### Can the app recover a region local OCR never found?
 
 Not in the default workflow. Visual recovery repairs text only on an existing region.
 
@@ -1280,11 +1318,11 @@ Follow the organization’s policy. Critical and regulated fields should still b
 
 ### Can the UI process 100 PDFs at once?
 
-No. The current UI processes one document. Production batch processing requires the architecture described in the Azure runbook.
+No. The current UI processes at most 20 files sequentially in one durable local workspace. A 100-file production workflow requires the architecture described in the Azure runbook.
 
 ### Are schemas and results both saved?
 
-Schemas and routing profiles are saved in SQLite. Parse, extraction, routing review, and chat results are session-only unless downloaded.
+Schemas and routing profiles are saved in SQLite. The active batch's sources, parse results, progress, analysis, failures, and usage are also saved locally. Extraction, routing review, and chat results remain session-only unless downloaded.
 
 ## 23. Glossary
 

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from PIL import Image, ImageDraw
 
-from grounded_docparse.config import AnalysisThresholds, ParserConfig
+from grounded_docparse.config import AnalysisThresholds, OcrEngine, ParserConfig
 from grounded_docparse.ingest import PageEvidence
 from grounded_docparse.local_ocr import GlmRegion, _regions
 from grounded_docparse.models import PageComplexity, ReadingOrderStatus
@@ -233,6 +233,65 @@ def test_table_form_and_visual_complexity(tmp_path: Path) -> None:
     assert visual.complexity is PageComplexity.VISUAL_HEAVY
 
 
+def test_html_table_cells_preserve_spans_for_semantics(tmp_path: Path) -> None:
+    content = (
+        '<table><tr><th colspan="2">Member information</th></tr>'
+        '<tr><td rowspan="2">Name</td><td>Lori</td></tr>'
+        "<tr><td></td></tr></table>"
+    )
+    evidence = page(tmp_path)
+    analysis = analyze(
+        Runtime([GlmRegion(0, "table", content, (0, 125, 1000, 625))]),
+        evidence,
+        min_edge_variance=0,
+        min_contrast_range=0,
+        clipping_border_ratio=1,
+    )
+
+    draft = draft_from_analysis(analysis)
+
+    assert draft.regions[0].text == content
+    assert [
+        (
+            cell.row_index,
+            cell.column_index,
+            cell.row_span,
+            cell.column_span,
+            cell.text,
+        )
+        for cell in draft.regions[0].table_cells
+    ] == [
+        (0, 0, 1, 2, "Member information"),
+        (1, 0, 2, 1, "Name"),
+        (1, 1, 1, 1, "Lori"),
+        (2, 1, 1, 1, ""),
+    ]
+    assert not any(
+        "low_table_quality" in candidate.reasons
+        for candidate in _page_recovery_candidates(evidence, analysis)
+    )
+
+
+def test_unresolved_checkbox_grid_is_prioritized_for_recovery(tmp_path: Path) -> None:
+    content = (
+        "<table><tr><td>Type of service:</td><td>Outpatient</td>"
+        "<td>Office visit</td><td>Hospital</td><td>Office</td></tr></table>"
+    )
+    evidence = page(tmp_path)
+    analysis = analyze(
+        Runtime([GlmRegion(0, "table", content, (0, 125, 1000, 625))]),
+        evidence,
+        min_edge_variance=0,
+        min_contrast_range=0,
+        clipping_border_ratio=1,
+    )
+
+    candidates = _page_recovery_candidates(evidence, analysis)
+
+    assert candidates[0].severity == 0
+    assert "unresolved_form_controls" in candidates[0].reasons
+
+
 def test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels(tmp_path: Path) -> None:
     analysis = analyze(
         Runtime([GlmRegion(0, "text", "Grounded text", (100, 100, 900, 200))]),
@@ -279,3 +338,64 @@ def test_recovery_uses_real_ocr_confidence_when_available(tmp_path: Path) -> Non
     result.regions[0].ocr_confidence = 0.54
     candidates = _page_recovery_candidates(evidence, result)
     assert any("low_ocr_confidence" in candidate.reasons for candidate in candidates)
+
+
+def test_paddle_uses_official_block_order_without_glm_column_ambiguity(
+    tmp_path: Path,
+) -> None:
+    regions = [
+        GlmRegion(1, "text", "Right alpha", (0.6, 0.1, 0.95, 0.2)),
+        GlmRegion(2, "text", "Left beta", (0.05, 0.3, 0.4, 0.4)),
+        GlmRegion(3, "text", "Right beta", (0.6, 0.3, 0.95, 0.4)),
+        GlmRegion(4, "text", "Left alpha", (0.05, 0.1, 0.4, 0.2)),
+    ]
+    config = ParserConfig(
+        ocr_engine=OcrEngine.PADDLEOCR_VL_1_6,
+        analysis_thresholds=AnalysisThresholds(
+            min_edge_variance=0,
+            min_contrast_range=0,
+            clipping_border_ratio=1,
+        ),
+    )
+    result = next(
+        PageAnalyzer(config, runtime_factory=lambda *_args: Runtime(regions)).analyze_window(
+            [page(tmp_path)]
+        )
+    )
+
+    assert result.reading_order.status is ReadingOrderStatus.CONFIDENT
+    assert result.reading_order.ordered_region_ids == [
+        "p1-analysis-1",
+        "p1-analysis-2",
+        "p1-analysis-3",
+        "p1-analysis-4",
+    ]
+    assert result.reading_order.basis == "PaddleOCR block_order"
+    assert result.engine.sdk == "paddleocr"
+
+
+def test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox(
+    tmp_path: Path,
+) -> None:
+    config = ParserConfig(
+        ocr_engine=OcrEngine.PADDLEOCR_VL_1_6,
+        analysis_thresholds=AnalysisThresholds(
+            min_edge_variance=0,
+            min_contrast_range=0,
+            clipping_border_ratio=1,
+        ),
+    )
+    analysis = next(
+        PageAnalyzer(
+            config,
+            runtime_factory=lambda *_args: Runtime(
+                [GlmRegion(1, "text", "[x] Nonparticipating", (0.1, 0.1, 0.9, 0.2))]
+            ),
+        ).analyze_window([page(tmp_path)])
+    )
+
+    draft = draft_from_analysis(analysis)
+
+    assert draft.regions[0].type.value == "checkbox"
+    assert draft.regions[0].checkbox_state.value == "checked"
+    assert draft.regions[0].text == "Nonparticipating"

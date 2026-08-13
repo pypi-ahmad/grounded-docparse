@@ -1,7 +1,7 @@
 """Grounded document parsing pipeline."""
 
 from .agentic import DocumentAgent, PreparedDocumentContext
-from .config import ParserConfig
+from .config import OcrEngine, ParserConfig
 from .extraction import DocumentExtractor
 from .models import (
     AgenticAnalysis,
@@ -23,15 +23,50 @@ from .models import (
     StoredSchema,
     VisualRecoveryResult,
 )
+from .native import (
+    CellSourceAnchor,
+    CharacterInterval,
+    CsvSourceAnchor,
+    NativeAsset,
+    NativeDocument,
+    NativeElement,
+    NativeExtractedValue,
+    NativeExtractionEvidence,
+    NativeExtractionResult,
+    NativeParseResult,
+    PageRoute,
+    PdfSourceAnchor,
+    PreviewArtifact,
+    ProcessingType,
+    SourceAnchor,
+    SourceFormat,
+    SourceSpan,
+    SourceUnit,
+    StructuralSourceAnchor,
+    TextSourceAnchor,
+    render_native_combined_result,
+    render_native_document,
+)
+from .native_extraction import LangExtractNativeExtractor, translate_stored_schema
 from .pipeline import DocumentParser
 from .render import render_combined_result
+from .universal import (
+    MixedNativePageUnusable,
+    NativePdfRequiresMixed,
+    PdfInspection,
+    ProcessingTypeMismatch,
+    UniversalDocumentParser,
+)
 
 __all__ = [
     "AgenticAnalysis",
+    "CellSourceAnchor",
+    "CharacterInterval",
     "ChatAnswer",
     "ChatSource",
     "ClassifierCategory",
     "ClassifierProfile",
+    "CsvSourceAnchor",
     "Document",
     "DocumentAgent",
     "DocumentExtractor",
@@ -41,14 +76,41 @@ __all__ = [
     "ExtractionResult",
     "FormClassificationResult",
     "FormSegment",
+    "LangExtractNativeExtractor",
+    "MixedNativePageUnusable",
+    "NativeAsset",
+    "NativeDocument",
+    "NativeElement",
+    "NativeExtractedValue",
+    "NativeExtractionEvidence",
+    "NativeExtractionResult",
+    "NativeParseResult",
+    "NativePdfRequiresMixed",
+    "OcrEngine",
+    "PageRoute",
     "ParseMetadata",
     "ParseResult",
     "ParserConfig",
+    "PdfInspection",
+    "PdfSourceAnchor",
     "PreparedDocumentContext",
+    "PreviewArtifact",
+    "ProcessingType",
+    "ProcessingTypeMismatch",
     "RoutedExtractionResult",
     "SchemaProposal",
     "SegmentExtraction",
+    "SourceAnchor",
+    "SourceFormat",
+    "SourceSpan",
+    "SourceUnit",
     "StoredSchema",
+    "StructuralSourceAnchor",
+    "TextSourceAnchor",
+    "UniversalDocumentParser",
     "VisualRecoveryResult",
     "render_combined_result",
+    "render_native_combined_result",
+    "render_native_document",
+    "translate_stored_schema",
 ]

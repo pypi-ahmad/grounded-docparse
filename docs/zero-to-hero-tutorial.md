@@ -5,15 +5,15 @@ This tutorial explains the repository from first principles through day-to-day u
 The short version is:
 
 ```text
-PDF or image
-  -> local GLM-OCR layout and recognition
-  -> deterministic quality checks
-  -> optional bounded Luna text recovery
-  -> grounded document model, Markdown, JSON, and annotated PDF
-  -> optional classification, form routing, extraction, TOC, and chat
+required per-file processing type
+  -> scanned PDF/image: selected local GLM-OCR or PaddleOCR-VL
+  -> Native PDF: pdf-inspector; Mixed PDF: reviewed page routes
+  -> Office/open formats: OCR-disabled Docling conversion
+  -> grounded OCR elements or immutable native source spans/anchors
+  -> Markdown, JSON, optional annotated PDF, and optional extraction/chat
 ```
 
-The most important design rule is that GLM-OCR and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
+The most important design rule is that the selected local OCR engine and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
 
 ## 1. Choose your path through this tutorial
 
@@ -36,9 +36,9 @@ Ordinary OCR answers “what text appears in this image?” A business document 
 - Can an extracted field be rejected when its evidence is missing?
 - Can a mixed fax packet be split into form ranges before extraction?
 
-Grounded DocParse converts one PDF or image into a structured, reviewable document representation. It is optimized for scanned and visually complex documents where source traceability matters.
+Grounded DocParse converts native documents, scanned PDFs, and images into structured, reviewable document representations. It preserves source traceability for selectable text as well as visually complex scans.
 
-The current application is a workstation-oriented Streamlit studio. It processes one uploaded document at a time. It is not currently a batch service, REST API, multi-user system, or durable job processor.
+The current application is a workstation-oriented Streamlit studio. It processes up to 20 uploaded files sequentially and restores one active local batch after restart. It is not an unattended batch service, REST API, multi-user system, or production job processor.
 
 ### 2.1 Core outputs
 
@@ -48,11 +48,12 @@ A successful parse can produce:
 | --- | --- |
 | Refined Markdown | Human-readable reconstruction with optional presentation improvements |
 | Grounded `base_markdown` | Canonical Markdown to which source spans refer |
-| Parse JSON v4.4.0 | Parse structure, elements, quality, provenance, usage, and recovery information |
-| Full JSON v4.5.0 | Parse data plus optional analysis, routing, and extraction results |
+| Parse JSON v4.5.0 | Parse structure, elements, quality, provenance, usage, recovery, and OCR-comparison information |
+| Full JSON v4.6.0 | Parse data plus optional analysis, routing, and extraction results |
 | Extraction JSON v1.1.0 | One-schema scalar extraction with evidence and field confidence |
 | Routed extraction JSON v2.0.0 | Per-form extraction results for approved eligible segments |
 | Annotated PDF | Original pages with semantic boxes, reading order, and source highlighting |
+| Native JSON v5.0.0 / combined v5.1.0 | Immutable `base_text`, source spans, anchors, and optional grounded extraction |
 
 ## 3. Essential concepts and vocabulary
 
@@ -60,15 +61,15 @@ Understanding these terms makes the rest of the repository much easier to follow
 
 ### 3.1 Rasterization
 
-Rasterization renders each PDF page into pixels. This project intentionally ignores selectable or embedded PDF text as extraction evidence. A visually scanned page and a digitally generated page therefore enter the same image-first pipeline.
+Rasterization renders scanned PDF pages and image frames into pixels. Native PDFs do not enter this image-first pipeline: `pdf-inspector` extracts their selectable text, layout, tables, and positions. Mixed PDFs explicitly combine both routes page by page.
 
-Why this matters: hidden, stale, malformed, or adversarial PDF text cannot disagree with what a reviewer sees and still become the authoritative source.
+Why this matters: the user explicitly selects the evidence route. Native PDF text is traceable through page/bounding-box anchors, while scanned-page evidence remains visual/OCR based. Mismatches are blocked rather than silently rerouted.
 
 ### 3.2 Layout analysis and OCR
 
 Layout analysis finds regions such as headings, paragraphs, tables, form areas, and images. OCR recognizes text inside those regions.
 
-GLM-OCR owns:
+The selected local OCR engine owns:
 
 - element identity;
 - normalized bounding boxes;
@@ -133,7 +134,7 @@ The supported local topology is deliberately small:
 
 ```text
 Browser
-  -> Streamlit studio on 127.0.0.1:8501
+  -> Streamlit studio on 127.0.0.1:8600
        -> ingest and rasterization
        -> GLM-OCR SDK
             -> local vLLM service on 127.0.0.1:8080
@@ -144,7 +145,7 @@ Browser
 
 There are two AI execution boundaries:
 
-1. **Local GLM-OCR:** layout and recognition run inside WSL against the local vLLM service.
+1. **Local OCR:** GLM-OCR or PaddleOCR-VL-1.6 layout and recognition run inside WSL against loopback-only services.
 2. **Optional Luna:** selected crops or recognized document context go to the configured OpenAI-compatible destination only when the associated feature is enabled and `OPENAI_API_KEY` is available.
 
 There is no open-ended agent loop. Optional features use bounded, typed requests followed by deterministic validation.
@@ -218,15 +219,15 @@ The setup process:
 5. writes the resolved runtime configuration under `.runtime/`;
 6. starts local vLLM and Streamlit;
 7. validates a real image-recognition request; and
-8. opens <http://localhost:8501>.
+8. opens <http://localhost:8600>.
 
-Later sessions use:
+Later sessions default to GLM-OCR:
 
 ```powershell
 .\Launch-GLM-OCR.cmd
 ```
 
-The launcher reuses healthy managed processes and refreshes the Windows user-scope OpenAI settings.
+Use `.\Launch-PaddleOCR-VL-1.6.cmd` to start with PaddleOCR-VL selected. Both launchers reuse healthy managed processes, refresh Windows user-scope OpenAI settings, and can switch the exclusive GPU backend from the app.
 
 ### 5.5 Manual WSL launch
 
@@ -253,18 +254,18 @@ Both managed services bind to loopback. Do not override that boundary on an untr
 
 ## 6. Your first successful parse
 
-Open <http://localhost:8501>, then follow this minimal path:
+Open <http://localhost:8600>, then follow this minimal path:
 
-1. Upload one PDF, PNG, JPEG, or TIFF. For a safe first run, use the bundled `examples/synthetic-report.pdf`.
-2. For a PDF, optionally enable **Page range** and choose an inclusive start/end range.
-3. Select an ADE mode.
-4. Decide whether visual recovery is allowed.
+1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
+2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
+3. For scanned PDFs and images, optionally enable **Page range**, select an OCR engine, then choose an ADE mode.
+4. Decide whether visual recovery is allowed for OCR routes.
 5. Select **Parse document**.
-6. Review the generated tabs before running extraction.
+6. Review Markdown, JSON, source structure, and any available annotated PDF before running extraction.
 
 ### 6.1 ADE modes
 
-“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same core GLM parse.
+“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same selected local OCR parse.
 
 | Mode | Markdown refinement | Document classification | TOC |
 | --- | --- | --- | --- |
@@ -274,32 +275,27 @@ Open <http://localhost:8501>, then follow this minimal path:
 
 Visual recovery and chat are separate toggles. Extraction is never automatically run by an ADE mode.
 
-If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a GLM-only run.
+If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a local-only run.
 
 ### 6.2 What happens after selecting Parse document?
 
 The progress UI reflects these major stages:
 
 ```text
-layout -> recognition -> recovery -> assembly -> annotation
-       -> optional enhancement -> optional document analysis
+selection -> validation -> selected native/OCR pipeline -> canonical evidence
+          -> optional enhancement -> optional document analysis/extraction
 ```
 
 The exact parser flow is:
 
-1. Validate extension, bytes, upload size, page count, and pixel limits.
-2. Rasterize every page or image frame.
-3. Run GLM-OCR in ordered windows of 16 pages.
-4. Analyze OCR confidence, density, garbage, empty-region area, and table structure.
-5. Rank recovery candidates.
-6. Optionally send at most eight crops per document and three per page to Luna.
-7. Accept only crop-backed text corrections with confidence of at least `0.85`.
-8. Restore source page order and build document hierarchy.
-9. Generate elements, quality state, `base_markdown`, parse JSON, and annotations.
-10. Optionally apply Markdown presentation directives.
-11. Optionally classify the whole document and generate the TOC.
+1. Require a compatible processing type and validate file signatures/container structure.
+2. Route scanned PDFs/images to OCR, Native PDF to `pdf-inspector`, Mixed PDF to confirmed page routes, and Office/open formats to Docling without OCR.
+3. Apply local OCR quality/recovery only to OCR routes; native embedded images are recorded rather than OCRed.
+4. Merge Mixed PDF pages in original order and build OCR elements or immutable native `base_text`, character spans, and anchors.
+5. Generate Markdown, JSON, source structure, and an annotated PDF only when a visual artifact exists.
+6. Optionally apply refinement, classification, TOC, extraction, and chat. Native LangExtract values must have exact intervals that resolve to source anchors.
 
-Pages are prepared/finalized concurrently within ordered windows, while the process-wide GLM-OCR SDK runtime serializes model access. Default page concurrency is eight.
+For GLM-OCR, pages are prepared/finalized concurrently within ordered windows while the process-wide SDK runtime serializes model access. Default page concurrency is eight. PaddleOCR-VL submits the complete document to its local API.
 
 The UI implements a page range by creating a new subset PDF before parsing. Output page 1 therefore means the first selected page, not necessarily page 1 of the original PDF. If downstream users need original-file page numbers, retain the selected start-page offset or another explicit mapping outside the current result.
 
@@ -312,12 +308,12 @@ Luna recovery may replace text on an existing element. It may not change:
 - type;
 - hierarchy;
 - reading order;
-- GLM confidence; or
+- local OCR confidence; or
 - document structure.
 
-Luna additions, rejected regions, geometry changes, and structural changes are ignored. If GLM misses a source region entirely, the default recovery path does not synthesize it.
+Luna additions, rejected regions, geometry changes, and structural changes are ignored. If local OCR misses a source region entirely, the default recovery path does not synthesize it.
 
-If at least one page is nonblank but no nonblank page contains any GLM layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.
+If at least one page is nonblank but no nonblank page contains any local OCR layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.
 
 ## 7. Learn the Streamlit studio
 
@@ -437,9 +433,22 @@ The H1 becomes the schema name. Without an H1, the filename stem is used. An omi
 
 Uploading Markdown loads an editable draft. It does not automatically save the schema or run extraction. Review the rows, then select **Save schema** if the definition should be reusable.
 
-The exact click path is **Extract** → **Extraction schemas** → **Import schema Markdown** → choose the `.md` file. The upload itself populates the draft; there is no separate Markdown-import button.
+The exact click path is **Extract** → **Extraction schemas** → **Import schema Markdown, CSV, or XLSX** → choose the `.md` file. The upload itself populates the draft; there is no separate import button.
 
-### 8.4 Import or export JSON
+### 8.4 Import an extraction schema from CSV or XLSX
+
+CSV and XLSX files use the same flat field columns:
+
+```csv
+Field name,Description,Type
+patient_name,Full patient name,string
+date_of_birth,Patient date of birth,date
+urgent,Whether the request is marked urgent,boolean
+```
+
+The first XLSX worksheet is imported. The filename becomes the schema name, and an empty type defaults to `string`. Uploading the file loads an editable draft without saving it.
+
+### 8.5 Import or export JSON
 
 The UI’s schema import/export shape is an application definition, not compiled JSON Schema:
 
@@ -457,9 +466,9 @@ The UI’s schema import/export shape is an application definition, not compiled
 }
 ```
 
-Selecting **Import JSON** validates and immediately persists the definition. Markdown import only populates the draft. **Export schema JSON** downloads the current valid draft.
+Selecting **Import JSON** validates and immediately persists the definition. Markdown, CSV, and XLSX imports only populate the draft. **Export schema JSON** downloads the current valid draft.
 
-### 8.5 What the UI compiles
+### 8.6 What the UI compiles
 
 The application converts every scalar field to a required but nullable JSON Schema property. A date becomes a nullable string whose description asks for ISO 8601 output.
 
@@ -518,7 +527,7 @@ schema validation
   -> deterministic exact/normalized/inferred/not-found decision
 ```
 
-Accepted evidence must point to existing parsed elements. The final box comes from the GLM-owned element, not from a new model-generated coordinate.
+Accepted evidence must point to existing parsed elements. The final box comes from the local-OCR-owned element, not from a new model-generated coordinate.
 
 The UI builder supports scalar schemas. The direct Python `DocumentExtractor` API also supports nested objects and arrays, but nested schemas use one direct extraction path rather than the long-document scalar partition/merge strategy.
 
@@ -642,6 +651,8 @@ Review every uncertain segment and select **Apply routing review**. The UI enabl
 
 Approving an ineligible `medical_records` or `other` segment confirms the routing decision; it does not make that segment extractable.
 
+Once every segment is approved and the profile is unchanged, select **Download split documents**. The `.segments.zip` exports every segment, including ineligible and repeated categories, as its own original-page PDF, Markdown, and canonical parsed-document JSON. `manifest.json` maps each segment's routing metadata to those files. Markdown and JSON keep parsed page numbers, element IDs, and source boxes.
+
 ### 11.6 Extract only eligible forms
 
 Select **Extract eligible forms**. For each eligible segment, the code creates an in-memory `ParseResult` subset containing only the segment’s original pages and elements, then runs its assigned schema.
@@ -684,7 +695,7 @@ The active UI keeps only the latest whole-document or routed extraction result. 
 
 ## 13. Use the public Python API
 
-The repository does not install a CLI entry point. Programmatic reuse is through the Python package.
+The repository installs `grounded-docparse`. Use `grounded-docparse ingest` for explicit native/OCR routing and `grounded-docparse parse` for legacy PDF/image OCR batches. Programmatic reuse is also available through the Python package.
 
 The snippets below are incremental: later examples assume the `result` produced in Section 13.1 unless they explicitly parse a different example. Save the combined imports and statements as `scratch.py` in the repository root.
 
@@ -695,7 +706,7 @@ source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/acti
 python scratch.py
 ```
 
-Native Windows `uv run python scratch.py` can import the core package but does not install the Linux-only local OCR runtime, so it is not the supported way to perform a real parse.
+Native Windows `uv run python scratch.py` can perform native parsing after `uv sync --locked --extra native`; Linux-only local OCR still requires the setup-created WSL runtime.
 
 ### 13.1 Parse a document
 
@@ -718,7 +729,7 @@ result_path = source.with_suffix(".annotated.pdf")
 result_path.write_bytes(result.annotated_pdf)
 ```
 
-`DocumentParser.parse` is synchronous. Supported extensions are `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, and `.tiff`.
+`DocumentParser.parse` is synchronous for legacy OCR. `UniversalDocumentParser.parse` is synchronous for manually selected native, scanned, mixed, and image routes.
 
 The Python parse API has no page-range parameter. Slice the PDF before calling it or use the Streamlit page-range control.
 
@@ -1105,14 +1116,16 @@ Constraints such as `pattern`, length/range bounds, conditional schemas, and com
 | `DOCPARSE_MAX_UPLOAD_BYTES` | `262144000` | Parser upload limit |
 | `DOCPARSE_MAX_PAGES` | `500` | Page/frame limit |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Per-page pixel limit |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `8` | Recovery crops per document |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |
 | `DOCPARSE_PROVIDER_RETRY_ATTEMPTS` | `3` | Total retryable attempts |
-| `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Local GLM analysis enabled |
+| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr` or `paddleocr-vl-1.6` |
+| `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Local OCR analysis enabled |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout device |
+| `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback PaddleX document-parser API |
 | `DOCPARSE_STUDIO_DB_PATH` | `data/document_studio.sqlite3` | Reusable-definition database |
 
 The managed vLLM profile uses a deliberate 32,768-token ceiling for the verified workstation rather than attempting the model’s theoretical maximum context. Change runtime limits only after measuring GPU memory, WSL memory, representative pages, and failure behavior.
@@ -1143,7 +1156,7 @@ Requests use `store=False`. This application setting does not replace contractua
 
 ### 17.3 Keep local services local
 
-The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `8501` or `8080` to an untrusted network.
+The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `8600` or `8080` to an untrusted network.
 
 ### 17.4 Know the residual data
 
@@ -1214,9 +1227,7 @@ The bundled corpus is a regression suite. It is not proof of broad production ac
 
 The repository intentionally does not currently provide:
 
-- batch processing in the UI;
 - a folder-upload workflow;
-- a CLI application entry point;
 - an HTTP application API;
 - queues or workers;
 - durable job/artifact state;
@@ -1249,7 +1260,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8501>; inspect `.runtime/streamlit.log` |
+| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8600>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
 | Luna controls are disabled | `OPENAI_API_KEY` unavailable to Streamlit | Save it in Windows user scope and rerun `Launch-GLM-OCR.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |
@@ -1290,7 +1301,7 @@ You are ready to use the app when you can answer “yes” to these questions:
 - Can I classify a mixed packet, review every segment, and extract only eligible categories?
 - Can I trace an output value to an element and annotated source box?
 - Do I understand what persists and what disappears with the session?
-- Do I know the current single-document and trusted-workstation limits?
+- Do I know the current 20-file session-batch and trusted-workstation limits?
 - Can I run the offline verification suite before changing code?
 - Will I use the production runbook rather than exposing the local app directly?
 

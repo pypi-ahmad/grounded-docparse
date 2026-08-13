@@ -8,8 +8,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-12
+
 ### Added
 
+- Manual native-document ingestion through the Streamlit app, Python API, and `grounded-docparse ingest` CLI. Every file now has an explicit compatible processing type; incompatible selections, missing batch assignments, and incomplete Mixed PDF page routes are rejected instead of silently rerouted.
+- Native PDF parsing through `pdf-inspector` and reviewed Native/OCR page merging in original order. Native PDF pages that need OCR stop and direct the user to Mixed PDF.
+- OCR-disabled Docling conversion for Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB documents, with immutable `base_text`, character-to-source spans, and anchors for paragraphs, shapes, sheets/cells, tables, and rows/columns. Embedded images are recorded but not OCRed.
+- Fail-closed LangExtract native extraction: only exact `char_interval` values that resolve to `base_text` and `SourceAnchor` evidence are accepted; ungrounded values are rejected. Native nonvisual formats may omit an annotated PDF.
+- Opt-in selective local-OCR disagreement checks that audit only uncertain crops, preserve primary OCR output, persist evidence, and flag disagreements for review.
+- Document-type accuracy and confidence calibration, OCR and classification review-rate reporting, JSON regression gates, and an external private calibration/holdout workflow.
+- Selectable PaddleOCR-VL-1.6 local parsing with an isolated locked runtime, Windows launcher, loopback-only PaddleX API, and exclusive GPU service switching.
+- Session-scoped batches of up to 20 files with sequential processing, per-file failure isolation, retry/skip behavior, and ZIP export.
+- Root usage, technical, contribution, conduct, changelog, and security guides with generated-site navigation.
+
+### Changed
+
+- Moved the managed Streamlit UI from loopback port `8501` to `8600`.
+- Made Luna recovery scale from eight to 64 prioritized crops with document length while retaining the three-per-page guard.
+- Kept local GLM form recovery independent from the Luna crop budget and standardized every Luna request on medium reasoning effort.
+- Generalized evidence ownership and recovery quality gates across GLM-OCR and PaddleOCR-VL-1.6.
+
+### Fixed
+
+- Forced WSL shell scripts to use LF line endings so the GLM-OCR and PaddleOCR-VL launchers do not invoke `bash\r` on Windows checkouts.
+
+## [0.5.0] - 2026-07-31
+
+### Added
+
+- A per-user Windows installer, resumable WSL/Ubuntu provisioning, dependency repair, NVIDIA vLLM selection, and Ollama BF16 CPU/AMD fallback.
 - Reusable Markdown/JSON extraction definitions and custom form-routing profiles for classifying mixed PDF packets, reviewing page segments, and extracting only selected categories.
 - Business, technical, and Azure bulk-fax guides, plus a sanitized application preview.
 - A responsive dark multipage documentation website generated from the repository's non-security Markdown files.

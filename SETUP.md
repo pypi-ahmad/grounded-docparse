@@ -1,16 +1,15 @@
 # Setup
 
-> Last verified against this repository: 2026-07-30.
+> Last verified against this repository: 2026-08-12.
 
-The supported local runtime is Windows 11 with Ubuntu 24.04 under WSL2 and an NVIDIA GPU. GLM-OCR and PP-DocLayout run inside WSL; Streamlit is launched from the same locked Linux environment. Native Windows does not install the `local-ocr` dependency because its package markers are Linux-only.
+The supported local runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. GLM-OCR retains NVIDIA vLLM and Ollama fallback support. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer for its vLLM recognition service; it fails closed rather than silently using GLM. The two OCR dependency stacks use separate locked environments. Native document parsing is available with the `native` extra and does not require local OCR or a GPU.
 
 ## Prerequisites
 
-- Windows 11 with WSL support
-- NVIDIA Windows driver with WSL GPU passthrough
+- Windows 10 22H2 or Windows 11 x64 with AVX2
+- At least 16 GB RAM and 20 GB free disk; 40 GB is recommended when both model caches are populated
 - Network access during first setup for Python packages and model weights
-- Enough disk space for the WSL virtual environment and model cache
-- Git for obtaining the repository
+- Administrator approval when Windows must enable WSL2
 
 Obtain the repository from PowerShell:
 
@@ -19,16 +18,7 @@ git clone https://github.com/pypi-ahmad/grounded-docparse.git
 Set-Location grounded-docparse
 ```
 
-Check WSL and GPU visibility from PowerShell:
-
-```powershell
-wsl --install -d Ubuntu-24.04
-wsl --update
-wsl --list --verbose
-wsl -d Ubuntu-24.04 -- nvidia-smi
-```
-
-Restart Windows if WSL installation requests it. The first Ubuntu launch may ask for a UNIX username and password.
+The release installer bundles the application, so target computers do not need Git. Source checkouts still require Git.
 
 ## Automated Windows setup
 
@@ -38,16 +28,56 @@ From the repository root, run:
 .\Setup-GLM-OCR.cmd
 ```
 
-The script:
+The setup assistant:
 
-1. checks for `wsl.exe` and Ubuntu 24.04;
-2. requests elevation only when the distribution must be installed;
-3. verifies `nvidia-smi` inside WSL;
-4. refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from the Windows user environment, then passes them and the repository path into WSL;
-5. runs `scripts/wsl/launch-stack.sh`;
-6. opens <http://localhost:8501> after vLLM and Streamlit are healthy.
+1. validates Windows, AVX2, RAM, and disk;
+2. installs or reuses WSL2 and Ubuntu 24.04, resuming after restart when required;
+3. reuses the Ubuntu user or securely creates one without persisting its password;
+4. installs only missing or stale locked local-OCR and native-document dependencies;
+5. tries NVIDIA CUDA, otherwise installs Ollama `glm-ocr:bf16`; supported AMD GPUs accelerate Ollama and unsupported GPUs use CPU;
+6. validates a real image request, starts Streamlit, and opens <http://localhost:8600>.
 
-If `uv` is not already available inside WSL, the first run installs `uv` 0.11.32 after verifying the installer checksum; otherwise it uses the existing executable. It then installs Python 3.12.10, creates `~/.local/share/grounded-docparse/.venv`, and runs `uv sync --locked --extra local-ocr`. Setup downloads exact GLM-OCR and PP-DocLayoutV3 revisions into the WSL Hugging Face cache and generates `.runtime/glmocr.yaml` with the resolved local layout-model path. Later launches are cache-only and fail instead of silently accessing the network.
+Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
+
+## Native document ingestion
+
+For local native-document development on Windows or WSL, install the native extra:
+
+```powershell
+uv sync --locked --extra native
+```
+
+Native parsing is local and non-OCR: `pdf-inspector` extracts selectable-text PDF structure, while Docling converts DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, and EPUB with OCR, VLM/model enrichments, remote services, and plugins disabled. Native embedded images are recorded as assets and are not OCRed. Optional LangExtract field extraction uses the OpenAI credentials described below.
+
+The Streamlit app requires a compatible selection for each uploaded file. The CLI exposes the same contract through `ingest`: PDFs use `native-pdf`, `scanned-pdf`, or `mixed-pdf`; Office and open formats use `word`, `powerpoint`, `excel`, `csv`, or `other-native`; images use `image`. File signatures and Office/container structure are validated after selection.
+
+```powershell
+uv run grounded-docparse ingest .\invoice.pdf `
+  --processing-type .\invoice.pdf=native-pdf `
+  --output .\output
+```
+
+Mixed PDFs require a route for every page. The app shows `pdf-inspector` suggestions for review; the CLI receives the confirmed routes explicitly:
+
+```powershell
+uv run grounded-docparse ingest .\mixed.pdf `
+  --processing-type .\mixed.pdf=mixed-pdf `
+  --page-route .\mixed.pdf#1=native `
+  --page-route .\mixed.pdf#2=ocr `
+  --output .\output
+```
+
+Native results contain immutable `base_text`, character-to-source spans, and source anchors. A native PDF with pages that need OCR stops and asks for Mixed PDF rather than falling back automatically. The legacy `grounded-docparse parse` command remains available for PDF/image OCR batches.
+
+### Build the installer
+
+Install Inno Setup 6, then run:
+
+```powershell
+.\scripts\build-installer.ps1
+```
+
+The build creates `dist\GroundedDocParse-<version>-Setup.exe` and a SHA-256 file. The artifact is unsigned because no public-trusted signing certificate is configured; Windows SmartScreen may warn.
 
 For later sessions:
 
@@ -55,9 +85,9 @@ For later sessions:
 .\Launch-GLM-OCR.cmd
 ```
 
-Both launchers reuse healthy processes. Runtime logs and PID files are stored under the ignored `.runtime/` directory.
+Use `.\Launch-PaddleOCR-VL-1.6.cmd` to start with Paddle selected. Both launchers open the same app. The dropdown can switch engines later; the manager serializes transitions, refuses unmanaged port owners, stops the old GPU service, and starts the selected one. Only one VLM service is resident on the supported 8 GB workstation profile.
 
-To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. The launcher enters WSL through `bash -lc`, so login-profile exports are inherited. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration; `DOCPARSE_GLMOCR_LAYOUT_DEVICE` remains overridable and defaults to `cuda:0`.
+To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration. Layout uses `cuda:0` with vLLM and `cpu` with Ollama.
 
 ## Manual WSL setup and launch
 
@@ -67,15 +97,23 @@ Run the following inside Ubuntu from the repository mounted under `/mnt/<drive>/
 bash scripts/wsl/setup-glmocr.sh
 ```
 
+Set `DOCPARSE_LOCAL_OCR_BACKEND=vllm` or `ollama` to force one backend. Without it, setup chooses vLLM only when `nvidia-smi` succeeds inside WSL.
+
 Then use two WSL terminals:
 
 ```bash
-# Terminal 1: vLLM on port 8080
+# Terminal 1a: vLLM on port 8080
 bash scripts/wsl/serve-glmocr.sh
 ```
 
+For Ollama instead:
+
 ```bash
-# Terminal 2: Streamlit on port 8501
+bash scripts/wsl/serve-ollama.sh
+```
+
+```bash
+# Terminal 2: Streamlit on port 8600
 bash scripts/wsl/run-app.sh
 ```
 
@@ -84,6 +122,17 @@ Or start/reuse both detached services and wait for their health checks:
 ```bash
 bash scripts/wsl/launch-stack.sh
 ```
+
+For PaddleOCR-VL-1.6, provision its isolated runtime and select it at launch:
+
+```bash
+bash scripts/wsl/setup-paddleocr.sh
+DOCPARSE_START_ENGINE=paddleocr-vl-1.6 bash scripts/wsl/launch-stack.sh
+```
+
+See [Local PaddleOCR-VL-1.6 runtime](docs/local-paddleocr-vl.md) for the dedicated installation guide, health checks, configuration, and troubleshooting.
+
+The official full pipeline runs PaddleOCR-VL-1.6-0.9B behind `paddleocr genai_server` on `127.0.0.1:8118`, and PP-DocLayoutV3 plus document parsing behind PaddleX on `127.0.0.1:8119`. PP-DocLayoutV3 runs on CPU so the 8 GB GPU remains available to vLLM. The first successful setup downloads the VLM, layout model, and required visualization font into `${PADDLE_PDX_CACHE_HOME:-~/.paddlex}`. Later starts validate those files and pass their local paths to both services with offline mode enabled, so they do not download again. Startup then requires API discovery and an end-to-end `/layout-parsing` probe.
 
 GLM-OCR declares 131072 maximum positions, but this 8GB workstation cannot provision one 128K request: at the verified 0.85 GPU fraction vLLM exposes about 62176 KV-cache tokens. The launcher therefore serves a deliberate 32768-token ceiling, which comfortably contains the SDK's 8192-token output allowance plus the cropped-region image/prompt tokens. Raising the server to 128K is unsupported on this profile.
 
@@ -102,7 +151,7 @@ GLM parsing does not require an OpenAI credential. Set user-level values only wh
 .\Launch-GLM-OCR.cmd
 ```
 
-The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8501` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
+The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8600` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
 
 ## Configuration reference
 
@@ -117,7 +166,7 @@ The Windows launcher reads user scope directly, so a newly saved value does not 
 | `DOCPARSE_MAX_PAGES` | `500` | Maximum pages or image frames |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Maximum rendered pixels per page |
 | `DOCPARSE_LUNA_MAX_OUTPUT_TOKENS` | `128000` | Upper bound used by Luna calls; individual stages apply smaller caps |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `8` | Document-wide recovery-crop limit |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit; cannot exceed batch size |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |
@@ -127,8 +176,14 @@ The Windows launcher reads user scope directly, so a newly saved value does not 
 | `DOCPARSE_PROVIDER_COOLDOWN_SECONDS` | `1.0` | Minimum cooldown after HTTP 429 |
 | `DOCPARSE_PROVIDER_SUCCESS_WINDOW` | `10` | Successes before reduced concurrency increases |
 | `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Enables local GLM analysis |
+| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr` or `paddleocr-vl-1.6` |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM-OCR SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout-model device |
+| `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback-only full PaddleX document-parser API; remote origins are rejected because document bytes are posted here |
+| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `900` | Local full-document request timeout |
+| `DOCPARSE_PADDLE_VLLM_PORT` | `8118` | Loopback port for PaddleOCR-VL recognition |
+| `DOCPARSE_PADDLE_API_PORT` | `8119` | Loopback port for the full PaddleX parser; launchers derive the service URL from it |
+| `PADDLE_PDX_CACHE_HOME` | `~/.paddlex` | Persistent Paddle model/font cache; keep this path stable to avoid downloading assets again |
 
 Additional application/runtime variables:
 
@@ -172,7 +227,7 @@ Check the services:
 source ~/.local/share/grounded-docparse/.venv/bin/activate
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python scripts/wsl/prepare_glmocr_runtime.py --offline
 python scripts/wsl/check-glmocr-api.py
-curl --fail --silent http://127.0.0.1:8501/_stcore/health
+curl --fail --silent http://127.0.0.1:8600/_stcore/health
 ```
 
 Reproduce the warm page benchmark without Luna or model-load time:
@@ -199,13 +254,15 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 | `nvidia-smi` fails inside WSL | Update the Windows NVIDIA driver and WSL; do not install a separate Linux display driver inside WSL |
 | vLLM runs out of memory | Stop competing GPU processes and inspect `.runtime/vllm.log`; do not lower the 32768 context while `page_loader.max_tokens` remains 8192 |
 | `/v1/models` works but recognition fails | Run `scripts/wsl/check-glmocr-api.py`; `launch-stack.sh` automatically restarts a managed server that fails this inference check |
-| Port `8080` or `8501` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
+| Port `8080` or `8600` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
+| Port `8118` or `8119` is occupied | Stop the unrelated listener; Paddle services are never adopted when ownership cannot be verified |
+| Paddle startup fails | Inspect `.runtime/paddle-vllm.log` and `.runtime/paddle-api.log`; confirm NVIDIA compute capability 8.0+ and CUDA 12.6+ |
 | GLM-OCR import fails | Rerun `scripts/wsl/setup-glmocr.sh`; do not use the native Windows environment for local OCR |
 | A pinned snapshot is missing in offline mode | Connect once and rerun `scripts/wsl/setup-glmocr.sh`; normal launch never falls back to a network download |
 | Luna controls are unavailable | Set `OPENAI_API_KEY` before starting Streamlit |
 | Startup times out | Inspect `.runtime/vllm.log` and `.runtime/streamlit.log` |
 
-Other serving backends and standalone PaddleOCR pipelines are not implemented or managed by this repository.
+Other Paddle recognition backends and standalone recognition-only modes are not implemented or managed by this repository.
 
 The repository does not claim a minimum GPU VRAM, RAM, disk footprint, or first-download duration. Validate the locked stack on the target workstation; reduce the documented vLLM settings if it does not fit.
 

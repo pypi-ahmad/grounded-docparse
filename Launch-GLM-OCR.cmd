@@ -4,6 +4,7 @@ title GLM-OCR Launcher
 cd /d "%~dp0"
 
 echo Starting GLM-OCR...
+set "DOCPARSE_START_ENGINE=glm-ocr"
 
 where wsl.exe >nul 2>&1
 if errorlevel 1 (
@@ -20,9 +21,9 @@ if not defined OPENAI_API_KEY echo WARNING: OPENAI_API_KEY is not set in the Win
 set "DOCPARSE_WINDOWS_ROOT=%CD%"
 set "DOCPARSE_OLD_WSLENV=%WSLENV%"
 if defined WSLENV (
-  set "WSLENV=%WSLENV%:OPENAI_API_KEY:OPENAI_BASE_URL:DOCPARSE_WINDOWS_ROOT/p"
+  set "WSLENV=%WSLENV%:OPENAI_API_KEY:OPENAI_BASE_URL:DOCPARSE_WINDOWS_ROOT/p:DOCPARSE_START_ENGINE:DOCPARSE_PADDLE_VLLM_PORT:DOCPARSE_PADDLE_API_PORT"
 ) else (
-  set "WSLENV=OPENAI_API_KEY:OPENAI_BASE_URL:DOCPARSE_WINDOWS_ROOT/p"
+  set "WSLENV=OPENAI_API_KEY:OPENAI_BASE_URL:DOCPARSE_WINDOWS_ROOT/p:DOCPARSE_START_ENGINE:DOCPARSE_PADDLE_VLLM_PORT:DOCPARSE_PADDLE_API_PORT"
 )
 
 wsl.exe -d Ubuntu-24.04 -- bash -lc "exec \"$DOCPARSE_WINDOWS_ROOT/scripts/wsl/launch-stack.sh\""
@@ -31,7 +32,7 @@ set "WSLENV=%DOCPARSE_OLD_WSLENV%"
 
 if not "%DOCPARSE_EXIT%"=="0" goto :failed
 
-start "" "http://localhost:8501"
+start "" "http://localhost:8600"
 echo.
 echo GLM-OCR is ready. This window can be closed.
 ping 127.0.0.1 -n 4 >nul
@@ -39,6 +40,6 @@ exit /b 0
 
 :failed
 echo.
-echo Startup failed. Review .runtime\vllm.log and .runtime\streamlit.log.
+echo Startup failed. Review .runtime\vllm.log, .runtime\ollama.log, and .runtime\streamlit.log.
 pause
 exit /b 1
