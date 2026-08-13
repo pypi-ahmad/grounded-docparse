@@ -9,7 +9,7 @@ This directory is a Karpathy-pattern knowledge base derived from the Grounded Do
 - Every article must use simple frontmatter keys: `tags`, `sources`, `snapshot`, and `status`.
 - `sources` contains comma-separated repository-relative paths. Name important symbols in the article when behavior depends on them.
 - Do not invent fallback behavior, supported formats, quality guarantees, or data contracts.
-- Mark feature-branch behavior as such until it is merged and released.
+- Mark unreleased branch behavior as such until it is merged and released. Released native-document ingestion is canonical on `main`.
 
 ## Structure rules
 

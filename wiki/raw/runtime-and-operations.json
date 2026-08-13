@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-6684c0091b62",
-    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
-    "branch": "native-document-ingestion",
+    "id": "content-f03a0de2c1a2",
+    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
+    "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-12T16:46:34.603348+00:00",
+  "generated_at": "2026-08-13T13:54:04.812099+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
       "path": "Launch-GLM-OCR.cmd",
-      "sha256": "e44d3bee61cd07d0de4722a7082048dc206502ec0928b5ffca6bb6b57e73a014",
-      "size": 1667
+      "sha256": "eb7819f5e93d7a7cbeb62b3bd8c5470062902010b284976eebd7f8cb848df736",
+      "size": 1668
     },
     {
       "path": "Launch-PaddleOCR-VL-1.6.cmd",
-      "sha256": "caa40ebb337ea5192ddd0f8a9115360b77a6809e5c91760522afb472f25e0910",
-      "size": 1714
+      "sha256": "838f81d6c487781353dd32e9768b7a602acd7088bccc9467c7e2be3d93fca2e2",
+      "size": 1715
     },
     {
       "path": "Setup-GLM-OCR.cmd",
@@ -26,13 +26,13 @@
     },
     {
       "path": "installer/GroundedDocParse.iss",
-      "sha256": "7f83a6bf815916d5af0d8227aa3f283e17207241a851b0c2814ae8a0f1133941",
-      "size": 2923
+      "sha256": "6b9fc12b0b802859f9a61903b57a5ae793b6e5534b1433dbf1074120699d420a",
+      "size": 2930
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "1076797c17a601243113d57b933e2d9d14e563b57ed2c13797fce562356bb892",
-      "size": 16170
+      "sha256": "aa935806e9d9beeaf6c13969b411a147293d5bc5436f78958adcfd1a92f64c06",
+      "size": 16171
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -51,8 +51,8 @@
     },
     {
       "path": "scripts/build_docs_site.py",
-      "sha256": "cf3cddef81a78f4e5cfeead7d717b9a3077e9933bf0ddc97a1b899264a070b52",
-      "size": 22201
+      "sha256": "4b95450a5f90976327a58cfddc6eab816f42f8e021fc9ff89060c88435cc9a1b",
+      "size": 22216
     },
     {
       "path": "scripts/evaluate_corpus.py",
@@ -61,8 +61,8 @@
     },
     {
       "path": "scripts/generate_evaluation_corpus.py",
-      "sha256": "460d8c8a1822a8fcbc9ee8dddff88c97e8066c997ff3e24d4497480086db1b9f",
-      "size": 19716
+      "sha256": "6a90c8c432807273eca1c434bb0cbd657f6bba1d1139452f61a7c96a92b952bb",
+      "size": 19739
     },
     {
       "path": "scripts/generate_examples.py",
@@ -71,8 +71,8 @@
     },
     {
       "path": "scripts/refresh_knowledge_wiki.py",
-      "sha256": "d7d93ace85b437934fc65194e1197dae7c5c90b234092a05cbc7f1303f35a32b",
-      "size": 11875
+      "sha256": "053e464723c5780364c9fd386707d1116e62a8b03839091ab023d9817ec84af9",
+      "size": 12229
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",
@@ -106,8 +106,8 @@
     },
     {
       "path": "scripts/wsl/prepare_paddleocr_runtime.py",
-      "sha256": "4de7c1064ae1d67ff8489770ec4856e405a6de932493c2b7dfd19f02f8e7dca8",
-      "size": 5178
+      "sha256": "9eab116d1aa0387939f6ee8e07f8a93452924bf8dcd1c51597a366029d36118a",
+      "size": 5186
     },
     {
       "path": "scripts/wsl/run-app.sh",

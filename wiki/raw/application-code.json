@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-6684c0091b62",
-    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
-    "branch": "native-document-ingestion",
+    "id": "content-f03a0de2c1a2",
+    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
+    "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-12T16:46:34.603348+00:00",
+  "generated_at": "2026-08-13T13:54:04.812099+00:00",
   "category": "application-code",
   "files": [
     {
       "path": "src/grounded_docparse/__init__.py",
-      "sha256": "a2147a7e1e2d7a8cfe2499e6d687d8c6cd0a09e4d8095267489afd75f3469b6c",
-      "size": 2786
+      "sha256": "7bff8e9d34353fc876053f5c7d7ce116164e4d1fc78ee7379a87032f8914b642",
+      "size": 2863
     },
     {
       "path": "src/grounded_docparse/agentic.py",
@@ -26,13 +26,13 @@
     },
     {
       "path": "src/grounded_docparse/benchmark.py",
-      "sha256": "8b775a7c3376eaeeadb92f47230bdea487817d77e5c35e0dd7f86e875dbe6144",
-      "size": 59202
+      "sha256": "72f008dd1025fc12aeae1e908de75f5ea5e23ee6860266cbfb15ba581fa772b9",
+      "size": 59231
     },
     {
       "path": "src/grounded_docparse/cli.py",
-      "sha256": "7656512dcf2e159ef71cc08f11102b6c53573b3c4f8c493022760a15043e6dde",
-      "size": 16184
+      "sha256": "5df89d74af34ec262c07cb8dcfd70457140bac9503f643b2565e3e6c09930261",
+      "size": 16406
     },
     {
       "path": "src/grounded_docparse/config.py",
@@ -41,8 +41,8 @@
     },
     {
       "path": "src/grounded_docparse/docling_native.py",
-      "sha256": "ca71d949ad261d672920ae28806ff24798dd14a1cabed354ad4615d96122a819",
-      "size": 25437
+      "sha256": "70180cdd2be4dc54f650e0de4bc1637d00fb01ef867d4d780deb06384f5d43e0",
+      "size": 26093
     },
     {
       "path": "src/grounded_docparse/enhancement.py",
@@ -76,18 +76,18 @@
     },
     {
       "path": "src/grounded_docparse/native.py",
-      "sha256": "9ed2e7be9edb9d1363b904798f446c0fcd691c3d568b06bfe38cab919d507902",
-      "size": 9268
+      "sha256": "2442b64427f03b25757c4844126f4698c4658664010b51c4721851096d5a1069",
+      "size": 9593
     },
     {
       "path": "src/grounded_docparse/native_extraction.py",
-      "sha256": "c0f94032034d837f9c2a67f87511e330b7c384995492687f759a4a8ebd378e30",
-      "size": 21404
+      "sha256": "4504135bae2807f0d80cd8790841fe66df32d212648563fde069cdc3e2d95a4c",
+      "size": 21995
     },
     {
       "path": "src/grounded_docparse/native_parsers.py",
-      "sha256": "9bf42f5560a68e64b353b8bf251909dd82b262b3ce03471833371282465533cb",
-      "size": 22733
+      "sha256": "9d29b1ba049285056e3f30a421987749e63b4de45df58d97687c909ec0733b36",
+      "size": 23301
     },
     {
       "path": "src/grounded_docparse/ocr_disagreement.py",
@@ -136,8 +136,8 @@
     },
     {
       "path": "src/grounded_docparse/runtime_control.py",
-      "sha256": "c0d5b6daa07ff448ca533bcb0fd4f36cb590da4ac4b1f98a4be988fc87320e5b",
-      "size": 1119
+      "sha256": "86878d5dd920219cd04f9ebf08a5e406e9f93cfce16638a1d308d3395e4c9de2",
+      "size": 1153
     },
     {
       "path": "src/grounded_docparse/schema_store.py",
@@ -146,18 +146,18 @@
     },
     {
       "path": "src/grounded_docparse/universal.py",
-      "sha256": "6f0082b143fe7fcbb33606fd44c18943586e80e85801bb5eaf754029bd0d0e56",
-      "size": 11504
+      "sha256": "b1d3ab913ad2df3769fbb80e3b9f95ecc1b5068a9dfd60070eef2059ad8e06f8",
+      "size": 11821
     },
     {
       "path": "src/grounded_docparse/workspace_store.py",
-      "sha256": "037e92022a6f92f44db40f5f7a59c823c4b30c9f58117911d179b02857a3b869",
-      "size": 21698
+      "sha256": "0acba0e0c733dff4a8057e845b4884c10eb2ba3a8234de6eae5001671c11de63",
+      "size": 21830
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "69a20742c0045f005e69a4234c5bd816c9bc65abee2824cbf6bbdf044bf745ea",
-      "size": 129579
+      "sha256": "fa383b5180d76811f154aecf83cf4725a6362beb4fffbf1c9a1eeaf4641ea308",
+      "size": 130235
     }
   ]
 }

@@ -672,17 +672,17 @@ If the user parsed a UI page-range subset, these are the subset’s renumbered p
 
 ### 12.1 What persists
 
-Reusable extraction schemas and routing profiles persist in:
+Reusable extraction schemas, routing profiles, and the active batch workspace persist in:
 
 ```text
 data/document_studio.sqlite3
 ```
 
-Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition.
+Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition. The sibling `workspaces/` directory stores uploaded source bytes, parse checkpoints, and annotated PDFs. The latest batch is restored after an app restart. Use **Clear saved workspace** to delete that durable batch.
 
 ### 12.2 What does not persist
 
-The current app keeps parse results, routing results, extraction results, chat, and review changes in Streamlit process/session state. Ending the session or restarting the process can lose them.
+Extraction, routing review, and chat remain in Streamlit process/session state. Ending the session or restarting the process can lose them. Parse results stay in the local workspace until the batch is replaced or cleared.
 
 Download required artifacts before ending the session:
 

@@ -8,7 +8,7 @@
 |---|---|
 | `src/grounded_docparse/` | Installable parsing, OCR, native ingestion, evidence, extraction, and persistence package |
 | `streamlit_app.py` | Single-file Streamlit application and workflow orchestration |
-| `tests/` | 38 pytest modules covering contracts, pipelines, UI, CLI, persistence, and evaluation |
+| `tests/` | 39 pytest modules covering contracts, pipelines, UI, CLI, persistence, and evaluation |
 | `benchmarks/` | Corpus manifests, annotations, schemas, and regression policies |
 | `scripts/` | Evaluation, corpus/example generation, docs/wiki refresh, installer build, and WSL runtime operations |
 | `installer/` | Windows PowerShell installer and Inno Setup definition |
@@ -39,7 +39,7 @@
 | Persistence/batch | `batch.py`, `schema_store.py`, `workspace_store.py` | Batch identity, SQLite schemas/profiles, durable results and artifacts |
 | Evaluation | `benchmark.py` | Corpus validation, metrics, calibration, and policy evaluation |
 
-The package currently contains 28 Python modules. Public imports are curated in `src/grounded_docparse/__init__.py`; UI-only state and presentation remain in `streamlit_app.py`.
+The package currently contains 29 Python modules. Public imports are curated in `src/grounded_docparse/__init__.py`; UI-only state and presentation remain in `streamlit_app.py`.
 
 ### 4) Naming and Organization Rules
 

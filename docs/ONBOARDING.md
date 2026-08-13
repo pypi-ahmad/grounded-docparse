@@ -1,6 +1,6 @@
 # Grounded DocParse Onboarding
 
-> **Freshness note:** This guide covers the native-document-ingestion architecture and its companion knowledge wiki. Refresh the structural graph and this guide after material code or documentation changes.
+> **Freshness note:** This guide covers the released native-document ingestion architecture on `main` as of v0.6.1, plus its companion knowledge wiki. Refresh the structural graph and this guide after material code or documentation changes.
 
 ## Project overview
 

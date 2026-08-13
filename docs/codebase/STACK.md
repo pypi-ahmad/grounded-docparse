@@ -7,7 +7,7 @@
 - Python package and local Streamlit application targeting Python `>=3.12,<3.15`.
 - `uv` owns dependency resolution, locked environments, and command execution; Hatchling builds the wheel.
 - The primary host is Windows 11. GPU OCR runtimes execute in WSL/Linux, while the Streamlit app, CLI, installer, and SQLite state can run on Windows.
-- The project version is `0.5.0`; the installed console command is `grounded-docparse`.
+- The project version is `0.6.1`; the installed console command is `grounded-docparse`.
 
 ### 2) Production Frameworks and Dependencies
 

@@ -4,11 +4,10 @@
 
 ### 1) Top Risks (Prioritized)
 
-1. **Canonical contract drift — high.** `docs/spec.md` and parts of `README.md` still define an OCR-first PDF/image product, while code exports native Office/PDF parsing, manual `ProcessingType`, source spans, and LangExtract. `CONTRIBUTING.md` says there is no installed CLI even though `pyproject.toml` installs one.
-2. **Persistence/security documentation drift — high.** `WorkspaceStore` persists source bytes, parse results, analyses, and extraction under the studio database/workspace directory. `SECURITY.md` still describes generated results primarily as temporary/process/browser data and only documents saved schemas for deletion.
-3. **Large orchestration hotspots — medium.** `pipeline.py` is 3,140 lines and `streamlit_app.py` is 3,025 lines. Both are high-churn and combine many control paths, increasing regression and review cost.
-4. **No automated repository gate — medium.** There is no checked-in CI workflow or coverage baseline. The local verification suite is strong, but enforcement depends on contributors running it.
-5. **Native adapter fidelity — medium.** Docling output is reconciled against a project-built source manifest. This correctly fails closed, but upstream conversion changes can cause valid documents to fail until adapters/tests are updated.
+1. **Large orchestration hotspots — medium.** `pipeline.py` and `streamlit_app.py` each exceed 3,000 lines. Both are high-churn and combine many control paths, increasing regression and review cost.
+2. **No automated repository gate — medium.** There is no checked-in CI workflow or coverage baseline. The local verification suite is strong, but enforcement depends on contributors running it.
+3. **Native adapter fidelity — medium.** Docling output is reconciled against a project-built source manifest. This correctly fails closed, but upstream conversion changes can cause valid documents to fail until adapters/tests are updated.
+4. **Split result versions — medium.** Streamlit workspace `RESULT_VERSION` is `4.6.0`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
 
 ### 2) Technical Debt
 
@@ -23,7 +22,7 @@
 - The app explicitly targets one trusted local workstation and has no authentication, authorization, tenant isolation, or safe public-network deployment mode.
 - Documents, archives, filenames, schemas, and provider output are untrusted. Existing controls include upload/page/pixel limits, signatures, required container parts, ZIP entry/expanded-size limits, `defusedxml`, sanitized HTML, and disabled Docling remote/plugins/enrichments.
 - Optional provider features can send recognized content, crops, schema, questions, or full bounded document context to OpenAI or a custom base URL.
-- Durable workspaces may retain uploaded bytes and generated content beyond process exit. The deletion/retention contract is not fully described in `SECURITY.md`.
+- Durable workspaces retain uploaded bytes and generated content beyond process exit until **Clear saved workspace** or database deletion. Operators must treat that as residual sensitive data.
 - Native parsers expand complex third-party formats in-process. Dependency patching and adversarial-format regression tests remain important even with current prevalidation.
 
 ### 4) Performance and Scaling Concerns
@@ -55,10 +54,7 @@ Counts come from `git log --since="90 days ago" --name-only`; they indicate chan
 
 ### 6) `[ASK USER]` Questions
 
-1. `[ASK USER]` Should native ingestion become part of the canonical product contract in `docs/spec.md` and the README goal/outputs, or remain an additive branch feature until a later release decision?
-2. `[ASK USER]` Is durable retention of uploaded source bytes, native/OCR results, analyses, and extraction intentional? If yes, what deletion and retention guarantee should `SECURITY.md` publish?
-3. `[ASK USER]` Is the installed `grounded-docparse` CLI now a supported public interface? `pyproject.toml` installs it, but `CONTRIBUTING.md` explicitly says no CLI entry point exists.
-4. `[ASK USER]` What active Windows-native feature requires `pywin32`? No source module currently imports it.
+1. `[ASK USER]` What active Windows-native feature requires `pywin32`? No source module currently imports it.
 
 ### 7) Evidence
 
