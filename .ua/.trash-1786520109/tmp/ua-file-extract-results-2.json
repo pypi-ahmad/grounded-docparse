@@ -1,0 +1,662 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 1,
+  "filesSkipped": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 1,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 1,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "src/grounded_docparse/config.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 304,
+      "nonEmptyLines": 289,
+      "functions": [
+        {
+          "name": "validate_paddleocr_service_url",
+          "startLine": 25,
+          "endLine": 46,
+          "params": [
+            "value"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "OcrEngine",
+          "startLine": 12,
+          "endLine": 22,
+          "methods": [
+            "label"
+          ],
+          "properties": []
+        },
+        {
+          "name": "AnalysisThresholds",
+          "startLine": 50,
+          "endLine": 84,
+          "methods": [
+            "__post_init__"
+          ],
+          "properties": [
+            "blank_foreground_ratio",
+            "skew_degrees",
+            "min_edge_variance",
+            "min_contrast_range",
+            "clipping_border_ratio",
+            "min_effective_dpi",
+            "min_short_edge_pixels",
+            "table_form_area_ratio",
+            "visual_area_ratio",
+            "unknown_area_ratio",
+            "complex_region_count"
+          ]
+        },
+        {
+          "name": "ParserConfig",
+          "startLine": 88,
+          "endLine": 304,
+          "methods": [
+            "__post_init__",
+            "from_env"
+          ],
+          "properties": [
+            "ocr_engine",
+            "render_dpi",
+            "crop_dpi",
+            "crop_padding",
+            "max_upload_bytes",
+            "max_pages",
+            "max_page_pixels",
+            "luna_max_output_tokens",
+            "max_visual_recovery_crops",
+            "ocr_disagreement_enabled",
+            "ocr_disagreement_similarity_threshold",
+            "max_ocr_disagreement_crops",
+            "max_ocr_disagreement_crops_per_page",
+            "page_batch_size",
+            "max_page_concurrency",
+            "provider_concurrency",
+            "provider_retry_attempts",
+            "provider_retry_base_seconds",
+            "provider_retry_cap_seconds",
+            "provider_cooldown_seconds",
+            "provider_success_window",
+            "full_page_fallback_fraction",
+            "local_ocr_enabled",
+            "glm_form_recovery_enabled",
+            "glmocr_config_path",
+            "glmocr_layout_device",
+            "paddleocr_service_url",
+            "paddleocr_timeout_seconds",
+            "analysis_thresholds"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "OcrEngine",
+          "line": 12,
+          "isDefault": false
+        },
+        {
+          "name": "validate_paddleocr_service_url",
+          "line": 25,
+          "isDefault": false
+        },
+        {
+          "name": "AnalysisThresholds",
+          "line": 49,
+          "isDefault": false
+        },
+        {
+          "name": "ParserConfig",
+          "line": 87,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "validate_paddleocr_service_url",
+          "callee": "urlsplit",
+          "lineNumber": 26
+        },
+        {
+          "caller": "validate_paddleocr_service_url",
+          "callee": "ValueError",
+          "lineNumber": 30
+        },
+        {
+          "caller": "validate_paddleocr_service_url",
+          "callee": "ValueError",
+          "lineNumber": 43
+        },
+        {
+          "caller": "validate_paddleocr_service_url",
+          "callee": "value.rstrip",
+          "lineNumber": 46
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "getattr",
+          "lineNumber": 73
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 74
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "getattr",
+          "lineNumber": 81
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 82
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 84
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "getattr",
+          "lineNumber": 136
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 137
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 139
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 141
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 143
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 148
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "getattr",
+          "lineNumber": 154
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 155
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 157
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 161
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "ValueError",
+          "lineNumber": 163
+        },
+        {
+          "caller": "__post_init__",
+          "callee": "validate_paddleocr_service_url",
+          "lineNumber": 164
+        },
+        {
+          "caller": "from_env",
+          "callee": "cls",
+          "lineNumber": 168
+        },
+        {
+          "caller": "from_env",
+          "callee": "AnalysisThresholds",
+          "lineNumber": 170
+        },
+        {
+          "caller": "from_env",
+          "callee": "type",
+          "lineNumber": 172
+        },
+        {
+          "caller": "from_env",
+          "callee": "getattr",
+          "lineNumber": 172
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 173
+        },
+        {
+          "caller": "from_env",
+          "callee": "name.upper",
+          "lineNumber": 174
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 175
+        },
+        {
+          "caller": "from_env",
+          "callee": "getattr",
+          "lineNumber": 175
+        },
+        {
+          "caller": "from_env",
+          "callee": "cls",
+          "lineNumber": 181
+        },
+        {
+          "caller": "from_env",
+          "callee": "OcrEngine",
+          "lineNumber": 182
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 183
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 185
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 185
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 185
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 186
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 186
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 186
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 187
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 188
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 188
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 190
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 191
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 191
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 193
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 193
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 193
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 194
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 195
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 195
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 197
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 198
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 200
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 203
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 204
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 206
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv(\r\n                \"DOCPARSE_OCR_DISAGREEMENT_ENABLED\", \"false\"\r\n            ).casefold",
+          "lineNumber": 209
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 209
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 213
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 214
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 216
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 219
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 220
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 222
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 225
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 226
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 228
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 231
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 232
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 232
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 234
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 235
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 237
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 240
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 241
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 243
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 246
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 247
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 249
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 252
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 253
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 255
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 258
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 259
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 261
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 264
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 265
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 267
+        },
+        {
+          "caller": "from_env",
+          "callee": "int",
+          "lineNumber": 270
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 271
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 273
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 276
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 277
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 279
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv(\"DOCPARSE_LOCAL_OCR_ENABLED\", \"true\").casefold",
+          "lineNumber": 282
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 282
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv(\r\n                \"DOCPARSE_GLM_FORM_RECOVERY_ENABLED\", \"true\"\r\n            ).casefold",
+          "lineNumber": 284
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 284
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 288
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 291
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv(\r\n                \"DOCPARSE_PADDLEOCR_SERVICE_URL\", defaults.paddleocr_service_url\r\n            ).rstrip",
+          "lineNumber": 294
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 294
+        },
+        {
+          "caller": "from_env",
+          "callee": "float",
+          "lineNumber": 297
+        },
+        {
+          "caller": "from_env",
+          "callee": "os.getenv",
+          "lineNumber": 298
+        },
+        {
+          "caller": "from_env",
+          "callee": "str",
+          "lineNumber": 300
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 4,
+        "functionCount": 1,
+        "classCount": 3
+      }
+    }
+  ]
+}

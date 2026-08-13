@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "function",
+      "name": "test_validate_cached_assets_requires_all_runtime_downloads",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        56,
+        71
+      ],
+      "summary": "Defines test_validate_cached_assets_requires_all_runtime_downloads, a tmp_path routine in test_paddle_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "function",
+      "name": "test_main_defaults_an_empty_forwarded_port",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        74,
+        87
+      ],
+      "summary": "Defines test_main_defaults_an_empty_forwarded_port, a tmp_path, monkeypatch routine in test_paddle_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_paddle_runtime_config.py",
+      "type": "file",
+      "name": "test_paddle_runtime_config.py",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "summary": "Test module 'test_paddle_runtime_config.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "function",
+      "name": "test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        30,
+        48
+      ],
+      "summary": "Defines test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm, a tmp_path routine in test_paddle_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "function",
+      "name": "test_configure_pipeline_rejects_non_v1_6_layout",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        51,
+        53
+      ],
+      "summary": "Defines test_configure_pipeline_rejects_non_v1_6_layout, a  routine in test_paddle_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "function",
+      "name": "_config",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        17,
+        27
+      ],
+      "summary": "Defines _config, a layout_model routine in test_paddle_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "projectRoot": "D:/AI/Github/grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786520109/assemble-review.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/assembled-graph.json",
+      "language": "json",
+      "sizeLines": 20055,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-1.json",
+      "language": "json",
+      "sizeLines": 6736,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-10.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-12.json",
+      "language": "json",
+      "sizeLines": 17,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-13.json",
+      "language": "json",
+      "sizeLines": 27,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-14.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-2.json",
+      "language": "json",
+      "sizeLines": 143,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-3.json",
+      "language": "json",
+      "sizeLines": 2041,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-4.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-6.json",
+      "language": "json",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-9.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-existing.json",
+      "language": "json",
+      "sizeLines": 9704,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batches.json",
+      "language": "json",
+      "sizeLines": 2564,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/fingerprint-input.json",
+      "language": "json",
+      "sizeLines": 184,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/layers.json",
+      "language": "json",
+      "sizeLines": 222,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/review.json",
+      "language": "json",
+      "sizeLines": 152,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tour.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786520109/assemble-review.json": [],
+    ".ua/.trash-1786520109/assembled-graph.json": [],
+    ".ua/.trash-1786520109/batch-1.json": [],
+    ".ua/.trash-1786520109/batch-10.json": [],
+    ".ua/.trash-1786520109/batch-12.json": [],
+    ".ua/.trash-1786520109/batch-13.json": [],
+    ".ua/.trash-1786520109/batch-14.json": [],
+    ".ua/.trash-1786520109/batch-2.json": [],
+    ".ua/.trash-1786520109/batch-3.json": [],
+    ".ua/.trash-1786520109/batch-4.json": [],
+    ".ua/.trash-1786520109/batch-6.json": [],
+    ".ua/.trash-1786520109/batch-9.json": [],
+    ".ua/.trash-1786520109/batch-existing.json": [],
+    ".ua/.trash-1786520109/batches.json": [],
+    ".ua/.trash-1786520109/fingerprint-input.json": [],
+    ".ua/.trash-1786520109/layers.json": [],
+    ".ua/.trash-1786520109/review.json": [],
+    ".ua/.trash-1786520109/tour.json": []
+  }
+}

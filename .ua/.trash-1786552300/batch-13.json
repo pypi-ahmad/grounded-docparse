@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "config:.ua/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".ua/config.json",
+      "summary": "Structured JSON configuration artifact for config, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/domain-graph.json",
+      "type": "config",
+      "name": "domain-graph.json",
+      "filePath": ".ua/domain-graph.json",
+      "summary": "Structured JSON configuration artifact for domain graph, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/fingerprints.json",
+      "type": "config",
+      "name": "fingerprints.json",
+      "filePath": ".ua/fingerprints.json",
+      "summary": "Structured JSON configuration artifact for fingerprints, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/knowledge-graph.json",
+      "type": "config",
+      "name": "knowledge-graph.json",
+      "filePath": ".ua/knowledge-graph.json",
+      "summary": "Structured JSON configuration artifact for knowledge graph, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/meta.json",
+      "type": "config",
+      "name": "meta.json",
+      "filePath": ".ua/meta.json",
+      "summary": "Structured JSON configuration artifact for meta, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

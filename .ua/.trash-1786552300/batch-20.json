@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "document:docs/codebase/.codebase-scan.txt",
+      "type": "document",
+      "name": ".codebase-scan.txt",
+      "filePath": "docs/codebase/.codebase-scan.txt",
+      "summary": "Documentation covering Optional; omit to use the OpenAI default endpoint. for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/codebase/ARCHITECTURE.md",
+      "type": "document",
+      "name": "ARCHITECTURE.md",
+      "filePath": "docs/codebase/ARCHITECTURE.md",
+      "summary": "Documentation covering Architecture for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/CONCERNS.md",
+      "type": "document",
+      "name": "CONCERNS.md",
+      "filePath": "docs/codebase/CONCERNS.md",
+      "summary": "Documentation covering Concerns for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/CONVENTIONS.md",
+      "type": "document",
+      "name": "CONVENTIONS.md",
+      "filePath": "docs/codebase/CONVENTIONS.md",
+      "summary": "Documentation covering Conventions for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/INTEGRATIONS.md",
+      "type": "document",
+      "name": "INTEGRATIONS.md",
+      "filePath": "docs/codebase/INTEGRATIONS.md",
+      "summary": "Documentation covering Integrations for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STACK.md",
+      "type": "document",
+      "name": "STACK.md",
+      "filePath": "docs/codebase/STACK.md",
+      "summary": "Documentation covering Stack for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STRUCTURE.md",
+      "type": "document",
+      "name": "STRUCTURE.md",
+      "filePath": "docs/codebase/STRUCTURE.md",
+      "summary": "Documentation covering Structure for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/TESTING.md",
+      "type": "document",
+      "name": "TESTING.md",
+      "filePath": "docs/codebase/TESTING.md",
+      "summary": "Documentation covering Testing for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

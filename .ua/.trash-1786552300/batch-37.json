@@ -1,0 +1,422 @@
+{
+  "nodes": [
+    {
+      "id": "file:scripts/wsl/launch-stack.sh",
+      "type": "file",
+      "name": "launch-stack.sh",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "summary": "Automation script 'launch-stack.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:wait_for_url",
+      "type": "function",
+      "name": "wait_for_url",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        28,
+        37
+      ],
+      "summary": "Defines wait_for_url, a  routine in launch-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:stop_managed",
+      "type": "function",
+      "name": "stop_managed",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        39,
+        49
+      ],
+      "summary": "Defines stop_managed, a  routine in launch-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:streamlit_engine",
+      "type": "function",
+      "name": "streamlit_engine",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        51,
+        63
+      ],
+      "summary": "Defines streamlit_engine, a  routine in launch-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:streamlit_environment_matches",
+      "type": "function",
+      "name": "streamlit_environment_matches",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        79,
+        94
+      ],
+      "summary": "Defines streamlit_environment_matches, a  routine in launch-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/launch-stack.sh:start_streamlit",
+      "type": "function",
+      "name": "start_streamlit",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "lineRange": [
+        96,
+        107
+      ],
+      "summary": "Defines start_streamlit, a  routine in launch-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/manage-ocr-stack.sh",
+      "type": "file",
+      "name": "manage-ocr-stack.sh",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "summary": "Automation script 'manage-ocr-stack.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:wait_for_url",
+      "type": "function",
+      "name": "wait_for_url",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        53,
+        62
+      ],
+      "summary": "Defines wait_for_url, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_managed",
+      "type": "function",
+      "name": "stop_managed",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        64,
+        84
+      ],
+      "summary": "Defines stop_managed, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:glm_backend",
+      "type": "function",
+      "name": "glm_backend",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        86,
+        95
+      ],
+      "summary": "Defines glm_backend, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_glm",
+      "type": "function",
+      "name": "stop_glm",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        97,
+        106
+      ],
+      "summary": "Defines stop_glm, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:stop_paddle",
+      "type": "function",
+      "name": "stop_paddle",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        108,
+        117
+      ],
+      "summary": "Defines stop_paddle, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:ensure_glm",
+      "type": "function",
+      "name": "ensure_glm",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        119,
+        163
+      ],
+      "summary": "Defines ensure_glm, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/manage-ocr-stack.sh:ensure_paddle",
+      "type": "function",
+      "name": "ensure_paddle",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "lineRange": [
+        165,
+        238
+      ],
+      "summary": "Defines ensure_paddle, a  routine in manage-ocr-stack.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/run-app.sh",
+      "type": "file",
+      "name": "run-app.sh",
+      "filePath": "scripts/wsl/run-app.sh",
+      "summary": "Automation script 'run-app.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/serve-glmocr.sh",
+      "type": "file",
+      "name": "serve-glmocr.sh",
+      "filePath": "scripts/wsl/serve-glmocr.sh",
+      "summary": "Automation script 'serve-glmocr.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/serve-ollama.sh",
+      "type": "file",
+      "name": "serve-ollama.sh",
+      "filePath": "scripts/wsl/serve-ollama.sh",
+      "summary": "Automation script 'serve-ollama.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/setup-glmocr.sh",
+      "type": "file",
+      "name": "setup-glmocr.sh",
+      "filePath": "scripts/wsl/setup-glmocr.sh",
+      "summary": "Automation script 'setup-glmocr.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/setup-ollama.sh",
+      "type": "file",
+      "name": "setup-ollama.sh",
+      "filePath": "scripts/wsl/setup-ollama.sh",
+      "summary": "Automation script 'setup-ollama.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/wsl/setup-ollama.sh:download_and_extract",
+      "type": "function",
+      "name": "download_and_extract",
+      "filePath": "scripts/wsl/setup-ollama.sh",
+      "lineRange": [
+        12,
+        23
+      ],
+      "summary": "Defines download_and_extract, a  routine in setup-ollama.sh.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/setup-paddleocr.sh",
+      "type": "file",
+      "name": "setup-paddleocr.sh",
+      "filePath": "scripts/wsl/setup-paddleocr.sh",
+      "summary": "Automation script 'setup-paddleocr.sh' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:wait_for_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:stop_managed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:streamlit_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:streamlit_environment_matches",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/launch-stack.sh",
+      "target": "function:scripts/wsl/launch-stack.sh:start_streamlit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:wait_for_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_managed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:glm_backend",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:stop_paddle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:ensure_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/manage-ocr-stack.sh",
+      "target": "function:scripts/wsl/manage-ocr-stack.sh:ensure_paddle",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/setup-ollama.sh",
+      "target": "function:scripts/wsl/setup-ollama.sh:download_and_extract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

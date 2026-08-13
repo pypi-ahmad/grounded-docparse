@@ -1,0 +1,63 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "language": "shell",
+      "sizeLines": 128,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "language": "shell",
+      "sizeLines": 265,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "language": "shell",
+      "sizeLines": 28,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 24,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "language": "shell",
+      "sizeLines": 14,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 84,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "language": "shell",
+      "sizeLines": 63,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "language": "shell",
+      "sizeLines": 53,
+      "fileCategory": "script"
+    }
+  ],
+  "batchImportData": {
+    "scripts/wsl/launch-stack.sh": [],
+    "scripts/wsl/manage-ocr-stack.sh": [],
+    "scripts/wsl/run-app.sh": [],
+    "scripts/wsl/serve-glmocr.sh": [],
+    "scripts/wsl/serve-ollama.sh": [],
+    "scripts/wsl/setup-glmocr.sh": [],
+    "scripts/wsl/setup-ollama.sh": [],
+    "scripts/wsl/setup-paddleocr.sh": []
+  }
+}

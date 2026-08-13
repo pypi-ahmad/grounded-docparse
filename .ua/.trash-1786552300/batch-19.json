@@ -1,0 +1,265 @@
+{
+  "nodes": [
+    {
+      "id": "document:docs/ONBOARDING.md",
+      "type": "document",
+      "name": "ONBOARDING.md",
+      "filePath": "docs/ONBOARDING.md",
+      "summary": "Documentation covering Grounded DocParse Onboarding for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/agentic-document-extraction-comparison.md",
+      "type": "document",
+      "name": "agentic-document-extraction-comparison.md",
+      "filePath": "docs/agentic-document-extraction-comparison.md",
+      "summary": "Documentation covering Agentic Document Extraction: LandingAI ADE and Grounded DocParse for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/api.md",
+      "type": "document",
+      "name": "api.md",
+      "filePath": "docs/api.md",
+      "summary": "Documentation covering Python API for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/architecture.md",
+      "type": "document",
+      "name": "architecture.md",
+      "filePath": "docs/architecture.md",
+      "summary": "Documentation covering Architecture for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/azure-bulk-fax-deployment.md",
+      "type": "document",
+      "name": "azure-bulk-fax-deployment.md",
+      "filePath": "docs/azure-bulk-fax-deployment.md",
+      "summary": "Documentation covering Deploy Grounded DocParse on Azure for bulk medical faxes for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/business-user-extraction-workflow.md",
+      "type": "document",
+      "name": "business-user-extraction-workflow.md",
+      "filePath": "docs/business-user-extraction-workflow.md",
+      "summary": "Documentation covering Business User Workflow for Extracting Large Field Sets for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/complete-user-guide.md",
+      "type": "document",
+      "name": "complete-user-guide.md",
+      "filePath": "docs/complete-user-guide.md",
+      "summary": "Documentation covering Grounded DocParse Complete User Guide for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/extraction-quality-research.md",
+      "type": "document",
+      "name": "extraction-quality-research.md",
+      "filePath": "docs/extraction-quality-research.md",
+      "summary": "Documentation covering Extraction quality research for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/how-grounded-docparse-is-agentic.md",
+      "type": "document",
+      "name": "how-grounded-docparse-is-agentic.md",
+      "filePath": "docs/how-grounded-docparse-is-agentic.md",
+      "summary": "Documentation covering How Grounded DocParse Is Agentic for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/how-it-works.md",
+      "type": "document",
+      "name": "how-it-works.md",
+      "filePath": "docs/how-it-works.md",
+      "summary": "Documentation covering How it works for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:docs/idp-vs-ade-classification.html",
+      "type": "file",
+      "name": "idp-vs-ade-classification.html",
+      "filePath": "docs/idp-vs-ade-classification.html",
+      "summary": "Static HTML documentation page presenting Grounded DocParse: IDP or ADE? for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/layout-aware-large-field-extraction-workflow.md",
+      "type": "document",
+      "name": "layout-aware-large-field-extraction-workflow.md",
+      "filePath": "docs/layout-aware-large-field-extraction-workflow.md",
+      "summary": "Documentation covering Layout-Aware Workflow for Extracting Large Field Sets for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/local-glmocr.md",
+      "type": "document",
+      "name": "local-glmocr.md",
+      "filePath": "docs/local-glmocr.md",
+      "summary": "Documentation covering Local GLM-OCR runtime for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/local-paddleocr-vl.md",
+      "type": "document",
+      "name": "local-paddleocr-vl.md",
+      "filePath": "docs/local-paddleocr-vl.md",
+      "summary": "Documentation covering Local PaddleOCR-VL-1.6 runtime for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/private-evaluation.md",
+      "type": "document",
+      "name": "private-evaluation.md",
+      "filePath": "docs/private-evaluation.md",
+      "summary": "Documentation covering Private confidence calibration and regression evaluation for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/research.md",
+      "type": "document",
+      "name": "research.md",
+      "filePath": "docs/research.md",
+      "summary": "Documentation covering Design basis for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/run.md",
+      "type": "document",
+      "name": "run.md",
+      "filePath": "docs/run.md",
+      "summary": "Documentation covering Run locally for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/spec.md",
+      "type": "document",
+      "name": "spec.md",
+      "filePath": "docs/spec.md",
+      "summary": "Documentation covering Product specification for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/tutorial.md",
+      "type": "document",
+      "name": "tutorial.md",
+      "filePath": "docs/tutorial.md",
+      "summary": "Documentation covering Tutorial for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/zero-to-hero-tutorial.md",
+      "type": "document",
+      "name": "zero-to-hero-tutorial.md",
+      "filePath": "docs/zero-to-hero-tutorial.md",
+      "summary": "Documentation covering Grounded DocParse: Zero-to-Hero Tutorial for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

@@ -1,0 +1,360 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/evaluate_corpus.py:_path_mappings",
+      "type": "function",
+      "name": "_path_mappings",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        24,
+        31
+      ],
+      "summary": "Defines _path_mappings, a values, option routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_reference_basis_mappings",
+      "type": "function",
+      "name": "_reference_basis_mappings",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        34,
+        41
+      ],
+      "summary": "Defines _reference_basis_mappings, a values routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        356,
+        440
+      ],
+      "summary": "Defines main, a  routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_live_report",
+      "type": "function",
+      "name": "_live_report",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        161,
+        353
+      ],
+      "summary": "Defines _live_report, a args routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_write_artifacts",
+      "type": "function",
+      "name": "_write_artifacts",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        129,
+        158
+      ],
+      "summary": "Defines _write_artifacts, a directory, document_id, parse_result, pipeline_mode, glm_only_proof routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_schema_node",
+      "type": "function",
+      "name": "_schema_node",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        87,
+        107
+      ],
+      "summary": "Defines _schema_node, a value, root routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_page_subset_mappings",
+      "type": "function",
+      "name": "_page_subset_mappings",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        44,
+        54
+      ],
+      "summary": "Defines _page_subset_mappings, a values routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_subset_pdf",
+      "type": "function",
+      "name": "_subset_pdf",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        64,
+        77
+      ],
+      "summary": "Defines _subset_pdf, a data, pages routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_unit_interval",
+      "type": "function",
+      "name": "_unit_interval",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        57,
+        61
+      ],
+      "summary": "Defines _unit_interval, a value routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_glm_only_proof",
+      "type": "function",
+      "name": "_glm_only_proof",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        110,
+        126
+      ],
+      "summary": "Defines _glm_only_proof, a parse_result routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/evaluate_corpus.py:_subset_reference",
+      "type": "function",
+      "name": "_subset_reference",
+      "filePath": "scripts/evaluate_corpus.py",
+      "lineRange": [
+        80,
+        84
+      ],
+      "summary": "Defines _subset_reference, a reference, pages routine in evaluate_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/evaluate_corpus.py",
+      "type": "file",
+      "name": "evaluate_corpus.py",
+      "filePath": "scripts/evaluate_corpus.py",
+      "summary": "Source or generated artifact 'evaluate_corpus.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_unit_interval",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_reference_basis_mappings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_live_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_schema_node",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_subset_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_page_subset_mappings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_write_artifacts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_write_artifacts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_subset_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_path_mappings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_page_subset_mappings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_schema_node",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_glm_only_proof",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_subset_reference",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_reference_basis_mappings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_subset_reference",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_live_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_unit_interval",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_path_mappings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/evaluate_corpus.py",
+      "target": "function:scripts/evaluate_corpus.py:_glm_only_proof",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "function",
+      "name": "test_parse_tabular_schema_rejects_invalid_file_input",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        220,
+        228
+      ],
+      "summary": "Defines test_parse_tabular_schema_rejects_invalid_file_input, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "function",
+      "name": "test_classifier_profile_markdown_bullets",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        280,
+        305
+      ],
+      "summary": "Defines test_classifier_profile_markdown_bullets, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "function",
+      "name": "test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        61,
+        72
+      ],
+      "summary": "Defines test_schema_store_save_list_get_and_case_insensitive_replacement, a tmp_path routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "function",
+      "name": "test_parse_tabular_schema_rejects_invalid_rows",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        213,
+        217
+      ],
+      "summary": "Defines test_parse_tabular_schema_rejects_invalid_rows, a content, message routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "function",
+      "name": "test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        173,
+        191
+      ],
+      "summary": "Defines test_parse_tabular_schema_xlsx_uses_first_worksheet, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_schema_store.py",
+      "type": "file",
+      "name": "test_schema_store.py",
+      "filePath": "tests/test_schema_store.py",
+      "summary": "Test module 'test_schema_store.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "function",
+      "name": "test_schema_json_round_trip_and_validation",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        82,
+        89
+      ],
+      "summary": "Defines test_schema_json_round_trip_and_validation, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "function",
+      "name": "test_parse_tabular_schema_csv",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        150,
+        170
+      ],
+      "summary": "Defines test_parse_tabular_schema_csv, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "function",
+      "name": "test_parse_markdown_schema_rejects_invalid_fields",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        244,
+        248
+      ],
+      "summary": "Defines test_parse_markdown_schema_rejects_invalid_fields, a content, message routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "function",
+      "name": "test_classifier_profile_store_and_markdown_table",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        260,
+        277
+      ],
+      "summary": "Defines test_classifier_profile_store_and_markdown_table, a tmp_path routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "function",
+      "name": "test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        137,
+        147
+      ],
+      "summary": "Defines test_parse_markdown_schema_bullets_uses_filename_fallback, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "function",
+      "name": "test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        103,
+        108
+      ],
+      "summary": "Defines test_schema_store_reads_legacy_v1_rows_after_v2_support, a tmp_path routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "function",
+      "name": "test_raw_nested_json_schema_round_trip_and_compilation",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        92,
+        100
+      ],
+      "summary": "Defines test_raw_nested_json_schema_round_trip_and_compilation, a tmp_path routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "function",
+      "name": "test_classifier_profile_markdown_rejects_invalid_profiles",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        323,
+        327
+      ],
+      "summary": "Defines test_classifier_profile_markdown_rejects_invalid_profiles, a content, message routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "function",
+      "name": "test_parse_markdown_schema_table",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        111,
+        134
+      ],
+      "summary": "Defines test_parse_markdown_schema_table, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "function",
+      "name": "test_parse_markdown_schema_rejects_invalid_file_input",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        251,
+        257
+      ],
+      "summary": "Defines test_parse_markdown_schema_rejects_invalid_file_input, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "function",
+      "name": "test_date_compiles_to_nullable_iso_string",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        74,
+        79
+      ],
+      "summary": "Defines test_date_compiles_to_nullable_iso_string, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:_schema",
+      "type": "function",
+      "name": "_schema",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        43,
+        58
+      ],
+      "summary": "Defines _schema, a  routine in test_schema_store.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

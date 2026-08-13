@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "file:scripts/wsl/check-paddleocr-api.py",
+      "type": "file",
+      "name": "check-paddleocr-api.py",
+      "filePath": "scripts/wsl/check-paddleocr-api.py",
+      "summary": "Source or generated artifact 'check-paddleocr-api.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/check-paddleocr-api.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/wsl/check-paddleocr-api.py",
+      "lineRange": [
+        20,
+        41
+      ],
+      "summary": "Defines main, a  routine in check-paddleocr-api.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/check-paddleocr-api.py:build_probe_png",
+      "type": "function",
+      "name": "build_probe_png",
+      "filePath": "scripts/wsl/check-paddleocr-api.py",
+      "lineRange": [
+        12,
+        17
+      ],
+      "summary": "Defines build_probe_png, a  routine in check-paddleocr-api.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/check-paddleocr-api.py",
+      "target": "function:scripts/wsl/check-paddleocr-api.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/check-paddleocr-api.py",
+      "target": "function:scripts/wsl/check-paddleocr-api.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/check-paddleocr-api.py",
+      "target": "function:scripts/wsl/check-paddleocr-api.py:build_probe_png",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/check-paddleocr-api.py",
+      "target": "function:scripts/wsl/check-paddleocr-api.py:build_probe_png",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

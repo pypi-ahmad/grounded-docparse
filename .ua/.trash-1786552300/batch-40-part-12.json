@@ -1,0 +1,825 @@
+{
+  "nodes": [
+    {
+      "id": "class:tests/test_agentic_extraction.py:LaunderingEvidenceGateway",
+      "type": "class",
+      "name": "LaunderingEvidenceGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        501,
+        518
+      ],
+      "summary": "Defines the LaunderingEvidenceGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_extract_returns_schema_data_with_resolved_evidence",
+      "type": "function",
+      "name": "test_extract_returns_schema_data_with_resolved_evidence",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        202,
+        217
+      ],
+      "summary": "Defines test_extract_returns_schema_data_with_resolved_evidence, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_scalar_grounding_accepts_deterministic_literal_normalization",
+      "type": "function",
+      "name": "test_scalar_grounding_accepts_deterministic_literal_normalization",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        630,
+        678
+      ],
+      "summary": "Defines test_scalar_grounding_accepts_deterministic_literal_normalization, a kind, value, source_text routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_rejected_audit_block_cannot_be_used_as_extraction_evidence",
+      "type": "function",
+      "name": "test_rejected_audit_block_cannot_be_used_as_extraction_evidence",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        458,
+        498
+      ],
+      "summary": "Defines test_rejected_audit_block_cannot_be_used_as_extraction_evidence, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_extraction_grounds_citations_in_base_markdown",
+      "type": "function",
+      "name": "test_extraction_grounds_citations_in_base_markdown",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        53,
+        65
+      ],
+      "summary": "Defines test_extraction_grounds_citations_in_base_markdown, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:DisjointStringEvidenceGateway",
+      "type": "class",
+      "name": "DisjointStringEvidenceGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        749,
+        761
+      ],
+      "summary": "Defines the DisjointStringEvidenceGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_extract_preserves_checkbox_labels_and_boolean_states",
+      "type": "function",
+      "name": "test_extract_preserves_checkbox_labels_and_boolean_states",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        220,
+        255
+      ],
+      "summary": "Defines test_extract_preserves_checkbox_labels_and_boolean_states, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:RepairingExtractionGateway",
+      "type": "class",
+      "name": "RepairingExtractionGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        287,
+        301
+      ],
+      "summary": "Defines the RepairingExtractionGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:_parse_result",
+      "type": "function",
+      "name": "_parse_result",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        68,
+        99
+      ],
+      "summary": "Defines _parse_result, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_missing_evidence_gets_one_luna_repair",
+      "type": "function",
+      "name": "test_missing_evidence_gets_one_luna_repair",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        304,
+        312
+      ],
+      "summary": "Defines test_missing_evidence_gets_one_luna_repair, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean",
+      "type": "function",
+      "name": "test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        698,
+        746
+      ],
+      "summary": "Defines test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean, a kind, value, source_text routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_nested_extraction_field_uses_descendant_evidence",
+      "type": "function",
+      "name": "test_nested_extraction_field_uses_descendant_evidence",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        419,
+        440
+      ],
+      "summary": "Defines test_nested_extraction_field_uses_descendant_evidence, a value, field_schema, pointer routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:ExtractionGateway",
+      "type": "class",
+      "name": "ExtractionGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        147,
+        185
+      ],
+      "summary": "Defines the ExtractionGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_agentic_extraction.py",
+      "type": "file",
+      "name": "test_agentic_extraction.py",
+      "filePath": "tests/test_agentic_extraction.py",
+      "summary": "Test module 'test_agentic_extraction.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:NestedEvidenceGateway",
+      "type": "class",
+      "name": "NestedEvidenceGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        379,
+        396
+      ],
+      "summary": "Defines the NestedEvidenceGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:InferredExtractionGateway",
+      "type": "class",
+      "name": "InferredExtractionGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        315,
+        328
+      ],
+      "summary": "Defines the InferredExtractionGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:_checkbox_parse_result",
+      "type": "function",
+      "name": "_checkbox_parse_result",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        102,
+        144
+      ],
+      "summary": "Defines _checkbox_parse_result, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_extract_accepts_envelope_rooted_evidence_pointer",
+      "type": "function",
+      "name": "test_extract_accepts_envelope_rooted_evidence_pointer",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        274,
+        284
+      ],
+      "summary": "Defines test_extract_accepts_envelope_rooted_evidence_pointer, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:LiteralEvidenceGateway",
+      "type": "class",
+      "name": "LiteralEvidenceGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        585,
+        601
+      ],
+      "summary": "Defines the LiteralEvidenceGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_inferred_mode_recovers_grounding_from_invalid_source_pointer",
+      "type": "function",
+      "name": "test_inferred_mode_recovers_grounding_from_invalid_source_pointer",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        362,
+        376
+      ],
+      "summary": "Defines test_inferred_mode_recovers_grounding_from_invalid_source_pointer, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_schema_architect_returns_valid_editable_schema",
+      "type": "function",
+      "name": "test_schema_architect_returns_valid_editable_schema",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        188,
+        199
+      ],
+      "summary": "Defines test_schema_architect_returns_valid_editable_schema, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_optional_inferred_mode_retains_value_with_grounded_box",
+      "type": "function",
+      "name": "test_optional_inferred_mode_retains_value_with_grounded_box",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        331,
+        343
+      ],
+      "summary": "Defines test_optional_inferred_mode_retains_value_with_grounded_box, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_string_grounding_does_not_join_disjoint_citation_slices",
+      "type": "function",
+      "name": "test_string_grounding_does_not_join_disjoint_citation_slices",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        764,
+        803
+      ],
+      "summary": "Defines test_string_grounding_does_not_join_disjoint_citation_slices, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:EnvelopePointerGateway",
+      "type": "class",
+      "name": "EnvelopePointerGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        258,
+        271
+      ],
+      "summary": "Defines the EnvelopePointerGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_extraction.py:test_rejected_only_value_cannot_be_laundered_through_rendered_citation",
+      "type": "function",
+      "name": "test_rejected_only_value_cannot_be_laundered_through_rendered_citation",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        521,
+        582
+      ],
+      "summary": "Defines test_rejected_only_value_cannot_be_laundered_through_rendered_citation, a  routine in test_agentic_extraction.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:RejectedEvidenceGateway",
+      "type": "class",
+      "name": "RejectedEvidenceGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        443,
+        455
+      ],
+      "summary": "Defines the RejectedEvidenceGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_extraction.py:SourcePointerExtractionGateway",
+      "type": "class",
+      "name": "SourcePointerExtractionGateway",
+      "filePath": "tests/test_agentic_extraction.py",
+      "lineRange": [
+        346,
+        359
+      ],
+      "summary": "Defines the SourcePointerExtractionGateway class in test_agentic_extraction.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:LaunderingEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_missing_evidence_gets_one_luna_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:SourcePointerExtractionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:NestedEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:SourcePointerExtractionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extraction_grounds_citations_in_base_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_schema_architect_returns_valid_editable_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:InferredExtractionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:EnvelopePointerGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_preserves_checkbox_labels_and_boolean_states",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_accepts_envelope_rooted_evidence_pointer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:DisjointStringEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_inferred_mode_recovers_grounding_from_invalid_source_pointer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_rejected_audit_block_cannot_be_used_as_extraction_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_accepts_envelope_rooted_evidence_pointer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_inferred_mode_recovers_grounding_from_invalid_source_pointer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_preserves_checkbox_labels_and_boolean_states",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:ExtractionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:_checkbox_parse_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_nested_extraction_field_uses_descendant_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:InferredExtractionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:RepairingExtractionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_missing_evidence_gets_one_luna_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_schema_architect_returns_valid_editable_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:RepairingExtractionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_rejected_only_value_cannot_be_laundered_through_rendered_citation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:LaunderingEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_rejected_only_value_cannot_be_laundered_through_rendered_citation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_returns_schema_data_with_resolved_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:ExtractionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extract_returns_schema_data_with_resolved_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_scalar_grounding_accepts_deterministic_literal_normalization",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_extraction_grounds_citations_in_base_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:RejectedEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:RejectedEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_scalar_grounding_rejects_sign_mismatch_and_ambiguous_boolean",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_string_grounding_does_not_join_disjoint_citation_slices",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:_parse_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:NestedEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:_checkbox_parse_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:LiteralEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_nested_extraction_field_uses_descendant_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:EnvelopePointerGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:_parse_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_optional_inferred_mode_retains_value_with_grounded_box",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_string_grounding_does_not_join_disjoint_citation_slices",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_rejected_audit_block_cannot_be_used_as_extraction_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:DisjointStringEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "class:tests/test_agentic_extraction.py:LiteralEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_scalar_grounding_accepts_deterministic_literal_normalization",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_extraction.py",
+      "target": "function:tests/test_agentic_extraction.py:test_optional_inferred_mode_retains_value_with_grounded_box",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

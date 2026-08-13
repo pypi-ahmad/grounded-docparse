@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_evaluation_report.py:test_live_report_groups_documents_and_marks_missing_grounding",
+      "type": "function",
+      "name": "test_live_report_groups_documents_and_marks_missing_grounding",
+      "filePath": "tests/test_evaluation_report.py",
+      "lineRange": [
+        6,
+        45
+      ],
+      "summary": "Defines test_live_report_groups_documents_and_marks_missing_grounding, a  routine in test_evaluation_report.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_evaluation_report.py",
+      "type": "file",
+      "name": "test_evaluation_report.py",
+      "filePath": "tests/test_evaluation_report.py",
+      "summary": "Test module 'test_evaluation_report.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_evaluation_report.py",
+      "target": "function:tests/test_evaluation_report.py:test_live_report_groups_documents_and_marks_missing_grounding",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_report.py",
+      "target": "function:tests/test_evaluation_report.py:test_live_report_groups_documents_and_marks_missing_grounding",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

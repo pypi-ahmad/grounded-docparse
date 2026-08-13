@@ -1,0 +1,3 @@
+Loaded 618 files (97 code).
+Info: compute-batches: merged 89 small batches (92 files) into 4 misc batches — singletons and orphans consolidated
+Wrote 41 batches (sizes: max=25, min=3) to D:\AI\Github\grounded-docparse\.ua\intermediate\batches.json

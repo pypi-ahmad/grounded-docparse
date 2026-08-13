@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "config:.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": ".env.example",
+      "summary": "Configuration stored in .env.example.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "Project documentation in CHANGELOG.md.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:CONTRIBUTING.md",
+      "type": "document",
+      "name": "CONTRIBUTING.md",
+      "filePath": "CONTRIBUTING.md",
+      "summary": "Project documentation in CONTRIBUTING.md.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:Launch-GLM-OCR.cmd",
+      "type": "file",
+      "name": "Launch-GLM-OCR.cmd",
+      "filePath": "Launch-GLM-OCR.cmd",
+      "summary": "Automation script Launch-GLM-OCR.cmd for the project runtime or setup.",
+      "tags": [
+        "automation",
+        "runtime",
+        "script"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:Launch-PaddleOCR-VL-1.6.cmd",
+      "type": "file",
+      "name": "Launch-PaddleOCR-VL-1.6.cmd",
+      "filePath": "Launch-PaddleOCR-VL-1.6.cmd",
+      "summary": "Automation script Launch-PaddleOCR-VL-1.6.cmd for the project runtime or setup.",
+      "tags": [
+        "automation",
+        "runtime",
+        "script"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project documentation in README.md.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:SECURITY.md",
+      "type": "document",
+      "name": "SECURITY.md",
+      "filePath": "SECURITY.md",
+      "summary": "Project documentation in SECURITY.md.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:SETUP.md",
+      "type": "document",
+      "name": "SETUP.md",
+      "filePath": "SETUP.md",
+      "summary": "Project documentation in SETUP.md.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:Setup-GLM-OCR.cmd",
+      "type": "file",
+      "name": "Setup-GLM-OCR.cmd",
+      "filePath": "Setup-GLM-OCR.cmd",
+      "summary": "Automation script Setup-GLM-OCR.cmd for the project runtime or setup.",
+      "tags": [
+        "automation",
+        "runtime",
+        "script"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "pyproject.toml",
+      "summary": "Configuration stored in pyproject.toml.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

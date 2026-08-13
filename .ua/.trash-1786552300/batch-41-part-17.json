@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "function",
+      "name": "test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        43,
+        55
+      ],
+      "summary": "Defines test_provisioner_handles_reboot_credentials_and_hardware_fallback, a  routine in test_windows_installer.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "function",
+      "name": "test_ollama_downloads_are_versioned_and_verified",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        58,
+        67
+      ],
+      "summary": "Defines test_ollama_downloads_are_versioned_and_verified, a  routine in test_windows_installer.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_windows_installer.py",
+      "type": "file",
+      "name": "test_windows_installer.py",
+      "filePath": "tests/test_windows_installer.py",
+      "summary": "Test module 'test_windows_installer.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "function",
+      "name": "test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        9,
+        25
+      ],
+      "summary": "Defines test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes, a  routine in test_windows_installer.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "function",
+      "name": "test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "filePath": "tests/test_windows_installer.py",
+      "lineRange": [
+        28,
+        40
+      ],
+      "summary": "Defines test_installer_payload_is_allowlisted_and_excludes_secrets, a  routine in test_windows_installer.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_ollama_downloads_are_versioned_and_verified",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_installer_payload_is_allowlisted_and_excludes_secrets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_windows_installer.py",
+      "target": "function:tests/test_windows_installer.py:test_provisioner_handles_reboot_credentials_and_hardware_fallback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

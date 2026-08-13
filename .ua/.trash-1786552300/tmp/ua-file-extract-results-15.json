@@ -1,0 +1,1006 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 13,
+  "filesSkipped": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 13,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 13
+    }
+  },
+  "results": [
+    {
+      "path": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 16,
+      "nonEmptyLines": 16,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 72,
+      "nonEmptyLines": 72,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 62
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 63
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 64
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 70
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 71
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 21,
+      "nonEmptyLines": 21,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 17
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 18
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 19
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 20
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/form.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 18,
+      "nonEmptyLines": 18,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 15
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 16
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 17
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/lists.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 35,
+      "nonEmptyLines": 35,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 29
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 30
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 31
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 32
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 33
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 34
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/native-text.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 23,
+      "nonEmptyLines": 23,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 17
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 18
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 19
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 20
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 21
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 22
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 99,
+      "nonEmptyLines": 99,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 93
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 94
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 95
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 96
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 97
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 98
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 14,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/tables.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 51,
+      "nonEmptyLines": 51,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 46
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 47
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 48
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 49
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 50
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 16,
+      "nonEmptyLines": 16,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "document_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "reference_text",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "reference_basis",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "reference_pages",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "anchors",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "tables",
+          "level": 1,
+          "line": 8
+        },
+        {
+          "heading": "grounding_regions",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "schema_output",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "continuity_pairs",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "forbidden_literals",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "rejected_block_ids",
+          "level": 1,
+          "line": 15
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    }
+  ]
+}

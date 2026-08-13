@@ -1,0 +1,14 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path":"docs/codebase/.codebase-scan.txt","language":"txt","sizeLines":548,"fileCategory":"docs"},
+    {"path":"docs/codebase/ARCHITECTURE.md","language":"markdown","sizeLines":86,"fileCategory":"docs"},
+    {"path":"docs/codebase/CONCERNS.md","language":"markdown","sizeLines":56,"fileCategory":"docs"},
+    {"path":"docs/codebase/CONVENTIONS.md","language":"markdown","sizeLines":39,"fileCategory":"docs"},
+    {"path":"docs/codebase/INTEGRATIONS.md","language":"markdown","sizeLines":46,"fileCategory":"docs"},
+    {"path":"docs/codebase/STACK.md","language":"markdown","sizeLines":45,"fileCategory":"docs"},
+    {"path":"docs/codebase/STRUCTURE.md","language":"markdown","sizeLines":52,"fileCategory":"docs"},
+    {"path":"docs/codebase/TESTING.md","language":"markdown","sizeLines":38,"fileCategory":"docs"}
+  ],
+  "batchImportData": {"docs/codebase/.codebase-scan.txt":[],"docs/codebase/ARCHITECTURE.md":[],"docs/codebase/CONCERNS.md":[],"docs/codebase/CONVENTIONS.md":[],"docs/codebase/INTEGRATIONS.md":[],"docs/codebase/STACK.md":[],"docs/codebase/STRUCTURE.md":[],"docs/codebase/TESTING.md":[]}
+}

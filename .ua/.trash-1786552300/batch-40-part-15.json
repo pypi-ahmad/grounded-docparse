@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_cli.py:test_parse_command_applies_json_schema",
+      "type": "function",
+      "name": "test_parse_command_applies_json_schema",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        68,
+        146
+      ],
+      "summary": "Defines test_parse_command_applies_json_schema, a monkeypatch, tmp_path routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_cli.py",
+      "type": "file",
+      "name": "test_cli.py",
+      "filePath": "tests/test_cli.py",
+      "summary": "Test module 'test_cli.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_directory_batch_continues_after_document_failure",
+      "type": "function",
+      "name": "test_directory_batch_continues_after_document_failure",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        149,
+        197
+      ],
+      "summary": "Defines test_directory_batch_continues_after_document_failure, a monkeypatch, tmp_path, capsys routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_project_registers_grounded_docparse_console_command",
+      "type": "function",
+      "name": "test_project_registers_grounded_docparse_console_command",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        255,
+        264
+      ],
+      "summary": "Defines test_project_registers_grounded_docparse_console_command, a  routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_nonempty_output_requires_overwrite_and_preserves_unrelated_files",
+      "type": "function",
+      "name": "test_nonempty_output_requires_overwrite_and_preserves_unrelated_files",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        200,
+        252
+      ],
+      "summary": "Defines test_nonempty_output_requires_overwrite_and_preserves_unrelated_files, a monkeypatch, tmp_path, capsys routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_markdown_schema_is_compiled_and_duplicate_inputs_are_deduplicated",
+      "type": "function",
+      "name": "test_markdown_schema_is_compiled_and_duplicate_inputs_are_deduplicated",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        267,
+        341
+      ],
+      "summary": "Defines test_markdown_schema_is_compiled_and_duplicate_inputs_are_deduplicated, a monkeypatch, tmp_path routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_parse_command_writes_standard_document_outputs",
+      "type": "function",
+      "name": "test_parse_command_writes_standard_document_outputs",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        19,
+        65
+      ],
+      "summary": "Defines test_parse_command_writes_standard_document_outputs, a monkeypatch, tmp_path routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_cli.py:test_preflight_rejects_schema_without_key_and_empty_input_directory",
+      "type": "function",
+      "name": "test_preflight_rejects_schema_without_key_and_empty_input_directory",
+      "filePath": "tests/test_cli.py",
+      "lineRange": [
+        344,
+        375
+      ],
+      "summary": "Defines test_preflight_rejects_schema_without_key_and_empty_input_directory, a monkeypatch, tmp_path, capsys routine in test_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_nonempty_output_requires_overwrite_and_preserves_unrelated_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_parse_command_writes_standard_document_outputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_parse_command_writes_standard_document_outputs",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_parse_command_applies_json_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_markdown_schema_is_compiled_and_duplicate_inputs_are_deduplicated",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_project_registers_grounded_docparse_console_command",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_preflight_rejects_schema_without_key_and_empty_input_directory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_directory_batch_continues_after_document_failure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_markdown_schema_is_compiled_and_duplicate_inputs_are_deduplicated",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_directory_batch_continues_after_document_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_preflight_rejects_schema_without_key_and_empty_input_directory",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_parse_command_applies_json_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_nonempty_output_requires_overwrite_and_preserves_unrelated_files",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_cli.py",
+      "target": "function:tests/test_cli.py:test_project_registers_grounded_docparse_console_command",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

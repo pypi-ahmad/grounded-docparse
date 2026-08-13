@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {"id":"file:.ua/.understandignore","type":"file","name":".understandignore","filePath":".ua/.understandignore","summary":"Defines optional ignore patterns for the repository knowledge-graph scan.","tags":["configuration","analysis","ignore-rules"],"complexity":"moderate"},
+    {"id":"config:.ua/config.json","type":"config","name":"config.json","filePath":".ua/config.json","summary":"Stores repository analysis configuration for the knowledge-graph tooling.","tags":["configuration","analysis","tooling"],"complexity":"simple"},
+    {"id":"config:.ua/domain-graph.json","type":"config","name":"domain-graph.json","filePath":".ua/domain-graph.json","summary":"Persists domain-level graph metadata used by repository analysis tooling.","tags":["configuration","knowledge-graph","domain-model"],"complexity":"complex"},
+    {"id":"config:benchmarks/policies/live-evaluation.example.json","type":"config","name":"live-evaluation.example.json","filePath":"benchmarks/policies/live-evaluation.example.json","summary":"Provides an example policy for evaluating live document-parser benchmark results.","tags":["configuration","benchmark","evaluation"],"complexity":"simple"},
+    {"id":"config:examples/schemas/invoice.schema.json","type":"config","name":"invoice.schema.json","filePath":"examples/schemas/invoice.schema.json","summary":"Defines an example invoice extraction schema for document-parser workflows.","tags":["configuration","schema","example"],"complexity":"moderate"},
+    {"id":"config:paddle-runtime/pyproject.toml","type":"config","name":"pyproject.toml","filePath":"paddle-runtime/pyproject.toml","summary":"Declares the isolated Paddle runtime package and its Python tooling configuration.","tags":["configuration","python","paddle-runtime"],"complexity":"simple"},
+    {"id":"file:scripts/evaluate_corpus.py","type":"file","name":"evaluate_corpus.py","filePath":"scripts/evaluate_corpus.py","summary":"CLI entry point that parses corpus documents, evaluates grounded outputs, and writes regression artifacts and reports.","tags":["cli","benchmark","evaluation","regression"],"complexity":"complex"},
+    {"id":"function:scripts/evaluate_corpus.py:_live_report","type":"function","name":"_live_report","filePath":"scripts/evaluate_corpus.py","lineRange":[161,353],"summary":"Runs corpus parsing and evaluation, aggregates telemetry, and builds the live report payload.","tags":["evaluation","benchmark","reporting"],"complexity":"complex"},
+    {"id":"function:scripts/evaluate_corpus.py:main","type":"function","name":"main","filePath":"scripts/evaluate_corpus.py","lineRange":[356,440],"summary":"Parses command-line options and coordinates live corpus evaluation with policy enforcement.","tags":["cli","entry-point","evaluation"],"complexity":"moderate"}
+  ],
+  "edges": [
+    {"source":"file:scripts/evaluate_corpus.py","target":"function:scripts/evaluate_corpus.py:_live_report","type":"contains","direction":"forward","weight":1.0},
+    {"source":"file:scripts/evaluate_corpus.py","target":"function:scripts/evaluate_corpus.py:main","type":"contains","direction":"forward","weight":1.0}
+  ]
+}

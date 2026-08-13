@@ -1,0 +1,2680 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 15,
+  "filesSkipped": [
+    ".ua/.understandignore",
+    "docs-site/assets/styles.css",
+    "graphify-out/.graphify_python",
+    "graphify-out/.graphify_root",
+    "installer/GroundedDocParse.iss",
+    "installer/Install-GroundedDocParse.ps1",
+    "presentations/grounded-docparse-business.pptx",
+    "presentations/grounded-docparse-github-overview.pptx",
+    "presentations/grounded-docparse-technical.pptx",
+    "scripts/build-installer.ps1"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 15,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 3,
+      "failed": 0,
+      "skipped": 12
+    }
+  },
+  "results": [
+    {
+      "path": ".ua/.trash-1786520109/tmp/write-meta.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 16,
+      "nonEmptyLines": 15,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-domain-1786453150/domain-graph.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 228,
+      "nonEmptyLines": 228,
+      "sections": [
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "nodes",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "edges",
+          "level": 1,
+          "line": 205
+        },
+        {
+          "heading": "layers",
+          "level": 1,
+          "line": 226
+        },
+        {
+          "heading": "tour",
+          "level": 1,
+          "line": 227
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": ".ua/intermediate/domain-analysis.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 91,
+      "nonEmptyLines": 82,
+      "sections": [
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "nodes",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "edges",
+          "level": 1,
+          "line": 67
+        },
+        {
+          "heading": "layers",
+          "level": 1,
+          "line": 89
+        },
+        {
+          "heading": "tour",
+          "level": 1,
+          "line": 90
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": ".ua/intermediate/scan-result.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 4443,
+      "nonEmptyLines": 4443,
+      "sections": [
+        {
+          "heading": "name",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "description",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "languages",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "frameworks",
+          "level": 1,
+          "line": 25
+        },
+        {
+          "heading": "files",
+          "level": 1,
+          "line": 29
+        },
+        {
+          "heading": "totalFiles",
+          "level": 1,
+          "line": 3739
+        },
+        {
+          "heading": "filteredByIgnore",
+          "level": 1,
+          "line": 3740
+        },
+        {
+          "heading": "estimatedComplexity",
+          "level": 1,
+          "line": 3741
+        },
+        {
+          "heading": "importMap",
+          "level": 1,
+          "line": 3742
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "benchmarks/baselines/offline-native-v1.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 638,
+      "nonEmptyLines": 638,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "corpus_id",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "evaluation_mode",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "broad_production_claim",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "documents",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "aggregate",
+          "level": 1,
+          "line": 590
+        },
+        {
+          "heading": "telemetry",
+          "level": 1,
+          "line": 608
+        },
+        {
+          "heading": "limitations",
+          "level": 1,
+          "line": 634
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "benchmarks/corpus-v1/manifest.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 184,
+      "nonEmptyLines": 184,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "annotation_schema_version",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "corpus_id",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "documents",
+          "level": 1,
+          "line": 5
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": "benchmarks/policies/live-evaluation.example.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 32,
+      "nonEmptyLines": 32,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "rules",
+          "level": 1,
+          "line": 3
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 13,
+      "nonEmptyLines": 13,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "models",
+          "level": 1,
+          "line": 3
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "config/glmocr.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 165,
+      "nonEmptyLines": 160,
+      "sections": [
+        {
+          "heading": "pipeline",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "config/paddle-vllm.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 4,
+      "nonEmptyLines": 4,
+      "sections": [
+        {
+          "heading": "gpu-memory-utilization",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "max-num-batched-tokens",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "no-enable-prefix-caching",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "mm-processor-cache-gb",
+          "level": 1,
+          "line": 4
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": "docs-site/assets/app.js",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 197,
+      "nonEmptyLines": 178,
+      "callGraph": [
+        {
+          "caller": "setMenu",
+          "callee": "body.classList.toggle",
+          "lineNumber": 13
+        },
+        {
+          "caller": "setMenu",
+          "callee": "menuButton?.setAttribute",
+          "lineNumber": 14
+        },
+        {
+          "caller": "setMenu",
+          "callee": "String",
+          "lineNumber": 14
+        },
+        {
+          "caller": "setMenu",
+          "callee": "window.setTimeout",
+          "lineNumber": 16
+        },
+        {
+          "caller": "setMenu",
+          "callee": "shelfSearch?.focus",
+          "lineNumber": 16
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "value.trim().toLocaleLowerCase",
+          "lineNumber": 24
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "value.trim",
+          "lineNumber": 24
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "document.querySelectorAll(\".shelf-group\").forEach",
+          "lineNumber": 25
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "document.querySelectorAll",
+          "lineNumber": 25
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "group.querySelectorAll(\".shelf-link\").forEach",
+          "lineNumber": 27
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "group.querySelectorAll",
+          "lineNumber": 27
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "link.dataset.search.includes",
+          "lineNumber": 28
+        },
+        {
+          "caller": "filterShelf",
+          "callee": "Number",
+          "lineNumber": 30
+        },
+        {
+          "caller": "searchableText",
+          "callee": "[item.title, item.path, item.summary, ...(item.headings || [])].join(\" \").toLocaleLowerCase",
+          "lineNumber": 39
+        },
+        {
+          "caller": "searchableText",
+          "callee": "[item.title, item.path, item.summary, ...(item.headings || [])].join",
+          "lineNumber": 39
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "document.querySelector",
+          "lineNumber": 42
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "query.trim().toLocaleLowerCase",
+          "lineNumber": 44
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "query.trim",
+          "lineNumber": 44
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.classList.remove",
+          "lineNumber": 46
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.replaceChildren",
+          "lineNumber": 47
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "normalized.split(/\\s+/).filter",
+          "lineNumber": 50
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "normalized.split",
+          "lineNumber": 50
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "(window.DOCS_SEARCH_INDEX || [])\n      .map((item) => ({\n        item,\n        score: terms.reduce((total, term) => {\n          const haystack = searchableText(item);\n          return total + (item.title.toLocaleLowerCase().includes(term) ? 4 : 0) + (haystack.includes(term) ? 1 : 0);\n        }, 0),\n      }))\n      .filter(({ score }) => score >= terms.length)\n      .sort((left, right) => right.score - left.score || left.item.title.localeCompare(right.item.title))\n      .slice",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "(window.DOCS_SEARCH_INDEX || [])\n      .map((item) => ({\n        item,\n        score: terms.reduce((total, term) => {\n          const haystack = searchableText(item);\n          return total + (item.title.toLocaleLowerCase().includes(term) ? 4 : 0) + (haystack.includes(term) ? 1 : 0);\n        }, 0),\n      }))\n      .filter(({ score }) => score >= terms.length)\n      .sort",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "(window.DOCS_SEARCH_INDEX || [])\n      .map((item) => ({\n        item,\n        score: terms.reduce((total, term) => {\n          const haystack = searchableText(item);\n          return total + (item.title.toLocaleLowerCase().includes(term) ? 4 : 0) + (haystack.includes(term) ? 1 : 0);\n        }, 0),\n      }))\n      .filter",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "(window.DOCS_SEARCH_INDEX || [])\n      .map",
+          "lineNumber": 51
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "terms.reduce",
+          "lineNumber": 54
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "searchableText",
+          "lineNumber": 55
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "item.title.toLocaleLowerCase().includes",
+          "lineNumber": 56
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "item.title.toLocaleLowerCase",
+          "lineNumber": 56
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "haystack.includes",
+          "lineNumber": 56
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "left.item.title.localeCompare",
+          "lineNumber": 60
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.replaceChildren",
+          "lineNumber": 63
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "document.createElement",
+          "lineNumber": 65
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "query.trim",
+          "lineNumber": 67
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.append",
+          "lineNumber": 68
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "results.forEach",
+          "lineNumber": 70
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "document.createElement",
+          "lineNumber": 71
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "document.createElement",
+          "lineNumber": 74
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "document.createElement",
+          "lineNumber": 76
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "link.append",
+          "lineNumber": 78
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.append",
+          "lineNumber": 79
+        },
+        {
+          "caller": "renderSearchResults",
+          "callee": "target.classList.add",
+          "lineNumber": 82
+        },
+        {
+          "caller": "focusSearch",
+          "callee": "globalSearch.focus",
+          "lineNumber": 89
+        },
+        {
+          "caller": "focusSearch",
+          "callee": "globalSearch.scrollIntoView",
+          "lineNumber": 90
+        },
+        {
+          "caller": "focusSearch",
+          "callee": "window.matchMedia",
+          "lineNumber": 93
+        },
+        {
+          "caller": "focusSearch",
+          "callee": "setMenu",
+          "lineNumber": 93
+        },
+        {
+          "caller": "focusSearch",
+          "callee": "shelfSearch?.focus",
+          "lineNumber": 94
+        },
+        {
+          "caller": "updateProgress",
+          "callee": "Math.min",
+          "lineNumber": 128
+        },
+        {
+          "caller": "copyText",
+          "callee": "navigator.clipboard.writeText",
+          "lineNumber": 157
+        },
+        {
+          "caller": "copyText",
+          "callee": "document.createElement",
+          "lineNumber": 160
+        },
+        {
+          "caller": "copyText",
+          "callee": "area.setAttribute",
+          "lineNumber": 162
+        },
+        {
+          "caller": "copyText",
+          "callee": "document.body.append",
+          "lineNumber": 165
+        },
+        {
+          "caller": "copyText",
+          "callee": "area.select",
+          "lineNumber": 166
+        },
+        {
+          "caller": "copyText",
+          "callee": "document.execCommand",
+          "lineNumber": 167
+        },
+        {
+          "caller": "copyText",
+          "callee": "area.remove",
+          "lineNumber": 168
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "graphify-out/cache/stat-index.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "sections": [
+        {
+          "heading": ".github/ISSUE_TEMPLATE/bug_report.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": ".github/ISSUE_TEMPLATE/feature_request.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "CHANGELOG.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "CONTRIBUTING.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "README.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "SECURITY.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "SETUP.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/baselines/offline-native-v1.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/checkboxes.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/figure-chart.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/form.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/lists.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/multi-column.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/native-text.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/tables.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/corpus-v1/manifest.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/schemas/annotation-v1.1.schema.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "benchmarks/schemas/manifest-v1.schema.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "config/glmocr.yaml",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "config/paddle-vllm.yaml",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/agentic-document-extraction-comparison.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/api.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/architecture.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/assets/app.js",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/assets/content/docs/images/document-parse-studio-full.png",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/assets/favicon.svg",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/azure-bulk-fax-deployment.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/business-user-extraction-workflow.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/changelog.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/complete-user-guide.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/contributing.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/extraction-quality-research.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/how-grounded-docparse-is-agentic.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/how-it-works.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/index.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/issue-template--bug-report.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/issue-template--feature-request.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/layout-aware-large-field-extraction-workflow.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/local-glmocr.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/research.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/run.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/security-content-excluded.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/setup.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/site-manifest.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/spec.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/tutorial.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/zero-to-hero-tutorial.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/agentic-document-extraction-comparison.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/api.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/architecture.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/azure-bulk-fax-deployment.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/business-user-extraction-workflow.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/complete-user-guide.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/extraction-quality-research.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/how-grounded-docparse-is-agentic.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/how-it-works.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/images/document-parse-studio-full.png",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/layout-aware-large-field-extraction-workflow.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/local-glmocr.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/research.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/run.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/spec.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/tutorial.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/zero-to-hero-tutorial.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "examples/schemas/invoice.schema.json",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "installer/Install-GroundedDocParse.ps1",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "paddle-runtime/pyproject.toml",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "pyproject.toml",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/build-installer.ps1",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/build_docs_site.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/evaluate_corpus.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/generate_evaluation_corpus.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/generate_examples.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/benchmark_glmocr.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/check-glmocr-api.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/check-paddleocr-api.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/launch-stack.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/manage-ocr-stack.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/prepare_glmocr_runtime.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/prepare_paddleocr_runtime.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/run-app.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/serve-glmocr.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/serve-ollama.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/setup-glmocr.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/setup-ollama.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "scripts/wsl/setup-paddleocr.sh",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/__init__.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/agentic.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/benchmark.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/config.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/enhancement.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/extraction.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/gateways.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/ingest.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/local_ocr.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/models.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/paddle_ocr.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/page_analysis.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/pipeline.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/prompts.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/quality.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/render.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/runtime.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/schema_store.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "streamlit_app.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/conftest.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_agentic_contract.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_agentic_extraction.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_agentic_features.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_confidence_spans.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_corpus_manifest.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_evaluation_metrics.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_evaluation_report.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_form_routing.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_glmocr_runtime_config.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_ingest.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_launcher_contract.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_markdown_enhancement.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_openai_vision_gateway.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_paddle_ocr.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_paddle_runtime_config.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_page_analysis.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_parallel_pages.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_provider_runtime.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_quality.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_schema_store.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_simple_contract.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_simple_pipeline.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_simple_streamlit.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_strict_recovery_contract.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_windows_installer.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs-site/local-paddleocr-vl.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/.codebase-scan.txt",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/ARCHITECTURE.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/CONCERNS.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/CONVENTIONS.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/INTEGRATIONS.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/STACK.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/STRUCTURE.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/codebase/TESTING.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/idp-vs-ade-classification.html",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "docs/local-paddleocr-vl.md",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "src/grounded_docparse/batch.py",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tests/test_batch.py",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 152
+      }
+    },
+    {
+      "path": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 30,
+      "nonEmptyLines": 23,
+      "sections": [
+        {
+          "heading": "Q: Why does load_corpus_manifest() connect Evaluation Benchmarking to Source Artifact Schema and Evaluation Corpus Models?",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "Answer",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Outcome",
+          "level": 2,
+          "line": 16
+        },
+        {
+          "heading": "Source Nodes",
+          "level": 2,
+          "line": 20
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": "graphify-out/reflections/LESSONS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 11,
+      "nonEmptyLines": 6,
+      "sections": [
+        {
+          "heading": "Lessons",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Summary",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Lessons",
+          "level": 2,
+          "line": 9
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 3
+      }
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 566,
+      "nonEmptyLines": 519,
+      "functions": [
+        {
+          "name": "is_security_document",
+          "startLine": 99,
+          "endLine": 101,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "name": "discover_markdown",
+          "startLine": 104,
+          "endLine": 128,
+          "params": []
+        },
+        {
+          "name": "output_name",
+          "startLine": 131,
+          "endLine": 142,
+          "params": [
+            "relative"
+          ]
+        },
+        {
+          "name": "split_front_matter",
+          "startLine": 145,
+          "endLine": 151,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "normalize_indented_fences",
+          "startLine": 154,
+          "endLine": 175,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "extract_document",
+          "startLine": 178,
+          "endLine": 210,
+          "params": [
+            "path"
+          ]
+        },
+        {
+          "name": "rewrite_links",
+          "startLine": 213,
+          "endLine": 239,
+          "params": [
+            "rendered",
+            "document",
+            "mapping",
+            "excluded"
+          ]
+        },
+        {
+          "name": "copy_local_images",
+          "startLine": 242,
+          "endLine": 262,
+          "params": [
+            "rendered",
+            "document"
+          ]
+        },
+        {
+          "name": "grouped_documents",
+          "startLine": 265,
+          "endLine": 276,
+          "params": [
+            "documents"
+          ]
+        },
+        {
+          "name": "nav_html",
+          "startLine": 279,
+          "endLine": 294,
+          "params": [
+            "groups",
+            "current"
+          ]
+        },
+        {
+          "name": "search_index",
+          "startLine": 297,
+          "endLine": 308,
+          "params": [
+            "documents"
+          ]
+        },
+        {
+          "name": "document_cards",
+          "startLine": 311,
+          "endLine": 330,
+          "params": [
+            "groups"
+          ]
+        },
+        {
+          "name": "page_template",
+          "startLine": 333,
+          "endLine": 452,
+          "params": [
+            "document",
+            "body",
+            "toc",
+            "nav",
+            "index_data",
+            "previous",
+            "following",
+            "groups",
+            "document_count",
+            "excluded_count"
+          ]
+        },
+        {
+          "name": "excluded_page",
+          "startLine": 455,
+          "endLine": 485,
+          "params": [
+            "nav",
+            "index_data",
+            "document_count",
+            "excluded_count"
+          ]
+        },
+        {
+          "name": "main",
+          "startLine": 488,
+          "endLine": 562,
+          "params": []
+        }
+      ],
+      "classes": [
+        {
+          "name": "Document",
+          "startLine": 87,
+          "endLine": 96,
+          "methods": [],
+          "properties": [
+            "source",
+            "relative",
+            "output_name",
+            "title",
+            "summary",
+            "raw_body",
+            "front_matter",
+            "words",
+            "headings"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Document",
+          "line": 86,
+          "isDefault": false
+        },
+        {
+          "name": "is_security_document",
+          "line": 99,
+          "isDefault": false
+        },
+        {
+          "name": "discover_markdown",
+          "line": 104,
+          "isDefault": false
+        },
+        {
+          "name": "output_name",
+          "line": 131,
+          "isDefault": false
+        },
+        {
+          "name": "split_front_matter",
+          "line": 145,
+          "isDefault": false
+        },
+        {
+          "name": "normalize_indented_fences",
+          "line": 154,
+          "isDefault": false
+        },
+        {
+          "name": "extract_document",
+          "line": 178,
+          "isDefault": false
+        },
+        {
+          "name": "rewrite_links",
+          "line": 213,
+          "isDefault": false
+        },
+        {
+          "name": "copy_local_images",
+          "line": 242,
+          "isDefault": false
+        },
+        {
+          "name": "grouped_documents",
+          "line": 265,
+          "isDefault": false
+        },
+        {
+          "name": "nav_html",
+          "line": 279,
+          "isDefault": false
+        },
+        {
+          "name": "search_index",
+          "line": 297,
+          "isDefault": false
+        },
+        {
+          "name": "document_cards",
+          "line": 311,
+          "isDefault": false
+        },
+        {
+          "name": "page_template",
+          "line": 333,
+          "isDefault": false
+        },
+        {
+          "name": "excluded_page",
+          "line": 455,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 488,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "is_security_document",
+          "callee": "path.name.casefold",
+          "lineNumber": 100
+        },
+        {
+          "caller": "is_security_document",
+          "callee": "any",
+          "lineNumber": 101
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "subprocess.run",
+          "lineNumber": 105
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "result.stdout.splitlines",
+          "lineNumber": 122
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "path.relative_to",
+          "lineNumber": 124
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "any",
+          "lineNumber": 125
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "(excluded if is_security_document(path) else included).append",
+          "lineNumber": 127
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "is_security_document",
+          "lineNumber": 127
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "sorted",
+          "lineNumber": 128
+        },
+        {
+          "caller": "discover_markdown",
+          "callee": "sorted",
+          "lineNumber": 128
+        },
+        {
+          "caller": "output_name",
+          "callee": "Path",
+          "lineNumber": 134
+        },
+        {
+          "caller": "output_name",
+          "callee": "list",
+          "lineNumber": 135
+        },
+        {
+          "caller": "output_name",
+          "callee": "path.with_suffix",
+          "lineNumber": 135
+        },
+        {
+          "caller": "output_name",
+          "callee": "\"--\".join(parts).casefold().replace",
+          "lineNumber": 140
+        },
+        {
+          "caller": "output_name",
+          "callee": "\"--\".join(parts).casefold",
+          "lineNumber": 140
+        },
+        {
+          "caller": "output_name",
+          "callee": "\"--\".join",
+          "lineNumber": 140
+        },
+        {
+          "caller": "output_name",
+          "callee": "re.sub(r\"[^a-z0-9-]+\", \"-\", slug).strip",
+          "lineNumber": 141
+        },
+        {
+          "caller": "output_name",
+          "callee": "re.sub",
+          "lineNumber": 141
+        },
+        {
+          "caller": "split_front_matter",
+          "callee": "text.startswith",
+          "lineNumber": 146
+        },
+        {
+          "caller": "split_front_matter",
+          "callee": "text.find",
+          "lineNumber": 148
+        },
+        {
+          "caller": "split_front_matter",
+          "callee": "text[4:marker].strip",
+          "lineNumber": 151
+        },
+        {
+          "caller": "split_front_matter",
+          "callee": "text[marker + 5 :].lstrip",
+          "lineNumber": 151
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "text.splitlines",
+          "lineNumber": 156
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "re.match",
+          "lineNumber": 161
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "len",
+          "lineNumber": 163
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "match.group",
+          "lineNumber": 163
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "match.group",
+          "lineNumber": 164
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "normalized.append",
+          "lineNumber": 165
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "line.startswith",
+          "lineNumber": 168
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "normalized.append",
+          "lineNumber": 169
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "re.match",
+          "lineNumber": 170
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "re.escape",
+          "lineNumber": 170
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "normalized.append",
+          "lineNumber": 174
+        },
+        {
+          "caller": "normalize_indented_fences",
+          "callee": "\"\\n\".join",
+          "lineNumber": 175
+        },
+        {
+          "caller": "extract_document",
+          "callee": "path.relative_to(ROOT).as_posix",
+          "lineNumber": 179
+        },
+        {
+          "caller": "extract_document",
+          "callee": "path.relative_to",
+          "lineNumber": 179
+        },
+        {
+          "caller": "extract_document",
+          "callee": "path.read_text",
+          "lineNumber": 180
+        },
+        {
+          "caller": "extract_document",
+          "callee": "split_front_matter",
+          "lineNumber": 181
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.search",
+          "lineNumber": 182
+        },
+        {
+          "caller": "extract_document",
+          "callee": "title_match.group(1).strip",
+          "lineNumber": 183
+        },
+        {
+          "caller": "extract_document",
+          "callee": "title_match.group",
+          "lineNumber": 183
+        },
+        {
+          "caller": "extract_document",
+          "callee": "path.stem.replace(\"-\", \" \").title",
+          "lineNumber": 183
+        },
+        {
+          "caller": "extract_document",
+          "callee": "path.stem.replace",
+          "lineNumber": 183
+        },
+        {
+          "caller": "extract_document",
+          "callee": "title_match.start",
+          "lineNumber": 185
+        },
+        {
+          "caller": "extract_document",
+          "callee": "title_match.end",
+          "lineNumber": 185
+        },
+        {
+          "caller": "extract_document",
+          "callee": "body.lstrip",
+          "lineNumber": 186
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub(r\"\\s+\", \" \", part).strip",
+          "lineNumber": 188
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub",
+          "lineNumber": 188
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.split",
+          "lineNumber": 189
+        },
+        {
+          "caller": "extract_document",
+          "callee": "part.strip",
+          "lineNumber": 190
+        },
+        {
+          "caller": "extract_document",
+          "callee": "part.lstrip().startswith",
+          "lineNumber": 191
+        },
+        {
+          "caller": "extract_document",
+          "callee": "part.lstrip",
+          "lineNumber": 191
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub",
+          "lineNumber": 193
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub",
+          "lineNumber": 194
+        },
+        {
+          "caller": "extract_document",
+          "callee": "tuple",
+          "lineNumber": 195
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub(r\"[`*_]\", \"\", match.group(1)).strip",
+          "lineNumber": 196
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.sub",
+          "lineNumber": 196
+        },
+        {
+          "caller": "extract_document",
+          "callee": "match.group",
+          "lineNumber": 196
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.finditer",
+          "lineNumber": 197
+        },
+        {
+          "caller": "extract_document",
+          "callee": "len",
+          "lineNumber": 199
+        },
+        {
+          "caller": "extract_document",
+          "callee": "re.findall",
+          "lineNumber": 199
+        },
+        {
+          "caller": "extract_document",
+          "callee": "Document",
+          "lineNumber": 200
+        },
+        {
+          "caller": "extract_document",
+          "callee": "output_name",
+          "lineNumber": 203
+        },
+        {
+          "caller": "replace_href",
+          "callee": "match.group",
+          "lineNumber": 215
+        },
+        {
+          "caller": "replace_href",
+          "callee": "html.unescape",
+          "lineNumber": 215
+        },
+        {
+          "caller": "replace_href",
+          "callee": "match.group",
+          "lineNumber": 215
+        },
+        {
+          "caller": "replace_href",
+          "callee": "urlsplit",
+          "lineNumber": 216
+        },
+        {
+          "caller": "replace_href",
+          "callee": "raw_target.startswith",
+          "lineNumber": 217
+        },
+        {
+          "caller": "replace_href",
+          "callee": "match.group",
+          "lineNumber": 218
+        },
+        {
+          "caller": "replace_href",
+          "callee": "unquote",
+          "lineNumber": 219
+        },
+        {
+          "caller": "replace_href",
+          "callee": "match.group",
+          "lineNumber": 221
+        },
+        {
+          "caller": "replace_href",
+          "callee": "(document.source.parent / target_path).resolve",
+          "lineNumber": 222
+        },
+        {
+          "caller": "replace_href",
+          "callee": "resolved.relative_to(ROOT).as_posix",
+          "lineNumber": 224
+        },
+        {
+          "caller": "replace_href",
+          "callee": "resolved.relative_to",
+          "lineNumber": 224
+        },
+        {
+          "caller": "replace_href",
+          "callee": "match.group",
+          "lineNumber": 226
+        },
+        {
+          "caller": "replace_href",
+          "callee": "resolved.exists",
+          "lineNumber": 232
+        },
+        {
+          "caller": "replace_href",
+          "callee": "resolved.is_dir",
+          "lineNumber": 233
+        },
+        {
+          "caller": "replace_href",
+          "callee": "html.escape",
+          "lineNumber": 237
+        },
+        {
+          "caller": "rewrite_links",
+          "callee": "re.sub",
+          "lineNumber": 239
+        },
+        {
+          "caller": "replace_src",
+          "callee": "match.group",
+          "lineNumber": 244
+        },
+        {
+          "caller": "replace_src",
+          "callee": "html.unescape",
+          "lineNumber": 244
+        },
+        {
+          "caller": "replace_src",
+          "callee": "match.group",
+          "lineNumber": 244
+        },
+        {
+          "caller": "replace_src",
+          "callee": "urlsplit",
+          "lineNumber": 245
+        },
+        {
+          "caller": "replace_src",
+          "callee": "raw_target.startswith",
+          "lineNumber": 246
+        },
+        {
+          "caller": "replace_src",
+          "callee": "match.group",
+          "lineNumber": 247
+        },
+        {
+          "caller": "replace_src",
+          "callee": "(document.source.parent / unquote(parsed.path)).resolve",
+          "lineNumber": 248
+        },
+        {
+          "caller": "replace_src",
+          "callee": "unquote",
+          "lineNumber": 248
+        },
+        {
+          "caller": "replace_src",
+          "callee": "resolved.relative_to",
+          "lineNumber": 250
+        },
+        {
+          "caller": "replace_src",
+          "callee": "match.group",
+          "lineNumber": 252
+        },
+        {
+          "caller": "replace_src",
+          "callee": "resolved.is_file",
+          "lineNumber": 253
+        },
+        {
+          "caller": "replace_src",
+          "callee": "match.group",
+          "lineNumber": 254
+        },
+        {
+          "caller": "replace_src",
+          "callee": "Path",
+          "lineNumber": 255
+        },
+        {
+          "caller": "replace_src",
+          "callee": "destination.parent.mkdir",
+          "lineNumber": 257
+        },
+        {
+          "caller": "replace_src",
+          "callee": "shutil.copyfile",
+          "lineNumber": 258
+        },
+        {
+          "caller": "replace_src",
+          "callee": "destination_relative.as_posix",
+          "lineNumber": 259
+        },
+        {
+          "caller": "replace_src",
+          "callee": "html.escape",
+          "lineNumber": 260
+        },
+        {
+          "caller": "copy_local_images",
+          "callee": "re.sub",
+          "lineNumber": 262
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "set",
+          "lineNumber": 267
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "grouped.append",
+          "lineNumber": 271
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "assigned.update",
+          "lineNumber": 272
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "sorted",
+          "lineNumber": 273
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "documents.items",
+          "lineNumber": 273
+        },
+        {
+          "caller": "grouped_documents",
+          "callee": "grouped.append",
+          "lineNumber": 275
+        },
+        {
+          "caller": "nav_html",
+          "callee": "\"\".join",
+          "lineNumber": 282
+        },
+        {
+          "caller": "nav_html",
+          "callee": "html.escape",
+          "lineNumber": 285
+        },
+        {
+          "caller": "nav_html",
+          "callee": "(item.title + \" \" + item.relative).casefold",
+          "lineNumber": 285
+        },
+        {
+          "caller": "nav_html",
+          "callee": "html.escape",
+          "lineNumber": 286
+        },
+        {
+          "caller": "nav_html",
+          "callee": "html.escape",
+          "lineNumber": 287
+        },
+        {
+          "caller": "nav_html",
+          "callee": "sections.append",
+          "lineNumber": 291
+        },
+        {
+          "caller": "nav_html",
+          "callee": "html.escape",
+          "lineNumber": 292
+        },
+        {
+          "caller": "nav_html",
+          "callee": "\"\".join",
+          "lineNumber": 294
+        },
+        {
+          "caller": "search_index",
+          "callee": "list",
+          "lineNumber": 304
+        },
+        {
+          "caller": "search_index",
+          "callee": "json.dumps(payload, ensure_ascii=False).replace",
+          "lineNumber": 308
+        },
+        {
+          "caller": "search_index",
+          "callee": "json.dumps",
+          "lineNumber": 308
+        },
+        {
+          "caller": "document_cards",
+          "callee": "\"\".join",
+          "lineNumber": 317
+        },
+        {
+          "caller": "document_cards",
+          "callee": "html.escape",
+          "lineNumber": 319
+        },
+        {
+          "caller": "document_cards",
+          "callee": "html.escape",
+          "lineNumber": 320
+        },
+        {
+          "caller": "document_cards",
+          "callee": "html.escape",
+          "lineNumber": 321
+        },
+        {
+          "caller": "document_cards",
+          "callee": "max",
+          "lineNumber": 322
+        },
+        {
+          "caller": "document_cards",
+          "callee": "round",
+          "lineNumber": 322
+        },
+        {
+          "caller": "document_cards",
+          "callee": "cards.append",
+          "lineNumber": 325
+        },
+        {
+          "caller": "document_cards",
+          "callee": "html.escape",
+          "lineNumber": 327
+        },
+        {
+          "caller": "document_cards",
+          "callee": "\"\".join",
+          "lineNumber": 330
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 349
+        },
+        {
+          "caller": "page_template",
+          "callee": "document.source.is_file",
+          "lineNumber": 353
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 358
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 364
+        },
+        {
+          "caller": "page_template",
+          "callee": "document_cards",
+          "lineNumber": 382
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 393
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 394
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 400
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 411
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 431
+        },
+        {
+          "caller": "page_template",
+          "callee": "html.escape",
+          "lineNumber": 432
+        },
+        {
+          "caller": "page_template",
+          "callee": "max",
+          "lineNumber": 435
+        },
+        {
+          "caller": "page_template",
+          "callee": "round",
+          "lineNumber": 435
+        },
+        {
+          "caller": "excluded_page",
+          "callee": "Document",
+          "lineNumber": 456
+        },
+        {
+          "caller": "excluded_page",
+          "callee": "page_template",
+          "lineNumber": 474
+        },
+        {
+          "caller": "main",
+          "callee": "discover_markdown",
+          "lineNumber": 489
+        },
+        {
+          "caller": "main",
+          "callee": "map",
+          "lineNumber": 490
+        },
+        {
+          "caller": "main",
+          "callee": "path.relative_to(ROOT).as_posix",
+          "lineNumber": 491
+        },
+        {
+          "caller": "main",
+          "callee": "path.relative_to",
+          "lineNumber": 491
+        },
+        {
+          "caller": "main",
+          "callee": "grouped_documents",
+          "lineNumber": 492
+        },
+        {
+          "caller": "main",
+          "callee": "search_index",
+          "lineNumber": 495
+        },
+        {
+          "caller": "main",
+          "callee": "OUTPUT.mkdir",
+          "lineNumber": 497
+        },
+        {
+          "caller": "main",
+          "callee": "ASSETS.mkdir",
+          "lineNumber": 498
+        },
+        {
+          "caller": "main",
+          "callee": "expected_pages.add",
+          "lineNumber": 502
+        },
+        {
+          "caller": "main",
+          "callee": "manifest_path.exists",
+          "lineNumber": 503
+        },
+        {
+          "caller": "main",
+          "callee": "json.loads",
+          "lineNumber": 504
+        },
+        {
+          "caller": "main",
+          "callee": "manifest_path.read_text",
+          "lineNumber": 504
+        },
+        {
+          "caller": "main",
+          "callee": "previous.get",
+          "lineNumber": 505
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 506
+        },
+        {
+          "caller": "main",
+          "callee": "candidate.unlink",
+          "lineNumber": 508
+        },
+        {
+          "caller": "main",
+          "callee": "enumerate",
+          "lineNumber": 510
+        },
+        {
+          "caller": "main",
+          "callee": "markdown.Markdown",
+          "lineNumber": 511
+        },
+        {
+          "caller": "main",
+          "callee": "converter.convert",
+          "lineNumber": 523
+        },
+        {
+          "caller": "main",
+          "callee": "normalize_indented_fences",
+          "lineNumber": 523
+        },
+        {
+          "caller": "main",
+          "callee": "rewrite_links",
+          "lineNumber": 524
+        },
+        {
+          "caller": "main",
+          "callee": "copy_local_images",
+          "lineNumber": 525
+        },
+        {
+          "caller": "main",
+          "callee": "page_template",
+          "lineNumber": 526
+        },
+        {
+          "caller": "main",
+          "callee": "nav_html",
+          "lineNumber": 530
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 533
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 535
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 536
+        },
+        {
+          "caller": "main",
+          "callee": "re.sub",
+          "lineNumber": 538
+        },
+        {
+          "caller": "main",
+          "callee": "(OUTPUT / document.output_name).write_text",
+          "lineNumber": 539
+        },
+        {
+          "caller": "main",
+          "callee": "excluded_page",
+          "lineNumber": 542
+        },
+        {
+          "caller": "main",
+          "callee": "nav_html",
+          "lineNumber": 543
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 543
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 543
+        },
+        {
+          "caller": "main",
+          "callee": "re.sub",
+          "lineNumber": 545
+        },
+        {
+          "caller": "main",
+          "callee": "(OUTPUT / \"security-content-excluded.html\").write_text",
+          "lineNumber": 546
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 553
+        },
+        {
+          "caller": "main",
+          "callee": "manifest_path.write_text",
+          "lineNumber": 556
+        },
+        {
+          "caller": "main",
+          "callee": "json.dumps",
+          "lineNumber": 557
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 561
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 561
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 562
+        },
+        {
+          "caller": "main",
+          "callee": "len",
+          "lineNumber": 562
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 16,
+        "functionCount": 15,
+        "classCount": 1
+      }
+    }
+  ]
+}

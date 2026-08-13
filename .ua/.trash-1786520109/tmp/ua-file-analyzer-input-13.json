@@ -1,0 +1,17 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path": "streamlit_app.py", "language": "python", "sizeLines": 2584, "fileCategory": "code"},
+    {"path": "tests/test_agentic_contract.py", "language": "python", "sizeLines": 837, "fileCategory": "code"},
+    {"path": "tests/test_agentic_features.py", "language": "python", "sizeLines": 232, "fileCategory": "code"},
+    {"path": "tests/test_batch.py", "language": "python", "sizeLines": 208, "fileCategory": "code"},
+    {"path": "tests/test_cli.py", "language": "python", "sizeLines": 375, "fileCategory": "code"},
+    {"path": "tests/test_confidence_spans.py", "language": "python", "sizeLines": 341, "fileCategory": "code"},
+    {"path": "tests/test_corpus_manifest.py", "language": "python", "sizeLines": 253, "fileCategory": "code"},
+    {"path": "tests/test_evaluation_calibration.py", "language": "python", "sizeLines": 156, "fileCategory": "code"},
+    {"path": "tests/test_evaluation_cli.py", "language": "python", "sizeLines": 160, "fileCategory": "code"},
+    {"path": "tests/test_evaluation_metrics.py", "language": "python", "sizeLines": 515, "fileCategory": "code"},
+    {"path": "tests/test_form_routing.py", "language": "python", "sizeLines": 271, "fileCategory": "code"}
+  ],
+  "batchImportData": {"streamlit_app.py": [], "tests/test_agentic_contract.py": [], "tests/test_agentic_features.py": [], "tests/test_batch.py": [], "tests/test_cli.py": [], "tests/test_confidence_spans.py": [], "tests/test_corpus_manifest.py": [], "tests/test_evaluation_calibration.py": [], "tests/test_evaluation_cli.py": [], "tests/test_evaluation_metrics.py": [], "tests/test_form_routing.py": []}
+}

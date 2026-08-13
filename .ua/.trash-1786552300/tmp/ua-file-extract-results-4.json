@@ -1,0 +1,632 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 7,
+  "filesSkipped": [
+    "Launch-GLM-OCR.cmd",
+    "Launch-PaddleOCR-VL-1.6.cmd",
+    "Setup-GLM-OCR.cmd"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 7,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 7
+    }
+  },
+  "results": [
+    {
+      "path": ".env.example",
+      "language": "config",
+      "fileCategory": "config",
+      "totalLines": 31,
+      "nonEmptyLines": 31,
+      "definitions": [
+        {
+          "name": "OPENAI_API_KEY",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 1,
+          "endLine": 1
+        },
+        {
+          "name": "OPENAI_BASE_URL",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 3,
+          "endLine": 3
+        },
+        {
+          "name": "DOCPARSE_LUNA_MAX_OUTPUT_TOKENS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 4,
+          "endLine": 4
+        },
+        {
+          "name": "DOCPARSE_LOCAL_OCR_ENABLED",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 5,
+          "endLine": 5
+        },
+        {
+          "name": "DOCPARSE_GLMOCR_CONFIG_PATH",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 6,
+          "endLine": 6
+        },
+        {
+          "name": "DOCPARSE_GLMOCR_LAYOUT_DEVICE",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 7,
+          "endLine": 7
+        },
+        {
+          "name": "DOCPARSE_PRELOAD_LOCAL_OCR",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 8,
+          "endLine": 8
+        },
+        {
+          "name": "GLMOCR_MAX_MODEL_LEN",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 9,
+          "endLine": 9
+        },
+        {
+          "name": "GLMOCR_GPU_MEMORY_UTILIZATION",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 10,
+          "endLine": 10
+        },
+        {
+          "name": "GLMOCR_PERFORMANCE_MODE",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 11,
+          "endLine": 11
+        },
+        {
+          "name": "GLMOCR_MM_PROCESSOR_CACHE_GB",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 12,
+          "endLine": 12
+        },
+        {
+          "name": "GLMOCR_SDK_MAX_WORKERS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 13,
+          "endLine": 13
+        },
+        {
+          "name": "DOCPARSE_STUDIO_DB_PATH",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 14,
+          "endLine": 14
+        },
+        {
+          "name": "DOCPARSE_RENDER_DPI",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 15,
+          "endLine": 15
+        },
+        {
+          "name": "DOCPARSE_CROP_DPI",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 16,
+          "endLine": 16
+        },
+        {
+          "name": "DOCPARSE_CROP_PADDING",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 17,
+          "endLine": 17
+        },
+        {
+          "name": "DOCPARSE_MAX_UPLOAD_BYTES",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 18,
+          "endLine": 18
+        },
+        {
+          "name": "DOCPARSE_MAX_PAGES",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 19,
+          "endLine": 19
+        },
+        {
+          "name": "DOCPARSE_MAX_PAGE_PIXELS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 20,
+          "endLine": 20
+        },
+        {
+          "name": "DOCPARSE_PAGE_BATCH_SIZE",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 21,
+          "endLine": 21
+        },
+        {
+          "name": "DOCPARSE_MAX_PAGE_CONCURRENCY",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 22,
+          "endLine": 22
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_CONCURRENCY",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 23,
+          "endLine": 23
+        },
+        {
+          "name": "DOCPARSE_MAX_VISUAL_RECOVERY_CROPS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 24,
+          "endLine": 24
+        },
+        {
+          "name": "DOCPARSE_FULL_PAGE_FALLBACK_FRACTION",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 26,
+          "endLine": 26
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_RETRY_ATTEMPTS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 27,
+          "endLine": 27
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_RETRY_BASE_SECONDS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 28,
+          "endLine": 28
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_RETRY_CAP_SECONDS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 29,
+          "endLine": 29
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_COOLDOWN_SECONDS",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 30,
+          "endLine": 30
+        },
+        {
+          "name": "DOCPARSE_PROVIDER_SUCCESS_WINDOW",
+          "kind": "variable",
+          "fields": [],
+          "startLine": 31,
+          "endLine": 31
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "definitionCount": 29
+      }
+    },
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 129,
+      "nonEmptyLines": 94,
+      "sections": [
+        {
+          "heading": "Changelog",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "[Unreleased]",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "[0.5.0] - 2026-07-31",
+          "level": 2,
+          "line": 24
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 26
+        },
+        {
+          "heading": "[0.4.0] - 2026-07-30",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "heading": "Removed",
+          "level": 3,
+          "line": 60
+        },
+        {
+          "heading": "[0.3.0] - 2026-07-28",
+          "level": 2,
+          "line": 66
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 68
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 76
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 83
+        },
+        {
+          "heading": "[0.2.0] - 2026-07-26",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 92
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 107
+        },
+        {
+          "heading": "Security",
+          "level": 3,
+          "line": 117
+        },
+        {
+          "heading": "[0.1.0] - 2026-07-26",
+          "level": 2,
+          "line": 124
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 126
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 20
+      }
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 72,
+      "nonEmptyLines": 51,
+      "sections": [
+        {
+          "heading": "Contributing",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Setup",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Development workflow",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Verify changes",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Documentation changes",
+          "level": 2,
+          "line": 39
+        },
+        {
+          "heading": "Pull requests",
+          "level": 2,
+          "line": 48
+        },
+        {
+          "heading": "Architecture constraints",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Reporting security issues",
+          "level": 2,
+          "line": 70
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 217,
+      "nonEmptyLines": 160,
+      "sections": [
+        {
+          "heading": "Grounded Document Parser",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Application preview",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "heading": "Install and set up",
+          "level": 2,
+          "line": 27
+        },
+        {
+          "heading": "How to use the app",
+          "level": 2,
+          "line": 64
+        },
+        {
+          "heading": "CLI batch parsing",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Outputs",
+          "level": 2,
+          "line": 115
+        },
+        {
+          "heading": "Public Python API",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Repository layout",
+          "level": 2,
+          "line": 150
+        },
+        {
+          "heading": "Documentation",
+          "level": 2,
+          "line": 171
+        },
+        {
+          "heading": "Development",
+          "level": 2,
+          "line": 190
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "SECURITY.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 19,
+      "nonEmptyLines": 12,
+      "sections": [
+        {
+          "heading": "Security policy",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "SETUP.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 239,
+      "nonEmptyLines": 175,
+      "sections": [
+        {
+          "heading": "Setup",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Prerequisites",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Automated Windows setup",
+          "level": 2,
+          "line": 23
+        },
+        {
+          "heading": "Build the installer",
+          "level": 3,
+          "line": 42
+        },
+        {
+          "heading": "Manual WSL setup and launch",
+          "level": 2,
+          "line": 62
+        },
+        {
+          "heading": "Luna configuration",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Configuration reference",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Verification",
+          "level": 2,
+          "line": 191
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 219
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 74,
+      "nonEmptyLines": 64,
+      "sections": [
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "project.scripts",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "project.optional-dependencies",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "[[tool.uv.index]]",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "[[tool.uv.index]]",
+          "level": 3,
+          "line": 41
+        },
+        {
+          "heading": "tool.uv",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "heading": "tool.uv.sources",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "heading": "dependency-groups",
+          "level": 1,
+          "line": 59
+        },
+        {
+          "heading": "build-system",
+          "level": 1,
+          "line": 65
+        },
+        {
+          "heading": "tool.hatch.build.targets.wheel",
+          "level": 5,
+          "line": 69
+        },
+        {
+          "heading": "tool.pytest.ini_options",
+          "level": 3,
+          "line": 72
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    }
+  ]
+}

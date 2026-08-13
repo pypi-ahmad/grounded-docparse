@@ -1,0 +1,13 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path":"CHANGELOG.md","language":"markdown","sizeLines":129,"fileCategory":"docs"},
+    {"path":"README.md","language":"markdown","sizeLines":217,"fileCategory":"docs"},
+    {"path":"grounded-docparse-threat-model.md","language":"markdown","sizeLines":167,"fileCategory":"docs"},
+    {"path":"pyproject.toml","language":"toml","sizeLines":74,"fileCategory":"config"},
+    {"path":"security_best_practices_report.md","language":"markdown","sizeLines":59,"fileCategory":"docs"}
+  ],
+  "batchImportData": {
+    "CHANGELOG.md": [], "README.md": [], "grounded-docparse-threat-model.md": [], "pyproject.toml": [], "security_best_practices_report.md": []
+  }
+}

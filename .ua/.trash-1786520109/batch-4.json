@@ -1,0 +1,51 @@
+{
+  "nodes": [
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "Records release history for Grounded Document Parser, including OCR engines, recovery controls, installation, and evaluation capabilities.",
+      "tags": ["documentation", "release-notes", "versioning"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Provides the project overview, Windows installation and usage instructions, CLI and Python API examples, output contracts, and repository orientation.",
+      "tags": ["documentation", "entry-point", "getting-started", "api-reference"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:grounded-docparse-threat-model.md",
+      "type": "document",
+      "name": "grounded-docparse-threat-model.md",
+      "filePath": "grounded-docparse-threat-model.md",
+      "summary": "Defines the trusted-workstation threat model, trust boundaries, assets, abuse paths, mitigations, and security invariants for the document parsing workflow.",
+      "tags": ["documentation", "security", "threat-model", "trust-boundaries"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "pyproject.toml",
+      "summary": "Defines Python package metadata, the grounded-docparse CLI entry point, runtime and optional OCR dependencies, uv source indexes, build settings, and pytest defaults.",
+      "tags": ["configuration", "python", "packaging", "dependencies", "build-system"],
+      "complexity": "moderate",
+      "languageNotes": "Uses PEP 621 project metadata with uv-managed platform-specific OCR dependency groups."
+    },
+    {
+      "id": "document:security_best_practices_report.md",
+      "type": "document",
+      "name": "security_best_practices_report.md",
+      "filePath": "security_best_practices_report.md",
+      "summary": "Summarizes the repository security review, prioritizing native parsing isolation, prompt-injection review, endpoint disclosure, and local schema persistence controls.",
+      "tags": ["documentation", "security", "risk-assessment", "deployment"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

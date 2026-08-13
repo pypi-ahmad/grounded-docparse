@@ -1,0 +1,83 @@
+{
+  "nodes": [
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-2.json",
+      "type": "config",
+      "name": "ua-file-extract-results-2.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-2.json",
+      "summary": "Structured JSON configuration artifact for ua file extract results 2, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-3.json",
+      "type": "config",
+      "name": "ua-file-extract-results-3.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-3.json",
+      "summary": "Structured JSON configuration artifact for ua file extract results 3, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-4.json",
+      "type": "config",
+      "name": "ua-file-extract-results-4.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-4.json",
+      "summary": "Structured JSON configuration artifact for ua file extract results 4, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-6.json",
+      "type": "config",
+      "name": "ua-file-extract-results-6.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-6.json",
+      "summary": "Structured JSON configuration artifact for ua file extract results 6, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-9.json",
+      "type": "config",
+      "name": "ua-file-extract-results-9.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-9.json",
+      "summary": "Structured JSON configuration artifact for ua file extract results 9, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-tour-results.json",
+      "type": "config",
+      "name": "ua-tour-results.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-tour-results.json",
+      "summary": "Structured JSON configuration artifact for ua tour results, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

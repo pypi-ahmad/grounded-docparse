@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "file:docs-site/setup.html",
+      "type": "file",
+      "name": "setup.html",
+      "filePath": "docs-site/setup.html",
+      "summary": "Static HTML documentation page presenting Setup · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:docs-site/site-manifest.json",
+      "type": "config",
+      "name": "site-manifest.json",
+      "filePath": "docs-site/site-manifest.json",
+      "summary": "Structured JSON configuration artifact for site manifest, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/spec.html",
+      "type": "file",
+      "name": "spec.html",
+      "filePath": "docs-site/spec.html",
+      "summary": "Static HTML documentation page presenting Product specification · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/tutorial.html",
+      "type": "file",
+      "name": "tutorial.html",
+      "filePath": "docs-site/tutorial.html",
+      "summary": "Static HTML documentation page presenting Tutorial · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/zero-to-hero-tutorial.html",
+      "type": "file",
+      "name": "zero-to-hero-tutorial.html",
+      "filePath": "docs-site/zero-to-hero-tutorial.html",
+      "summary": "Static HTML documentation page presenting Grounded DocParse: Zero-to-Hero Tutorial · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

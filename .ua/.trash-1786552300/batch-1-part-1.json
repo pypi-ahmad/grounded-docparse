@@ -1,0 +1,1751 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/batch.py",
+      "type": "file",
+      "name": "batch.py",
+      "filePath": "src/grounded_docparse/batch.py",
+      "summary": "Source file batch.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/batch.py:build_batch_documents",
+      "type": "function",
+      "name": "build_batch_documents",
+      "filePath": "src/grounded_docparse/batch.py",
+      "lineRange": [
+        49,
+        84
+      ],
+      "summary": "Implements build_batch_documents within batch.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/batch.py:build_output_archive",
+      "type": "function",
+      "name": "build_output_archive",
+      "filePath": "src/grounded_docparse/batch.py",
+      "lineRange": [
+        93,
+        132
+      ],
+      "summary": "Implements build_output_archive within batch.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/batch.py:build_split_archive",
+      "type": "function",
+      "name": "build_split_archive",
+      "filePath": "src/grounded_docparse/batch.py",
+      "lineRange": [
+        145,
+        216
+      ],
+      "summary": "Implements build_split_archive within batch.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/grounded_docparse/batch.py:BatchDocument",
+      "type": "class",
+      "name": "BatchDocument",
+      "filePath": "src/grounded_docparse/batch.py",
+      "lineRange": [
+        24,
+        34
+      ],
+      "summary": "Defines BatchDocument in batch.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/batch.py:BatchArchiveEntry",
+      "type": "class",
+      "name": "BatchArchiveEntry",
+      "filePath": "src/grounded_docparse/batch.py",
+      "lineRange": [
+        38,
+        46
+      ],
+      "summary": "Defines BatchArchiveEntry in batch.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/benchmark.py",
+      "type": "file",
+      "name": "benchmark.py",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "summary": "Source file benchmark.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:load_corpus_manifest",
+      "type": "function",
+      "name": "load_corpus_manifest",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        212,
+        255
+      ],
+      "summary": "Implements load_corpus_manifest within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_markdown_reference_text",
+      "type": "function",
+      "name": "_markdown_reference_text",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        268,
+        282
+      ],
+      "summary": "Implements _markdown_reference_text within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics",
+      "type": "function",
+      "name": "semantic_text_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        285,
+        299
+      ],
+      "summary": "Implements semantic_text_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_canonical_block_text",
+      "type": "function",
+      "name": "_canonical_block_text",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        302,
+        336
+      ],
+      "summary": "Implements _canonical_block_text within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:canonical_document_pages",
+      "type": "function",
+      "name": "canonical_document_pages",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        339,
+        357
+      ],
+      "summary": "Implements canonical_document_pages within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_for_reference_pages",
+      "type": "function",
+      "name": "semantic_text_metrics_for_reference_pages",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        360,
+        379
+      ],
+      "summary": "Implements semantic_text_metrics_for_reference_pages within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_aggregate_sequence_metrics",
+      "type": "function",
+      "name": "_aggregate_sequence_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        382,
+        396
+      ],
+      "summary": "Implements _aggregate_sequence_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_by_page",
+      "type": "function",
+      "name": "semantic_text_metrics_by_page",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        399,
+        422
+      ],
+      "summary": "Implements semantic_text_metrics_by_page within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:reading_order_metrics",
+      "type": "function",
+      "name": "reading_order_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        425,
+        455
+      ],
+      "summary": "Implements reading_order_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:table_cell_metrics",
+      "type": "function",
+      "name": "table_cell_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        458,
+        495
+      ],
+      "summary": "Implements table_cell_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_intersection_over_union",
+      "type": "function",
+      "name": "_intersection_over_union",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        498,
+        518
+      ],
+      "summary": "Implements _intersection_over_union within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:grounding_metrics",
+      "type": "function",
+      "name": "grounding_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        521,
+        534
+      ],
+      "summary": "Implements grounding_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_json_type",
+      "type": "function",
+      "name": "_json_type",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        537,
+        546
+      ],
+      "summary": "Implements _json_type within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_json_leaves",
+      "type": "function",
+      "name": "_json_leaves",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        549,
+        561
+      ],
+      "summary": "Implements _json_leaves within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:schema_leaf_metrics",
+      "type": "function",
+      "name": "schema_leaf_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        564,
+        582
+      ],
+      "summary": "Implements schema_leaf_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:continuity_metrics",
+      "type": "function",
+      "name": "continuity_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        585,
+        599
+      ],
+      "summary": "Implements continuity_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_word_insertions",
+      "type": "function",
+      "name": "_word_insertions",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        602,
+        618
+      ],
+      "summary": "Implements _word_insertions within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:hallucination_metrics",
+      "type": "function",
+      "name": "hallucination_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        621,
+        647
+      ],
+      "summary": "Implements hallucination_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:summarize_telemetry",
+      "type": "function",
+      "name": "summarize_telemetry",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        650,
+        741
+      ],
+      "summary": "Implements summarize_telemetry within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_macro_metrics",
+      "type": "function",
+      "name": "_macro_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        744,
+        764
+      ],
+      "summary": "Implements _macro_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_group_metrics",
+      "type": "function",
+      "name": "_group_metrics",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        767,
+        781
+      ],
+      "summary": "Implements _group_metrics within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_ocr_review_summary",
+      "type": "function",
+      "name": "_ocr_review_summary",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        784,
+        800
+      ],
+      "summary": "Implements _ocr_review_summary within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_classification_summary",
+      "type": "function",
+      "name": "_classification_summary",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        803,
+        969
+      ],
+      "summary": "Implements _classification_summary within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:build_live_report",
+      "type": "function",
+      "name": "build_live_report",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        972,
+        1042
+      ],
+      "summary": "Implements build_live_report within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_candidate_tables",
+      "type": "function",
+      "name": "_candidate_tables",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1045,
+        1062
+      ],
+      "summary": "Implements _candidate_tables within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_candidate_anchor_ids",
+      "type": "function",
+      "name": "_candidate_anchor_ids",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1065,
+        1079
+      ],
+      "summary": "Implements _candidate_anchor_ids within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_reference_basis",
+      "type": "function",
+      "name": "_reference_basis",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1082,
+        1097
+      ],
+      "summary": "Implements _reference_basis within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:evaluate_live_document",
+      "type": "function",
+      "name": "evaluate_live_document",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1100,
+        1271
+      ],
+      "summary": "Implements evaluate_live_document within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:evaluate_regression_policy",
+      "type": "function",
+      "name": "evaluate_regression_policy",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1288,
+        1376
+      ],
+      "summary": "Implements evaluate_regression_policy within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:live_telemetry_record",
+      "type": "function",
+      "name": "live_telemetry_record",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1379,
+        1460
+      ],
+      "summary": "Implements live_telemetry_record within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/benchmark.py:_edit_distance",
+      "type": "function",
+      "name": "_edit_distance",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        1475,
+        1489
+      ],
+      "summary": "Implements _edit_distance within benchmark.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:ReferenceBasis",
+      "type": "class",
+      "name": "ReferenceBasis",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        28,
+        35
+      ],
+      "summary": "Defines ReferenceBasis in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:EvaluationAnchor",
+      "type": "class",
+      "name": "EvaluationAnchor",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        38,
+        42
+      ],
+      "summary": "Defines EvaluationAnchor in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:EvaluationTableCell",
+      "type": "class",
+      "name": "EvaluationTableCell",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        45,
+        52
+      ],
+      "summary": "Defines EvaluationTableCell in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:EvaluationTable",
+      "type": "class",
+      "name": "EvaluationTable",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        55,
+        60
+      ],
+      "summary": "Defines EvaluationTable in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:CorpusAnnotation",
+      "type": "class",
+      "name": "CorpusAnnotation",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        63,
+        92
+      ],
+      "summary": "Defines CorpusAnnotation in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:CorpusSource",
+      "type": "class",
+      "name": "CorpusSource",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        95,
+        106
+      ],
+      "summary": "Defines CorpusSource in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:CorpusDocument",
+      "type": "class",
+      "name": "CorpusDocument",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        109,
+        119
+      ],
+      "summary": "Defines CorpusDocument in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:CorpusManifest",
+      "type": "class",
+      "name": "CorpusManifest",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        122,
+        150
+      ],
+      "summary": "Defines CorpusManifest in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:ModelRate",
+      "type": "class",
+      "name": "ModelRate",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        153,
+        157
+      ],
+      "summary": "Defines ModelRate in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:ModelRateCard",
+      "type": "class",
+      "name": "ModelRateCard",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        160,
+        164
+      ],
+      "summary": "Defines ModelRateCard in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:RegressionRule",
+      "type": "class",
+      "name": "RegressionRule",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        167,
+        191
+      ],
+      "summary": "Defines RegressionRule in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/benchmark.py:RegressionPolicy",
+      "type": "class",
+      "name": "RegressionPolicy",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "lineRange": [
+        194,
+        198
+      ],
+      "summary": "Defines RegressionPolicy in benchmark.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/cli.py",
+      "type": "file",
+      "name": "cli.py",
+      "filePath": "src/grounded_docparse/cli.py",
+      "summary": "Source file cli.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/cli.py:_parser",
+      "type": "function",
+      "name": "_parser",
+      "filePath": "src/grounded_docparse/cli.py",
+      "lineRange": [
+        42,
+        55
+      ],
+      "summary": "Implements _parser within cli.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/cli.py:_load_schema",
+      "type": "function",
+      "name": "_load_schema",
+      "filePath": "src/grounded_docparse/cli.py",
+      "lineRange": [
+        58,
+        76
+      ],
+      "summary": "Implements _load_schema within cli.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/cli.py:_discover",
+      "type": "function",
+      "name": "_discover",
+      "filePath": "src/grounded_docparse/cli.py",
+      "lineRange": [
+        79,
+        105
+      ],
+      "summary": "Implements _discover within cli.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/cli.py:_parse",
+      "type": "function",
+      "name": "_parse",
+      "filePath": "src/grounded_docparse/cli.py",
+      "lineRange": [
+        108,
+        214
+      ],
+      "summary": "Implements _parse within cli.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/cli.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "src/grounded_docparse/cli.py",
+      "lineRange": [
+        217,
+        235
+      ],
+      "summary": "Implements main within cli.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_batch_documents",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_batch_documents",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_output_archive",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_output_archive",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_split_archive",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "function:src/grounded_docparse/batch.py:build_split_archive",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "class:src/grounded_docparse/batch.py:BatchDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "class:src/grounded_docparse/batch.py:BatchDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "class:src/grounded_docparse/batch.py:BatchArchiveEntry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "class:src/grounded_docparse/batch.py:BatchArchiveEntry",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:load_corpus_manifest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:load_corpus_manifest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_markdown_reference_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_markdown_reference_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_canonical_block_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_canonical_block_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:canonical_document_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:canonical_document_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_for_reference_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_for_reference_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_aggregate_sequence_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_aggregate_sequence_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_by_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:semantic_text_metrics_by_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:reading_order_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:reading_order_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:table_cell_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:table_cell_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_intersection_over_union",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_intersection_over_union",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:grounding_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:grounding_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_json_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_json_type",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_json_leaves",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_json_leaves",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:schema_leaf_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:schema_leaf_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:continuity_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:continuity_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_word_insertions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_word_insertions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:hallucination_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:hallucination_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:summarize_telemetry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:summarize_telemetry",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_macro_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_macro_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_group_metrics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_group_metrics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_ocr_review_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_ocr_review_summary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_classification_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_classification_summary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:build_live_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:build_live_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_candidate_tables",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_candidate_tables",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_candidate_anchor_ids",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_candidate_anchor_ids",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_reference_basis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_reference_basis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:evaluate_live_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:evaluate_live_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:evaluate_regression_policy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:evaluate_regression_policy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:live_telemetry_record",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:live_telemetry_record",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_edit_distance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "function:src/grounded_docparse/benchmark.py:_edit_distance",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ReferenceBasis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ReferenceBasis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationAnchor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationAnchor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationTableCell",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationTableCell",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationTable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:EvaluationTable",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusAnnotation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusAnnotation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusSource",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusSource",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusDocument",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusDocument",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusManifest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:CorpusManifest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ModelRate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ModelRate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ModelRateCard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:ModelRateCard",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:RegressionRule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:RegressionRule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:RegressionPolicy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "class:src/grounded_docparse/benchmark.py:RegressionPolicy",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_parser",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_parser",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_load_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_load_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_discover",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_discover",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_parse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:_parse",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "function:src/grounded_docparse/cli.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/schema_store.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

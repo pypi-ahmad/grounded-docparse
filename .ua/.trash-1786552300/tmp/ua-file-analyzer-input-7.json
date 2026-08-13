@@ -1,0 +1,147 @@
+{
+  "projectRoot": "D:/AI/Github/grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786452692/tmp/domain-context.json",
+      "language": "json",
+      "sizeLines": 789,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-input.json",
+      "language": "json",
+      "sizeLines": 3364,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-results.json",
+      "language": "json",
+      "sizeLines": 980,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-1.json",
+      "language": "json",
+      "sizeLines": 96,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-10.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-11.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-12.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-13.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-14.json",
+      "language": "json",
+      "sizeLines": 119,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-2.json",
+      "language": "json",
+      "sizeLines": 82,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-3.json",
+      "language": "json",
+      "sizeLines": 85,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-4.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-6.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-7.json",
+      "language": "json",
+      "sizeLines": 147,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-8.json",
+      "language": "json",
+      "sizeLines": 11,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-1.json",
+      "language": "json",
+      "sizeLines": 12812,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-10.json",
+      "language": "json",
+      "sizeLines": 406,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-11.json",
+      "language": "json",
+      "sizeLines": 229,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-12.json",
+      "language": "json",
+      "sizeLines": 2759,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-13.json",
+      "language": "json",
+      "sizeLines": 10888,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786452692/tmp/domain-context.json": [],
+    ".ua/.trash-1786452692/tmp/ua-arch-input.json": [],
+    ".ua/.trash-1786452692/tmp/ua-arch-results.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-1.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-10.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-11.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-12.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-13.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-14.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-2.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-3.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-4.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-6.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-7.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-8.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-1.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-10.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-11.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-12.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-13.json": []
+  }
+}

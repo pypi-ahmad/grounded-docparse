@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:configure_pipeline",
+      "type": "function",
+      "name": "configure_pipeline",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        90,
+        105
+      ],
+      "summary": "Defines configure_pipeline, a config, port, cache_root routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:find_submodule",
+      "type": "function",
+      "name": "find_submodule",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        26,
+        40
+      ],
+      "summary": "Defines find_submodule, a value, name routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:ensure_cached_assets",
+      "type": "function",
+      "name": "ensure_cached_assets",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        71,
+        87
+      ],
+      "summary": "Defines ensure_cached_assets, a cache_root routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "type": "file",
+      "name": "prepare_paddleocr_runtime.py",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "summary": "Source or generated artifact 'prepare_paddleocr_runtime.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:validate_cached_assets",
+      "type": "function",
+      "name": "validate_cached_assets",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        49,
+        68
+      ],
+      "summary": "Defines validate_cached_assets, a cache_root routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:paddle_cache_root",
+      "type": "function",
+      "name": "paddle_cache_root",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        43,
+        46
+      ],
+      "summary": "Defines paddle_cache_root, a  routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_paddleocr_runtime.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "lineRange": [
+        108,
+        142
+      ],
+      "summary": "Defines main, a  routine in prepare_paddleocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:paddle_cache_root",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:find_submodule",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:ensure_cached_assets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:configure_pipeline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:ensure_cached_assets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:validate_cached_assets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:configure_pipeline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:find_submodule",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:validate_cached_assets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_paddleocr_runtime.py:paddle_cache_root",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

@@ -1,0 +1,329 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_launcher_contract.py:test_paddle_readiness_probe_generates_its_png",
+      "type": "function",
+      "name": "test_paddle_readiness_probe_generates_its_png",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        94,
+        98
+      ],
+      "summary": "Defines test_paddle_readiness_probe_generates_its_png, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_paddle_runtime_downloads_once_then_uses_local_cache_offline",
+      "type": "function",
+      "name": "test_paddle_runtime_downloads_once_then_uses_local_cache_offline",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        66,
+        76
+      ],
+      "summary": "Defines test_paddle_runtime_downloads_once_then_uses_local_cache_offline, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_launcher_contract.py",
+      "type": "file",
+      "name": "test_launcher_contract.py",
+      "filePath": "tests/test_launcher_contract.py",
+      "summary": "Test module 'test_launcher_contract.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_paddle_launcher_and_service_manager_use_official_full_pipeline",
+      "type": "function",
+      "name": "test_paddle_launcher_and_service_manager_use_official_full_pipeline",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        37,
+        63
+      ],
+      "summary": "Defines test_paddle_launcher_and_service_manager_use_official_full_pipeline, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format",
+      "type": "function",
+      "name": "test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        79,
+        82
+      ],
+      "summary": "Defines test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_wsl_services_bind_to_loopback",
+      "type": "function",
+      "name": "test_wsl_services_bind_to_loopback",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        27,
+        34
+      ],
+      "summary": "Defines test_wsl_services_bind_to_loopback, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_installer_reuses_dependencies_and_has_cpu_fallback",
+      "type": "function",
+      "name": "test_installer_reuses_dependencies_and_has_cpu_fallback",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        116,
+        125
+      ],
+      "summary": "Defines test_installer_reuses_dependencies_and_has_cpu_fallback, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_detached_services_do_not_inherit_launcher_locks",
+      "type": "function",
+      "name": "test_detached_services_do_not_inherit_launcher_locks",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        85,
+        91
+      ],
+      "summary": "Defines test_detached_services_do_not_inherit_launcher_locks, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_primary_launcher_defaults_to_glm_but_supports_runtime_switching",
+      "type": "function",
+      "name": "test_primary_launcher_defaults_to_glm_but_supports_runtime_switching",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        101,
+        113
+      ],
+      "summary": "Defines test_primary_launcher_defaults_to_glm_but_supports_runtime_switching, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_wsl_launcher_restarts_streamlit_on_luna_environment_drift",
+      "type": "function",
+      "name": "test_wsl_launcher_restarts_streamlit_on_luna_environment_drift",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        19,
+        24
+      ],
+      "summary": "Defines test_wsl_launcher_restarts_streamlit_on_luna_environment_drift, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_launcher_contract.py:test_windows_launcher_reads_openai_values_from_user_environment",
+      "type": "function",
+      "name": "test_windows_launcher_reads_openai_values_from_user_environment",
+      "filePath": "tests/test_launcher_contract.py",
+      "lineRange": [
+        6,
+        16
+      ],
+      "summary": "Defines test_windows_launcher_reads_openai_values_from_user_environment, a  routine in test_launcher_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_installer_reuses_dependencies_and_has_cpu_fallback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_wsl_launcher_restarts_streamlit_on_luna_environment_drift",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_windows_launcher_reads_openai_values_from_user_environment",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_windows_launcher_reads_openai_values_from_user_environment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_wsl_services_bind_to_loopback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_runtime_downloads_once_then_uses_local_cache_offline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_detached_services_do_not_inherit_launcher_locks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_readiness_probe_generates_its_png",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_runtime_downloads_once_then_uses_local_cache_offline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_primary_launcher_defaults_to_glm_but_supports_runtime_switching",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_wsl_services_bind_to_loopback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_wsl_launcher_restarts_streamlit_on_luna_environment_drift",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_installer_reuses_dependencies_and_has_cpu_fallback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_readiness_probe_generates_its_png",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_launcher_and_service_manager_use_official_full_pipeline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_detached_services_do_not_inherit_launcher_locks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_paddle_launcher_and_service_manager_use_official_full_pipeline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_launcher_contract.py",
+      "target": "function:tests/test_launcher_contract.py:test_primary_launcher_defaults_to_glm_but_supports_runtime_switching",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

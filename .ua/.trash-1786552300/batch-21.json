@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "config:graphify-out/.graphify_labels.json",
+      "type": "config",
+      "name": ".graphify_labels.json",
+      "filePath": "graphify-out/.graphify_labels.json",
+      "summary": "Structured JSON configuration artifact for .graphify labels, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/.graphify_learning.json",
+      "type": "config",
+      "name": ".graphify_learning.json",
+      "filePath": "graphify-out/.graphify_learning.json",
+      "summary": "Structured JSON configuration artifact for .graphify learning, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:graphify-out/.vocab.txt",
+      "type": "document",
+      "name": ".vocab.txt",
+      "filePath": "graphify-out/.vocab.txt",
+      "summary": "Documentation covering .vocab for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:graphify-out/GRAPH_REPORT.md",
+      "type": "document",
+      "name": "GRAPH_REPORT.md",
+      "filePath": "graphify-out/GRAPH_REPORT.md",
+      "summary": "Documentation covering Graph Report - .  (2026-08-10) for users, contributors, or maintainers of grounded-docparse.",
+      "tags": [
+        "documentation",
+        "project-guide",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:graphify-out/cost.json",
+      "type": "config",
+      "name": "cost.json",
+      "filePath": "graphify-out/cost.json",
+      "summary": "Structured JSON configuration artifact for cost, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:graphify-out/graph.html",
+      "type": "file",
+      "name": "graph.html",
+      "filePath": "graphify-out/graph.html",
+      "summary": "Static HTML documentation page presenting graphify - graphify-out\\graph.html for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:graphify-out/graph.json",
+      "type": "config",
+      "name": "graph.json",
+      "filePath": "graphify-out/graph.json",
+      "summary": "Structured JSON configuration artifact for graph, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:graphify-out/manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "graphify-out/manifest.json",
+      "summary": "Structured JSON configuration artifact for manifest, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

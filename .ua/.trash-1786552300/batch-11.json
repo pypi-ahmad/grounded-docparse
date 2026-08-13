@@ -1,0 +1,265 @@
+{
+  "nodes": [
+    {
+      "id": "document:.ua/.trash-1786520109/tmp/changed-files.txt",
+      "type": "document",
+      "name": "changed-files.txt",
+      "filePath": ".ua/.trash-1786520109/tmp/changed-files.txt",
+      "summary": "Project documentation in changed-files.txt.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.ua/.trash-1786520109/tmp/fingerprint-output.txt",
+      "type": "document",
+      "name": "fingerprint-output.txt",
+      "filePath": ".ua/.trash-1786520109/tmp/fingerprint-output.txt",
+      "summary": "Project documentation in fingerprint-output.txt.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.ua/.trash-1786520109/tmp/merge-report.txt",
+      "type": "document",
+      "name": "merge-report.txt",
+      "filePath": ".ua/.trash-1786520109/tmp/merge-report.txt",
+      "summary": "Project documentation in merge-report.txt.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-arch-input.json",
+      "type": "config",
+      "name": "ua-arch-input.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-arch-input.json",
+      "summary": "Configuration stored in ua-arch-input.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-arch-results.json",
+      "type": "config",
+      "name": "ua-arch-results.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-arch-results.json",
+      "summary": "Configuration stored in ua-arch-results.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-1.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-1.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-1.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-1.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-10.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-10.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-10.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-10.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-12.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-12.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-12.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-12.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-13.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-13.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-13.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-13.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-14.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-14.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-14.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-14.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-2.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-2.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-2.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-2.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-3.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-3.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-3.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-3.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-4.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-4.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-4.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-4.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-6.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-6.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-6.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-6.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-analyzer-input-9.json",
+      "type": "config",
+      "name": "ua-file-analyzer-input-9.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-9.json",
+      "summary": "Configuration stored in ua-file-analyzer-input-9.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-1.json",
+      "type": "config",
+      "name": "ua-file-extract-results-1.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-1.json",
+      "summary": "Configuration stored in ua-file-extract-results-1.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-10.json",
+      "type": "config",
+      "name": "ua-file-extract-results-10.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-10.json",
+      "summary": "Configuration stored in ua-file-extract-results-10.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-12.json",
+      "type": "config",
+      "name": "ua-file-extract-results-12.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-12.json",
+      "summary": "Configuration stored in ua-file-extract-results-12.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-13.json",
+      "type": "config",
+      "name": "ua-file-extract-results-13.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-13.json",
+      "summary": "Configuration stored in ua-file-extract-results-13.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tmp/ua-file-extract-results-14.json",
+      "type": "config",
+      "name": "ua-file-extract-results-14.json",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-file-extract-results-14.json",
+      "summary": "Configuration stored in ua-file-extract-results-14.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

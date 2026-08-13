@@ -1,0 +1,953 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 5,
+  "filesSkipped": [
+    ".ua/.understandignore",
+    "examples/schemas/invoice.schema.json"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 5,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 1,
+      "failed": 0,
+      "skipped": 4
+    }
+  },
+  "results": [
+    {
+      "path": ".ua/config.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 3,
+      "nonEmptyLines": 3,
+      "sections": [
+        {
+          "heading": "outputLanguage",
+          "level": 1,
+          "line": 2
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": ".ua/domain-graph.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 57,
+      "nonEmptyLines": 57,
+      "sections": [
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "nodes",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "edges",
+          "level": 1,
+          "line": 43
+        },
+        {
+          "heading": "layers",
+          "level": 1,
+          "line": 57
+        },
+        {
+          "heading": "tour",
+          "level": 1,
+          "line": 57
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "benchmarks/policies/live-evaluation.example.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 32,
+      "nonEmptyLines": 32,
+      "sections": [
+        {
+          "heading": "schema_version",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "rules",
+          "level": 1,
+          "line": 3
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "paddle-runtime/pyproject.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 14,
+      "nonEmptyLines": 13,
+      "sections": [
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "tool.uv",
+          "level": 2,
+          "line": 13
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 444,
+      "nonEmptyLines": 417,
+      "functions": [
+        {
+          "name": "_path_mappings",
+          "startLine": 24,
+          "endLine": 31,
+          "params": [
+            "values",
+            "option"
+          ]
+        },
+        {
+          "name": "_reference_basis_mappings",
+          "startLine": 34,
+          "endLine": 41,
+          "params": [
+            "values"
+          ]
+        },
+        {
+          "name": "_page_subset_mappings",
+          "startLine": 44,
+          "endLine": 54,
+          "params": [
+            "values"
+          ]
+        },
+        {
+          "name": "_unit_interval",
+          "startLine": 57,
+          "endLine": 61,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_subset_pdf",
+          "startLine": 64,
+          "endLine": 77,
+          "params": [
+            "data",
+            "pages"
+          ]
+        },
+        {
+          "name": "_subset_reference",
+          "startLine": 80,
+          "endLine": 84,
+          "params": [
+            "reference",
+            "pages"
+          ]
+        },
+        {
+          "name": "_schema_node",
+          "startLine": 87,
+          "endLine": 107,
+          "params": [
+            "value",
+            "root"
+          ]
+        },
+        {
+          "name": "_glm_only_proof",
+          "startLine": 110,
+          "endLine": 126,
+          "params": [
+            "parse_result"
+          ]
+        },
+        {
+          "name": "_write_artifacts",
+          "startLine": 129,
+          "endLine": 158,
+          "params": [
+            "directory",
+            "document_id",
+            "parse_result",
+            "pipeline_mode",
+            "glm_only_proof"
+          ]
+        },
+        {
+          "name": "_live_report",
+          "startLine": 161,
+          "endLine": 353,
+          "params": [
+            "args"
+          ]
+        },
+        {
+          "name": "main",
+          "startLine": 356,
+          "endLine": 440,
+          "params": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "_path_mappings",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "_reference_basis_mappings",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "_page_subset_mappings",
+          "line": 44,
+          "isDefault": false
+        },
+        {
+          "name": "_unit_interval",
+          "line": 57,
+          "isDefault": false
+        },
+        {
+          "name": "_subset_pdf",
+          "line": 64,
+          "isDefault": false
+        },
+        {
+          "name": "_subset_reference",
+          "line": 80,
+          "isDefault": false
+        },
+        {
+          "name": "_schema_node",
+          "line": 87,
+          "isDefault": false
+        },
+        {
+          "name": "_glm_only_proof",
+          "line": 110,
+          "isDefault": false
+        },
+        {
+          "name": "_write_artifacts",
+          "line": 129,
+          "isDefault": false
+        },
+        {
+          "name": "_live_report",
+          "line": 161,
+          "isDefault": false
+        },
+        {
+          "name": "main",
+          "line": 356,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "_path_mappings",
+          "callee": "value.partition",
+          "lineNumber": 27
+        },
+        {
+          "caller": "_path_mappings",
+          "callee": "ValueError",
+          "lineNumber": 29
+        },
+        {
+          "caller": "_path_mappings",
+          "callee": "Path",
+          "lineNumber": 30
+        },
+        {
+          "caller": "_reference_basis_mappings",
+          "callee": "value.partition",
+          "lineNumber": 37
+        },
+        {
+          "caller": "_reference_basis_mappings",
+          "callee": "ValueError",
+          "lineNumber": 39
+        },
+        {
+          "caller": "_reference_basis_mappings",
+          "callee": "ReferenceBasis",
+          "lineNumber": 40
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "value.partition",
+          "lineNumber": 47
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "ValueError",
+          "lineNumber": 49
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "int",
+          "lineNumber": 50
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "page_list.split",
+          "lineNumber": 50
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "any",
+          "lineNumber": 51
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "len",
+          "lineNumber": 51
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "len",
+          "lineNumber": 51
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "set",
+          "lineNumber": 51
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "ValueError",
+          "lineNumber": 52
+        },
+        {
+          "caller": "_page_subset_mappings",
+          "callee": "sorted",
+          "lineNumber": 53
+        },
+        {
+          "caller": "_unit_interval",
+          "callee": "float",
+          "lineNumber": 58
+        },
+        {
+          "caller": "_unit_interval",
+          "callee": "argparse.ArgumentTypeError",
+          "lineNumber": 60
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "pymupdf.open",
+          "lineNumber": 65
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "any",
+          "lineNumber": 67
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "ValueError",
+          "lineNumber": 68
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "pymupdf.open",
+          "lineNumber": 69
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "subset.insert_pdf",
+          "lineNumber": 72
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "subset.tobytes",
+          "lineNumber": 73
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "subset.close",
+          "lineNumber": 75
+        },
+        {
+          "caller": "_subset_pdf",
+          "callee": "source.close",
+          "lineNumber": 77
+        },
+        {
+          "caller": "_subset_reference",
+          "callee": "reference.split",
+          "lineNumber": 81
+        },
+        {
+          "caller": "_subset_reference",
+          "callee": "any",
+          "lineNumber": 82
+        },
+        {
+          "caller": "_subset_reference",
+          "callee": "len",
+          "lineNumber": 82
+        },
+        {
+          "caller": "_subset_reference",
+          "callee": "ValueError",
+          "lineNumber": 83
+        },
+        {
+          "caller": "_subset_reference",
+          "callee": "\"<!-- PAGE BREAK -->\".join",
+          "lineNumber": 84
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "isinstance",
+          "lineNumber": 88
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "_schema_node",
+          "lineNumber": 89
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "value.items",
+          "lineNumber": 89
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "list",
+          "lineNumber": 93
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "isinstance",
+          "lineNumber": 96
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "_schema_node",
+          "lineNumber": 98
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "isinstance",
+          "lineNumber": 99
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "isinstance",
+          "lineNumber": 101
+        },
+        {
+          "caller": "_schema_node",
+          "callee": "isinstance",
+          "lineNumber": 103
+        },
+        {
+          "caller": "_glm_only_proof",
+          "callee": "list",
+          "lineNumber": 112
+        },
+        {
+          "caller": "_glm_only_proof",
+          "callee": "len",
+          "lineNumber": 115
+        },
+        {
+          "caller": "_glm_only_proof",
+          "callee": "len",
+          "lineNumber": 117
+        },
+        {
+          "caller": "_glm_only_proof",
+          "callee": "RuntimeError",
+          "lineNumber": 125
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "directory.mkdir",
+          "lineNumber": 137
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "(directory / f\"{document_id}.md\").write_text",
+          "lineNumber": 138
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "(directory / f\"{document_id}.parse.json\").write_text",
+          "lineNumber": 141
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "parse_result.json.rstrip",
+          "lineNumber": 142
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "parse_result.metadata.model_dump",
+          "lineNumber": 147
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "parse_result.usage.model_dump",
+          "lineNumber": 149
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "item.model_dump",
+          "lineNumber": 152
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "(directory / f\"{document_id}.run.json\").write_text",
+          "lineNumber": 155
+        },
+        {
+          "caller": "_write_artifacts",
+          "callee": "json.dumps",
+          "lineNumber": 156
+        },
+        {
+          "caller": "_live_report",
+          "callee": "load_corpus_manifest",
+          "lineNumber": 162
+        },
+        {
+          "caller": "_live_report",
+          "callee": "args.repository_root.resolve",
+          "lineNumber": 163
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_path_mappings",
+          "lineNumber": 165
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_path_mappings",
+          "lineNumber": 166
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_reference_basis_mappings",
+          "lineNumber": 167
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_page_subset_mappings",
+          "lineNumber": 168
+        },
+        {
+          "caller": "_live_report",
+          "callee": "set",
+          "lineNumber": 169
+        },
+        {
+          "caller": "_live_report",
+          "callee": "external_sources.get",
+          "lineNumber": 175
+        },
+        {
+          "caller": "_live_report",
+          "callee": "documents.append",
+          "lineNumber": 179
+        },
+        {
+          "caller": "_live_report",
+          "callee": "print",
+          "lineNumber": 208
+        },
+        {
+          "caller": "_live_report",
+          "callee": "time.perf_counter",
+          "lineNumber": 209
+        },
+        {
+          "caller": "_live_report",
+          "callee": "source_path.read_bytes",
+          "lineNumber": 211
+        },
+        {
+          "caller": "_live_report",
+          "callee": "page_subsets.get",
+          "lineNumber": 212
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_subset_pdf",
+          "lineNumber": 214
+        },
+        {
+          "caller": "_live_report",
+          "callee": "'-'.join",
+          "lineNumber": 219
+        },
+        {
+          "caller": "_live_report",
+          "callee": "map",
+          "lineNumber": 219
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentParser().parse",
+          "lineNumber": 223
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentParser",
+          "lineNumber": 223
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_glm_only_proof",
+          "lineNumber": 229
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentAgent().analyze",
+          "lineNumber": 232
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentAgent",
+          "lineNumber": 232
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentExtractor().extract",
+          "lineNumber": 243
+        },
+        {
+          "caller": "_live_report",
+          "callee": "DocumentExtractor",
+          "lineNumber": 243
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_schema_node",
+          "lineNumber": 245
+        },
+        {
+          "caller": "_live_report",
+          "callee": "live_telemetry_record",
+          "lineNumber": 247
+        },
+        {
+          "caller": "_live_report",
+          "callee": "time.perf_counter",
+          "lineNumber": 251
+        },
+        {
+          "caller": "_live_report",
+          "callee": "references.get",
+          "lineNumber": 253
+        },
+        {
+          "caller": "_live_report",
+          "callee": "reference_path.read_text",
+          "lineNumber": 255
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_subset_reference",
+          "lineNumber": 260
+        },
+        {
+          "caller": "_live_report",
+          "callee": "evaluate_live_document",
+          "lineNumber": 261
+        },
+        {
+          "caller": "_live_report",
+          "callee": "bool",
+          "lineNumber": 272
+        },
+        {
+          "caller": "_live_report",
+          "callee": "reference_path.suffix.casefold",
+          "lineNumber": 274
+        },
+        {
+          "caller": "_live_report",
+          "callee": "reference_bases.get",
+          "lineNumber": 276
+        },
+        {
+          "caller": "_live_report",
+          "callee": "analysis_result.features.get",
+          "lineNumber": 286
+        },
+        {
+          "caller": "_live_report",
+          "callee": "_write_artifacts",
+          "lineNumber": 304
+        },
+        {
+          "caller": "_live_report",
+          "callee": "documents.append",
+          "lineNumber": 311
+        },
+        {
+          "caller": "_live_report",
+          "callee": "documents.append",
+          "lineNumber": 314
+        },
+        {
+          "caller": "_live_report",
+          "callee": "type",
+          "lineNumber": 326
+        },
+        {
+          "caller": "_live_report",
+          "callee": "time.perf_counter",
+          "lineNumber": 329
+        },
+        {
+          "caller": "_live_report",
+          "callee": "json.loads",
+          "lineNumber": 341
+        },
+        {
+          "caller": "_live_report",
+          "callee": "args.rate_card.read_text",
+          "lineNumber": 341
+        },
+        {
+          "caller": "_live_report",
+          "callee": "build_live_report",
+          "lineNumber": 346
+        },
+        {
+          "caller": "main",
+          "callee": "argparse.ArgumentParser",
+          "lineNumber": 357
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 360
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 363
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 365
+        },
+        {
+          "caller": "main",
+          "callee": "Path(__file__).resolve",
+          "lineNumber": 368
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 368
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 370
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 374
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 375
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 380
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 385
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 386
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 387
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 388
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 394
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 403
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 404
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 410
+        },
+        {
+          "caller": "main",
+          "callee": "parser.add_argument",
+          "lineNumber": 415
+        },
+        {
+          "caller": "main",
+          "callee": "parser.parse_args",
+          "lineNumber": 416
+        },
+        {
+          "caller": "main",
+          "callee": "parser.error",
+          "lineNumber": 418
+        },
+        {
+          "caller": "main",
+          "callee": "_live_report",
+          "lineNumber": 419
+        },
+        {
+          "caller": "main",
+          "callee": "json.loads",
+          "lineNumber": 422
+        },
+        {
+          "caller": "main",
+          "callee": "args.thresholds.read_text",
+          "lineNumber": 422
+        },
+        {
+          "caller": "main",
+          "callee": "json.loads",
+          "lineNumber": 424
+        },
+        {
+          "caller": "main",
+          "callee": "args.baseline.read_text",
+          "lineNumber": 424
+        },
+        {
+          "caller": "main",
+          "callee": "evaluate_regression_policy",
+          "lineNumber": 428
+        },
+        {
+          "caller": "main",
+          "callee": "parser.error",
+          "lineNumber": 433
+        },
+        {
+          "caller": "main",
+          "callee": "Path",
+          "lineNumber": 434
+        },
+        {
+          "caller": "main",
+          "callee": "output.parent.mkdir",
+          "lineNumber": 435
+        },
+        {
+          "caller": "main",
+          "callee": "output.write_text",
+          "lineNumber": 436
+        },
+        {
+          "caller": "main",
+          "callee": "json.dumps",
+          "lineNumber": 437
+        },
+        {
+          "caller": "main",
+          "callee": "print",
+          "lineNumber": 439
+        },
+        {
+          "caller": "main",
+          "callee": "int",
+          "lineNumber": 440
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 11,
+        "functionCount": 11,
+        "classCount": 0
+      }
+    }
+  ]
+}

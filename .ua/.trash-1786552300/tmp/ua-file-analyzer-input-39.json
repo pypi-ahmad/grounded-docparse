@@ -1,0 +1,182 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786520109/tmp/write-meta.mjs",
+      "language": "javascript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-domain-1786453150/domain-graph.json",
+      "language": "json",
+      "sizeLines": 228,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.understandignore",
+      "language": "unknown",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/intermediate/domain-analysis.json",
+      "language": "json",
+      "sizeLines": 91,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/intermediate/scan-result.json",
+      "language": "json",
+      "sizeLines": 4415,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/baselines/offline-native-v1.json",
+      "language": "json",
+      "sizeLines": 638,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/manifest.json",
+      "language": "json",
+      "sizeLines": 184,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/policies/live-evaluation.example.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/glmocr.yaml",
+      "language": "yaml",
+      "sizeLines": 165,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/paddle-vllm.yaml",
+      "language": "yaml",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs-site/assets/app.js",
+      "language": "javascript",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "docs-site/assets/styles.css",
+      "language": "css",
+      "sizeLines": 1380,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "graphify-out/.graphify_python",
+      "language": "unknown",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "graphify-out/.graphify_root",
+      "language": "unknown",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "graphify-out/cache/stat-index.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "language": "markdown",
+      "sizeLines": 29,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "graphify-out/reflections/LESSONS.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "installer/GroundedDocParse.iss",
+      "language": "iss",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": "installer/Install-GroundedDocParse.ps1",
+      "language": "powershell",
+      "sizeLines": 371,
+      "fileCategory": "script"
+    },
+    {
+      "path": "presentations/grounded-docparse-business.pptx",
+      "language": "pptx",
+      "sizeLines": 619,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-github-overview.pptx",
+      "language": "pptx",
+      "sizeLines": 631,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-technical.pptx",
+      "language": "pptx",
+      "sizeLines": 630,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/build-installer.ps1",
+      "language": "powershell",
+      "sizeLines": 46,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "language": "python",
+      "sizeLines": 566,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786520109/tmp/write-meta.mjs": [],
+    ".ua/.trash-domain-1786453150/domain-graph.json": [],
+    ".ua/.understandignore": [],
+    ".ua/intermediate/domain-analysis.json": [],
+    ".ua/intermediate/scan-result.json": [],
+    "benchmarks/baselines/offline-native-v1.json": [],
+    "benchmarks/corpus-v1/manifest.json": [],
+    "benchmarks/policies/live-evaluation.example.json": [],
+    "benchmarks/rate-cards/openai-standard-2026-07-28.json": [],
+    "config/glmocr.yaml": [],
+    "config/paddle-vllm.yaml": [],
+    "docs-site/assets/app.js": [],
+    "docs-site/assets/styles.css": [],
+    "graphify-out/.graphify_python": [],
+    "graphify-out/.graphify_root": [],
+    "graphify-out/cache/stat-index.json": [],
+    "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md": [],
+    "graphify-out/reflections/LESSONS.md": [],
+    "installer/GroundedDocParse.iss": [],
+    "installer/Install-GroundedDocParse.ps1": [],
+    "presentations/grounded-docparse-business.pptx": [],
+    "presentations/grounded-docparse-github-overview.pptx": [],
+    "presentations/grounded-docparse-technical.pptx": [],
+    "scripts/build-installer.ps1": [],
+    "scripts/build_docs_site.py": []
+  }
+}

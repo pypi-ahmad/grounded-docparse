@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "function",
+      "name": "test_regression_policy_requires_matching_baseline_review_threshold",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        103,
+        110
+      ],
+      "summary": "Defines test_regression_policy_requires_matching_baseline_review_threshold, a  routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:_report",
+      "type": "function",
+      "name": "_report",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        8,
+        17
+      ],
+      "summary": "Defines _report, a accuracy, review_rate routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_regression_policy.py",
+      "type": "file",
+      "name": "test_regression_policy.py",
+      "filePath": "tests/test_regression_policy.py",
+      "summary": "Test module 'test_regression_policy.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "function",
+      "name": "test_regression_policy_reports_each_failed_constraint",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        54,
+        70
+      ],
+      "summary": "Defines test_regression_policy_reports_each_failed_constraint, a  routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "function",
+      "name": "test_regression_policy_fails_closed_for_missing_metric",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        73,
+        90
+      ],
+      "summary": "Defines test_regression_policy_fails_closed_for_missing_metric, a  routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "function",
+      "name": "test_regression_policy_rejects_incompatible_baseline",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        93,
+        100
+      ],
+      "summary": "Defines test_regression_policy_rejects_incompatible_baseline, a  routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "function",
+      "name": "test_regression_policy_passes_absolute_and_baseline_limits",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        41,
+        51
+      ],
+      "summary": "Defines test_regression_policy_passes_absolute_and_baseline_limits, a  routine in test_regression_policy.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

@@ -1,0 +1,1290 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/models.py",
+      "type": "file",
+      "name": "models.py",
+      "filePath": "src/grounded_docparse/models.py",
+      "summary": "Source file models.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:FormSegment",
+      "type": "class",
+      "name": "FormSegment",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        515,
+        537
+      ],
+      "summary": "Defines FormSegment in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:FormClassificationResult",
+      "type": "class",
+      "name": "FormClassificationResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        540,
+        550
+      ],
+      "summary": "Defines FormClassificationResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ChatSource",
+      "type": "class",
+      "name": "ChatSource",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        553,
+        558
+      ],
+      "summary": "Defines ChatSource in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ExtractedField",
+      "type": "class",
+      "name": "ExtractedField",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        561,
+        569
+      ],
+      "summary": "Defines ExtractedField in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:DocumentClassification",
+      "type": "class",
+      "name": "DocumentClassification",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        584,
+        590
+      ],
+      "summary": "Defines DocumentClassification in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:TocSection",
+      "type": "class",
+      "name": "TocSection",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        593,
+        600
+      ],
+      "summary": "Defines TocSection in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:TableOfContents",
+      "type": "class",
+      "name": "TableOfContents",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        603,
+        606
+      ],
+      "summary": "Defines TableOfContents in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ChatAnswer",
+      "type": "class",
+      "name": "ChatAnswer",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        609,
+        616
+      ],
+      "summary": "Defines ChatAnswer in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ChatCitationWire",
+      "type": "class",
+      "name": "ChatCitationWire",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        619,
+        622
+      ],
+      "summary": "Defines ChatCitationWire in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ChatAnswerWire",
+      "type": "class",
+      "name": "ChatAnswerWire",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        625,
+        630
+      ],
+      "summary": "Defines ChatAnswerWire in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:VisualRecoveryResult",
+      "type": "class",
+      "name": "VisualRecoveryResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        633,
+        642
+      ],
+      "summary": "Defines VisualRecoveryResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:OcrComparisonResult",
+      "type": "class",
+      "name": "OcrComparisonResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        645,
+        657
+      ],
+      "summary": "Defines OcrComparisonResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:AgenticFeatureMetadata",
+      "type": "class",
+      "name": "AgenticFeatureMetadata",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        660,
+        665
+      ],
+      "summary": "Defines AgenticFeatureMetadata in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:AgenticAnalysis",
+      "type": "class",
+      "name": "AgenticAnalysis",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        668,
+        675
+      ],
+      "summary": "Defines AgenticAnalysis in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ExtractionResult",
+      "type": "class",
+      "name": "ExtractionResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        679,
+        688
+      ],
+      "summary": "Defines ExtractionResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SegmentExtraction",
+      "type": "class",
+      "name": "SegmentExtraction",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        692,
+        700
+      ],
+      "summary": "Defines SegmentExtraction in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:RoutedExtractionResult",
+      "type": "class",
+      "name": "RoutedExtractionResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        704,
+        709
+      ],
+      "summary": "Defines RoutedExtractionResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:TableCellDraft",
+      "type": "class",
+      "name": "TableCellDraft",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        712,
+        723
+      ],
+      "summary": "Defines TableCellDraft in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:AtomicDraft",
+      "type": "class",
+      "name": "AtomicDraft",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        726,
+        733
+      ],
+      "summary": "Defines AtomicDraft in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:RegionDraft",
+      "type": "class",
+      "name": "RegionDraft",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        736,
+        755
+      ],
+      "summary": "Defines RegionDraft in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:PageDraft",
+      "type": "class",
+      "name": "PageDraft",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        758,
+        762
+      ],
+      "summary": "Defines PageDraft in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:InspectionDecision",
+      "type": "class",
+      "name": "InspectionDecision",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        765,
+        774
+      ],
+      "summary": "Defines InspectionDecision in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:InspectionRegionAddition",
+      "type": "class",
+      "name": "InspectionRegionAddition",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        777,
+        783
+      ],
+      "summary": "Defines InspectionRegionAddition in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:PageInspection",
+      "type": "class",
+      "name": "PageInspection",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        786,
+        792
+      ],
+      "summary": "Defines PageInspection in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SpanRepairAction",
+      "type": "class",
+      "name": "SpanRepairAction",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        795,
+        798
+      ],
+      "summary": "Defines SpanRepairAction in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SpanRepairTarget",
+      "type": "class",
+      "name": "SpanRepairTarget",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        801,
+        816
+      ],
+      "summary": "Defines SpanRepairTarget in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SpanRepairDecision",
+      "type": "class",
+      "name": "SpanRepairDecision",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        819,
+        838
+      ],
+      "summary": "Defines SpanRepairDecision in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SpanRepairInspection",
+      "type": "class",
+      "name": "SpanRepairInspection",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        841,
+        845
+      ],
+      "summary": "Defines SpanRepairInspection in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:PageQuality",
+      "type": "class",
+      "name": "PageQuality",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        848,
+        853
+      ],
+      "summary": "Defines PageQuality in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:Page",
+      "type": "class",
+      "name": "Page",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        856,
+        865
+      ],
+      "summary": "Defines Page in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:Document",
+      "type": "class",
+      "name": "Document",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        868,
+        874
+      ],
+      "summary": "Defines Document in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:CropInspectionRequest",
+      "type": "class",
+      "name": "CropInspectionRequest",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        878,
+        883
+      ],
+      "summary": "Defines CropInspectionRequest in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:SpanRepairRequest",
+      "type": "class",
+      "name": "SpanRepairRequest",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        887,
+        890
+      ],
+      "summary": "Defines SpanRepairRequest in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ProgressEvent",
+      "type": "class",
+      "name": "ProgressEvent",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        893,
+        897
+      ],
+      "summary": "Defines ProgressEvent in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:PresentationDirective",
+      "type": "class",
+      "name": "PresentationDirective",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        903,
+        922
+      ],
+      "summary": "Defines PresentationDirective in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:PagePresentationPlan",
+      "type": "class",
+      "name": "PagePresentationPlan",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        925,
+        929
+      ],
+      "summary": "Defines PagePresentationPlan in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:MarkdownPresentationPlan",
+      "type": "class",
+      "name": "MarkdownPresentationPlan",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        932,
+        935
+      ],
+      "summary": "Defines MarkdownPresentationPlan in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:EnhancementMetadata",
+      "type": "class",
+      "name": "EnhancementMetadata",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        938,
+        948
+      ],
+      "summary": "Defines EnhancementMetadata in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:Element",
+      "type": "class",
+      "name": "Element",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        951,
+        974
+      ],
+      "summary": "Defines Element in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ParseMetadata",
+      "type": "class",
+      "name": "ParseMetadata",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        977,
+        1005
+      ],
+      "summary": "Defines ParseMetadata in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/models.py:ParseResult",
+      "type": "class",
+      "name": "ParseResult",
+      "filePath": "src/grounded_docparse/models.py",
+      "lineRange": [
+        1009,
+        1030
+      ],
+      "summary": "Defines ParseResult in models.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:FormSegment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:FormSegment",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:FormClassificationResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:FormClassificationResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatSource",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatSource",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ExtractedField",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ExtractedField",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:DocumentClassification",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:DocumentClassification",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TocSection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TocSection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TableOfContents",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TableOfContents",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatAnswer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatAnswer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatCitationWire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatCitationWire",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatAnswerWire",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ChatAnswerWire",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:VisualRecoveryResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:VisualRecoveryResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:OcrComparisonResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:OcrComparisonResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AgenticFeatureMetadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AgenticFeatureMetadata",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AgenticAnalysis",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AgenticAnalysis",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ExtractionResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ExtractionResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SegmentExtraction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SegmentExtraction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:RoutedExtractionResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:RoutedExtractionResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TableCellDraft",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:TableCellDraft",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AtomicDraft",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:AtomicDraft",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:RegionDraft",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:RegionDraft",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageDraft",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageDraft",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:InspectionDecision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:InspectionDecision",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:InspectionRegionAddition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:InspectionRegionAddition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageInspection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageInspection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairAction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairAction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairTarget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairTarget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairDecision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairDecision",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairInspection",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairInspection",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageQuality",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PageQuality",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:CropInspectionRequest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:CropInspectionRequest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairRequest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:SpanRepairRequest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ProgressEvent",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ProgressEvent",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PresentationDirective",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PresentationDirective",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PagePresentationPlan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:PagePresentationPlan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:MarkdownPresentationPlan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:MarkdownPresentationPlan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:EnhancementMetadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:EnhancementMetadata",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Element",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:Element",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ParseMetadata",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ParseMetadata",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ParseResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/models.py",
+      "target": "class:src/grounded_docparse/models.py:ParseResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

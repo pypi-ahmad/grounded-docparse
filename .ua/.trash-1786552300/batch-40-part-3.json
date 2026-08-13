@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "file:scripts/generate_examples.py",
+      "type": "file",
+      "name": "generate_examples.py",
+      "filePath": "scripts/generate_examples.py",
+      "summary": "Source or generated artifact 'generate_examples.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/generate_examples.py:fax_document",
+      "type": "function",
+      "name": "fax_document",
+      "filePath": "scripts/generate_examples.py",
+      "lineRange": [
+        36,
+        58
+      ],
+      "summary": "Defines fax_document, a  routine in generate_examples.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_examples.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/generate_examples.py",
+      "lineRange": [
+        61,
+        65
+      ],
+      "summary": "Defines main, a  routine in generate_examples.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_examples.py:digital_report",
+      "type": "function",
+      "name": "digital_report",
+      "filePath": "scripts/generate_examples.py",
+      "lineRange": [
+        13,
+        33
+      ],
+      "summary": "Defines digital_report, a  routine in generate_examples.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:digital_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:fax_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:digital_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_examples.py",
+      "target": "function:scripts/generate_examples.py:fax_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

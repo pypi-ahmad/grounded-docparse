@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/conftest.py:simple_pdf",
+      "type": "function",
+      "name": "simple_pdf",
+      "filePath": "tests/conftest.py",
+      "lineRange": [
+        8,
+        15
+      ],
+      "summary": "Defines simple_pdf, a  routine in conftest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "type": "file",
+      "name": "conftest.py",
+      "filePath": "tests/conftest.py",
+      "summary": "Test module 'conftest.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:simple_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/conftest.py",
+      "target": "function:tests/conftest.py:simple_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

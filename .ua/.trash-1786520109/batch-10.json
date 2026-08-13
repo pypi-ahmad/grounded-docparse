@@ -1,0 +1,13 @@
+{
+  "nodes": [
+    {"id":"document:docs/codebase/.codebase-scan.txt","type":"document","name":".codebase-scan.txt","filePath":"docs/codebase/.codebase-scan.txt","summary":"Raw repository scan used as evidence for the generated codebase documentation set.","tags":["documentation","codebase-scan","inventory"],"complexity":"complex"},
+    {"id":"document:docs/codebase/ARCHITECTURE.md","type":"document","name":"ARCHITECTURE.md","filePath":"docs/codebase/ARCHITECTURE.md","summary":"Concise architecture record covering style, system flow, module responsibilities, reused patterns, risks, and ADE-versus-IDP positioning.","tags":["documentation","architecture","decision-record"],"complexity":"moderate"},
+    {"id":"document:docs/codebase/CONCERNS.md","type":"document","name":"CONCERNS.md","filePath":"docs/codebase/CONCERNS.md","summary":"Records product taxonomy, architecture, security, evaluation, and high-complexity-module concerns identified from repository evidence.","tags":["documentation","risks","security"],"complexity":"simple"},
+    {"id":"document:docs/codebase/CONVENTIONS.md","type":"document","name":"CONVENTIONS.md","filePath":"docs/codebase/CONVENTIONS.md","summary":"Summarizes project naming, contract validation, error handling, and evidence-grounding conventions.","tags":["documentation","conventions","validation"],"complexity":"simple"},
+    {"id":"document:docs/codebase/INTEGRATIONS.md","type":"document","name":"INTEGRATIONS.md","filePath":"docs/codebase/INTEGRATIONS.md","summary":"Documents local OCR, OpenAI/Luna, persistence integrations, and deliberately excluded integrations.","tags":["documentation","integrations","ocr"],"complexity":"simple"},
+    {"id":"document:docs/codebase/STACK.md","type":"document","name":"STACK.md","filePath":"docs/codebase/STACK.md","summary":"Lists the repository languages, runtimes, frameworks, tooling, persistence, and service dependencies.","tags":["documentation","technology-stack","dependencies"],"complexity":"simple"},
+    {"id":"document:docs/codebase/STRUCTURE.md","type":"document","name":"STRUCTURE.md","filePath":"docs/codebase/STRUCTURE.md","summary":"Maps the top-level layout, package modules, and executable entry points of the repository.","tags":["documentation","repository-structure","modules"],"complexity":"moderate"},
+    {"id":"document:docs/codebase/TESTING.md","type":"document","name":"TESTING.md","filePath":"docs/codebase/TESTING.md","summary":"Describes the test framework, suite layout, testing strategy, and notable validation themes.","tags":["documentation","testing","quality-assurance"],"complexity":"simple"}
+  ],
+  "edges": []
+}

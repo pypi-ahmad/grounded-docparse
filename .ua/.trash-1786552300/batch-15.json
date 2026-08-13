@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/checkboxes.json",
+      "type": "config",
+      "name": "checkboxes.json",
+      "filePath": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "summary": "Structured JSON configuration artifact for checkboxes, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "type": "config",
+      "name": "cross-page-table.json",
+      "filePath": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "summary": "Structured JSON configuration artifact for cross page table, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "type": "config",
+      "name": "degraded-scan.json",
+      "filePath": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "summary": "Structured JSON configuration artifact for degraded scan, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/figure-chart.json",
+      "type": "config",
+      "name": "figure-chart.json",
+      "filePath": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "summary": "Structured JSON configuration artifact for figure chart, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/form.json",
+      "type": "config",
+      "name": "form.json",
+      "filePath": "benchmarks/corpus-v1/annotations/form.json",
+      "summary": "Structured JSON configuration artifact for form, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/lists.json",
+      "type": "config",
+      "name": "lists.json",
+      "filePath": "benchmarks/corpus-v1/annotations/lists.json",
+      "summary": "Structured JSON configuration artifact for lists, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/multi-column.json",
+      "type": "config",
+      "name": "multi-column.json",
+      "filePath": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "summary": "Structured JSON configuration artifact for multi column, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/native-text.json",
+      "type": "config",
+      "name": "native-text.json",
+      "filePath": "benchmarks/corpus-v1/annotations/native-text.json",
+      "summary": "Structured JSON configuration artifact for native text, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "type": "config",
+      "name": "public-water-mass-mailing.json",
+      "filePath": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "summary": "Structured JSON configuration artifact for public water mass mailing, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "type": "config",
+      "name": "synthetic-medical-fax.json",
+      "filePath": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "summary": "Structured JSON configuration artifact for synthetic medical fax, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "type": "config",
+      "name": "synthetic-report.json",
+      "filePath": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "summary": "Structured JSON configuration artifact for synthetic report, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/tables.json",
+      "type": "config",
+      "name": "tables.json",
+      "filePath": "benchmarks/corpus-v1/annotations/tables.json",
+      "summary": "Structured JSON configuration artifact for tables, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "type": "config",
+      "name": "unicode-identifiers.json",
+      "filePath": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "summary": "Structured JSON configuration artifact for unicode identifiers, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

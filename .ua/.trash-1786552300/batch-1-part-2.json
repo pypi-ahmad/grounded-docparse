@@ -1,0 +1,618 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/enhancement.py",
+      "type": "file",
+      "name": "enhancement.py",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "summary": "Source file enhancement.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/enhancement.py:_page_input",
+      "type": "function",
+      "name": "_page_input",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "lineRange": [
+        45,
+        71
+      ],
+      "summary": "Implements _page_input within enhancement.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/enhancement.py:build_enhancement_chunks",
+      "type": "function",
+      "name": "build_enhancement_chunks",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "lineRange": [
+        74,
+        117
+      ],
+      "summary": "Implements build_enhancement_chunks within enhancement.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/enhancement.py:render_chunk_plan",
+      "type": "function",
+      "name": "render_chunk_plan",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "lineRange": [
+        127,
+        179
+      ],
+      "summary": "Implements render_chunk_plan within enhancement.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/enhancement.py:combine_page_markdown",
+      "type": "function",
+      "name": "combine_page_markdown",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "lineRange": [
+        182,
+        197
+      ],
+      "summary": "Implements combine_page_markdown within enhancement.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/enhancement.py:EnhancementChunk",
+      "type": "class",
+      "name": "EnhancementChunk",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "lineRange": [
+        32,
+        36
+      ],
+      "summary": "Defines EnhancementChunk in enhancement.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/quality.py",
+      "type": "file",
+      "name": "quality.py",
+      "filePath": "src/grounded_docparse/quality.py",
+      "summary": "Source file quality.py in the grounded-docparse project.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "application-code"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "function",
+      "name": "_spatial_recovery_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        91,
+        105
+      ],
+      "summary": "Implements _spatial_recovery_blocks within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "function",
+      "name": "recovery_content_is_redundant",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        108,
+        119
+      ],
+      "summary": "Implements recovery_content_is_redundant within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "function",
+      "name": "recovery_content_conflicts",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        122,
+        137
+      ],
+      "summary": "Implements recovery_content_conflicts within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "function",
+      "name": "_rectangle_union_area",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        180,
+        214
+      ],
+      "summary": "Implements _rectangle_union_area within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "function",
+      "name": "_covered_fraction",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        217,
+        231
+      ],
+      "summary": "Implements _covered_fraction within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "function",
+      "name": "_scan_probes",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        234,
+        266
+      ],
+      "summary": "Implements _scan_probes within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "function",
+      "name": "literal_repair_candidates",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        284,
+        337
+      ],
+      "summary": "Implements literal_repair_candidates within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "function",
+      "name": "_structured_repair_risks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        345,
+        367
+      ],
+      "summary": "Implements _structured_repair_risks within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "function",
+      "name": "select_repair_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        370,
+        397
+      ],
+      "summary": "Implements select_repair_blocks within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "function",
+      "name": "_normalize_marker",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        400,
+        412
+      ],
+      "summary": "Implements _normalize_marker within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "function",
+      "name": "_duplicate",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        429,
+        449
+      ],
+      "summary": "Implements _duplicate within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "function",
+      "name": "normalize_page_blocks",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        462,
+        514
+      ],
+      "summary": "Implements normalize_page_blocks within quality.py.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "class",
+      "name": "LiteralRepairCandidate",
+      "filePath": "src/grounded_docparse/quality.py",
+      "lineRange": [
+        54,
+        59
+      ],
+      "summary": "Defines LiteralRepairCandidate in quality.py.",
+      "tags": [
+        "python",
+        "document-model",
+        "class"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:_page_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:_page_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:build_enhancement_chunks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:build_enhancement_chunks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:render_chunk_plan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:render_chunk_plan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:combine_page_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "function:src/grounded_docparse/enhancement.py:combine_page_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "class:src/grounded_docparse/enhancement.py:EnhancementChunk",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "class:src/grounded_docparse/enhancement.py:EnhancementChunk",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_spatial_recovery_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_is_redundant",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:recovery_content_conflicts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_rectangle_union_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_covered_fraction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_scan_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:literal_repair_candidates",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_structured_repair_risks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:select_repair_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_normalize_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "function:src/grounded_docparse/quality.py:normalize_page_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "class:src/grounded_docparse/quality.py:LiteralRepairCandidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

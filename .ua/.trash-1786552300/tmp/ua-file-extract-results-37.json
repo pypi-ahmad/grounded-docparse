@@ -1,0 +1,230 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 8,
+  "filesSkipped": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 8,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 8
+    }
+  },
+  "results": [
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 128,
+      "nonEmptyLines": 115,
+      "functions": [
+        {
+          "name": "pid_matches",
+          "startLine": 17,
+          "endLine": 24,
+          "params": []
+        },
+        {
+          "name": "port_is_listening",
+          "startLine": 26,
+          "endLine": 26,
+          "params": []
+        },
+        {
+          "name": "wait_for_url",
+          "startLine": 28,
+          "endLine": 37,
+          "params": []
+        },
+        {
+          "name": "stop_managed",
+          "startLine": 39,
+          "endLine": 49,
+          "params": []
+        },
+        {
+          "name": "streamlit_engine",
+          "startLine": 51,
+          "endLine": 63,
+          "params": []
+        },
+        {
+          "name": "streamlit_environment_matches",
+          "startLine": 79,
+          "endLine": 94,
+          "params": []
+        },
+        {
+          "name": "start_streamlit",
+          "startLine": 96,
+          "endLine": 107,
+          "params": []
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 7,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 265,
+      "nonEmptyLines": 251,
+      "functions": [
+        {
+          "name": "pid_matches",
+          "startLine": 42,
+          "endLine": 49,
+          "params": []
+        },
+        {
+          "name": "port_is_listening",
+          "startLine": 51,
+          "endLine": 51,
+          "params": []
+        },
+        {
+          "name": "wait_for_url",
+          "startLine": 53,
+          "endLine": 62,
+          "params": []
+        },
+        {
+          "name": "stop_managed",
+          "startLine": 64,
+          "endLine": 84,
+          "params": []
+        },
+        {
+          "name": "glm_backend",
+          "startLine": 86,
+          "endLine": 95,
+          "params": []
+        },
+        {
+          "name": "stop_glm",
+          "startLine": 97,
+          "endLine": 106,
+          "params": []
+        },
+        {
+          "name": "stop_paddle",
+          "startLine": 108,
+          "endLine": 117,
+          "params": []
+        },
+        {
+          "name": "ensure_glm",
+          "startLine": 119,
+          "endLine": 163,
+          "params": []
+        },
+        {
+          "name": "ensure_paddle",
+          "startLine": 165,
+          "endLine": 238,
+          "params": []
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 9,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 28,
+      "nonEmptyLines": 27,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 24,
+      "nonEmptyLines": 23,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 14,
+      "nonEmptyLines": 12,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 84,
+      "nonEmptyLines": 81,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 63,
+      "nonEmptyLines": 57,
+      "functions": [
+        {
+          "name": "download_and_extract",
+          "startLine": 12,
+          "endLine": 23,
+          "params": []
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 53,
+      "nonEmptyLines": 50,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    }
+  ]
+}

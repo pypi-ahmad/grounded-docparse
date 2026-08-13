@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/wsl/check-glmocr-api.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/wsl/check-glmocr-api.py",
+      "lineRange": [
+        26,
+        85
+      ],
+      "summary": "Defines main, a  routine in check-glmocr-api.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/check-glmocr-api.py",
+      "type": "file",
+      "name": "check-glmocr-api.py",
+      "filePath": "scripts/wsl/check-glmocr-api.py",
+      "summary": "Source or generated artifact 'check-glmocr-api.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/check-glmocr-api.py",
+      "target": "function:scripts/wsl/check-glmocr-api.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/check-glmocr-api.py",
+      "target": "function:scripts/wsl/check-glmocr-api.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

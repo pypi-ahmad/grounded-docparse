@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "summary": "Defines the JSON Schema for evaluation-corpus manifests, including document sources, annotation paths, feature labels, synthetic status, and expected document types.",
+      "tags": ["configuration", "json-schema", "evaluation", "corpus"],
+      "complexity": "moderate",
+      "languageNotes": "Uses JSON Schema Draft 2020-12 with closed object shapes and explicit nullable fields."
+    },
+    {
+      "id": "config:benchmarks/schemas/regression-policy-v1.schema.json",
+      "type": "config",
+      "name": "regression-policy-v1.schema.json",
+      "filePath": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "summary": "Defines the JSON Schema for benchmark regression rules with metric paths, preferred direction, and minimum, maximum, or maximum-regression thresholds.",
+      "tags": ["configuration", "json-schema", "evaluation", "regression-testing"],
+      "complexity": "moderate",
+      "languageNotes": "Uses JSON Schema Draft 2020-12 to enforce one or more bounded threshold forms per rule."
+    }
+  ],
+  "edges": []
+}

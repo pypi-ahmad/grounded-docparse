@@ -1,0 +1,63 @@
+[
+  {
+    "order": 1,
+    "title": "Project Overview",
+    "description": "Start with the README to understand grounded-docparse as a local document-parsing studio that produces structured, traceable outputs. It gives the user-facing vocabulary for the Streamlit interface, OCR backends, and grounded Markdown before the tour follows the runtime path."
+    ,"nodeIds": ["document:README.md"]
+  },
+  {
+    "order": 2,
+    "title": "Runtime Configuration",
+    "description": "The project manifest defines the Python package and the tools that make the application runnable and testable. Read it next to establish the dependency boundary before following the interactive application and its processing modules."
+    ,"nodeIds": ["config:pyproject.toml"]
+  },
+  {
+    "order": 3,
+    "title": "Studio Interface",
+    "description": "The Streamlit application is the broadest production-facing node in the graph, making it the best map of the interactive workflow. It connects upload, processing choices, results, and source-facing views so newcomers can see how the package becomes a usable document studio."
+    ,"nodeIds": ["file:streamlit_app.py"]
+  },
+  {
+    "order": 4,
+    "title": "Core Document Model",
+    "description": "The shared models are the graph's highest fan-in file, so they establish the data contracts reused across the system. Learn these representations before studying processing: they are how parsed content, evidence, and document state remain consistent from ingestion through rendering."
+    ,"nodeIds": ["file:src/grounded_docparse/models.py", "file:src/grounded_docparse/config.py"]
+  },
+  {
+    "order": 5,
+    "title": "Input Ingestion",
+    "description": "This is the input boundary where documents are accepted and prepared for downstream processing. It is the right place to understand how the application distinguishes input handling from the OCR and native-document routes that the UI presents to users."
+    ,"nodeIds": ["file:src/grounded_docparse/ingest.py"]
+  },
+  {
+    "order": 6,
+    "title": "Processing Pipeline",
+    "description": "The pipeline is the central orchestration node, with one of the largest production fan-outs in the topology. Building on the document model and ingestion boundary, it coordinates the stages that turn prepared input into grounded results without making the UI own that logic."
+    ,"nodeIds": ["file:src/grounded_docparse/pipeline.py", "file:src/grounded_docparse/agentic.py"]
+  },
+  {
+    "order": 7,
+    "title": "OCR Services",
+    "description": "The OCR modules provide the local recognition implementation used when documents need visual extraction. Read these after the pipeline to see how backend-specific work is isolated from the common result model, including the Paddle-oriented integration and service layer."
+    ,"nodeIds": ["file:src/grounded_docparse/local_ocr.py", "file:src/grounded_docparse/ocr_services.py", "file:src/grounded_docparse/paddle_ocr.py"]
+  },
+  {
+    "order": 8,
+    "title": "Grounded Output Rendering",
+    "description": "Once processing produces document data, the rendering module turns it into the grounded Markdown and presentation-friendly output used by the studio. Its high fan-in makes it an important boundary for preserving traceability while keeping display concerns separate from recognition and orchestration."
+    ,"nodeIds": ["file:src/grounded_docparse/render.py", "file:src/grounded_docparse/workspace_store.py"]
+  },
+  {
+    "order": 9,
+    "title": "Regression Evaluation",
+    "description": "The evaluation and test modules turn the processing contract into repeatable checks, covering the pipeline and the interactive surface. This stop shows how changes to recognition, evidence, or rendering are protected by regression tests and corpus-based measurement."
+    ,"nodeIds": ["file:tests/test_simple_pipeline.py", "file:tests/test_simple_streamlit.py", "file:src/grounded_docparse/benchmark.py", "config:benchmarks/corpus-v1/manifest.json"]
+  },
+  {
+    "order": 10,
+    "title": "Local Runtime Launch",
+    "description": "Finish with the Windows launchers that assemble the local OCR runtime and application services described in the earlier steps. They are the operational bridge between the package architecture and a workstation deployment, and should be read with the local-run documentation when setting up a development machine."
+    ,"nodeIds": ["file:Launch-GLM-OCR.cmd", "file:Launch-PaddleOCR-VL-1.6.cmd", "document:docs/run.md"]
+    ,"languageLesson": "Windows command launchers are orchestration boundaries: keep environment setup, service startup, readiness checks, and shutdown behavior explicit so a failed dependency does not leave partial local processes running."
+  }
+]

@@ -1,0 +1,433 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 5,
+  "filesSkipped": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 5,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 5
+    }
+  },
+  "results": [
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 129,
+      "nonEmptyLines": 94,
+      "sections": [
+        {
+          "heading": "Changelog",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "[Unreleased]",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "[0.5.0] - 2026-07-31",
+          "level": 2,
+          "line": 24
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 26
+        },
+        {
+          "heading": "[0.4.0] - 2026-07-30",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "heading": "Removed",
+          "level": 3,
+          "line": 60
+        },
+        {
+          "heading": "[0.3.0] - 2026-07-28",
+          "level": 2,
+          "line": 66
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 68
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 76
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 83
+        },
+        {
+          "heading": "[0.2.0] - 2026-07-26",
+          "level": 2,
+          "line": 90
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 92
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 107
+        },
+        {
+          "heading": "Security",
+          "level": 3,
+          "line": 117
+        },
+        {
+          "heading": "[0.1.0] - 2026-07-26",
+          "level": 2,
+          "line": 124
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 126
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 20
+      }
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 217,
+      "nonEmptyLines": 160,
+      "sections": [
+        {
+          "heading": "Grounded Document Parser",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Application preview",
+          "level": 2,
+          "line": 19
+        },
+        {
+          "heading": "Install and set up",
+          "level": 2,
+          "line": 27
+        },
+        {
+          "heading": "How to use the app",
+          "level": 2,
+          "line": 64
+        },
+        {
+          "heading": "CLI batch parsing",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Outputs",
+          "level": 2,
+          "line": 115
+        },
+        {
+          "heading": "Public Python API",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Repository layout",
+          "level": 2,
+          "line": 150
+        },
+        {
+          "heading": "Documentation",
+          "level": 2,
+          "line": 171
+        },
+        {
+          "heading": "Development",
+          "level": 2,
+          "line": 190
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "grounded-docparse-threat-model.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 167,
+      "nonEmptyLines": 123,
+      "sections": [
+        {
+          "heading": "Threat model: grounded-docparse",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Executive summary",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Scope and assumptions",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "Components and trust boundaries",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Assets",
+          "level": 2,
+          "line": 68
+        },
+        {
+          "heading": "Entry points and controls",
+          "level": 2,
+          "line": 79
+        },
+        {
+          "heading": "Abuse paths",
+          "level": 2,
+          "line": 92
+        },
+        {
+          "heading": "TM-001: malicious native document parsing",
+          "level": 3,
+          "line": 94
+        },
+        {
+          "heading": "TM-002: indirect prompt injection",
+          "level": 3,
+          "line": 103
+        },
+        {
+          "heading": "TM-003: endpoint confidentiality loss",
+          "level": 3,
+          "line": 112
+        },
+        {
+          "heading": "TM-004: local resource exhaustion",
+          "level": 3,
+          "line": 121
+        },
+        {
+          "heading": "TM-005: unauthenticated network exposure",
+          "level": 3,
+          "line": 130
+        },
+        {
+          "heading": "TM-006: residual local data",
+          "level": 3,
+          "line": 139
+        },
+        {
+          "heading": "Security invariants",
+          "level": 2,
+          "line": 148
+        },
+        {
+          "heading": "Reassessment triggers",
+          "level": 2,
+          "line": 158
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 15
+      }
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 74,
+      "nonEmptyLines": 64,
+      "sections": [
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "project.scripts",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "project.optional-dependencies",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "[[tool.uv.index]]",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "[[tool.uv.index]]",
+          "level": 3,
+          "line": 41
+        },
+        {
+          "heading": "tool.uv",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "heading": "tool.uv.sources",
+          "level": 3,
+          "line": 49
+        },
+        {
+          "heading": "dependency-groups",
+          "level": 1,
+          "line": 59
+        },
+        {
+          "heading": "build-system",
+          "level": 1,
+          "line": 65
+        },
+        {
+          "heading": "tool.hatch.build.targets.wheel",
+          "level": 5,
+          "line": 69
+        },
+        {
+          "heading": "tool.pytest.ini_options",
+          "level": 3,
+          "line": 72
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    },
+    {
+      "path": "security_best_practices_report.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 59,
+      "nonEmptyLines": 40,
+      "sections": [
+        {
+          "heading": "Security best-practices report: grounded-docparse",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Summary",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Medium",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "SBP-001: untrusted native parsing runs in the Streamlit process",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "SBP-002: grounding does not eliminate indirect prompt injection",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "Low / informational",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "SBP-003: no structured application logging",
+          "level": 3,
+          "line": 27
+        },
+        {
+          "heading": "SBP-004: custom endpoint destination is not shown before egress",
+          "level": 3,
+          "line": 33
+        },
+        {
+          "heading": "SBP-005: reusable schemas persist unencrypted",
+          "level": 3,
+          "line": 39
+        },
+        {
+          "heading": "Checked and current",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "heading": "Deployment boundary",
+          "level": 2,
+          "line": 57
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_confidence_spans.py:test_agentic_confidence_evidence_uses_codepoint_spans",
+      "type": "function",
+      "name": "test_agentic_confidence_evidence_uses_codepoint_spans",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        22,
+        78
+      ],
+      "summary": "Defines test_agentic_confidence_evidence_uses_codepoint_spans, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_targeted_table_cell_repair_preserves_neighboring_cell",
+      "type": "function",
+      "name": "test_targeted_table_cell_repair_preserves_neighboring_cell",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        298,
+        341
+      ],
+      "summary": "Defines test_targeted_table_cell_repair_preserves_neighboring_cell, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_stale_target_does_not_replace_adjacent_text",
+      "type": "function",
+      "name": "test_stale_target_does_not_replace_adjacent_text",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        261,
+        295
+      ],
+      "summary": "Defines test_stale_target_does_not_replace_adjacent_text, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified",
+      "type": "function",
+      "name": "test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        81,
+        105
+      ],
+      "summary": "Defines test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_emitted_table_atom_rebases_span_for_markdown_escaping",
+      "type": "function",
+      "name": "test_emitted_table_atom_rebases_span_for_markdown_escaping",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        108,
+        145
+      ],
+      "summary": "Defines test_emitted_table_atom_rebases_span_for_markdown_escaping, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_confidence_spans.py",
+      "type": "file",
+      "name": "test_confidence_spans.py",
+      "filePath": "tests/test_confidence_spans.py",
+      "summary": "Test module 'test_confidence_spans.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_cleaning_discards_span_that_targets_removed_soft_hyphen",
+      "type": "function",
+      "name": "test_cleaning_discards_span_that_targets_removed_soft_hyphen",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        186,
+        206
+      ],
+      "summary": "Defines test_cleaning_discards_span_that_targets_removed_soft_hyphen, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_targeted_repair_replaces_only_exact_literal_and_records_provenance",
+      "type": "function",
+      "name": "test_targeted_repair_replaces_only_exact_literal_and_records_provenance",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        209,
+        258
+      ],
+      "summary": "Defines test_targeted_repair_replaces_only_exact_literal_and_records_provenance, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_confidence_spans.py:test_emitted_visual_atom_rebases_span_for_its_label",
+      "type": "function",
+      "name": "test_emitted_visual_atom_rebases_span_for_its_label",
+      "filePath": "tests/test_confidence_spans.py",
+      "lineRange": [
+        148,
+        183
+      ],
+      "summary": "Defines test_emitted_visual_atom_rebases_span_for_its_label, a  routine in test_confidence_spans.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_targeted_repair_replaces_only_exact_literal_and_records_provenance",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_cleaning_discards_span_that_targets_removed_soft_hyphen",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_agentic_confidence_evidence_uses_codepoint_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_emitted_table_atom_rebases_span_for_markdown_escaping",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_targeted_repair_replaces_only_exact_literal_and_records_provenance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_agentic_confidence_evidence_uses_codepoint_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_targeted_table_cell_repair_preserves_neighboring_cell",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_emitted_visual_atom_rebases_span_for_its_label",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_cleaning_discards_span_that_targets_removed_soft_hyphen",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_targeted_table_cell_repair_preserves_neighboring_cell",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_emitted_table_atom_rebases_span_for_markdown_escaping",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_stale_target_does_not_replace_adjacent_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_emitted_visual_atom_rebases_span_for_its_label",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_stale_target_does_not_replace_adjacent_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_confidence_spans.py",
+      "target": "function:tests/test_confidence_spans.py:test_invalid_confidence_evidence_is_discarded_and_cannot_be_verified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}
