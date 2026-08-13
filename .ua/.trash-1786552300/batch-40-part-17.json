@@ -1,0 +1,391 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_validates_local_sources_and_annotations",
+      "type": "function",
+      "name": "test_load_manifest_validates_local_sources_and_annotations",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        72,
+        77
+      ],
+      "summary": "Defines test_load_manifest_validates_local_sources_and_annotations, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_annotation_anchor_ids",
+      "type": "function",
+      "name": "test_load_manifest_rejects_duplicate_annotation_anchor_ids",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        210,
+        218
+      ],
+      "summary": "Defines test_load_manifest_rejects_duplicate_annotation_anchor_ids, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_expected_document_type",
+      "type": "function",
+      "name": "test_load_manifest_accepts_expected_document_type",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        104,
+        113
+      ],
+      "summary": "Defines test_load_manifest_accepts_expected_document_type, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsafe_or_inconsistent_files",
+      "type": "function",
+      "name": "test_load_manifest_rejects_unsafe_or_inconsistent_files",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        184,
+        207
+      ],
+      "summary": "Defines test_load_manifest_rejects_unsafe_or_inconsistent_files, a tmp_path, mutation, message routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_generator_builds_twelve_local_documents_and_external_public_water",
+      "type": "function",
+      "name": "test_generator_builds_twelve_local_documents_and_external_public_water",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        221,
+        253
+      ],
+      "summary": "Defines test_generator_builds_twelve_local_documents_and_external_public_water, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsupported_manifest_annotation_schema_version",
+      "type": "function",
+      "name": "test_load_manifest_rejects_unsupported_manifest_annotation_schema_version",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        162,
+        172
+      ],
+      "summary": "Defines test_load_manifest_rejects_unsupported_manifest_annotation_schema_version, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unknown_expected_document_type",
+      "type": "function",
+      "name": "test_load_manifest_rejects_unknown_expected_document_type",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        116,
+        124
+      ],
+      "summary": "Defines test_load_manifest_rejects_unknown_expected_document_type, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:_write_annotation",
+      "type": "function",
+      "name": "_write_annotation",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        16,
+        31
+      ],
+      "summary": "Defines _write_annotation, a path, document_id, version routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_v1_rejects_document_type_label",
+      "type": "function",
+      "name": "test_load_manifest_v1_rejects_document_type_label",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        127,
+        134
+      ],
+      "summary": "Defines test_load_manifest_v1_rejects_document_type_label, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_document_ids",
+      "type": "function",
+      "name": "test_load_manifest_rejects_duplicate_document_ids",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        137,
+        159
+      ],
+      "summary": "Defines test_load_manifest_rejects_duplicate_document_ids, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_reference_provenance",
+      "type": "function",
+      "name": "test_load_manifest_accepts_reference_provenance",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        80,
+        101
+      ],
+      "summary": "Defines test_load_manifest_accepts_reference_provenance, a tmp_path routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_corpus_manifest.py",
+      "type": "file",
+      "name": "test_corpus_manifest.py",
+      "filePath": "tests/test_corpus_manifest.py",
+      "summary": "Test module 'test_corpus_manifest.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_corpus_manifest.py:_write_manifest",
+      "type": "function",
+      "name": "_write_manifest",
+      "filePath": "tests/test_corpus_manifest.py",
+      "lineRange": [
+        34,
+        69
+      ],
+      "summary": "Defines _write_manifest, a root, documents routine in test_corpus_manifest.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_v1_rejects_document_type_label",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_generator_builds_twelve_local_documents_and_external_public_water",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:_write_manifest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:_write_manifest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_annotation_anchor_ids",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:_write_annotation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unknown_expected_document_type",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_expected_document_type",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_expected_document_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsupported_manifest_annotation_schema_version",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsafe_or_inconsistent_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_generator_builds_twelve_local_documents_and_external_public_water",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsupported_manifest_annotation_schema_version",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_v1_rejects_document_type_label",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_reference_provenance",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_validates_local_sources_and_annotations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_document_ids",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unknown_expected_document_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_validates_local_sources_and_annotations",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_annotation_anchor_ids",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_accepts_reference_provenance",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_duplicate_document_ids",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:test_load_manifest_rejects_unsafe_or_inconsistent_files",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_corpus_manifest.py",
+      "target": "function:tests/test_corpus_manifest.py:_write_annotation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

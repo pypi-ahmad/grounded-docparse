@@ -1,0 +1,147 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "docs/ONBOARDING.md",
+      "language": "markdown",
+      "sizeLines": 108,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/agentic-document-extraction-comparison.md",
+      "language": "markdown",
+      "sizeLines": 234,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/api.md",
+      "language": "markdown",
+      "sizeLines": 324,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/architecture.md",
+      "language": "markdown",
+      "sizeLines": 121,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/azure-bulk-fax-deployment.md",
+      "language": "markdown",
+      "sizeLines": 640,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/business-user-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 221,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/complete-user-guide.md",
+      "language": "markdown",
+      "sizeLines": 1363,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/extraction-quality-research.md",
+      "language": "markdown",
+      "sizeLines": 97,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-grounded-docparse-is-agentic.md",
+      "language": "markdown",
+      "sizeLines": 168,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-it-works.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/idp-vs-ade-classification.html",
+      "language": "html",
+      "sizeLines": 690,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/layout-aware-large-field-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 434,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-glmocr.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-paddleocr-vl.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/private-evaluation.md",
+      "language": "markdown",
+      "sizeLines": 105,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/run.md",
+      "language": "markdown",
+      "sizeLines": 93,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/spec.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/tutorial.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/zero-to-hero-tutorial.md",
+      "language": "markdown",
+      "sizeLines": 1322,
+      "fileCategory": "docs"
+    }
+  ],
+  "batchImportData": {
+    "docs/ONBOARDING.md": [],
+    "docs/agentic-document-extraction-comparison.md": [],
+    "docs/api.md": [],
+    "docs/architecture.md": [],
+    "docs/azure-bulk-fax-deployment.md": [],
+    "docs/business-user-extraction-workflow.md": [],
+    "docs/complete-user-guide.md": [],
+    "docs/extraction-quality-research.md": [],
+    "docs/how-grounded-docparse-is-agentic.md": [],
+    "docs/how-it-works.md": [],
+    "docs/idp-vs-ade-classification.html": [],
+    "docs/layout-aware-large-field-extraction-workflow.md": [],
+    "docs/local-glmocr.md": [],
+    "docs/local-paddleocr-vl.md": [],
+    "docs/private-evaluation.md": [],
+    "docs/research.md": [],
+    "docs/run.md": [],
+    "docs/spec.md": [],
+    "docs/tutorial.md": [],
+    "docs/zero-to-hero-tutorial.md": []
+  }
+}

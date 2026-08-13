@@ -1,0 +1,10 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path":"benchmarks/schemas/manifest-v1.1.schema.json","language":"json","sizeLines":103,"fileCategory":"config"},
+    {"path":"benchmarks/schemas/regression-policy-v1.schema.json","language":"json","sizeLines":60,"fileCategory":"config"}
+  ],
+  "batchImportData": {
+    "benchmarks/schemas/manifest-v1.1.schema.json": [], "benchmarks/schemas/regression-policy-v1.schema.json": []
+  }
+}

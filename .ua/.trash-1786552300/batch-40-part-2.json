@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:_annotation",
+      "type": "function",
+      "name": "_annotation",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        79,
+        100
+      ],
+      "summary": "Defines _annotation, a document_id, reference_text, reference_basis routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:_save_pdf",
+      "type": "function",
+      "name": "_save_pdf",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        46,
+        61
+      ],
+      "summary": "Defines _save_pdf, a path, pages routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:_save_degraded_scan",
+      "type": "function",
+      "name": "_save_degraded_scan",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        64,
+        76
+      ],
+      "summary": "Defines _save_degraded_scan, a path routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:generate_corpus",
+      "type": "function",
+      "name": "generate_corpus",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        192,
+        427
+      ],
+      "summary": "Defines generate_corpus, a repository_root routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/generate_evaluation_corpus.py",
+      "type": "file",
+      "name": "generate_evaluation_corpus.py",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "summary": "Source or generated artifact 'generate_evaluation_corpus.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        430,
+        442
+      ],
+      "summary": "Defines main, a  routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/generate_evaluation_corpus.py:_write_schemas",
+      "type": "function",
+      "name": "_write_schemas",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "lineRange": [
+        103,
+        189
+      ],
+      "summary": "Defines _write_schemas, a schema_dir routine in generate_evaluation_corpus.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:generate_corpus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_save_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_write_schemas",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_save_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:generate_corpus",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_save_degraded_scan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_write_schemas",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_annotation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_save_degraded_scan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/generate_evaluation_corpus.py",
+      "target": "function:scripts/generate_evaluation_corpus.py:_annotation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

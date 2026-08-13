@@ -1,0 +1,355 @@
+{
+  "nodes": [
+    {
+      "id": "file:.code-review-graph/graph.db",
+      "type": "file",
+      "name": "graph.db",
+      "filePath": ".code-review-graph/graph.db",
+      "summary": "Source or generated artifact 'graph.db' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:.code-review-graph/graph.db-shm",
+      "type": "file",
+      "name": "graph.db-shm",
+      "filePath": ".code-review-graph/graph.db-shm",
+      "summary": "Source or generated artifact 'graph.db-shm' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.code-review-graph/graph.db-wal",
+      "type": "file",
+      "name": "graph.db-wal",
+      "filePath": ".code-review-graph/graph.db-wal",
+      "summary": "Source or generated artifact 'graph.db-wal' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.codegraph/codegraph.db",
+      "type": "file",
+      "name": "codegraph.db",
+      "filePath": ".codegraph/codegraph.db",
+      "summary": "Source or generated artifact 'codegraph.db' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:.codegraph/codegraph.db-shm",
+      "type": "file",
+      "name": "codegraph.db-shm",
+      "filePath": ".codegraph/codegraph.db-shm",
+      "summary": "Source or generated artifact 'codegraph.db-shm' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.codegraph/codegraph.db-wal",
+      "type": "file",
+      "name": "codegraph.db-wal",
+      "filePath": ".codegraph/codegraph.db-wal",
+      "summary": "Source or generated artifact 'codegraph.db-wal' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.gitattributes",
+      "type": "file",
+      "name": ".gitattributes",
+      "filePath": ".gitattributes",
+      "summary": "Source or generated artifact '.gitattributes' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.github/ISSUE_TEMPLATE/bug_report.md",
+      "type": "document",
+      "name": "bug_report.md",
+      "filePath": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "summary": "Documentation artifact 'bug_report.md' that records project guidance or issue-reporting information.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.github/ISSUE_TEMPLATE/feature_request.md",
+      "type": "document",
+      "name": "feature_request.md",
+      "filePath": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "summary": "Documentation artifact 'feature_request.md' that records project guidance or issue-reporting information.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.streamlit/config.toml",
+      "type": "config",
+      "name": "config.toml",
+      "filePath": ".streamlit/config.toml",
+      "summary": "Configuration or generated metadata artifact 'config.toml' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-arch-analyze.js",
+      "type": "file",
+      "name": "ua-arch-analyze.js",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-arch-analyze.js",
+      "summary": "Source or generated artifact 'ua-arch-analyze.js' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-assemble-final.cjs",
+      "type": "file",
+      "name": "ua-assemble-final.cjs",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-assemble-final.cjs",
+      "summary": "Source or generated artifact 'ua-assemble-final.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-finalize.cjs",
+      "type": "file",
+      "name": "ua-finalize.cjs",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-finalize.cjs",
+      "summary": "Source or generated artifact 'ua-finalize.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-fingerprint-input.cjs",
+      "type": "file",
+      "name": "ua-fingerprint-input.cjs",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-fingerprint-input.cjs",
+      "summary": "Source or generated artifact 'ua-fingerprint-input.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-inline-validate.cjs",
+      "type": "file",
+      "name": "ua-inline-validate.cjs",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-inline-validate.cjs",
+      "summary": "Source or generated artifact 'ua-inline-validate.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786452692/tmp/ua-tour-analyze.js",
+      "type": "file",
+      "name": "ua-tour-analyze.js",
+      "filePath": ".ua/.trash-1786452692/tmp/ua-tour-analyze.js",
+      "summary": "Source or generated artifact 'ua-tour-analyze.js' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/assemble-final.mjs",
+      "type": "file",
+      "name": "assemble-final.mjs",
+      "filePath": ".ua/.trash-1786520109/tmp/assemble-final.mjs",
+      "summary": "Source or generated artifact 'assemble-final.mjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "type": "file",
+      "name": "build-batch-fragments.cjs",
+      "filePath": ".ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "summary": "Source or generated artifact 'build-batch-fragments.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:.ua/.trash-1786520109/tmp/build-batch-fragments.cjs:build",
+      "type": "function",
+      "name": "build",
+      "filePath": ".ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "lineRange": [
+        21,
+        54
+      ],
+      "summary": "Defines build, a index routine in build-batch-fragments.cjs.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/prepare-save.mjs",
+      "type": "file",
+      "name": "prepare-save.mjs",
+      "filePath": ".ua/.trash-1786520109/tmp/prepare-save.mjs",
+      "summary": "Source or generated artifact 'prepare-save.mjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/prune-existing.mjs",
+      "type": "file",
+      "name": "prune-existing.mjs",
+      "filePath": ".ua/.trash-1786520109/tmp/prune-existing.mjs",
+      "summary": "Source or generated artifact 'prune-existing.mjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/ua-arch-analyze.cjs",
+      "type": "file",
+      "name": "ua-arch-analyze.cjs",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-arch-analyze.cjs",
+      "summary": "Source or generated artifact 'ua-arch-analyze.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/ua-arch-prepare.cjs",
+      "type": "file",
+      "name": "ua-arch-prepare.cjs",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-arch-prepare.cjs",
+      "summary": "Source or generated artifact 'ua-arch-prepare.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/ua-inline-validate.cjs",
+      "type": "file",
+      "name": "ua-inline-validate.cjs",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-inline-validate.cjs",
+      "summary": "Source or generated artifact 'ua-inline-validate.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/ua-normalize-layers.cjs",
+      "type": "file",
+      "name": "ua-normalize-layers.cjs",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-normalize-layers.cjs",
+      "summary": "Source or generated artifact 'ua-normalize-layers.cjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/ua-tour-analyze.js",
+      "type": "file",
+      "name": "ua-tour-analyze.js",
+      "filePath": ".ua/.trash-1786520109/tmp/ua-tour-analyze.js",
+      "summary": "Source or generated artifact 'ua-tour-analyze.js' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:.ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "target": "function:.ua/.trash-1786520109/tmp/build-batch-fragments.cjs:build",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

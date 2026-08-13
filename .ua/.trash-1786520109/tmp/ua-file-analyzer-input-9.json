@@ -1,0 +1,18 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path":"docs/agentic-document-extraction-comparison.md","language":"markdown","sizeLines":234,"fileCategory":"docs"},
+    {"path":"docs/api.md","language":"markdown","sizeLines":324,"fileCategory":"docs"},
+    {"path":"docs/architecture.md","language":"markdown","sizeLines":121,"fileCategory":"docs"},
+    {"path":"docs/business-user-extraction-workflow.md","language":"markdown","sizeLines":221,"fileCategory":"docs"},
+    {"path":"docs/complete-user-guide.md","language":"markdown","sizeLines":1363,"fileCategory":"docs"},
+    {"path":"docs/how-it-works.md","language":"markdown","sizeLines":17,"fileCategory":"docs"},
+    {"path":"docs/idp-vs-ade-classification.html","language":"html","sizeLines":690,"fileCategory":"markup"},
+    {"path":"docs/private-evaluation.md","language":"markdown","sizeLines":105,"fileCategory":"docs"},
+    {"path":"docs/spec.md","language":"markdown","sizeLines":67,"fileCategory":"docs"},
+    {"path":"docs/zero-to-hero-tutorial.md","language":"markdown","sizeLines":1322,"fileCategory":"docs"}
+  ],
+  "batchImportData": {
+    "docs/agentic-document-extraction-comparison.md":[],"docs/api.md":[],"docs/architecture.md":[],"docs/business-user-extraction-workflow.md":[],"docs/complete-user-guide.md":[],"docs/how-it-works.md":[],"docs/idp-vs-ade-classification.html":[],"docs/private-evaluation.md":[],"docs/spec.md":[],"docs/zero-to-hero-tutorial.md":[]
+  }
+}

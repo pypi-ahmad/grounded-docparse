@@ -1,0 +1,14 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 0,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "The merge report contains only two duplicate file-node removals; this is a reasonable cross-fragment deduplication result.",
+    "All 63 non-empty importMap relationships have a corresponding forward imports edge.",
+    "The assembled graph has no dangling edge endpoints, duplicate edges, unknown node types, or unsupported complexity values.",
+    "Non-fatal upstream warning retained: batch-3-part-2 exceeded its fragment edge cap by 3 edges, but the merged graph is structurally valid."
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/wsl/benchmark_glmocr.py:_content",
+      "type": "function",
+      "name": "_content",
+      "filePath": "scripts/wsl/benchmark_glmocr.py",
+      "lineRange": [
+        36,
+        59
+      ],
+      "summary": "Defines _content, a result routine in benchmark_glmocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/benchmark_glmocr.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/wsl/benchmark_glmocr.py",
+      "lineRange": [
+        62,
+        117
+      ],
+      "summary": "Defines main, a  routine in benchmark_glmocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/wsl/benchmark_glmocr.py:_page_image",
+      "type": "function",
+      "name": "_page_image",
+      "filePath": "scripts/wsl/benchmark_glmocr.py",
+      "lineRange": [
+        20,
+        33
+      ],
+      "summary": "Defines _page_image, a source, page_number, directory routine in benchmark_glmocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/benchmark_glmocr.py",
+      "type": "file",
+      "name": "benchmark_glmocr.py",
+      "filePath": "scripts/wsl/benchmark_glmocr.py",
+      "summary": "Source or generated artifact 'benchmark_glmocr.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:_page_image",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/benchmark_glmocr.py",
+      "target": "function:scripts/wsl/benchmark_glmocr.py:_page_image",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

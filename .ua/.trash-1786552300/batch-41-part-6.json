@@ -1,0 +1,546 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "function",
+      "name": "test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        377,
+        401
+      ],
+      "summary": "Defines test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "function",
+      "name": "test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        343,
+        374
+      ],
+      "summary": "Defines test_paddle_uses_official_block_order_without_glm_column_ambiguity, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:analyzer",
+      "type": "function",
+      "name": "analyzer",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        53,
+        55
+      ],
+      "summary": "Defines analyzer, a runtime routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "function",
+      "name": "test_recovery_uses_real_ocr_confidence_when_available",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        323,
+        340
+      ],
+      "summary": "Defines test_recovery_uses_real_ocr_confidence_when_available, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "function",
+      "name": "test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        177,
+        207
+      ],
+      "summary": "Defines test_dense_form_uses_spatial_order_and_defers_vertical_margin, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "function",
+      "name": "test_low_resolution_scan",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        137,
+        147
+      ],
+      "summary": "Defines test_low_resolution_scan, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:page",
+      "type": "function",
+      "name": "page",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        26,
+        50
+      ],
+      "summary": "Defines page, a tmp_path, size, blank, dpi routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "function",
+      "name": "test_html_table_cells_preserve_spans_for_semantics",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        236,
+        272
+      ],
+      "summary": "Defines test_html_table_cells_preserve_spans_for_semantics, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "function",
+      "name": "test_multi_column_order_is_explicitly_ambiguous",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        150,
+        174
+      ],
+      "summary": "Defines test_multi_column_order_is_explicitly_ambiguous, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "function",
+      "name": "test_table_form_and_visual_complexity",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        210,
+        233
+      ],
+      "summary": "Defines test_table_form_and_visual_complexity, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "function",
+      "name": "test_blank_page_skips_glm",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        62,
+        66
+      ],
+      "summary": "Defines test_blank_page_skips_glm, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "function",
+      "name": "test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        275,
+        292
+      ],
+      "summary": "Defines test_unresolved_checkbox_grid_is_prioritized_for_recovery, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "function",
+      "name": "test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        295,
+        320
+      ],
+      "summary": "Defines test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:analyze",
+      "type": "function",
+      "name": "analyze",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        58,
+        59
+      ],
+      "summary": "Defines analyze, a runtime, evidence routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "function",
+      "name": "test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        69,
+        108
+      ],
+      "summary": "Defines test_glm_regions_preserve_failed_recognition_separately_from_skipped_images, a  routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_page_analysis.py",
+      "type": "file",
+      "name": "test_page_analysis.py",
+      "filePath": "tests/test_page_analysis.py",
+      "summary": "Test module 'test_page_analysis.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:tests/test_page_analysis.py:Runtime",
+      "type": "class",
+      "name": "Runtime",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        16,
+        23
+      ],
+      "summary": "Defines the Runtime class in test_page_analysis.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "function",
+      "name": "test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        111,
+        134
+      ],
+      "summary": "Defines test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence, a tmp_path routine in test_page_analysis.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "class:tests/test_page_analysis.py:Runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyze",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "class:tests/test_page_analysis.py:Runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyze",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

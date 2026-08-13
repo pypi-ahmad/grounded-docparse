@@ -1,0 +1,49 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-2.json",
+      "language": "json",
+      "sizeLines": 661,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-3.json",
+      "language": "json",
+      "sizeLines": 5136,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-4.json",
+      "language": "json",
+      "sizeLines": 432,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-6.json",
+      "language": "json",
+      "sizeLines": 119,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-9.json",
+      "language": "json",
+      "sizeLines": 1453,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-tour-results.json",
+      "language": "json",
+      "sizeLines": 4270,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786520109/tmp/ua-file-extract-results-2.json": [],
+    ".ua/.trash-1786520109/tmp/ua-file-extract-results-3.json": [],
+    ".ua/.trash-1786520109/tmp/ua-file-extract-results-4.json": [],
+    ".ua/.trash-1786520109/tmp/ua-file-extract-results-6.json": [],
+    ".ua/.trash-1786520109/tmp/ua-file-extract-results-9.json": [],
+    ".ua/.trash-1786520109/tmp/ua-tour-results.json": []
+  }
+}

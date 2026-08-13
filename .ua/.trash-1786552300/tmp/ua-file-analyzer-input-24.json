@@ -1,0 +1,147 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/973fad29a3f6f3fed512385e43dc5383d37a32f8578ec8281cefcca8d464bce8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/975ebfe905f5a9d099591c52a19086bf4206886f8e01edab9a568b5e3514ef93.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/991077ac9a33c2fa82b46b00d92f327038a30c8d3e9ee26c851fb286a9762611.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a19ede7b26890d73d40862334c450799485ae54936e44e0e95e61e6dbfe7ca6a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a44863a98594e78bbd6141e03aa16ae4e72e2a573f16c1f38b0a618bac5c57eb.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a82b4a875f872871e857ee12bb42fe8a35f698735c9bc40c248f54d7710f3c7d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/ae4d1d0e5f135225e17492d1f668a45e7b4b8276ffd17d5529502a2a18acab7a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/b485d28a73add49d6d43e96323636c2a63740a2dd591499e5e57b17a7db97d4f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bcfdb82415de33fbafea888ccb2a1ba0b86ea6c4bde675e782fb4c9c304c3b62.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bf14db789633faae9d1aaaf953397d70ed826233b5ebef88d52a82a4e8c40dbf.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bf36735947a13027e1e476c0f7339588d6198663088b4c85eacb6ceb9856d900.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/c2953f4fc34f9d6c13d69fdba1b007b225a585a8b7adb5d396f14c89aa847729.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/c436ba1015afb710e0c687b12ae05383801ddab298506e3e25626743b7d0791f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/ca1d93946f3a90005176b813825a0857e2ebff862515849bbf6c59e89fc33360.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/cba6c8c392067c1b20f7cb71fe5f14e8351ef76d5fdabebe74d7a606302022f3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d0bdd4781ca769289e9008b278f5f3400dded5304b7be3e59ab6fa01feea6970.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d38d913067a0c55dec0f3f876369e97afc4fa235cc47035543db2bfd3636fe31.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d54911a586d0551f4a0ada32ae9388edbc8253237a83b96b9c2a753e4fad8ede.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d6c3338eb87bed21aa6fe1d03ce459ba552b0bd004d02a508b431262f71b1ebc.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d733a960c2989929b13ba141ccccebcf09416f20e0cf739a760cad0f4c106e21.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    "graphify-out/cache/ast/v0.9.35/973fad29a3f6f3fed512385e43dc5383d37a32f8578ec8281cefcca8d464bce8.json": [],
+    "graphify-out/cache/ast/v0.9.35/975ebfe905f5a9d099591c52a19086bf4206886f8e01edab9a568b5e3514ef93.json": [],
+    "graphify-out/cache/ast/v0.9.35/991077ac9a33c2fa82b46b00d92f327038a30c8d3e9ee26c851fb286a9762611.json": [],
+    "graphify-out/cache/ast/v0.9.35/a19ede7b26890d73d40862334c450799485ae54936e44e0e95e61e6dbfe7ca6a.json": [],
+    "graphify-out/cache/ast/v0.9.35/a44863a98594e78bbd6141e03aa16ae4e72e2a573f16c1f38b0a618bac5c57eb.json": [],
+    "graphify-out/cache/ast/v0.9.35/a82b4a875f872871e857ee12bb42fe8a35f698735c9bc40c248f54d7710f3c7d.json": [],
+    "graphify-out/cache/ast/v0.9.35/ae4d1d0e5f135225e17492d1f668a45e7b4b8276ffd17d5529502a2a18acab7a.json": [],
+    "graphify-out/cache/ast/v0.9.35/b485d28a73add49d6d43e96323636c2a63740a2dd591499e5e57b17a7db97d4f.json": [],
+    "graphify-out/cache/ast/v0.9.35/bcfdb82415de33fbafea888ccb2a1ba0b86ea6c4bde675e782fb4c9c304c3b62.json": [],
+    "graphify-out/cache/ast/v0.9.35/bf14db789633faae9d1aaaf953397d70ed826233b5ebef88d52a82a4e8c40dbf.json": [],
+    "graphify-out/cache/ast/v0.9.35/bf36735947a13027e1e476c0f7339588d6198663088b4c85eacb6ceb9856d900.json": [],
+    "graphify-out/cache/ast/v0.9.35/c2953f4fc34f9d6c13d69fdba1b007b225a585a8b7adb5d396f14c89aa847729.json": [],
+    "graphify-out/cache/ast/v0.9.35/c436ba1015afb710e0c687b12ae05383801ddab298506e3e25626743b7d0791f.json": [],
+    "graphify-out/cache/ast/v0.9.35/ca1d93946f3a90005176b813825a0857e2ebff862515849bbf6c59e89fc33360.json": [],
+    "graphify-out/cache/ast/v0.9.35/cba6c8c392067c1b20f7cb71fe5f14e8351ef76d5fdabebe74d7a606302022f3.json": [],
+    "graphify-out/cache/ast/v0.9.35/d0bdd4781ca769289e9008b278f5f3400dded5304b7be3e59ab6fa01feea6970.json": [],
+    "graphify-out/cache/ast/v0.9.35/d38d913067a0c55dec0f3f876369e97afc4fa235cc47035543db2bfd3636fe31.json": [],
+    "graphify-out/cache/ast/v0.9.35/d54911a586d0551f4a0ada32ae9388edbc8253237a83b96b9c2a753e4fad8ede.json": [],
+    "graphify-out/cache/ast/v0.9.35/d6c3338eb87bed21aa6fe1d03ce459ba552b0bd004d02a508b431262f71b1ebc.json": [],
+    "graphify-out/cache/ast/v0.9.35/d733a960c2989929b13ba141ccccebcf09416f20e0cf739a760cad0f4c106e21.json": []
+  }
+}

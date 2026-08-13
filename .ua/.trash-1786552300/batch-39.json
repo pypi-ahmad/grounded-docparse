@@ -1,0 +1,827 @@
+{
+  "nodes": [
+    {
+      "id": "file:.ua/.trash-1786520109/tmp/write-meta.mjs",
+      "type": "file",
+      "name": "write-meta.mjs",
+      "filePath": ".ua/.trash-1786520109/tmp/write-meta.mjs",
+      "summary": "Source or generated artifact 'write-meta.mjs' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-domain-1786453150/domain-graph.json",
+      "type": "config",
+      "name": "domain-graph.json",
+      "filePath": ".ua/.trash-domain-1786453150/domain-graph.json",
+      "summary": "Configuration or generated metadata artifact 'domain-graph.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:.ua/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".ua/.understandignore",
+      "summary": "Source or generated artifact '.understandignore' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/intermediate/domain-analysis.json",
+      "type": "config",
+      "name": "domain-analysis.json",
+      "filePath": ".ua/intermediate/domain-analysis.json",
+      "summary": "Configuration or generated metadata artifact 'domain-analysis.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/intermediate/scan-result.json",
+      "type": "config",
+      "name": "scan-result.json",
+      "filePath": ".ua/intermediate/scan-result.json",
+      "summary": "Configuration or generated metadata artifact 'scan-result.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:benchmarks/baselines/offline-native-v1.json",
+      "type": "config",
+      "name": "offline-native-v1.json",
+      "filePath": "benchmarks/baselines/offline-native-v1.json",
+      "summary": "Configuration or generated metadata artifact 'offline-native-v1.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "benchmarks/corpus-v1/manifest.json",
+      "summary": "Configuration or generated metadata artifact 'manifest.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/policies/live-evaluation.example.json",
+      "type": "config",
+      "name": "live-evaluation.example.json",
+      "filePath": "benchmarks/policies/live-evaluation.example.json",
+      "summary": "Configuration or generated metadata artifact 'live-evaluation.example.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "type": "config",
+      "name": "openai-standard-2026-07-28.json",
+      "filePath": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "summary": "Configuration or generated metadata artifact 'openai-standard-2026-07-28.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:config/glmocr.yaml",
+      "type": "config",
+      "name": "glmocr.yaml",
+      "filePath": "config/glmocr.yaml",
+      "summary": "Configuration or generated metadata artifact 'glmocr.yaml' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:config/paddle-vllm.yaml",
+      "type": "config",
+      "name": "paddle-vllm.yaml",
+      "filePath": "config/paddle-vllm.yaml",
+      "summary": "Configuration or generated metadata artifact 'paddle-vllm.yaml' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:docs-site/assets/app.js",
+      "type": "file",
+      "name": "app.js",
+      "filePath": "docs-site/assets/app.js",
+      "summary": "Source or generated artifact 'app.js' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/assets/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "docs-site/assets/styles.css",
+      "summary": "Frontend markup asset 'styles.css' used by the documentation site.",
+      "tags": [
+        "frontend",
+        "documentation-site",
+        "asset"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:graphify-out/.graphify_python",
+      "type": "file",
+      "name": ".graphify_python",
+      "filePath": "graphify-out/.graphify_python",
+      "summary": "Source or generated artifact '.graphify_python' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:graphify-out/.graphify_root",
+      "type": "file",
+      "name": ".graphify_root",
+      "filePath": "graphify-out/.graphify_root",
+      "summary": "Source or generated artifact '.graphify_root' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/stat-index.json",
+      "type": "config",
+      "name": "stat-index.json",
+      "filePath": "graphify-out/cache/stat-index.json",
+      "summary": "Configuration or generated metadata artifact 'stat-index.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "type": "document",
+      "name": "query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "filePath": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "summary": "Documentation artifact 'query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md' that records project guidance or issue-reporting information.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:graphify-out/reflections/LESSONS.md",
+      "type": "document",
+      "name": "LESSONS.md",
+      "filePath": "graphify-out/reflections/LESSONS.md",
+      "summary": "Documentation artifact 'LESSONS.md' that records project guidance or issue-reporting information.",
+      "tags": [
+        "documentation",
+        "project-guidance",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:installer/GroundedDocParse.iss",
+      "type": "file",
+      "name": "GroundedDocParse.iss",
+      "filePath": "installer/GroundedDocParse.iss",
+      "summary": "Source or generated artifact 'GroundedDocParse.iss' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:installer/Install-GroundedDocParse.ps1",
+      "type": "file",
+      "name": "Install-GroundedDocParse.ps1",
+      "filePath": "installer/Install-GroundedDocParse.ps1",
+      "summary": "Automation script 'Install-GroundedDocParse.ps1' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-business.pptx",
+      "type": "file",
+      "name": "grounded-docparse-business.pptx",
+      "filePath": "presentations/grounded-docparse-business.pptx",
+      "summary": "Source or generated artifact 'grounded-docparse-business.pptx' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-github-overview.pptx",
+      "type": "file",
+      "name": "grounded-docparse-github-overview.pptx",
+      "filePath": "presentations/grounded-docparse-github-overview.pptx",
+      "summary": "Source or generated artifact 'grounded-docparse-github-overview.pptx' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-technical.pptx",
+      "type": "file",
+      "name": "grounded-docparse-technical.pptx",
+      "filePath": "presentations/grounded-docparse-technical.pptx",
+      "summary": "Source or generated artifact 'grounded-docparse-technical.pptx' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/build-installer.ps1",
+      "type": "file",
+      "name": "build-installer.ps1",
+      "filePath": "scripts/build-installer.ps1",
+      "summary": "Automation script 'build-installer.ps1' supporting the project's local runtime or build workflow.",
+      "tags": [
+        "automation",
+        "runtime",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/build_docs_site.py",
+      "type": "file",
+      "name": "build_docs_site.py",
+      "filePath": "scripts/build_docs_site.py",
+      "summary": "Source or generated artifact 'build_docs_site.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:is_security_document",
+      "type": "function",
+      "name": "is_security_document",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        99,
+        101
+      ],
+      "summary": "Defines is_security_document, a path routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:discover_markdown",
+      "type": "function",
+      "name": "discover_markdown",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        104,
+        128
+      ],
+      "summary": "Defines discover_markdown, a  routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:output_name",
+      "type": "function",
+      "name": "output_name",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        131,
+        142
+      ],
+      "summary": "Defines output_name, a relative routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:split_front_matter",
+      "type": "function",
+      "name": "split_front_matter",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        145,
+        151
+      ],
+      "summary": "Defines split_front_matter, a text routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:normalize_indented_fences",
+      "type": "function",
+      "name": "normalize_indented_fences",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        154,
+        175
+      ],
+      "summary": "Defines normalize_indented_fences, a text routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:extract_document",
+      "type": "function",
+      "name": "extract_document",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        178,
+        210
+      ],
+      "summary": "Defines extract_document, a path routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:rewrite_links",
+      "type": "function",
+      "name": "rewrite_links",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        213,
+        239
+      ],
+      "summary": "Defines rewrite_links, a rendered, document, mapping, excluded routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:copy_local_images",
+      "type": "function",
+      "name": "copy_local_images",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        242,
+        262
+      ],
+      "summary": "Defines copy_local_images, a rendered, document routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:grouped_documents",
+      "type": "function",
+      "name": "grouped_documents",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        265,
+        276
+      ],
+      "summary": "Defines grouped_documents, a documents routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:nav_html",
+      "type": "function",
+      "name": "nav_html",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        279,
+        294
+      ],
+      "summary": "Defines nav_html, a groups, current routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:search_index",
+      "type": "function",
+      "name": "search_index",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        297,
+        308
+      ],
+      "summary": "Defines search_index, a documents routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:document_cards",
+      "type": "function",
+      "name": "document_cards",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        311,
+        330
+      ],
+      "summary": "Defines document_cards, a groups routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:page_template",
+      "type": "function",
+      "name": "page_template",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        333,
+        452
+      ],
+      "summary": "Defines page_template, a document, body, toc, nav, index_data, previous, following, groups, document_count, excluded_count routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:excluded_page",
+      "type": "function",
+      "name": "excluded_page",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        455,
+        485
+      ],
+      "summary": "Defines excluded_page, a nav, index_data, document_count, excluded_count routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/build_docs_site.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        488,
+        562
+      ],
+      "summary": "Defines main, a  routine in build_docs_site.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:scripts/build_docs_site.py:Document",
+      "type": "class",
+      "name": "Document",
+      "filePath": "scripts/build_docs_site.py",
+      "lineRange": [
+        87,
+        96
+      ],
+      "summary": "Defines the Document class in build_docs_site.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:is_security_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:is_security_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:discover_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:discover_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:output_name",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:output_name",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:split_front_matter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:split_front_matter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:normalize_indented_fences",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:normalize_indented_fences",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:extract_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:extract_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:rewrite_links",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:rewrite_links",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:copy_local_images",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:copy_local_images",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:grouped_documents",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:grouped_documents",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:nav_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:nav_html",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:search_index",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:search_index",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:document_cards",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:document_cards",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:page_template",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:page_template",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:excluded_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:excluded_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "function:scripts/build_docs_site.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "class:scripts/build_docs_site.py:Document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/build_docs_site.py",
+      "target": "class:scripts/build_docs_site.py:Document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

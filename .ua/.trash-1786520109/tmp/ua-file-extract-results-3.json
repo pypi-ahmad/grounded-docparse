@@ -1,0 +1,5137 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 3,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 3,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "results": [
+    {
+      "path": "src/grounded_docparse/ocr_disagreement.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 30,
+      "nonEmptyLines": 24,
+      "functions": [
+        {
+          "name": "_tokens",
+          "startLine": 7,
+          "endLine": 9,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "token_edit_similarity",
+          "startLine": 12,
+          "endLine": 30,
+          "params": [
+            "left",
+            "right"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "_tokens",
+          "line": 7,
+          "isDefault": false
+        },
+        {
+          "name": "token_edit_similarity",
+          "line": 12,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "_tokens",
+          "callee": "unicodedata.normalize(\"NFKC\", value).casefold",
+          "lineNumber": 8
+        },
+        {
+          "caller": "_tokens",
+          "callee": "unicodedata.normalize",
+          "lineNumber": 8
+        },
+        {
+          "caller": "_tokens",
+          "callee": "re.findall",
+          "lineNumber": 9
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "_tokens",
+          "lineNumber": 15
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "_tokens",
+          "lineNumber": 15
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "list",
+          "lineNumber": 18
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "range",
+          "lineNumber": 18
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "len",
+          "lineNumber": 18
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "enumerate",
+          "lineNumber": 19
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "enumerate",
+          "lineNumber": 21
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "current.append",
+          "lineNumber": 22
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "min",
+          "lineNumber": 23
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "max",
+          "lineNumber": 30
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "len",
+          "lineNumber": 30
+        },
+        {
+          "caller": "token_edit_similarity",
+          "callee": "len",
+          "lineNumber": 30
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/grounded_docparse/ocr_services.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 29,
+      "nonEmptyLines": 24,
+      "functions": [
+        {
+          "name": "ensure_managed_ocr_engine",
+          "startLine": 11,
+          "endLine": 29,
+          "params": [
+            "engine"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "ensure_managed_ocr_engine",
+          "line": 11,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "os.getenv(\"DOCPARSE_MANAGE_OCR_SERVICES\", \"false\").casefold",
+          "lineNumber": 14
+        },
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "os.getenv",
+          "lineNumber": 14
+        },
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "clear_glmocr_runtimes",
+          "lineNumber": 21
+        },
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "Path",
+          "lineNumber": 22
+        },
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "subprocess.run",
+          "lineNumber": 23
+        },
+        {
+          "caller": "ensure_managed_ocr_engine",
+          "callee": "str",
+          "lineNumber": 24
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/grounded_docparse/pipeline.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 3140,
+      "nonEmptyLines": 2936,
+      "functions": [
+        {
+          "name": "_visible_html",
+          "startLine": 182,
+          "endLine": 184,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_raw_html_cells",
+          "startLine": 187,
+          "endLine": 196,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_checkbox_state_and_label",
+          "startLine": 199,
+          "endLine": 209,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_form_option",
+          "startLine": 212,
+          "endLine": 214,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_option_states",
+          "startLine": 217,
+          "endLine": 227,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_paddle_form_states",
+          "startLine": 230,
+          "endLine": 276,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_merge_confirmed_form_states",
+          "startLine": 279,
+          "endLine": 312,
+          "params": [
+            "primary",
+            "confirmed"
+          ]
+        },
+        {
+          "name": "_form_control_recovery_severity",
+          "startLine": 315,
+          "endLine": 321,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_merge_form_html",
+          "startLine": 324,
+          "endLine": 388,
+          "params": [
+            "primary",
+            "recovered"
+          ]
+        },
+        {
+          "name": "_clean_text",
+          "startLine": 391,
+          "endLine": 396,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_clean_form_data",
+          "startLine": 402,
+          "endLine": 409,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_emit",
+          "startLine": 412,
+          "endLine": 422,
+          "params": [
+            "callback",
+            "stage",
+            "current",
+            "total",
+            "message"
+          ]
+        },
+        {
+          "name": "_form",
+          "startLine": 425,
+          "endLine": 433,
+          "params": [
+            "region"
+          ]
+        },
+        {
+          "name": "_bbox",
+          "startLine": 436,
+          "endLine": 442,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_valid_confidence_spans",
+          "startLine": 445,
+          "endLine": 450,
+          "params": [
+            "text",
+            "spans"
+          ]
+        },
+        {
+          "name": "_clean_confidence_spans",
+          "startLine": 453,
+          "endLine": 499,
+          "params": [
+            "text",
+            "spans",
+            "confidence",
+            "bbox",
+            "source"
+          ]
+        },
+        {
+          "name": "_table",
+          "startLine": 502,
+          "endLine": 531,
+          "params": [
+            "region"
+          ]
+        },
+        {
+          "name": "_atoms",
+          "startLine": 534,
+          "endLine": 557,
+          "params": [
+            "region"
+          ]
+        },
+        {
+          "name": "_aggregated_confidence",
+          "startLine": 560,
+          "endLine": 570,
+          "params": [
+            "region"
+          ]
+        },
+        {
+          "name": "_block",
+          "startLine": 573,
+          "endLine": 614,
+          "params": [
+            "region",
+            "page_number",
+            "index"
+          ]
+        },
+        {
+          "name": "_needs_verification",
+          "startLine": 617,
+          "endLine": 624,
+          "params": [
+            "block"
+          ]
+        },
+        {
+          "name": "_apply_correction",
+          "startLine": 627,
+          "endLine": 684,
+          "params": [
+            "block",
+            "region",
+            "page_number",
+            "preserve_layout"
+          ]
+        },
+        {
+          "name": "_apply_decision",
+          "startLine": 687,
+          "endLine": 720,
+          "params": [
+            "block",
+            "decision",
+            "page_number",
+            "preserve_layout"
+          ]
+        },
+        {
+          "name": "_region_from_block",
+          "startLine": 723,
+          "endLine": 776,
+          "params": [
+            "block"
+          ]
+        },
+        {
+          "name": "_span_owner",
+          "startLine": 779,
+          "endLine": 788,
+          "params": [
+            "block",
+            "owner_kind",
+            "owner_index"
+          ]
+        },
+        {
+          "name": "_span_repair_target",
+          "startLine": 791,
+          "endLine": 831,
+          "params": [
+            "block",
+            "candidate",
+            "page_number"
+          ]
+        },
+        {
+          "name": "_rebase_owner_spans",
+          "startLine": 834,
+          "endLine": 862,
+          "params": [
+            "owner",
+            "target",
+            "replacement"
+          ]
+        },
+        {
+          "name": "_apply_span_repairs",
+          "startLine": 865,
+          "endLine": 963,
+          "params": [
+            "block",
+            "targets",
+            "decisions",
+            "repair_source"
+          ]
+        },
+        {
+          "name": "_proactive_crop_priority",
+          "startLine": 966,
+          "endLine": 974,
+          "params": [
+            "block"
+          ]
+        },
+        {
+          "name": "_paddle_table_anchor",
+          "startLine": 1020,
+          "endLine": 1029,
+          "params": [
+            "value"
+          ]
+        },
+        {
+          "name": "_paddle_recovery_content",
+          "startLine": 1032,
+          "endLine": 1039,
+          "params": [
+            "result",
+            "anchor"
+          ]
+        },
+        {
+          "name": "_confirmed_paddle_states",
+          "startLine": 1042,
+          "endLine": 1050,
+          "params": [
+            "left",
+            "right"
+          ]
+        },
+        {
+          "name": "_recover_paddle_form_regions",
+          "startLine": 1053,
+          "endLine": 1179,
+          "params": [
+            "source",
+            "pages",
+            "analyses",
+            "workdir",
+            "config"
+          ]
+        },
+        {
+          "name": "_form_recovery_priority",
+          "startLine": 1182,
+          "endLine": 1194,
+          "params": [
+            "region"
+          ]
+        },
+        {
+          "name": "_glm_recovery_content",
+          "startLine": 1197,
+          "endLine": 1207,
+          "params": [
+            "result"
+          ]
+        },
+        {
+          "name": "_recover_glm_form_regions",
+          "startLine": 1210,
+          "endLine": 1313,
+          "params": [
+            "source",
+            "pages",
+            "analyses",
+            "workdir",
+            "config"
+          ]
+        },
+        {
+          "name": "_recovery_box_key",
+          "startLine": 1316,
+          "endLine": 1319,
+          "params": [
+            "bbox"
+          ]
+        },
+        {
+          "name": "_box_area",
+          "startLine": 1322,
+          "endLine": 1323,
+          "params": [
+            "box"
+          ]
+        },
+        {
+          "name": "_box_intersection",
+          "startLine": 1326,
+          "endLine": 1329,
+          "params": [
+            "left",
+            "right"
+          ]
+        },
+        {
+          "name": "_same_recovery_area",
+          "startLine": 1332,
+          "endLine": 1341,
+          "params": [
+            "left",
+            "right"
+          ]
+        },
+        {
+          "name": "_visible_character_count",
+          "startLine": 1344,
+          "endLine": 1345,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "_garbage_ratio",
+          "startLine": 1348,
+          "endLine": 1360,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "_table_quality",
+          "startLine": 1363,
+          "endLine": 1375,
+          "params": [
+            "block"
+          ]
+        },
+        {
+          "name": "_page_recovery_candidates",
+          "startLine": 1378,
+          "endLine": 1493,
+          "params": [
+            "page",
+            "analysis"
+          ]
+        },
+        {
+          "name": "_visual_recovery_crop_budget",
+          "startLine": 1503,
+          "endLine": 1504,
+          "params": [
+            "page_count",
+            "ceiling"
+          ]
+        },
+        {
+          "name": "_visual_recovery_plan",
+          "startLine": 1507,
+          "endLine": 1544,
+          "params": [
+            "pages",
+            "analyses",
+            "enabled",
+            "limit"
+          ]
+        },
+        {
+          "name": "_build_recovery_log",
+          "startLine": 1547,
+          "endLine": 1574,
+          "params": [
+            "document",
+            "recovered_region_ids"
+          ]
+        },
+        {
+          "name": "_decision_issue",
+          "startLine": 1577,
+          "endLine": 1594,
+          "params": [
+            "decision",
+            "region_id",
+            "source"
+          ]
+        },
+        {
+          "name": "_validated_crop_decisions",
+          "startLine": 1597,
+          "endLine": 1662,
+          "params": [
+            "requests",
+            "inspection",
+            "source"
+          ]
+        },
+        {
+          "name": "_hierarchy",
+          "startLine": 1665,
+          "endLine": 1691,
+          "params": [
+            "blocks",
+            "inherited_sections"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "_UnavailableGateway",
+          "startLine": 113,
+          "endLine": 128,
+          "methods": [
+            "__init__",
+            "draft_page",
+            "inspect_crops"
+          ],
+          "properties": []
+        },
+        {
+          "name": "_RawHTMLCell",
+          "startLine": 175,
+          "endLine": 179,
+          "methods": [],
+          "properties": [
+            "start",
+            "end",
+            "body",
+            "text"
+          ]
+        },
+        {
+          "name": "_RecoveryCandidate",
+          "startLine": 981,
+          "endLine": 1000,
+          "methods": [
+            "rank"
+          ],
+          "properties": [
+            "page",
+            "bbox",
+            "severity",
+            "confidence",
+            "reading_order",
+            "target_id",
+            "reasons",
+            "primary_text"
+          ]
+        },
+        {
+          "name": "_GlmFormRecovery",
+          "startLine": 1004,
+          "endLine": 1009,
+          "methods": [],
+          "properties": [
+            "statuses",
+            "candidate_count",
+            "crops",
+            "duration",
+            "warnings"
+          ]
+        },
+        {
+          "name": "_PaddleFormRecovery",
+          "startLine": 1013,
+          "endLine": 1017,
+          "methods": [],
+          "properties": [
+            "attempts",
+            "resolved",
+            "duration",
+            "warnings"
+          ]
+        },
+        {
+          "name": "_VisualRecoveryPlan",
+          "startLine": 1497,
+          "endLine": 1500,
+          "methods": [],
+          "properties": [
+            "allowed",
+            "deferred",
+            "candidate_count"
+          ]
+        },
+        {
+          "name": "_ProcessedPage",
+          "startLine": 1695,
+          "endLine": 1701,
+          "methods": [],
+          "properties": [
+            "page",
+            "warnings",
+            "usage",
+            "trace",
+            "visual_recovery_crops",
+            "recovered_region_ids"
+          ]
+        },
+        {
+          "name": "DocumentParser",
+          "startLine": 1704,
+          "endLine": 3140,
+          "methods": [
+            "__init__",
+            "_cross_check_uncertain_regions",
+            "_process_page",
+            "_refine_document",
+            "parse"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "_UnavailableGateway",
+          "line": 113,
+          "isDefault": false
+        },
+        {
+          "name": "_RawHTMLCell",
+          "line": 174,
+          "isDefault": false
+        },
+        {
+          "name": "_visible_html",
+          "line": 182,
+          "isDefault": false
+        },
+        {
+          "name": "_raw_html_cells",
+          "line": 187,
+          "isDefault": false
+        },
+        {
+          "name": "_checkbox_state_and_label",
+          "line": 199,
+          "isDefault": false
+        },
+        {
+          "name": "_form_option",
+          "line": 212,
+          "isDefault": false
+        },
+        {
+          "name": "_option_states",
+          "line": 217,
+          "isDefault": false
+        },
+        {
+          "name": "_paddle_form_states",
+          "line": 230,
+          "isDefault": false
+        },
+        {
+          "name": "_merge_confirmed_form_states",
+          "line": 279,
+          "isDefault": false
+        },
+        {
+          "name": "_form_control_recovery_severity",
+          "line": 315,
+          "isDefault": false
+        },
+        {
+          "name": "_merge_form_html",
+          "line": 324,
+          "isDefault": false
+        },
+        {
+          "name": "_clean_text",
+          "line": 391,
+          "isDefault": false
+        },
+        {
+          "name": "_clean_form_data",
+          "line": 402,
+          "isDefault": false
+        },
+        {
+          "name": "_emit",
+          "line": 412,
+          "isDefault": false
+        },
+        {
+          "name": "_form",
+          "line": 425,
+          "isDefault": false
+        },
+        {
+          "name": "_bbox",
+          "line": 436,
+          "isDefault": false
+        },
+        {
+          "name": "_valid_confidence_spans",
+          "line": 445,
+          "isDefault": false
+        },
+        {
+          "name": "_clean_confidence_spans",
+          "line": 453,
+          "isDefault": false
+        },
+        {
+          "name": "_table",
+          "line": 502,
+          "isDefault": false
+        },
+        {
+          "name": "_atoms",
+          "line": 534,
+          "isDefault": false
+        },
+        {
+          "name": "_aggregated_confidence",
+          "line": 560,
+          "isDefault": false
+        },
+        {
+          "name": "_block",
+          "line": 573,
+          "isDefault": false
+        },
+        {
+          "name": "_needs_verification",
+          "line": 617,
+          "isDefault": false
+        },
+        {
+          "name": "_apply_correction",
+          "line": 627,
+          "isDefault": false
+        },
+        {
+          "name": "_apply_decision",
+          "line": 687,
+          "isDefault": false
+        },
+        {
+          "name": "_region_from_block",
+          "line": 723,
+          "isDefault": false
+        },
+        {
+          "name": "_span_owner",
+          "line": 779,
+          "isDefault": false
+        },
+        {
+          "name": "_span_repair_target",
+          "line": 791,
+          "isDefault": false
+        },
+        {
+          "name": "_rebase_owner_spans",
+          "line": 834,
+          "isDefault": false
+        },
+        {
+          "name": "_apply_span_repairs",
+          "line": 865,
+          "isDefault": false
+        },
+        {
+          "name": "_proactive_crop_priority",
+          "line": 966,
+          "isDefault": false
+        },
+        {
+          "name": "_RecoveryCandidate",
+          "line": 980,
+          "isDefault": false
+        },
+        {
+          "name": "_GlmFormRecovery",
+          "line": 1003,
+          "isDefault": false
+        },
+        {
+          "name": "_PaddleFormRecovery",
+          "line": 1012,
+          "isDefault": false
+        },
+        {
+          "name": "_paddle_table_anchor",
+          "line": 1020,
+          "isDefault": false
+        },
+        {
+          "name": "_paddle_recovery_content",
+          "line": 1032,
+          "isDefault": false
+        },
+        {
+          "name": "_confirmed_paddle_states",
+          "line": 1042,
+          "isDefault": false
+        },
+        {
+          "name": "_recover_paddle_form_regions",
+          "line": 1053,
+          "isDefault": false
+        },
+        {
+          "name": "_form_recovery_priority",
+          "line": 1182,
+          "isDefault": false
+        },
+        {
+          "name": "_glm_recovery_content",
+          "line": 1197,
+          "isDefault": false
+        },
+        {
+          "name": "_recover_glm_form_regions",
+          "line": 1210,
+          "isDefault": false
+        },
+        {
+          "name": "_recovery_box_key",
+          "line": 1316,
+          "isDefault": false
+        },
+        {
+          "name": "_box_area",
+          "line": 1322,
+          "isDefault": false
+        },
+        {
+          "name": "_box_intersection",
+          "line": 1326,
+          "isDefault": false
+        },
+        {
+          "name": "_same_recovery_area",
+          "line": 1332,
+          "isDefault": false
+        },
+        {
+          "name": "_visible_character_count",
+          "line": 1344,
+          "isDefault": false
+        },
+        {
+          "name": "_garbage_ratio",
+          "line": 1348,
+          "isDefault": false
+        },
+        {
+          "name": "_table_quality",
+          "line": 1363,
+          "isDefault": false
+        },
+        {
+          "name": "_page_recovery_candidates",
+          "line": 1378,
+          "isDefault": false
+        },
+        {
+          "name": "_VisualRecoveryPlan",
+          "line": 1496,
+          "isDefault": false
+        },
+        {
+          "name": "_visual_recovery_crop_budget",
+          "line": 1503,
+          "isDefault": false
+        },
+        {
+          "name": "_visual_recovery_plan",
+          "line": 1507,
+          "isDefault": false
+        },
+        {
+          "name": "_build_recovery_log",
+          "line": 1547,
+          "isDefault": false
+        },
+        {
+          "name": "_decision_issue",
+          "line": 1577,
+          "isDefault": false
+        },
+        {
+          "name": "_validated_crop_decisions",
+          "line": 1597,
+          "isDefault": false
+        },
+        {
+          "name": "_hierarchy",
+          "line": 1665,
+          "isDefault": false
+        },
+        {
+          "name": "_ProcessedPage",
+          "line": 1694,
+          "isDefault": false
+        },
+        {
+          "name": "DocumentParser",
+          "line": 1704,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "__init__",
+          "callee": "RunUsage",
+          "lineNumber": 121
+        },
+        {
+          "caller": "draft_page",
+          "callee": "PageDraft",
+          "lineNumber": 125
+        },
+        {
+          "caller": "inspect_crops",
+          "callee": "PageInspection",
+          "lineNumber": 128
+        },
+        {
+          "caller": "_visible_html",
+          "callee": "re.sub",
+          "lineNumber": 183
+        },
+        {
+          "caller": "_visible_html",
+          "callee": "\" \".join",
+          "lineNumber": 184
+        },
+        {
+          "caller": "_visible_html",
+          "callee": "html.unescape(re.sub(r\"(?s)<[^>]+>\", \" \", with_breaks)).split",
+          "lineNumber": 184
+        },
+        {
+          "caller": "_visible_html",
+          "callee": "html.unescape",
+          "lineNumber": 184
+        },
+        {
+          "caller": "_visible_html",
+          "callee": "re.sub",
+          "lineNumber": 184
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "_RawHTMLCell",
+          "lineNumber": 189
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "match.start",
+          "lineNumber": 190
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "match.end",
+          "lineNumber": 191
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "match.group",
+          "lineNumber": 192
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "_visible_html",
+          "lineNumber": 193
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "match.group",
+          "lineNumber": 193
+        },
+        {
+          "caller": "_raw_html_cells",
+          "callee": "_HTML_CELL_PATTERN.finditer",
+          "lineNumber": 195
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "_CHECKBOX_PREFIX_PATTERN.match",
+          "lineNumber": 200
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "match.group",
+          "lineNumber": 203
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "match.group",
+          "lineNumber": 203
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "match.group",
+          "lineNumber": 203
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "match.end",
+          "lineNumber": 208
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "\" \".join",
+          "lineNumber": 209
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "value.casefold().rstrip(\":\").split",
+          "lineNumber": 209
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "value.casefold().rstrip",
+          "lineNumber": 209
+        },
+        {
+          "caller": "_checkbox_state_and_label",
+          "callee": "value.casefold",
+          "lineNumber": 209
+        },
+        {
+          "caller": "_form_option",
+          "callee": "_checkbox_state_and_label",
+          "lineNumber": 213
+        },
+        {
+          "caller": "_option_states",
+          "callee": "_raw_html_cells",
+          "lineNumber": 220
+        },
+        {
+          "caller": "_option_states",
+          "callee": "_form_option",
+          "lineNumber": 221
+        },
+        {
+          "caller": "_option_states",
+          "callee": "counts.get",
+          "lineNumber": 224
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "match.group",
+          "lineNumber": 233
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "_HTML_ROW_PATTERN.finditer",
+          "lineNumber": 233
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "_option_states",
+          "lineNumber": 235
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "_raw_html_cells",
+          "lineNumber": 242
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "cell.text.strip().casefold",
+          "lineNumber": 243
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "cell.text.strip",
+          "lineNumber": 243
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "_form_option",
+          "lineNumber": 250
+        },
+        {
+          "caller": "_paddle_form_states",
+          "callee": "counts.get",
+          "lineNumber": 254
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "_raw_html_cells",
+          "lineNumber": 284
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "enumerate",
+          "lineNumber": 287
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "_form_option",
+          "lineNumber": 288
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "occurrences.get",
+          "lineNumber": 291
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "confirmed.get",
+          "lineNumber": 293
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "{\"checked\": \"[x]\", \"unchecked\": \"[ ]\"}.get",
+          "lineNumber": 296
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "_RAW_CHECKBOX_PREFIX_PATTERN.sub",
+          "lineNumber": 299
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "cleaned.lstrip",
+          "lineNumber": 300
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "enumerate",
+          "lineNumber": 305
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "replacements.get",
+          "lineNumber": 306
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "pieces.extend",
+          "lineNumber": 309
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "pieces.append",
+          "lineNumber": 311
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "\"\".join",
+          "lineNumber": 312
+        },
+        {
+          "caller": "_merge_confirmed_form_states",
+          "callee": "len",
+          "lineNumber": 312
+        },
+        {
+          "caller": "_form_control_recovery_severity",
+          "callee": "sum",
+          "lineNumber": 316
+        },
+        {
+          "caller": "_form_control_recovery_severity",
+          "callee": "_option_states(value).values",
+          "lineNumber": 316
+        },
+        {
+          "caller": "_form_control_recovery_severity",
+          "callee": "_option_states",
+          "lineNumber": 316
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "_raw_html_cells",
+          "lineNumber": 327
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "_raw_html_cells",
+          "lineNumber": 330
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "_option_states",
+          "lineNumber": 331
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "enumerate",
+          "lineNumber": 336
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "_form_option",
+          "lineNumber": 337
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "occurrences.get",
+          "lineNumber": 339
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "recovered_states.get",
+          "lineNumber": 341
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "{\"checked\": \"[x]\", \"unchecked\": \"[ ]\"}.get",
+          "lineNumber": 347
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "_RAW_CHECKBOX_PREFIX_PATTERN.sub",
+          "lineNumber": 348
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "cleaned.lstrip",
+          "lineNumber": 349
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "len",
+          "lineNumber": 359
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "primary_cells[index - 1].text.rstrip().endswith",
+          "lineNumber": 360
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "primary_cells[index - 1].text.rstrip",
+          "lineNumber": 360
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "recovered_cells[index - 1].text.casefold",
+          "lineNumber": 361
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "primary_cells[index - 1].text.casefold",
+          "lineNumber": 362
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "html.escape",
+          "lineNumber": 365
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "enumerate",
+          "lineNumber": 372
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "replacements.get",
+          "lineNumber": 373
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "pieces.extend",
+          "lineNumber": 376
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "pieces.append",
+          "lineNumber": 378
+        },
+        {
+          "caller": "_merge_form_html",
+          "callee": "\"\".join",
+          "lineNumber": 388
+        },
+        {
+          "caller": "_clean_text",
+          "callee": "value.translate",
+          "lineNumber": 394
+        },
+        {
+          "caller": "_clean_text",
+          "callee": "ord",
+          "lineNumber": 395
+        },
+        {
+          "caller": "_clean_text",
+          "callee": "ord",
+          "lineNumber": 395
+        },
+        {
+          "caller": "_clean_text",
+          "callee": "ord",
+          "lineNumber": 395
+        },
+        {
+          "caller": "_clean_form_data",
+          "callee": "FormData",
+          "lineNumber": 405
+        },
+        {
+          "caller": "_clean_form_data",
+          "callee": "_clean_text",
+          "lineNumber": 406
+        },
+        {
+          "caller": "_clean_form_data",
+          "callee": "_clean_text",
+          "lineNumber": 407
+        },
+        {
+          "caller": "_clean_form_data",
+          "callee": "_clean_text",
+          "lineNumber": 408
+        },
+        {
+          "caller": "_emit",
+          "callee": "callback",
+          "lineNumber": 420
+        },
+        {
+          "caller": "_emit",
+          "callee": "ProgressEvent",
+          "lineNumber": 421
+        },
+        {
+          "caller": "_form",
+          "callee": "_clean_form_data",
+          "lineNumber": 429
+        },
+        {
+          "caller": "_form",
+          "callee": "(_clean_text(region.text) or \"\").partition",
+          "lineNumber": 430
+        },
+        {
+          "caller": "_form",
+          "callee": "_clean_text",
+          "lineNumber": 430
+        },
+        {
+          "caller": "_form",
+          "callee": "FormData",
+          "lineNumber": 431
+        },
+        {
+          "caller": "_form",
+          "callee": "label.strip",
+          "lineNumber": 432
+        },
+        {
+          "caller": "_form",
+          "callee": "value.strip",
+          "lineNumber": 432
+        },
+        {
+          "caller": "_bbox",
+          "callee": "BoundingBox",
+          "lineNumber": 440
+        },
+        {
+          "caller": "_bbox",
+          "callee": "value.model_dump",
+          "lineNumber": 440
+        },
+        {
+          "caller": "_valid_confidence_spans",
+          "callee": "len",
+          "lineNumber": 449
+        },
+        {
+          "caller": "_valid_confidence_spans",
+          "callee": "len",
+          "lineNumber": 450
+        },
+        {
+          "caller": "_valid_confidence_spans",
+          "callee": "len",
+          "lineNumber": 450
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "_valid_confidence_spans",
+          "lineNumber": 461
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "_clean_text",
+          "lineNumber": 462
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "sorted",
+          "lineNumber": 465
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "any",
+          "lineNumber": 469
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "sum",
+          "lineNumber": 475
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "sum",
+          "lineNumber": 479
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "_clean_text",
+          "lineNumber": 483
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "rebased.append",
+          "lineNumber": 486
+        },
+        {
+          "caller": "_clean_confidence_spans",
+          "callee": "ConfidenceSpan",
+          "lineNumber": 487
+        },
+        {
+          "caller": "_table",
+          "callee": "_bbox",
+          "lineNumber": 508
+        },
+        {
+          "caller": "_table",
+          "callee": "_clean_confidence_spans",
+          "lineNumber": 509
+        },
+        {
+          "caller": "_table",
+          "callee": "cells.append",
+          "lineNumber": 518
+        },
+        {
+          "caller": "_table",
+          "callee": "TableCell",
+          "lineNumber": 519
+        },
+        {
+          "caller": "_table",
+          "callee": "TableData",
+          "lineNumber": 531
+        },
+        {
+          "caller": "_atoms",
+          "callee": "_bbox",
+          "lineNumber": 538
+        },
+        {
+          "caller": "_atoms",
+          "callee": "_clean_confidence_spans",
+          "lineNumber": 539
+        },
+        {
+          "caller": "_atoms",
+          "callee": "atoms.append",
+          "lineNumber": 548
+        },
+        {
+          "caller": "_atoms",
+          "callee": "AtomicEvidence",
+          "lineNumber": 549
+        },
+        {
+          "caller": "_aggregated_confidence",
+          "callee": "min",
+          "lineNumber": 570
+        },
+        {
+          "caller": "_block",
+          "callee": "_bbox",
+          "lineNumber": 575
+        },
+        {
+          "caller": "_block",
+          "callee": "_table",
+          "lineNumber": 576
+        },
+        {
+          "caller": "_block",
+          "callee": "_atoms",
+          "lineNumber": 577
+        },
+        {
+          "caller": "_block",
+          "callee": "Block",
+          "lineNumber": 578
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 581
+        },
+        {
+          "caller": "_block",
+          "callee": "_aggregated_confidence",
+          "lineNumber": 584
+        },
+        {
+          "caller": "_block",
+          "callee": "Citation",
+          "lineNumber": 585
+        },
+        {
+          "caller": "_block",
+          "callee": "_form",
+          "lineNumber": 589
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 593
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 594
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 595
+        },
+        {
+          "caller": "_block",
+          "callee": "point.model_copy",
+          "lineNumber": 597
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 599
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 600
+        },
+        {
+          "caller": "_block",
+          "callee": "_clean_text",
+          "lineNumber": 601
+        },
+        {
+          "caller": "replace_text",
+          "callee": "_clean_text",
+          "lineNumber": 639
+        },
+        {
+          "caller": "replace_text",
+          "callee": "cleaned.strip",
+          "lineNumber": 640
+        },
+        {
+          "caller": "replace_text",
+          "callee": "getattr",
+          "lineNumber": 640
+        },
+        {
+          "caller": "replace_text",
+          "callee": "setattr",
+          "lineNumber": 642
+        },
+        {
+          "caller": "replace_text",
+          "callee": "hasattr",
+          "lineNumber": 643
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 647
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "cells.get",
+          "lineNumber": 652
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 654
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 657
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 658
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 659
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 668
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "getattr",
+          "lineNumber": 668
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "len",
+          "lineNumber": 670
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "len",
+          "lineNumber": 670
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "zip",
+          "lineNumber": 671
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 672
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 673
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 674
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "len",
+          "lineNumber": 676
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "len",
+          "lineNumber": 676
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "zip",
+          "lineNumber": 677
+        },
+        {
+          "caller": "_apply_correction",
+          "callee": "replace_text",
+          "lineNumber": 679
+        },
+        {
+          "caller": "_apply_decision",
+          "callee": "_apply_correction",
+          "lineNumber": 708
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "block.bbox.model_dump",
+          "lineNumber": 724
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "TableCellDraft",
+          "lineNumber": 728
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "cell.bbox.model_dump",
+          "lineNumber": 733
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "RegionDraft",
+          "lineNumber": 745
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "AtomicDraft",
+          "lineNumber": 763
+        },
+        {
+          "caller": "_region_from_block",
+          "callee": "atom.bbox.model_dump",
+          "lineNumber": 767
+        },
+        {
+          "caller": "_span_owner",
+          "callee": "len",
+          "lineNumber": 780
+        },
+        {
+          "caller": "_span_owner",
+          "callee": "len",
+          "lineNumber": 785
+        },
+        {
+          "caller": "_span_repair_target",
+          "callee": "_span_owner",
+          "lineNumber": 797
+        },
+        {
+          "caller": "_span_repair_target",
+          "callee": "len",
+          "lineNumber": 801
+        },
+        {
+          "caller": "_span_repair_target",
+          "callee": "SpanRepairTarget",
+          "lineNumber": 811
+        },
+        {
+          "caller": "_span_repair_target",
+          "callee": "max",
+          "lineNumber": 819
+        },
+        {
+          "caller": "_rebase_owner_spans",
+          "callee": "len",
+          "lineNumber": 839
+        },
+        {
+          "caller": "_rebase_owner_spans",
+          "callee": "rebased.append",
+          "lineNumber": 852
+        },
+        {
+          "caller": "_rebase_owner_spans",
+          "callee": "rebased.append",
+          "lineNumber": 854
+        },
+        {
+          "caller": "_rebase_owner_spans",
+          "callee": "span.model_copy",
+          "lineNumber": 855
+        },
+        {
+          "caller": "_rebase_owner_spans",
+          "callee": "rebased.append",
+          "lineNumber": 861
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "set",
+          "lineNumber": 873
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "duplicate_ids.add",
+          "lineNumber": 876
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "sorted",
+          "lineNumber": 879
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "by_id.get",
+          "lineNumber": 882
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "_span_owner",
+          "lineNumber": 883
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "len",
+          "lineNumber": 922
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "match.start",
+          "lineNumber": 926
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "re.finditer",
+          "lineNumber": 927
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "re.escape",
+          "lineNumber": 927
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "len",
+          "lineNumber": 929
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "_rebase_owner_spans",
+          "lineNumber": 940
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "_rebase_owner_spans",
+          "lineNumber": 948
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "block.correction_lineage.append",
+          "lineNumber": 950
+        },
+        {
+          "caller": "_apply_span_repairs",
+          "callee": "CorrectionLineage",
+          "lineNumber": 951
+        },
+        {
+          "caller": "_proactive_crop_priority",
+          "callee": "\"\\n\".join",
+          "lineNumber": 967
+        },
+        {
+          "caller": "_proactive_crop_priority",
+          "callee": "AMBIGUOUS_LITERAL_PATTERN.search",
+          "lineNumber": 972
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "_raw_html_cells",
+          "lineNumber": 1022
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "cell.text.strip",
+          "lineNumber": 1023
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "text.casefold",
+          "lineNumber": 1024
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "_form_option",
+          "lineNumber": 1026
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "\" \".join",
+          "lineNumber": 1028
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "text.casefold().split",
+          "lineNumber": 1028
+        },
+        {
+          "caller": "_paddle_table_anchor",
+          "callee": "text.casefold",
+          "lineNumber": 1028
+        },
+        {
+          "caller": "_paddle_recovery_content",
+          "callee": "region.content.casefold",
+          "lineNumber": 1036
+        },
+        {
+          "caller": "_paddle_recovery_content",
+          "callee": "_paddle_table_anchor",
+          "lineNumber": 1037
+        },
+        {
+          "caller": "_paddle_recovery_content",
+          "callee": "len",
+          "lineNumber": 1039
+        },
+        {
+          "caller": "_confirmed_paddle_states",
+          "callee": "left.items",
+          "lineNumber": 1048
+        },
+        {
+          "caller": "_confirmed_paddle_states",
+          "callee": "right.get",
+          "lineNumber": 1049
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1062
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_PaddleFormRecovery",
+          "lineNumber": 1063
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "source.source_path.suffix.casefold",
+          "lineNumber": 1064
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "analyses.items",
+          "lineNumber": 1068
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_paddle_form_states",
+          "lineNumber": 1074
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_paddle_table_anchor",
+          "lineNumber": 1075
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "len",
+          "lineNumber": 1077
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "any",
+          "lineNumber": 1078
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "states.values",
+          "lineNumber": 1078
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "candidates.setdefault(page_number, []).append",
+          "lineNumber": 1081
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "candidates.setdefault",
+          "lineNumber": 1081
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1083
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "sorted",
+          "lineNumber": 1088
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "len",
+          "lineNumber": 1089
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "len",
+          "lineNumber": 1089
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1090
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "len",
+          "lineNumber": 1092
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "len",
+          "lineNumber": 1092
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "recovery_dir.mkdir",
+          "lineNumber": 1096
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "BoundingBox",
+          "lineNumber": 1097
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "get_paddleocr_runtime",
+          "lineNumber": 1098
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "pages_by_number.get",
+          "lineNumber": 1103
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "anchor_counts.get",
+          "lineNumber": 1108
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1115
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "page.image_path.exists",
+          "lineNumber": 1126
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "render_region_crop",
+          "lineNumber": 1131
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "results.append",
+          "lineNumber": 1140
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "runtime.parse_recovery_image",
+          "lineNumber": 1140
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1142
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "type",
+          "lineNumber": 1144
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_paddle_recovery_content",
+          "lineNumber": 1150
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "any",
+          "lineNumber": 1152
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1153
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_paddle_form_states",
+          "lineNumber": 1159
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_confirmed_paddle_states",
+          "lineNumber": 1161
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "_merge_confirmed_form_states",
+          "lineNumber": 1162
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1165
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "analyses.get",
+          "lineNumber": 1172
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "analysis.warnings.append",
+          "lineNumber": 1174
+        },
+        {
+          "caller": "_recover_paddle_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1178
+        },
+        {
+          "caller": "_form_recovery_priority",
+          "callee": "sum",
+          "lineNumber": 1185
+        },
+        {
+          "caller": "_form_recovery_priority",
+          "callee": "_form_option",
+          "lineNumber": 1186
+        },
+        {
+          "caller": "_form_recovery_priority",
+          "callee": "_raw_html_cells",
+          "lineNumber": 1186
+        },
+        {
+          "caller": "_form_recovery_priority",
+          "callee": "re.search",
+          "lineNumber": 1192
+        },
+        {
+          "caller": "_form_recovery_priority",
+          "callee": "region.text.count",
+          "lineNumber": 1192
+        },
+        {
+          "caller": "_glm_recovery_content",
+          "callee": "region.label.casefold",
+          "lineNumber": 1201
+        },
+        {
+          "caller": "_glm_recovery_content",
+          "callee": "region.content.strip",
+          "lineNumber": 1201
+        },
+        {
+          "caller": "_glm_recovery_content",
+          "callee": "max",
+          "lineNumber": 1204
+        },
+        {
+          "caller": "_glm_recovery_content",
+          "callee": "\"\\n\".join",
+          "lineNumber": 1205
+        },
+        {
+          "caller": "_glm_recovery_content",
+          "callee": "region.content.strip",
+          "lineNumber": 1206
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1217
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "_GlmFormRecovery",
+          "lineNumber": 1218
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "analyses.items",
+          "lineNumber": 1224
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "enumerate",
+          "lineNumber": 1227
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "_form_recovery_priority",
+          "lineNumber": 1228
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "candidates.append",
+          "lineNumber": 1230
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "len",
+          "lineNumber": 1233
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "sorted",
+          "lineNumber": 1236
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "per_page.get",
+          "lineNumber": 1239
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "selected.append",
+          "lineNumber": 1241
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "per_page.get",
+          "lineNumber": 1242
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1244
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "enumerate",
+          "lineNumber": 1248
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "render_region_crop",
+          "lineNumber": 1251
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1260
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "type",
+          "lineNumber": 1262
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "crop_path.resolve",
+          "lineNumber": 1265
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1267
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "get_glmocr_form_recovery_runtime",
+          "lineNumber": 1271
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "hasattr",
+          "lineNumber": 1274
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "runtime.parse_many",
+          "lineNumber": 1275
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "list",
+          "lineNumber": 1275
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "GlmPageResult",
+          "lineNumber": 1278
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "runtime.parse",
+          "lineNumber": 1278
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "requests.get",
+          "lineNumber": 1281
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "result.image_path.resolve",
+          "lineNumber": 1281
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "_glm_recovery_content",
+          "lineNumber": 1286
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1288
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "_merge_form_html",
+          "lineNumber": 1292
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "_recovery_box_key",
+          "lineNumber": 1298
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "outcome.statuses.setdefault",
+          "lineNumber": 1300
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "analyses.get",
+          "lineNumber": 1302
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "analysis.warnings.append",
+          "lineNumber": 1304
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "outcome.warnings.append",
+          "lineNumber": 1309
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "type",
+          "lineNumber": 1310
+        },
+        {
+          "caller": "_recover_glm_form_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1312
+        },
+        {
+          "caller": "_recovery_box_key",
+          "callee": "tuple",
+          "lineNumber": 1319
+        },
+        {
+          "caller": "_recovery_box_key",
+          "callee": "round",
+          "lineNumber": 1319
+        },
+        {
+          "caller": "_box_area",
+          "callee": "max",
+          "lineNumber": 1323
+        },
+        {
+          "caller": "_box_area",
+          "callee": "max",
+          "lineNumber": 1323
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "max",
+          "lineNumber": 1327
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "min",
+          "lineNumber": 1327
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "max",
+          "lineNumber": 1327
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "max",
+          "lineNumber": 1327
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "min",
+          "lineNumber": 1328
+        },
+        {
+          "caller": "_box_intersection",
+          "callee": "max",
+          "lineNumber": 1328
+        },
+        {
+          "caller": "_same_recovery_area",
+          "callee": "_box_intersection",
+          "lineNumber": 1333
+        },
+        {
+          "caller": "_same_recovery_area",
+          "callee": "_box_area",
+          "lineNumber": 1336
+        },
+        {
+          "caller": "_same_recovery_area",
+          "callee": "_box_area",
+          "lineNumber": 1336
+        },
+        {
+          "caller": "_same_recovery_area",
+          "callee": "min",
+          "lineNumber": 1339
+        },
+        {
+          "caller": "_same_recovery_area",
+          "callee": "min",
+          "lineNumber": 1340
+        },
+        {
+          "caller": "_visible_character_count",
+          "callee": "sum",
+          "lineNumber": 1345
+        },
+        {
+          "caller": "_visible_character_count",
+          "callee": "character.isspace",
+          "lineNumber": 1345
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "character.isspace",
+          "lineNumber": 1349
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "sum",
+          "lineNumber": 1352
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "text.count",
+          "lineNumber": 1352
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "sum",
+          "lineNumber": 1353
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "unicodedata.category(character).startswith",
+          "lineNumber": 1354
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "unicodedata.category",
+          "lineNumber": 1354
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "sum",
+          "lineNumber": 1356
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "len",
+          "lineNumber": 1357
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "match.group",
+          "lineNumber": 1357
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "re.finditer",
+          "lineNumber": 1358
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "min",
+          "lineNumber": 1360
+        },
+        {
+          "caller": "_garbage_ratio",
+          "callee": "len",
+          "lineNumber": 1360
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "max",
+          "lineNumber": 1367
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "max",
+          "lineNumber": 1368
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "sum",
+          "lineNumber": 1371
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "bool",
+          "lineNumber": 1371
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "cell.text.strip",
+          "lineNumber": 1371
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "len",
+          "lineNumber": 1371
+        },
+        {
+          "caller": "_table_quality",
+          "callee": "len",
+          "lineNumber": 1372
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "draft_from_analysis",
+          "lineNumber": 1385
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_block",
+          "lineNumber": 1387
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "enumerate",
+          "lineNumber": 1388
+        },
+        {
+          "caller": "add",
+          "callee": "_recovery_box_key",
+          "lineNumber": 1401
+        },
+        {
+          "caller": "add",
+          "callee": "CRITICAL_LITERAL_PATTERN.search",
+          "lineNumber": 1404
+        },
+        {
+          "caller": "add",
+          "callee": "semantic_text",
+          "lineNumber": 1405
+        },
+        {
+          "caller": "add",
+          "callee": "max",
+          "lineNumber": 1407
+        },
+        {
+          "caller": "add",
+          "callee": "_RecoveryCandidate",
+          "lineNumber": 1408
+        },
+        {
+          "caller": "add",
+          "callee": "semantic_text",
+          "lineNumber": 1415
+        },
+        {
+          "caller": "add",
+          "callee": "by_box.get",
+          "lineNumber": 1418
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "select_repair_blocks",
+          "lineNumber": 1422
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "zip",
+          "lineNumber": 1423
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_recovery_box_key",
+          "lineNumber": 1426
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_box_area",
+          "lineNumber": 1427
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "semantic_text",
+          "lineNumber": 1428
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_visible_character_count",
+          "lineNumber": 1429
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "text.strip",
+          "lineNumber": 1432
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1434
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_form_control_recovery_severity",
+          "lineNumber": 1436
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1441
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1442
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_table_quality",
+          "lineNumber": 1443
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1444
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1445
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_garbage_ratio",
+          "lineNumber": 1446
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1452
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.extend",
+          "lineNumber": 1453
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1455
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1456
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1458
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1459
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "max",
+          "lineNumber": 1460
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "min",
+          "lineNumber": 1461
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "reasons.append",
+          "lineNumber": 1462
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "add",
+          "lineNumber": 1464
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "tuple",
+          "lineNumber": 1464
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "dict.fromkeys",
+          "lineNumber": 1464
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "add",
+          "lineNumber": 1466
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "requires_region_repair",
+          "lineNumber": 1468
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "literal_repair_candidates",
+          "lineNumber": 1471
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_span_repair_target",
+          "lineNumber": 1472
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "add",
+          "lineNumber": 1474
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_needs_verification",
+          "lineNumber": 1481
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "add",
+          "lineNumber": 1482
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_proactive_crop_priority",
+          "lineNumber": 1483
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "add",
+          "lineNumber": 1484
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "sorted",
+          "lineNumber": 1487
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "by_box.values",
+          "lineNumber": 1487
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "any",
+          "lineNumber": 1488
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "_same_recovery_area",
+          "lineNumber": 1489
+        },
+        {
+          "caller": "_page_recovery_candidates",
+          "callee": "selected.append",
+          "lineNumber": 1492
+        },
+        {
+          "caller": "_visual_recovery_crop_budget",
+          "callee": "min",
+          "lineNumber": 1504
+        },
+        {
+          "caller": "_visual_recovery_crop_budget",
+          "callee": "max",
+          "lineNumber": 1504
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "_page_recovery_candidates",
+          "lineNumber": 1515
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "analyses.get",
+          "lineNumber": 1515
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "by_page.values",
+          "lineNumber": 1518
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "_VisualRecoveryPlan",
+          "lineNumber": 1519
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "len",
+          "lineNumber": 1519
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "plan.deferred.setdefault(candidate.page, set()).add",
+          "lineNumber": 1522
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "plan.deferred.setdefault",
+          "lineNumber": 1522
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "set",
+          "lineNumber": 1522
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "sorted",
+          "lineNumber": 1529
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "len",
+          "lineNumber": 1530
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "per_page.get",
+          "lineNumber": 1532
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "selected.append",
+          "lineNumber": 1534
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "per_page.get",
+          "lineNumber": 1535
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "target.setdefault(candidate.page, set()).add",
+          "lineNumber": 1543
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "target.setdefault",
+          "lineNumber": 1543
+        },
+        {
+          "caller": "_visual_recovery_plan",
+          "callee": "set",
+          "lineNumber": 1543
+        },
+        {
+          "caller": "collect",
+          "callee": "sorted",
+          "lineNumber": 1554
+        },
+        {
+          "caller": "collect",
+          "callee": "recovered.append",
+          "lineNumber": 1556
+        },
+        {
+          "caller": "collect",
+          "callee": "collect",
+          "lineNumber": 1557
+        },
+        {
+          "caller": "_build_recovery_log",
+          "callee": "collect",
+          "lineNumber": 1560
+        },
+        {
+          "caller": "_build_recovery_log",
+          "callee": "enumerate",
+          "lineNumber": 1563
+        },
+        {
+          "caller": "_build_recovery_log",
+          "callee": "records.append",
+          "lineNumber": 1564
+        },
+        {
+          "caller": "_build_recovery_log",
+          "callee": "VisualRecoveryResult",
+          "lineNumber": 1565
+        },
+        {
+          "caller": "_build_recovery_log",
+          "callee": "semantic_text",
+          "lineNumber": 1569
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1604
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "duplicate_requests.add",
+          "lineNumber": 1607
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1611
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1612
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1613
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1614
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "unexpected_ids.add",
+          "lineNumber": 1619
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "duplicate_decisions.add",
+          "lineNumber": 1622
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "returned.pop",
+          "lineNumber": 1623
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "seen_decision_ids.add",
+          "lineNumber": 1625
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "evidence_mismatches.add",
+          "lineNumber": 1627
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "_decision_issue",
+          "lineNumber": 1629
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set(expected).difference",
+          "lineNumber": 1635
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "set",
+          "lineNumber": 1635
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.append",
+          "lineNumber": 1640
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "', '.join",
+          "lineNumber": 1641
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1641
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.append",
+          "lineNumber": 1644
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "', '.join",
+          "lineNumber": 1645
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1645
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.append",
+          "lineNumber": 1648
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "', '.join",
+          "lineNumber": 1649
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1649
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.append",
+          "lineNumber": 1652
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "', '.join",
+          "lineNumber": 1652
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1652
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.append",
+          "lineNumber": 1654
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "', '.join",
+          "lineNumber": 1656
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1656
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "problems.extend",
+          "lineNumber": 1659
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "sorted",
+          "lineNumber": 1659
+        },
+        {
+          "caller": "_validated_crop_decisions",
+          "callee": "'; '.join",
+          "lineNumber": 1661
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "list",
+          "lineNumber": 1670
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "sorted",
+          "lineNumber": 1671
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "heading_stack.pop",
+          "lineNumber": 1675
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "len",
+          "lineNumber": 1676
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "sections.pop",
+          "lineNumber": 1677
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "list",
+          "lineNumber": 1678
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "heading_stack[-1].children.append",
+          "lineNumber": 1680
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "roots.append",
+          "lineNumber": 1682
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "heading_stack.append",
+          "lineNumber": 1683
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "sections.append",
+          "lineNumber": 1684
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "list",
+          "lineNumber": 1686
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "heading_stack[-1].children.append",
+          "lineNumber": 1688
+        },
+        {
+          "caller": "_hierarchy",
+          "callee": "roots.append",
+          "lineNumber": 1690
+        },
+        {
+          "caller": "__init__",
+          "callee": "ParserConfig.from_env",
+          "lineNumber": 1712
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "sorted",
+          "lineNumber": 1725
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "_page_recovery_candidates",
+          "lineNumber": 1729
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "analyses.get",
+          "lineNumber": 1729
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "len",
+          "lineNumber": 1736
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "per_page.get",
+          "lineNumber": 1738
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "selected.append",
+          "lineNumber": 1740
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "per_page.get",
+          "lineNumber": 1741
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "len",
+          "lineNumber": 1743
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1745
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "self.ocr_service_switcher",
+          "lineNumber": 1755
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "get_glmocr_form_recovery_runtime",
+          "lineNumber": 1757
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "get_paddleocr_runtime",
+          "lineNumber": 1762
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "enumerate",
+          "lineNumber": 1766
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "render_region_crop",
+          "lineNumber": 1767
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "BoundingBox",
+          "lineNumber": 1770
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "runtime.parse",
+          "lineNumber": 1781
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "runtime.parse_recovery_image",
+          "lineNumber": 1783
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "region.content.strip",
+          "lineNumber": 1785
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "region.content.strip",
+          "lineNumber": 1785
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "\"\\n\".join",
+          "lineNumber": 1786
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "max",
+          "lineNumber": 1787
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "token_edit_similarity",
+          "lineNumber": 1789
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "token_edit_similarity",
+          "lineNumber": 1791
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "results.append",
+          "lineNumber": 1793
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "OcrComparisonResult",
+          "lineNumber": 1794
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "type",
+          "lineNumber": 1811
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "results.append",
+          "lineNumber": 1815
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "OcrComparisonResult",
+          "lineNumber": 1816
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "self.ocr_service_switcher",
+          "lineNumber": 1828
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "results.append",
+          "lineNumber": 1830
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "OcrComparisonResult",
+          "lineNumber": 1831
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "type",
+          "lineNumber": 1837
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "len",
+          "lineNumber": 1840
+        },
+        {
+          "caller": "_cross_check_uncertain_regions",
+          "callee": "time.perf_counter",
+          "lineNumber": 1840
+        },
+        {
+          "caller": "_process_page",
+          "callee": "bool",
+          "lineNumber": 1860
+        },
+        {
+          "caller": "_process_page",
+          "callee": "os.getenv",
+          "lineNumber": 1860
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_UnavailableGateway",
+          "lineNumber": 1863
+        },
+        {
+          "caller": "_process_page",
+          "callee": "self.gateway_factory",
+          "lineNumber": 1873
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 1875
+        },
+        {
+          "caller": "_process_page",
+          "callee": "callable",
+          "lineNumber": 1876
+        },
+        {
+          "caller": "_process_page",
+          "callee": "bind_runtime",
+          "lineNumber": 1877
+        },
+        {
+          "caller": "_process_page",
+          "callee": "set",
+          "lineNumber": 1879
+        },
+        {
+          "caller": "_process_page",
+          "callee": "set",
+          "lineNumber": 1880
+        },
+        {
+          "caller": "consume_recovery_box",
+          "callee": "_recovery_box_key",
+          "lineNumber": 1884
+        },
+        {
+          "caller": "consume_recovery_box",
+          "callee": "used_recovery_boxes.add",
+          "lineNumber": 1893
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_emit",
+          "lineNumber": 1895
+        },
+        {
+          "caller": "_process_page",
+          "callee": "gateway.draft_page",
+          "lineNumber": 1903
+        },
+        {
+          "caller": "_process_page",
+          "callee": "PageDraft",
+          "lineNumber": 1906
+        },
+        {
+          "caller": "_process_page",
+          "callee": "PageDraft",
+          "lineNumber": 1910
+        },
+        {
+          "caller": "_process_page",
+          "callee": "draft_from_analysis",
+          "lineNumber": 1917
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_block",
+          "lineNumber": 1919
+        },
+        {
+          "caller": "_process_page",
+          "callee": "enumerate",
+          "lineNumber": 1920
+        },
+        {
+          "caller": "_process_page",
+          "callee": "(glm_recovery_statuses or {}).get",
+          "lineNumber": 1923
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_recovery_box_key",
+          "lineNumber": 1924
+        },
+        {
+          "caller": "_process_page",
+          "callee": "block.correction_lineage.append",
+          "lineNumber": 1939
+        },
+        {
+          "caller": "_process_page",
+          "callee": "CorrectionLineage",
+          "lineNumber": 1940
+        },
+        {
+          "caller": "_process_page",
+          "callee": "recovered_region_ids.add",
+          "lineNumber": 1950
+        },
+        {
+          "caller": "_process_page",
+          "callee": "Image.open",
+          "lineNumber": 1953
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "blocks_by_id.get",
+          "lineNumber": 1968
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "consume_recovery_box",
+          "lineNumber": 1972
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "render_region_crop",
+          "lineNumber": 1976
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "max",
+          "lineNumber": 1982
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "requests.append",
+          "lineNumber": 1984
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "CropInspectionRequest",
+          "lineNumber": 1985
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "str",
+          "lineNumber": 1986
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "_region_from_block",
+          "lineNumber": 1988
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "PageInspection",
+          "lineNumber": 1994
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "len",
+          "lineNumber": 1995
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "getattr",
+          "lineNumber": 1996
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "callable",
+          "lineNumber": 1997
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "TypeError",
+          "lineNumber": 1998
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "inspect.signature",
+          "lineNumber": 2005
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "any",
+          "lineNumber": 2006
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "signature.parameters.values",
+          "lineNumber": 2008
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "optional.items",
+          "lineNumber": 2012
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "crop_inspector",
+          "lineNumber": 2015
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "_validated_crop_decisions",
+          "lineNumber": 2016
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "ValueError",
+          "lineNumber": 2022
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "inspection_result.model_copy",
+          "lineNumber": 2023
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "list",
+          "lineNumber": 2024
+        },
+        {
+          "caller": "inspect_targets",
+          "callee": "bound_decisions.values",
+          "lineNumber": 2024
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.extend",
+          "lineNumber": 2027
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2028
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_recovery_box_key",
+          "lineNumber": 2041
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2046
+        },
+        {
+          "caller": "_process_page",
+          "callee": "zip",
+          "lineNumber": 2052
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_needs_verification",
+          "lineNumber": 2053
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_emit",
+          "lineNumber": 2058
+        },
+        {
+          "caller": "_process_page",
+          "callee": "inspect_targets",
+          "lineNumber": 2067
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2073
+        },
+        {
+          "caller": "_process_page",
+          "callee": "list",
+          "lineNumber": 2078
+        },
+        {
+          "caller": "_process_page",
+          "callee": "inspection_warnings.append",
+          "lineNumber": 2082
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decisions.pop",
+          "lineNumber": 2088
+        },
+        {
+          "caller": "_process_page",
+          "callee": "inspection_warnings.append",
+          "lineNumber": 2090
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_decision_issue",
+          "lineNumber": 2092
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2099
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2101
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2105
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.extend",
+          "lineNumber": 2109
+        },
+        {
+          "caller": "_process_page",
+          "callee": "set",
+          "lineNumber": 2113
+        },
+        {
+          "caller": "_process_page",
+          "callee": "zip",
+          "lineNumber": 2116
+        },
+        {
+          "caller": "_process_page",
+          "callee": "any",
+          "lineNumber": 2118
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decisions.get",
+          "lineNumber": 2121
+        },
+        {
+          "caller": "_process_page",
+          "callee": "resolution_failures.get",
+          "lineNumber": 2126
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_apply_decision",
+          "lineNumber": 2130
+        },
+        {
+          "caller": "_process_page",
+          "callee": "explicit_crop_ids.add",
+          "lineNumber": 2139
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_apply_decision",
+          "lineNumber": 2141
+        },
+        {
+          "caller": "_process_page",
+          "callee": "recovered_region_ids.add",
+          "lineNumber": 2146
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_recovery_box_key",
+          "lineNumber": 2156
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_proactive_crop_priority",
+          "lineNumber": 2164
+        },
+        {
+          "caller": "_process_page",
+          "callee": "sorted",
+          "lineNumber": 2179
+        },
+        {
+          "caller": "_process_page",
+          "callee": "nonvisual_candidates.values",
+          "lineNumber": 2180
+        },
+        {
+          "caller": "_process_page",
+          "callee": "next",
+          "lineNumber": 2193
+        },
+        {
+          "caller": "_process_page",
+          "callee": "consume_recovery_box",
+          "lineNumber": 2200
+        },
+        {
+          "caller": "_process_page",
+          "callee": "render_region_crop",
+          "lineNumber": 2203
+        },
+        {
+          "caller": "_process_page",
+          "callee": "max",
+          "lineNumber": 2210
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2218
+        },
+        {
+          "caller": "_process_page",
+          "callee": "crop_requests.append",
+          "lineNumber": 2221
+        },
+        {
+          "caller": "_process_page",
+          "callee": "CropInspectionRequest",
+          "lineNumber": 2222
+        },
+        {
+          "caller": "_process_page",
+          "callee": "str",
+          "lineNumber": 2223
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_region_from_block",
+          "lineNumber": 2225
+        },
+        {
+          "caller": "_process_page",
+          "callee": "crop_blocks.append",
+          "lineNumber": 2230
+        },
+        {
+          "caller": "_process_page",
+          "callee": "range",
+          "lineNumber": 2231
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2231
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2236
+        },
+        {
+          "caller": "_process_page",
+          "callee": "gateway.inspect_crops",
+          "lineNumber": 2238
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2240
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_validated_crop_decisions",
+          "lineNumber": 2245
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2251
+        },
+        {
+          "caller": "_process_page",
+          "callee": "crop_decisions.get",
+          "lineNumber": 2257
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_apply_decision",
+          "lineNumber": 2262
+        },
+        {
+          "caller": "_process_page",
+          "callee": "recovered_region_ids.add",
+          "lineNumber": 2272
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2274
+        },
+        {
+          "caller": "_process_page",
+          "callee": "callable",
+          "lineNumber": 2275
+        },
+        {
+          "caller": "_process_page",
+          "callee": "set",
+          "lineNumber": 2279
+        },
+        {
+          "caller": "_process_page",
+          "callee": "select_repair_blocks",
+          "lineNumber": 2280
+        },
+        {
+          "caller": "_process_page",
+          "callee": "selected.append",
+          "lineNumber": 2282
+        },
+        {
+          "caller": "_process_page",
+          "callee": "selected_ids.add",
+          "lineNumber": 2283
+        },
+        {
+          "caller": "_process_page",
+          "callee": "literal_repair_candidates",
+          "lineNumber": 2288
+        },
+        {
+          "caller": "_process_page",
+          "callee": "selected.append",
+          "lineNumber": 2290
+        },
+        {
+          "caller": "_process_page",
+          "callee": "selected_ids.add",
+          "lineNumber": 2291
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2298
+        },
+        {
+          "caller": "_process_page",
+          "callee": "literal_repair_candidates",
+          "lineNumber": 2304
+        },
+        {
+          "caller": "_process_page",
+          "callee": "callable",
+          "lineNumber": 2306
+        },
+        {
+          "caller": "_process_page",
+          "callee": "bool",
+          "lineNumber": 2307
+        },
+        {
+          "caller": "_process_page",
+          "callee": "requires_region_repair",
+          "lineNumber": 2308
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_span_repair_target",
+          "lineNumber": 2315
+        },
+        {
+          "caller": "_process_page",
+          "callee": "enumerate",
+          "lineNumber": 2324
+        },
+        {
+          "caller": "_process_page",
+          "callee": "consume_recovery_box",
+          "lineNumber": 2325
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_recovery_box_key",
+          "lineNumber": 2326
+        },
+        {
+          "caller": "_process_page",
+          "callee": "set",
+          "lineNumber": 2327
+        },
+        {
+          "caller": "_process_page",
+          "callee": "render_region_crop",
+          "lineNumber": 2338
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2350
+        },
+        {
+          "caller": "_process_page",
+          "callee": "span_requests.append",
+          "lineNumber": 2353
+        },
+        {
+          "caller": "_process_page",
+          "callee": "SpanRepairRequest",
+          "lineNumber": 2354
+        },
+        {
+          "caller": "_process_page",
+          "callee": "str",
+          "lineNumber": 2355
+        },
+        {
+          "caller": "_process_page",
+          "callee": "span_targets_by_block.setdefault(block.id, []).append",
+          "lineNumber": 2360
+        },
+        {
+          "caller": "_process_page",
+          "callee": "span_targets_by_block.setdefault",
+          "lineNumber": 2360
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2371
+        },
+        {
+          "caller": "_process_page",
+          "callee": "consume_recovery_box",
+          "lineNumber": 2375
+        },
+        {
+          "caller": "_process_page",
+          "callee": "render_region_crop",
+          "lineNumber": 2379
+        },
+        {
+          "caller": "_process_page",
+          "callee": "max",
+          "lineNumber": 2385
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2393
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2394
+        },
+        {
+          "caller": "_process_page",
+          "callee": "quality_requests.append",
+          "lineNumber": 2398
+        },
+        {
+          "caller": "_process_page",
+          "callee": "CropInspectionRequest",
+          "lineNumber": 2399
+        },
+        {
+          "caller": "_process_page",
+          "callee": "str",
+          "lineNumber": 2400
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_region_from_block",
+          "lineNumber": 2402
+        },
+        {
+          "caller": "_process_page",
+          "callee": "quality_blocks.append",
+          "lineNumber": 2407
+        },
+        {
+          "caller": "_process_page",
+          "callee": "list",
+          "lineNumber": 2410
+        },
+        {
+          "caller": "_process_page",
+          "callee": "zip",
+          "lineNumber": 2410
+        },
+        {
+          "caller": "_process_page",
+          "callee": "range",
+          "lineNumber": 2411
+        },
+        {
+          "caller": "_process_page",
+          "callee": "range",
+          "lineNumber": 2413
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2414
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2419
+        },
+        {
+          "caller": "_process_page",
+          "callee": "span_repairer",
+          "lineNumber": 2421
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2428
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decision.target_id.split",
+          "lineNumber": 2437
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decisions_by_block.setdefault(region_id, []).append",
+          "lineNumber": 2438
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decisions_by_block.setdefault",
+          "lineNumber": 2438
+        },
+        {
+          "caller": "_process_page",
+          "callee": "span_targets_by_block.items",
+          "lineNumber": 2441
+        },
+        {
+          "caller": "_process_page",
+          "callee": "decisions_by_block.get",
+          "lineNumber": 2451
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_apply_span_repairs",
+          "lineNumber": 2453
+        },
+        {
+          "caller": "_process_page",
+          "callee": "any",
+          "lineNumber": 2459
+        },
+        {
+          "caller": "_process_page",
+          "callee": "recovered_region_ids.add",
+          "lineNumber": 2463
+        },
+        {
+          "caller": "_process_page",
+          "callee": "range",
+          "lineNumber": 2465
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2465
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2468
+        },
+        {
+          "caller": "_process_page",
+          "callee": "quality_inspector",
+          "lineNumber": 2470
+        },
+        {
+          "caller": "_process_page",
+          "callee": "type",
+          "lineNumber": 2475
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_validated_crop_decisions",
+          "lineNumber": 2479
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2489
+        },
+        {
+          "caller": "_process_page",
+          "callee": "quality_decisions.get",
+          "lineNumber": 2493
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_apply_decision",
+          "lineNumber": 2498
+        },
+        {
+          "caller": "_process_page",
+          "callee": "recovered_region_ids.add",
+          "lineNumber": 2508
+        },
+        {
+          "caller": "_process_page",
+          "callee": "semantic_text(block).strip",
+          "lineNumber": 2512
+        },
+        {
+          "caller": "_process_page",
+          "callee": "semantic_text",
+          "lineNumber": 2512
+        },
+        {
+          "caller": "_process_page",
+          "callee": "grounded_corrections.append",
+          "lineNumber": 2514
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.append",
+          "lineNumber": 2538
+        },
+        {
+          "caller": "_process_page",
+          "callee": "len",
+          "lineNumber": 2539
+        },
+        {
+          "caller": "_process_page",
+          "callee": "normalize_page_blocks",
+          "lineNumber": 2542
+        },
+        {
+          "caller": "_process_page",
+          "callee": "(ocr_comparisons or {}).get",
+          "lineNumber": 2544
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_recovery_box_key",
+          "lineNumber": 2544
+        },
+        {
+          "caller": "_process_page",
+          "callee": "warnings.extend",
+          "lineNumber": 2555
+        },
+        {
+          "caller": "_process_page",
+          "callee": "int",
+          "lineNumber": 2558
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2558
+        },
+        {
+          "caller": "_process_page",
+          "callee": "int",
+          "lineNumber": 2559
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2559
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2560
+        },
+        {
+          "caller": "_process_page",
+          "callee": "isinstance",
+          "lineNumber": 2561
+        },
+        {
+          "caller": "_process_page",
+          "callee": "RunUsage",
+          "lineNumber": 2562
+        },
+        {
+          "caller": "_process_page",
+          "callee": "AgentUsage",
+          "lineNumber": 2564
+        },
+        {
+          "caller": "_process_page",
+          "callee": "_ProcessedPage",
+          "lineNumber": 2572
+        },
+        {
+          "caller": "_process_page",
+          "callee": "Page",
+          "lineNumber": 2573
+        },
+        {
+          "caller": "_process_page",
+          "callee": "list",
+          "lineNumber": 2583
+        },
+        {
+          "caller": "_process_page",
+          "callee": "getattr",
+          "lineNumber": 2583
+        },
+        {
+          "caller": "_process_page",
+          "callee": "sorted",
+          "lineNumber": 2585
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "time.perf_counter",
+          "lineNumber": 2595
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "render_agentic_document",
+          "lineNumber": 2596
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "EnhancementMetadata",
+          "lineNumber": 2600
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "RunUsage",
+          "lineNumber": 2601
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "EnhancementMetadata",
+          "lineNumber": 2608
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "RunUsage",
+          "lineNumber": 2612
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "os.getenv",
+          "lineNumber": 2616
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "EnhancementMetadata",
+          "lineNumber": 2620
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "RunUsage",
+          "lineNumber": 2621
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "build_enhancement_chunks",
+          "lineNumber": 2626
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "EnhancementMetadata",
+          "lineNumber": 2635
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2637
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "RunUsage",
+          "lineNumber": 2640
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "time.perf_counter",
+          "lineNumber": 2642
+        },
+        {
+          "caller": "refine",
+          "callee": "self.gateway_factory",
+          "lineNumber": 2646
+        },
+        {
+          "caller": "refine",
+          "callee": "getattr",
+          "lineNumber": 2647
+        },
+        {
+          "caller": "refine",
+          "callee": "callable",
+          "lineNumber": 2648
+        },
+        {
+          "caller": "refine",
+          "callee": "bind_runtime",
+          "lineNumber": 2649
+        },
+        {
+          "caller": "refine",
+          "callee": "getattr",
+          "lineNumber": 2650
+        },
+        {
+          "caller": "refine",
+          "callee": "callable",
+          "lineNumber": 2651
+        },
+        {
+          "caller": "refine",
+          "callee": "TypeError",
+          "lineNumber": 2652
+        },
+        {
+          "caller": "refine",
+          "callee": "refiner",
+          "lineNumber": 2653
+        },
+        {
+          "caller": "refine",
+          "callee": "render_chunk_plan",
+          "lineNumber": 2656
+        },
+        {
+          "caller": "refine",
+          "callee": "getattr",
+          "lineNumber": 2657
+        },
+        {
+          "caller": "refine",
+          "callee": "RunUsage",
+          "lineNumber": 2657
+        },
+        {
+          "caller": "refine",
+          "callee": "list",
+          "lineNumber": 2658
+        },
+        {
+          "caller": "refine",
+          "callee": "getattr",
+          "lineNumber": 2658
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2663
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "RunUsage",
+          "lineNumber": 2664
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "ThreadPoolExecutor",
+          "lineNumber": 2666
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "min",
+          "lineNumber": 2667
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2667
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "executor.submit",
+          "lineNumber": 2670
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "futures.items",
+          "lineNumber": 2671
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "future.result",
+          "lineNumber": 2673
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "warnings.append",
+          "lineNumber": 2676
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "type",
+          "lineNumber": 2678
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "sorted",
+          "lineNumber": 2680
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "refined_pages.update",
+          "lineNumber": 2682
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "isinstance",
+          "lineNumber": 2683
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "usage.calls.extend",
+          "lineNumber": 2684
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "trace.extend",
+          "lineNumber": 2685
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2687
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "combine_page_markdown",
+          "lineNumber": 2696
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "EnhancementMetadata",
+          "lineNumber": 2697
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2699
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "len",
+          "lineNumber": 2699
+        },
+        {
+          "caller": "_refine_document",
+          "callee": "time.perf_counter",
+          "lineNumber": 2705
+        },
+        {
+          "caller": "parse",
+          "callee": "time.perf_counter",
+          "lineNumber": 2717
+        },
+        {
+          "caller": "parse",
+          "callee": "ProviderRuntime",
+          "lineNumber": 2718
+        },
+        {
+          "caller": "parse",
+          "callee": "PageAnalyzer",
+          "lineNumber": 2719
+        },
+        {
+          "caller": "parse",
+          "callee": "tempfile.TemporaryDirectory",
+          "lineNumber": 2720
+        },
+        {
+          "caller": "parse",
+          "callee": "Path",
+          "lineNumber": 2721
+        },
+        {
+          "caller": "parse",
+          "callee": "ingest_document",
+          "lineNumber": 2722
+        },
+        {
+          "caller": "parse",
+          "callee": "self.ocr_service_switcher",
+          "lineNumber": 2732
+        },
+        {
+          "caller": "parse",
+          "callee": "analyzer.prepare_document",
+          "lineNumber": 2737
+        },
+        {
+          "caller": "parse",
+          "callee": "RunUsage",
+          "lineNumber": 2741
+        },
+        {
+          "caller": "parse",
+          "callee": "set",
+          "lineNumber": 2743
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 2745
+        },
+        {
+          "caller": "parse",
+          "callee": "bool",
+          "lineNumber": 2748
+        },
+        {
+          "caller": "parse",
+          "callee": "os.getenv",
+          "lineNumber": 2748
+        },
+        {
+          "caller": "parse",
+          "callee": "SimpleQueue",
+          "lineNumber": 2750
+        },
+        {
+          "caller": "queue_progress",
+          "callee": "progress_events.put",
+          "lineNumber": 2753
+        },
+        {
+          "caller": "drain_progress",
+          "callee": "progress_events.get_nowait",
+          "lineNumber": 2760
+        },
+        {
+          "caller": "drain_progress",
+          "callee": "progress_callback",
+          "lineNumber": 2763
+        },
+        {
+          "caller": "parse",
+          "callee": "range",
+          "lineNumber": 2767
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 2771
+        },
+        {
+          "caller": "parse",
+          "callee": "analyzer.analyze_window",
+          "lineNumber": 2779
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 2783
+        },
+        {
+          "caller": "parse",
+          "callee": "analyses_by_page.values",
+          "lineNumber": 2797
+        },
+        {
+          "caller": "parse",
+          "callee": "all",
+          "lineNumber": 2800
+        },
+        {
+          "caller": "parse",
+          "callee": "RuntimeError",
+          "lineNumber": 2801
+        },
+        {
+          "caller": "parse",
+          "callee": "any",
+          "lineNumber": 2811
+        },
+        {
+          "caller": "parse",
+          "callee": "all",
+          "lineNumber": 2819
+        },
+        {
+          "caller": "parse",
+          "callee": "region.text.strip",
+          "lineNumber": 2819
+        },
+        {
+          "caller": "parse",
+          "callee": "RuntimeError",
+          "lineNumber": 2821
+        },
+        {
+          "caller": "parse",
+          "callee": "time.perf_counter",
+          "lineNumber": 2826
+        },
+        {
+          "caller": "parse",
+          "callee": "_recover_paddle_form_regions",
+          "lineNumber": 2829
+        },
+        {
+          "caller": "parse",
+          "callee": "_PaddleFormRecovery",
+          "lineNumber": 2837
+        },
+        {
+          "caller": "parse",
+          "callee": "warnings.extend",
+          "lineNumber": 2839
+        },
+        {
+          "caller": "parse",
+          "callee": "_recover_glm_form_regions",
+          "lineNumber": 2846
+        },
+        {
+          "caller": "parse",
+          "callee": "_GlmFormRecovery",
+          "lineNumber": 2854
+        },
+        {
+          "caller": "parse",
+          "callee": "warnings.extend",
+          "lineNumber": 2856
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 2861
+        },
+        {
+          "caller": "parse",
+          "callee": "self._cross_check_uncertain_regions",
+          "lineNumber": 2869
+        },
+        {
+          "caller": "parse",
+          "callee": "comparisons_by_page.setdefault",
+          "lineNumber": 2878
+        },
+        {
+          "caller": "parse",
+          "callee": "_visual_recovery_crop_budget",
+          "lineNumber": 2881
+        },
+        {
+          "caller": "parse",
+          "callee": "_visual_recovery_plan",
+          "lineNumber": 2888
+        },
+        {
+          "caller": "parse",
+          "callee": "glm_form_recovery.statuses.items",
+          "lineNumber": 2897
+        },
+        {
+          "caller": "parse",
+          "callee": "deferred_recovery[page_number].difference_update",
+          "lineNumber": 2899
+        },
+        {
+          "caller": "parse",
+          "callee": "ThreadPoolExecutor",
+          "lineNumber": 2907
+        },
+        {
+          "caller": "parse",
+          "callee": "min",
+          "lineNumber": 2908
+        },
+        {
+          "caller": "parse",
+          "callee": "range",
+          "lineNumber": 2911
+        },
+        {
+          "caller": "parse",
+          "callee": "executor.submit",
+          "lineNumber": 2917
+        },
+        {
+          "caller": "parse",
+          "callee": "allowed_recovery.get",
+          "lineNumber": 2928
+        },
+        {
+          "caller": "parse",
+          "callee": "set",
+          "lineNumber": 2928
+        },
+        {
+          "caller": "parse",
+          "callee": "deferred_recovery.get",
+          "lineNumber": 2931
+        },
+        {
+          "caller": "parse",
+          "callee": "set",
+          "lineNumber": 2931
+        },
+        {
+          "caller": "parse",
+          "callee": "glm_form_recovery.statuses.get",
+          "lineNumber": 2934
+        },
+        {
+          "caller": "parse",
+          "callee": "comparisons_by_page.get",
+          "lineNumber": 2935
+        },
+        {
+          "caller": "parse",
+          "callee": "set",
+          "lineNumber": 2938
+        },
+        {
+          "caller": "parse",
+          "callee": "wait",
+          "lineNumber": 2942
+        },
+        {
+          "caller": "parse",
+          "callee": "drain_progress",
+          "lineNumber": 2947
+        },
+        {
+          "caller": "parse",
+          "callee": "processed.append",
+          "lineNumber": 2950
+        },
+        {
+          "caller": "parse",
+          "callee": "future.result",
+          "lineNumber": 2950
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 2952
+        },
+        {
+          "caller": "parse",
+          "callee": "remaining.cancel",
+          "lineNumber": 2961
+        },
+        {
+          "caller": "parse",
+          "callee": "drain_progress",
+          "lineNumber": 2963
+        },
+        {
+          "caller": "parse",
+          "callee": "sorted",
+          "lineNumber": 2965
+        },
+        {
+          "caller": "parse",
+          "callee": "_hierarchy",
+          "lineNumber": 2966
+        },
+        {
+          "caller": "parse",
+          "callee": "pages.append",
+          "lineNumber": 2967
+        },
+        {
+          "caller": "parse",
+          "callee": "Page",
+          "lineNumber": 2968
+        },
+        {
+          "caller": "parse",
+          "callee": "warnings.extend",
+          "lineNumber": 2978
+        },
+        {
+          "caller": "parse",
+          "callee": "usage.calls.extend",
+          "lineNumber": 2979
+        },
+        {
+          "caller": "parse",
+          "callee": "trace.extend",
+          "lineNumber": 2980
+        },
+        {
+          "caller": "parse",
+          "callee": "recovered_region_ids.update",
+          "lineNumber": 2982
+        },
+        {
+          "caller": "parse",
+          "callee": "Document",
+          "lineNumber": 2984
+        },
+        {
+          "caller": "parse",
+          "callee": "materialize_document_quality",
+          "lineNumber": 2990
+        },
+        {
+          "caller": "parse",
+          "callee": "_build_recovery_log",
+          "lineNumber": 2991
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 2992
+        },
+        {
+          "caller": "parse",
+          "callee": "build_elements",
+          "lineNumber": 2999
+        },
+        {
+          "caller": "parse",
+          "callee": "render_agentic_document",
+          "lineNumber": 3004
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 3005
+        },
+        {
+          "caller": "parse",
+          "callee": "render_annotated_pdf",
+          "lineNumber": 3012
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 3016
+        },
+        {
+          "caller": "parse",
+          "callee": "time.perf_counter",
+          "lineNumber": 3018
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 3020
+        },
+        {
+          "caller": "parse",
+          "callee": "self._refine_document",
+          "lineNumber": 3033
+        },
+        {
+          "caller": "parse",
+          "callee": "usage.calls.extend",
+          "lineNumber": 3038
+        },
+        {
+          "caller": "parse",
+          "callee": "trace.extend",
+          "lineNumber": 3039
+        },
+        {
+          "caller": "parse",
+          "callee": "runtime.diagnostics",
+          "lineNumber": 3042
+        },
+        {
+          "caller": "parse",
+          "callee": "round",
+          "lineNumber": 3043
+        },
+        {
+          "caller": "parse",
+          "callee": "time.perf_counter",
+          "lineNumber": 3043
+        },
+        {
+          "caller": "parse",
+          "callee": "getattr",
+          "lineNumber": 3044
+        },
+        {
+          "caller": "parse",
+          "callee": "version_getter",
+          "lineNumber": 3045
+        },
+        {
+          "caller": "parse",
+          "callee": "callable",
+          "lineNumber": 3045
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3046
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3049
+        },
+        {
+          "caller": "parse",
+          "callee": "ParseMetadata",
+          "lineNumber": 3052
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 3058
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3062
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3074
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 3075
+        },
+        {
+          "caller": "parse",
+          "callee": "deferred_recovery.values",
+          "lineNumber": 3075
+        },
+        {
+          "caller": "parse",
+          "callee": "sorted",
+          "lineNumber": 3077
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 3084
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3087
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3090
+        },
+        {
+          "caller": "parse",
+          "callee": "sum",
+          "lineNumber": 3093
+        },
+        {
+          "caller": "parse",
+          "callee": "max",
+          "lineNumber": 3096
+        },
+        {
+          "caller": "parse",
+          "callee": "len",
+          "lineNumber": 3097
+        },
+        {
+          "caller": "parse",
+          "callee": "render_agentic_document",
+          "lineNumber": 3112
+        },
+        {
+          "caller": "parse",
+          "callee": "_emit",
+          "lineNumber": 3124
+        },
+        {
+          "caller": "parse",
+          "callee": "ParseResult",
+          "lineNumber": 3125
+        }
+      ],
+      "metrics": {
+        "importCount": 13,
+        "exportCount": 58,
+        "functionCount": 50,
+        "classCount": 8
+      }
+    }
+  ]
+}

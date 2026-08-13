@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_form_routing.py:_result",
+      "type": "function",
+      "name": "_result",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        23,
+        54
+      ],
+      "summary": "Defines _result, a  routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_form_routing.py:test_custom_classification_repairs_invalid_grounding_once",
+      "type": "function",
+      "name": "test_custom_classification_repairs_invalid_grounding_once",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        164,
+        203
+      ],
+      "summary": "Defines test_custom_classification_repairs_invalid_grounding_once, a  routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_form_routing.py:test_routed_extraction_processes_only_approved_eligible_segments",
+      "type": "function",
+      "name": "test_routed_extraction_processes_only_approved_eligible_segments",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        206,
+        271
+      ],
+      "summary": "Defines test_routed_extraction_processes_only_approved_eligible_segments, a monkeypatch routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_form_routing.py:_profile",
+      "type": "function",
+      "name": "_profile",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        57,
+        72
+      ],
+      "summary": "Defines _profile, a  routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_form_routing.py:test_custom_classification_gates_low_confidence_and_assigns_schema",
+      "type": "function",
+      "name": "test_custom_classification_gates_low_confidence_and_assigns_schema",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        110,
+        126
+      ],
+      "summary": "Defines test_custom_classification_gates_low_confidence_and_assigns_schema, a  routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_form_routing.py:test_adjacent_same_category_forms_remain_separate_within_a_window",
+      "type": "function",
+      "name": "test_adjacent_same_category_forms_remain_separate_within_a_window",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        129,
+        161
+      ],
+      "summary": "Defines test_adjacent_same_category_forms_remain_separate_within_a_window, a  routine in test_form_routing.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_form_routing.py",
+      "type": "file",
+      "name": "test_form_routing.py",
+      "filePath": "tests/test_form_routing.py",
+      "summary": "Test module 'test_form_routing.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:tests/test_form_routing.py:RoutingGateway",
+      "type": "class",
+      "name": "RoutingGateway",
+      "filePath": "tests/test_form_routing.py",
+      "lineRange": [
+        75,
+        107
+      ],
+      "summary": "Defines the RoutingGateway class in test_form_routing.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "class:tests/test_form_routing.py:RoutingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_custom_classification_gates_low_confidence_and_assigns_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_custom_classification_repairs_invalid_grounding_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:_profile",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_custom_classification_gates_low_confidence_and_assigns_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "class:tests/test_form_routing.py:RoutingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_adjacent_same_category_forms_remain_separate_within_a_window",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_custom_classification_repairs_invalid_grounding_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_routed_extraction_processes_only_approved_eligible_segments",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_routed_extraction_processes_only_approved_eligible_segments",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:_profile",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:test_adjacent_same_category_forms_remain_separate_within_a_window",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_form_routing.py",
+      "target": "function:tests/test_form_routing.py:_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

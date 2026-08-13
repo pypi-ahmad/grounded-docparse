@@ -1,0 +1,1073 @@
+{
+  "nodes": [
+    {
+      "id": "function:streamlit_app.py:split_output_archive",
+      "type": "function",
+      "name": "split_output_archive",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        360,
+        366
+      ],
+      "summary": "Defines split_output_archive, a source, source_name, result, classification routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:select_element",
+      "type": "function",
+      "name": "select_element",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        390,
+        391
+      ],
+      "summary": "Defines select_element, a element_id routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:_profile_from_draft",
+      "type": "function",
+      "name": "_profile_from_draft",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        663,
+        684
+      ],
+      "summary": "Defines _profile_from_draft, a name, instructions, rows routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:ensure_ocr_engine",
+      "type": "function",
+      "name": "ensure_ocr_engine",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        253,
+        274
+      ],
+      "summary": "Defines ensure_ocr_engine, a engine routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:output_archive",
+      "type": "function",
+      "name": "output_archive",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        355,
+        356
+      ],
+      "summary": "Defines output_archive, a entries routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:apply_ade_preset",
+      "type": "function",
+      "name": "apply_ade_preset",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        226,
+        229
+      ],
+      "summary": "Defines apply_ade_preset, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:annotation_variant",
+      "type": "function",
+      "name": "annotation_variant",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        330,
+        351
+      ],
+      "summary": "Defines annotation_variant, a data, filename, elements_json, page_count, show_annotations, show_reading_order, selected_element_id, recovered_ids_json routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:_apply_routing_review",
+      "type": "function",
+      "name": "_apply_routing_review",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        879,
+        953
+      ],
+      "summary": "Defines _apply_routing_review, a classification, rows, page_count routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:streamlit_app.py:_missing_profile_schemas",
+      "type": "function",
+      "name": "_missing_profile_schemas",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        687,
+        697
+      ],
+      "summary": "Defines _missing_profile_schemas, a profile routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:streamlit_app.py",
+      "type": "file",
+      "name": "streamlit_app.py",
+      "filePath": "streamlit_app.py",
+      "summary": "Source or generated artifact 'streamlit_app.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:streamlit_app.py:reset_extraction_mode_state",
+      "type": "function",
+      "name": "reset_extraction_mode_state",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        209,
+        213
+      ],
+      "summary": "Defines reset_extraction_mode_state, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:default_document_state",
+      "type": "function",
+      "name": "default_document_state",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        145,
+        163
+      ],
+      "summary": "Defines default_document_state, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:flattened_toc",
+      "type": "function",
+      "name": "flattened_toc",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        383,
+        387
+      ],
+      "summary": "Defines flattened_toc, a sections, prefix routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:luna_usage_summary",
+      "type": "function",
+      "name": "luna_usage_summary",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        109,
+        122
+      ],
+      "summary": "Defines luna_usage_summary, a usage routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:capture_document_state",
+      "type": "function",
+      "name": "capture_document_state",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        172,
+        177
+      ],
+      "summary": "Defines capture_document_state, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:select_pdf_pages",
+      "type": "function",
+      "name": "select_pdf_pages",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        284,
+        293
+      ],
+      "summary": "Defines select_pdf_pages, a data, start, end routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:mark_ade_custom",
+      "type": "function",
+      "name": "mark_ade_custom",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        232,
+        242
+      ],
+      "summary": "Defines mark_ade_custom, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:preload_local_ocr",
+      "type": "function",
+      "name": "preload_local_ocr",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        246,
+        250
+      ],
+      "summary": "Defines preload_local_ocr, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:select_source",
+      "type": "function",
+      "name": "select_source",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        394,
+        397
+      ],
+      "summary": "Defines select_source, a element_id, page routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:render_classifier_profile_builder",
+      "type": "function",
+      "name": "render_classifier_profile_builder",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        700,
+        859
+      ],
+      "summary": "Defines render_classifier_profile_builder, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:streamlit_app.py:reset_document_state",
+      "type": "function",
+      "name": "reset_document_state",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        166,
+        169
+      ],
+      "summary": "Defines reset_document_state, a clear_session_usage routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:stage_markdown",
+      "type": "function",
+      "name": "stage_markdown",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        369,
+        374
+      ],
+      "summary": "Defines stage_markdown, a active, completed routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:pdf_page_count",
+      "type": "function",
+      "name": "pdf_page_count",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        278,
+        280
+      ],
+      "summary": "Defines pdf_page_count, a data routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:page_thumbnail",
+      "type": "function",
+      "name": "page_thumbnail",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        310,
+        326
+      ],
+      "summary": "Defines page_thumbnail, a data, filename, page_index routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:append_session_usage",
+      "type": "function",
+      "name": "append_session_usage",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        100,
+        106
+      ],
+      "summary": "Defines append_session_usage, a usage, skip_calls routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:workspace_settings",
+      "type": "function",
+      "name": "workspace_settings",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        201,
+        206
+      ],
+      "summary": "Defines workspace_settings, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:pdf_page",
+      "type": "function",
+      "name": "pdf_page",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        297,
+        306
+      ],
+      "summary": "Defines pdf_page, a data, page_index routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:flattened_blocks",
+      "type": "function",
+      "name": "flattened_blocks",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        377,
+        380
+      ],
+      "summary": "Defines flattened_blocks, a blocks, depth routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:save_active_workspace",
+      "type": "function",
+      "name": "save_active_workspace",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        180,
+        184
+      ],
+      "summary": "Defines save_active_workspace, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:_classification_rows",
+      "type": "function",
+      "name": "_classification_rows",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        862,
+        876
+      ],
+      "summary": "Defines _classification_rows, a classification routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:initialize_ade_mode",
+      "type": "function",
+      "name": "initialize_ade_mode",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        216,
+        223
+      ],
+      "summary": "Defines initialize_ade_mode, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:_profile_rows",
+      "type": "function",
+      "name": "_profile_rows",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        651,
+        660
+      ],
+      "summary": "Defines _profile_rows, a profile routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:load_workspace",
+      "type": "function",
+      "name": "load_workspace",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        187,
+        191
+      ],
+      "summary": "Defines load_workspace, a document_id routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:switch_active_document",
+      "type": "function",
+      "name": "switch_active_document",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        194,
+        198
+      ],
+      "summary": "Defines switch_active_document, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:streamlit_app.py:render_schema_builder",
+      "type": "function",
+      "name": "render_schema_builder",
+      "filePath": "streamlit_app.py",
+      "lineRange": [
+        408,
+        648
+      ],
+      "summary": "Defines render_schema_builder, a  routine in streamlit_app.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_apply_routing_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:pdf_page_count",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:render_classifier_profile_builder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:load_workspace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:initialize_ade_mode",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:flattened_toc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:page_thumbnail",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:annotation_variant",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:reset_extraction_mode_state",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:luna_usage_summary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:flattened_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:render_schema_builder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:stage_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:reset_extraction_mode_state",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_pdf_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:stage_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:switch_active_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:flattened_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:render_schema_builder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:output_archive",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:preload_local_ocr",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:pdf_page_count",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:capture_document_state",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:default_document_state",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:append_session_usage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:workspace_settings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_profile_rows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_apply_routing_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:save_active_workspace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:split_output_archive",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:workspace_settings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:ensure_ocr_engine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:apply_ade_preset",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_element",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_missing_profile_schemas",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:append_session_usage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_missing_profile_schemas",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:ensure_ocr_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:preload_local_ocr",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:split_output_archive",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:pdf_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:annotation_variant",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:mark_ade_custom",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:save_active_workspace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_classification_rows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:reset_document_state",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_source",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:apply_ade_preset",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:capture_document_state",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:mark_ade_custom",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:page_thumbnail",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:initialize_ade_mode",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_profile_from_draft",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:luna_usage_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_classification_rows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:default_document_state",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:load_workspace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_source",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_profile_from_draft",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:_profile_rows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_pdf_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:render_classifier_profile_builder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:select_element",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:pdf_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:flattened_toc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:switch_active_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:reset_document_state",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:streamlit_app.py",
+      "target": "function:streamlit_app.py:output_archive",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

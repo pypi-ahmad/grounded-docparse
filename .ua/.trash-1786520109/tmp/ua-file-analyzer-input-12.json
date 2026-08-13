@@ -1,0 +1,13 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {"path": ".ua/.understandignore", "language": "unknown", "sizeLines": 106, "fileCategory": "code"},
+    {"path": ".ua/config.json", "language": "json", "sizeLines": 3, "fileCategory": "config"},
+    {"path": ".ua/domain-graph.json", "language": "json", "sizeLines": 228, "fileCategory": "config"},
+    {"path": "benchmarks/policies/live-evaluation.example.json", "language": "json", "sizeLines": 32, "fileCategory": "config"},
+    {"path": "examples/schemas/invoice.schema.json", "language": "json", "sizeLines": 50, "fileCategory": "config"},
+    {"path": "paddle-runtime/pyproject.toml", "language": "toml", "sizeLines": 14, "fileCategory": "config"},
+    {"path": "scripts/evaluate_corpus.py", "language": "python", "sizeLines": 444, "fileCategory": "code"}
+  ],
+  "batchImportData": {".ua/.understandignore": [], ".ua/config.json": [], ".ua/domain-graph.json": [], "benchmarks/policies/live-evaluation.example.json": [], "examples/schemas/invoice.schema.json": [], "paddle-runtime/pyproject.toml": [], "scripts/evaluate_corpus.py": []}
+}

@@ -1,0 +1,91 @@
+{
+  "projectRoot": "D:/AI/Github/grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786452692/batch-3-part-2.json",
+      "language": "json",
+      "sizeLines": 2458,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-4.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-5.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-6.json",
+      "language": "json",
+      "sizeLines": 61,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-7.json",
+      "language": "json",
+      "sizeLines": 265,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-8.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-9.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batches.json",
+      "language": "json",
+      "sizeLines": 4376,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/fingerprint-input.json",
+      "language": "json",
+      "sizeLines": 183,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/layers.json",
+      "language": "json",
+      "sizeLines": 222,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/review.json",
+      "language": "json",
+      "sizeLines": 145,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tour.json",
+      "language": "json",
+      "sizeLines": 84,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786452692/batch-3-part-2.json": [],
+    ".ua/.trash-1786452692/batch-4.json": [],
+    ".ua/.trash-1786452692/batch-5.json": [],
+    ".ua/.trash-1786452692/batch-6.json": [],
+    ".ua/.trash-1786452692/batch-7.json": [],
+    ".ua/.trash-1786452692/batch-8.json": [],
+    ".ua/.trash-1786452692/batch-9.json": [],
+    ".ua/.trash-1786452692/batches.json": [],
+    ".ua/.trash-1786452692/fingerprint-input.json": [],
+    ".ua/.trash-1786452692/layers.json": [],
+    ".ua/.trash-1786452692/review.json": [],
+    ".ua/.trash-1786452692/tour.json": []
+  }
+}

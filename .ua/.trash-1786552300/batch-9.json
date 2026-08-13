@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-1-part-1.json",
+      "type": "config",
+      "name": "batch-1-part-1.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-1.json",
+      "summary": "Configuration stored in batch-1-part-1.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-1-part-2.json",
+      "type": "config",
+      "name": "batch-1-part-2.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-2.json",
+      "summary": "Configuration stored in batch-1-part-2.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-1-part-3.json",
+      "type": "config",
+      "name": "batch-1-part-3.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-3.json",
+      "summary": "Configuration stored in batch-1-part-3.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-1-part-4.json",
+      "type": "config",
+      "name": "batch-1-part-4.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-4.json",
+      "summary": "Configuration stored in batch-1-part-4.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-1-part-5.json",
+      "type": "config",
+      "name": "batch-1-part-5.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-5.json",
+      "summary": "Configuration stored in batch-1-part-5.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-13-part-1.json",
+      "type": "config",
+      "name": "batch-13-part-1.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-1.json",
+      "summary": "Configuration stored in batch-13-part-1.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-13-part-2.json",
+      "type": "config",
+      "name": "batch-13-part-2.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-2.json",
+      "summary": "Configuration stored in batch-13-part-2.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-13-part-3.json",
+      "type": "config",
+      "name": "batch-13-part-3.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-3.json",
+      "summary": "Configuration stored in batch-13-part-3.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786452692/tmp/retry-backup/batch-13-part-4.json",
+      "type": "config",
+      "name": "batch-13-part-4.json",
+      "filePath": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-4.json",
+      "summary": "Configuration stored in batch-13-part-4.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

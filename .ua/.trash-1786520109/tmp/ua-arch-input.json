@@ -1,0 +1,3367 @@
+{
+  "fileNodes": [
+    {
+      "id": "file:src/grounded_docparse/enhancement.py",
+      "type": "file",
+      "name": "enhancement.py",
+      "filePath": "src/grounded_docparse/enhancement.py",
+      "summary": "Builds compatible page chunks and combines enhancement output into document Markdown.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/quality.py",
+      "type": "file",
+      "name": "quality.py",
+      "filePath": "src/grounded_docparse/quality.py",
+      "summary": "Evaluates page content quality and selects evidence-based recovery or repair candidates.",
+      "tags": [
+        "document-parsing",
+        "python",
+        "library",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/grounded_docparse/__init__.py",
+      "summary": "Exposes the public parsing, configuration, extraction, rendering, and agentic APIs for the grounded document parser package.",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "public-api"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/agentic.py",
+      "type": "file",
+      "name": "agentic.py",
+      "filePath": "src/grounded_docparse/agentic.py",
+      "summary": "Coordinates agentic document analysis, form routing, schema-guided extraction, table-of-contents generation, and grounded document chat.",
+      "tags": [
+        "agentic",
+        "orchestration",
+        "document-analysis",
+        "extraction"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/extraction.py",
+      "type": "file",
+      "name": "extraction.py",
+      "filePath": "src/grounded_docparse/extraction.py",
+      "summary": "Implements schema validation and grounded field extraction with citation resolution, evidence checks, and structured result construction.",
+      "tags": [
+        "extraction",
+        "validation",
+        "grounding",
+        "schema"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/gateways.py",
+      "type": "file",
+      "name": "gateways.py",
+      "filePath": "src/grounded_docparse/gateways.py",
+      "summary": "Provides the OpenAI-backed document gateway for structured multimodal requests, response validation, usage tracking, and agent operations.",
+      "tags": [
+        "gateway",
+        "openai",
+        "multimodal",
+        "provider"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/prompts.py",
+      "type": "file",
+      "name": "prompts.py",
+      "filePath": "src/grounded_docparse/prompts.py",
+      "summary": "Centralizes security instructions that constrain document-processing prompts used by provider requests.",
+      "tags": [
+        "prompts",
+        "security",
+        "provider",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/runtime.py",
+      "type": "file",
+      "name": "runtime.py",
+      "filePath": "src/grounded_docparse/runtime.py",
+      "summary": "Manages provider concurrency, retry behavior, request budgets, and diagnostics for document-processing calls.",
+      "tags": [
+        "runtime",
+        "rate-limiting",
+        "retries",
+        "provider"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/ingest.py",
+      "type": "file",
+      "name": "ingest.py",
+      "filePath": "src/grounded_docparse/ingest.py",
+      "summary": "Ingests PDF and image uploads into normalized, rendered page evidence for downstream document analysis.",
+      "tags": [
+        "document-ingestion",
+        "pdf",
+        "image-processing",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/local_ocr.py",
+      "type": "file",
+      "name": "local_ocr.py",
+      "filePath": "src/grounded_docparse/local_ocr.py",
+      "summary": "Provides the serialized local GLM-OCR runtime and converts its responses into normalized OCR page regions.",
+      "tags": [
+        "ocr",
+        "runtime",
+        "glm-ocr",
+        "normalization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "file",
+      "name": "paddle_ocr.py",
+      "filePath": "src/grounded_docparse/paddle_ocr.py",
+      "summary": "Implements the PaddleOCR-VL service client and normalizes its document-parsing output into OCR regions.",
+      "tags": [
+        "ocr",
+        "paddleocr",
+        "service-client",
+        "normalization"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/page_analysis.py",
+      "type": "file",
+      "name": "page_analysis.py",
+      "filePath": "src/grounded_docparse/page_analysis.py",
+      "summary": "Analyzes page layout, OCR, reading order, and visual features to construct grounded page drafts.",
+      "tags": [
+        "page-analysis",
+        "layout-analysis",
+        "ocr",
+        "document-parsing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.env.example",
+      "type": "config",
+      "name": ".env.example",
+      "filePath": ".env.example",
+      "summary": "Provides example environment variables for OpenAI access, local OCR runtime tuning, document limits, and provider retry behavior.",
+      "tags": [
+        "configuration",
+        "environment",
+        "ocr",
+        "provider-settings"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:CONTRIBUTING.md",
+      "type": "document",
+      "name": "CONTRIBUTING.md",
+      "filePath": "CONTRIBUTING.md",
+      "summary": "Defines contributor setup, development and verification workflows, documentation expectations, pull-request guidance, and architecture constraints.",
+      "tags": [
+        "documentation",
+        "development",
+        "contributing",
+        "workflow"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:Launch-GLM-OCR.cmd",
+      "type": "file",
+      "name": "Launch-GLM-OCR.cmd",
+      "filePath": "Launch-GLM-OCR.cmd",
+      "summary": "Windows launcher that selects the GLM-OCR engine, forwards optional OpenAI settings into WSL, starts the OCR stack, and opens the Streamlit application.",
+      "tags": [
+        "windows",
+        "launcher",
+        "wsl",
+        "glm-ocr"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Batch script propagates selected Windows environment variables through WSLENV before starting the WSL stack."
+    },
+    {
+      "id": "file:Launch-PaddleOCR-VL-1.6.cmd",
+      "type": "file",
+      "name": "Launch-PaddleOCR-VL-1.6.cmd",
+      "filePath": "Launch-PaddleOCR-VL-1.6.cmd",
+      "summary": "Windows launcher that selects PaddleOCR-VL-1.6, forwards optional OpenAI settings into WSL, starts the OCR stack, and opens the Streamlit application.",
+      "tags": [
+        "windows",
+        "launcher",
+        "wsl",
+        "paddleocr"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Batch script propagates selected Windows environment variables through WSLENV before starting the WSL stack."
+    },
+    {
+      "id": "document:SECURITY.md",
+      "type": "document",
+      "name": "SECURITY.md",
+      "filePath": "SECURITY.md",
+      "summary": "States the project security policy and the supported channel for reporting security vulnerabilities.",
+      "tags": [
+        "documentation",
+        "security",
+        "policy"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:SETUP.md",
+      "type": "document",
+      "name": "SETUP.md",
+      "filePath": "SETUP.md",
+      "summary": "Provides prerequisites, automated Windows installation, manual WSL setup, Luna configuration, environment-variable reference, verification, and troubleshooting guidance.",
+      "tags": [
+        "documentation",
+        "setup",
+        "windows",
+        "wsl"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:Setup-GLM-OCR.cmd",
+      "type": "file",
+      "name": "Setup-GLM-OCR.cmd",
+      "filePath": "Setup-GLM-OCR.cmd",
+      "summary": "Windows bootstrap wrapper that invokes the PowerShell installer in provisioning mode for the repository installation root.",
+      "tags": [
+        "windows",
+        "installer",
+        "bootstrap",
+        "glm-ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/checkboxes.json",
+      "type": "config",
+      "name": "checkboxes.json",
+      "filePath": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "summary": "Defines benchmark reference annotations for the checkboxes corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "type": "config",
+      "name": "cross-page-table.json",
+      "filePath": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "summary": "Defines benchmark reference annotations for the cross page table corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "type": "config",
+      "name": "degraded-scan.json",
+      "filePath": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "summary": "Defines benchmark reference annotations for the degraded scan corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/figure-chart.json",
+      "type": "config",
+      "name": "figure-chart.json",
+      "filePath": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "summary": "Defines benchmark reference annotations for the figure chart corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/form.json",
+      "type": "config",
+      "name": "form.json",
+      "filePath": "benchmarks/corpus-v1/annotations/form.json",
+      "summary": "Defines benchmark reference annotations for the form corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/lists.json",
+      "type": "config",
+      "name": "lists.json",
+      "filePath": "benchmarks/corpus-v1/annotations/lists.json",
+      "summary": "Defines benchmark reference annotations for the lists corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/multi-column.json",
+      "type": "config",
+      "name": "multi-column.json",
+      "filePath": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "summary": "Defines benchmark reference annotations for the multi column corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/native-text.json",
+      "type": "config",
+      "name": "native-text.json",
+      "filePath": "benchmarks/corpus-v1/annotations/native-text.json",
+      "summary": "Defines benchmark reference annotations for the native text corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "type": "config",
+      "name": "public-water-mass-mailing.json",
+      "filePath": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "summary": "Defines benchmark reference annotations for the public water mass mailing corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "type": "config",
+      "name": "synthetic-medical-fax.json",
+      "filePath": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "summary": "Defines benchmark reference annotations for the synthetic medical fax corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "type": "config",
+      "name": "synthetic-report.json",
+      "filePath": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "summary": "Defines benchmark reference annotations for the synthetic report corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/tables.json",
+      "type": "config",
+      "name": "tables.json",
+      "filePath": "benchmarks/corpus-v1/annotations/tables.json",
+      "summary": "Defines benchmark reference annotations for the tables corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "type": "config",
+      "name": "unicode-identifiers.json",
+      "filePath": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "summary": "Defines benchmark reference annotations for the unicode identifiers corpus document, including expected text, anchors, tables, and grounding regions.",
+      "tags": [
+        "configuration",
+        "benchmarking",
+        "evaluation",
+        "reference-data"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/schemas/annotation-v1.1.schema.json",
+      "type": "config",
+      "name": "annotation-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/annotation-v1.1.schema.json",
+      "summary": "Defines version 1.1 evaluation annotations, including grounded references, document anchors, tables, regions, and required document identity.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "grounding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.schema.json",
+      "summary": "Defines the original evaluation corpus manifest format with versioned document sources, annotation paths, features, and synthetic markers.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "corpus"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/agentic-document-extraction-comparison.html",
+      "type": "file",
+      "name": "agentic-document-extraction-comparison.html",
+      "filePath": "docs-site/agentic-document-extraction-comparison.html",
+      "summary": "Documentation page comparing Grounded DocParse with LandingAI ADE for agentic document extraction.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/api.html",
+      "type": "file",
+      "name": "api.html",
+      "filePath": "docs-site/api.html",
+      "summary": "Documentation page describing the public Python API for Grounded DocParse.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/architecture.html",
+      "type": "file",
+      "name": "architecture.html",
+      "filePath": "docs-site/architecture.html",
+      "summary": "Documentation page explaining the system architecture and major parser components.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/azure-bulk-fax-deployment.html",
+      "type": "file",
+      "name": "azure-bulk-fax-deployment.html",
+      "filePath": "docs-site/azure-bulk-fax-deployment.html",
+      "summary": "Deployment guide for processing bulk medical faxes with Grounded DocParse on Azure.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/business-user-extraction-workflow.html",
+      "type": "file",
+      "name": "business-user-extraction-workflow.html",
+      "filePath": "docs-site/business-user-extraction-workflow.html",
+      "summary": "Workflow guide for business users extracting large structured field sets from documents.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/changelog.html",
+      "type": "file",
+      "name": "changelog.html",
+      "filePath": "docs-site/changelog.html",
+      "summary": "Published changelog page tracking user-visible project releases and changes.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/complete-user-guide.html",
+      "type": "file",
+      "name": "complete-user-guide.html",
+      "filePath": "docs-site/complete-user-guide.html",
+      "summary": "Comprehensive documentation covering installation, configuration, workflows, and parser use.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/contributing.html",
+      "type": "file",
+      "name": "contributing.html",
+      "filePath": "docs-site/contributing.html",
+      "summary": "Contributor documentation covering how to participate in project development.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/extraction-quality-research.html",
+      "type": "file",
+      "name": "extraction-quality-research.html",
+      "filePath": "docs-site/extraction-quality-research.html",
+      "summary": "Research documentation on extraction quality methods and evaluation findings.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/how-grounded-docparse-is-agentic.html",
+      "type": "file",
+      "name": "how-grounded-docparse-is-agentic.html",
+      "filePath": "docs-site/how-grounded-docparse-is-agentic.html",
+      "summary": "Documentation explaining the project’s agentic document-parsing behavior and evidence model.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/how-it-works.html",
+      "type": "file",
+      "name": "how-it-works.html",
+      "filePath": "docs-site/how-it-works.html",
+      "summary": "High-level explanation of the document parsing workflow and its outputs.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "docs-site/index.html",
+      "summary": "Documentation-site landing page introducing Grounded DocParse and its evidence-driven parsing approach.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/issue-template--bug-report.html",
+      "type": "file",
+      "name": "issue-template--bug-report.html",
+      "filePath": "docs-site/issue-template--bug-report.html",
+      "summary": "Rendered documentation page for the bug-report issue template.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/issue-template--feature-request.html",
+      "type": "file",
+      "name": "issue-template--feature-request.html",
+      "filePath": "docs-site/issue-template--feature-request.html",
+      "summary": "Rendered documentation page for the feature-request issue template.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/layout-aware-large-field-extraction-workflow.html",
+      "type": "file",
+      "name": "layout-aware-large-field-extraction-workflow.html",
+      "filePath": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "summary": "Workflow guide for layout-aware extraction of large structured field sets.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/local-glmocr.html",
+      "type": "file",
+      "name": "local-glmocr.html",
+      "filePath": "docs-site/local-glmocr.html",
+      "summary": "Setup documentation for running the local GLM-OCR runtime.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/local-paddleocr-vl.html",
+      "type": "file",
+      "name": "local-paddleocr-vl.html",
+      "filePath": "docs-site/local-paddleocr-vl.html",
+      "summary": "Setup documentation for running the local PaddleOCR-VL runtime.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/research.html",
+      "type": "file",
+      "name": "research.html",
+      "filePath": "docs-site/research.html",
+      "summary": "Documentation page describing the design basis and research informing the parser.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/run.html",
+      "type": "file",
+      "name": "run.html",
+      "filePath": "docs-site/run.html",
+      "summary": "Local execution guide for running Grounded DocParse.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/security-content-excluded.html",
+      "type": "file",
+      "name": "security-content-excluded.html",
+      "filePath": "docs-site/security-content-excluded.html",
+      "summary": "Documentation notice identifying content intentionally excluded for security reasons.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/setup.html",
+      "type": "file",
+      "name": "setup.html",
+      "filePath": "docs-site/setup.html",
+      "summary": "Static documentation page rendering setup instructions for prerequisites, Windows installation, WSL operation, Luna configuration, verification, and troubleshooting.",
+      "tags": [
+        "documentation",
+        "static-site",
+        "setup",
+        "html"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:docs-site/site-manifest.json",
+      "type": "config",
+      "name": "site-manifest.json",
+      "filePath": "docs-site/site-manifest.json",
+      "summary": "Lists source documentation included in the generated documentation site, the excluded-document count, and the resulting HTML page inventory.",
+      "tags": [
+        "configuration",
+        "documentation",
+        "static-site",
+        "manifest"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/spec.html",
+      "type": "file",
+      "name": "spec.html",
+      "filePath": "docs-site/spec.html",
+      "summary": "Static documentation page presenting the product specification, including goals, inputs, required behavior, public interfaces, non-goals, and completion criteria.",
+      "tags": [
+        "documentation",
+        "static-site",
+        "specification",
+        "html"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/tutorial.html",
+      "type": "file",
+      "name": "tutorial.html",
+      "filePath": "docs-site/tutorial.html",
+      "summary": "Static documentation page providing a concise tutorial for using Grounded DocParse.",
+      "tags": [
+        "documentation",
+        "static-site",
+        "tutorial",
+        "html"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/zero-to-hero-tutorial.html",
+      "type": "file",
+      "name": "zero-to-hero-tutorial.html",
+      "filePath": "docs-site/zero-to-hero-tutorial.html",
+      "summary": "Comprehensive static tutorial that explains document parsing concepts, setup, Streamlit workflows, extraction and routing, APIs, architecture, safety, testing, and troubleshooting.",
+      "tags": [
+        "documentation",
+        "static-site",
+        "tutorial",
+        "architecture"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/azure-bulk-fax-deployment.md",
+      "type": "document",
+      "name": "azure-bulk-fax-deployment.md",
+      "filePath": "docs/azure-bulk-fax-deployment.md",
+      "summary": "Guides Azure deployment for bulk fax processing.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/extraction-quality-research.md",
+      "type": "document",
+      "name": "extraction-quality-research.md",
+      "filePath": "docs/extraction-quality-research.md",
+      "summary": "Summarizes research on extraction-quality evaluation.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/how-grounded-docparse-is-agentic.md",
+      "type": "document",
+      "name": "how-grounded-docparse-is-agentic.md",
+      "filePath": "docs/how-grounded-docparse-is-agentic.md",
+      "summary": "Explains the product's agentic document-processing design.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/layout-aware-large-field-extraction-workflow.md",
+      "type": "document",
+      "name": "layout-aware-large-field-extraction-workflow.md",
+      "filePath": "docs/layout-aware-large-field-extraction-workflow.md",
+      "summary": "Documents layout-aware extraction of large structured fields.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/local-glmocr.md",
+      "type": "document",
+      "name": "local-glmocr.md",
+      "filePath": "docs/local-glmocr.md",
+      "summary": "Explains local GLM-OCR setup and usage.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/local-paddleocr-vl.md",
+      "type": "document",
+      "name": "local-paddleocr-vl.md",
+      "filePath": "docs/local-paddleocr-vl.md",
+      "summary": "Explains local PaddleOCR-VL setup and usage.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/research.md",
+      "type": "document",
+      "name": "research.md",
+      "filePath": "docs/research.md",
+      "summary": "Indexes related research material.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/run.md",
+      "type": "document",
+      "name": "run.md",
+      "filePath": "docs/run.md",
+      "summary": "Provides commands and guidance for running the project.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/tutorial.md",
+      "type": "document",
+      "name": "tutorial.md",
+      "filePath": "docs/tutorial.md",
+      "summary": "Offers a short getting-started tutorial.",
+      "tags": [
+        "documentation",
+        "document-parsing",
+        "tutorial"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/launch-stack.sh",
+      "type": "file",
+      "name": "launch-stack.sh",
+      "filePath": "scripts/wsl/launch-stack.sh",
+      "summary": "Starts the requested local OCR engine and the Streamlit application with health checks and process locking.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/manage-ocr-stack.sh",
+      "type": "file",
+      "name": "manage-ocr-stack.sh",
+      "filePath": "scripts/wsl/manage-ocr-stack.sh",
+      "summary": "Ensures exactly one managed local OCR service stack is running in WSL.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/run-app.sh",
+      "type": "file",
+      "name": "run-app.sh",
+      "filePath": "scripts/wsl/run-app.sh",
+      "summary": "Activates the WSL runtime, prepares the configured local OCR backend, and launches the application.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/serve-glmocr.sh",
+      "type": "file",
+      "name": "serve-glmocr.sh",
+      "filePath": "scripts/wsl/serve-glmocr.sh",
+      "summary": "Starts the GLM-OCR service using the prepared local runtime.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/serve-ollama.sh",
+      "type": "file",
+      "name": "serve-ollama.sh",
+      "filePath": "scripts/wsl/serve-ollama.sh",
+      "summary": "Starts the Ollama service used as a local OCR backend.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/setup-glmocr.sh",
+      "type": "file",
+      "name": "setup-glmocr.sh",
+      "filePath": "scripts/wsl/setup-glmocr.sh",
+      "summary": "Creates and configures the WSL environment for the local GLM-OCR runtime.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/setup-ollama.sh",
+      "type": "file",
+      "name": "setup-ollama.sh",
+      "filePath": "scripts/wsl/setup-ollama.sh",
+      "summary": "Installs and configures Ollama for local OCR inference in WSL.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:scripts/wsl/setup-paddleocr.sh",
+      "type": "file",
+      "name": "setup-paddleocr.sh",
+      "filePath": "scripts/wsl/setup-paddleocr.sh",
+      "summary": "Creates the PaddleOCR WSL environment and prepares its runtime dependencies.",
+      "tags": [
+        "wsl",
+        "shell-script",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Bash strict mode (`set -euo pipefail`) makes startup and setup failures explicit."
+    },
+    {
+      "id": "file:.gitattributes",
+      "type": "file",
+      "name": ".gitattributes",
+      "filePath": ".gitattributes",
+      "summary": "Defines repository Git attribute handling rules.",
+      "tags": [
+        "git",
+        "configuration",
+        "repository"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.github/ISSUE_TEMPLATE/bug_report.md",
+      "type": "document",
+      "name": "bug_report.md",
+      "filePath": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "summary": "GitHub issue template that collects reproducible bug-report details.",
+      "tags": [
+        "documentation",
+        "github",
+        "issue-template"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:.github/ISSUE_TEMPLATE/feature_request.md",
+      "type": "document",
+      "name": "feature_request.md",
+      "filePath": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "summary": "GitHub issue template that structures feature requests and their rationale.",
+      "tags": [
+        "documentation",
+        "github",
+        "issue-template"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.streamlit/config.toml",
+      "type": "config",
+      "name": "config.toml",
+      "filePath": ".streamlit/config.toml",
+      "summary": "Configures Streamlit upload limits and the dark application theme.",
+      "tags": [
+        "configuration",
+        "streamlit",
+        "theme"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:benchmarks/baselines/offline-native-v1.json",
+      "type": "config",
+      "name": "offline-native-v1.json",
+      "filePath": "benchmarks/baselines/offline-native-v1.json",
+      "summary": "Records an offline native-ingest benchmark baseline with per-document metrics, aggregate results, telemetry caveats, and limitations.",
+      "tags": [
+        "configuration",
+        "benchmark",
+        "evaluation",
+        "baseline"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:benchmarks/corpus-v1/manifest.json",
+      "type": "config",
+      "name": "manifest.json",
+      "filePath": "benchmarks/corpus-v1/manifest.json",
+      "summary": "Defines the synthetic evaluation corpus, its source documents, annotations, checksums, and covered document features.",
+      "tags": [
+        "configuration",
+        "benchmark",
+        "corpus",
+        "manifest"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "type": "config",
+      "name": "openai-standard-2026-07-28.json",
+      "filePath": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "summary": "Defines dated OpenAI standard pricing data for evaluation cost calculations.",
+      "tags": [
+        "configuration",
+        "benchmark",
+        "pricing",
+        "rate-card"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:config/glmocr.yaml",
+      "type": "config",
+      "name": "glmocr.yaml",
+      "filePath": "config/glmocr.yaml",
+      "summary": "Configures the GLM-OCR pipeline, OpenAI-compatible API runtime, page processing, formatting, layout analysis, and recognition labels.",
+      "tags": [
+        "configuration",
+        "glm-ocr",
+        "ocr",
+        "runtime"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:config/paddle-vllm.yaml",
+      "type": "config",
+      "name": "paddle-vllm.yaml",
+      "filePath": "config/paddle-vllm.yaml",
+      "summary": "Sets Paddle vLLM GPU-memory, batching, prefix-cache, and multimodal processor-cache options.",
+      "tags": [
+        "configuration",
+        "paddleocr",
+        "vllm",
+        "runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:docs-site/assets/app.js",
+      "type": "file",
+      "name": "app.js",
+      "filePath": "docs-site/assets/app.js",
+      "summary": "Provides documentation-site navigation, filtering, search, reading-progress, outline, clipboard, and external-link behavior.",
+      "tags": [
+        "static-site",
+        "javascript",
+        "ui",
+        "search"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/assets/styles.css",
+      "type": "file",
+      "name": "styles.css",
+      "filePath": "docs-site/assets/styles.css",
+      "summary": "Defines the responsive visual system and component styling for the generated documentation site.",
+      "tags": [
+        "static-site",
+        "css",
+        "styling",
+        "responsive"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:installer/GroundedDocParse.iss",
+      "type": "file",
+      "name": "GroundedDocParse.iss",
+      "filePath": "installer/GroundedDocParse.iss",
+      "summary": "Inno Setup definition that packages the Windows launcher, application source, WSL scripts, configuration, and provisioning step.",
+      "tags": [
+        "installer",
+        "windows",
+        "inno-setup",
+        "packaging"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:installer/Install-GroundedDocParse.ps1",
+      "type": "file",
+      "name": "Install-GroundedDocParse.ps1",
+      "filePath": "installer/Install-GroundedDocParse.ps1",
+      "summary": "Windows installer that provisions WSL, runtime dependencies, local OCR services, and application launch or uninstall behavior.",
+      "tags": [
+        "windows",
+        "installer",
+        "wsl",
+        "provisioning"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-business.pptx",
+      "type": "file",
+      "name": "grounded-docparse-business.pptx",
+      "filePath": "presentations/grounded-docparse-business.pptx",
+      "summary": "Business-oriented presentation deck for Grounded DocParse.",
+      "tags": [
+        "presentation",
+        "business",
+        "documentation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-github-overview.pptx",
+      "type": "file",
+      "name": "grounded-docparse-github-overview.pptx",
+      "filePath": "presentations/grounded-docparse-github-overview.pptx",
+      "summary": "Presentation deck providing a GitHub-oriented overview of Grounded DocParse.",
+      "tags": [
+        "presentation",
+        "github",
+        "documentation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:presentations/grounded-docparse-technical.pptx",
+      "type": "file",
+      "name": "grounded-docparse-technical.pptx",
+      "filePath": "presentations/grounded-docparse-technical.pptx",
+      "summary": "Technical presentation deck describing Grounded DocParse.",
+      "tags": [
+        "presentation",
+        "technical",
+        "documentation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/build-installer.ps1",
+      "type": "file",
+      "name": "build-installer.ps1",
+      "filePath": "scripts/build-installer.ps1",
+      "summary": "Builds and validates the Windows installer, rejects forbidden payload paths, and writes a SHA-256 checksum.",
+      "tags": [
+        "windows",
+        "installer",
+        "build",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/build_docs_site.py",
+      "type": "file",
+      "name": "build_docs_site.py",
+      "filePath": "scripts/build_docs_site.py",
+      "summary": "Builds the static documentation site by discovering Markdown, rendering pages, copying images, constructing navigation, and emitting manifests.",
+      "tags": [
+        "script",
+        "documentation",
+        "static-site",
+        "generator"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/generate_evaluation_corpus.py",
+      "type": "file",
+      "name": "generate_evaluation_corpus.py",
+      "filePath": "scripts/generate_evaluation_corpus.py",
+      "summary": "Generates the document evaluation corpus and associated reference artifacts.",
+      "tags": [
+        "script",
+        "benchmark",
+        "corpus"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:scripts/generate_examples.py",
+      "type": "file",
+      "name": "generate_examples.py",
+      "filePath": "scripts/generate_examples.py",
+      "summary": "Generates example documents for project demonstrations.",
+      "tags": [
+        "script",
+        "examples",
+        "generation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/benchmark_glmocr.py",
+      "type": "file",
+      "name": "benchmark_glmocr.py",
+      "filePath": "scripts/wsl/benchmark_glmocr.py",
+      "summary": "Runs GLM-OCR benchmark operations in the WSL environment.",
+      "tags": [
+        "script",
+        "benchmark",
+        "glm-ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/check-glmocr-api.py",
+      "type": "file",
+      "name": "check-glmocr-api.py",
+      "filePath": "scripts/wsl/check-glmocr-api.py",
+      "summary": "Checks availability of the GLM-OCR API runtime.",
+      "tags": [
+        "script",
+        "health-check",
+        "glm-ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/check-paddleocr-api.py",
+      "type": "file",
+      "name": "check-paddleocr-api.py",
+      "filePath": "scripts/wsl/check-paddleocr-api.py",
+      "summary": "Checks availability of the PaddleOCR API runtime.",
+      "tags": [
+        "script",
+        "health-check",
+        "paddleocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "type": "file",
+      "name": "prepare_glmocr_runtime.py",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "summary": "Prepares the local GLM-OCR runtime for WSL execution.",
+      "tags": [
+        "script",
+        "runtime",
+        "glm-ocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:scripts/wsl/prepare_paddleocr_runtime.py",
+      "type": "file",
+      "name": "prepare_paddleocr_runtime.py",
+      "filePath": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "summary": "Prepares the local PaddleOCR runtime for WSL execution.",
+      "tags": [
+        "script",
+        "runtime",
+        "paddleocr"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "type": "file",
+      "name": "conftest.py",
+      "filePath": "tests/conftest.py",
+      "summary": "Provides shared pytest configuration and fixtures.",
+      "tags": [
+        "test",
+        "pytest",
+        "fixtures"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_agentic_extraction.py",
+      "type": "file",
+      "name": "test_agentic_extraction.py",
+      "filePath": "tests/test_agentic_extraction.py",
+      "summary": "Tests agentic extraction workflows and outputs.",
+      "tags": [
+        "test",
+        "agentic",
+        "extraction"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_evaluation_report.py",
+      "type": "file",
+      "name": "test_evaluation_report.py",
+      "filePath": "tests/test_evaluation_report.py",
+      "summary": "Tests evaluation report generation.",
+      "tags": [
+        "test",
+        "evaluation",
+        "reporting"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_glmocr_runtime_config.py",
+      "type": "file",
+      "name": "test_glmocr_runtime_config.py",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "summary": "Tests GLM-OCR runtime configuration behavior.",
+      "tags": [
+        "test",
+        "glm-ocr",
+        "configuration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_ingest.py",
+      "type": "file",
+      "name": "test_ingest.py",
+      "filePath": "tests/test_ingest.py",
+      "summary": "Tests document ingestion behavior.",
+      "tags": [
+        "test",
+        "ingest",
+        "parsing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_launcher_contract.py",
+      "type": "file",
+      "name": "test_launcher_contract.py",
+      "filePath": "tests/test_launcher_contract.py",
+      "summary": "Tests application launcher contracts.",
+      "tags": [
+        "test",
+        "launcher",
+        "contracts"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_markdown_enhancement.py",
+      "type": "file",
+      "name": "test_markdown_enhancement.py",
+      "filePath": "tests/test_markdown_enhancement.py",
+      "summary": "Tests Markdown enhancement behavior.",
+      "tags": [
+        "test",
+        "markdown",
+        "enhancement"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_openai_vision_gateway.py",
+      "type": "file",
+      "name": "test_openai_vision_gateway.py",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "summary": "Contains pytest coverage for openai vision gateway behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_paddle_ocr.py",
+      "type": "file",
+      "name": "test_paddle_ocr.py",
+      "filePath": "tests/test_paddle_ocr.py",
+      "summary": "Contains pytest coverage for paddle ocr behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_paddle_runtime_config.py",
+      "type": "file",
+      "name": "test_paddle_runtime_config.py",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "summary": "Contains pytest coverage for paddle runtime config behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_page_analysis.py",
+      "type": "file",
+      "name": "test_page_analysis.py",
+      "filePath": "tests/test_page_analysis.py",
+      "summary": "Contains pytest coverage for page analysis behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_parallel_pages.py",
+      "type": "file",
+      "name": "test_parallel_pages.py",
+      "filePath": "tests/test_parallel_pages.py",
+      "summary": "Contains pytest coverage for parallel pages behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_quality.py",
+      "type": "file",
+      "name": "test_quality.py",
+      "filePath": "tests/test_quality.py",
+      "summary": "Contains pytest coverage for quality behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_strict_recovery_contract.py",
+      "type": "file",
+      "name": "test_strict_recovery_contract.py",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "summary": "Contains pytest coverage for strict recovery contract behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_windows_installer.py",
+      "type": "file",
+      "name": "test_windows_installer.py",
+      "filePath": "tests/test_windows_installer.py",
+      "summary": "Contains pytest coverage for windows installer behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/batch.py",
+      "type": "file",
+      "name": "batch.py",
+      "filePath": "src/grounded_docparse/batch.py",
+      "summary": "Coordinates batch document processing and aggregates per-document results for the application workflow.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/grounded_docparse/benchmark.py",
+      "type": "file",
+      "name": "benchmark.py",
+      "filePath": "src/grounded_docparse/benchmark.py",
+      "summary": "Defines benchmark cases, evaluation metrics, and report generation for document parsing quality.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/cli.py",
+      "type": "file",
+      "name": "cli.py",
+      "filePath": "src/grounded_docparse/cli.py",
+      "summary": "Provides the command-line interface for discovering inputs, selecting parser options, and writing results.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/models.py",
+      "type": "file",
+      "name": "models.py",
+      "filePath": "src/grounded_docparse/models.py",
+      "summary": "Defines the Pydantic data models that carry document evidence, parsing state, and output contracts.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/render.py",
+      "type": "file",
+      "name": "render.py",
+      "filePath": "src/grounded_docparse/render.py",
+      "summary": "Renders parsed document structures as Markdown, elements, combined results, and annotated PDF output.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/schema_store.py",
+      "type": "file",
+      "name": "schema_store.py",
+      "filePath": "src/grounded_docparse/schema_store.py",
+      "summary": "Persists extraction schemas and validates schema metadata for reuse by document workflows.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/workspace_store.py",
+      "type": "file",
+      "name": "workspace_store.py",
+      "filePath": "src/grounded_docparse/workspace_store.py",
+      "summary": "Persists workspace documents, batches, and parser artifacts for later retrieval.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/config.py",
+      "type": "file",
+      "name": "config.py",
+      "filePath": "src/grounded_docparse/config.py",
+      "summary": "Defines parser configuration, OCR engine selection, validation, and environment-derived runtime settings.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_disagreement.py",
+      "type": "file",
+      "name": "ocr_disagreement.py",
+      "filePath": "src/grounded_docparse/ocr_disagreement.py",
+      "summary": "Detects meaningful disagreement between OCR outputs to identify regions requiring attention.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/ocr_services.py",
+      "type": "file",
+      "name": "ocr_services.py",
+      "filePath": "src/grounded_docparse/ocr_services.py",
+      "summary": "Selects and initializes managed local OCR engines from parser configuration.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/grounded_docparse/pipeline.py",
+      "type": "file",
+      "name": "pipeline.py",
+      "filePath": "src/grounded_docparse/pipeline.py",
+      "summary": "Implements the end-to-end document parsing pipeline, including OCR, quality checks, recovery, rendering, and result assembly.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "Records release history for Grounded Document Parser, including OCR engines, recovery controls, installation, and evaluation capabilities.",
+      "tags": [
+        "documentation",
+        "release-notes",
+        "versioning"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Provides the project overview, Windows installation and usage instructions, CLI and Python API examples, output contracts, and repository orientation.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "getting-started",
+        "api-reference"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:grounded-docparse-threat-model.md",
+      "type": "document",
+      "name": "grounded-docparse-threat-model.md",
+      "filePath": "grounded-docparse-threat-model.md",
+      "summary": "Defines the trusted-workstation threat model, trust boundaries, assets, abuse paths, mitigations, and security invariants for the document parsing workflow.",
+      "tags": [
+        "documentation",
+        "security",
+        "threat-model",
+        "trust-boundaries"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "pyproject.toml",
+      "summary": "Defines Python package metadata, the grounded-docparse CLI entry point, runtime and optional OCR dependencies, uv source indexes, build settings, and pytest defaults.",
+      "tags": [
+        "configuration",
+        "python",
+        "packaging",
+        "dependencies",
+        "build-system"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses PEP 621 project metadata with uv-managed platform-specific OCR dependency groups."
+    },
+    {
+      "id": "document:security_best_practices_report.md",
+      "type": "document",
+      "name": "security_best_practices_report.md",
+      "filePath": "security_best_practices_report.md",
+      "summary": "Summarizes the repository security review, prioritizing native parsing isolation, prompt-injection review, endpoint disclosure, and local schema persistence controls.",
+      "tags": [
+        "documentation",
+        "security",
+        "risk-assessment",
+        "deployment"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "summary": "Defines the JSON Schema for evaluation-corpus manifests, including document sources, annotation paths, feature labels, synthetic status, and expected document types.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "corpus"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses JSON Schema Draft 2020-12 with closed object shapes and explicit nullable fields."
+    },
+    {
+      "id": "config:benchmarks/schemas/regression-policy-v1.schema.json",
+      "type": "config",
+      "name": "regression-policy-v1.schema.json",
+      "filePath": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "summary": "Defines the JSON Schema for benchmark regression rules with metric paths, preferred direction, and minimum, maximum, or maximum-regression thresholds.",
+      "tags": [
+        "configuration",
+        "json-schema",
+        "evaluation",
+        "regression-testing"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses JSON Schema Draft 2020-12 to enforce one or more bounded threshold forms per rule."
+    },
+    {
+      "id": "document:docs/agentic-document-extraction-comparison.md",
+      "type": "document",
+      "name": "agentic-document-extraction-comparison.md",
+      "filePath": "docs/agentic-document-extraction-comparison.md",
+      "summary": "Compares Grounded DocParse with LandingAI-style agentic document extraction and identifies its bounded, evidence-grounded ADE characteristics.",
+      "tags": [
+        "documentation",
+        "agentic-extraction",
+        "comparison"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/api.md",
+      "type": "document",
+      "name": "api.md",
+      "filePath": "docs/api.md",
+      "summary": "Reference for the Python API, CLI batch command, parser, document-agent features, and exported result models.",
+      "tags": [
+        "documentation",
+        "api-reference",
+        "python"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/architecture.md",
+      "type": "document",
+      "name": "architecture.md",
+      "filePath": "docs/architecture.md",
+      "summary": "Defines the application boundary, repository responsibilities, parse pipeline, ownership contract, agentic features, and result contracts.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "pipeline"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/business-user-extraction-workflow.md",
+      "type": "document",
+      "name": "business-user-extraction-workflow.md",
+      "filePath": "docs/business-user-extraction-workflow.md",
+      "summary": "Guides business users through field definition, upload, parsing, schema creation, extraction review, chat, and export workflows.",
+      "tags": [
+        "documentation",
+        "user-workflow",
+        "extraction"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/complete-user-guide.md",
+      "type": "document",
+      "name": "complete-user-guide.md",
+      "filePath": "docs/complete-user-guide.md",
+      "summary": "Comprehensive end-user guide covering setup, processing options, review tabs, extraction, routing, persistence, security, integrations, and troubleshooting.",
+      "tags": [
+        "documentation",
+        "user-guide",
+        "workflows"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/how-it-works.md",
+      "type": "document",
+      "name": "how-it-works.md",
+      "filePath": "docs/how-it-works.md",
+      "summary": "Concise overview of the grounded document-processing approach and its pipeline stages.",
+      "tags": [
+        "documentation",
+        "overview",
+        "pipeline"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:docs/idp-vs-ade-classification.html",
+      "type": "file",
+      "name": "idp-vs-ade-classification.html",
+      "filePath": "docs/idp-vs-ade-classification.html",
+      "summary": "Standalone styled classification brief explaining why the repository is primarily an ADE-pattern system with partial IDP capabilities and local OCR evidence ownership.",
+      "tags": [
+        "documentation",
+        "classification",
+        "ade"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/private-evaluation.md",
+      "type": "document",
+      "name": "private-evaluation.md",
+      "filePath": "docs/private-evaluation.md",
+      "summary": "Defines a private evaluation corpus, calibration procedure, locked holdout gate, and privacy requirements for live document evaluation.",
+      "tags": [
+        "documentation",
+        "evaluation",
+        "privacy"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/spec.md",
+      "type": "document",
+      "name": "spec.md",
+      "filePath": "docs/spec.md",
+      "summary": "Product specification for selected local OCR parsing, bounded Luna features, public interfaces, output contracts, and completion checks.",
+      "tags": [
+        "documentation",
+        "specification",
+        "requirements"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/zero-to-hero-tutorial.md",
+      "type": "document",
+      "name": "zero-to-hero-tutorial.md",
+      "filePath": "docs/zero-to-hero-tutorial.md",
+      "summary": "End-to-end tutorial covering concepts, installation, Streamlit workflows, schemas, routing, APIs, architecture, security, testing, and troubleshooting.",
+      "tags": [
+        "documentation",
+        "tutorial",
+        "onboarding"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/codebase/.codebase-scan.txt",
+      "type": "document",
+      "name": ".codebase-scan.txt",
+      "filePath": "docs/codebase/.codebase-scan.txt",
+      "summary": "Raw repository scan used as evidence for the generated codebase documentation set.",
+      "tags": [
+        "documentation",
+        "codebase-scan",
+        "inventory"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/codebase/ARCHITECTURE.md",
+      "type": "document",
+      "name": "ARCHITECTURE.md",
+      "filePath": "docs/codebase/ARCHITECTURE.md",
+      "summary": "Concise architecture record covering style, system flow, module responsibilities, reused patterns, risks, and ADE-versus-IDP positioning.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "decision-record"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/CONCERNS.md",
+      "type": "document",
+      "name": "CONCERNS.md",
+      "filePath": "docs/codebase/CONCERNS.md",
+      "summary": "Records product taxonomy, architecture, security, evaluation, and high-complexity-module concerns identified from repository evidence.",
+      "tags": [
+        "documentation",
+        "risks",
+        "security"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/CONVENTIONS.md",
+      "type": "document",
+      "name": "CONVENTIONS.md",
+      "filePath": "docs/codebase/CONVENTIONS.md",
+      "summary": "Summarizes project naming, contract validation, error handling, and evidence-grounding conventions.",
+      "tags": [
+        "documentation",
+        "conventions",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/INTEGRATIONS.md",
+      "type": "document",
+      "name": "INTEGRATIONS.md",
+      "filePath": "docs/codebase/INTEGRATIONS.md",
+      "summary": "Documents local OCR, OpenAI/Luna, persistence integrations, and deliberately excluded integrations.",
+      "tags": [
+        "documentation",
+        "integrations",
+        "ocr"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STACK.md",
+      "type": "document",
+      "name": "STACK.md",
+      "filePath": "docs/codebase/STACK.md",
+      "summary": "Lists the repository languages, runtimes, frameworks, tooling, persistence, and service dependencies.",
+      "tags": [
+        "documentation",
+        "technology-stack",
+        "dependencies"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STRUCTURE.md",
+      "type": "document",
+      "name": "STRUCTURE.md",
+      "filePath": "docs/codebase/STRUCTURE.md",
+      "summary": "Maps the top-level layout, package modules, and executable entry points of the repository.",
+      "tags": [
+        "documentation",
+        "repository-structure",
+        "modules"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/TESTING.md",
+      "type": "document",
+      "name": "TESTING.md",
+      "filePath": "docs/codebase/TESTING.md",
+      "summary": "Describes the test framework, suite layout, testing strategy, and notable validation themes.",
+      "tags": [
+        "documentation",
+        "testing",
+        "quality-assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.ua/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".ua/.understandignore",
+      "summary": "Defines optional ignore patterns for the repository knowledge-graph scan.",
+      "tags": [
+        "configuration",
+        "analysis",
+        "ignore-rules"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/config.json",
+      "type": "config",
+      "name": "config.json",
+      "filePath": ".ua/config.json",
+      "summary": "Stores repository analysis configuration for the knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "analysis",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/domain-graph.json",
+      "type": "config",
+      "name": "domain-graph.json",
+      "filePath": ".ua/domain-graph.json",
+      "summary": "Persists domain-level graph metadata used by repository analysis tooling.",
+      "tags": [
+        "configuration",
+        "knowledge-graph",
+        "domain-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:benchmarks/policies/live-evaluation.example.json",
+      "type": "config",
+      "name": "live-evaluation.example.json",
+      "filePath": "benchmarks/policies/live-evaluation.example.json",
+      "summary": "Provides an example policy for evaluating live document-parser benchmark results.",
+      "tags": [
+        "configuration",
+        "benchmark",
+        "evaluation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:examples/schemas/invoice.schema.json",
+      "type": "config",
+      "name": "invoice.schema.json",
+      "filePath": "examples/schemas/invoice.schema.json",
+      "summary": "Defines an example invoice extraction schema for document-parser workflows.",
+      "tags": [
+        "configuration",
+        "schema",
+        "example"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:paddle-runtime/pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "paddle-runtime/pyproject.toml",
+      "summary": "Declares the isolated Paddle runtime package and its Python tooling configuration.",
+      "tags": [
+        "configuration",
+        "python",
+        "paddle-runtime"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/evaluate_corpus.py",
+      "type": "file",
+      "name": "evaluate_corpus.py",
+      "filePath": "scripts/evaluate_corpus.py",
+      "summary": "CLI entry point that parses corpus documents, evaluates grounded outputs, and writes regression artifacts and reports.",
+      "tags": [
+        "cli",
+        "benchmark",
+        "evaluation",
+        "regression"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:streamlit_app.py",
+      "type": "file",
+      "name": "streamlit_app.py",
+      "filePath": "streamlit_app.py",
+      "summary": "Streamlit studio entry point that manages uploads, parser settings, document state, processing, review, and exports.",
+      "tags": [
+        "entry-point",
+        "streamlit",
+        "ui",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_agentic_contract.py",
+      "type": "file",
+      "name": "test_agentic_contract.py",
+      "filePath": "tests/test_agentic_contract.py",
+      "summary": "Contract tests for agentic document grounding, rendering, visual semantics, and evidence spans.",
+      "tags": [
+        "test",
+        "agentic",
+        "grounding",
+        "contracts"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_agentic_features.py",
+      "type": "file",
+      "name": "test_agentic_features.py",
+      "filePath": "tests/test_agentic_features.py",
+      "summary": "Tests agentic analysis context, reuse, classification, citations, and result composition.",
+      "tags": [
+        "test",
+        "agentic",
+        "features"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_batch.py",
+      "type": "file",
+      "name": "test_batch.py",
+      "filePath": "tests/test_batch.py",
+      "summary": "Tests batch document identity, limits, archival output, and approved-segment exports.",
+      "tags": [
+        "test",
+        "batch",
+        "exports"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_cli.py",
+      "type": "file",
+      "name": "test_cli.py",
+      "filePath": "tests/test_cli.py",
+      "summary": "Tests the command-line parse workflow, schema handling, batches, and preflight validation.",
+      "tags": [
+        "test",
+        "cli",
+        "validation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_confidence_spans.py",
+      "type": "file",
+      "name": "test_confidence_spans.py",
+      "filePath": "tests/test_confidence_spans.py",
+      "summary": "Tests evidence span preservation, rebasing, cleaning, and targeted repair safeguards.",
+      "tags": [
+        "test",
+        "grounding",
+        "evidence"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_corpus_manifest.py",
+      "type": "file",
+      "name": "test_corpus_manifest.py",
+      "filePath": "tests/test_corpus_manifest.py",
+      "summary": "Tests corpus-manifest validation, provenance, annotations, and fixture generation.",
+      "tags": [
+        "test",
+        "benchmark",
+        "manifest"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_evaluation_calibration.py",
+      "type": "file",
+      "name": "test_evaluation_calibration.py",
+      "filePath": "tests/test_evaluation_calibration.py",
+      "summary": "Tests calibration and review-rate scoring in live evaluation reports.",
+      "tags": [
+        "test",
+        "evaluation",
+        "calibration"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_evaluation_cli.py",
+      "type": "file",
+      "name": "test_evaluation_cli.py",
+      "filePath": "tests/test_evaluation_cli.py",
+      "summary": "Tests CLI behavior for live reports and failing regression gates.",
+      "tags": [
+        "test",
+        "cli",
+        "evaluation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_evaluation_metrics.py",
+      "type": "file",
+      "name": "test_evaluation_metrics.py",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "summary": "Tests semantic, grounding, schema, continuity, hallucination, and telemetry evaluation metrics.",
+      "tags": [
+        "test",
+        "evaluation",
+        "metrics"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_form_routing.py",
+      "type": "file",
+      "name": "test_form_routing.py",
+      "filePath": "tests/test_form_routing.py",
+      "summary": "Tests classification profiles, routing decisions, repairs, and eligible form extraction.",
+      "tags": [
+        "test",
+        "classification",
+        "routing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_ocr_disagreement.py",
+      "type": "file",
+      "name": "test_ocr_disagreement.py",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "summary": "Tests optional OCR disagreement checks, bounded crop budgets, and persisted comparison evidence.",
+      "tags": [
+        "test",
+        "ocr",
+        "quality"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_provider_runtime.py",
+      "type": "file",
+      "name": "test_provider_runtime.py",
+      "filePath": "tests/test_provider_runtime.py",
+      "summary": "Tests provider runtime retries, rate-limit adaptation, admission control, and parser binding.",
+      "tags": [
+        "test",
+        "provider-runtime",
+        "resilience"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_regression_policy.py",
+      "type": "file",
+      "name": "test_regression_policy.py",
+      "filePath": "tests/test_regression_policy.py",
+      "summary": "Tests benchmark regression-policy limits, failure reporting, and compatibility checks.",
+      "tags": [
+        "test",
+        "regression",
+        "policy"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_schema_store.py",
+      "type": "file",
+      "name": "test_schema_store.py",
+      "filePath": "tests/test_schema_store.py",
+      "summary": "Tests schema and classifier-profile persistence, parsing, validation, and legacy compatibility.",
+      "tags": [
+        "test",
+        "schema",
+        "persistence"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_simple_contract.py",
+      "type": "file",
+      "name": "test_simple_contract.py",
+      "filePath": "tests/test_simple_contract.py",
+      "summary": "Tests rendering contracts for annotated PDFs, nested documents, semantic HTML, and markdown output.",
+      "tags": [
+        "test",
+        "rendering",
+        "contracts"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_simple_pipeline.py",
+      "type": "file",
+      "name": "test_simple_pipeline.py",
+      "filePath": "tests/test_simple_pipeline.py",
+      "summary": "Comprehensive pipeline tests covering OCR recovery, grounding, quality review, visual enrichment, and safety invariants.",
+      "tags": [
+        "test",
+        "pipeline",
+        "ocr",
+        "grounding"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_simple_streamlit.py",
+      "type": "file",
+      "name": "test_simple_streamlit.py",
+      "filePath": "tests/test_simple_streamlit.py",
+      "summary": "Tests Streamlit studio state, OCR controls, results, batch recovery, and checkpoint resume behavior.",
+      "tags": [
+        "test",
+        "streamlit",
+        "batch",
+        "workspace"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_workspace_store.py",
+      "type": "file",
+      "name": "test_workspace_store.py",
+      "filePath": "tests/test_workspace_store.py",
+      "summary": "Tests durable workspace documents, interrupted processing recovery, result invalidation, and corrupt-result isolation.",
+      "tags": [
+        "test",
+        "workspace",
+        "persistence"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "importEdges": [
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/prompts.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/schema_store.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/batch.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/enhancement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_disagreement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_services.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/page_analysis.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    }
+  ],
+  "allEdges": [
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/extraction.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/prompts.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "document:SETUP.md",
+      "target": "file:Setup-GLM-OCR.cmd",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:SETUP.md",
+      "target": "file:Launch-GLM-OCR.cmd",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:docs-site/site-manifest.json",
+      "target": "file:docs-site/setup.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:docs-site/site-manifest.json",
+      "target": "file:docs-site/spec.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:docs-site/site-manifest.json",
+      "target": "file:docs-site/tutorial.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:docs-site/site-manifest.json",
+      "target": "file:docs-site/zero-to-hero-tutorial.html",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/batch.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/benchmark.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/agentic.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/cli.py",
+      "target": "file:src/grounded_docparse/schema_store.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/render.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/schema_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/batch.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/workspace_store.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/ocr_services.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/enhancement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/gateways.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ingest.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/local_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_disagreement.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/ocr_services.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/paddle_ocr.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/page_analysis.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/quality.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/pipeline.py",
+      "target": "file:src/grounded_docparse/runtime.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/__init__.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/agentic.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/enhancement.py",
+      "target": "file:src/grounded_docparse/render.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/extraction.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/gateways.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/ingest.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/paddle_ocr.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/page_analysis.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/quality.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    },
+    {
+      "source": "file:src/grounded_docparse/runtime.py",
+      "target": "file:src/grounded_docparse/models.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7,
+      "recoveredFromImportMap": true
+    }
+  ]
+}

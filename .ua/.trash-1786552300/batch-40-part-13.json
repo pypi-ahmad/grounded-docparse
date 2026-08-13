@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_agentic_features.py:test_analysis_classifies_first_two_pages_and_builds_grounded_toc",
+      "type": "function",
+      "name": "test_analysis_classifies_first_two_pages_and_builds_grounded_toc",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        166,
+        177
+      ],
+      "summary": "Defines test_analysis_classifies_first_two_pages_and_builds_grounded_toc, a  routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_features.py:test_agentic_context_contains_compact_text_layout",
+      "type": "function",
+      "name": "test_agentic_context_contains_compact_text_layout",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        130,
+        144
+      ],
+      "summary": "Defines test_agentic_context_contains_compact_text_layout, a  routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_features.py:_result",
+      "type": "function",
+      "name": "_result",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        27,
+        67
+      ],
+      "summary": "Defines _result, a page_count routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_agentic_features.py:FeatureGateway",
+      "type": "class",
+      "name": "FeatureGateway",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        70,
+        127
+      ],
+      "summary": "Defines the FeatureGateway class in test_agentic_features.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_agentic_features.py:test_prepared_context_is_reusable_across_agentic_calls",
+      "type": "function",
+      "name": "test_prepared_context_is_reusable_across_agentic_calls",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        147,
+        163
+      ],
+      "summary": "Defines test_prepared_context_is_reusable_across_agentic_calls, a  routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_agentic_features.py",
+      "type": "file",
+      "name": "test_agentic_features.py",
+      "filePath": "tests/test_agentic_features.py",
+      "summary": "Test module 'test_agentic_features.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_agentic_features.py:test_chat_maps_only_element_ids_to_grounded_citations",
+      "type": "function",
+      "name": "test_chat_maps_only_element_ids_to_grounded_citations",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        180,
+        194
+      ],
+      "summary": "Defines test_chat_maps_only_element_ids_to_grounded_citations, a  routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_features.py:test_combined_result_uses_additive_flat_v45_contract",
+      "type": "function",
+      "name": "test_combined_result_uses_additive_flat_v45_contract",
+      "filePath": "tests/test_agentic_features.py",
+      "lineRange": [
+        197,
+        232
+      ],
+      "summary": "Defines test_combined_result_uses_additive_flat_v45_contract, a  routine in test_agentic_features.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_combined_result_uses_additive_flat_v45_contract",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "class:tests/test_agentic_features.py:FeatureGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_agentic_context_contains_compact_text_layout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_prepared_context_is_reusable_across_agentic_calls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_chat_maps_only_element_ids_to_grounded_citations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_prepared_context_is_reusable_across_agentic_calls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_analysis_classifies_first_two_pages_and_builds_grounded_toc",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_chat_maps_only_element_ids_to_grounded_citations",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_analysis_classifies_first_two_pages_and_builds_grounded_toc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_agentic_context_contains_compact_text_layout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:test_combined_result_uses_additive_flat_v45_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:_result",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "function:tests/test_agentic_features.py:_result",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_features.py",
+      "target": "class:tests/test_agentic_features.py:FeatureGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

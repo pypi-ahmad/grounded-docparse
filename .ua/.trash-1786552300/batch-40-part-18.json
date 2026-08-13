@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_evaluation_calibration.py:test_live_report_groups_metrics_and_micro_review_by_document_type",
+      "type": "function",
+      "name": "test_live_report_groups_metrics_and_micro_review_by_document_type",
+      "filePath": "tests/test_evaluation_calibration.py",
+      "lineRange": [
+        120,
+        156
+      ],
+      "summary": "Defines test_live_report_groups_metrics_and_micro_review_by_document_type, a  routine in test_evaluation_calibration.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_evaluation_calibration.py",
+      "type": "file",
+      "name": "test_evaluation_calibration.py",
+      "filePath": "tests/test_evaluation_calibration.py",
+      "summary": "Test module 'test_evaluation_calibration.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_evaluation_calibration.py:_document",
+      "type": "function",
+      "name": "_document",
+      "filePath": "tests/test_evaluation_calibration.py",
+      "lineRange": [
+        8,
+        50
+      ],
+      "summary": "Defines _document, a document_id, expected, predicted, confidence, blocks, needs_review, rejected routine in test_evaluation_calibration.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_calibration.py:test_live_report_scores_classification_calibration_and_review_rate",
+      "type": "function",
+      "name": "test_live_report_scores_classification_calibration_and_review_rate",
+      "filePath": "tests/test_evaluation_calibration.py",
+      "lineRange": [
+        53,
+        117
+      ],
+      "summary": "Defines test_live_report_scores_classification_calibration_and_review_rate, a  routine in test_evaluation_calibration.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:test_live_report_scores_classification_calibration_and_review_rate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:test_live_report_groups_metrics_and_micro_review_by_document_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:test_live_report_groups_metrics_and_micro_review_by_document_type",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:test_live_report_scores_classification_calibration_and_review_rate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_calibration.py",
+      "target": "function:tests/test_evaluation_calibration.py:_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

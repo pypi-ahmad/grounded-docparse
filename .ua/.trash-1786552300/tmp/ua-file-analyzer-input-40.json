@@ -1,0 +1,182 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "language": "python",
+      "sizeLines": 444,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_evaluation_corpus.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_examples.py",
+      "language": "python",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/benchmark_glmocr.py",
+      "language": "python",
+      "sizeLines": 121,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-glmocr-api.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-paddleocr-api.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/prepare_glmocr_runtime.py",
+      "language": "python",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "language": "python",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "streamlit_app.py",
+      "language": "python",
+      "sizeLines": 2584,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/conftest.py",
+      "language": "python",
+      "sizeLines": 15,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_contract.py",
+      "language": "python",
+      "sizeLines": 837,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_extraction.py",
+      "language": "python",
+      "sizeLines": 803,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_features.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_batch.py",
+      "language": "python",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_cli.py",
+      "language": "python",
+      "sizeLines": 375,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_confidence_spans.py",
+      "language": "python",
+      "sizeLines": 341,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_corpus_manifest.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_calibration.py",
+      "language": "python",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_cli.py",
+      "language": "python",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_metrics.py",
+      "language": "python",
+      "sizeLines": 515,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_report.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_form_routing.py",
+      "language": "python",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_glmocr_runtime_config.py",
+      "language": "python",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_ingest.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_launcher_contract.py",
+      "language": "python",
+      "sizeLines": 125,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "scripts/evaluate_corpus.py": [],
+    "scripts/generate_evaluation_corpus.py": [],
+    "scripts/generate_examples.py": [],
+    "scripts/wsl/benchmark_glmocr.py": [],
+    "scripts/wsl/check-glmocr-api.py": [],
+    "scripts/wsl/check-paddleocr-api.py": [],
+    "scripts/wsl/prepare_glmocr_runtime.py": [],
+    "scripts/wsl/prepare_paddleocr_runtime.py": [],
+    "streamlit_app.py": [],
+    "tests/conftest.py": [],
+    "tests/test_agentic_contract.py": [],
+    "tests/test_agentic_extraction.py": [],
+    "tests/test_agentic_features.py": [],
+    "tests/test_batch.py": [],
+    "tests/test_cli.py": [],
+    "tests/test_confidence_spans.py": [],
+    "tests/test_corpus_manifest.py": [],
+    "tests/test_evaluation_calibration.py": [],
+    "tests/test_evaluation_cli.py": [],
+    "tests/test_evaluation_metrics.py": [],
+    "tests/test_evaluation_report.py": [],
+    "tests/test_form_routing.py": [],
+    "tests/test_glmocr_runtime_config.py": [],
+    "tests/test_ingest.py": [],
+    "tests/test_launcher_contract.py": []
+  }
+}

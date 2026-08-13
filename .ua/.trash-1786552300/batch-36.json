@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "config:graphify-out/cache/semantic/f4ba3f67bffca3d12bfe639c670826664af0524f0e989e18629a1f1da27bb630.json",
+      "type": "config",
+      "name": "f4ba3f67bffca3d12bfe639c670826664af0524f0e989e18629a1f1da27bb630.json",
+      "filePath": "graphify-out/cache/semantic/f4ba3f67bffca3d12bfe639c670826664af0524f0e989e18629a1f1da27bb630.json",
+      "summary": "Configuration or generated metadata artifact 'f4ba3f67bffca3d12bfe639c670826664af0524f0e989e18629a1f1da27bb630.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/f5f7dafc8340e53289163df464fb981735cbae798374676b01c4c01dec6811c3.json",
+      "type": "config",
+      "name": "f5f7dafc8340e53289163df464fb981735cbae798374676b01c4c01dec6811c3.json",
+      "filePath": "graphify-out/cache/semantic/f5f7dafc8340e53289163df464fb981735cbae798374676b01c4c01dec6811c3.json",
+      "summary": "Configuration or generated metadata artifact 'f5f7dafc8340e53289163df464fb981735cbae798374676b01c4c01dec6811c3.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/f60920272acceb2e030365f883921f3f147553b98d02dd7b66d6b00e3bbcb0b5.json",
+      "type": "config",
+      "name": "f60920272acceb2e030365f883921f3f147553b98d02dd7b66d6b00e3bbcb0b5.json",
+      "filePath": "graphify-out/cache/semantic/f60920272acceb2e030365f883921f3f147553b98d02dd7b66d6b00e3bbcb0b5.json",
+      "summary": "Configuration or generated metadata artifact 'f60920272acceb2e030365f883921f3f147553b98d02dd7b66d6b00e3bbcb0b5.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/f6b38bb4eb2502ca56a5219b48743ad2278ebbcf4ab208b3c122c99e4fe11f7a.json",
+      "type": "config",
+      "name": "f6b38bb4eb2502ca56a5219b48743ad2278ebbcf4ab208b3c122c99e4fe11f7a.json",
+      "filePath": "graphify-out/cache/semantic/f6b38bb4eb2502ca56a5219b48743ad2278ebbcf4ab208b3c122c99e4fe11f7a.json",
+      "summary": "Configuration or generated metadata artifact 'f6b38bb4eb2502ca56a5219b48743ad2278ebbcf4ab208b3c122c99e4fe11f7a.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/f8125ac1cbb0cf5c19fbab68be2dc44198d26564d95ff2fedb7fbdd30fb55dba.json",
+      "type": "config",
+      "name": "f8125ac1cbb0cf5c19fbab68be2dc44198d26564d95ff2fedb7fbdd30fb55dba.json",
+      "filePath": "graphify-out/cache/semantic/f8125ac1cbb0cf5c19fbab68be2dc44198d26564d95ff2fedb7fbdd30fb55dba.json",
+      "summary": "Configuration or generated metadata artifact 'f8125ac1cbb0cf5c19fbab68be2dc44198d26564d95ff2fedb7fbdd30fb55dba.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/f9a4131bfdfec5b5b3ee24810d38b04ca4100adb0b146c1c9ecc53a2c41a0ba1.json",
+      "type": "config",
+      "name": "f9a4131bfdfec5b5b3ee24810d38b04ca4100adb0b146c1c9ecc53a2c41a0ba1.json",
+      "filePath": "graphify-out/cache/semantic/f9a4131bfdfec5b5b3ee24810d38b04ca4100adb0b146c1c9ecc53a2c41a0ba1.json",
+      "summary": "Configuration or generated metadata artifact 'f9a4131bfdfec5b5b3ee24810d38b04ca4100adb0b146c1c9ecc53a2c41a0ba1.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/fa2c0eb024e1b8de41ff50c0cb1fa5f45f7359c455379eba29840a4dc2fe313e.json",
+      "type": "config",
+      "name": "fa2c0eb024e1b8de41ff50c0cb1fa5f45f7359c455379eba29840a4dc2fe313e.json",
+      "filePath": "graphify-out/cache/semantic/fa2c0eb024e1b8de41ff50c0cb1fa5f45f7359c455379eba29840a4dc2fe313e.json",
+      "summary": "Configuration or generated metadata artifact 'fa2c0eb024e1b8de41ff50c0cb1fa5f45f7359c455379eba29840a4dc2fe313e.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/fabb36009f0a953087c0e476eace79a320b0742f13fbf781e1705c4fdfec6fba.json",
+      "type": "config",
+      "name": "fabb36009f0a953087c0e476eace79a320b0742f13fbf781e1705c4fdfec6fba.json",
+      "filePath": "graphify-out/cache/semantic/fabb36009f0a953087c0e476eace79a320b0742f13fbf781e1705c4fdfec6fba.json",
+      "summary": "Configuration or generated metadata artifact 'fabb36009f0a953087c0e476eace79a320b0742f13fbf781e1705c4fdfec6fba.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/fdec773a651c4e1fc9b2cfa3f0875d37625c196d907d1dd8a3c31f59af6da722.json",
+      "type": "config",
+      "name": "fdec773a651c4e1fc9b2cfa3f0875d37625c196d907d1dd8a3c31f59af6da722.json",
+      "filePath": "graphify-out/cache/semantic/fdec773a651c4e1fc9b2cfa3f0875d37625c196d907d1dd8a3c31f59af6da722.json",
+      "summary": "Configuration or generated metadata artifact 'fdec773a651c4e1fc9b2cfa3f0875d37625c196d907d1dd8a3c31f59af6da722.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:graphify-out/cache/semantic/fe0e3745bd7012402618a95b6b5454df7918c3c9d5aa613c1ae457468a7d938d.json",
+      "type": "config",
+      "name": "fe0e3745bd7012402618a95b6b5454df7918c3c9d5aa613c1ae457468a7d938d.json",
+      "filePath": "graphify-out/cache/semantic/fe0e3745bd7012402618a95b6b5454df7918c3c9d5aa613c1ae457468a7d938d.json",
+      "summary": "Configuration or generated metadata artifact 'fe0e3745bd7012402618a95b6b5454df7918c3c9d5aa613c1ae457468a7d938d.json' used by the project tooling.",
+      "tags": [
+        "configuration",
+        "generated-artifact",
+        "tooling"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

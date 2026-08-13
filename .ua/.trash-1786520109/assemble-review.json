@@ -1,0 +1,14 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 0,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "The merge completed without a 'Could not fix' section or dropped-item diagnostics.",
+    "All 63 importMap relationships have matching imports edges; the merge script recovered 20 of them.",
+    "All 728 assembled nodes use supported types and normalized complexity values, and no self-referencing edges were found.",
+    "The graph can proceed to architectural layer analysis."
+  ]
+}

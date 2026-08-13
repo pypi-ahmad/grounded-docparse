@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "function",
+      "name": "test_disagreement_check_defaults_off_with_bounded_budget",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        15,
+        21
+      ],
+      "summary": "Defines test_disagreement_check_defaults_off_with_bounded_budget, a  routine in test_ocr_disagreement.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "function",
+      "name": "test_parse_json_persists_ocr_comparison_evidence",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        34,
+        58
+      ],
+      "summary": "Defines test_parse_json_persists_ocr_comparison_evidence, a  routine in test_ocr_disagreement.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_ocr_disagreement.py",
+      "type": "file",
+      "name": "test_ocr_disagreement.py",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "summary": "Test module 'test_ocr_disagreement.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "function",
+      "name": "test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        61,
+        109
+      ],
+      "summary": "Defines test_cross_check_sends_only_budgeted_crops_and_restores_primary, a monkeypatch, tmp_path routine in test_ocr_disagreement.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "function",
+      "name": "test_token_similarity_ignores_case_punctuation_and_spacing",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        29,
+        31
+      ],
+      "summary": "Defines test_token_similarity_ignores_case_punctuation_and_spacing, a  routine in test_ocr_disagreement.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "function",
+      "name": "test_disagreement_config_rejects_invalid_limits",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        24,
+        26
+      ],
+      "summary": "Defines test_disagreement_config_rejects_invalid_limits, a  routine in test_ocr_disagreement.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

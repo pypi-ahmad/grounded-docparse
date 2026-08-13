@@ -1,0 +1,265 @@
+{
+  "nodes": [
+    {
+      "id": "file:docs-site/agentic-document-extraction-comparison.html",
+      "type": "file",
+      "name": "agentic-document-extraction-comparison.html",
+      "filePath": "docs-site/agentic-document-extraction-comparison.html",
+      "summary": "Static HTML documentation page presenting Agentic Document Extraction: LandingAI ADE and Grounded DocParse · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/api.html",
+      "type": "file",
+      "name": "api.html",
+      "filePath": "docs-site/api.html",
+      "summary": "Static HTML documentation page presenting Python API · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/architecture.html",
+      "type": "file",
+      "name": "architecture.html",
+      "filePath": "docs-site/architecture.html",
+      "summary": "Static HTML documentation page presenting Architecture · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/azure-bulk-fax-deployment.html",
+      "type": "file",
+      "name": "azure-bulk-fax-deployment.html",
+      "filePath": "docs-site/azure-bulk-fax-deployment.html",
+      "summary": "Static HTML documentation page presenting Deploy Grounded DocParse on Azure for bulk medical faxes · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/business-user-extraction-workflow.html",
+      "type": "file",
+      "name": "business-user-extraction-workflow.html",
+      "filePath": "docs-site/business-user-extraction-workflow.html",
+      "summary": "Static HTML documentation page presenting Business User Workflow for Extracting Large Field Sets · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/changelog.html",
+      "type": "file",
+      "name": "changelog.html",
+      "filePath": "docs-site/changelog.html",
+      "summary": "Static HTML documentation page presenting Changelog · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/complete-user-guide.html",
+      "type": "file",
+      "name": "complete-user-guide.html",
+      "filePath": "docs-site/complete-user-guide.html",
+      "summary": "Static HTML documentation page presenting Grounded DocParse Complete User Guide · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/contributing.html",
+      "type": "file",
+      "name": "contributing.html",
+      "filePath": "docs-site/contributing.html",
+      "summary": "Static HTML documentation page presenting Contributing · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/extraction-quality-research.html",
+      "type": "file",
+      "name": "extraction-quality-research.html",
+      "filePath": "docs-site/extraction-quality-research.html",
+      "summary": "Static HTML documentation page presenting Extraction quality research · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/how-grounded-docparse-is-agentic.html",
+      "type": "file",
+      "name": "how-grounded-docparse-is-agentic.html",
+      "filePath": "docs-site/how-grounded-docparse-is-agentic.html",
+      "summary": "Static HTML documentation page presenting How Grounded DocParse Is Agentic · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/how-it-works.html",
+      "type": "file",
+      "name": "how-it-works.html",
+      "filePath": "docs-site/how-it-works.html",
+      "summary": "Static HTML documentation page presenting How it works · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "docs-site/index.html",
+      "summary": "Static HTML documentation page presenting Grounded Document Parser · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/issue-template--bug-report.html",
+      "type": "file",
+      "name": "issue-template--bug-report.html",
+      "filePath": "docs-site/issue-template--bug-report.html",
+      "summary": "Static HTML documentation page presenting Bug_Report · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/issue-template--feature-request.html",
+      "type": "file",
+      "name": "issue-template--feature-request.html",
+      "filePath": "docs-site/issue-template--feature-request.html",
+      "summary": "Static HTML documentation page presenting Feature_Request · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/layout-aware-large-field-extraction-workflow.html",
+      "type": "file",
+      "name": "layout-aware-large-field-extraction-workflow.html",
+      "filePath": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "summary": "Static HTML documentation page presenting Layout-Aware Workflow for Extracting Large Field Sets · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/local-glmocr.html",
+      "type": "file",
+      "name": "local-glmocr.html",
+      "filePath": "docs-site/local-glmocr.html",
+      "summary": "Static HTML documentation page presenting Local GLM-OCR runtime · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/local-paddleocr-vl.html",
+      "type": "file",
+      "name": "local-paddleocr-vl.html",
+      "filePath": "docs-site/local-paddleocr-vl.html",
+      "summary": "Static HTML documentation page presenting Local PaddleOCR-VL-1.6 runtime · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/research.html",
+      "type": "file",
+      "name": "research.html",
+      "filePath": "docs-site/research.html",
+      "summary": "Static HTML documentation page presenting Design basis · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/run.html",
+      "type": "file",
+      "name": "run.html",
+      "filePath": "docs-site/run.html",
+      "summary": "Static HTML documentation page presenting Run locally · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/security-content-excluded.html",
+      "type": "file",
+      "name": "security-content-excluded.html",
+      "filePath": "docs-site/security-content-excluded.html",
+      "summary": "Static HTML documentation page presenting Content intentionally excluded · Grounded DocParse Docs for the generated grounded-docparse documentation site.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-page"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

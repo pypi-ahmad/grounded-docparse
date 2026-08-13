@@ -1,0 +1,360 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "function",
+      "name": "_parse",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        109,
+        112
+      ],
+      "summary": "Defines _parse, a simple_pdf, gateway routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "class",
+      "name": "RecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        27,
+        83
+      ],
+      "summary": "Defines the RecoveryGateway class in test_strict_recovery_contract.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_strict_recovery_contract.py",
+      "type": "file",
+      "name": "test_strict_recovery_contract.py",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "summary": "Test module 'test_strict_recovery_contract.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "function",
+      "name": "test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        178,
+        211
+      ],
+      "summary": "Defines test_glm_failure_on_all_nonblank_pages_stops_before_luna, a monkeypatch, simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "function",
+      "name": "test_mismatched_crop_evidence_fails_closed",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        158,
+        165
+      ],
+      "summary": "Defines test_mismatched_crop_evidence_fails_closed, a simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "function",
+      "name": "test_sub_high_confidence_recovery_keeps_glm_text",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        137,
+        145
+      ],
+      "summary": "Defines test_sub_high_confidence_recovery_keeps_glm_text, a simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "function",
+      "name": "test_duplicate_crop_decisions_fail_closed",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        168,
+        175
+      ],
+      "summary": "Defines test_duplicate_crop_decisions_fail_closed, a simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "class",
+      "name": "DuplicateRecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        93,
+        106
+      ],
+      "summary": "Defines the DuplicateRecoveryGateway class in test_strict_recovery_contract.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "function",
+      "name": "test_high_confidence_recovery_changes_only_existing_text",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        115,
+        134
+      ],
+      "summary": "Defines test_high_confidence_recovery_changes_only_existing_text, a simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "function",
+      "name": "test_luna_rejection_keeps_glm_text_visible",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        148,
+        155
+      ],
+      "summary": "Defines test_luna_rejection_keeps_glm_text_visible, a simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "function",
+      "name": "test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        214,
+        304
+      ],
+      "summary": "Defines test_glm_recognition_failure_is_not_exported_as_an_image_only_success, a monkeypatch, simple_pdf routine in test_strict_recovery_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "class",
+      "name": "MismatchedEvidenceRecoveryGateway",
+      "filePath": "tests/test_strict_recovery_contract.py",
+      "lineRange": [
+        86,
+        90
+      ],
+      "summary": "Defines the MismatchedEvidenceRecoveryGateway class in test_strict_recovery_contract.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:DuplicateRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_recognition_failure_is_not_exported_as_an_image_only_success",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_sub_high_confidence_recovery_keeps_glm_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:_parse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_mismatched_crop_evidence_fails_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_glm_failure_on_all_nonblank_pages_stops_before_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_luna_rejection_keeps_glm_text_visible",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:RecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_duplicate_crop_decisions_fail_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "function:tests/test_strict_recovery_contract.py:test_high_confidence_recovery_changes_only_existing_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_strict_recovery_contract.py",
+      "target": "class:tests/test_strict_recovery_contract.py:MismatchedEvidenceRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

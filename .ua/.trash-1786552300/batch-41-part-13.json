@@ -1,0 +1,1848 @@
+{
+  "nodes": [
+    {
+      "id": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "class",
+      "name": "OverflowingScanProbeGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        983,
+        1014
+      ],
+      "summary": "Defines the OverflowingScanProbeGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "class",
+      "name": "InvalidCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1795,
+        1821
+      ],
+      "summary": "Defines the InvalidCorrectionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "class",
+      "name": "SelectiveGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1698,
+        1730
+      ],
+      "summary": "Defines the SelectiveGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "class",
+      "name": "ProactiveCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2239,
+        2294
+      ],
+      "summary": "Defines the ProactiveCropGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "class",
+      "name": "CriticalLiteralGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1748,
+        1781
+      ],
+      "summary": "Defines the CriticalLiteralGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "class",
+      "name": "ManyVisualsGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2319,
+        2354
+      ],
+      "summary": "Defines the ManyVisualsGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "class",
+      "name": "OrderedRejectedAdditionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2112,
+        2139
+      ],
+      "summary": "Defines the OrderedRejectedAdditionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "class",
+      "name": "NormalizingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2194,
+        2221
+      ],
+      "summary": "Defines the NormalizingGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "function",
+      "name": "test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        512,
+        582
+      ],
+      "summary": "Defines test_glm_form_recovery_uses_high_resolution_crop_without_luna, a tmp_path, monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "class",
+      "name": "UnresolvedCriticalGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1044,
+        1072
+      ],
+      "summary": "Defines the UnresolvedCriticalGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "class",
+      "name": "CropBatchGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1860,
+        1889
+      ],
+      "summary": "Defines the CropBatchGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "class",
+      "name": "ExtremeOrderGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2404,
+        2437
+      ],
+      "summary": "Defines the ExtremeOrderGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "class",
+      "name": "ScanProbeRecoveryGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        703,
+        752
+      ],
+      "summary": "Defines the ScanProbeRecoveryGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "class",
+      "name": "InvalidBoxGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1530,
+        1541
+      ],
+      "summary": "Defines the InvalidBoxGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "function",
+      "name": "test_glm_form_merge_fills_only_aligned_blank_values",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        499,
+        509
+      ],
+      "summary": "Defines test_glm_form_merge_fills_only_aligned_blank_values, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "function",
+      "name": "test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1824,
+        1840
+      ],
+      "summary": "Defines test_invalid_corrected_geometry_is_ignored_while_text_is_applied, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "function",
+      "name": "test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        475,
+        496
+      ],
+      "summary": "Defines test_form_control_recovery_severity_prioritizes_dense_unknown_groups, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "class",
+      "name": "FailingVerifierGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1843,
+        1845
+      ],
+      "summary": "Defines the FailingVerifierGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "class",
+      "name": "PlannedQualityCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        165,
+        196
+      ],
+      "summary": "Defines the PlannedQualityCropGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "class",
+      "name": "WrongCropRegionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1660,
+        1682
+      ],
+      "summary": "Defines the WrongCropRegionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "class",
+      "name": "MalformedCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1215,
+        1227
+      ],
+      "summary": "Defines the MalformedCorrectionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "class",
+      "name": "ConflictingScanProbeGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        925,
+        963
+      ],
+      "summary": "Defines the ConflictingScanProbeGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "function",
+      "name": "test_failed_quality_crop_preserves_reviewable_structured_content",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1196,
+        1212
+      ],
+      "summary": "Defines test_failed_quality_crop_preserves_reviewable_structured_content, a monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "class",
+      "name": "CorrectingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1594,
+        1621
+      ],
+      "summary": "Defines the CorrectingGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "class",
+      "name": "MismatchedQualityEvidenceGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1291,
+        1311
+      ],
+      "summary": "Defines the MismatchedQualityEvidenceGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "class",
+      "name": "RejectedAdditionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2022,
+        2089
+      ],
+      "summary": "Defines the RejectedAdditionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "function",
+      "name": "_account_pdf",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1097,
+        1103
+      ],
+      "summary": "Defines _account_pdf, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "class",
+      "name": "SemanticRejectionOfClippedGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1445,
+        1475
+      ],
+      "summary": "Defines the SemanticRejectionOfClippedGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "function",
+      "name": "test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        585,
+        674
+      ],
+      "summary": "Defines test_glm_form_recovery_does_not_consume_luna_document_budget, a tmp_path, monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "class",
+      "name": "AcceptingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        58,
+        93
+      ],
+      "summary": "Defines the AcceptingGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "class",
+      "name": "QualityRecoveryGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        122,
+        154
+      ],
+      "summary": "Defines the QualityRecoveryGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "function",
+      "name": "test_explicit_rejection_keeps_glm_content_reviewable",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1651,
+        1657
+      ],
+      "summary": "Defines test_explicit_rejection_keeps_glm_content_reviewable, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "function",
+      "name": "test_grounded_correction_replaces_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1624,
+        1633
+      ],
+      "summary": "Defines test_grounded_correction_replaces_draft_text, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "class",
+      "name": "DirectInspectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1491,
+        1512
+      ],
+      "summary": "Defines the DirectInspectionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "function",
+      "name": "test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        455,
+        472
+      ],
+      "summary": "Defines test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "class",
+      "name": "RepeatedQualityRejectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1343,
+        1360
+      ],
+      "summary": "Defines the RepeatedQualityRejectionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "function",
+      "name": "test_crop_decision_for_wrong_region_remains_unresolved",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1685,
+        1695
+      ],
+      "summary": "Defines test_crop_decision_for_wrong_region_remains_unresolved, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "class",
+      "name": "MissingCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1559,
+        1578
+      ],
+      "summary": "Defines the MissingCorrectionGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "function",
+      "name": "test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1892,
+        1907
+      ],
+      "summary": "Defines test_crop_requests_cover_all_risky_regions_in_one_batch, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "function",
+      "name": "test_clipped_critical_literal_remains_visible_with_review_warning",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1075,
+        1094
+      ],
+      "summary": "Defines test_clipped_critical_literal_remains_visible_with_review_warning, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "class",
+      "name": "GeometryOnlyQualityGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1377,
+        1426
+      ],
+      "summary": "Defines the GeometryOnlyQualityGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "function",
+      "name": "test_all_visuals_are_enriched_in_bounded_batches",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2357,
+        2370
+      ],
+      "summary": "Defines test_all_visuals_are_enriched_in_bounded_batches, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "function",
+      "name": "test_geometry_only_rejection_remains_visible_for_review",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1429,
+        1442
+      ],
+      "summary": "Defines test_geometry_only_rejection_remains_visible_for_review, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "function",
+      "name": "test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        677,
+        700
+      ],
+      "summary": "Defines test_custom_gateway_without_analysis_does_not_synthesize_scan_probes, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "function",
+      "name": "test_full_page_scan_recovery_is_not_attempted",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        966,
+        980
+      ],
+      "summary": "Defines test_full_page_scan_recovery_is_not_attempted, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "class",
+      "name": "SecondVisualBatchFailsGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2373,
+        2378
+      ],
+      "summary": "Defines the SecondVisualBatchFailsGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "function",
+      "name": "test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1017,
+        1041
+      ],
+      "summary": "Defines test_incomplete_scanned_structures_are_repaired_without_duplicate_probes, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "class",
+      "name": "ManyQualityCandidatesGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1244,
+        1288
+      ],
+      "summary": "Defines the ManyQualityCandidatesGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "class",
+      "name": "RejectingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1636,
+        1648
+      ],
+      "summary": "Defines the RejectingGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "function",
+      "name": "test_crop_verifier_error_preserves_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1936,
+        1945
+      ],
+      "summary": "Defines test_crop_verifier_error_preserves_draft_text, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "function",
+      "name": "test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        35,
+        55
+      ],
+      "summary": "Defines test_geometry_only_rejection_flag_is_additive_and_fail_closed, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "function",
+      "name": "test_garbage_ratio_is_unicode_safe",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        920,
+        922
+      ],
+      "summary": "Defines test_garbage_ratio_is_unicode_safe, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "class",
+      "name": "FailingCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1931,
+        1933
+      ],
+      "summary": "Defines the FailingCropGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "class",
+      "name": "NoQualityScanGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        157,
+        162
+      ],
+      "summary": "Defines the NoQualityScanGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "class",
+      "name": "SecondRoundStructuredRepairGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1106,
+        1178
+      ],
+      "summary": "Defines the SecondRoundStructuredRepairGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_simple_pipeline.py",
+      "type": "file",
+      "name": "test_simple_pipeline.py",
+      "filePath": "tests/test_simple_pipeline.py",
+      "summary": "Test module 'test_simple_pipeline.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "function",
+      "name": "test_crop_render_error_preserves_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1910,
+        1928
+      ],
+      "summary": "Defines test_crop_render_error_preserves_draft_text, a simple_pdf, monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "function",
+      "name": "test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2224,
+        2236
+      ],
+      "summary": "Defines test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "function",
+      "name": "test_extreme_page_reordering_is_ignored_and_audited",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2440,
+        2452
+      ],
+      "summary": "Defines test_extreme_page_reordering_is_ignored_and_audited, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "class",
+      "name": "CoverageGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1948,
+        1998
+      ],
+      "summary": "Defines the CoverageGateway class in test_simple_pipeline.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

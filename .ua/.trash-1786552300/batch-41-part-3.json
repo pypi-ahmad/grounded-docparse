@@ -1,0 +1,794 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        278,
+        287
+      ],
+      "summary": "Defines _page, a path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "function",
+      "name": "test_dynamic_extractor_repairs_invalid_json_once",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        578,
+        595
+      ],
+      "summary": "Defines test_dynamic_extractor_repairs_invalid_json_once, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "function",
+      "name": "test_schema_architect_uses_luna_medium",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        519,
+        541
+      ],
+      "summary": "Defines test_schema_architect_uses_luna_medium, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "function",
+      "name": "_assert_untrusted_document_instruction",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        168,
+        171
+      ],
+      "summary": "Defines _assert_untrusted_document_instruction, a call routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "function",
+      "name": "_assert_no_prompt_cache",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        97,
+        106
+      ],
+      "summary": "Defines _assert_no_prompt_cache, a value routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "function",
+      "name": "test_agentic_analysis_requests_are_structured_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        213,
+        232
+      ],
+      "summary": "Defines test_agentic_analysis_requests_are_structured_text_only, a method, parsed routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "function",
+      "name": "_assert_no_image_payload",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        109,
+        119
+      ],
+      "summary": "Defines _assert_no_image_payload, a value routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "function",
+      "name": "test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        475,
+        516
+      ],
+      "summary": "Defines test_quality_crop_inspection_uses_luna_and_records_page_targets, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "function",
+      "name": "test_luna_draft_uses_deterministic_structured_vision_request",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        290,
+        326
+      ],
+      "summary": "Defines test_luna_draft_uses_deterministic_structured_vision_request, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "function",
+      "name": "test_page_draft_schema_has_no_free_form_model_output",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        382,
+        390
+      ],
+      "summary": "Defines test_page_draft_schema_has_no_free_form_model_output, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "function",
+      "name": "test_gateway_records_cached_input_tokens",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        141,
+        151
+      ],
+      "summary": "Defines test_gateway_records_cached_input_tokens, a response routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "class",
+      "name": "RecordingCreateResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        50,
+        63
+      ],
+      "summary": "Defines the RecordingCreateResponses class in test_openai_vision_gateway.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "function",
+      "name": "test_document_chat_request_is_structured_and_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        235,
+        252
+      ],
+      "summary": "Defines test_document_chat_request_is_structured_and_text_only, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "function",
+      "name": "test_gateway_accumulates_usage_across_requests",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        329,
+        340
+      ],
+      "summary": "Defines test_gateway_accumulates_usage_across_requests, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "function",
+      "name": "test_markdown_refinement_is_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        174,
+        195
+      ],
+      "summary": "Defines test_markdown_refinement_is_text_only, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "function",
+      "name": "_additional_properties_values",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        393,
+        401
+      ],
+      "summary": "Defines _additional_properties_values, a value routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "function",
+      "name": "test_luna_crop_inspection_batches_images_in_one_request",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        404,
+        472
+      ],
+      "summary": "Defines test_luna_crop_inspection_batches_images_in_one_request, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "function",
+      "name": "test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        343,
+        379
+      ],
+      "summary": "Defines test_incomplete_draft_reports_provider_context_before_schema_validation, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_openai_vision_gateway.py",
+      "type": "file",
+      "name": "test_openai_vision_gateway.py",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "summary": "Test module 'test_openai_vision_gateway.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "function",
+      "name": "test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        154,
+        165
+      ],
+      "summary": "Defines test_gateway_defaults_missing_cached_input_tokens_to_zero, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "function",
+      "name": "test_structured_agentic_request_repairs_schema_failure_once",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        255,
+        275
+      ],
+      "summary": "Defines test_structured_agentic_request_repairs_schema_failure_once, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "class",
+      "name": "RecordingResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        34,
+        47
+      ],
+      "summary": "Defines the RecordingResponses class in test_openai_vision_gateway.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "function",
+      "name": "test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        598,
+        650
+      ],
+      "summary": "Defines test_targeted_span_repair_sends_only_literal_context_and_crop, a tmp_path routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "class",
+      "name": "RepairingResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        66,
+        77
+      ],
+      "summary": "Defines the RepairingResponses class in test_openai_vision_gateway.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "function",
+      "name": "test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        544,
+        575
+      ],
+      "summary": "Defines test_dynamic_extractor_uses_user_schema_and_luna_repair, a  routine in test_openai_vision_gateway.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "class",
+      "name": "RepairingCreateResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        80,
+        94
+      ],
+      "summary": "Defines the RepairingCreateResponses class in test_openai_vision_gateway.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

@@ -1,0 +1,1852 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 6,
+  "filesSkipped": [
+    "graphify-out/.vocab.txt",
+    "graphify-out/graph.html"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 6,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 6
+    }
+  },
+  "results": [
+    {
+      "path": "graphify-out/.graphify_labels.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 1,
+      "nonEmptyLines": 1,
+      "sections": [
+        {
+          "heading": "0",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "2",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "3",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "4",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "5",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "6",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "7",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "8",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "9",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "10",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "11",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "12",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "13",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "14",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "15",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "16",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "17",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "18",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "19",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "20",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "21",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "22",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "23",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "24",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "25",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "26",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "27",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "28",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "29",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "30",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "31",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "32",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "33",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "34",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "35",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "36",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "37",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "38",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "39",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "40",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "41",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "42",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "43",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "44",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "45",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "46",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "47",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "48",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "49",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "50",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "51",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "52",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "53",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "54",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "55",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "56",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "57",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "58",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "59",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "60",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "61",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "62",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "63",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "64",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "65",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "66",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "67",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "68",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "69",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "70",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "71",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "72",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "73",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "74",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "75",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "76",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "77",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "78",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "79",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "80",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "81",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "82",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "83",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "84",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "85",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "86",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "87",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "88",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "89",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "90",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "91",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 92
+      }
+    },
+    {
+      "path": "graphify-out/.graphify_learning.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 5,
+      "nonEmptyLines": 5,
+      "sections": [
+        {
+          "heading": "generated_at",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "nodes",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "version",
+          "level": 1,
+          "line": 4
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 3
+      }
+    },
+    {
+      "path": "graphify-out/GRAPH_REPORT.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 417,
+      "nonEmptyLines": 343,
+      "sections": [
+        {
+          "heading": "Graph Report - .  (2026-08-10)",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Corpus Check",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Summary",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Community Hubs (Navigation)",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "God Nodes (most connected - your core abstractions)",
+          "level": 2,
+          "line": 101
+        },
+        {
+          "heading": "Surprising Connections (you probably didn't know these)",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Import Cycles",
+          "level": 2,
+          "line": 125
+        },
+        {
+          "heading": "Hyperedges (group relationships)",
+          "level": 2,
+          "line": 128
+        },
+        {
+          "heading": "Communities (92 total, 24 thin omitted)",
+          "level": 2,
+          "line": 142
+        },
+        {
+          "heading": "Community 0 - \"Parser Configuration\"",
+          "level": 3,
+          "line": 144
+        },
+        {
+          "heading": "Community 1 - \"Document Models and Rendering\"",
+          "level": 3,
+          "line": 148
+        },
+        {
+          "heading": "Community 2 - \"Parsing Pipeline\"",
+          "level": 3,
+          "line": 152
+        },
+        {
+          "heading": "Community 3 - \"OpenAI Gateway\"",
+          "level": 3,
+          "line": 156
+        },
+        {
+          "heading": "Community 4 - \"Evaluation and Benchmarking\"",
+          "level": 3,
+          "line": 160
+        },
+        {
+          "heading": "Community 5 - \"Local OCR Runtime\"",
+          "level": 3,
+          "line": 164
+        },
+        {
+          "heading": "Community 6 - \"Page Analysis\"",
+          "level": 3,
+          "line": 168
+        },
+        {
+          "heading": "Community 7 - \"Quality Repair\"",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Community 8 - \"Schema Storage\"",
+          "level": 3,
+          "line": 176
+        },
+        {
+          "heading": "Community 9 - \"Markdown Rendering\"",
+          "level": 3,
+          "line": 180
+        },
+        {
+          "heading": "Community 10 - \"Annotation Schema\"",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Community 11 - \"Provider Runtime\"",
+          "level": 3,
+          "line": 188
+        },
+        {
+          "heading": "Community 12 - \"Core Models\"",
+          "level": 3,
+          "line": 192
+        },
+        {
+          "heading": "Community 13 - \"Extraction Validation\"",
+          "level": 3,
+          "line": 196
+        },
+        {
+          "heading": "Community 14 - \"Streamlit Classifier UI\"",
+          "level": 3,
+          "line": 200
+        },
+        {
+          "heading": "Community 15 - \"Agentic Runtime Usage\"",
+          "level": 3,
+          "line": 204
+        },
+        {
+          "heading": "Community 16 - \"Architecture and Security\"",
+          "level": 3,
+          "line": 208
+        },
+        {
+          "heading": "Community 17 - \"Agentic Context Models\"",
+          "level": 3,
+          "line": 212
+        },
+        {
+          "heading": "Community 18 - \"Grounding Quality\"",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "Community 19 - \"Document Studio UI\"",
+          "level": 3,
+          "line": 220
+        },
+        {
+          "heading": "Community 20 - \"Documentation Site Builder\"",
+          "level": 3,
+          "line": 224
+        },
+        {
+          "heading": "Community 21 - \"Windows WSL Installer\"",
+          "level": 3,
+          "line": 228
+        },
+        {
+          "heading": "Community 22 - \"Parallel Page Processing\"",
+          "level": 3,
+          "line": 232
+        },
+        {
+          "heading": "Community 23 - \"Stack and Changelog\"",
+          "level": 3,
+          "line": 236
+        },
+        {
+          "heading": "Community 24 - \"Batch Processing\"",
+          "level": 3,
+          "line": 240
+        },
+        {
+          "heading": "Community 25 - \"Agentic Workflow\"",
+          "level": 3,
+          "line": 244
+        },
+        {
+          "heading": "Community 26 - \"OCR Stack Manager\"",
+          "level": 3,
+          "line": 248
+        },
+        {
+          "heading": "Community 28 - \"Corpus Source Schema\"",
+          "level": 3,
+          "line": 252
+        },
+        {
+          "heading": "Community 29 - \"Parsing UI Pages\"",
+          "level": 3,
+          "line": 256
+        },
+        {
+          "heading": "Community 30 - \"Line Item Fields\"",
+          "level": 3,
+          "line": 260
+        },
+        {
+          "heading": "Community 31 - \"Line Item Schema\"",
+          "level": 3,
+          "line": 264
+        },
+        {
+          "heading": "Community 32 - \"Stack Launcher\"",
+          "level": 3,
+          "line": 268
+        },
+        {
+          "heading": "Community 33 - \"Form Routing Tests\"",
+          "level": 3,
+          "line": 272
+        },
+        {
+          "heading": "Community 34 - \"Evaluation Corpus Generator\"",
+          "level": 3,
+          "line": 276
+        },
+        {
+          "heading": "Community 35 - \"GLM OCR Runtime Preparation\"",
+          "level": 3,
+          "line": 280
+        },
+        {
+          "heading": "Community 36 - \"Corpus Annotation Schema\"",
+          "level": 3,
+          "line": 284
+        },
+        {
+          "heading": "Community 37 - \"Corpus Feature Schema\"",
+          "level": 3,
+          "line": 288
+        },
+        {
+          "heading": "Community 38 - \"Application Runtime Script\"",
+          "level": 3,
+          "line": 292
+        },
+        {
+          "heading": "Community 39 - \"Paddle Runtime Tests\"",
+          "level": 3,
+          "line": 296
+        },
+        {
+          "heading": "Community 40 - \"GLM OCR Documentation\"",
+          "level": 3,
+          "line": 300
+        },
+        {
+          "heading": "Community 41 - \"User Guide Documentation\"",
+          "level": 3,
+          "line": 304
+        },
+        {
+          "heading": "Community 42 - \"Extraction Quality Research\"",
+          "level": 3,
+          "line": 308
+        },
+        {
+          "heading": "Community 43 - \"Invoice Core Schema\"",
+          "level": 3,
+          "line": 312
+        },
+        {
+          "heading": "Community 44 - \"Invoice Schema\"",
+          "level": 3,
+          "line": 316
+        },
+        {
+          "heading": "Community 45 - \"Invoice Number Fields\"",
+          "level": 3,
+          "line": 320
+        },
+        {
+          "heading": "Community 46 - \"Invoice Total Fields\"",
+          "level": 3,
+          "line": 324
+        },
+        {
+          "heading": "Community 47 - \"Manifest Schema\"",
+          "level": 3,
+          "line": 328
+        },
+        {
+          "heading": "Community 48 - \"Manifest Entries\"",
+          "level": 3,
+          "line": 332
+        },
+        {
+          "heading": "Community 49 - \"Evidence Governance\"",
+          "level": 3,
+          "line": 336
+        },
+        {
+          "heading": "Community 50 - \"Item Alias Schema\"",
+          "level": 3,
+          "line": 340
+        },
+        {
+          "heading": "Community 51 - \"GLM OCR Benchmark\"",
+          "level": 3,
+          "line": 344
+        },
+        {
+          "heading": "Community 52 - \"Ollama Setup\"",
+          "level": 3,
+          "line": 348
+        },
+        {
+          "heading": "Community 53 - \"Corpus Manifest\"",
+          "level": 3,
+          "line": 352
+        },
+        {
+          "heading": "Community 54 - \"Corpus Document Requirements\"",
+          "level": 3,
+          "line": 356
+        },
+        {
+          "heading": "Community 55 - \"Manifest Requirements\"",
+          "level": 3,
+          "line": 360
+        },
+        {
+          "heading": "Community 56 - \"Ollama Service\"",
+          "level": 3,
+          "line": 364
+        },
+        {
+          "heading": "Community 57 - \"PaddleOCR Setup\"",
+          "level": 3,
+          "line": 368
+        },
+        {
+          "heading": "Community 59 - \"Annotation Path Schema\"",
+          "level": 3,
+          "line": 372
+        },
+        {
+          "heading": "Community 60 - \"Example Document Generator\"",
+          "level": 3,
+          "line": 376
+        },
+        {
+          "heading": "Community 61 - \"GLM OCR Service\"",
+          "level": 3,
+          "line": 380
+        },
+        {
+          "heading": "Community 62 - \"GLM OCR Setup\"",
+          "level": 3,
+          "line": 384
+        },
+        {
+          "heading": "Community 63 - \"Product Classification\"",
+          "level": 3,
+          "line": 388
+        },
+        {
+          "heading": "Community 64 - \"Documentation Assets\"",
+          "level": 3,
+          "line": 392
+        },
+        {
+          "heading": "Knowledge Gaps",
+          "level": 2,
+          "line": 396
+        },
+        {
+          "heading": "Suggested Questions",
+          "level": 2,
+          "line": 401
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 74
+      }
+    },
+    {
+      "path": "graphify-out/cost.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 96,
+      "nonEmptyLines": 96,
+      "sections": [
+        {
+          "heading": "runs",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "total_input_tokens",
+          "level": 1,
+          "line": 94
+        },
+        {
+          "heading": "total_output_tokens",
+          "level": 1,
+          "line": 95
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 3
+      }
+    },
+    {
+      "path": "graphify-out/graph.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 85965,
+      "nonEmptyLines": 85965,
+      "sections": [
+        {
+          "heading": "directed",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "multigraph",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "graph",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "nodes",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "links",
+          "level": 1,
+          "line": 18304
+        },
+        {
+          "heading": "hyperedges",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "built_at_commit",
+          "level": 1,
+          "line": 85964
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "graphify-out/manifest.json",
+      "language": "json",
+      "fileCategory": "config",
+      "totalLines": 842,
+      "nonEmptyLines": 842,
+      "sections": [
+        {
+          "heading": ".claude/settings.local.json",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "benchmarks/baselines/offline-native-v1.json",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/checkboxes.json",
+          "level": 1,
+          "line": 12
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+          "level": 1,
+          "line": 17
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+          "level": 1,
+          "line": 22
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/figure-chart.json",
+          "level": 1,
+          "line": 27
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/form.json",
+          "level": 1,
+          "line": 32
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/lists.json",
+          "level": 1,
+          "line": 37
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/multi-column.json",
+          "level": 1,
+          "line": 42
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/native-text.json",
+          "level": 1,
+          "line": 47
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+          "level": 1,
+          "line": 52
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+          "level": 1,
+          "line": 57
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+          "level": 1,
+          "line": 62
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/tables.json",
+          "level": 1,
+          "line": 67
+        },
+        {
+          "heading": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+          "level": 1,
+          "line": 72
+        },
+        {
+          "heading": "benchmarks/corpus-v1/manifest.json",
+          "level": 1,
+          "line": 77
+        },
+        {
+          "heading": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+          "level": 1,
+          "line": 82
+        },
+        {
+          "heading": "benchmarks/schemas/annotation-v1.1.schema.json",
+          "level": 1,
+          "line": 87
+        },
+        {
+          "heading": "benchmarks/schemas/manifest-v1.schema.json",
+          "level": 1,
+          "line": 92
+        },
+        {
+          "heading": "examples/schemas/invoice.schema.json",
+          "level": 1,
+          "line": 97
+        },
+        {
+          "heading": "pyproject.toml",
+          "level": 1,
+          "line": 102
+        },
+        {
+          "heading": "scripts/evaluate_corpus.py",
+          "level": 1,
+          "line": 107
+        },
+        {
+          "heading": "scripts/generate_evaluation_corpus.py",
+          "level": 1,
+          "line": 112
+        },
+        {
+          "heading": "scripts/generate_examples.py",
+          "level": 1,
+          "line": 117
+        },
+        {
+          "heading": "scripts/wsl/launch-stack.sh",
+          "level": 1,
+          "line": 122
+        },
+        {
+          "heading": "scripts/wsl/run-app.sh",
+          "level": 1,
+          "line": 127
+        },
+        {
+          "heading": "scripts/wsl/serve-glmocr.sh",
+          "level": 1,
+          "line": 132
+        },
+        {
+          "heading": "scripts/wsl/setup-glmocr.sh",
+          "level": 1,
+          "line": 137
+        },
+        {
+          "heading": "src/grounded_docparse/__init__.py",
+          "level": 1,
+          "line": 142
+        },
+        {
+          "heading": "src/grounded_docparse/agentic.py",
+          "level": 1,
+          "line": 147
+        },
+        {
+          "heading": "src/grounded_docparse/benchmark.py",
+          "level": 1,
+          "line": 152
+        },
+        {
+          "heading": "src/grounded_docparse/config.py",
+          "level": 1,
+          "line": 157
+        },
+        {
+          "heading": "src/grounded_docparse/enhancement.py",
+          "level": 1,
+          "line": 162
+        },
+        {
+          "heading": "src/grounded_docparse/extraction.py",
+          "level": 1,
+          "line": 167
+        },
+        {
+          "heading": "src/grounded_docparse/gateways.py",
+          "level": 1,
+          "line": 172
+        },
+        {
+          "heading": "src/grounded_docparse/ingest.py",
+          "level": 1,
+          "line": 177
+        },
+        {
+          "heading": "src/grounded_docparse/local_ocr.py",
+          "level": 1,
+          "line": 182
+        },
+        {
+          "heading": "src/grounded_docparse/models.py",
+          "level": 1,
+          "line": 187
+        },
+        {
+          "heading": "src/grounded_docparse/page_analysis.py",
+          "level": 1,
+          "line": 192
+        },
+        {
+          "heading": "src/grounded_docparse/pipeline.py",
+          "level": 1,
+          "line": 197
+        },
+        {
+          "heading": "src/grounded_docparse/prompts.py",
+          "level": 1,
+          "line": 202
+        },
+        {
+          "heading": "src/grounded_docparse/quality.py",
+          "level": 1,
+          "line": 207
+        },
+        {
+          "heading": "src/grounded_docparse/render.py",
+          "level": 1,
+          "line": 212
+        },
+        {
+          "heading": "src/grounded_docparse/runtime.py",
+          "level": 1,
+          "line": 217
+        },
+        {
+          "heading": "src/grounded_docparse/schema_store.py",
+          "level": 1,
+          "line": 222
+        },
+        {
+          "heading": "streamlit_app.py",
+          "level": 1,
+          "line": 227
+        },
+        {
+          "heading": "tests/conftest.py",
+          "level": 1,
+          "line": 232
+        },
+        {
+          "heading": "tests/test_agentic_contract.py",
+          "level": 1,
+          "line": 237
+        },
+        {
+          "heading": "tests/test_agentic_extraction.py",
+          "level": 1,
+          "line": 242
+        },
+        {
+          "heading": "tests/test_agentic_features.py",
+          "level": 1,
+          "line": 247
+        },
+        {
+          "heading": "tests/test_confidence_spans.py",
+          "level": 1,
+          "line": 252
+        },
+        {
+          "heading": "tests/test_corpus_manifest.py",
+          "level": 1,
+          "line": 257
+        },
+        {
+          "heading": "tests/test_evaluation_metrics.py",
+          "level": 1,
+          "line": 262
+        },
+        {
+          "heading": "tests/test_evaluation_report.py",
+          "level": 1,
+          "line": 267
+        },
+        {
+          "heading": "tests/test_ingest.py",
+          "level": 1,
+          "line": 272
+        },
+        {
+          "heading": "tests/test_markdown_enhancement.py",
+          "level": 1,
+          "line": 277
+        },
+        {
+          "heading": "tests/test_openai_vision_gateway.py",
+          "level": 1,
+          "line": 282
+        },
+        {
+          "heading": "tests/test_page_analysis.py",
+          "level": 1,
+          "line": 287
+        },
+        {
+          "heading": "tests/test_parallel_pages.py",
+          "level": 1,
+          "line": 292
+        },
+        {
+          "heading": "tests/test_provider_runtime.py",
+          "level": 1,
+          "line": 297
+        },
+        {
+          "heading": "tests/test_quality.py",
+          "level": 1,
+          "line": 302
+        },
+        {
+          "heading": "tests/test_schema_store.py",
+          "level": 1,
+          "line": 307
+        },
+        {
+          "heading": "tests/test_simple_contract.py",
+          "level": 1,
+          "line": 312
+        },
+        {
+          "heading": "tests/test_simple_pipeline.py",
+          "level": 1,
+          "line": 317
+        },
+        {
+          "heading": "tests/test_simple_streamlit.py",
+          "level": 1,
+          "line": 322
+        },
+        {
+          "heading": ".github/ISSUE_TEMPLATE/bug_report.md",
+          "level": 1,
+          "line": 327
+        },
+        {
+          "heading": ".github/ISSUE_TEMPLATE/feature_request.md",
+          "level": 1,
+          "line": 332
+        },
+        {
+          "heading": "CHANGELOG.md",
+          "level": 1,
+          "line": 337
+        },
+        {
+          "heading": "CONTRIBUTING.md",
+          "level": 1,
+          "line": 342
+        },
+        {
+          "heading": "README.md",
+          "level": 1,
+          "line": 347
+        },
+        {
+          "heading": "SECURITY.md",
+          "level": 1,
+          "line": 352
+        },
+        {
+          "heading": "SETUP.md",
+          "level": 1,
+          "line": 357
+        },
+        {
+          "heading": "config/glmocr.yaml",
+          "level": 1,
+          "line": 362
+        },
+        {
+          "heading": "docs/architecture.md",
+          "level": 1,
+          "line": 367
+        },
+        {
+          "heading": "docs/extraction-quality-research.md",
+          "level": 1,
+          "line": 372
+        },
+        {
+          "heading": "docs/how-it-works.md",
+          "level": 1,
+          "line": 377
+        },
+        {
+          "heading": "docs/local-glmocr.md",
+          "level": 1,
+          "line": 382
+        },
+        {
+          "heading": "docs/research.md",
+          "level": 1,
+          "line": 387
+        },
+        {
+          "heading": "docs/run.md",
+          "level": 1,
+          "line": 392
+        },
+        {
+          "heading": "docs/spec.md",
+          "level": 1,
+          "line": 397
+        },
+        {
+          "heading": "docs/tutorial.md",
+          "level": 1,
+          "line": 402
+        },
+        {
+          "heading": "grounded-docparse-threat-model.md",
+          "level": 1,
+          "line": 407
+        },
+        {
+          "heading": "security_best_practices_report.md",
+          "level": 1,
+          "line": 412
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/checkboxes.pdf",
+          "level": 1,
+          "line": 417
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/cross-page-table.pdf",
+          "level": 1,
+          "line": 422
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/degraded-scan.pdf",
+          "level": 1,
+          "line": 427
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/figure-chart.pdf",
+          "level": 1,
+          "line": 432
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/form.pdf",
+          "level": 1,
+          "line": 437
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/lists.pdf",
+          "level": 1,
+          "line": 442
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/multi-column.pdf",
+          "level": 1,
+          "line": 447
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/native-text.pdf",
+          "level": 1,
+          "line": 452
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/tables.pdf",
+          "level": 1,
+          "line": 457
+        },
+        {
+          "heading": "benchmarks/corpus-v1/documents/unicode-identifiers.pdf",
+          "level": 1,
+          "line": 462
+        },
+        {
+          "heading": "examples/synthetic-medical-fax.pdf",
+          "level": 1,
+          "line": 467
+        },
+        {
+          "heading": "examples/synthetic-report.pdf",
+          "level": 1,
+          "line": 472
+        },
+        {
+          "heading": "tests/test_strict_recovery_contract.py",
+          "level": 1,
+          "line": 477
+        },
+        {
+          "heading": "scripts/wsl/benchmark_glmocr.py",
+          "level": 1,
+          "line": 482
+        },
+        {
+          "heading": "scripts/wsl/check-glmocr-api.py",
+          "level": 1,
+          "line": 487
+        },
+        {
+          "heading": "scripts/wsl/prepare_glmocr_runtime.py",
+          "level": 1,
+          "line": 492
+        },
+        {
+          "heading": "tests/test_glmocr_runtime_config.py",
+          "level": 1,
+          "line": 497
+        },
+        {
+          "heading": "tests/test_launcher_contract.py",
+          "level": 1,
+          "line": 502
+        },
+        {
+          "heading": "docs/api.md",
+          "level": 1,
+          "line": 507
+        },
+        {
+          "heading": "docs/business-user-extraction-workflow.md",
+          "level": 1,
+          "line": 512
+        },
+        {
+          "heading": "docs/layout-aware-large-field-extraction-workflow.md",
+          "level": 1,
+          "line": 517
+        },
+        {
+          "heading": "tests/test_form_routing.py",
+          "level": 1,
+          "line": 522
+        },
+        {
+          "heading": "docs/azure-bulk-fax-deployment.md",
+          "level": 1,
+          "line": 527
+        },
+        {
+          "heading": "docs-site/assets/app.js",
+          "level": 1,
+          "line": 532
+        },
+        {
+          "heading": "docs-site/site-manifest.json",
+          "level": 1,
+          "line": 537
+        },
+        {
+          "heading": "scripts/build_docs_site.py",
+          "level": 1,
+          "line": 542
+        },
+        {
+          "heading": "docs-site/agentic-document-extraction-comparison.html",
+          "level": 1,
+          "line": 547
+        },
+        {
+          "heading": "docs-site/api.html",
+          "level": 1,
+          "line": 552
+        },
+        {
+          "heading": "docs-site/architecture.html",
+          "level": 1,
+          "line": 557
+        },
+        {
+          "heading": "docs-site/azure-bulk-fax-deployment.html",
+          "level": 1,
+          "line": 562
+        },
+        {
+          "heading": "docs-site/business-user-extraction-workflow.html",
+          "level": 1,
+          "line": 567
+        },
+        {
+          "heading": "docs-site/changelog.html",
+          "level": 1,
+          "line": 572
+        },
+        {
+          "heading": "docs-site/complete-user-guide.html",
+          "level": 1,
+          "line": 577
+        },
+        {
+          "heading": "docs-site/contributing.html",
+          "level": 1,
+          "line": 582
+        },
+        {
+          "heading": "docs-site/extraction-quality-research.html",
+          "level": 1,
+          "line": 587
+        },
+        {
+          "heading": "docs-site/how-grounded-docparse-is-agentic.html",
+          "level": 1,
+          "line": 592
+        },
+        {
+          "heading": "docs-site/how-it-works.html",
+          "level": 1,
+          "line": 597
+        },
+        {
+          "heading": "docs-site/index.html",
+          "level": 1,
+          "line": 602
+        },
+        {
+          "heading": "docs-site/issue-template--bug-report.html",
+          "level": 1,
+          "line": 607
+        },
+        {
+          "heading": "docs-site/issue-template--feature-request.html",
+          "level": 1,
+          "line": 612
+        },
+        {
+          "heading": "docs-site/layout-aware-large-field-extraction-workflow.html",
+          "level": 1,
+          "line": 617
+        },
+        {
+          "heading": "docs-site/local-glmocr.html",
+          "level": 1,
+          "line": 622
+        },
+        {
+          "heading": "docs-site/research.html",
+          "level": 1,
+          "line": 627
+        },
+        {
+          "heading": "docs-site/run.html",
+          "level": 1,
+          "line": 632
+        },
+        {
+          "heading": "docs-site/security-content-excluded.html",
+          "level": 1,
+          "line": 637
+        },
+        {
+          "heading": "docs-site/setup.html",
+          "level": 1,
+          "line": 642
+        },
+        {
+          "heading": "docs-site/spec.html",
+          "level": 1,
+          "line": 647
+        },
+        {
+          "heading": "docs-site/tutorial.html",
+          "level": 1,
+          "line": 652
+        },
+        {
+          "heading": "docs-site/zero-to-hero-tutorial.html",
+          "level": 1,
+          "line": 657
+        },
+        {
+          "heading": "docs/agentic-document-extraction-comparison.md",
+          "level": 1,
+          "line": 662
+        },
+        {
+          "heading": "docs/complete-user-guide.md",
+          "level": 1,
+          "line": 667
+        },
+        {
+          "heading": "docs/how-grounded-docparse-is-agentic.md",
+          "level": 1,
+          "line": 672
+        },
+        {
+          "heading": "docs/zero-to-hero-tutorial.md",
+          "level": 1,
+          "line": 677
+        },
+        {
+          "heading": "presentations/grounded-docparse-video-demo-script.md",
+          "level": 1,
+          "line": 682
+        },
+        {
+          "heading": "docs-site/assets/content/docs/images/document-parse-studio-full.png",
+          "level": 1,
+          "line": 687
+        },
+        {
+          "heading": "docs-site/assets/favicon.svg",
+          "level": 1,
+          "line": 692
+        },
+        {
+          "heading": "docs/images/document-parse-studio-full.png",
+          "level": 1,
+          "line": 697
+        },
+        {
+          "heading": "installer/Install-GroundedDocParse.ps1",
+          "level": 1,
+          "line": 702
+        },
+        {
+          "heading": "paddle-runtime/pyproject.toml",
+          "level": 1,
+          "line": 707
+        },
+        {
+          "heading": "scripts/build-installer.ps1",
+          "level": 1,
+          "line": 712
+        },
+        {
+          "heading": "scripts/wsl/check-paddleocr-api.py",
+          "level": 1,
+          "line": 717
+        },
+        {
+          "heading": "scripts/wsl/manage-ocr-stack.sh",
+          "level": 1,
+          "line": 722
+        },
+        {
+          "heading": "scripts/wsl/prepare_paddleocr_runtime.py",
+          "level": 1,
+          "line": 727
+        },
+        {
+          "heading": "scripts/wsl/serve-ollama.sh",
+          "level": 1,
+          "line": 732
+        },
+        {
+          "heading": "scripts/wsl/setup-ollama.sh",
+          "level": 1,
+          "line": 737
+        },
+        {
+          "heading": "scripts/wsl/setup-paddleocr.sh",
+          "level": 1,
+          "line": 742
+        },
+        {
+          "heading": "src/grounded_docparse/paddle_ocr.py",
+          "level": 1,
+          "line": 747
+        },
+        {
+          "heading": "tests/test_paddle_ocr.py",
+          "level": 1,
+          "line": 752
+        },
+        {
+          "heading": "tests/test_paddle_runtime_config.py",
+          "level": 1,
+          "line": 757
+        },
+        {
+          "heading": "tests/test_windows_installer.py",
+          "level": 1,
+          "line": 762
+        },
+        {
+          "heading": "config/paddle-vllm.yaml",
+          "level": 1,
+          "line": 767
+        },
+        {
+          "heading": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+          "level": 1,
+          "line": 772
+        },
+        {
+          "heading": "src/grounded_docparse/batch.py",
+          "level": 1,
+          "line": 777
+        },
+        {
+          "heading": "tests/test_batch.py",
+          "level": 1,
+          "line": 782
+        },
+        {
+          "heading": "docs-site/local-paddleocr-vl.html",
+          "level": 1,
+          "line": 787
+        },
+        {
+          "heading": "docs/codebase/.codebase-scan.txt",
+          "level": 1,
+          "line": 792
+        },
+        {
+          "heading": "docs/codebase/ARCHITECTURE.md",
+          "level": 1,
+          "line": 797
+        },
+        {
+          "heading": "docs/codebase/CONCERNS.md",
+          "level": 1,
+          "line": 802
+        },
+        {
+          "heading": "docs/codebase/CONVENTIONS.md",
+          "level": 1,
+          "line": 807
+        },
+        {
+          "heading": "docs/codebase/INTEGRATIONS.md",
+          "level": 1,
+          "line": 812
+        },
+        {
+          "heading": "docs/codebase/STACK.md",
+          "level": 1,
+          "line": 817
+        },
+        {
+          "heading": "docs/codebase/STRUCTURE.md",
+          "level": 1,
+          "line": 822
+        },
+        {
+          "heading": "docs/codebase/TESTING.md",
+          "level": 1,
+          "line": 827
+        },
+        {
+          "heading": "docs/idp-vs-ade-classification.html",
+          "level": 1,
+          "line": 832
+        },
+        {
+          "heading": "docs/local-paddleocr-vl.md",
+          "level": 1,
+          "line": 837
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 168
+      }
+    }
+  ]
+}

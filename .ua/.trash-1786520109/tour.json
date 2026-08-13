@@ -1,0 +1,57 @@
+[
+  {
+    "order": 1,
+    "title": "Project Overview",
+    "description": "Begin with the README to learn the workstation-oriented promise: local OCR establishes document evidence, while optional Luna features remain bounded and grounded. It also introduces the two ways to use the project and the outputs you should expect before reading implementation code.",
+    "nodeIds": ["document:README.md"]
+  },
+  {
+    "order": 2,
+    "title": "Studio Entry Point",
+    "description": "The Streamlit application is the primary interactive entry point. It owns upload and review flow, parser settings, document state, processing controls, and exports, so it is the right place to understand the user journey before following the parsing internals.",
+    "nodeIds": ["file:streamlit_app.py", "function:streamlit_app.py:render_schema_builder", "function:streamlit_app.py:render_classifier_profile_builder", "function:streamlit_app.py:_apply_routing_review"]
+  },
+  {
+    "order": 3,
+    "title": "Command Line Flow",
+    "description": "The CLI is the second supported entry point for repeatable batch parsing. Its import edges lead directly to the configuration, domain contracts, parser, agentic layer, rendering, and schema persistence that make the same workflow usable without the UI.",
+    "nodeIds": ["file:src/grounded_docparse/cli.py", "file:src/grounded_docparse/config.py", "file:src/grounded_docparse/models.py", "file:src/grounded_docparse/schema_store.py"]
+  },
+  {
+    "order": 4,
+    "title": "Evidence Ingest",
+    "description": "The parser pipeline starts by turning uploads into normalized rendered page evidence. The central models define the typed evidence and output contracts shared by the rest of the system, which is why they have the highest fan-in in the graph.",
+    "nodeIds": ["file:src/grounded_docparse/pipeline.py", "file:src/grounded_docparse/ingest.py", "file:src/grounded_docparse/models.py"]
+  },
+  {
+    "order": 5,
+    "title": "Local OCR Choices",
+    "description": "From the pipeline, follow the imports to the two local OCR adapters. They normalize GLM-OCR and PaddleOCR-VL responses into the same evidence model, preserving the design rule that the selected local engine owns layout, geometry, confidence, and reading order.",
+    "nodeIds": ["file:src/grounded_docparse/local_ocr.py", "file:src/grounded_docparse/paddle_ocr.py", "file:src/grounded_docparse/page_analysis.py", "file:src/grounded_docparse/quality.py"]
+  },
+  {
+    "order": 6,
+    "title": "Grounded Outputs",
+    "description": "Once evidence has passed deterministic quality and recovery planning, rendering turns it into Markdown, structured JSON, element records, and annotated PDFs. This keeps presentation and export downstream of the evidence-owning parse rather than letting optional reasoning redefine the source document.",
+    "nodeIds": ["file:src/grounded_docparse/render.py", "file:src/grounded_docparse/pipeline.py"]
+  },
+  {
+    "order": 7,
+    "title": "Bounded Agent Features",
+    "description": "The agentic layer builds on completed parse results for classification, table of contents, routing, extraction, and chat. Extraction validates schemas and resolves citations back to known evidence, while gateways isolate the structured model calls used by these optional features.",
+    "nodeIds": ["file:src/grounded_docparse/agentic.py", "file:src/grounded_docparse/extraction.py", "file:src/grounded_docparse/gateways.py", "class:src/grounded_docparse/agentic.py:DocumentAgent", "class:src/grounded_docparse/extraction.py:DocumentExtractor"],
+    "languageLesson": "Pydantic models let Python code validate the typed records passed between parsing, rendering, and optional agent features, making invalid states easier to reject at boundaries."
+  },
+  {
+    "order": 8,
+    "title": "Durable Workspace",
+    "description": "The workspace store persists active-batch metadata and artifacts so the Streamlit workflow can restore progress after a restart. Schema and routing-profile storage are intentionally narrower: they save reusable definitions without turning the project into a durable job service.",
+    "nodeIds": ["file:src/grounded_docparse/workspace_store.py", "file:src/grounded_docparse/schema_store.py"]
+  },
+  {
+    "order": 9,
+    "title": "Contracts And Evaluation",
+    "description": "Finish with the architecture and API references to connect the implementation to its public contracts and ownership rules. The evaluation command and private-evaluation guide show how grounded outputs are measured, calibrated, and protected without requiring live paid requests for normal verification.",
+    "nodeIds": ["document:docs/architecture.md", "document:docs/api.md", "file:scripts/evaluate_corpus.py", "document:docs/private-evaluation.md"]
+  }
+]

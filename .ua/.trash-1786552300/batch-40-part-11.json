@@ -1,0 +1,670 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_agentic_contract.py:test_verified_table_with_blank_cell_is_incomplete_and_needs_review",
+      "type": "function",
+      "name": "test_verified_table_with_blank_cell_is_incomplete_and_needs_review",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        596,
+        618
+      ],
+      "summary": "Defines test_verified_table_with_blank_cell_is_incomplete_and_needs_review, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_agentic_contract.py",
+      "type": "file",
+      "name": "test_agentic_contract.py",
+      "filePath": "tests/test_agentic_contract.py",
+      "summary": "Test module 'test_agentic_contract.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_extraction_schema_requires_nullable_closed_objects",
+      "type": "function",
+      "name": "test_extraction_schema_requires_nullable_closed_objects",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        105,
+        127
+      ],
+      "summary": "Defines test_extraction_schema_requires_nullable_closed_objects, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_repeated_text_blocks_receive_distinct_exact_emission_spans",
+      "type": "function",
+      "name": "test_repeated_text_blocks_receive_distinct_exact_emission_spans",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        435,
+        459
+      ],
+      "summary": "Defines test_repeated_text_blocks_receive_distinct_exact_emission_spans, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_list_coverage_counts_marker_occurrence_separately",
+      "type": "function",
+      "name": "test_list_coverage_counts_marker_occurrence_separately",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        730,
+        757
+      ],
+      "summary": "Defines test_list_coverage_counts_marker_occurrence_separately, a monkeypatch routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_ungrouped_checkbox_renders_its_structured_option",
+      "type": "function",
+      "name": "test_ungrouped_checkbox_renders_its_structured_option",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        403,
+        432
+      ],
+      "summary": "Defines test_ungrouped_checkbox_renders_its_structured_option, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_duplicate_visual_values_preserve_provider_kind_bbox_and_span",
+      "type": "function",
+      "name": "test_duplicate_visual_values_preserve_provider_kind_bbox_and_span",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        793,
+        837
+      ],
+      "summary": "Defines test_duplicate_visual_values_preserve_provider_kind_bbox_and_span, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_verified_replacement_preserves_rejected_lineage_in_page_status",
+      "type": "function",
+      "name": "test_verified_replacement_preserves_rejected_lineage_in_page_status",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        621,
+        648
+      ],
+      "summary": "Defines test_verified_replacement_preserves_rejected_lineage_in_page_status, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_agentic_document_maps_blocks_and_lines_to_canonical_markdown",
+      "type": "function",
+      "name": "test_agentic_document_maps_blocks_and_lines_to_canonical_markdown",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        25,
+        103
+      ],
+      "summary": "Defines test_agentic_document_maps_blocks_and_lines_to_canonical_markdown, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_verified_incomplete_structure_fails_full_semantic_coverage",
+      "type": "function",
+      "name": "test_verified_incomplete_structure_fails_full_semantic_coverage",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        571,
+        593
+      ],
+      "summary": "Defines test_verified_incomplete_structure_fails_full_semantic_coverage, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds",
+      "type": "function",
+      "name": "test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        462,
+        498
+      ],
+      "summary": "Defines test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_provider_line_grounding_is_preserved_in_v2_atoms",
+      "type": "function",
+      "name": "test_provider_line_grounding_is_preserved_in_v2_atoms",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        147,
+        179
+      ],
+      "summary": "Defines test_provider_line_grounding_is_preserved_in_v2_atoms, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans",
+      "type": "function",
+      "name": "test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        351,
+        400
+      ],
+      "summary": "Defines test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed",
+      "type": "function",
+      "name": "test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        182,
+        204
+      ],
+      "summary": "Defines test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_visual_coverage_counts_overlapping_field_occurrences",
+      "type": "function",
+      "name": "test_visual_coverage_counts_overlapping_field_occurrences",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        697,
+        727
+      ],
+      "summary": "Defines test_visual_coverage_counts_overlapping_field_occurrences, a monkeypatch routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_table_coverage_detects_residual_omission_independently",
+      "type": "function",
+      "name": "test_table_coverage_detects_residual_omission_independently",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        321,
+        348
+      ],
+      "summary": "Defines test_table_coverage_detects_residual_omission_independently, a monkeypatch routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_agentic_render_preserves_table_residual_and_all_visual_semantics",
+      "type": "function",
+      "name": "test_agentic_render_preserves_table_residual_and_all_visual_semantics",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        207,
+        275
+      ],
+      "summary": "Defines test_agentic_render_preserves_table_residual_and_all_visual_semantics, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_list_coverage_does_not_duplicate_equivalent_leading_marker",
+      "type": "function",
+      "name": "test_list_coverage_does_not_duplicate_equivalent_leading_marker",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        768,
+        790
+      ],
+      "summary": "Defines test_list_coverage_does_not_duplicate_equivalent_leading_marker, a marker, text routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_visual_atom_span_uses_its_labeled_emission",
+      "type": "function",
+      "name": "test_visual_atom_span_uses_its_labeled_emission",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        651,
+        694
+      ],
+      "summary": "Defines test_visual_atom_span_uses_its_labeled_emission, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells",
+      "type": "function",
+      "name": "test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        278,
+        318
+      ],
+      "summary": "Defines test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review",
+      "type": "function",
+      "name": "test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        501,
+        568
+      ],
+      "summary": "Defines test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_agentic_contract.py:test_extraction_schema_rejects_unsupported_keywords",
+      "type": "function",
+      "name": "test_extraction_schema_rejects_unsupported_keywords",
+      "filePath": "tests/test_agentic_contract.py",
+      "lineRange": [
+        130,
+        144
+      ],
+      "summary": "Defines test_extraction_schema_rejects_unsupported_keywords, a  routine in test_agentic_contract.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_table_with_blank_cell_is_incomplete_and_needs_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_replacement_preserves_rejected_lineage_in_page_status",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_extraction_schema_rejects_unsupported_keywords",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_document_maps_blocks_and_lines_to_canonical_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_incomplete_structure_fails_full_semantic_coverage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_list_coverage_counts_marker_occurrence_separately",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_table_coverage_detects_residual_omission_independently",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_rejected_and_empty_probe_history_remain_auditable_and_mark_page_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_render_preserves_table_residual_and_all_visual_semantics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_duplicate_visual_values_preserve_provider_kind_bbox_and_span",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_render_preserves_table_residual_and_all_visual_semantics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_extraction_schema_requires_nullable_closed_objects",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_grouped_checkboxes_ground_group_labels_and_options_in_exact_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_list_coverage_does_not_duplicate_equivalent_leading_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_extraction_schema_rejects_unsupported_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_provider_line_grounding_is_preserved_in_v2_atoms",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_list_coverage_counts_marker_occurrence_separately",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_document_maps_blocks_and_lines_to_canonical_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_visual_coverage_counts_overlapping_field_occurrences",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_replacement_preserves_rejected_lineage_in_page_status",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_table_coverage_detects_residual_omission_independently",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_ungrouped_checkbox_renders_its_structured_option",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_extraction_schema_requires_nullable_closed_objects",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_duplicate_visual_values_preserve_provider_kind_bbox_and_span",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_visual_coverage_counts_overlapping_field_occurrences",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_visual_atom_span_uses_its_labeled_emission",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_visual_atom_span_uses_its_labeled_emission",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_repeated_text_blocks_receive_distinct_exact_emission_spans",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_ungrouped_checkbox_renders_its_structured_option",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_incomplete_structure_fails_full_semantic_coverage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_repeated_text_blocks_receive_distinct_exact_emission_spans",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_provider_line_grounding_is_preserved_in_v2_atoms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_agentic_reading_order_is_contiguous_after_rejected_blocks_are_removed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_list_coverage_does_not_duplicate_equivalent_leading_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_verified_table_with_blank_cell_is_incomplete_and_needs_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_table_residual_preserves_prose_and_does_not_duplicate_multiline_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_agentic_contract.py",
+      "target": "function:tests/test_agentic_contract.py:test_all_emission_spans_preserve_trailing_whitespace_and_stay_in_bounds",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

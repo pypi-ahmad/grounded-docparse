@@ -1,0 +1,546 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_live_document_records_expected_classification_and_review_counts",
+      "type": "function",
+      "name": "test_live_document_records_expected_classification_and_review_counts",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        193,
+        249
+      ],
+      "summary": "Defines test_live_document_records_expected_classification_and_review_counts, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_tables_match_by_page_and_ordinal_then_cell_coordinates",
+      "type": "function",
+      "name": "test_tables_match_by_page_and_ordinal_then_cell_coordinates",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        308,
+        335
+      ],
+      "summary": "Defines test_tables_match_by_page_and_ordinal_then_cell_coordinates, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_reading_order_reports_pairwise_accuracy_and_anchor_coverage",
+      "type": "function",
+      "name": "test_reading_order_reports_pairwise_accuracy_and_anchor_coverage",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        298,
+        305
+      ],
+      "summary": "Defines test_reading_order_reports_pairwise_accuracy_and_anchor_coverage, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_cross_page_continuity_uses_pair_precision_recall_and_f1",
+      "type": "function",
+      "name": "test_cross_page_continuity_uses_pair_precision_recall_and_f1",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        367,
+        373
+      ],
+      "summary": "Defines test_cross_page_continuity_uses_pair_precision_recall_and_f1, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_hallucination_separates_insertions_forbidden_rejections_and_false_accepts",
+      "type": "function",
+      "name": "test_hallucination_separates_insertions_forbidden_rejections_and_false_accepts",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        376,
+        395
+      ],
+      "summary": "Defines test_hallucination_separates_insertions_forbidden_rejections_and_false_accepts, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_partial_page_metrics_use_original_source_page_numbers",
+      "type": "function",
+      "name": "test_partial_page_metrics_use_original_source_page_numbers",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        111,
+        119
+      ],
+      "summary": "Defines test_partial_page_metrics_use_original_source_page_numbers, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_telemetry_cost_aggregates_luna_usage_per_page",
+      "type": "function",
+      "name": "test_telemetry_cost_aggregates_luna_usage_per_page",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        447,
+        471
+      ],
+      "summary": "Defines test_telemetry_cost_aggregates_luna_usage_per_page, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_grounding_reports_mean_iou_and_recall_at_half_overlap",
+      "type": "function",
+      "name": "test_grounding_reports_mean_iou_and_recall_at_half_overlap",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        338,
+        351
+      ],
+      "summary": "Defines test_grounding_reports_mean_iou_and_recall_at_half_overlap, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_recognized_text_excludes_figure_prose_but_keeps_literal_atoms",
+      "type": "function",
+      "name": "test_recognized_text_excludes_figure_prose_but_keeps_literal_atoms",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        122,
+        139
+      ],
+      "summary": "Defines test_recognized_text_excludes_figure_prose_but_keeps_literal_atoms, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_canonical_document_text_includes_markers_and_table_cells_once",
+      "type": "function",
+      "name": "test_canonical_document_text_includes_markers_and_table_cells_once",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        53,
+        97
+      ],
+      "summary": "Defines test_canonical_document_text_includes_markers_and_table_cells_once, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_live_metrics_separate_verified_and_generated_references",
+      "type": "function",
+      "name": "test_live_metrics_separate_verified_and_generated_references",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        142,
+        190
+      ],
+      "summary": "Defines test_live_metrics_separate_verified_and_generated_references, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_markdown_reference_scores_all_text_after_removing_presentation_syntax",
+      "type": "function",
+      "name": "test_markdown_reference_scores_all_text_after_removing_presentation_syntax",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        252,
+        295
+      ],
+      "summary": "Defines test_markdown_reference_scores_all_text_after_removing_presentation_syntax, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_schema_leaf_comparison_requires_pointer_value_and_json_type",
+      "type": "function",
+      "name": "test_schema_leaf_comparison_requires_pointer_value_and_json_type",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        354,
+        364
+      ],
+      "summary": "Defines test_schema_leaf_comparison_requires_pointer_value_and_json_type, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_semantic_text_metrics_normalize_unicode_and_whitespace",
+      "type": "function",
+      "name": "test_semantic_text_metrics_normalize_unicode_and_whitespace",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        42,
+        50
+      ],
+      "summary": "Defines test_semantic_text_metrics_normalize_unicode_and_whitespace, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_telemetry_uses_median_nearest_rank_and_optional_rate_card",
+      "type": "function",
+      "name": "test_telemetry_uses_median_nearest_rank_and_optional_rate_card",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        398,
+        444
+      ],
+      "summary": "Defines test_telemetry_uses_median_nearest_rank_and_optional_rate_card, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_semantic_metrics_align_explicit_page_breaks_before_aggregation",
+      "type": "function",
+      "name": "test_semantic_metrics_align_explicit_page_breaks_before_aggregation",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        100,
+        108
+      ],
+      "summary": "Defines test_semantic_metrics_align_explicit_page_breaks_before_aggregation, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_evaluation_metrics.py",
+      "type": "file",
+      "name": "test_evaluation_metrics.py",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "summary": "Test module 'test_evaluation_metrics.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_evaluation_metrics.py:test_live_telemetry_includes_document_classification_usage",
+      "type": "function",
+      "name": "test_live_telemetry_includes_document_classification_usage",
+      "filePath": "tests/test_evaluation_metrics.py",
+      "lineRange": [
+        474,
+        515
+      ],
+      "summary": "Defines test_live_telemetry_includes_document_classification_usage, a  routine in test_evaluation_metrics.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_markdown_reference_scores_all_text_after_removing_presentation_syntax",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_cross_page_continuity_uses_pair_precision_recall_and_f1",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_markdown_reference_scores_all_text_after_removing_presentation_syntax",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_document_records_expected_classification_and_review_counts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_telemetry_uses_median_nearest_rank_and_optional_rate_card",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_reading_order_reports_pairwise_accuracy_and_anchor_coverage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_schema_leaf_comparison_requires_pointer_value_and_json_type",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_telemetry_cost_aggregates_luna_usage_per_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_document_records_expected_classification_and_review_counts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_schema_leaf_comparison_requires_pointer_value_and_json_type",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_tables_match_by_page_and_ordinal_then_cell_coordinates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_telemetry_uses_median_nearest_rank_and_optional_rate_card",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_semantic_text_metrics_normalize_unicode_and_whitespace",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_metrics_separate_verified_and_generated_references",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_canonical_document_text_includes_markers_and_table_cells_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_tables_match_by_page_and_ordinal_then_cell_coordinates",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_hallucination_separates_insertions_forbidden_rejections_and_false_accepts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_partial_page_metrics_use_original_source_page_numbers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_cross_page_continuity_uses_pair_precision_recall_and_f1",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_hallucination_separates_insertions_forbidden_rejections_and_false_accepts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_reading_order_reports_pairwise_accuracy_and_anchor_coverage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_canonical_document_text_includes_markers_and_table_cells_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_telemetry_includes_document_classification_usage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_telemetry_includes_document_classification_usage",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_recognized_text_excludes_figure_prose_but_keeps_literal_atoms",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_semantic_metrics_align_explicit_page_breaks_before_aggregation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_telemetry_cost_aggregates_luna_usage_per_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_semantic_metrics_align_explicit_page_breaks_before_aggregation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_partial_page_metrics_use_original_source_page_numbers",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_recognized_text_excludes_figure_prose_but_keeps_literal_atoms",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_grounding_reports_mean_iou_and_recall_at_half_overlap",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_semantic_text_metrics_normalize_unicode_and_whitespace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_live_metrics_separate_verified_and_generated_references",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_metrics.py",
+      "target": "function:tests/test_evaluation_metrics.py:test_grounding_reports_mean_iou_and_recall_at_half_overlap",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

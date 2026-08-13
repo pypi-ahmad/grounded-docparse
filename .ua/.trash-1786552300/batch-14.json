@@ -1,0 +1,44 @@
+{
+  "nodes": [
+    {
+      "id": "config:.ua/tmp/ua-import-map-input.json",
+      "type": "config",
+      "name": "ua-import-map-input.json",
+      "filePath": ".ua/tmp/ua-import-map-input.json",
+      "summary": "Structured JSON configuration artifact for ua import map input, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/tmp/ua-import-map-output.json",
+      "type": "config",
+      "name": "ua-import-map-output.json",
+      "filePath": ".ua/tmp/ua-import-map-output.json",
+      "summary": "Structured JSON configuration artifact for ua import map output, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/tmp/ua-scan-files.json",
+      "type": "config",
+      "name": "ua-scan-files.json",
+      "filePath": ".ua/tmp/ua-scan-files.json",
+      "summary": "Structured JSON configuration artifact for ua scan files, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": []
+}

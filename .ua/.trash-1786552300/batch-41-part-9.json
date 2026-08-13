@@ -1,0 +1,887 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "function",
+      "name": "test_normalization_removes_redundant_aggregate_paragraph",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        619,
+        634
+      ],
+      "summary": "Defines test_normalization_removes_redundant_aggregate_paragraph, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "function",
+      "name": "test_recovery_content_compares_nested_grounded_children",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        88,
+        120
+      ],
+      "summary": "Defines test_recovery_content_compares_nested_grounded_children, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "function",
+      "name": "test_normalization_ignores_whitespace_only_list_marker",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        496,
+        508
+      ],
+      "summary": "Defines test_normalization_ignores_whitespace_only_list_marker, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "function",
+      "name": "test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        269,
+        274
+      ],
+      "summary": "Defines test_rectangle_union_area_scales_to_many_disjoint_strips, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "function",
+      "name": "test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        263,
+        266
+      ],
+      "summary": "Defines test_rectangle_union_area_handles_overlap_duplicates_and_zero_area, a boxes, expected routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "function",
+      "name": "test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        540,
+        560
+      ],
+      "summary": "Defines test_normalization_prefers_active_correction_over_rejected_duplicate, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "function",
+      "name": "test_scanned_page_probes_large_uncovered_internal_region",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        242,
+        250
+      ],
+      "summary": "Defines test_scanned_page_probes_large_uncovered_internal_region, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "function",
+      "name": "test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        563,
+        583
+      ],
+      "summary": "Defines test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "function",
+      "name": "test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        393,
+        404
+      ],
+      "summary": "Defines test_clipped_structured_geometry_is_selected_for_quality_repair, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "function",
+      "name": "test_recovery_content_with_novel_literal_is_not_redundant",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        123,
+        135
+      ],
+      "summary": "Defines test_recovery_content_with_novel_literal_is_not_redundant, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "function",
+      "name": "test_all_structural_candidates_are_returned_for_downstream_batching",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        372,
+        390
+      ],
+      "summary": "Defines test_all_structural_candidates_are_returned_for_downstream_batching, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        32,
+        40
+      ],
+      "summary": "Defines _page, a scanned routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "function",
+      "name": "test_normalization_strips_structural_marker_duplication",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        407,
+        432
+      ],
+      "summary": "Defines test_normalization_strips_structural_marker_duplication, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "function",
+      "name": "test_scanned_page_probes_untranscribed_large_visual_only",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        205,
+        220
+      ],
+      "summary": "Defines test_scanned_page_probes_untranscribed_large_visual_only, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "function",
+      "name": "test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        300,
+        345
+      ],
+      "summary": "Defines test_only_failed_structured_content_is_selected_without_warning_keywords, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "function",
+      "name": "test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        277,
+        297
+      ],
+      "summary": "Defines test_degraded_scanned_table_with_codes_is_selected_for_repair, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "function",
+      "name": "test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        167,
+        185
+      ],
+      "summary": "Defines test_full_page_recovery_allows_line_wrapped_hyphenated_literals, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:_box",
+      "type": "function",
+      "name": "_box",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        28,
+        29
+      ],
+      "summary": "Defines _box, a x0, y0, x1, y1 routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_quality.py",
+      "type": "file",
+      "name": "test_quality.py",
+      "filePath": "tests/test_quality.py",
+      "summary": "Test module 'test_quality.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_quality.py:_block",
+      "type": "function",
+      "name": "_block",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        43,
+        68
+      ],
+      "summary": "Defines _block, a block_id, text, bbox, node_type, order, marker, table, form, confidence, verification routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "function",
+      "name": "test_rejected_structured_block_remains_a_repair_candidate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        348,
+        369
+      ],
+      "summary": "Defines test_rejected_structured_block_remains_a_repair_candidate, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "function",
+      "name": "test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        151,
+        164
+      ],
+      "summary": "Defines test_scan_recovery_with_conflicting_critical_literal_is_rejected, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "function",
+      "name": "test_normalization_removes_duplicate_table_with_same_order",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        511,
+        537
+      ],
+      "summary": "Defines test_normalization_removes_duplicate_table_with_same_order, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "function",
+      "name": "test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        138,
+        148
+      ],
+      "summary": "Defines test_recovery_at_a_different_location_is_not_treated_as_duplicate, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "function",
+      "name": "test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        71,
+        85
+      ],
+      "summary": "Defines test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "function",
+      "name": "test_normalization_removes_repeated_ordered_markers_idempotently",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        435,
+        493
+      ],
+      "summary": "Defines test_normalization_removes_repeated_ordered_markers_idempotently, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "function",
+      "name": "test_scanned_blank_page_creates_an_internal_quality_probe",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        188,
+        202
+      ],
+      "summary": "Defines test_scanned_blank_page_creates_an_internal_quality_probe, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "function",
+      "name": "test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        223,
+        239
+      ],
+      "summary": "Defines test_scanned_page_does_not_duplicate_repairable_structured_content, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "function",
+      "name": "test_normalization_rejects_conflicting_aggregate_paragraph",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        586,
+        616
+      ],
+      "summary": "Defines test_normalization_rejects_conflicting_aggregate_paragraph, a  routine in test_quality.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_box",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_block",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_box",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_block",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

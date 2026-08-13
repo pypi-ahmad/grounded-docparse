@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/grounded_docparse/config.py",
+      "type": "file",
+      "name": "config.py",
+      "filePath": "src/grounded_docparse/config.py",
+      "summary": "Defines parser configuration, OCR engine selection, validation, and environment-derived runtime settings.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "implementation"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "function",
+      "name": "validate_paddleocr_service_url",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        25,
+        46
+      ],
+      "summary": "Implements validate_paddleocr_service_url as part of config.py's document parsing workflow.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "function"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "class",
+      "name": "OcrEngine",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        12,
+        22
+      ],
+      "summary": "Defines OcrEngine, a structured component used by config.py's document parsing workflow.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "class",
+      "name": "AnalysisThresholds",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        50,
+        84
+      ],
+      "summary": "Defines AnalysisThresholds, a structured component used by config.py's document parsing workflow.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "data-model"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "class",
+      "name": "ParserConfig",
+      "filePath": "src/grounded_docparse/config.py",
+      "lineRange": [
+        88,
+        304
+      ],
+      "summary": "Defines ParserConfig, a structured component used by config.py's document parsing workflow.",
+      "tags": [
+        "python",
+        "document-parsing",
+        "data-model"
+      ],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "function:src/grounded_docparse/config.py:validate_paddleocr_service_url",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:OcrEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:AnalysisThresholds",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/grounded_docparse/config.py",
+      "target": "class:src/grounded_docparse/config.py:ParserConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

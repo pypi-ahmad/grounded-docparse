@@ -1,0 +1,98 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "language": "json",
+      "sizeLines": 72,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/form.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/lists.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/native-text.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "language": "json",
+      "sizeLines": 99,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/tables.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    "benchmarks/corpus-v1/annotations/checkboxes.json": [],
+    "benchmarks/corpus-v1/annotations/cross-page-table.json": [],
+    "benchmarks/corpus-v1/annotations/degraded-scan.json": [],
+    "benchmarks/corpus-v1/annotations/figure-chart.json": [],
+    "benchmarks/corpus-v1/annotations/form.json": [],
+    "benchmarks/corpus-v1/annotations/lists.json": [],
+    "benchmarks/corpus-v1/annotations/multi-column.json": [],
+    "benchmarks/corpus-v1/annotations/native-text.json": [],
+    "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json": [],
+    "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json": [],
+    "benchmarks/corpus-v1/annotations/synthetic-report.json": [],
+    "benchmarks/corpus-v1/annotations/tables.json": [],
+    "benchmarks/corpus-v1/annotations/unicode-identifiers.json": []
+  }
+}

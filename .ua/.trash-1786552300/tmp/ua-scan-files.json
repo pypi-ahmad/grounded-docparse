@@ -1,0 +1,3748 @@
+{
+  "scriptCompleted": true,
+  "contentDigest": "1bc0b377b15c0776d9271912b4ba8132abaf6f687aebc53b13500f79886281e7",
+  "files": [
+    {
+      "path": ".code-review-graph/graph.db",
+      "language": "db",
+      "sizeLines": 29436,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".code-review-graph/graph.db-shm",
+      "language": "db-shm",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".code-review-graph/graph.db-wal",
+      "language": "db-wal",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".codegraph/codegraph.db",
+      "language": "db",
+      "sizeLines": 28910,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".codegraph/codegraph.db-shm",
+      "language": "db-shm",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".codegraph/codegraph.db-wal",
+      "language": "db-wal",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".env.example",
+      "language": "config",
+      "sizeLines": 31,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".gitattributes",
+      "language": "unknown",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "language": "markdown",
+      "sizeLines": 41,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "language": "markdown",
+      "sizeLines": 30,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "language": "toml",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/assemble-review.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/assembled-graph.json",
+      "language": "json",
+      "sizeLines": 25438,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-1-part-1.json",
+      "language": "json",
+      "sizeLines": 1822,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-1-part-2.json",
+      "language": "json",
+      "sizeLines": 1809,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-1-part-3.json",
+      "language": "json",
+      "sizeLines": 1308,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-1-part-4.json",
+      "language": "json",
+      "sizeLines": 1860,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-1-part-5.json",
+      "language": "json",
+      "sizeLines": 1140,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-10.json",
+      "language": "json",
+      "sizeLines": 116,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-11.json",
+      "language": "json",
+      "sizeLines": 451,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-12-part-1.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-12-part-2.json",
+      "language": "json",
+      "sizeLines": 54,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-13.json",
+      "language": "json",
+      "sizeLines": 27,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-14-part-1.json",
+      "language": "json",
+      "sizeLines": 1329,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-14-part-2.json",
+      "language": "json",
+      "sizeLines": 2259,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-14-part-3.json",
+      "language": "json",
+      "sizeLines": 4088,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-14-part-4.json",
+      "language": "json",
+      "sizeLines": 944,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-14-part-5.json",
+      "language": "json",
+      "sizeLines": 174,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-2-part-1.json",
+      "language": "json",
+      "sizeLines": 1585,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-2-part-2.json",
+      "language": "json",
+      "sizeLines": 252,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-3-part-1.json",
+      "language": "json",
+      "sizeLines": 734,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-3-part-2.json",
+      "language": "json",
+      "sizeLines": 2458,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-4.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-5.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-6.json",
+      "language": "json",
+      "sizeLines": 61,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-7.json",
+      "language": "json",
+      "sizeLines": 265,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-8.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batch-9.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/batches.json",
+      "language": "json",
+      "sizeLines": 4376,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/fingerprint-input.json",
+      "language": "json",
+      "sizeLines": 183,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/layers.json",
+      "language": "json",
+      "sizeLines": 222,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/review.json",
+      "language": "json",
+      "sizeLines": 145,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/domain-context.json",
+      "language": "json",
+      "sizeLines": 789,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-1.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-2.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-3.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-4.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-1-part-5.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-1.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-2.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-3.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/retry-backup/batch-13-part-4.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-analyze.js",
+      "language": "javascript",
+      "sizeLines": 26,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-input.json",
+      "language": "json",
+      "sizeLines": 3364,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-results.json",
+      "language": "json",
+      "sizeLines": 980,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-assemble-final.cjs",
+      "language": "javascript",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-1.json",
+      "language": "json",
+      "sizeLines": 96,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-10.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-11.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-12.json",
+      "language": "json",
+      "sizeLines": 7,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-13.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-14.json",
+      "language": "json",
+      "sizeLines": 119,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-2.json",
+      "language": "json",
+      "sizeLines": 82,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-3.json",
+      "language": "json",
+      "sizeLines": 85,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-4.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-6.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-7.json",
+      "language": "json",
+      "sizeLines": 147,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-analyzer-input-8.json",
+      "language": "json",
+      "sizeLines": 11,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-1.json",
+      "language": "json",
+      "sizeLines": 12812,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-10.json",
+      "language": "json",
+      "sizeLines": 406,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-11.json",
+      "language": "json",
+      "sizeLines": 229,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-12.json",
+      "language": "json",
+      "sizeLines": 2759,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-13.json",
+      "language": "json",
+      "sizeLines": 10888,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-14.json",
+      "language": "json",
+      "sizeLines": 13465,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-2.json",
+      "language": "json",
+      "sizeLines": 5944,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-3.json",
+      "language": "json",
+      "sizeLines": 8564,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-4.json",
+      "language": "json",
+      "sizeLines": 793,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-6.json",
+      "language": "json",
+      "sizeLines": 221,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-7.json",
+      "language": "json",
+      "sizeLines": 37,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-8.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-finalize.cjs",
+      "language": "javascript",
+      "sizeLines": 8,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-fingerprint-input.cjs",
+      "language": "javascript",
+      "sizeLines": 7,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-import-map-input.json",
+      "language": "json",
+      "sizeLines": 894,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-import-map-output.json",
+      "language": "json",
+      "sizeLines": 268,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-inline-validate.cjs",
+      "language": "javascript",
+      "sizeLines": 39,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-scan-files.json",
+      "language": "json",
+      "sizeLines": 1104,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-analyze.js",
+      "language": "javascript",
+      "sizeLines": 26,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-input.json",
+      "language": "json",
+      "sizeLines": 2180,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-results.json",
+      "language": "json",
+      "sizeLines": 1049,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tour.json",
+      "language": "json",
+      "sizeLines": 84,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/assemble-review.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/assembled-graph.json",
+      "language": "json",
+      "sizeLines": 20055,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-1.json",
+      "language": "json",
+      "sizeLines": 6736,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-10.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-12.json",
+      "language": "json",
+      "sizeLines": 17,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-13.json",
+      "language": "json",
+      "sizeLines": 27,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-14.json",
+      "language": "json",
+      "sizeLines": 22,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-2.json",
+      "language": "json",
+      "sizeLines": 143,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-3.json",
+      "language": "json",
+      "sizeLines": 2041,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-4.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-6.json",
+      "language": "json",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-9.json",
+      "language": "json",
+      "sizeLines": 15,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batch-existing.json",
+      "language": "json",
+      "sizeLines": 9704,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/batches.json",
+      "language": "json",
+      "sizeLines": 2564,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/fingerprint-input.json",
+      "language": "json",
+      "sizeLines": 184,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/layers.json",
+      "language": "json",
+      "sizeLines": 222,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/review.json",
+      "language": "json",
+      "sizeLines": 152,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/assemble-final.mjs",
+      "language": "javascript",
+      "sizeLines": 31,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "language": "javascript",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/changed-files.txt",
+      "language": "txt",
+      "sizeLines": 457,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/fingerprint-output.txt",
+      "language": "txt",
+      "sizeLines": 1,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/merge-report.txt",
+      "language": "txt",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/prepare-save.mjs",
+      "language": "javascript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/prune-existing.mjs",
+      "language": "javascript",
+      "sizeLines": 31,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-analyze.cjs",
+      "language": "javascript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-input.json",
+      "language": "json",
+      "sizeLines": 3367,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-prepare.cjs",
+      "language": "javascript",
+      "sizeLines": 8,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-results.json",
+      "language": "json",
+      "sizeLines": 943,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-1.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-10.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-12.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-13.json",
+      "language": "json",
+      "sizeLines": 17,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-14.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-2.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-3.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-4.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-6.json",
+      "language": "json",
+      "sizeLines": 10,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-analyzer-input-9.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-1.json",
+      "language": "json",
+      "sizeLines": 11089,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-10.json",
+      "language": "json",
+      "sizeLines": 406,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-12.json",
+      "language": "json",
+      "sizeLines": 952,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-13.json",
+      "language": "json",
+      "sizeLines": 6746,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-14.json",
+      "language": "json",
+      "sizeLines": 8690,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-2.json",
+      "language": "json",
+      "sizeLines": 661,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-3.json",
+      "language": "json",
+      "sizeLines": 5136,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-4.json",
+      "language": "json",
+      "sizeLines": 432,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-6.json",
+      "language": "json",
+      "sizeLines": 119,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-file-extract-results-9.json",
+      "language": "json",
+      "sizeLines": 1453,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-inline-validate.cjs",
+      "language": "javascript",
+      "sizeLines": 63,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-normalize-layers.cjs",
+      "language": "javascript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-tour-analyze.js",
+      "language": "javascript",
+      "sizeLines": 19,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-tour-results.json",
+      "language": "json",
+      "sizeLines": 4270,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/write-meta.mjs",
+      "language": "javascript",
+      "sizeLines": 16,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/.trash-1786520109/tour.json",
+      "language": "json",
+      "sizeLines": 57,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-domain-1786453150/domain-graph.json",
+      "language": "json",
+      "sizeLines": 228,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.understandignore",
+      "language": "unknown",
+      "sizeLines": 106,
+      "fileCategory": "code"
+    },
+    {
+      "path": ".ua/config.json",
+      "language": "json",
+      "sizeLines": 3,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/domain-graph.json",
+      "language": "json",
+      "sizeLines": 91,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/fingerprints.json",
+      "language": "json",
+      "sizeLines": 15275,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/intermediate/domain-analysis.json",
+      "language": "json",
+      "sizeLines": 91,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/intermediate/scan-result.json",
+      "language": "json",
+      "sizeLines": 4415,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/knowledge-graph.json",
+      "language": "json",
+      "sizeLines": 20055,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/meta.json",
+      "language": "json",
+      "sizeLines": 6,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/tmp/ua-import-map-input.json",
+      "language": "json",
+      "sizeLines": 3075,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/tmp/ua-import-map-output.json",
+      "language": "json",
+      "sizeLines": 704,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/tmp/ua-scan-files.json",
+      "language": "json",
+      "sizeLines": 3723,
+      "fileCategory": "config"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "sizeLines": 129,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "language": "markdown",
+      "sizeLines": 72,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Launch-GLM-OCR.cmd",
+      "language": "batch",
+      "sizeLines": 45,
+      "fileCategory": "script"
+    },
+    {
+      "path": "Launch-PaddleOCR-VL-1.6.cmd",
+      "language": "batch",
+      "sizeLines": 45,
+      "fileCategory": "script"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 217,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "SECURITY.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "SETUP.md",
+      "language": "markdown",
+      "sizeLines": 239,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "Setup-GLM-OCR.cmd",
+      "language": "batch",
+      "sizeLines": 5,
+      "fileCategory": "script"
+    },
+    {
+      "path": "benchmarks/baselines/offline-native-v1.json",
+      "language": "json",
+      "sizeLines": 638,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/checkboxes.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/cross-page-table.json",
+      "language": "json",
+      "sizeLines": 72,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/degraded-scan.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/figure-chart.json",
+      "language": "json",
+      "sizeLines": 21,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/form.json",
+      "language": "json",
+      "sizeLines": 18,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/lists.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/multi-column.json",
+      "language": "json",
+      "sizeLines": 35,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/native-text.json",
+      "language": "json",
+      "sizeLines": 23,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/public-water-mass-mailing.json",
+      "language": "json",
+      "sizeLines": 99,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-medical-fax.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/synthetic-report.json",
+      "language": "json",
+      "sizeLines": 14,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/tables.json",
+      "language": "json",
+      "sizeLines": 51,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/annotations/unicode-identifiers.json",
+      "language": "json",
+      "sizeLines": 16,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/corpus-v1/manifest.json",
+      "language": "json",
+      "sizeLines": 184,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/policies/live-evaluation.example.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/rate-cards/openai-standard-2026-07-28.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/annotation-v1.1.schema.json",
+      "language": "json",
+      "sizeLines": 63,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "language": "json",
+      "sizeLines": 103,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/manifest-v1.schema.json",
+      "language": "json",
+      "sizeLines": 86,
+      "fileCategory": "config"
+    },
+    {
+      "path": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "language": "json",
+      "sizeLines": 60,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/glmocr.yaml",
+      "language": "yaml",
+      "sizeLines": 165,
+      "fileCategory": "config"
+    },
+    {
+      "path": "config/paddle-vllm.yaml",
+      "language": "yaml",
+      "sizeLines": 4,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs-site/agentic-document-extraction-comparison.html",
+      "language": "html",
+      "sizeLines": 331,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/api.html",
+      "language": "html",
+      "sizeLines": 366,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/architecture.html",
+      "language": "html",
+      "sizeLines": 288,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/assets/app.js",
+      "language": "javascript",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "docs-site/assets/styles.css",
+      "language": "css",
+      "sizeLines": 1380,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/azure-bulk-fax-deployment.html",
+      "language": "html",
+      "sizeLines": 1062,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/business-user-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 296,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/changelog.html",
+      "language": "html",
+      "sizeLines": 217,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/complete-user-guide.html",
+      "language": "html",
+      "sizeLines": 1636,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/contributing.html",
+      "language": "html",
+      "sizeLines": 132,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/extraction-quality-research.html",
+      "language": "html",
+      "sizeLines": 160,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-grounded-docparse-is-agentic.html",
+      "language": "html",
+      "sizeLines": 253,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/how-it-works.html",
+      "language": "html",
+      "sizeLines": 84,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/index.html",
+      "language": "html",
+      "sizeLines": 273,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--bug-report.html",
+      "language": "html",
+      "sizeLines": 105,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/issue-template--feature-request.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "language": "html",
+      "sizeLines": 495,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-glmocr.html",
+      "language": "html",
+      "sizeLines": 97,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/local-paddleocr-vl.html",
+      "language": "html",
+      "sizeLines": 201,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/research.html",
+      "language": "html",
+      "sizeLines": 82,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/run.html",
+      "language": "html",
+      "sizeLines": 165,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/security-content-excluded.html",
+      "language": "html",
+      "sizeLines": 66,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/setup.html",
+      "language": "html",
+      "sizeLines": 489,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/site-manifest.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": "docs-site/spec.html",
+      "language": "html",
+      "sizeLines": 136,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/tutorial.html",
+      "language": "html",
+      "sizeLines": 88,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs-site/zero-to-hero-tutorial.html",
+      "language": "html",
+      "sizeLines": 1554,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/ONBOARDING.md",
+      "language": "markdown",
+      "sizeLines": 108,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/agentic-document-extraction-comparison.md",
+      "language": "markdown",
+      "sizeLines": 234,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/api.md",
+      "language": "markdown",
+      "sizeLines": 324,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/architecture.md",
+      "language": "markdown",
+      "sizeLines": 121,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/azure-bulk-fax-deployment.md",
+      "language": "markdown",
+      "sizeLines": 640,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/business-user-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 221,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/.codebase-scan.txt",
+      "language": "txt",
+      "sizeLines": 548,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/ARCHITECTURE.md",
+      "language": "markdown",
+      "sizeLines": 86,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/CONCERNS.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/CONVENTIONS.md",
+      "language": "markdown",
+      "sizeLines": 39,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/INTEGRATIONS.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/STACK.md",
+      "language": "markdown",
+      "sizeLines": 45,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/STRUCTURE.md",
+      "language": "markdown",
+      "sizeLines": 52,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/codebase/TESTING.md",
+      "language": "markdown",
+      "sizeLines": 38,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/complete-user-guide.md",
+      "language": "markdown",
+      "sizeLines": 1363,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/extraction-quality-research.md",
+      "language": "markdown",
+      "sizeLines": 97,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-grounded-docparse-is-agentic.md",
+      "language": "markdown",
+      "sizeLines": 168,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/how-it-works.md",
+      "language": "markdown",
+      "sizeLines": 17,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/idp-vs-ade-classification.html",
+      "language": "html",
+      "sizeLines": 690,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "docs/layout-aware-large-field-extraction-workflow.md",
+      "language": "markdown",
+      "sizeLines": 434,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-glmocr.md",
+      "language": "markdown",
+      "sizeLines": 46,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/local-paddleocr-vl.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/private-evaluation.md",
+      "language": "markdown",
+      "sizeLines": 105,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/research.md",
+      "language": "markdown",
+      "sizeLines": 19,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/run.md",
+      "language": "markdown",
+      "sizeLines": 93,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/spec.md",
+      "language": "markdown",
+      "sizeLines": 67,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/tutorial.md",
+      "language": "markdown",
+      "sizeLines": 21,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "docs/zero-to-hero-tutorial.md",
+      "language": "markdown",
+      "sizeLines": 1322,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "graphify-out/.graphify_labels.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/.graphify_learning.json",
+      "language": "json",
+      "sizeLines": 5,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/.graphify_python",
+      "language": "unknown",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "graphify-out/.graphify_root",
+      "language": "unknown",
+      "sizeLines": 0,
+      "fileCategory": "code"
+    },
+    {
+      "path": "graphify-out/.vocab.txt",
+      "language": "txt",
+      "sizeLines": 1090,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "graphify-out/GRAPH_REPORT.md",
+      "language": "markdown",
+      "sizeLines": 416,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/026fff97a25adc6dffb0acc9cf2c37678dda60db46385876e1aac23e98f35bd7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/05151bef54c18ba581a5a86ad9bc47ebbf894315efdd780983d6365e3f9c6849.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/066aa75de768a02d9f1c835d5c4ef4bb465d7671b8e8e92a1c7e56f5e2c7fe7a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/080466cc055db4a459093a46cecaaaed5a9dbe25055096738a3616ac6fc68ba3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/0bbd476f6bf9d3dea77da2c31c70f4d0353b3c2143d3b67965249d959c01026f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/0c2214777138b37cf16de1ddace64677a7d7a153d6745824bcd3422f1a350607.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/0f91d9bb7cf0b73878daa9761746794508876af463ef830d648b36b1bf626205.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/1e2ddd30e9ec374c9ce136114b81af5822d647285284cfdada1b6d7f27660734.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/212e87783938fad68e70b5b9059cb2a16765d625378ae45cd4ab71950dd5e6a9.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/266501902cc4d9b2185e29691b4e1b32d45af572a9decaef38c69a6363b9b9ea.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/271351831425a7125d408abdd4389594cff3fbf11b8074329557adfe051657c6.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/2a51bb55fc831ab2612d3ded03545ad6f3dc3f881c9d2d07f8b3474990df64eb.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/2b1c6b7c23e13be17631b33eebb26ceb826351f39c88cc2e6dcafdc95b7ca8f5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/2dbf03bb773c5e379e1697506fc95af8640af732a7cc63062f123ee43b709020.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/2e1342b0d27bce87c93de809a2c76220877e3e88cbd53da6f3386906e9aef7c6.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/33d34d7c7d16929cd181a27e57f451cbc514d25db4104587da33c8cad71d7e55.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/3d0b22cf210608cb56833caaf1ada992e7a8889279c89ec4dbba265290dd66da.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/3f5f985568fb1bc3313a08e72a0d06c03180ced82b7a6d788f1efc7fd09299ad.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/418fdc64badb531d4e0183165a0e4cf21c18e1fad9e387140cbe7fb06b20d1c2.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/4706731821107253cb9a475f33ddd6768f01087c4ba6c998aa194a6cde655e49.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/48d04fab9ffc080e45759508d9969911ec62fe94aeb3e8cf360d97187a408e7c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/49990d3cadfb7acec5624080c5b67ffa9eb1d554106744ea48fa51919e5cfab8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/4e9cbdd33fa03cc9d50c6eb44ade984ae031a11923fd5478565b59811e0713d7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/5061973d2491b1519512d75f20129d87459c6f07fdfee199f873d31e2b009a13.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/51eeba7fd5c154163062ef4b0efe7b2432b917b2766c8450c3f1152f0dcf27b9.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/63fdae82044fdc45806a42f6a36f3d29fe9a3fadc35b071c83d6784b78e59726.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/6880279b25ceac4d2fee6caa39c53ba6bfe6affb125caf0822980371190e5306.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/6950fd7bb5ac801d6ca6942c66caf05ed05f23633789f46db2efce8d841e7eed.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/6caef657912b5363f0030716a13a2b23ca07e9bbae0fdde1f17b363b34ead609.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/6f4e105485797b697af86d7e1c74eac1148deb91bdd92cec51bfd680ce3fa67d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/6f833e75c291e3982d24f196cb389079b131df8fc3929babc7a9c5c3b28542ba.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/7319134165a1bece32e4aeecd8e2da54906b9f9cdd6327b34b9de5364dc23ea8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/759945e5e0c1a5160cf301da60820f7fb3fb13a90d058730f8075cd907c08dc4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/780315bcdaa8f71626ec598c4f672ea8ac3ef2c1f61f356d555fc512e36acd4f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/7ee1b65cbf4bdc7fe09d2db6b3fa02b82d5716608cbce35c5c4b789bfc405760.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/870631f7522ee53057cc7a63c6dfcdbc3caa76146bae3d336d843265a9af1969.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/88c474676180bf0e8a8c91d8a22c8b093c577d46e7ff6a7a500e284374b0e22c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/8bf7a05e83c093dfb2275f73d8ad2abe2b8f556b84d20b944de2214a571ff46f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/8d9e3bff534dc96295f83aa77d1e4efaab7bab1814e75af5ea57976a211c847a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/90218c4793bf098bcd6e1a55cb5ec39b8b23b8124ca0e7a2dba1eb510603f4f8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/973fad29a3f6f3fed512385e43dc5383d37a32f8578ec8281cefcca8d464bce8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/975ebfe905f5a9d099591c52a19086bf4206886f8e01edab9a568b5e3514ef93.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/991077ac9a33c2fa82b46b00d92f327038a30c8d3e9ee26c851fb286a9762611.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a19ede7b26890d73d40862334c450799485ae54936e44e0e95e61e6dbfe7ca6a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a44863a98594e78bbd6141e03aa16ae4e72e2a573f16c1f38b0a618bac5c57eb.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/a82b4a875f872871e857ee12bb42fe8a35f698735c9bc40c248f54d7710f3c7d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/ae4d1d0e5f135225e17492d1f668a45e7b4b8276ffd17d5529502a2a18acab7a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/b485d28a73add49d6d43e96323636c2a63740a2dd591499e5e57b17a7db97d4f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bcfdb82415de33fbafea888ccb2a1ba0b86ea6c4bde675e782fb4c9c304c3b62.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bf14db789633faae9d1aaaf953397d70ed826233b5ebef88d52a82a4e8c40dbf.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/bf36735947a13027e1e476c0f7339588d6198663088b4c85eacb6ceb9856d900.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/c2953f4fc34f9d6c13d69fdba1b007b225a585a8b7adb5d396f14c89aa847729.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/c436ba1015afb710e0c687b12ae05383801ddab298506e3e25626743b7d0791f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/ca1d93946f3a90005176b813825a0857e2ebff862515849bbf6c59e89fc33360.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/cba6c8c392067c1b20f7cb71fe5f14e8351ef76d5fdabebe74d7a606302022f3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d0bdd4781ca769289e9008b278f5f3400dded5304b7be3e59ab6fa01feea6970.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d38d913067a0c55dec0f3f876369e97afc4fa235cc47035543db2bfd3636fe31.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d54911a586d0551f4a0ada32ae9388edbc8253237a83b96b9c2a753e4fad8ede.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d6c3338eb87bed21aa6fe1d03ce459ba552b0bd004d02a508b431262f71b1ebc.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/d733a960c2989929b13ba141ccccebcf09416f20e0cf739a760cad0f4c106e21.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/dc2de1c52035800655771281ad542405fe34f4fa73b530c8100e171ae4dbc72f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/dde304b05d6f0394040a4e637480e70330f953fd0a5f2c24e2b203afee0fb47e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/e1aefef8857c09d8c22a5d566b5bb4b03091d91ac5172bf109f559caa59ce857.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/e50144fb101ec0ee73f6e853910cc4f9fa8e314235821afe715cccc232ae0530.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/e57da9e5496afa4d6e83b8c3f0da876e535d9079915b8d9015689b8332b0be6c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/eaad67ca992f491d0a4315d643d415a574c2e3a7ccf70e27e19e3439c97c1ace.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/f3184f7be7eff167e4405b1c1d77af91ce0b2ead8121f33c082802220d21ee8d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/f38aea27410d4ff4dab30a882575e1469b6209aa00829f61dc62dd936617361e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/f3f7e813a847c0a7c7ea6c0dd49ca6b9457c4f107e81d2fd78c2e33b7f265c10.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/f92a5b2f785d5c4950acd842e94a9598d199cb9c06f4e6cde7d4cdf013315236.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/fb4dbaa7be6adf4b073c2ee70efd43eeaed2ca3338360322ea74b68f19c397b7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/ast/v0.9.35/fedc739c51ca14769715ac4f57b5bc6eb65a00764fcafd28d9704207eccf46a3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0125be023f4306fd9d7b84462b5ce42eade5dbe205d13e6e217f055835d5506f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/01b8768625d02811a168cd7996088917f1f27e9ed62daf2ab471292545e9f515.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/01fa2d475b76b099bd42210f44824491e1bf2f095d72ba07c9483c85820b768d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0304b723057e02642c0653ce087e499c8e365ad5a5062a64aa3e67740aa5b621.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0336ca7e07f26ff7c0c8c365e840c4abb7403c5652f2a2127dbad8dcf1dbc122.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0428e55ee3c64a492ffc6869e0872bad88df8ed3ed3dcc228b0a864d7529604e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/050824332962f758012f64d9eef9b0faba88b7481d99a0bbab961fd314b8c5a0.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0641d8599905e74926d491fdae288f83949df67fce4396d6d8dbf20dc34468b3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/09a80f51fbbb3f92310f0bbb572dd6e04b5a769874b7a75a5141bbfb2393eee4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/09d27ec031dfd9dc74ddf3e86313854aa391e91a2f7dd0b8869792d666498184.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0b7838441cef93f9ab641720ffddd7c2af9106c17445d7ff1770568daf482a17.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0c500ec6c5767b614f2df2612039aab174ca15bfbcae71d27308ce1a2203684b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/0d82bd3d6dd25e0387857e6d9e42711aa7d28a48cc30b113fd79b24066b10638.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/10aedd492765b783624103119f895df51b705cfe9a15e74e1b42f38944ba4c84.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1147f297dfa44145b4d6123bbc3df7fa8fa2d5141b757c4387f13cc8e08c2ce5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/117a87a47ae5b4c5c0b312df595aad24ebcb6c125b953ee7b130ae784e1affaf.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1224ffbc453c5b89a3e09d48de44f080d648990674e46e2263bd0297b956dd81.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/12ac3f331d37de17673106d19e4c96141637bef19b6897b6cba32949bd977568.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1538da5af35ec39f3d878563ae23029754f4925d4255f3ef7fa6fba6f6a211e3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/17f735def3258b376c8f567b2aff7da031cddb69fbf245287fae53d9bc5d2e75.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/18c94b183355c62084f08758ba3e8440439314a03d130569659aaaca0725cc2a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1938357ee2ad000f5fe35c75747e0669f5c1c32108773f6a15c6f69822788986.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/19bc29b3a1cc00718839c107078a373fe75be8391a1ba62fa46673145f06244f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1ad807ddabe27f65ef974d248d67d5eea2c18aadb143d4487c95142c5d7e3978.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1d85a9997182a9b69e7b390295dd502cb785d83c971789f2ade03f6b3269c35a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1ea857c561a7cf1ad22b77ac450eda41f98cd2e8e6464fb9e8d94f75d509fa51.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1f86c190a98a63ee93bc6edac322d164020b274fbfe6fedadb2b8433012d3120.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/1fc0f6e512c3f95dbd02bc3c21ebc1b14fe247008dcd3e6932ce798a9950f55e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/21d97aece04e317113138636bda53fc830f694e4b03a2c1ecf0a2e0f105d187c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/223a20089be7ab7ac4e0e75bc675efba26e2b73be0aeea02f39bbedc0cb19eac.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/249122c505fb1bf67eeefb709a3403cc6dbe71def024cc518ffb345d547c976b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/24d47ebf121d4bbaa9353761f618485725e1c48876e0934c3cff43b46be9ae29.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2564a32b23522155f58d2ace5981f754fe82b588f5402f9d56870ef3632c0b37.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/25f31a53a781a90c6f4cdbe6a74076dcd1ab170a21ac884289653366d801f488.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/265e17c744b4ced5eefd7aa25b6423783179493d7ec452d30415a7490ec356ed.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/279f156efe7b3923b8c2ff79ad375ce38f309b960ad9d8db8935b71723347a3a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/299a73ffab00d4520080d3bf941309417a7628e3065db827402aa2a55dcfb389.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2a9f6059d2c16045d256089e6a4a74e8b611fff750323fa022b67d8a1c0c3c5d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2c43ca94078cf470625f7f1211df311d8e00b4d3a57ad7668999d059a8f0ede7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2c6c79d06e08e097b37e033baf9fc8cf62070668c4dae238adf988c30b69e834.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2cb2648206a527f273782b568f146228ded0c403369f81274a3c55e12e4fb4ac.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2d3ff0846a05a5661a14ff5dcfef5d29267caac3d98deee1d46e1002c5d2afd8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2d92c8d4eea6736f69bb526d398d525d7db7561b30f4da600ce442124baf9afd.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2dc1528a3d3ebb45340f2108fd7c73e506dc8a98885038cb15eaefeda6a20e58.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2e841c797ac37eb430cb7105cf95743327a8313ee464fdb580d93823db747247.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/2eb4ac41af5b826fabeb54637a22666c335e0aafb80a2f490e50a66936e9aa98.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/30036f01a7ae0b68626c0ea42001b2faea27c77bd5baf721bccd18f598f029ae.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/34e1ff6d7bcad6a46a453436b7a5a2d76172159b4ef94e5fb9250c56dbf3ce37.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/35aefa0be79d79872336c341fdc809b1208e75a1c237dfb319cd464275f94515.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/368c9906ba2a4929ae6274480b7eaa0e26a34c07add3bbbb9d154723cb628a9e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/3819af27bed2981b11ce8fdd59fac57fb3749639223e50e76c18ea574fd62ee5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/39b49398712005f28e3780a8d2c9eb3c8af911a294ef97ad305707b42931f319.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/39e0975683fbe5947398cab8da38b25a604ee2c83bbdd4feddf82a2f29a0d67e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/3d7773ac0b135ef7eb07db83bee46fe9b40360d2f14a5adefcc002fa23cb5273.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/3e16e98e743496dd33e3885ac7ec5cd73a772e0b2423e9f9205d49588b321402.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/3e73da16eebe5077eaf8eae4181bdaa7cce27562fc9eaba821160a69f593ac1b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/417d99bc2327aa86b80bbc61ad863ffd5dfe608c403856a63e71b98d3c5b5114.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/44bb2bb2db6656a404eb192f9c342aba2abb47db5d228f9340aecd78b7bb6e27.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/4645a07d90c80aafb5e2fb875febf4199352ae23783f27f475c7f69f337461e3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/472b6ee9b71cb9cb00c90dce5bc9b957aa96cc0a1079028465bc268fd5aac46f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/49d7f5c55ed41eaa3fa0815c2ebf7f7548d57014748eb0006ccae7e29eae70b5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/49f5f49d7277137d5c376eee54ae88bba04d37e4f68b04172ac21d245e1ed43d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/4b7ca31bb1a72907ea388ce8a3c6993c3ca17a28ffae87cc1733279ba39ff4c4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/4cb744f83b18fab7109cdb64ad442fba20db82a24709c54300f23af778028b21.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/4cd0da43c09ea234ddaab1ae793dea3c02c37666062fd7e00ef202500751f789.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/4cfea7d0cdef956e9a8a5e8967529b8a5be862cb32a9b7861160bd0055c321e7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/524baee2baa1f2f6dfb9a335b388d5eb43876b83f4ebdb2ddf655e242783e6c3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/52818beb30315d6533891c7f773437a8e695cda30b4f02249bfcd1f50b2dd025.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/569d9f4c949a2f5d6596ca36268d49d83f5cba2bc96486d7003b674f22debb57.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5794dc8b86cb6185778ed3ba34b70a84f769bcc27db4fef30470beb8d99677de.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5898f01ae52e61b0cbbeeec05abf3bd6bff465c14d73d593844bb479a6213b08.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5a67e0f539b5f749bd2ce4f00c149b647284c00532a0f097ae05e3bcc62592bb.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5b4ada845da9fd0c1791d8fccc35e1cc6efb5c6b597a3c954d494f1054e6d735.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5c0cfd012444f14ff06c8c48c9663c078a8084ab8caac247e953e176a5d311e8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5c0d1d8a5e9dd4e2f93bc94502f2fc66011da9f023e610bf81b13d1a29b0b853.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5c2c18338966aeda1fd020218c4191ebda330ac0a8807bc6977673e8232c32ee.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5d1e5830514e823c38af642ef9102063d0403e3b6063e82ffcb61aa91c5a2c73.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/5e7f9dec8442ad0701fe0fa37c401316ec0f8517141fbfe935a27e75a581ce2f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/603d63ca704e1ebc390d9e1f08a67e408643f6aeb77d15655d79e1d403ef0f5f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/61eab8834ce7992cfaf0d351515dddebaa902a2e22f779ae271393db748448a0.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6281d1c8248b524b1939bf500ece8372917cd82406c9a5660dd7cf25100c1c00.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6344048fc7cf074f5c607b2ca5ee83881bd432d5fe02c598cbda85dc30a9cadf.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/67300805083dfabb85d99079b6e49652a9ab38119e056214479a335f9b00da33.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/689885aa9afcf349b9399997e05d630f97db34442094dc343de6b791f46712ce.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/68aa93873636d234d15b9ec02fc4573a3abeb4c232ff0f8d6e1bdb4075275ea7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/69bcb2dd2e30c5bb40ed3ee27d6c6a279d2c5992458540e509161d7f93d6acec.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6b295ac7b8216cfc0cb981802c2f6124f95a1f20ff1cd78fda2cd5e3334c8491.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6e6d80f0cfa4c17ae74db563e176ca99f4076c5c35ff9d4b972ad64af974a0a9.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6eb16cdc178abeb00e90d099e4fd99c007fb5aecbdfd00b98f19c9e198a7cf51.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6f1e8053e3ec877100f6260a94c40dedaacba2efbf1e9631a34023f76f58dd9c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6f2b2910644740758753202a0224dfbfe915b15f1e7e84d1ab077abaf7584494.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/6ff79d25bbcaa14623621654e9390560ed178bc6d38f5f79014a9c0b98c74440.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7005be237ee4d21d120cb161e130a280d7f70224e7fae665ee8a66b266deb6c2.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7143385ee89d6b903fc14cd4c3df180a80d47737d695ec93802121c954f228e8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/71a602d588b648916615f5748da07299acf38cd64c121ed20a31c4cf1d2bbb84.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/72f43de1cf944ae6b1b3628f79653c4d8a7124b15469b662b18e65151a993338.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/737c84d1a73f8241efbe79d3e1d09b2b42480109d629d0532c61421453016eb7.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/73c67998c4e20079eb971ee2f886dbc8308f937f8765d3114033c26807e08c9c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/746868b4cf9712440558bad4938aca02422f692a75bca1d7c8c6de181110c114.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/74e807e0f5f4e02d3d83797767bc5f000ca9fd0c243165824e1dc44c39c41925.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/75312f1dfc12cb9c7887d1acf25e844b46898d0db1c63637a380885591d8d802.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/75e7c70c0a930fe77aa904db1b517309ae927a63ab8d1e8777f0c30a82357a2b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/78036c132d679b4410c8f92282f29ffc0ff320be97a921bff253180ccb9efdd4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7829a63c156992ea751dde8e10d30c813f3f33cccc9939dd6072e066ef8ff485.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/793d429baa62a340f3bdb5cd994ec2a5a5ee752b7c7a15e6bccaeb169e9ba98c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7b9dbfd936129c5622ba7abc1b158b72f263e61c1b862c18df9e39ae215f6b3d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7dc0305ade1564968e4313c858835b7fb20a9fd5de61ff74f92a25e1b47ae0ee.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7e45a2a88a660cf78f05d2cdc5ba6b1d46a6ef33df049bc7465b473ad903a2ee.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7eadc0fad831d5f43ba45bdea12b944e79d749b4bfbb97265e7a5069baf26407.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/7f3a315673f0ce458c55f0f8e49b4c391bc1a763ee87a559d0a8acec457d88d0.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/813397d308e00adbe55894f7106c15218d8388973547014162df4898bb4efc8a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/829c70388dabd4be917f995f166cda89e91a64aafc3c9610f9232c8d27c0a756.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/82d3a7ebd2bf22dadea98a17ccc1e7f5729a5d9a11e765adfcdbf4ce0637b600.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/83517547e27ad4014a5b9f18d5736274dbaf0f75519f9ec25009897d24876f78.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/84348553cd3fcd9edec90ab9d32f5333d4e2a78b5e9f1dfac45c26d37ad5496e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/844e22b8eee77cee0a788e72b1d4d707e296cdd46f0bf41d43a10288a2a97ef3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/84797f10ba6e61cf60a87c5ab01ea0c4787a437bc1350a76dac6eb0407e88361.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8799798770088753388918a34395508067d3dabb0a7aa520d6f6f68c5959548a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/88807eba118df4483816ccf289d60898ef2c880de968371d54a423f8726bf472.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8b57ac34d4ac4d2a6940e81fd9061c4cbac6fad5dad7e7a93da8d586eda905ca.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8ba0d0956ac3aaa11ddc01d25fec179163ef5daf86ee650cde8777dbb3939839.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8cfd1c5fcc18f05bf41d8f3e5747faa87d90f7c4c747f5fff954d45673b716e0.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8df3199c766b30056f04db5406ae71b39ac9d86465baccb4864a7276a16029aa.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/8fc49b8f064866d43de34a5ae55418ad4d68ce23570d652cd5c174c54a36fd63.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/91a290792ca00c10efdf2f0c1f7d6c1e32eae1024bb35704bcde1812ae00b307.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/92067e82c2c63cbf8ae80b455daa18cafb7bc405b08a4919c4d7998050563864.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9240ac06b527889649bb2579d72be838c5e692949f4d5a52a06de5ca31d865ba.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9446c6b3c060ad57cb6569b08bda39b6ecba9f47c9f92f96a2d70d4ed771434e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/95d263c4c9f4acd1eb88822c0264a3d76a419eff01462143ed46c6fa17d7740f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9690b25a47c988ba3280401801d43e9a7eabcde71f0a89feff5c470b4a492d68.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9772047aef720087ac9cb5e1c14a7a95bd97608ffd63447288b392485b3ed14f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/99cbea84cd8293740bb27e3e97779300394aa3072d25e9f5dc4c91d3f0330209.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9abaa8c8b22f47a824892292b62dccf1d7c3edc5cc405da816693953ee2d903b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9b9d8d520c81f2b629cfad921c6cad41374cab5da09a7744f6c69e44242abdbf.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/9de8a5eb80cf3bd76581ebcc68d314e5b5644db3228f4eaad9f4d0b28853a325.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a27539853bae550e24d13fe4df7e5ba682492bd7d5b1262ab63fbe7c8d389bd6.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a38ebb929cee8a899895e384d1947c8b4a538ab04356128102e41cc61ea0ea28.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a458ec1a6cc8211c180add3407d2ddb0930f7db4063bc27891024cbbe792bee5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a4cbc295d8964613e928f8e527f32005e42c30d9905a17dad5a021c02c1f86fe.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a5b46a541d1207d8be3ba2f7014df742da1536a84bab3a5c97407dda0c866dd1.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a5cdce4c476b47f785dca571660db9acfb451c7fc301d7e2e308456b6b3489d6.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a6966c613077fd3e484bd2606c97a9f05963039a23ccd6211d94faf50fc00e86.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a7b405fa24c69421db33d44015bee76849c33d0d7159d224ea5824f1b5b916f8.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a7cb0fd9b8466e0599ad7584854488a7a5cd8992de317dc3b361cd5f76d1dbc2.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a7d1bae292ae87731d3715e6696ebe49b2d9082d508366cd53dd5133bce19af6.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a8dccdab21f68799fab5797384f525837c474f70f4f3c0400edd75108fd09c52.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a9211b123d2de92ad40190fb5540cd2a8598d5c29a446d1427d945e761521dae.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/a9663d7bb0295633c66af6256a2ca2a24d1b12ab2a170f2b5303bc79e4dfc1fa.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ad310706a621cf1404c88cabb53f00013a5bcd25b34015829a773fe9ef5af2ff.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ad82d5d9feb1021cd34f4adb3a2e5f7c3fd88893044fd9529e69ddf3a58f5c29.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/adb31de1b513c812ec42c6b28ec00e57068a96f6f9b72e4a27453588c9203598.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ae4f9bb8c5c326225f1682665dd0c2b036aa2b052231dc8a6cede2d0b9e20a72.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/b243098556cc50673efbd26121ea4c34b6e4f055ccbcfcd307240737f9f32bc2.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/b4cb6688a676e5b9ba39580a58d7487cfcddc3b4bfe464cb4a8d94106f18fb4c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/b733a43a4b696cdbe9a353b84a35e44fd0ed3cc098c347acc68af1059c7084bc.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ba710f3fbad5175f46b014f1c73f7b715d44405aac3839390c8e5d9826b2d458.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ba95590d1dfbe95ae4168cbe5a783ece6893675e42f3db382571d98856d08ded.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/bdf66e474c2e4dc822e8d6fa8d5d6c2ffde1e8981e02839b3e0763358ee6e665.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/bfa87eb21e2d88f05c3daac98a8a7baf864ef6a4f520816fc54165dc761bdf26.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/bff18cb70e137733c8a52ffe58cd88438f991f4463ad4d8c53220b2c331ff98b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c08b89dc43d071791a3d713c44841febc812cce37f0be2f277e91daebc877796.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c26185b392b7cfff407be953aacfbcdbe4cccafc1c9a2f42e4d6c5bcbbc474de.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c317c600e6ee62e8134948bb3464d641d6c4e6f7e7a3cde7de326c29a862fb7f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c456b65ce32324f9f2c32fd97198bc7dd0ed09e5c1f872f14822e380b24fc45c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c49375780b7a9373e19d9545fa724749c6dccf980ba73b8bd44353b11d430809.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c62317031d8b7fc67e205f1dfb09338fffc43008f86fd68d8af6cd1fc7f9c96e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c66b250b95d09228bee0bf3af6ca9551cf55466f4eed0ce140746cb07666264c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c7c85fb41db3a7d29ec4fc51de7492f458ffb1d1df5cd6da6ae6f6487b84540b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c7cd698739c2a55a64c1671431033d8c503e5420bec4effd78a40b02be80a106.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c92aa0092c3cf8dfd0c02e401dbfa279f0e014db07be9088d1a1ba278cb3567b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c9a0e90b859420f122bca2154b277cb498d7572dfa94c7127a746175e5551b5b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/c9a8e9fb9962cf4cc526505729f922887b0d63b3cf6ee8935b5a68cf1d405bd9.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ca0ae2298b1f9e39be079f74770f3e5434f3086508196f5ddc8e8847e800d193.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ca2913a82425c0c3a8243dc625481bda67bca2b90576da5163ec5e5b6ba5b73f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/cb35ee3914be078776353c3927edd3dc7d93b7e373ae57fcce98623f278dacd4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ccb5157bf47c3f98552e8fe4d767e5faed26c8d3de6505be3a08858b7c6bb707.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ce4096d030118dd69448f2e1d37dd46fa42decce260b9707f2098494f9e19995.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/d452f78a6c0c119816b60c8c198386b2a904b6cc8ba4c7db6f89845cf786e766.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/d5ca93ede0f9ebc9676c5b4595c079e0457938663ed8fe28953564345914a8a1.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/d6bc2db7cf8444b5968efd759317622eec728013fa6aecea53d1c03c79b377ac.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/db8765688d21c0df4a310cc211a32597833668537aea2251cb9d025da78899e4.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/dc983e9149d09b0907016ed97fce576a72836e88d9566e66df93a316cb18b240.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/df9b60444f9302a9cc84ec978e9f8c728534348e2aa00552877efd95231eb84a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/dfd1e489b3241c11ce698ea8e4112519d6e03b09af7378f8f06c1a80854cd70c.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e19fba2879a63494c70fb179d2e18e1957f985d26f535e39cf31fea913dd5047.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e37f101f13931f1ec0e1855915acbe4540c3215fca40aa74b0cae5abd85eaf55.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e3daf6948cfaddb5b9a03f8dba415d5e4d89d3fd828d667844f5183b13d79596.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e3ff4f5ac6f1cf803c53138d1b21c093e49b412ce723aa92f9ddaeeb8956ff1f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e4e1dc7089ace8a412c6a856d13c367e3da495296be1e4704fd0de7806339943.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e6d09368b474ac823ab952514cb50c6eb84083b14a34fbccaa16e6418d4c4779.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e75fbdfa804328291e0002f8a0e35a297315fa0c4bfd8eea5b7c5a46a01de7b2.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/e872be6dfcd8ee420cb3d3af49f4f6a2766513c7db048f6fce5b421cd0ed7f63.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ea0b685a8c959aa34c321153bc0c30d46da9a39635df3585ed53a046c4d6a7fc.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ea46e90aca5999f0dffe4a08c0e64984edf548d1e552c23bea70a28b0b5c061b.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/ebe6c10205a7cba273d53558a5ef33391962ab5a42eef569e50038b538e49fcd.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f037949549fb7fd1ed2c25adc9a3d5aab4c5ea666968b4f726e420b4c6e92f29.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f1c69e2368b439bf4fe01b294f9c1b3fbfb667e154d0b4131a1484328c9327d9.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f1d9a7d49fcdbd2d43fa3b35ef9820faba1c0b971b904a4b34d5c6bb11a123dc.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f27e5f554925bc3b3b44c79f4539ec2f8220d03d5335a4973fbd01e73b652a9f.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f30b02ceaae033e9e7179f514efddda908c4f61346da6fb32b78041d29ce13d5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f4ba3f67bffca3d12bfe639c670826664af0524f0e989e18629a1f1da27bb630.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f5f7dafc8340e53289163df464fb981735cbae798374676b01c4c01dec6811c3.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f60920272acceb2e030365f883921f3f147553b98d02dd7b66d6b00e3bbcb0b5.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f6b38bb4eb2502ca56a5219b48743ad2278ebbcf4ab208b3c122c99e4fe11f7a.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f8125ac1cbb0cf5c19fbab68be2dc44198d26564d95ff2fedb7fbdd30fb55dba.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/f9a4131bfdfec5b5b3ee24810d38b04ca4100adb0b146c1c9ecc53a2c41a0ba1.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/fa2c0eb024e1b8de41ff50c0cb1fa5f45f7359c455379eba29840a4dc2fe313e.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/fabb36009f0a953087c0e476eace79a320b0742f13fbf781e1705c4fdfec6fba.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/fdec773a651c4e1fc9b2cfa3f0875d37625c196d907d1dd8a3c31f59af6da722.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/semantic/fe0e3745bd7012402618a95b6b5454df7918c3c9d5aa613c1ae457468a7d938d.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cache/stat-index.json",
+      "language": "json",
+      "sizeLines": 0,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/cost.json",
+      "language": "json",
+      "sizeLines": 95,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/graph.html",
+      "language": "html",
+      "sizeLines": 319,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "graphify-out/graph.json",
+      "language": "json",
+      "sizeLines": 85964,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/manifest.json",
+      "language": "json",
+      "sizeLines": 841,
+      "fileCategory": "config"
+    },
+    {
+      "path": "graphify-out/memory/query_20260730_154807_why_does_load_corpus_manifest___connect_evaluation.md",
+      "language": "markdown",
+      "sizeLines": 29,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "graphify-out/reflections/LESSONS.md",
+      "language": "markdown",
+      "sizeLines": 11,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "installer/GroundedDocParse.iss",
+      "language": "iss",
+      "sizeLines": 54,
+      "fileCategory": "code"
+    },
+    {
+      "path": "installer/Install-GroundedDocParse.ps1",
+      "language": "powershell",
+      "sizeLines": 371,
+      "fileCategory": "script"
+    },
+    {
+      "path": "presentations/grounded-docparse-business.pptx",
+      "language": "pptx",
+      "sizeLines": 619,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-github-overview.pptx",
+      "language": "pptx",
+      "sizeLines": 631,
+      "fileCategory": "code"
+    },
+    {
+      "path": "presentations/grounded-docparse-technical.pptx",
+      "language": "pptx",
+      "sizeLines": 630,
+      "fileCategory": "code"
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "sizeLines": 74,
+      "fileCategory": "config"
+    },
+    {
+      "path": "scripts/build-installer.ps1",
+      "language": "powershell",
+      "sizeLines": 46,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "language": "python",
+      "sizeLines": 566,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "language": "python",
+      "sizeLines": 444,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_evaluation_corpus.py",
+      "language": "python",
+      "sizeLines": 446,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/generate_examples.py",
+      "language": "python",
+      "sizeLines": 69,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/benchmark_glmocr.py",
+      "language": "python",
+      "sizeLines": 121,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-glmocr-api.py",
+      "language": "python",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/check-paddleocr-api.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "language": "shell",
+      "sizeLines": 128,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "language": "shell",
+      "sizeLines": 265,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/prepare_glmocr_runtime.py",
+      "language": "python",
+      "sizeLines": 165,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "language": "python",
+      "sizeLines": 146,
+      "fileCategory": "code"
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "language": "shell",
+      "sizeLines": 28,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 24,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "language": "shell",
+      "sizeLines": 14,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "language": "shell",
+      "sizeLines": 84,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "language": "shell",
+      "sizeLines": 63,
+      "fileCategory": "script"
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "language": "shell",
+      "sizeLines": 53,
+      "fileCategory": "script"
+    },
+    {
+      "path": "src/grounded_docparse/__init__.py",
+      "language": "python",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/agentic.py",
+      "language": "python",
+      "sizeLines": 1002,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/batch.py",
+      "language": "python",
+      "sizeLines": 216,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/benchmark.py",
+      "language": "python",
+      "sizeLines": 1500,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/cli.py",
+      "language": "python",
+      "sizeLines": 239,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/config.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/enhancement.py",
+      "language": "python",
+      "sizeLines": 197,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/extraction.py",
+      "language": "python",
+      "sizeLines": 758,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/gateways.py",
+      "language": "python",
+      "sizeLines": 901,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ingest.py",
+      "language": "python",
+      "sizeLines": 218,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/local_ocr.py",
+      "language": "python",
+      "sizeLines": 236,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/models.py",
+      "language": "python",
+      "sizeLines": 1030,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 30,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/ocr_services.py",
+      "language": "python",
+      "sizeLines": 29,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 228,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/page_analysis.py",
+      "language": "python",
+      "sizeLines": 861,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/pipeline.py",
+      "language": "python",
+      "sizeLines": 3140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/prompts.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/quality.py",
+      "language": "python",
+      "sizeLines": 514,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/render.py",
+      "language": "python",
+      "sizeLines": 1425,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/runtime.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/schema_store.py",
+      "language": "python",
+      "sizeLines": 418,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/workspace_store.py",
+      "language": "python",
+      "sizeLines": 451,
+      "fileCategory": "code"
+    },
+    {
+      "path": "streamlit_app.py",
+      "language": "python",
+      "sizeLines": 2584,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/conftest.py",
+      "language": "python",
+      "sizeLines": 15,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_contract.py",
+      "language": "python",
+      "sizeLines": 837,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_extraction.py",
+      "language": "python",
+      "sizeLines": 803,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_agentic_features.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_batch.py",
+      "language": "python",
+      "sizeLines": 208,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_cli.py",
+      "language": "python",
+      "sizeLines": 375,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_confidence_spans.py",
+      "language": "python",
+      "sizeLines": 341,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_corpus_manifest.py",
+      "language": "python",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_calibration.py",
+      "language": "python",
+      "sizeLines": 156,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_cli.py",
+      "language": "python",
+      "sizeLines": 160,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_metrics.py",
+      "language": "python",
+      "sizeLines": 515,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_evaluation_report.py",
+      "language": "python",
+      "sizeLines": 45,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_form_routing.py",
+      "language": "python",
+      "sizeLines": 271,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_glmocr_runtime_config.py",
+      "language": "python",
+      "sizeLines": 150,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_ingest.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_launcher_contract.py",
+      "language": "python",
+      "sizeLines": 125,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_markdown_enhancement.py",
+      "language": "python",
+      "sizeLines": 123,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_ocr_disagreement.py",
+      "language": "python",
+      "sizeLines": 109,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_openai_vision_gateway.py",
+      "language": "python",
+      "sizeLines": 650,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_ocr.py",
+      "language": "python",
+      "sizeLines": 204,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_paddle_runtime_config.py",
+      "language": "python",
+      "sizeLines": 87,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_page_analysis.py",
+      "language": "python",
+      "sizeLines": 401,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_parallel_pages.py",
+      "language": "python",
+      "sizeLines": 244,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_provider_runtime.py",
+      "language": "python",
+      "sizeLines": 426,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_quality.py",
+      "language": "python",
+      "sizeLines": 634,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_regression_policy.py",
+      "language": "python",
+      "sizeLines": 110,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_schema_store.py",
+      "language": "python",
+      "sizeLines": 327,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_contract.py",
+      "language": "python",
+      "sizeLines": 533,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_pipeline.py",
+      "language": "python",
+      "sizeLines": 2452,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_simple_streamlit.py",
+      "language": "python",
+      "sizeLines": 812,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_strict_recovery_contract.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_windows_installer.py",
+      "language": "python",
+      "sizeLines": 67,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tests/test_workspace_store.py",
+      "language": "python",
+      "sizeLines": 194,
+      "fileCategory": "code"
+    }
+  ],
+  "totalFiles": 618,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "very-large",
+  "stats": {
+    "filesScanned": 618,
+    "byCategory": {
+      "code": 97,
+      "config": 440,
+      "docs": 41,
+      "script": 13,
+      "markup": 27
+    },
+    "byLanguage": {
+      "db": 2,
+      "db-shm": 2,
+      "db-wal": 2,
+      "config": 1,
+      "unknown": 4,
+      "markdown": 36,
+      "toml": 2,
+      "json": 435,
+      "javascript": 17,
+      "txt": 5,
+      "batch": 3,
+      "yaml": 2,
+      "html": 26,
+      "css": 1,
+      "iss": 1,
+      "powershell": 2,
+      "pptx": 3,
+      "python": 66,
+      "shell": 8
+    }
+  }
+}

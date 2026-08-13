@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:_positive_int",
+      "type": "function",
+      "name": "_positive_int",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        29,
+        37
+      ],
+      "summary": "Defines _positive_int, a name, default routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:_resolve_snapshot",
+      "type": "function",
+      "name": "_resolve_snapshot",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        40,
+        62
+      ],
+      "summary": "Defines _resolve_snapshot, a repo_id, revision, offline routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:prepare",
+      "type": "function",
+      "name": "prepare",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        107,
+        138
+      ],
+      "summary": "Defines prepare, a offline, backend routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:_atomic_write",
+      "type": "function",
+      "name": "_atomic_write",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        65,
+        76
+      ],
+      "summary": "Defines _atomic_write, a path, content routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        141,
+        161
+      ],
+      "summary": "Defines main, a  routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "type": "file",
+      "name": "prepare_glmocr_runtime.py",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "summary": "Source or generated artifact 'prepare_glmocr_runtime.py' used by grounded-docparse tooling.",
+      "tags": [
+        "source",
+        "tooling",
+        "project-artifact"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:scripts/wsl/prepare_glmocr_runtime.py:_runtime_config",
+      "type": "function",
+      "name": "_runtime_config",
+      "filePath": "scripts/wsl/prepare_glmocr_runtime.py",
+      "lineRange": [
+        79,
+        104
+      ],
+      "summary": "Defines _runtime_config, a layout_path, max_workers, backend routine in prepare_glmocr_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_resolve_snapshot",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_resolve_snapshot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_atomic_write",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:prepare",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_atomic_write",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:prepare",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_runtime_config",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_positive_int",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_positive_int",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:scripts/wsl/prepare_glmocr_runtime.py",
+      "target": "function:scripts/wsl/prepare_glmocr_runtime.py:_runtime_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

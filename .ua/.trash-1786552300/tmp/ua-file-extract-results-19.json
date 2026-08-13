@@ -1,0 +1,2214 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 19,
+  "filesSkipped": [
+    "docs/idp-vs-ade-classification.html"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 19,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 19
+    }
+  },
+  "results": [
+    {
+      "path": "docs/ONBOARDING.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 108,
+      "nonEmptyLines": 80,
+      "sections": [
+        {
+          "heading": "Grounded DocParse Onboarding",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Project overview",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Architecture layers",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "Core document processing",
+          "level": 3,
+          "line": 13
+        },
+        {
+          "heading": "Streamlit interface",
+          "level": 3,
+          "line": 28
+        },
+        {
+          "heading": "Testing",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "Evaluation data",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "Documentation",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "Operations and configuration",
+          "level": 3,
+          "line": 44
+        },
+        {
+          "heading": "Key concepts",
+          "level": 2,
+          "line": 48
+        },
+        {
+          "heading": "Guided tour",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "File map",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "Complexity hotspots",
+          "level": 2,
+          "line": 97
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 13
+      }
+    },
+    {
+      "path": "docs/agentic-document-extraction-comparison.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 234,
+      "nonEmptyLines": 155,
+      "sections": [
+        {
+          "heading": "Agentic Document Extraction: LandingAI ADE and Grounded DocParse",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "What agentic document extraction means",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "How LandingAI uses the term",
+          "level": 2,
+          "line": 32
+        },
+        {
+          "heading": "How Grounded DocParse is agentic",
+          "level": 2,
+          "line": 48
+        },
+        {
+          "heading": "Capability comparison",
+          "level": 2,
+          "line": 76
+        },
+        {
+          "heading": "Do we have Parse, Classify, Split, Section, and Extract?",
+          "level": 2,
+          "line": 93
+        },
+        {
+          "heading": "Parse — yes",
+          "level": 3,
+          "line": 95
+        },
+        {
+          "heading": "Classify — yes, with a different execution point",
+          "level": 3,
+          "line": 109
+        },
+        {
+          "heading": "Split — yes",
+          "level": 3,
+          "line": 120
+        },
+        {
+          "heading": "Section — yes",
+          "level": 3,
+          "line": 128
+        },
+        {
+          "heading": "Extract — yes",
+          "level": 3,
+          "line": 132
+        },
+        {
+          "heading": "Do we meet the characteristics of agentic extraction?",
+          "level": 2,
+          "line": 140
+        },
+        {
+          "heading": "1. Visual and structural understanding — yes, with a boundary",
+          "level": 3,
+          "line": 142
+        },
+        {
+          "heading": "2. Goal-directed behavior — yes",
+          "level": 3,
+          "line": 148
+        },
+        {
+          "heading": "3. Adaptive processing — yes",
+          "level": 3,
+          "line": 152
+        },
+        {
+          "heading": "4. Grounding — yes, strongly enforced",
+          "level": 3,
+          "line": 158
+        },
+        {
+          "heading": "5. Validation and self-correction — yes, bounded",
+          "level": 3,
+          "line": 170
+        },
+        {
+          "heading": "6. Uncertainty handling — yes",
+          "level": 3,
+          "line": 176
+        },
+        {
+          "heading": "7. Orchestration — yes",
+          "level": 3,
+          "line": 182
+        },
+        {
+          "heading": "8. Controlled autonomy — yes",
+          "level": 3,
+          "line": 202
+        },
+        {
+          "heading": "What this comparison does not claim",
+          "level": 2,
+          "line": 210
+        },
+        {
+          "heading": "Bottom line",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "References",
+          "level": 2,
+          "line": 226
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 23
+      }
+    },
+    {
+      "path": "docs/api.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 324,
+      "nonEmptyLines": 263,
+      "sections": [
+        {
+          "heading": "Python API",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "CLI batch command",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Exported names",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Parsing",
+          "level": 2,
+          "line": 47
+        },
+        {
+          "heading": "Agentic features",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Direct schema proposal and extraction",
+          "level": 2,
+          "line": 190
+        },
+        {
+          "heading": "Exported result models",
+          "level": 2,
+          "line": 239
+        },
+        {
+          "heading": "Combined JSON",
+          "level": 2,
+          "line": 258
+        },
+        {
+          "heading": "Configuration and test doubles",
+          "level": 2,
+          "line": 318
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "docs/architecture.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 121,
+      "nonEmptyLines": 95,
+      "sections": [
+        {
+          "heading": "Architecture",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "System boundary",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Repository map",
+          "level": 2,
+          "line": 21
+        },
+        {
+          "heading": "Parse pipeline",
+          "level": 2,
+          "line": 54
+        },
+        {
+          "heading": "Ownership and recovery contract",
+          "level": 2,
+          "line": 74
+        },
+        {
+          "heading": "Agentic layer",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "heading": "Result contracts",
+          "level": 2,
+          "line": 105
+        },
+        {
+          "heading": "Evaluation boundary",
+          "level": 2,
+          "line": 113
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "docs/azure-bulk-fax-deployment.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 640,
+      "nonEmptyLines": 483,
+      "sections": [
+        {
+          "heading": "Deploy Grounded DocParse on Azure for bulk medical faxes",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Purpose and readiness warning",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Chosen production baseline",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "Reference architecture",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "heading": "Required application changes",
+          "level": 2,
+          "line": 76
+        },
+        {
+          "heading": "1. Separate the web process from document processing",
+          "level": 3,
+          "line": 80
+        },
+        {
+          "heading": "2. Add durable batch and document state",
+          "level": 3,
+          "line": 97
+        },
+        {
+          "heading": "3. Make queue processing idempotent",
+          "level": 3,
+          "line": 123
+        },
+        {
+          "heading": "4. Version Markdown definitions",
+          "level": 3,
+          "line": 142
+        },
+        {
+          "heading": "5. Add the batch UI and upload/download brokers",
+          "level": 3,
+          "line": 155
+        },
+        {
+          "heading": "6. Support automated Blob batches",
+          "level": 3,
+          "line": 179
+        },
+        {
+          "heading": "7. Add a provider factory",
+          "level": 3,
+          "line": 205
+        },
+        {
+          "heading": "Azure resource contract",
+          "level": 2,
+          "line": 225
+        },
+        {
+          "heading": "Required roles",
+          "level": 3,
+          "line": 248
+        },
+        {
+          "heading": "Build and deployment procedure",
+          "level": 2,
+          "line": 265
+        },
+        {
+          "heading": "1. Select the subscription and region",
+          "level": 3,
+          "line": 269
+        },
+        {
+          "heading": "2. Prepare deployment parameters",
+          "level": 3,
+          "line": 282
+        },
+        {
+          "heading": "3. Deploy shared infrastructure",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "4. Build and validate the GPU image",
+          "level": 3,
+          "line": 315
+        },
+        {
+          "heading": "5. Build and publish application images",
+          "level": 3,
+          "line": 330
+        },
+        {
+          "heading": "6. Run database migrations",
+          "level": 3,
+          "line": 334
+        },
+        {
+          "heading": "7. Configure the AI provider",
+          "level": 3,
+          "line": 338
+        },
+        {
+          "heading": "8. Enable ingress last",
+          "level": 3,
+          "line": 359
+        },
+        {
+          "heading": "Runtime configuration",
+          "level": 2,
+          "line": 363
+        },
+        {
+          "heading": "Security and PHI controls",
+          "level": 2,
+          "line": 391
+        },
+        {
+          "heading": "Data minimization and logging",
+          "level": 3,
+          "line": 393
+        },
+        {
+          "heading": "Retention and deletion",
+          "level": 3,
+          "line": 399
+        },
+        {
+          "heading": "Availability and disaster recovery",
+          "level": 3,
+          "line": 419
+        },
+        {
+          "heading": "Network and host controls",
+          "level": 3,
+          "line": 449
+        },
+        {
+          "heading": "Autoscaling and capacity",
+          "level": 2,
+          "line": 489
+        },
+        {
+          "heading": "Operations",
+          "level": 2,
+          "line": 503
+        },
+        {
+          "heading": "Normal batch flow",
+          "level": 3,
+          "line": 505
+        },
+        {
+          "heading": "Alert baseline",
+          "level": 3,
+          "line": 517
+        },
+        {
+          "heading": "Retry and recovery",
+          "level": 3,
+          "line": 535
+        },
+        {
+          "heading": "Pre-production acceptance gates",
+          "level": 2,
+          "line": 545
+        },
+        {
+          "heading": "Functional",
+          "level": 3,
+          "line": 549
+        },
+        {
+          "heading": "Input and failure handling",
+          "level": 3,
+          "line": 559
+        },
+        {
+          "heading": "AI providers",
+          "level": 3,
+          "line": 568
+        },
+        {
+          "heading": "Security and compliance",
+          "level": 3,
+          "line": 576
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 588
+        },
+        {
+          "heading": "Deployment evidence and handoff",
+          "level": 2,
+          "line": 604
+        },
+        {
+          "heading": "First-party references",
+          "level": 2,
+          "line": 621
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 42
+      }
+    },
+    {
+      "path": "docs/business-user-extraction-workflow.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 221,
+      "nonEmptyLines": 144,
+      "sections": [
+        {
+          "heading": "Business User Workflow for Extracting Large Field Sets",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Purpose",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "The Workflow at a Glance",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "1. Define the Business Fields First",
+          "level": 2,
+          "line": 27
+        },
+        {
+          "heading": "2. Upload the Document",
+          "level": 2,
+          "line": 53
+        },
+        {
+          "heading": "3. Choose the Processing Options",
+          "level": 2,
+          "line": 66
+        },
+        {
+          "heading": "4. Parse the Document",
+          "level": 2,
+          "line": 76
+        },
+        {
+          "heading": "5. Review the Parse Before Extracting",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "heading": "6. Build and Save the Extraction Schema",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "7. Run the Field Extraction",
+          "level": 2,
+          "line": 133
+        },
+        {
+          "heading": "8. Interpret and Validate the Results",
+          "level": 2,
+          "line": 141
+        },
+        {
+          "heading": "9. Use Chat for Follow-up Questions",
+          "level": 2,
+          "line": 162
+        },
+        {
+          "heading": "10. Export the Results",
+          "level": 2,
+          "line": 170
+        },
+        {
+          "heading": "11. Repeat Consistently",
+          "level": 2,
+          "line": 181
+        },
+        {
+          "heading": "Applying the Workflow Beyond Healthcare",
+          "level": 2,
+          "line": 194
+        },
+        {
+          "heading": "What a Successful Run Looks Like",
+          "level": 2,
+          "line": 210
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "docs/complete-user-guide.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 1363,
+      "nonEmptyLines": 929,
+      "sections": [
+        {
+          "heading": "Grounded DocParse Complete User Guide",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1. Start here",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "1.1 Which type of user are you?",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "2. What the application can and cannot do",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "heading": "2.1 What it can do",
+          "level": 3,
+          "line": 43
+        },
+        {
+          "heading": "2.2 What it cannot currently do",
+          "level": 3,
+          "line": 65
+        },
+        {
+          "heading": "2.3 Core parsing versus optional AI features",
+          "level": 3,
+          "line": 82
+        },
+        {
+          "heading": "3. Before you use the application",
+          "level": 2,
+          "line": 91
+        },
+        {
+          "heading": "3.1 Business-user checklist",
+          "level": 3,
+          "line": 93
+        },
+        {
+          "heading": "3.2 Technical setup summary",
+          "level": 3,
+          "line": 106
+        },
+        {
+          "heading": "3.3 Optional Luna configuration",
+          "level": 3,
+          "line": 126
+        },
+        {
+          "heading": "4. Understand where document data goes",
+          "level": 2,
+          "line": 140
+        },
+        {
+          "heading": "5. Upload a document",
+          "level": 2,
+          "line": 169
+        },
+        {
+          "heading": "5.1 Supported files",
+          "level": 3,
+          "line": 171
+        },
+        {
+          "heading": "5.2 Page range",
+          "level": 3,
+          "line": 189
+        },
+        {
+          "heading": "5.3 Show reading order",
+          "level": 3,
+          "line": 204
+        },
+        {
+          "heading": "6. Choose processing options",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "6.1 ADE mode",
+          "level": 3,
+          "line": 220
+        },
+        {
+          "heading": "6.2 Enhance with gpt-5.6-luna",
+          "level": 3,
+          "line": 236
+        },
+        {
+          "heading": "6.3 Enable visual recovery on hard regions",
+          "level": 3,
+          "line": 248
+        },
+        {
+          "heading": "6.4 Classify document type",
+          "level": 3,
+          "line": 274
+        },
+        {
+          "heading": "6.5 Generate table of contents",
+          "level": 3,
+          "line": 282
+        },
+        {
+          "heading": "6.6 Enable document chat",
+          "level": 3,
+          "line": 296
+        },
+        {
+          "heading": "7. Parse the document",
+          "level": 2,
+          "line": 302
+        },
+        {
+          "heading": "7.1 What happens technically",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "7.2 What happens when an optional feature fails",
+          "level": 3,
+          "line": 337
+        },
+        {
+          "heading": "7.3 Tab map",
+          "level": 3,
+          "line": 343
+        },
+        {
+          "heading": "8. Use the Overview tab",
+          "level": 2,
+          "line": 358
+        },
+        {
+          "heading": "8.1 Summary metrics",
+          "level": 3,
+          "line": 362
+        },
+        {
+          "heading": "8.2 Document type",
+          "level": 3,
+          "line": 375
+        },
+        {
+          "heading": "8.3 Table of contents",
+          "level": 3,
+          "line": 385
+        },
+        {
+          "heading": "8.4 Page thumbnails and original page viewer",
+          "level": 3,
+          "line": 389
+        },
+        {
+          "heading": "9. Use the Markdown tab",
+          "level": 2,
+          "line": 403
+        },
+        {
+          "heading": "9.1 Refined Markdown versus grounded Markdown",
+          "level": 3,
+          "line": 417
+        },
+        {
+          "heading": "9.2 What to do when Markdown looks wrong",
+          "level": 3,
+          "line": 423
+        },
+        {
+          "heading": "10. Use the Annotated PDF tab",
+          "level": 2,
+          "line": 435
+        },
+        {
+          "heading": "10.1 Annotation colors",
+          "level": 3,
+          "line": 439
+        },
+        {
+          "heading": "10.2 Page controls",
+          "level": 3,
+          "line": 450
+        },
+        {
+          "heading": "10.3 Selected regions",
+          "level": 3,
+          "line": 456
+        },
+        {
+          "heading": "10.4 Reviewer checklist",
+          "level": 3,
+          "line": 462
+        },
+        {
+          "heading": "11. Use the Layout Tree tab",
+          "level": 2,
+          "line": 474
+        },
+        {
+          "heading": "12. Extract business fields from the whole document",
+          "level": 2,
+          "line": 495
+        },
+        {
+          "heading": "12.1 When to use extraction",
+          "level": 3,
+          "line": 499
+        },
+        {
+          "heading": "12.2 Open the extraction builder",
+          "level": 3,
+          "line": 515
+        },
+        {
+          "heading": "12.3 Create a schema manually",
+          "level": 3,
+          "line": 526
+        },
+        {
+          "heading": "12.4 Import schema JSON",
+          "level": 3,
+          "line": 561
+        },
+        {
+          "heading": "12.5 Import schema Markdown",
+          "level": 3,
+          "line": 590
+        },
+        {
+          "heading": "12.6 Import schema CSV or XLSX",
+          "level": 3,
+          "line": 627
+        },
+        {
+          "heading": "12.7 Load a saved schema",
+          "level": 3,
+          "line": 640
+        },
+        {
+          "heading": "12.8 Review extraction results",
+          "level": 3,
+          "line": 644
+        },
+        {
+          "heading": "12.9 Large field sets",
+          "level": 3,
+          "line": 664
+        },
+        {
+          "heading": "13. Classify mixed forms and extract selected categories",
+          "level": 2,
+          "line": 680
+        },
+        {
+          "heading": "13.1 Understand the routing terms",
+          "level": 3,
+          "line": 695
+        },
+        {
+          "heading": "13.2 Prepare extraction schemas first",
+          "level": 3,
+          "line": 704
+        },
+        {
+          "heading": "13.3 Create a routing profile manually",
+          "level": 3,
+          "line": 710
+        },
+        {
+          "heading": "13.4 Import routing profile JSON",
+          "level": 3,
+          "line": 741
+        },
+        {
+          "heading": "13.5 Import routing profile Markdown",
+          "level": 3,
+          "line": 773
+        },
+        {
+          "heading": "13.6 Classify forms",
+          "level": 3,
+          "line": 811
+        },
+        {
+          "heading": "13.7 Review classified segments",
+          "level": 3,
+          "line": 825
+        },
+        {
+          "heading": "13.8 Extract eligible forms",
+          "level": 3,
+          "line": 860
+        },
+        {
+          "heading": "13.9 Review routed results",
+          "level": 3,
+          "line": 876
+        },
+        {
+          "heading": "14. Use document chat",
+          "level": 2,
+          "line": 890
+        },
+        {
+          "heading": "15. Download and understand outputs",
+          "level": 2,
+          "line": 913
+        },
+        {
+          "heading": "15.1 Download Markdown",
+          "level": 3,
+          "line": 917
+        },
+        {
+          "heading": "15.2 Download annotated PDF",
+          "level": 3,
+          "line": 927
+        },
+        {
+          "heading": "15.3 Download Extract JSON",
+          "level": 3,
+          "line": 937
+        },
+        {
+          "heading": "15.4 Download Full JSON",
+          "level": 3,
+          "line": 951
+        },
+        {
+          "heading": "15.5 Footer diagnostics",
+          "level": 3,
+          "line": 973
+        },
+        {
+          "heading": "16. Business operating model",
+          "level": 2,
+          "line": 986
+        },
+        {
+          "heading": "16.1 Recommended roles",
+          "level": 3,
+          "line": 990
+        },
+        {
+          "heading": "16.2 Recommended standard operating procedure",
+          "level": 3,
+          "line": 1002
+        },
+        {
+          "heading": "16.3 Risk-based field review",
+          "level": 3,
+          "line": 1015
+        },
+        {
+          "heading": "16.4 What a successful result means",
+          "level": 3,
+          "line": 1029
+        },
+        {
+          "heading": "17. Technical behavior in simple terms",
+          "level": 2,
+          "line": 1040
+        },
+        {
+          "heading": "17.1 Source ownership",
+          "level": 3,
+          "line": 1042
+        },
+        {
+          "heading": "17.2 Grounding",
+          "level": 3,
+          "line": 1055
+        },
+        {
+          "heading": "17.3 Structured output and validation",
+          "level": 3,
+          "line": 1061
+        },
+        {
+          "heading": "17.4 Long documents",
+          "level": 3,
+          "line": 1067
+        },
+        {
+          "heading": "17.5 Result versions",
+          "level": 3,
+          "line": 1073
+        },
+        {
+          "heading": "18. Persistence, privacy, and security",
+          "level": 2,
+          "line": 1086
+        },
+        {
+          "heading": "18.1 What is saved by the app",
+          "level": 3,
+          "line": 1088
+        },
+        {
+          "heading": "18.2 What is session-only",
+          "level": 3,
+          "line": 1100
+        },
+        {
+          "heading": "18.3 Other residual data",
+          "level": 3,
+          "line": 1118
+        },
+        {
+          "heading": "18.4 Local-workstation boundary",
+          "level": 3,
+          "line": 1132
+        },
+        {
+          "heading": "19. Technical integration and extension",
+          "level": 2,
+          "line": 1140
+        },
+        {
+          "heading": "19.1 Python API",
+          "level": 3,
+          "line": 1142
+        },
+        {
+          "heading": "19.2 Current integration limits",
+          "level": 3,
+          "line": 1156
+        },
+        {
+          "heading": "19.3 Azure bulk processing",
+          "level": 3,
+          "line": 1171
+        },
+        {
+          "heading": "20. Common workflows",
+          "level": 2,
+          "line": 1185
+        },
+        {
+          "heading": "20.1 Simple invoice extraction",
+          "level": 3,
+          "line": 1187
+        },
+        {
+          "heading": "20.2 Extract only new authorizations from a medical fax",
+          "level": 3,
+          "line": 1198
+        },
+        {
+          "heading": "20.3 Process a sensitive document with no remote AI",
+          "level": 3,
+          "line": 1215
+        },
+        {
+          "heading": "20.4 Review a long report",
+          "level": 3,
+          "line": 1225
+        },
+        {
+          "heading": "20.5 Handle a poor scan",
+          "level": 3,
+          "line": 1235
+        },
+        {
+          "heading": "21. Troubleshooting",
+          "level": 2,
+          "line": 1243
+        },
+        {
+          "heading": "22. Frequently asked questions",
+          "level": 2,
+          "line": 1264
+        },
+        {
+          "heading": "Does Fast mode mean no external API calls?",
+          "level": 3,
+          "line": 1266
+        },
+        {
+          "heading": "Is extraction automatic after parsing?",
+          "level": 3,
+          "line": 1270
+        },
+        {
+          "heading": "Can I upload a field list?",
+          "level": 3,
+          "line": 1274
+        },
+        {
+          "heading": "Can I upload a Markdown routing definition?",
+          "level": 3,
+          "line": 1278
+        },
+        {
+          "heading": "Can one PDF contain several forms?",
+          "level": 3,
+          "line": 1282
+        },
+        {
+          "heading": "Can I extract only `newauth` and ignore medical records?",
+          "level": 3,
+          "line": 1286
+        },
+        {
+          "heading": "Does approval make every category extractable?",
+          "level": 3,
+          "line": 1290
+        },
+        {
+          "heading": "Can Luna change a bounding box?",
+          "level": 3,
+          "line": 1294
+        },
+        {
+          "heading": "Can the app recover a region local OCR never found?",
+          "level": 3,
+          "line": 1298
+        },
+        {
+          "heading": "Does a high-confidence field require review?",
+          "level": 3,
+          "line": 1302
+        },
+        {
+          "heading": "Can the UI process 100 PDFs at once?",
+          "level": 3,
+          "line": 1306
+        },
+        {
+          "heading": "Are schemas and results both saved?",
+          "level": 3,
+          "line": 1310
+        },
+        {
+          "heading": "23. Glossary",
+          "level": 2,
+          "line": 1314
+        },
+        {
+          "heading": "24. Final checklist",
+          "level": 2,
+          "line": 1337
+        },
+        {
+          "heading": "Further reading",
+          "level": 2,
+          "line": 1353
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 111
+      }
+    },
+    {
+      "path": "docs/extraction-quality-research.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 97,
+      "nonEmptyLines": 80,
+      "sections": [
+        {
+          "heading": "Extraction quality research",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Scope and interpretation",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Findings",
+          "level": 2,
+          "line": 17
+        },
+        {
+          "heading": "Evaluation policy",
+          "level": 2,
+          "line": 38
+        },
+        {
+          "heading": "Changes and experiments",
+          "level": 2,
+          "line": 54
+        },
+        {
+          "heading": "July 2026 targeted result",
+          "level": 3,
+          "line": 72
+        },
+        {
+          "heading": "Acceptance and limitations",
+          "level": 2,
+          "line": 86
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "docs/how-grounded-docparse-is-agentic.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 168,
+      "nonEmptyLines": 115,
+      "sections": [
+        {
+          "heading": "How Grounded DocParse Is Agentic",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Agentic in plain language",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "The deterministic foundation comes first",
+          "level": 2,
+          "line": 31
+        },
+        {
+          "heading": "The specialized agentic roles",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "heading": "How the application observes and prepares context",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "How the system reasons, checks, and repairs",
+          "level": 2,
+          "line": 76
+        },
+        {
+          "heading": "Human control is part of the design",
+          "level": 2,
+          "line": 94
+        },
+        {
+          "heading": "Example: a mixed-form business packet",
+          "level": 2,
+          "line": 109
+        },
+        {
+          "heading": "Grounding is the control plane",
+          "level": 2,
+          "line": 125
+        },
+        {
+          "heading": "Failure isolation and deterministic fallbacks",
+          "level": 2,
+          "line": 135
+        },
+        {
+          "heading": "What the app does not do",
+          "level": 2,
+          "line": 148
+        },
+        {
+          "heading": "The precise description",
+          "level": 2,
+          "line": 162
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "docs/how-it-works.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 17,
+      "nonEmptyLines": 15,
+      "sections": [
+        {
+          "heading": "How it works",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "docs/layout-aware-large-field-extraction-workflow.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 434,
+      "nonEmptyLines": 317,
+      "sections": [
+        {
+          "heading": "Layout-Aware Workflow for Extracting Large Field Sets",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Purpose",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Current Capability and Proposed Extension",
+          "level": 2,
+          "line": 13
+        },
+        {
+          "heading": "The Two Inputs Must Remain Separate",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "Plain-language terms",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "Workflow for a Business User",
+          "level": 2,
+          "line": 61
+        },
+        {
+          "heading": "1. Define the business outcome",
+          "level": 3,
+          "line": 63
+        },
+        {
+          "heading": "2. Organize large field sets",
+          "level": 3,
+          "line": 81
+        },
+        {
+          "heading": "3. Upload and parse the source document",
+          "level": 3,
+          "line": 96
+        },
+        {
+          "heading": "4. Review the parse before extraction",
+          "level": 3,
+          "line": 111
+        },
+        {
+          "heading": "5. Select or prepare the field schema",
+          "level": 3,
+          "line": 127
+        },
+        {
+          "heading": "6. Run extraction",
+          "level": 3,
+          "line": 133
+        },
+        {
+          "heading": "7. Review the results",
+          "level": 3,
+          "line": 143
+        },
+        {
+          "heading": "8. Export and use the result",
+          "level": 3,
+          "line": 156
+        },
+        {
+          "heading": "Workflow for a Technical User",
+          "level": 2,
+          "line": 162
+        },
+        {
+          "heading": "Stage 1: Source ingestion and visual parsing",
+          "level": 3,
+          "line": 164
+        },
+        {
+          "heading": "Stage 2: Optional bounded visual recovery",
+          "level": 3,
+          "line": 170
+        },
+        {
+          "heading": "Stage 3: Extraction context preparation",
+          "level": 3,
+          "line": 174
+        },
+        {
+          "heading": "Stage 4: Schema-constrained extraction",
+          "level": 3,
+          "line": 183
+        },
+        {
+          "heading": "Stage 5: Evidence validation and repair",
+          "level": 3,
+          "line": 189
+        },
+        {
+          "heading": "Stage 6: Grounding and serialization",
+          "level": 3,
+          "line": 202
+        },
+        {
+          "heading": "Representative Extraction Output",
+          "level": 2,
+          "line": 218
+        },
+        {
+          "heading": "Optional Markdown Field-Specification Feature",
+          "level": 2,
+          "line": 306
+        },
+        {
+          "heading": "Recommended user experience",
+          "level": 3,
+          "line": 308
+        },
+        {
+          "heading": "Suggested field-specification content",
+          "level": 3,
+          "line": 325
+        },
+        {
+          "heading": "Recommended first version",
+          "level": 3,
+          "line": 360
+        },
+        {
+          "heading": "Extension for 100+ fields",
+          "level": 3,
+          "line": 373
+        },
+        {
+          "heading": "Safety and Governance Requirements",
+          "level": 2,
+          "line": 386
+        },
+        {
+          "heading": "General Applicability",
+          "level": 2,
+          "line": 406
+        },
+        {
+          "heading": "Recommended Decision",
+          "level": 2,
+          "line": 423
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 30
+      }
+    },
+    {
+      "path": "docs/local-glmocr.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 46,
+      "nonEmptyLines": 31,
+      "sections": [
+        {
+          "heading": "Local GLM-OCR runtime",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "docs/local-paddleocr-vl.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 102,
+      "nonEmptyLines": 69,
+      "sections": [
+        {
+          "heading": "Local PaddleOCR-VL-1.6 runtime",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Recommended Windows installation",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Manual WSL installation",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "Runtime architecture",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Health checks",
+          "level": 2,
+          "line": 59
+        },
+        {
+          "heading": "Configuration",
+          "level": 2,
+          "line": 77
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 90
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "docs/private-evaluation.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 105,
+      "nonEmptyLines": 86,
+      "sections": [
+        {
+          "heading": "Private confidence calibration and regression evaluation",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Keep two external sets",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Calibrate the review threshold",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "Gate the locked holdout set",
+          "level": 2,
+          "line": 75
+        },
+        {
+          "heading": "Privacy boundary",
+          "level": 2,
+          "line": 99
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "docs/research.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 19,
+      "nonEmptyLines": 13,
+      "sections": [
+        {
+          "heading": "Design basis",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "docs/run.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 93,
+      "nonEmptyLines": 64,
+      "sections": [
+        {
+          "heading": "Run locally",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Recommended Windows launcher",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Manual commands",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "Use the studio",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Stop and restart",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 81
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "docs/spec.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 67,
+      "nonEmptyLines": 54,
+      "sections": [
+        {
+          "heading": "Product specification",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Goal",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "Inputs",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "Required behavior",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Public interfaces",
+          "level": 2,
+          "line": 42
+        },
+        {
+          "heading": "Non-goals",
+          "level": 2,
+          "line": 58
+        },
+        {
+          "heading": "Done when",
+          "level": 2,
+          "line": 62
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "docs/tutorial.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 21,
+      "nonEmptyLines": 19,
+      "sections": [
+        {
+          "heading": "Tutorial",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "docs/zero-to-hero-tutorial.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 1322,
+      "nonEmptyLines": 963,
+      "sections": [
+        {
+          "heading": "Grounded DocParse: Zero-to-Hero Tutorial",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "1. Choose your path through this tutorial",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "2. What problem does this project solve?",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "2.1 Core outputs",
+          "level": 3,
+          "line": 43
+        },
+        {
+          "heading": "3. Essential concepts and vocabulary",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "3.1 Rasterization",
+          "level": 3,
+          "line": 61
+        },
+        {
+          "heading": "3.2 Layout analysis and OCR",
+          "level": 3,
+          "line": 67
+        },
+        {
+          "heading": "3.3 Grounding",
+          "level": 3,
+          "line": 80
+        },
+        {
+          "heading": "3.4 Recovery versus refinement versus extraction",
+          "level": 3,
+          "line": 98
+        },
+        {
+          "heading": "3.5 Document classification versus custom form routing",
+          "level": 3,
+          "line": 110
+        },
+        {
+          "heading": "3.6 Evidence confidence",
+          "level": 3,
+          "line": 119
+        },
+        {
+          "heading": "4. Architecture at a glance",
+          "level": 2,
+          "line": 130
+        },
+        {
+          "heading": "5. Install the supported local environment",
+          "level": 2,
+          "line": 152
+        },
+        {
+          "heading": "5.1 Prerequisites",
+          "level": 3,
+          "line": 154
+        },
+        {
+          "heading": "5.2 Clone and verify WSL/GPU access",
+          "level": 3,
+          "line": 169
+        },
+        {
+          "heading": "5.3 Decide whether optional Luna features are allowed",
+          "level": 3,
+          "line": 185
+        },
+        {
+          "heading": "5.4 Run first-time setup",
+          "level": 3,
+          "line": 204
+        },
+        {
+          "heading": "5.5 Manual WSL launch",
+          "level": 3,
+          "line": 231
+        },
+        {
+          "heading": "6. Your first successful parse",
+          "level": 2,
+          "line": 254
+        },
+        {
+          "heading": "6.1 ADE modes",
+          "level": 3,
+          "line": 265
+        },
+        {
+          "heading": "6.2 What happens after selecting Parse document?",
+          "level": 3,
+          "line": 279
+        },
+        {
+          "heading": "6.3 Recovery invariants",
+          "level": 3,
+          "line": 306
+        },
+        {
+          "heading": "7. Learn the Streamlit studio",
+          "level": 2,
+          "line": 322
+        },
+        {
+          "heading": "7.1 Overview",
+          "level": 3,
+          "line": 326
+        },
+        {
+          "heading": "7.2 Markdown",
+          "level": 3,
+          "line": 330
+        },
+        {
+          "heading": "7.3 Annotated PDF",
+          "level": 3,
+          "line": 341
+        },
+        {
+          "heading": "7.4 Extract",
+          "level": 3,
+          "line": 345
+        },
+        {
+          "heading": "7.5 Chat",
+          "level": 3,
+          "line": 354
+        },
+        {
+          "heading": "7.6 Layout Tree",
+          "level": 3,
+          "line": 358
+        },
+        {
+          "heading": "8. Define an extraction schema",
+          "level": 2,
+          "line": 362
+        },
+        {
+          "heading": "8.1 Good field design",
+          "level": 3,
+          "line": 366
+        },
+        {
+          "heading": "8.2 Build fields in the UI",
+          "level": 3,
+          "line": 390
+        },
+        {
+          "heading": "8.3 Import an extraction schema from Markdown",
+          "level": 3,
+          "line": 404
+        },
+        {
+          "heading": "8.4 Import an extraction schema from CSV or XLSX",
+          "level": 3,
+          "line": 442
+        },
+        {
+          "heading": "8.5 Import or export JSON",
+          "level": 3,
+          "line": 455
+        },
+        {
+          "heading": "8.6 What the UI compiles",
+          "level": 3,
+          "line": 475
+        },
+        {
+          "heading": "9. Run and review whole-document extraction",
+          "level": 2,
+          "line": 497
+        },
+        {
+          "heading": "10. Understand extraction validation",
+          "level": 2,
+          "line": 520
+        },
+        {
+          "heading": "11. Mixed medical faxes: extract only new authorizations",
+          "level": 2,
+          "line": 538
+        },
+        {
+          "heading": "11.1 Save the extraction schema first",
+          "level": 3,
+          "line": 559
+        },
+        {
+          "heading": "11.2 Create a routing profile in the UI",
+          "level": 3,
+          "line": 563
+        },
+        {
+          "heading": "11.3 Import a routing profile from Markdown",
+          "level": 3,
+          "line": 587
+        },
+        {
+          "heading": "11.4 Classify and segment the packet",
+          "level": 3,
+          "line": 623
+        },
+        {
+          "heading": "11.5 Review before extraction",
+          "level": 3,
+          "line": 639
+        },
+        {
+          "heading": "11.6 Extract only eligible forms",
+          "level": 3,
+          "line": 660
+        },
+        {
+          "heading": "12. Persistence, downloads, and session behavior",
+          "level": 2,
+          "line": 675
+        },
+        {
+          "heading": "12.1 What persists",
+          "level": 3,
+          "line": 677
+        },
+        {
+          "heading": "12.2 What does not persist",
+          "level": 3,
+          "line": 687
+        },
+        {
+          "heading": "13. Use the public Python API",
+          "level": 2,
+          "line": 700
+        },
+        {
+          "heading": "13.1 Parse a document",
+          "level": 3,
+          "line": 715
+        },
+        {
+          "heading": "13.2 Observe progress",
+          "level": 3,
+          "line": 740
+        },
+        {
+          "heading": "13.3 Reuse prepared context for optional features",
+          "level": 3,
+          "line": 762
+        },
+        {
+          "heading": "13.4 Route mixed forms in Python",
+          "level": 3,
+          "line": 807
+        },
+        {
+          "heading": "13.5 Direct extraction API",
+          "level": 3,
+          "line": 967
+        },
+        {
+          "heading": "14. Read the code from the outside in",
+          "level": 2,
+          "line": 988
+        },
+        {
+          "heading": "14.1 Main UI call path",
+          "level": 3,
+          "line": 1011
+        },
+        {
+          "heading": "14.2 Parse call path",
+          "level": 3,
+          "line": 1025
+        },
+        {
+          "heading": "14.3 Optional feature call path",
+          "level": 3,
+          "line": 1041
+        },
+        {
+          "heading": "15. Data contracts and invariants",
+          "level": 2,
+          "line": 1051
+        },
+        {
+          "heading": "15.1 Canonical hierarchy",
+          "level": 3,
+          "line": 1053
+        },
+        {
+          "heading": "15.2 ParseResult",
+          "level": 3,
+          "line": 1067
+        },
+        {
+          "heading": "15.3 Routing contracts",
+          "level": 3,
+          "line": 1084
+        },
+        {
+          "heading": "15.4 Schema restrictions",
+          "level": 3,
+          "line": 1100
+        },
+        {
+          "heading": "16. Configuration and performance controls",
+          "level": 2,
+          "line": 1112
+        },
+        {
+          "heading": "17. Security and privacy model",
+          "level": 2,
+          "line": 1139
+        },
+        {
+          "heading": "17.1 Treat every document as untrusted",
+          "level": 3,
+          "line": 1143
+        },
+        {
+          "heading": "17.2 Understand feature egress",
+          "level": 3,
+          "line": 1147
+        },
+        {
+          "heading": "17.3 Keep local services local",
+          "level": 3,
+          "line": 1161
+        },
+        {
+          "heading": "17.4 Know the residual data",
+          "level": 3,
+          "line": 1165
+        },
+        {
+          "heading": "18. Test and contribute safely",
+          "level": 2,
+          "line": 1179
+        },
+        {
+          "heading": "18.1 Install the locked development environment",
+          "level": 3,
+          "line": 1181
+        },
+        {
+          "heading": "18.2 Run the standard checks",
+          "level": 3,
+          "line": 1191
+        },
+        {
+          "heading": "18.3 Optional live evaluation",
+          "level": 3,
+          "line": 1216
+        },
+        {
+          "heading": "19. Current limitations and production path",
+          "level": 2,
+          "line": 1230
+        },
+        {
+          "heading": "20. Troubleshooting guide",
+          "level": 2,
+          "line": 1264
+        },
+        {
+          "heading": "21. A practical learning sequence",
+          "level": 2,
+          "line": 1283
+        },
+        {
+          "heading": "22. Completion checklist",
+          "level": 2,
+          "line": 1298
+        },
+        {
+          "heading": "Further reading",
+          "level": 2,
+          "line": 1313
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 78
+      }
+    }
+  ]
+}

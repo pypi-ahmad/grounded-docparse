@@ -1,0 +1,236 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_uses_supported_retry_and_image_limits",
+      "type": "function",
+      "name": "test_glmocr_config_uses_supported_retry_and_image_limits",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        98,
+        107
+      ],
+      "summary": "Defines test_glmocr_config_uses_supported_retry_and_image_limits, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_runtime_config_uses_pinned_layout_path_and_worker_override",
+      "type": "function",
+      "name": "test_runtime_config_uses_pinned_layout_path_and_worker_override",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        123,
+        130
+      ],
+      "summary": "Defines test_runtime_config_uses_pinned_layout_path_and_worker_override, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_has_complete_official_task_contract",
+      "type": "function",
+      "name": "test_glmocr_config_has_complete_official_task_contract",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        66,
+        84
+      ],
+      "summary": "Defines test_glmocr_config_has_complete_official_task_contract, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_glmocr_runtime_config.py",
+      "type": "file",
+      "name": "test_glmocr_runtime_config.py",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "summary": "Test module 'test_glmocr_runtime_config.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_ollama_runtime_uses_cpu_layout_and_bf16_model",
+      "type": "function",
+      "name": "test_ollama_runtime_uses_cpu_layout_and_bf16_model",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        133,
+        150
+      ],
+      "summary": "Defines test_ollama_runtime_uses_cpu_layout_and_bf16_model, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_form_recovery_config_is_isolated_and_higher_resolution",
+      "type": "function",
+      "name": "test_form_recovery_config_is_isolated_and_higher_resolution",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        110,
+        120
+      ],
+      "summary": "Defines test_form_recovery_config_is_isolated_and_higher_resolution, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:pipeline_config",
+      "type": "function",
+      "name": "pipeline_config",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        62,
+        63
+      ],
+      "summary": "Defines pipeline_config, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_preserves_document_boilerplate_as_text",
+      "type": "function",
+      "name": "test_glmocr_config_preserves_document_boilerplate_as_text",
+      "filePath": "tests/test_glmocr_runtime_config.py",
+      "lineRange": [
+        87,
+        95
+      ],
+      "summary": "Defines test_glmocr_config_preserves_document_boilerplate_as_text, a  routine in test_glmocr_runtime_config.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_uses_supported_retry_and_image_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_has_complete_official_task_contract",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_runtime_config_uses_pinned_layout_path_and_worker_override",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_runtime_config_uses_pinned_layout_path_and_worker_override",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_ollama_runtime_uses_cpu_layout_and_bf16_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_uses_supported_retry_and_image_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:pipeline_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_has_complete_official_task_contract",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:pipeline_config",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_preserves_document_boilerplate_as_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_form_recovery_config_is_isolated_and_higher_resolution",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_ollama_runtime_uses_cpu_layout_and_bf16_model",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_glmocr_config_preserves_document_boilerplate_as_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_glmocr_runtime_config.py",
+      "target": "function:tests/test_glmocr_runtime_config.py:test_form_recovery_config_is_isolated_and_higher_resolution",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

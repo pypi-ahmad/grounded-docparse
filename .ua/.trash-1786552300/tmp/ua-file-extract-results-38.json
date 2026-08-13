@@ -1,0 +1,712 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 18,
+  "filesSkipped": [
+    ".code-review-graph/graph.db",
+    ".code-review-graph/graph.db-shm",
+    ".code-review-graph/graph.db-wal",
+    ".codegraph/codegraph.db",
+    ".codegraph/codegraph.db-shm",
+    ".codegraph/codegraph.db-wal",
+    ".gitattributes"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 18,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 15,
+      "failed": 0,
+      "skipped": 3
+    }
+  },
+  "results": [
+    {
+      "path": ".github/ISSUE_TEMPLATE/bug_report.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 41,
+      "nonEmptyLines": 28,
+      "sections": [
+        {
+          "heading": "Summary",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Reproduction",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Expected behavior",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "heading": "Actual behavior",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "heading": "Runtime",
+          "level": 2,
+          "line": 24
+        },
+        {
+          "heading": "Sanitized diagnostics",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "heading": "Security reports",
+          "level": 2,
+          "line": 39
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/feature_request.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 30,
+      "nonEmptyLines": 19,
+      "sections": [
+        {
+          "heading": "Problem",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Proposed outcome",
+          "level": 2,
+          "line": 12
+        },
+        {
+          "heading": "Evidence and audit requirements",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "Interface and compatibility",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Security, retention, and cost impact",
+          "level": 2,
+          "line": 24
+        },
+        {
+          "heading": "Alternatives considered",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Acceptance criteria",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "Additional context",
+          "level": 2,
+          "line": 30
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": ".streamlit/config.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 23,
+      "nonEmptyLines": 21,
+      "sections": [
+        {
+          "heading": "server",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "theme",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "theme.sidebar",
+          "level": 2,
+          "line": 20
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 3
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-arch-analyze.js",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 26,
+      "callGraph": [
+        {
+          "caller": "group",
+          "callee": "n.filePath.split",
+          "lineNumber": 9
+        },
+        {
+          "caller": "group",
+          "callee": "p.slice",
+          "lineNumber": 9
+        },
+        {
+          "caller": "has",
+          "callee": "paths.some",
+          "lineNumber": 20
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-assemble-final.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 54,
+      "nonEmptyLines": 50,
+      "functions": [
+        {
+          "name": "kebab",
+          "startLine": 11,
+          "endLine": 11,
+          "params": []
+        },
+        {
+          "name": "ref",
+          "startLine": 12,
+          "endLine": 12,
+          "params": []
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "kebab",
+          "callee": "String(value || 'unnamed').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace",
+          "lineNumber": 11
+        },
+        {
+          "caller": "kebab",
+          "callee": "String(value || 'unnamed').toLowerCase().replace",
+          "lineNumber": 11
+        },
+        {
+          "caller": "kebab",
+          "callee": "String(value || 'unnamed').toLowerCase",
+          "lineNumber": 11
+        },
+        {
+          "caller": "kebab",
+          "callee": "String",
+          "lineNumber": 11
+        },
+        {
+          "caller": "ref",
+          "callee": "prefixes.test",
+          "lineNumber": 12
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-finalize.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 8,
+      "nonEmptyLines": 8,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-fingerprint-input.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 7,
+      "nonEmptyLines": 7,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-inline-validate.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 39,
+      "nonEmptyLines": 39,
+      "callGraph": [
+        {
+          "caller": "count",
+          "callee": "items.reduce",
+          "lineNumber": 36
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-analyze.js",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 26,
+      "nonEmptyLines": 26,
+      "callGraph": [
+        {
+          "caller": "rank",
+          "callee": "[...nodes].sort((a,b) => map.get(b.id)-map.get(a.id) || a.id.localeCompare(b.id)).slice(0,20).map",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "[...nodes].sort((a,b) => map.get(b.id)-map.get(a.id) || a.id.localeCompare(b.id)).slice",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "[...nodes].sort",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "map.get",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "map.get",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "a.id.localeCompare",
+          "lineNumber": 16
+        },
+        {
+          "caller": "rank",
+          "callee": "map.get",
+          "lineNumber": 16
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/assemble-final.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 31,
+      "nonEmptyLines": 28,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/build-batch-fragments.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 55,
+      "nonEmptyLines": 54,
+      "functions": [
+        {
+          "name": "complexity",
+          "startLine": 18,
+          "endLine": 18,
+          "params": [
+            "lines"
+          ]
+        },
+        {
+          "name": "functionSummary",
+          "startLine": 19,
+          "endLine": 19,
+          "params": [
+            "name",
+            "file"
+          ]
+        },
+        {
+          "name": "classSummary",
+          "startLine": 20,
+          "endLine": 20,
+          "params": [
+            "name",
+            "file"
+          ]
+        },
+        {
+          "name": "build",
+          "startLine": 21,
+          "endLine": 54,
+          "params": [
+            "index"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "build",
+          "callee": "JSON.parse",
+          "lineNumber": 22
+        },
+        {
+          "caller": "build",
+          "callee": "fs.readFileSync",
+          "lineNumber": 22
+        },
+        {
+          "caller": "build",
+          "callee": "path.join",
+          "lineNumber": 22
+        },
+        {
+          "caller": "build",
+          "callee": "JSON.parse",
+          "lineNumber": 23
+        },
+        {
+          "caller": "build",
+          "callee": "fs.readFileSync",
+          "lineNumber": 23
+        },
+        {
+          "caller": "build",
+          "callee": "path.join",
+          "lineNumber": 23
+        },
+        {
+          "caller": "build",
+          "callee": "path.posix.basename",
+          "lineNumber": 26
+        },
+        {
+          "caller": "build",
+          "callee": "nodes.push",
+          "lineNumber": 27
+        },
+        {
+          "caller": "build",
+          "callee": "complexity",
+          "lineNumber": 27
+        },
+        {
+          "caller": "build",
+          "callee": "(result.exports || []).map",
+          "lineNumber": 28
+        },
+        {
+          "caller": "build",
+          "callee": "exported.has",
+          "lineNumber": 31
+        },
+        {
+          "caller": "build",
+          "callee": "nodes.push",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build",
+          "callee": "functionSummary",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build",
+          "callee": "complexity",
+          "lineNumber": 33
+        },
+        {
+          "caller": "build",
+          "callee": "edges.push",
+          "lineNumber": 34
+        },
+        {
+          "caller": "build",
+          "callee": "exported.has",
+          "lineNumber": 35
+        },
+        {
+          "caller": "build",
+          "callee": "edges.push",
+          "lineNumber": 35
+        },
+        {
+          "caller": "build",
+          "callee": "exported.has",
+          "lineNumber": 39
+        },
+        {
+          "caller": "build",
+          "callee": "nodes.push",
+          "lineNumber": 41
+        },
+        {
+          "caller": "build",
+          "callee": "classSummary",
+          "lineNumber": 41
+        },
+        {
+          "caller": "build",
+          "callee": "complexity",
+          "lineNumber": 41
+        },
+        {
+          "caller": "build",
+          "callee": "edges.push",
+          "lineNumber": 42
+        },
+        {
+          "caller": "build",
+          "callee": "exported.has",
+          "lineNumber": 43
+        },
+        {
+          "caller": "build",
+          "callee": "edges.push",
+          "lineNumber": 43
+        },
+        {
+          "caller": "build",
+          "callee": "edges.push",
+          "lineNumber": 46
+        },
+        {
+          "caller": "build",
+          "callee": "path.join",
+          "lineNumber": 50
+        },
+        {
+          "caller": "build",
+          "callee": "fs.writeFileSync",
+          "lineNumber": 51
+        },
+        {
+          "caller": "build",
+          "callee": "JSON.stringify",
+          "lineNumber": 51
+        },
+        {
+          "caller": "build",
+          "callee": "JSON.parse",
+          "lineNumber": 52
+        },
+        {
+          "caller": "build",
+          "callee": "fs.readFileSync",
+          "lineNumber": 52
+        },
+        {
+          "caller": "build",
+          "callee": "console.log",
+          "lineNumber": 53
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 4,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/prepare-save.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 19,
+      "nonEmptyLines": 17,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/prune-existing.mjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 31,
+      "nonEmptyLines": 27,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-analyze.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 18,
+      "nonEmptyLines": 18,
+      "functions": [
+        {
+          "name": "group",
+          "startLine": 11,
+          "endLine": 11,
+          "params": []
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "group",
+          "callee": "(n.filePath||'').split",
+          "lineNumber": 11
+        },
+        {
+          "caller": "group",
+          "callee": "parts.slice",
+          "lineNumber": 11
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-arch-prepare.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 8,
+      "nonEmptyLines": 8,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-inline-validate.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 63,
+      "nonEmptyLines": 63,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-normalize-layers.cjs",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 18,
+      "nonEmptyLines": 18,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": ".ua/.trash-1786520109/tmp/ua-tour-analyze.js",
+      "language": "javascript",
+      "fileCategory": "code",
+      "totalLines": 19,
+      "nonEmptyLines": 19,
+      "functions": [
+        {
+          "name": "rank",
+          "startLine": 12,
+          "endLine": 12,
+          "params": [
+            "m",
+            "key"
+          ]
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "rank",
+          "callee": "[...m].map(([id, value]) => ({id, [key]:value, name:byId.get(id).name})).sort((a,b)=>b[key]-a[key] || a.id.localeCompare(b.id)).slice",
+          "lineNumber": 12
+        },
+        {
+          "caller": "rank",
+          "callee": "[...m].map(([id, value]) => ({id, [key]:value, name:byId.get(id).name})).sort",
+          "lineNumber": 12
+        },
+        {
+          "caller": "rank",
+          "callee": "[...m].map",
+          "lineNumber": 12
+        },
+        {
+          "caller": "rank",
+          "callee": "byId.get",
+          "lineNumber": 12
+        },
+        {
+          "caller": "rank",
+          "callee": "a.id.localeCompare",
+          "lineNumber": 12
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 1,
+        "classCount": 0
+      }
+    }
+  ]
+}

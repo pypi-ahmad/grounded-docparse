@@ -1,0 +1,949 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "function",
+      "name": "test_visual_crop_batch_failure_is_isolated",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2381,
+        2401
+      ],
+      "summary": "Defines test_visual_crop_batch_failure_is_isolated, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "function",
+      "name": "test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        774,
+        816
+      ],
+      "summary": "Defines test_visual_recovery_plan_prioritizes_failures_across_pages, a monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "function",
+      "name": "test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        258,
+        280
+      ],
+      "summary": "Defines test_merge_confirmed_form_states_changes_only_confirmed_option_cells, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "function",
+      "name": "test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1363,
+        1374
+      ],
+      "summary": "Defines test_semantic_rejection_remains_reviewable_after_one_quality_round, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "function",
+      "name": "test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1329,
+        1340
+      ],
+      "summary": "Defines test_quality_repair_processes_all_candidates_in_batches_of_eight, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "function",
+      "name": "test_unexpected_crop_decision_rejects_the_visual_batch",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2297,
+        2316
+      ],
+      "summary": "Defines test_unexpected_crop_decision_rejects_the_visual_batch, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "function",
+      "name": "test_planner_approved_nonvisual_box_is_dispatched",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        199,
+        239
+      ],
+      "summary": "Defines test_planner_approved_nonvisual_box_is_dispatched, a tmp_path routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "function",
+      "name": "test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        283,
+        367
+      ],
+      "summary": "Defines test_paddle_form_recovery_merges_only_two_scale_consensus, a tmp_path, monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "function",
+      "name": "test_mismatched_quality_crop_evidence_fails_closed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1314,
+        1327
+      ],
+      "summary": "Defines test_mismatched_quality_crop_evidence_fails_closed, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "function",
+      "name": "test_visual_recovery_crop_budget_scales_with_document_length",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        912,
+        917
+      ],
+      "summary": "Defines test_visual_recovery_crop_budget_scales_with_document_length, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "function",
+      "name": "test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        370,
+        452
+      ],
+      "summary": "Defines test_paddle_form_recovery_preserves_primary_when_scales_disagree, a tmp_path, monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "function",
+      "name": "test_visual_recovery_plan_enforces_document_and_page_limits",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        855,
+        909
+      ],
+      "summary": "Defines test_visual_recovery_plan_enforces_document_and_page_limits, a monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "function",
+      "name": "test_missing_correction_remains_unresolved",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1581,
+        1591
+      ],
+      "summary": "Defines test_missing_correction_remains_unresolved, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "function",
+      "name": "test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        819,
+        852
+      ],
+      "summary": "Defines test_visual_recovery_plan_prioritizes_unresolved_form_controls, a monkeypatch routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_simple_pipeline.py",
+      "type": "file",
+      "name": "test_simple_pipeline.py",
+      "filePath": "tests/test_simple_pipeline.py",
+      "summary": "Test module 'test_simple_pipeline.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "function",
+      "name": "test_verifier_error_preserves_draft_text_as_needs_review",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1848,
+        1857
+      ],
+      "summary": "Defines test_verifier_error_preserves_draft_text_as_needs_review, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "function",
+      "name": "test_rejected_form_remains_reviewable_after_one_quality_round",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1181,
+        1193
+      ],
+      "summary": "Defines test_rejected_form_remains_reviewable_after_one_quality_round, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "function",
+      "name": "test_parser_builds_verified_nested_document",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        96,
+        119
+      ],
+      "summary": "Defines test_parser_builds_verified_nested_document, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "function",
+      "name": "test_visual_recovery_does_not_synthesize_missing_regions",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        755,
+        771
+      ],
+      "summary": "Defines test_visual_recovery_does_not_synthesize_missing_regions, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "function",
+      "name": "test_luna_addition_cannot_supersede_glm_element",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2092,
+        2109
+      ],
+      "summary": "Defines test_luna_addition_cannot_supersede_glm_element, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "function",
+      "name": "test_risky_regions_are_inspected_directly",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1515,
+        1527
+      ],
+      "summary": "Defines test_risky_regions_are_inspected_directly, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "function",
+      "name": "test_provider_order_alias_cannot_reorder_glm_elements",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2142,
+        2158
+      ],
+      "summary": "Defines test_provider_order_alias_cannot_reorder_glm_elements, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "function",
+      "name": "test_luna_addition_is_ignored_even_when_duplicate",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2161,
+        2174
+      ],
+      "summary": "Defines test_luna_addition_is_ignored_even_when_duplicate, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "function",
+      "name": "test_only_low_confidence_regions_are_sent_to_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1733,
+        1745
+      ],
+      "summary": "Defines test_only_low_confidence_regions_are_sent_to_luna, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "function",
+      "name": "test_invalid_grounding_cannot_be_verified",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1544,
+        1556
+      ],
+      "summary": "Defines test_invalid_grounding_cannot_be_verified, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "function",
+      "name": "test_only_ambiguous_critical_literals_trigger_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1784,
+        1792
+      ],
+      "summary": "Defines test_only_ambiguous_critical_literals_trigger_luna, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "function",
+      "name": "test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        242,
+        255
+      ],
+      "summary": "Defines test_paddle_form_states_reads_standalone_marker_only_within_its_row, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "function",
+      "name": "test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2001,
+        2019
+      ],
+      "summary": "Defines test_page_inspection_cannot_add_content_or_reorder_glm_manifest, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "function",
+      "name": "test_malformed_quality_correction_preserves_reviewable_content",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1230,
+        1241
+      ],
+      "summary": "Defines test_malformed_quality_correction_preserves_reviewable_content, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "function",
+      "name": "test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2177,
+        2191
+      ],
+      "summary": "Defines test_luna_addition_is_ignored_for_multiple_glm_predecessors, a simple_pdf routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "function",
+      "name": "test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1478,
+        1488
+      ],
+      "summary": "Defines test_semantic_rejection_of_clipped_content_remains_suppressed, a  routine in test_simple_pipeline.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

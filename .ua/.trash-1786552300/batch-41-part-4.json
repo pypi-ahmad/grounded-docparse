@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "function",
+      "name": "test_paddle_runtime_posts_document_once_and_maps_pages",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        63,
+        127
+      ],
+      "summary": "Defines test_paddle_runtime_posts_document_once_and_maps_pages, a tmp_path, monkeypatch routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_paddle_ocr.py",
+      "type": "file",
+      "name": "test_paddle_ocr.py",
+      "filePath": "tests/test_paddle_ocr.py",
+      "summary": "Test module 'test_paddle_ocr.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "function",
+      "name": "test_paddle_runtime_fails_closed_on_service_error",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        185,
+        199
+      ],
+      "summary": "Defines test_paddle_runtime_fails_closed_on_service_error, a tmp_path, monkeypatch routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "function",
+      "name": "test_paddle_runtime_rejects_remote_document_destination",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        202,
+        204
+      ],
+      "summary": "Defines test_paddle_runtime_rejects_remote_document_destination, a  routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        14,
+        27
+      ],
+      "summary": "Defines _page, a tmp_path, number routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "function",
+      "name": "test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        130,
+        182
+      ],
+      "summary": "Defines test_paddle_runtime_recovery_posts_deterministic_image_without_preparing, a tmp_path, monkeypatch routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "function",
+      "name": "test_paddle_regions_normalize_ordered_official_blocks",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        30,
+        60
+      ],
+      "summary": "Defines test_paddle_regions_normalize_ordered_official_blocks, a  routine in test_paddle_ocr.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

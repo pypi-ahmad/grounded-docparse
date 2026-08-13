@@ -1,0 +1,91 @@
+{
+  "projectRoot": "D:/AI/Github/grounded-docparse",
+  "batchFiles": [
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-14.json",
+      "language": "json",
+      "sizeLines": 13465,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-2.json",
+      "language": "json",
+      "sizeLines": 5944,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-3.json",
+      "language": "json",
+      "sizeLines": 8564,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-4.json",
+      "language": "json",
+      "sizeLines": 793,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-6.json",
+      "language": "json",
+      "sizeLines": 221,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-7.json",
+      "language": "json",
+      "sizeLines": 37,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-file-extract-results-8.json",
+      "language": "json",
+      "sizeLines": 53,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-import-map-input.json",
+      "language": "json",
+      "sizeLines": 894,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-import-map-output.json",
+      "language": "json",
+      "sizeLines": 268,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-scan-files.json",
+      "language": "json",
+      "sizeLines": 1104,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-input.json",
+      "language": "json",
+      "sizeLines": 2180,
+      "fileCategory": "config"
+    },
+    {
+      "path": ".ua/.trash-1786452692/tmp/ua-tour-results.json",
+      "language": "json",
+      "sizeLines": 1049,
+      "fileCategory": "config"
+    }
+  ],
+  "batchImportData": {
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-14.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-2.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-3.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-4.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-6.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-7.json": [],
+    ".ua/.trash-1786452692/tmp/ua-file-extract-results-8.json": [],
+    ".ua/.trash-1786452692/tmp/ua-import-map-input.json": [],
+    ".ua/.trash-1786452692/tmp/ua-import-map-output.json": [],
+    ".ua/.trash-1786452692/tmp/ua-scan-files.json": [],
+    ".ua/.trash-1786452692/tmp/ua-tour-input.json": [],
+    ".ua/.trash-1786452692/tmp/ua-tour-results.json": []
+  }
+}

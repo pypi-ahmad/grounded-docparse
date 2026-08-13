@@ -1,0 +1,57 @@
+{
+  "nodes": [
+    {
+      "id": "config:benchmarks/schemas/annotation-v1.1.schema.json",
+      "type": "config",
+      "name": "annotation-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/annotation-v1.1.schema.json",
+      "summary": "Structured JSON configuration artifact for annotation v1.1.schema, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.1.schema.json",
+      "summary": "Structured JSON configuration artifact for manifest v1.1.schema, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/manifest-v1.schema.json",
+      "type": "config",
+      "name": "manifest-v1.schema.json",
+      "filePath": "benchmarks/schemas/manifest-v1.schema.json",
+      "summary": "Structured JSON configuration artifact for manifest v1.schema, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:benchmarks/schemas/regression-policy-v1.schema.json",
+      "type": "config",
+      "name": "regression-policy-v1.schema.json",
+      "filePath": "benchmarks/schemas/regression-policy-v1.schema.json",
+      "summary": "Structured JSON configuration artifact for regression policy v1.schema, used by the repository's documentation, evaluation, or knowledge-graph tooling.",
+      "tags": [
+        "configuration",
+        "json",
+        "project-data"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

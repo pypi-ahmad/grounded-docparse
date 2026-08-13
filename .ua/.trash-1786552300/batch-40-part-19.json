@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_evaluation_cli.py",
+      "type": "file",
+      "name": "test_evaluation_cli.py",
+      "filePath": "tests/test_evaluation_cli.py",
+      "summary": "Test module 'test_evaluation_cli.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_evaluation_cli.py:test_main_writes_failed_regression_gate_before_nonzero_exit",
+      "type": "function",
+      "name": "test_main_writes_failed_regression_gate_before_nonzero_exit",
+      "filePath": "tests/test_evaluation_cli.py",
+      "lineRange": [
+        109,
+        160
+      ],
+      "summary": "Defines test_main_writes_failed_regression_gate_before_nonzero_exit, a monkeypatch, tmp_path routine in test_evaluation_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_evaluation_cli.py:test_live_report_classifies_only_labeled_document",
+      "type": "function",
+      "name": "test_live_report_classifies_only_labeled_document",
+      "filePath": "tests/test_evaluation_cli.py",
+      "lineRange": [
+        26,
+        106
+      ],
+      "summary": "Defines test_live_report_classifies_only_labeled_document, a monkeypatch, tmp_path routine in test_evaluation_cli.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_evaluation_cli.py",
+      "target": "function:tests/test_evaluation_cli.py:test_live_report_classifies_only_labeled_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_cli.py",
+      "target": "function:tests/test_evaluation_cli.py:test_live_report_classifies_only_labeled_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_evaluation_cli.py",
+      "target": "function:tests/test_evaluation_cli.py:test_main_writes_failed_regression_gate_before_nonzero_exit",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_evaluation_cli.py",
+      "target": "function:tests/test_evaluation_cli.py:test_main_writes_failed_regression_gate_before_nonzero_exit",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

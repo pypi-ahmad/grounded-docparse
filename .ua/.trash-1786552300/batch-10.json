@@ -1,0 +1,239 @@
+{
+  "nodes": [
+    {
+      "id": "config:.ua/.trash-1786520109/assemble-review.json",
+      "type": "config",
+      "name": "assemble-review.json",
+      "filePath": ".ua/.trash-1786520109/assemble-review.json",
+      "summary": "Configuration stored in assemble-review.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/assembled-graph.json",
+      "type": "config",
+      "name": "assembled-graph.json",
+      "filePath": ".ua/.trash-1786520109/assembled-graph.json",
+      "summary": "Configuration stored in assembled-graph.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-1.json",
+      "type": "config",
+      "name": "batch-1.json",
+      "filePath": ".ua/.trash-1786520109/batch-1.json",
+      "summary": "Configuration stored in batch-1.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-10.json",
+      "type": "config",
+      "name": "batch-10.json",
+      "filePath": ".ua/.trash-1786520109/batch-10.json",
+      "summary": "Configuration stored in batch-10.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-12.json",
+      "type": "config",
+      "name": "batch-12.json",
+      "filePath": ".ua/.trash-1786520109/batch-12.json",
+      "summary": "Configuration stored in batch-12.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-13.json",
+      "type": "config",
+      "name": "batch-13.json",
+      "filePath": ".ua/.trash-1786520109/batch-13.json",
+      "summary": "Configuration stored in batch-13.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-14.json",
+      "type": "config",
+      "name": "batch-14.json",
+      "filePath": ".ua/.trash-1786520109/batch-14.json",
+      "summary": "Configuration stored in batch-14.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-2.json",
+      "type": "config",
+      "name": "batch-2.json",
+      "filePath": ".ua/.trash-1786520109/batch-2.json",
+      "summary": "Configuration stored in batch-2.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-3.json",
+      "type": "config",
+      "name": "batch-3.json",
+      "filePath": ".ua/.trash-1786520109/batch-3.json",
+      "summary": "Configuration stored in batch-3.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-4.json",
+      "type": "config",
+      "name": "batch-4.json",
+      "filePath": ".ua/.trash-1786520109/batch-4.json",
+      "summary": "Configuration stored in batch-4.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-6.json",
+      "type": "config",
+      "name": "batch-6.json",
+      "filePath": ".ua/.trash-1786520109/batch-6.json",
+      "summary": "Configuration stored in batch-6.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-9.json",
+      "type": "config",
+      "name": "batch-9.json",
+      "filePath": ".ua/.trash-1786520109/batch-9.json",
+      "summary": "Configuration stored in batch-9.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batch-existing.json",
+      "type": "config",
+      "name": "batch-existing.json",
+      "filePath": ".ua/.trash-1786520109/batch-existing.json",
+      "summary": "Configuration stored in batch-existing.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/batches.json",
+      "type": "config",
+      "name": "batches.json",
+      "filePath": ".ua/.trash-1786520109/batches.json",
+      "summary": "Configuration stored in batches.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/fingerprint-input.json",
+      "type": "config",
+      "name": "fingerprint-input.json",
+      "filePath": ".ua/.trash-1786520109/fingerprint-input.json",
+      "summary": "Configuration stored in fingerprint-input.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/layers.json",
+      "type": "config",
+      "name": "layers.json",
+      "filePath": ".ua/.trash-1786520109/layers.json",
+      "summary": "Configuration stored in layers.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/review.json",
+      "type": "config",
+      "name": "review.json",
+      "filePath": ".ua/.trash-1786520109/review.json",
+      "summary": "Configuration stored in review.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:.ua/.trash-1786520109/tour.json",
+      "type": "config",
+      "name": "tour.json",
+      "filePath": ".ua/.trash-1786520109/tour.json",
+      "summary": "Configuration stored in tour.json.",
+      "tags": [
+        "configuration",
+        "project-settings",
+        "build-system"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

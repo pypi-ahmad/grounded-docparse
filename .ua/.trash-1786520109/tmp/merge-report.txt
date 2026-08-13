@@ -1,0 +1,21 @@
+Found 11 batch files (11 logical batches, 0 multi-part):
+  batch-existing.json: 379 nodes, 520 edges
+  batch-1.json: 218 nodes, 436 edges
+  batch-2.json: 5 nodes, 8 edges
+  batch-3.json: 64 nodes, 137 edges
+  batch-4.json: 5 nodes, 0 edges
+  batch-6.json: 2 nodes, 0 edges
+  batch-9.json: 10 nodes, 0 edges
+  batch-10.json: 8 nodes, 0 edges
+  batch-12.json: 9 nodes, 2 edges
+  batch-13.json: 16 nodes, 5 edges
+  batch-14.json: 12 nodes, 4 edges
+
+Input: 728 nodes, 1112 edges
+
+Output: 728 nodes, 1112 edges
+
+Imports edge recovery:
+  Recovered 20 `imports` edges from importMap (178 entries scanned)
+
+Written to D:\AI\Github\grounded-docparse\.ua\intermediate\assembled-graph.json (611 KB)

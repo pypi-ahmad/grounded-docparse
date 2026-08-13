@@ -1,0 +1,546 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_provider_runtime.py",
+      "type": "file",
+      "name": "test_provider_runtime.py",
+      "filePath": "tests/test_provider_runtime.py",
+      "summary": "Test module 'test_provider_runtime.py' that verifies grounded-docparse behavior and regression contracts.",
+      "tags": [
+        "test",
+        "regression",
+        "verification"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "function",
+      "name": "test_runtime_honors_retry_after_and_capped_full_jitter",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        143,
+        164
+      ],
+      "summary": "Defines test_runtime_honors_retry_after_and_capped_full_jitter, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "function",
+      "name": "test_runtime_does_not_retry_nonretryable_http_statuses",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        127,
+        140
+      ],
+      "summary": "Defines test_runtime_does_not_retry_nonretryable_http_statuses, a status routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "function",
+      "name": "test_runtime_honors_http_date_retry_after",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        167,
+        186
+      ],
+      "summary": "Defines test_runtime_honors_http_date_retry_after, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "function",
+      "name": "test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        76,
+        89
+      ],
+      "summary": "Defines test_runtime_retries_connection_errors_and_stops_at_attempt_bound, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "class",
+      "name": "FakeTime",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        25,
+        35
+      ],
+      "summary": "Defines the FakeTime class in test_provider_runtime.py.",
+      "tags": [
+        "class",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "function",
+      "name": "test_parser_binds_one_runtime_without_changing_factory_signature",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        333,
+        395
+      ],
+      "summary": "Defines test_parser_binds_one_runtime_without_changing_factory_signature, a monkeypatch, tmp_path routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "function",
+      "name": "test_runtime_shares_provider_admission_across_callers",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        189,
+        218
+      ],
+      "summary": "Defines test_runtime_shares_provider_admission_across_callers, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "function",
+      "name": "test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        259,
+        286
+      ],
+      "summary": "Defines test_runtime_releases_permit_after_base_exception_and_callback_failure, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "function",
+      "name": "_runtime",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        45,
+        55
+      ],
+      "summary": "Defines _runtime, a config, fake_time routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "function",
+      "name": "test_default_gateway_disables_sdk_retries",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        289,
+        301
+      ],
+      "summary": "Defines test_default_gateway_disables_sdk_retries, a monkeypatch routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "function",
+      "name": "_status_error",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        38,
+        42
+      ],
+      "summary": "Defines _status_error, a status, retry_after routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "function",
+      "name": "test_runtime_config_defaults_environment_and_validation",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        398,
+        426
+      ],
+      "summary": "Defines test_runtime_config_defaults_environment_and_validation, a monkeypatch routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "function",
+      "name": "test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        221,
+        256
+      ],
+      "summary": "Defines test_429_halves_concurrency_then_success_window_recovers_one_slot, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "function",
+      "name": "test_runtime_releases_permit_after_provider_timeout",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        92,
+        106
+      ],
+      "summary": "Defines test_runtime_releases_permit_after_provider_timeout, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "function",
+      "name": "_stub_document",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        304,
+        330
+      ],
+      "summary": "Defines _stub_document, a monkeypatch, tmp_path, page_count routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "function",
+      "name": "test_runtime_retries_only_retryable_http_statuses",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        59,
+        73
+      ],
+      "summary": "Defines test_runtime_retries_only_retryable_http_statuses, a status routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "function",
+      "name": "test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        109,
+        124
+      ],
+      "summary": "Defines test_runtime_counts_logical_calls_separately_from_retry_attempts, a  routine in test_provider_runtime.py.",
+      "tags": [
+        "function",
+        "implementation",
+        "project-logic"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}
