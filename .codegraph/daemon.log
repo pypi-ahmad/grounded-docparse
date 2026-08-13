@@ -1038,3 +1038,13 @@
 [CodeGraph MCP] Auto-synced 1 file(s) in 32ms
 [CodeGraph MCP] Auto-synced 1 file(s) in 30ms
 [CodeGraph MCP] Auto-synced 6 file(s) in 1493ms
+[CodeGraph MCP] Auto-synced 1 file(s) in 160ms
+[CodeGraph daemon] Listening on \\.\pipe\codegraph-11ef70d200b051e3 (pid 21100, v1.5.0). Idle timeout 300000ms.
+[CodeGraph MCP] File watcher active — graph will auto-sync on changes
+[CodeGraph MCP] Query pool: up to 15 worker thread(s) for concurrent reads.
+[CodeGraph daemon] Listening on \\.\pipe\codegraph-11ef70d200b051e3 (pid 25476, v1.5.0). Idle timeout 300000ms.
+[CodeGraph MCP] File watcher active — graph will auto-sync on changes
+[CodeGraph MCP] Query pool: up to 15 worker thread(s) for concurrent reads.
+[CodeGraph daemon] Listening on \\.\pipe\codegraph-11ef70d200b051e3 (pid 29676, v1.5.0). Idle timeout 300000ms.
+[CodeGraph MCP] File watcher active — graph will auto-sync on changes
+[CodeGraph MCP] Query pool: up to 15 worker thread(s) for concurrent reads.
