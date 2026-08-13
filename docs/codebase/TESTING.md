@@ -4,7 +4,7 @@
 
 ### 1) Test Stack and Commands
 
-The default suite uses pytest 8+ with `testpaths = ["tests"]` and quiet output. The checked-in suite has 38 `test_*.py` modules.
+The default suite uses pytest 8+ with `testpaths = ["tests"]` and quiet output. The checked-in suite has 39 `test_*.py` modules.
 
 ```powershell
 uv run python -m pytest -q

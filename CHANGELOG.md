@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- Aligned remaining product, security, onboarding, and knowledge-wiki documentation with the released native-document ingestion contract on `main`.
+
 ## [0.6.1] - 2026-08-13
 
 ### Changed

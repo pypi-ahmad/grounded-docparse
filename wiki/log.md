@@ -1,5 +1,10 @@
 # Wiki operation log
 
+## 2026-08-13 — Released on main as v0.6.1
+
+- Promoted native-document ingestion articles from `feature-branch` to `released`.
+- Recorded that the product contract, CLI `ingest` command, and durable workspace persistence are now the `main` line.
+
 ## 2026-08-12 — Initial feature-branch knowledge snapshot
 
 - Created 24 grounded articles across five categories.

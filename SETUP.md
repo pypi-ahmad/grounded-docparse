@@ -67,7 +67,7 @@ uv run grounded-docparse ingest .\mixed.pdf `
   --output .\output
 ```
 
-Native results contain immutable `base_text`, character-to-source spans, and source anchors. A native PDF with pages that need OCR stops and asks for Mixed PDF rather than falling back automatically. The legacy `grounded-docparse parse` command remains available for PDF/image OCR batches.
+Native results contain immutable `base_text`, character-to-source spans, and source anchors. A native PDF with pages that need OCR stops and asks for Mixed PDF rather than falling back automatically. The Streamlit studio restores the latest batch from `data/document_studio.sqlite3` and sibling `workspaces/` artifacts after restart. The legacy `grounded-docparse parse` command remains available for PDF/image OCR batches.
 
 ### Build the installer
 

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-6684c0091b62",
-    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
-    "branch": "native-document-ingestion",
+    "id": "content-f03a0de2c1a2",
+    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
+    "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-12T16:46:34.603348+00:00",
+  "generated_at": "2026-08-13T13:54:04.812099+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
@@ -16,18 +16,18 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "f7a08036cdc1eb1719ec58480ecee85a6ab2dfe3a0a0eed9e5d3aea3e94ce296",
-      "size": 113
+      "sha256": "f822775233cc3c408ffd8ed5587fca742c4a41a4d1b90470f4706d3dff26df55",
+      "size": 116
     },
     {
       "path": ".gitignore",
-      "sha256": "3a77dd61762bc796aa42035d958264a74497ec7683298ac57a77414378400831",
-      "size": 848
+      "sha256": "f6da9a69b9cecd7293ee41e0a8be6653035095b56b43d091d54b875efc97b8a6",
+      "size": 1047
     },
     {
       "path": ".streamlit/config.toml",
-      "sha256": "545b82d1912205e5030112474e8e8d4b104ac672be0425cbcfb98b29b4b1e1e2",
-      "size": 510
+      "sha256": "b43f4a42ce0d929422dce824dd2b3d5b6b714e169433661b4c8997f29ffc03d7",
+      "size": 513
     },
     {
       "path": "LICENSE",
@@ -46,13 +46,13 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "4aa693693e43b382ab25a016bac923127eca231cce6856c6bf3b65564d3c1b85",
-      "size": 2108
+      "sha256": "a7b43b6b5c26d72053fdf4cb73dc2e7a59b874818024853addc2116125c15a17",
+      "size": 2119
     },
     {
       "path": "uv.lock",
-      "sha256": "8e84d7ba06e8db6b3970cd73ebf7277b46276725c0982ad6fb5af343e2c97602",
-      "size": 1205070
+      "sha256": "c51f8f03a1355840b44483eab9e29b8732c7c917a6e6b6540954e4d5239c6eec",
+      "size": 1211644
     }
   ]
 }

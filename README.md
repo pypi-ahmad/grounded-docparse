@@ -104,7 +104,7 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 6. Choose a file from **Document results**. Native results expose Overview, Markdown, JSON, source structure, Extract, optional Chat, and Layout Tree. Annotated PDF is shown only when the pipeline produces a visual artifact.
 7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
 
-The latest batch is saved locally and restored after an app restart. Sources, parse results, document analysis, failures, progress, settings, and usage survive; interrupted documents resume from the last completed parse checkpoint when **Resume batch** is selected. Use **Clear saved workspace** to remove the durable batch. Extraction, routing review, and chat remain session-only.
+The latest batch is saved locally and restored after an app restart. SQLite at `data/document_studio.sqlite3` (or `DOCPARSE_STUDIO_DB_PATH`) stores settings, progress, analysis, failures, usage, reusable schemas, and routing profiles. The sibling `workspaces/` directory stores source bytes, parse checkpoints, and annotated PDFs. Interrupted documents resume from the last completed parse checkpoint when **Resume batch** is selected. Use **Clear saved workspace** to remove the durable batch. Extraction, routing review, and chat remain session-only.
 
 Extraction is always on demand after parsing. Native extraction sends immutable `base_text` to LangExtract, never refined Markdown. A returned value is accepted only when it includes a `char_interval` whose exact substring resolves through the native source spans to at least one `SourceAnchor`; ungrounded values are rejected. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown, CSV, and XLSX imports populate the flat field builder.
 
@@ -189,7 +189,7 @@ grounded-docparse parse .\incoming --schema invoice.md --output results --overwr
 - Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes when a visual artifact is available
 - Run metadata including GLM, Luna recovery, and Luna agentic timing
 
-Annotated PDF bytes are downloaded separately and are not embedded in JSON. Native nonvisual formats may have no annotated PDF at all. Reusable extraction schemas and routing profiles persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it.
+Annotated PDF bytes are downloaded separately and are not embedded in JSON. Native nonvisual formats may have no annotated PDF at all. Reusable extraction schemas, routing profiles, and the active batch workspace persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it. Source bytes and parse artifacts live beside that database under `workspaces/`.
 
 ## Public Python API
 
@@ -248,6 +248,8 @@ full_json = render_combined_result(result, analysis)
 ├── examples/                     # Synthetic documents and extraction schema
 ├── tests/                        # Offline contract and behavior tests
 ├── docs/                         # Architecture, operation, API, workflows, research
+├── docs-site/                    # Generated static documentation site
+├── wiki/                         # Grounded knowledge wiki for native ingestion
 ├── pyproject.toml                # Package metadata and dependency declarations
 └── uv.lock                       # Cross-platform locked dependency graph
 ```
@@ -271,7 +273,9 @@ full_json = render_combined_result(result, analysis)
 | [Local GLM-OCR](docs/local-glmocr.md) | Locked GLM-OCR/vLLM runtime and evaluation path |
 | [Local PaddleOCR-VL-1.6](docs/local-paddleocr-vl.md) | Isolated Paddle runtime installation, health checks, and troubleshooting |
 | [Azure bulk medical fax deployment](docs/azure-bulk-fax-deployment.md) | Production design and operations runbook for secure bulk medical-fax processing on Azure |
-| [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, and retention |
+| [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, workspace retention, and deletion |
+| [Knowledge wiki](wiki/index.md) | Grounded articles for routing, evidence, pipelines, and interfaces |
+| [Changelog](CHANGELOG.md) | Released behavior from v0.6.1 backward |
 | [Contributing](CONTRIBUTING.md) | Development workflow, verification, and architecture constraints |
 | [Code of conduct](CODE_OF_CONDUCT.md) | Community standards and private conduct reporting |
 

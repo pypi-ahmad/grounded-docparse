@@ -59,7 +59,7 @@ For native extraction, LangExtract receives only `NativeDocument.base_text`. A v
 ### 5) Known Architectural Risks
 
 - `streamlit_app.py` and `pipeline.py` each exceed 3,000 lines and combine orchestration with many behavior branches.
-- Canonical product docs still describe an OCR-first/PDF-image system and do not fully define the native public contract.
+- Product docs on `main` now describe native ingestion as the canonical contract; keep them synchronized when routing, JSON versions, or persistence change.
 - Optional native libraries have independent conversion models; `docling_native.py` maintains a second source manifest specifically to prove exact structural provenance.
 - Workspace invalidation uses app `RESULT_VERSION = "4.6.0"`, while native JSON is versioned `5.0.0`/`5.1.0`; maintainers must update the workspace version whenever compatibility changes.
 - The local Streamlit deployment is trusted-workstation software, not a multi-user service boundary.

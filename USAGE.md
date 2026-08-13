@@ -84,6 +84,16 @@ models.
 - Native formats may not have an annotated PDF; their JSON and source-structure
   views carry the evidence instead.
 
+## Persistence
+
+The latest batch is restored after an app restart. Settings, progress, parse
+checkpoints, analysis, failures, usage, reusable schemas, and routing profiles
+live in `data/document_studio.sqlite3` or `DOCPARSE_STUDIO_DB_PATH`. Source
+bytes and annotated PDFs live in the sibling `workspaces/` directory. Use
+**Clear saved workspace** to delete that durable batch. Extraction, routing
+review, and chat remain session-only; download those outputs before ending the
+session.
+
 ## Troubleshooting
 
 - Installation and runtime repair: [SETUP.md](SETUP.md)

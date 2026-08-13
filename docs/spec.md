@@ -40,7 +40,7 @@ Parse native documents, scanned PDFs, and images into grounded Markdown and stru
 - Emit Full JSON v4.6.0 with the same envelope plus optional custom classification and per-form extraction, combined usage/trace/timing, and feature statuses.
 - Emit extraction JSON v1.1.0 with values, evidence, fields, `element_id`, source text, confidence, and local-OCR-owned normalized boxes.
 - Keep annotated PDF bytes outside JSON and offer them as a separate download only when produced by the selected route.
-- Use SQLite only for intentional application-managed schema and routing-profile persistence; keep parse and routing results in temporary/process/session state.
+- Persist reusable schemas, routing profiles, and the active batch workspace in SQLite plus sibling `workspaces/` artifacts. Restore that batch after restart. Keep extraction, routing review, and chat session-only. **Clear saved workspace** deletes the durable batch.
 - Process batch files sequentially, isolate per-file failures, skip unchanged completed files on rerun, and export a ZIP archive.
 - Allow local-only parsing without `OPENAI_API_KEY`.
 
@@ -63,7 +63,7 @@ Signatures, return-model summaries, schema rules, and envelope examples are in [
 
 ## Non-goals
 
-Document/chat persistence, durable jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review storage, cost estimation, durable or cross-session result caching, full-page Luna fallback, missing-region synthesis, and production batch orchestration. Session-scoped sequential batch processing is in scope.
+Durable chat or review storage, durable jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review queues, cost estimation, full-page Luna fallback, missing-region synthesis, and production batch orchestration. One local sequential batch workspace and reusable schema/profile persistence are in scope.
 
 ## Done when
 

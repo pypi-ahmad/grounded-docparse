@@ -1,6 +1,6 @@
 # Grounded DocParse Knowledge Wiki
 
-This wiki connects product intent, processing behavior, evidence guarantees, interfaces, and engineering practices for the native-document-ingestion feature snapshot.
+This wiki connects product intent, processing behavior, evidence guarantees, interfaces, and engineering practices for native-document ingestion as released on `main` in v0.6.1.
 
 ## Product and Principles
 

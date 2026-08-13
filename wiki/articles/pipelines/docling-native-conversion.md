@@ -1,8 +1,8 @@
 ---
 tags: docling, conversion, no-ocr
 sources: src/grounded_docparse/docling_native.py, src/grounded_docparse/native_parsers.py
-snapshot: content-6684c0091b62
-status: feature-branch
+snapshot: content-f03a0de2c1a2
+status: released
 ---
 
 # Docling native conversion
