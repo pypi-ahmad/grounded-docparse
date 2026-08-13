@@ -1,7 +1,7 @@
 ---
 tags: product, architecture, overview
 sources: README.md, docs/architecture.md
-snapshot: content-6684c0091b62
+snapshot: content-0efef1084957
 status: feature-branch
 ---
 
