@@ -53,7 +53,7 @@ def test_agentic_confidence_evidence_uses_codepoint_spans() -> None:
     node = payload["document"]["pages"][0]["blocks"][0]
     cell = node["semantic"]["table"]["cells"][0]
     atom = node["atoms"][0]
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert block.confidence == 0.72
     assert cell["confidence"] == 0.72
     assert cell["low_confidence_spans"] == [

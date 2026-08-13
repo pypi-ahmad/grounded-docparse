@@ -1,0 +1,84 @@
+[
+  {
+    "order": 1,
+    "title": "Project Overview",
+    "description": "Start with the README to understand Grounded DocParse as a workstation-oriented parser for PDFs and images with locally owned OCR evidence. It establishes the central boundary for the rest of the tour: optional AI recovery can improve content, but it does not replace the local OCR layout and geometry evidence.",
+    "nodeIds": [
+      "document:README.md"
+    ]
+  },
+  {
+    "order": 2,
+    "title": "User-Facing Interfaces",
+    "description": "The Streamlit app exposes the interactive parsing, review, and extraction workflows, while the CLI serves batch-oriented automation. Together they show the two supported ways users enter the same grounded document-processing system.",
+    "nodeIds": [
+      "file:streamlit_app.py",
+      "file:src/grounded_docparse/cli.py"
+    ]
+  },
+  {
+    "order": 3,
+    "title": "Shared Result Models",
+    "description": "The shared models define the vocabulary passed between every processing stage: page evidence, regions, extraction results, diagnostics, and final parse output. Because this is the graph\u2019s highest fan-in file, understanding these contracts makes the surrounding modules easier to read.",
+    "nodeIds": [
+      "file:src/grounded_docparse/models.py"
+    ]
+  },
+  {
+    "order": 4,
+    "title": "Configuration And Runtime",
+    "description": "Configuration centralizes validated parser, OCR, provider, quality, and recovery settings rather than letting each component interpret environment values independently. The runtime module then applies those settings to provider calls and budget-aware execution.",
+    "nodeIds": [
+      "file:src/grounded_docparse/config.py",
+      "file:src/grounded_docparse/runtime.py"
+    ]
+  },
+  {
+    "order": 5,
+    "title": "Ingest And OCR",
+    "description": "Ingestion turns PDFs and images into normalized page evidence, then the local OCR runtimes create the regions used downstream. This separation keeps source rendering and engine-specific normalization distinct while giving later stages a consistent page representation.",
+    "nodeIds": [
+      "file:src/grounded_docparse/ingest.py",
+      "file:src/grounded_docparse/local_ocr.py",
+      "file:src/grounded_docparse/paddle_ocr.py"
+    ]
+  },
+  {
+    "order": 6,
+    "title": "Page Analysis",
+    "description": "Page analysis combines local OCR, layout features, reading order, and visual evidence into grounded page drafts. Quality analysis follows by identifying incomplete or risky content and selecting only evidence-based repair candidates.",
+    "nodeIds": [
+      "file:src/grounded_docparse/page_analysis.py",
+      "file:src/grounded_docparse/quality.py"
+    ]
+  },
+  {
+    "order": 7,
+    "title": "Core Parser Pipeline",
+    "description": "The parser pipeline has the highest fan-out because it coordinates ingestion, analysis, recovery, verification, rendering, and optional refinement. Read it after the preceding components so its orchestration decisions map to concrete contracts and processing stages.",
+    "nodeIds": [
+      "file:src/grounded_docparse/pipeline.py"
+    ]
+  },
+  {
+    "order": 8,
+    "title": "Outputs And Agentic Workflows",
+    "description": "Rendering materializes grounded Markdown, structured elements, and annotated PDFs from the parser result. The agentic module builds on those grounded outputs for classification, extraction, table-of-contents generation, and chat rather than bypassing the evidence model.",
+    "nodeIds": [
+      "file:src/grounded_docparse/render.py",
+      "file:src/grounded_docparse/agentic.py",
+      "file:src/grounded_docparse/extraction.py"
+    ]
+  },
+  {
+    "order": 9,
+    "title": "Operations And Documentation",
+    "description": "The WSL launcher scripts manage the exclusive local OCR service stack and start the application in a reproducible runtime environment. The generated architecture page provides the corresponding operational explanation, connecting the code tour back to the project documentation.",
+    "nodeIds": [
+      "file:scripts/wsl/launch-stack.sh",
+      "file:scripts/wsl/manage-ocr-stack.sh",
+      "file:docs-site/architecture.html"
+    ],
+    "languageLesson": "Bash scripts commonly use strict mode (`set -euo pipefail`) so failed commands, unset variables, and broken pipelines stop service startup early."
+  }
+]

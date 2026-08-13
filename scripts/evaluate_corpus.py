@@ -8,10 +8,12 @@ from typing import Any
 
 import pymupdf
 
+from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.benchmark import (
     ReferenceBasis,
     build_live_report,
     evaluate_live_document,
+    evaluate_regression_policy,
     live_telemetry_record,
     load_corpus_manifest,
 )
@@ -50,6 +52,13 @@ def _page_subset_mappings(values: list[str]) -> dict[str, list[int]]:
             raise ValueError("page subsets require unique positive page numbers")
         mappings[document_id] = sorted(pages)
     return mappings
+
+
+def _unit_interval(value: str) -> float:
+    parsed = float(value)
+    if not 0 <= parsed <= 1:
+        raise argparse.ArgumentTypeError("value must be between 0 and 1")
+    return parsed
 
 
 def _subset_pdf(data: bytes, pages: list[int]) -> bytes:
@@ -171,6 +180,15 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 {
                     "id": corpus_document.id,
                     "features": corpus_document.features,
+                    "expected_document_type": corpus_document.expected_document_type,
+                    "classification": (
+                        {
+                            "value": None,
+                            "reason": "source is unavailable",
+                        }
+                        if corpus_document.expected_document_type is not None
+                        else None
+                    ),
                     "pages": 0,
                     "status": "source_unavailable",
                     "metrics": {},
@@ -209,6 +227,13 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 visual_recovery=not args.glm_only,
             )
             glm_only_proof = _glm_only_proof(parse_result) if args.glm_only else None
+            analysis_result = None
+            if corpus_document.expected_document_type is not None and not args.glm_only:
+                analysis_result = DocumentAgent().analyze(
+                    parse_result,
+                    classify=True,
+                    generate_toc=False,
+                )
             extraction_result = None
             if (
                 not args.glm_only
@@ -221,6 +246,7 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 )
             telemetry = live_telemetry_record(
                 parse_result,
+                analysis_result=analysis_result,
                 extraction_result=extraction_result,
                 latency_seconds=time.perf_counter() - started,
             )
@@ -236,6 +262,11 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 corpus_document,
                 parse_result.document,
                 telemetry=telemetry,
+                classification=(
+                    analysis_result.classification
+                    if analysis_result is not None
+                    else None
+                ),
                 extraction_data=extraction_result.data if extraction_result else None,
                 reference_text=reference_text,
                 reference_is_markdown=bool(
@@ -247,6 +278,24 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
             )
             record["status"] = "evaluated"
             record["pipeline_mode"] = "glm_only" if args.glm_only else "full"
+            if (
+                corpus_document.expected_document_type is not None
+                and record["classification"] is None
+            ):
+                status = (
+                    analysis_result.features.get("classification")
+                    if analysis_result is not None
+                    else None
+                )
+                reason = "classification result is unavailable"
+                if args.glm_only:
+                    reason = "classification is disabled by --glm-only"
+                elif status is not None:
+                    reason = f"classification status: {status.status}"
+                record["classification"] = {
+                    "value": None,
+                    "reason": reason,
+                }
             if glm_only_proof is not None:
                 record["glm_only_proof"] = glm_only_proof
             if source_pages is not None:
@@ -266,6 +315,12 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
                 {
                     "id": corpus_document.id,
                     "features": corpus_document.features,
+                    "expected_document_type": corpus_document.expected_document_type,
+                    "classification": (
+                        {"value": None, "reason": "document evaluation failed"}
+                        if corpus_document.expected_document_type is not None
+                        else None
+                    ),
                     "pages": 0,
                     "status": "error",
                     "error_type": type(exc).__name__,
@@ -292,6 +347,7 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
             corpus_id=manifest.corpus_id,
             documents=documents,
             rate_card=rate_card,
+            review_threshold=args.review_threshold,
         ),
         had_error,
     )
@@ -299,7 +355,7 @@ def _live_report(args: argparse.Namespace) -> tuple[dict[str, Any], bool]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Evaluate a corpus with existing offline native ingest evidence"
+        description="Run live corpus evaluation and optional regression gates"
     )
     parser.add_argument(
         "--manifest",
@@ -345,17 +401,43 @@ def main() -> int:
         ),
     )
     parser.add_argument("--rate-card", type=Path)
+    parser.add_argument(
+        "--review-threshold",
+        type=_unit_interval,
+        default=0.85,
+        help="Confidence below this value requires document-type review",
+    )
+    parser.add_argument(
+        "--thresholds",
+        type=Path,
+        help="Regression policy JSON with absolute and optional baseline limits",
+    )
+    parser.add_argument("--baseline", type=Path, help="Prior compatible report JSON")
     args = parser.parse_args()
     if not args.live:
         parser.error("visual-only evaluation requires --live")
     report, had_error = _live_report(args)
+    gate_failed = False
+    if args.thresholds is not None:
+        policy = json.loads(args.thresholds.read_text(encoding="utf-8"))
+        baseline = (
+            json.loads(args.baseline.read_text(encoding="utf-8"))
+            if args.baseline is not None
+            else None
+        )
+        report["regression"] = evaluate_regression_policy(
+            report, policy, baseline=baseline
+        )
+        gate_failed = not report["regression"]["passed"]
+    elif args.baseline is not None:
+        parser.error("--baseline requires --thresholds")
     output = args.output or Path("output/evaluation-corpus-live.json")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(
         json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     print(output)
-    return int(had_error)
+    return int(had_error or gate_failed)
 
 
 if __name__ == "__main__":

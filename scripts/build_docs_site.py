@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "docs-site"
 ASSETS = OUTPUT / "assets"
 REPOSITORY_URL = "https://github.com/pypi-ahmad/grounded-docparse"
-SKIP_DIRECTORIES = {".git", ".venv", "docs-site", "graphify-out"}
+SKIP_DIRECTORIES = {".codex", ".git", ".venv", "docs-site", "graphify-out"}
 SECURITY_FILE_MARKERS = ("security", "threat-model", "threat_model")
 
 GROUP_ORDER = (
@@ -36,6 +36,7 @@ GROUP_ORDER = (
         "Start here",
         (
             "README.md",
+            "USAGE.md",
             "docs/complete-user-guide.md",
             "docs/tutorial.md",
             "docs/zero-to-hero-tutorial.md",
@@ -55,12 +56,14 @@ GROUP_ORDER = (
             "SETUP.md",
             "docs/run.md",
             "docs/local-glmocr.md",
+            "docs/local-paddleocr-vl.md",
             "docs/azure-bulk-fax-deployment.md",
         ),
     ),
     (
         "Architecture & reference",
         (
+            "TECHNICAL.md",
             "docs/architecture.md",
             "docs/how-grounded-docparse-is-agentic.md",
             "docs/agentic-document-extraction-comparison.md",
@@ -74,6 +77,8 @@ GROUP_ORDER = (
         "Project",
         (
             "CONTRIBUTING.md",
+            "CODE_OF_CONDUCT.md",
+            "SECURITY.md",
             "CHANGELOG.md",
             ".github/ISSUE_TEMPLATE/bug_report.md",
             ".github/ISSUE_TEMPLATE/feature_request.md",

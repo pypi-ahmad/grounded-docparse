@@ -19,7 +19,11 @@ from grounded_docparse.models import (
     TableData,
     VerificationState,
 )
-from grounded_docparse.render import render_agentic_document, render_markdown
+from grounded_docparse.render import (
+    render_agentic_document,
+    render_markdown,
+    sanitize_markdown_preview,
+)
 
 
 def test_annotated_pdf_draws_nested_audit_boxes(simple_pdf: bytes) -> None:
@@ -222,6 +226,63 @@ def test_needs_review_text_remains_readable_and_auditable() -> None:
     assert '"verification_reason": "No verification decision"' in payload
 
 
+def test_semantic_html_table_keeps_original_layout_in_markdown() -> None:
+    source = '<table><tr><td colspan="2">[?] Participating</td></tr></table>'
+    block = Block(
+        id="p1-b1",
+        type="table",
+        text=source,
+        reading_order=0,
+        table=TableData(
+            cells=[TableCell(row=0, column=0, column_span=2, text="[?] Participating")]
+        ),
+    )
+    document = Document(
+        source_name="form.pdf",
+        source_sha256="f" * 64,
+        pages=[Page(number=1, width=100, height=100, blocks=[block])],
+    )
+
+    assert render_markdown(document) == f"{source}\n"
+
+
+def test_markdown_preview_preserves_markdown_and_sanitizes_supported_html() -> None:
+    source = (
+        "# Heading\n\n> Quoted text\n\n"
+        "`<code-tag>` [link](https://example.com/?a=1&b=2)\n\n"
+        '<table border="1" onclick="alert(1)"><tr>'
+        '<td colspan="2" onmouseover="alert(2)">'
+        "<script>alert(3)</script>Cell</td></tr></table>\n\n"
+        '<figure><div style="text-align: center;">'
+        '<img src="imgs/page-2.jpg" alt="Image" width="22%" '
+        'onerror="alert(4)"></div>Text</figure>\n\n'
+        '<figure><img src="https://example.com/tracker.jpg"></figure>\n\n'
+        '<div style="text-align: center;">Specialty: PAIN MEDICINE</div>\n\n'
+        '<img src="x" onerror="alert(5)">'
+    )
+
+    preview = sanitize_markdown_preview(source)
+
+    assert "# Heading\n\n> Quoted text" in preview
+    assert "`&lt;code-tag&gt;` [link](https://example.com/?a=1&b=2)" in preview
+    assert '<table border="1">' in preview
+    assert '<td colspan="2">alert(3)Cell</td>' in preview
+    assert "onclick" not in preview
+    assert "onmouseover" not in preview
+    assert "<script" not in preview
+    assert "alert(3)" in preview
+    assert (
+        '<figure><div style="text-align:center">'
+        '<img src="imgs/page-2.jpg" alt="Image" width="22%">'
+        "</div>Text</figure>"
+    ) in preview
+    assert '<div style="text-align:center">Specialty: PAIN MEDICINE</div>' in preview
+    assert "alert(4)" not in preview
+    assert '<figure><img></figure>' in preview
+    assert '<img src="x">' in preview
+    assert "alert(5)" not in preview
+
+
 def test_provider_draft_accepts_unordered_coordinates_for_local_validation() -> None:
     draft = PageDraft.model_validate(
         {
@@ -360,7 +421,7 @@ def test_schema_version_and_list_marker_are_preserved_in_json() -> None:
 
     json_text = render_agentic_document(document).json
 
-    assert '"schema_version": "4.4.0"' in json_text
+    assert '"schema_version": "4.5.0"' in json_text
     assert '"list_marker": "1."' in json_text
 
 

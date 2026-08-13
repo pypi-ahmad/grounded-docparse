@@ -10,6 +10,10 @@
       "text": "Synthetic Native Text Fixture"
     },
     {
+      "id": "native-record",
+      "text": "NATIVE-001"
+    },
+    {
       "id": "native-status",
       "text": "Status: complete"
     }
@@ -19,5 +23,19 @@
   "schema_output": null,
   "continuity_pairs": [],
   "forbidden_literals": [],
-  "rejected_block_ids": []
+  "rejected_block_ids": [],
+  "native_extractions": [
+    {
+      "pointer": "/record_id",
+      "source_text": "NATIVE-001",
+      "char_interval": [37, 47],
+      "anchor_id": "native-record"
+    },
+    {
+      "pointer": "/status",
+      "source_text": "complete",
+      "char_interval": [77, 85],
+      "anchor_id": "native-status"
+    }
+  ]
 }

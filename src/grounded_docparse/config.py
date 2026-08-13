@@ -2,8 +2,48 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from enum import StrEnum
+from urllib.parse import urlsplit
 
 LUNA_MODEL = "gpt-5.6-luna"
+LUNA_REASONING_EFFORT = "medium"
+
+
+class OcrEngine(StrEnum):
+    GLM_OCR = "glm-ocr"
+    PADDLEOCR_VL_1_6 = "paddleocr-vl-1.6"
+
+    @property
+    def label(self) -> str:
+        return (
+            "GLM-OCR"
+            if self is OcrEngine.GLM_OCR
+            else "PaddleOCR-VL-1.6"
+        )
+
+
+def validate_paddleocr_service_url(value: str) -> str:
+    parsed = urlsplit(value)
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(
+            "paddleocr_service_url must be an HTTP loopback origin with a valid port"
+        ) from exc
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or port is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.path not in {"", "/"}
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError(
+            "paddleocr_service_url must be an HTTP loopback origin with an explicit port"
+        )
+    return value.rstrip("/")
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +86,7 @@ class AnalysisThresholds:
 
 @dataclass(frozen=True, slots=True)
 class ParserConfig:
+    ocr_engine: OcrEngine = OcrEngine.GLM_OCR
     render_dpi: int = 200
     crop_dpi: int = 450
     crop_padding: float = 0.1
@@ -53,7 +94,11 @@ class ParserConfig:
     max_pages: int = 500
     max_page_pixels: int = 20_000_000
     luna_max_output_tokens: int = 128_000
-    max_visual_recovery_crops: int = 8
+    max_visual_recovery_crops: int = 64
+    ocr_disagreement_enabled: bool = False
+    ocr_disagreement_similarity_threshold: float = 0.90
+    max_ocr_disagreement_crops: int = 16
+    max_ocr_disagreement_crops_per_page: int = 2
     page_batch_size: int = 16
     max_page_concurrency: int = 8
     provider_concurrency: int = 8
@@ -64,8 +109,11 @@ class ParserConfig:
     provider_success_window: int = 10
     full_page_fallback_fraction: float = 0.1
     local_ocr_enabled: bool = True
+    glm_form_recovery_enabled: bool = True
     glmocr_config_path: str = "config/glmocr.yaml"
     glmocr_layout_device: str = "cuda:0"
+    paddleocr_service_url: str = "http://127.0.0.1:8119"
+    paddleocr_timeout_seconds: float = 900.0
     analysis_thresholds: AnalysisThresholds = field(default_factory=AnalysisThresholds)
 
     def __post_init__(self) -> None:
@@ -77,6 +125,8 @@ class ParserConfig:
             "max_page_pixels",
             "luna_max_output_tokens",
             "max_visual_recovery_crops",
+            "max_ocr_disagreement_crops",
+            "max_ocr_disagreement_crops_per_page",
             "page_batch_size",
             "max_page_concurrency",
             "provider_concurrency",
@@ -87,6 +137,13 @@ class ParserConfig:
                 raise ValueError(f"{name} must be positive")
         if not 0 <= self.crop_padding <= 0.5:
             raise ValueError("crop_padding must be between 0 and 0.5")
+        if not 0 <= self.ocr_disagreement_similarity_threshold <= 1:
+            raise ValueError("ocr_disagreement_similarity_threshold must be between 0 and 1")
+        if self.max_ocr_disagreement_crops_per_page > self.max_ocr_disagreement_crops:
+            raise ValueError(
+                "max_ocr_disagreement_crops_per_page cannot exceed "
+                "max_ocr_disagreement_crops"
+            )
         if self.max_page_concurrency > self.page_batch_size:
             raise ValueError("max_page_concurrency cannot exceed page_batch_size")
         for name in (
@@ -102,6 +159,9 @@ class ParserConfig:
             )
         if not 0 < self.full_page_fallback_fraction <= 1:
             raise ValueError("full_page_fallback_fraction must be in (0,1]")
+        if self.paddleocr_timeout_seconds <= 0:
+            raise ValueError("paddleocr_timeout_seconds must be positive")
+        validate_paddleocr_service_url(self.paddleocr_service_url)
 
     @classmethod
     def from_env(cls) -> ParserConfig:
@@ -119,6 +179,9 @@ class ParserConfig:
             }
         )
         return cls(
+            ocr_engine=OcrEngine(
+                os.getenv("DOCPARSE_OCR_ENGINE", defaults.ocr_engine.value)
+            ),
             render_dpi=int(os.getenv("DOCPARSE_RENDER_DPI", str(defaults.render_dpi))),
             crop_dpi=int(os.getenv("DOCPARSE_CROP_DPI", str(defaults.crop_dpi))),
             crop_padding=float(
@@ -141,6 +204,28 @@ class ParserConfig:
                 os.getenv(
                     "DOCPARSE_MAX_VISUAL_RECOVERY_CROPS",
                     str(defaults.max_visual_recovery_crops),
+                )
+            ),
+            ocr_disagreement_enabled=os.getenv(
+                "DOCPARSE_OCR_DISAGREEMENT_ENABLED", "false"
+            ).casefold()
+            not in {"0", "false", "no"},
+            ocr_disagreement_similarity_threshold=float(
+                os.getenv(
+                    "DOCPARSE_OCR_DISAGREEMENT_SIMILARITY_THRESHOLD",
+                    str(defaults.ocr_disagreement_similarity_threshold),
+                )
+            ),
+            max_ocr_disagreement_crops=int(
+                os.getenv(
+                    "DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS",
+                    str(defaults.max_ocr_disagreement_crops),
+                )
+            ),
+            max_ocr_disagreement_crops_per_page=int(
+                os.getenv(
+                    "DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS_PER_PAGE",
+                    str(defaults.max_ocr_disagreement_crops_per_page),
                 )
             ),
             page_batch_size=int(
@@ -196,11 +281,24 @@ class ParserConfig:
             ),
             local_ocr_enabled=os.getenv("DOCPARSE_LOCAL_OCR_ENABLED", "true").casefold()
             not in {"0", "false", "no"},
+            glm_form_recovery_enabled=os.getenv(
+                "DOCPARSE_GLM_FORM_RECOVERY_ENABLED", "true"
+            ).casefold()
+            not in {"0", "false", "no"},
             glmocr_config_path=os.getenv(
                 "DOCPARSE_GLMOCR_CONFIG_PATH", defaults.glmocr_config_path
             ),
             glmocr_layout_device=os.getenv(
                 "DOCPARSE_GLMOCR_LAYOUT_DEVICE", defaults.glmocr_layout_device
+            ),
+            paddleocr_service_url=os.getenv(
+                "DOCPARSE_PADDLEOCR_SERVICE_URL", defaults.paddleocr_service_url
+            ).rstrip("/"),
+            paddleocr_timeout_seconds=float(
+                os.getenv(
+                    "DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS",
+                    str(defaults.paddleocr_timeout_seconds),
+                )
             ),
             analysis_thresholds=thresholds,
         )

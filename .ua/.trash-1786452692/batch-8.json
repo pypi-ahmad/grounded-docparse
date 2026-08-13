@@ -1,0 +1,15 @@
+{
+  "nodes": [
+    {"id":"file:docs-site/setup.html","type":"file","name":"setup.html","filePath":"docs-site/setup.html","summary":"Static documentation page rendering setup instructions for prerequisites, Windows installation, WSL operation, Luna configuration, verification, and troubleshooting.","tags":["documentation","static-site","setup","html"],"complexity":"complex"},
+    {"id":"config:docs-site/site-manifest.json","type":"config","name":"site-manifest.json","filePath":"docs-site/site-manifest.json","summary":"Lists source documentation included in the generated documentation site, the excluded-document count, and the resulting HTML page inventory.","tags":["configuration","documentation","static-site","manifest"],"complexity":"moderate"},
+    {"id":"file:docs-site/spec.html","type":"file","name":"spec.html","filePath":"docs-site/spec.html","summary":"Static documentation page presenting the product specification, including goals, inputs, required behavior, public interfaces, non-goals, and completion criteria.","tags":["documentation","static-site","specification","html"],"complexity":"moderate"},
+    {"id":"file:docs-site/tutorial.html","type":"file","name":"tutorial.html","filePath":"docs-site/tutorial.html","summary":"Static documentation page providing a concise tutorial for using Grounded DocParse.","tags":["documentation","static-site","tutorial","html"],"complexity":"moderate"},
+    {"id":"file:docs-site/zero-to-hero-tutorial.html","type":"file","name":"zero-to-hero-tutorial.html","filePath":"docs-site/zero-to-hero-tutorial.html","summary":"Comprehensive static tutorial that explains document parsing concepts, setup, Streamlit workflows, extraction and routing, APIs, architecture, safety, testing, and troubleshooting.","tags":["documentation","static-site","tutorial","architecture"],"complexity":"complex"}
+  ],
+  "edges": [
+    {"source":"config:docs-site/site-manifest.json","target":"file:docs-site/setup.html","type":"configures","direction":"forward","weight":0.6},
+    {"source":"config:docs-site/site-manifest.json","target":"file:docs-site/spec.html","type":"configures","direction":"forward","weight":0.6},
+    {"source":"config:docs-site/site-manifest.json","target":"file:docs-site/tutorial.html","type":"configures","direction":"forward","weight":0.6},
+    {"source":"config:docs-site/site-manifest.json","target":"file:docs-site/zero-to-hero-tutorial.html","type":"configures","direction":"forward","weight":0.6}
+  ]
+}

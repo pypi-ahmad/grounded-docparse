@@ -1,0 +1,407 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 7,
+  "filesSkipped": [
+    "docs/codebase/.codebase-scan.txt"
+  ],
+  "analysisOutcomes": {
+    "structure": {
+      "succeeded": 7,
+      "failed": 0
+    },
+    "callGraph": {
+      "succeeded": 0,
+      "failed": 0,
+      "skipped": 7
+    }
+  },
+  "results": [
+    {
+      "path": "docs/codebase/ARCHITECTURE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 86,
+      "nonEmptyLines": 68,
+      "sections": [
+        {
+          "heading": "Architecture",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Architectural Style",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) System Flow",
+          "level": 3,
+          "line": 18
+        },
+        {
+          "heading": "3) Layer/Module Responsibilities",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "4) Reused Patterns",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "heading": "5) Known Architectural Risks",
+          "level": 3,
+          "line": 57
+        },
+        {
+          "heading": "6) IDP vs ADE decision record",
+          "level": 3,
+          "line": 64
+        },
+        {
+          "heading": "7) Evidence",
+          "level": 3,
+          "line": 75
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 9
+      }
+    },
+    {
+      "path": "docs/codebase/CONCERNS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 56,
+      "nonEmptyLines": 39,
+      "sections": [
+        {
+          "heading": "Concerns",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Product taxonomy risk (mislabeling)",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) Architectural limits",
+          "level": 3,
+          "line": 12
+        },
+        {
+          "heading": "3) Security / privacy",
+          "level": 3,
+          "line": 19
+        },
+        {
+          "heading": "4) Accuracy and evaluation caution",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "5) High-complexity modules",
+          "level": 3,
+          "line": 30
+        },
+        {
+          "heading": "6) Evidence",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Intent vs reality",
+          "level": 2,
+          "line": 44
+        },
+        {
+          "heading": "[ASK USER]",
+          "level": 2,
+          "line": 52
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "docs/codebase/CONVENTIONS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 39,
+      "nonEmptyLines": 26,
+      "sections": [
+        {
+          "heading": "Conventions",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Naming",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) Contracts and validation",
+          "level": 3,
+          "line": 11
+        },
+        {
+          "heading": "3) Error handling posture",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "4) Grounding rules",
+          "level": 3,
+          "line": 24
+        },
+        {
+          "heading": "5) Evidence",
+          "level": 3,
+          "line": 30
+        },
+        {
+          "heading": "Notes",
+          "level": 2,
+          "line": 37
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "docs/codebase/INTEGRATIONS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 46,
+      "nonEmptyLines": 32,
+      "sections": [
+        {
+          "heading": "Integrations",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Local OCR services",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) OpenAI / Luna",
+          "level": 3,
+          "line": 14
+        },
+        {
+          "heading": "3) Persistence",
+          "level": 3,
+          "line": 23
+        },
+        {
+          "heading": "4) Explicit non-integrations",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "5) Evidence",
+          "level": 3,
+          "line": 39
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    },
+    {
+      "path": "docs/codebase/STACK.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 45,
+      "nonEmptyLines": 32,
+      "sections": [
+        {
+          "heading": "Stack",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Languages and runtimes",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) Frameworks and libraries",
+          "level": 3,
+          "line": 12
+        },
+        {
+          "heading": "3) Tooling",
+          "level": 3,
+          "line": 23
+        },
+        {
+          "heading": "4) Persistence and services",
+          "level": 3,
+          "line": 30
+        },
+        {
+          "heading": "5) Evidence",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Notes / TODOs",
+          "level": 2,
+          "line": 42
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "docs/codebase/STRUCTURE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 52,
+      "nonEmptyLines": 43,
+      "sections": [
+        {
+          "heading": "Structure",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Top-level layout",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) Package modules (`src/grounded_docparse/`)",
+          "level": 3,
+          "line": 21
+        },
+        {
+          "heading": "3) Entry points",
+          "level": 3,
+          "line": 41
+        },
+        {
+          "heading": "4) Evidence",
+          "level": 3,
+          "line": 48
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 6
+      }
+    },
+    {
+      "path": "docs/codebase/TESTING.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 38,
+      "nonEmptyLines": 27,
+      "sections": [
+        {
+          "heading": "Testing",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Core Sections (Required)",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "1) Framework and layout",
+          "level": 3,
+          "line": 5
+        },
+        {
+          "heading": "2) Strategy (from docs + suite names)",
+          "level": 3,
+          "line": 10
+        },
+        {
+          "heading": "3) Notable test themes",
+          "level": 3,
+          "line": 17
+        },
+        {
+          "heading": "4) Evidence",
+          "level": 3,
+          "line": 28
+        },
+        {
+          "heading": "Notes",
+          "level": 2,
+          "line": 36
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 7
+      }
+    }
+  ]
+}

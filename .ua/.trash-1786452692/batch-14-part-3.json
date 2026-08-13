@@ -1,0 +1,4088 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_regression_policy.py",
+      "type": "file",
+      "name": "test_regression_policy.py",
+      "filePath": "tests/test_regression_policy.py",
+      "summary": "Contains pytest coverage for regression policy behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:_report",
+      "type": "function",
+      "name": "_report",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        8,
+        17
+      ],
+      "summary": "Exercises _report behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "function",
+      "name": "test_regression_policy_passes_absolute_and_baseline_limits",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        41,
+        51
+      ],
+      "summary": "Exercises test_regression_policy_passes_absolute_and_baseline_limits behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "function",
+      "name": "test_regression_policy_reports_each_failed_constraint",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        54,
+        70
+      ],
+      "summary": "Exercises test_regression_policy_reports_each_failed_constraint behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "function",
+      "name": "test_regression_policy_fails_closed_for_missing_metric",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        73,
+        90
+      ],
+      "summary": "Exercises test_regression_policy_fails_closed_for_missing_metric behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "function",
+      "name": "test_regression_policy_rejects_incompatible_baseline",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        93,
+        100
+      ],
+      "summary": "Exercises test_regression_policy_rejects_incompatible_baseline behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "function",
+      "name": "test_regression_policy_requires_matching_baseline_review_threshold",
+      "filePath": "tests/test_regression_policy.py",
+      "lineRange": [
+        103,
+        110
+      ],
+      "summary": "Exercises test_regression_policy_requires_matching_baseline_review_threshold behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_schema_store.py",
+      "type": "file",
+      "name": "test_schema_store.py",
+      "filePath": "tests/test_schema_store.py",
+      "summary": "Contains pytest coverage for schema store behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:_schema",
+      "type": "function",
+      "name": "_schema",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        43,
+        58
+      ],
+      "summary": "Exercises _schema behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "function",
+      "name": "test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        61,
+        72
+      ],
+      "summary": "Exercises test_schema_store_save_list_get_and_case_insensitive_replacement behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "function",
+      "name": "test_date_compiles_to_nullable_iso_string",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        74,
+        79
+      ],
+      "summary": "Exercises test_date_compiles_to_nullable_iso_string behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "function",
+      "name": "test_schema_json_round_trip_and_validation",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        82,
+        89
+      ],
+      "summary": "Exercises test_schema_json_round_trip_and_validation behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "function",
+      "name": "test_raw_nested_json_schema_round_trip_and_compilation",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        92,
+        100
+      ],
+      "summary": "Exercises test_raw_nested_json_schema_round_trip_and_compilation behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "function",
+      "name": "test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        103,
+        108
+      ],
+      "summary": "Exercises test_schema_store_reads_legacy_v1_rows_after_v2_support behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "function",
+      "name": "test_parse_markdown_schema_table",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        111,
+        134
+      ],
+      "summary": "Exercises test_parse_markdown_schema_table behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "function",
+      "name": "test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        137,
+        147
+      ],
+      "summary": "Exercises test_parse_markdown_schema_bullets_uses_filename_fallback behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "function",
+      "name": "test_parse_tabular_schema_csv",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        150,
+        170
+      ],
+      "summary": "Exercises test_parse_tabular_schema_csv behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "function",
+      "name": "test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        173,
+        191
+      ],
+      "summary": "Exercises test_parse_tabular_schema_xlsx_uses_first_worksheet behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "function",
+      "name": "test_parse_tabular_schema_rejects_invalid_rows",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        213,
+        217
+      ],
+      "summary": "Exercises test_parse_tabular_schema_rejects_invalid_rows behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "function",
+      "name": "test_parse_tabular_schema_rejects_invalid_file_input",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        220,
+        228
+      ],
+      "summary": "Exercises test_parse_tabular_schema_rejects_invalid_file_input behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "function",
+      "name": "test_parse_markdown_schema_rejects_invalid_fields",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        244,
+        248
+      ],
+      "summary": "Exercises test_parse_markdown_schema_rejects_invalid_fields behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "function",
+      "name": "test_parse_markdown_schema_rejects_invalid_file_input",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        251,
+        257
+      ],
+      "summary": "Exercises test_parse_markdown_schema_rejects_invalid_file_input behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "function",
+      "name": "test_classifier_profile_store_and_markdown_table",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        260,
+        277
+      ],
+      "summary": "Exercises test_classifier_profile_store_and_markdown_table behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "function",
+      "name": "test_classifier_profile_markdown_bullets",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        280,
+        305
+      ],
+      "summary": "Exercises test_classifier_profile_markdown_bullets behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "function",
+      "name": "test_classifier_profile_markdown_rejects_invalid_profiles",
+      "filePath": "tests/test_schema_store.py",
+      "lineRange": [
+        323,
+        327
+      ],
+      "summary": "Exercises test_classifier_profile_markdown_rejects_invalid_profiles behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_simple_contract.py",
+      "type": "file",
+      "name": "test_simple_contract.py",
+      "filePath": "tests/test_simple_contract.py",
+      "summary": "Contains pytest coverage for simple contract behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_annotated_pdf_draws_nested_audit_boxes",
+      "type": "function",
+      "name": "test_annotated_pdf_draws_nested_audit_boxes",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        29,
+        78
+      ],
+      "summary": "Exercises test_annotated_pdf_draws_nested_audit_boxes behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_annotated_pdf_converts_multiframe_image",
+      "type": "function",
+      "name": "test_annotated_pdf_converts_multiframe_image",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        81,
+        102
+      ],
+      "summary": "Exercises test_annotated_pdf_converts_multiframe_image behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_annotated_pdf_rejects_page_count_mismatch",
+      "type": "function",
+      "name": "test_annotated_pdf_rejects_page_count_mismatch",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        105,
+        113
+      ],
+      "summary": "Exercises test_annotated_pdf_rejects_page_count_mismatch behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_annotated_pdf_supports_semantic_labels_and_selected_overlay",
+      "type": "function",
+      "name": "test_annotated_pdf_supports_semantic_labels_and_selected_overlay",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        116,
+        144
+      ],
+      "summary": "Exercises test_annotated_pdf_supports_semantic_labels_and_selected_overlay behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_nested_document_renders_layout_aware_markdown_and_json",
+      "type": "function",
+      "name": "test_nested_document_renders_layout_aware_markdown_and_json",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        147,
+        184
+      ],
+      "summary": "Exercises test_nested_document_renders_layout_aware_markdown_and_json behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_only_rejected_blocks_are_suppressed_without_warning_callouts",
+      "type": "function",
+      "name": "test_only_rejected_blocks_are_suppressed_without_warning_callouts",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        187,
+        205
+      ],
+      "summary": "Exercises test_only_rejected_blocks_are_suppressed_without_warning_callouts behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_needs_review_text_remains_readable_and_auditable",
+      "type": "function",
+      "name": "test_needs_review_text_remains_readable_and_auditable",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        208,
+        226
+      ],
+      "summary": "Exercises test_needs_review_text_remains_readable_and_auditable behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_semantic_html_table_keeps_original_layout_in_markdown",
+      "type": "function",
+      "name": "test_semantic_html_table_keeps_original_layout_in_markdown",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        229,
+        246
+      ],
+      "summary": "Exercises test_semantic_html_table_keeps_original_layout_in_markdown behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_markdown_preview_preserves_markdown_and_sanitizes_supported_html",
+      "type": "function",
+      "name": "test_markdown_preview_preserves_markdown_and_sanitizes_supported_html",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        249,
+        283
+      ],
+      "summary": "Exercises test_markdown_preview_preserves_markdown_and_sanitizes_supported_html behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_provider_draft_accepts_unordered_coordinates_for_local_validation",
+      "type": "function",
+      "name": "test_provider_draft_accepts_unordered_coordinates_for_local_validation",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        286,
+        300
+      ],
+      "summary": "Exercises test_provider_draft_accepts_unordered_coordinates_for_local_validation behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_markdown_escapes_source_name_and_table_cells",
+      "type": "function",
+      "name": "test_markdown_escapes_source_name_and_table_cells",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        303,
+        323
+      ],
+      "summary": "Exercises test_markdown_escapes_source_name_and_table_cells behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_clean_markdown_renders_document_elements_and_exact_page_break",
+      "type": "function",
+      "name": "test_clean_markdown_renders_document_elements_and_exact_page_break",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        326,
+        391
+      ],
+      "summary": "Exercises test_clean_markdown_renders_document_elements_and_exact_page_break behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text",
+      "type": "function",
+      "name": "test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        394,
+        411
+      ],
+      "summary": "Exercises test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_schema_version_and_list_marker_are_preserved_in_json",
+      "type": "function",
+      "name": "test_schema_version_and_list_marker_are_preserved_in_json",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        414,
+        425
+      ],
+      "summary": "Exercises test_schema_version_and_list_marker_are_preserved_in_json behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_unchecked_high_confidence_content_has_truthful_audit_state",
+      "type": "function",
+      "name": "test_unchecked_high_confidence_content_has_truthful_audit_state",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        428,
+        438
+      ],
+      "summary": "Exercises test_unchecked_high_confidence_content_has_truthful_audit_state behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_provider_draft_accepts_explicit_form_and_checkbox_fields",
+      "type": "function",
+      "name": "test_provider_draft_accepts_explicit_form_and_checkbox_fields",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        441,
+        464
+      ],
+      "summary": "Exercises test_provider_draft_accepts_explicit_form_and_checkbox_fields behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_form_label_with_source_colon_renders_one_colon",
+      "type": "function",
+      "name": "test_form_label_with_source_colon_renders_one_colon",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        467,
+        489
+      ],
+      "summary": "Exercises test_form_label_with_source_colon_renders_one_colon behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_contract.py:test_form_hint_remains_visible_and_structured_in_json",
+      "type": "function",
+      "name": "test_form_hint_remains_visible_and_structured_in_json",
+      "filePath": "tests/test_simple_contract.py",
+      "lineRange": [
+        492,
+        533
+      ],
+      "summary": "Exercises test_form_hint_remains_visible_and_structured_in_json behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_simple_pipeline.py",
+      "type": "file",
+      "name": "test_simple_pipeline.py",
+      "filePath": "tests/test_simple_pipeline.py",
+      "summary": "Contains pytest coverage for simple pipeline behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "function",
+      "name": "test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        35,
+        55
+      ],
+      "summary": "Exercises test_geometry_only_rejection_flag_is_additive_and_fail_closed behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "function",
+      "name": "test_parser_builds_verified_nested_document",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        96,
+        119
+      ],
+      "summary": "Exercises test_parser_builds_verified_nested_document behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "function",
+      "name": "test_planner_approved_nonvisual_box_is_dispatched",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        199,
+        239
+      ],
+      "summary": "Exercises test_planner_approved_nonvisual_box_is_dispatched behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "function",
+      "name": "test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        242,
+        255
+      ],
+      "summary": "Exercises test_paddle_form_states_reads_standalone_marker_only_within_its_row behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "function",
+      "name": "test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        258,
+        280
+      ],
+      "summary": "Exercises test_merge_confirmed_form_states_changes_only_confirmed_option_cells behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "function",
+      "name": "test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        283,
+        367
+      ],
+      "summary": "Exercises test_paddle_form_recovery_merges_only_two_scale_consensus behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "function",
+      "name": "test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        370,
+        452
+      ],
+      "summary": "Exercises test_paddle_form_recovery_preserves_primary_when_scales_disagree behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "function",
+      "name": "test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        455,
+        472
+      ],
+      "summary": "Exercises test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "function",
+      "name": "test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        475,
+        496
+      ],
+      "summary": "Exercises test_form_control_recovery_severity_prioritizes_dense_unknown_groups behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "function",
+      "name": "test_glm_form_merge_fills_only_aligned_blank_values",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        499,
+        509
+      ],
+      "summary": "Exercises test_glm_form_merge_fills_only_aligned_blank_values behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "function",
+      "name": "test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        512,
+        582
+      ],
+      "summary": "Exercises test_glm_form_recovery_uses_high_resolution_crop_without_luna behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "function",
+      "name": "test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        585,
+        674
+      ],
+      "summary": "Exercises test_glm_form_recovery_does_not_consume_luna_document_budget behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "function",
+      "name": "test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        677,
+        700
+      ],
+      "summary": "Exercises test_custom_gateway_without_analysis_does_not_synthesize_scan_probes behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "function",
+      "name": "test_visual_recovery_does_not_synthesize_missing_regions",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        755,
+        771
+      ],
+      "summary": "Exercises test_visual_recovery_does_not_synthesize_missing_regions behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "function",
+      "name": "test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        774,
+        816
+      ],
+      "summary": "Exercises test_visual_recovery_plan_prioritizes_failures_across_pages behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "function",
+      "name": "test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        819,
+        852
+      ],
+      "summary": "Exercises test_visual_recovery_plan_prioritizes_unresolved_form_controls behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "function",
+      "name": "test_visual_recovery_plan_enforces_document_and_page_limits",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        855,
+        909
+      ],
+      "summary": "Exercises test_visual_recovery_plan_enforces_document_and_page_limits behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "function",
+      "name": "test_visual_recovery_crop_budget_scales_with_document_length",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        912,
+        917
+      ],
+      "summary": "Exercises test_visual_recovery_crop_budget_scales_with_document_length behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "function",
+      "name": "test_garbage_ratio_is_unicode_safe",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        920,
+        922
+      ],
+      "summary": "Exercises test_garbage_ratio_is_unicode_safe behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "function",
+      "name": "test_full_page_scan_recovery_is_not_attempted",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        966,
+        980
+      ],
+      "summary": "Exercises test_full_page_scan_recovery_is_not_attempted behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "function",
+      "name": "test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1017,
+        1041
+      ],
+      "summary": "Exercises test_incomplete_scanned_structures_are_repaired_without_duplicate_probes behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "function",
+      "name": "test_clipped_critical_literal_remains_visible_with_review_warning",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1075,
+        1094
+      ],
+      "summary": "Exercises test_clipped_critical_literal_remains_visible_with_review_warning behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "function",
+      "name": "_account_pdf",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1097,
+        1103
+      ],
+      "summary": "Exercises _account_pdf behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "function",
+      "name": "test_rejected_form_remains_reviewable_after_one_quality_round",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1181,
+        1193
+      ],
+      "summary": "Exercises test_rejected_form_remains_reviewable_after_one_quality_round behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "function",
+      "name": "test_failed_quality_crop_preserves_reviewable_structured_content",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1196,
+        1212
+      ],
+      "summary": "Exercises test_failed_quality_crop_preserves_reviewable_structured_content behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "function",
+      "name": "test_malformed_quality_correction_preserves_reviewable_content",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1230,
+        1241
+      ],
+      "summary": "Exercises test_malformed_quality_correction_preserves_reviewable_content behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "function",
+      "name": "test_mismatched_quality_crop_evidence_fails_closed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1314,
+        1327
+      ],
+      "summary": "Exercises test_mismatched_quality_crop_evidence_fails_closed behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "function",
+      "name": "test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1329,
+        1340
+      ],
+      "summary": "Exercises test_quality_repair_processes_all_candidates_in_batches_of_eight behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "function",
+      "name": "test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1363,
+        1374
+      ],
+      "summary": "Exercises test_semantic_rejection_remains_reviewable_after_one_quality_round behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "function",
+      "name": "test_geometry_only_rejection_remains_visible_for_review",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1429,
+        1442
+      ],
+      "summary": "Exercises test_geometry_only_rejection_remains_visible_for_review behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "function",
+      "name": "test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1478,
+        1488
+      ],
+      "summary": "Exercises test_semantic_rejection_of_clipped_content_remains_suppressed behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "function",
+      "name": "test_risky_regions_are_inspected_directly",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1515,
+        1527
+      ],
+      "summary": "Exercises test_risky_regions_are_inspected_directly behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "function",
+      "name": "test_invalid_grounding_cannot_be_verified",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1544,
+        1556
+      ],
+      "summary": "Exercises test_invalid_grounding_cannot_be_verified behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "function",
+      "name": "test_missing_correction_remains_unresolved",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1581,
+        1591
+      ],
+      "summary": "Exercises test_missing_correction_remains_unresolved behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "function",
+      "name": "test_grounded_correction_replaces_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1624,
+        1633
+      ],
+      "summary": "Exercises test_grounded_correction_replaces_draft_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "function",
+      "name": "test_explicit_rejection_keeps_glm_content_reviewable",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1651,
+        1657
+      ],
+      "summary": "Exercises test_explicit_rejection_keeps_glm_content_reviewable behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "function",
+      "name": "test_crop_decision_for_wrong_region_remains_unresolved",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1685,
+        1695
+      ],
+      "summary": "Exercises test_crop_decision_for_wrong_region_remains_unresolved behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "function",
+      "name": "test_only_low_confidence_regions_are_sent_to_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1733,
+        1745
+      ],
+      "summary": "Exercises test_only_low_confidence_regions_are_sent_to_luna behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "function",
+      "name": "test_only_ambiguous_critical_literals_trigger_luna",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1784,
+        1792
+      ],
+      "summary": "Exercises test_only_ambiguous_critical_literals_trigger_luna behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "function",
+      "name": "test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1824,
+        1840
+      ],
+      "summary": "Exercises test_invalid_corrected_geometry_is_ignored_while_text_is_applied behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "function",
+      "name": "test_verifier_error_preserves_draft_text_as_needs_review",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1848,
+        1857
+      ],
+      "summary": "Exercises test_verifier_error_preserves_draft_text_as_needs_review behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "function",
+      "name": "test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1892,
+        1907
+      ],
+      "summary": "Exercises test_crop_requests_cover_all_risky_regions_in_one_batch behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "function",
+      "name": "test_crop_render_error_preserves_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1910,
+        1928
+      ],
+      "summary": "Exercises test_crop_render_error_preserves_draft_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "function",
+      "name": "test_crop_verifier_error_preserves_draft_text",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1936,
+        1945
+      ],
+      "summary": "Exercises test_crop_verifier_error_preserves_draft_text behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "function",
+      "name": "test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2001,
+        2019
+      ],
+      "summary": "Exercises test_page_inspection_cannot_add_content_or_reorder_glm_manifest behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "function",
+      "name": "test_luna_addition_cannot_supersede_glm_element",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2092,
+        2109
+      ],
+      "summary": "Exercises test_luna_addition_cannot_supersede_glm_element behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "function",
+      "name": "test_provider_order_alias_cannot_reorder_glm_elements",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2142,
+        2158
+      ],
+      "summary": "Exercises test_provider_order_alias_cannot_reorder_glm_elements behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "function",
+      "name": "test_luna_addition_is_ignored_even_when_duplicate",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2161,
+        2174
+      ],
+      "summary": "Exercises test_luna_addition_is_ignored_even_when_duplicate behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "function",
+      "name": "test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2177,
+        2191
+      ],
+      "summary": "Exercises test_luna_addition_is_ignored_for_multiple_glm_predecessors behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "function",
+      "name": "test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2224,
+        2236
+      ],
+      "summary": "Exercises test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "function",
+      "name": "test_unexpected_crop_decision_rejects_the_visual_batch",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2297,
+        2316
+      ],
+      "summary": "Exercises test_unexpected_crop_decision_rejects_the_visual_batch behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "function",
+      "name": "test_all_visuals_are_enriched_in_bounded_batches",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2357,
+        2370
+      ],
+      "summary": "Exercises test_all_visuals_are_enriched_in_bounded_batches behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "function",
+      "name": "test_visual_crop_batch_failure_is_isolated",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2381,
+        2401
+      ],
+      "summary": "Exercises test_visual_crop_batch_failure_is_isolated behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "function",
+      "name": "test_extreme_page_reordering_is_ignored_and_audited",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2440,
+        2452
+      ],
+      "summary": "Exercises test_extreme_page_reordering_is_ignored_and_audited behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "class",
+      "name": "AcceptingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        58,
+        93
+      ],
+      "summary": "Provides the AcceptingGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "class",
+      "name": "QualityRecoveryGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        122,
+        154
+      ],
+      "summary": "Provides the QualityRecoveryGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "class",
+      "name": "NoQualityScanGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        157,
+        162
+      ],
+      "summary": "Provides the NoQualityScanGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "class",
+      "name": "PlannedQualityCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        165,
+        196
+      ],
+      "summary": "Provides the PlannedQualityCropGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "class",
+      "name": "ScanProbeRecoveryGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        703,
+        752
+      ],
+      "summary": "Provides the ScanProbeRecoveryGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "class",
+      "name": "ConflictingScanProbeGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        925,
+        963
+      ],
+      "summary": "Provides the ConflictingScanProbeGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "class",
+      "name": "OverflowingScanProbeGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        983,
+        1014
+      ],
+      "summary": "Provides the OverflowingScanProbeGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "class",
+      "name": "UnresolvedCriticalGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1044,
+        1072
+      ],
+      "summary": "Provides the UnresolvedCriticalGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "class",
+      "name": "SecondRoundStructuredRepairGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1106,
+        1178
+      ],
+      "summary": "Provides the SecondRoundStructuredRepairGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "class",
+      "name": "MalformedCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1215,
+        1227
+      ],
+      "summary": "Provides the MalformedCorrectionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "class",
+      "name": "ManyQualityCandidatesGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1244,
+        1288
+      ],
+      "summary": "Provides the ManyQualityCandidatesGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "class",
+      "name": "MismatchedQualityEvidenceGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1291,
+        1311
+      ],
+      "summary": "Provides the MismatchedQualityEvidenceGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "class",
+      "name": "RepeatedQualityRejectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1343,
+        1360
+      ],
+      "summary": "Provides the RepeatedQualityRejectionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "class",
+      "name": "GeometryOnlyQualityGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1377,
+        1426
+      ],
+      "summary": "Provides the GeometryOnlyQualityGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "class",
+      "name": "SemanticRejectionOfClippedGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1445,
+        1475
+      ],
+      "summary": "Provides the SemanticRejectionOfClippedGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "class",
+      "name": "DirectInspectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1491,
+        1512
+      ],
+      "summary": "Provides the DirectInspectionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "class",
+      "name": "InvalidBoxGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1530,
+        1541
+      ],
+      "summary": "Provides the InvalidBoxGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "class",
+      "name": "MissingCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1559,
+        1578
+      ],
+      "summary": "Provides the MissingCorrectionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "class",
+      "name": "CorrectingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1594,
+        1621
+      ],
+      "summary": "Provides the CorrectingGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "class",
+      "name": "RejectingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1636,
+        1648
+      ],
+      "summary": "Provides the RejectingGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "class",
+      "name": "WrongCropRegionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1660,
+        1682
+      ],
+      "summary": "Provides the WrongCropRegionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "class",
+      "name": "SelectiveGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1698,
+        1730
+      ],
+      "summary": "Provides the SelectiveGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "class",
+      "name": "CriticalLiteralGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1748,
+        1781
+      ],
+      "summary": "Provides the CriticalLiteralGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "class",
+      "name": "InvalidCorrectionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1795,
+        1821
+      ],
+      "summary": "Provides the InvalidCorrectionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "class",
+      "name": "FailingVerifierGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1843,
+        1845
+      ],
+      "summary": "Provides the FailingVerifierGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "class",
+      "name": "CropBatchGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1860,
+        1889
+      ],
+      "summary": "Provides the CropBatchGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "class",
+      "name": "FailingCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1931,
+        1933
+      ],
+      "summary": "Provides the FailingCropGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "class",
+      "name": "CoverageGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        1948,
+        1998
+      ],
+      "summary": "Provides the CoverageGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "class",
+      "name": "RejectedAdditionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2022,
+        2089
+      ],
+      "summary": "Provides the RejectedAdditionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "class",
+      "name": "OrderedRejectedAdditionGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2112,
+        2139
+      ],
+      "summary": "Provides the OrderedRejectedAdditionGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "class",
+      "name": "NormalizingGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2194,
+        2221
+      ],
+      "summary": "Provides the NormalizingGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "class",
+      "name": "ProactiveCropGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2239,
+        2294
+      ],
+      "summary": "Provides the ProactiveCropGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "class",
+      "name": "ManyVisualsGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2319,
+        2354
+      ],
+      "summary": "Provides the ManyVisualsGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "class",
+      "name": "SecondVisualBatchFailsGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2373,
+        2378
+      ],
+      "summary": "Provides the SecondVisualBatchFailsGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "class",
+      "name": "ExtremeOrderGateway",
+      "filePath": "tests/test_simple_pipeline.py",
+      "lineRange": [
+        2404,
+        2437
+      ],
+      "summary": "Provides the ExtremeOrderGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:_report",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:_report",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_passes_absolute_and_baseline_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_reports_each_failed_constraint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_fails_closed_for_missing_metric",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_rejects_incompatible_baseline",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_regression_policy.py",
+      "target": "function:tests/test_regression_policy.py:test_regression_policy_requires_matching_baseline_review_threshold",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:_schema",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:_schema",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_save_list_get_and_case_insensitive_replacement",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_date_compiles_to_nullable_iso_string",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_json_round_trip_and_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_raw_nested_json_schema_round_trip_and_compilation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_schema_store_reads_legacy_v1_rows_after_v2_support",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_bullets_uses_filename_fallback",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_csv",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_xlsx_uses_first_worksheet",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_rows",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_tabular_schema_rejects_invalid_file_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_fields",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_parse_markdown_schema_rejects_invalid_file_input",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_store_and_markdown_table",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_bullets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_schema_store.py",
+      "target": "function:tests/test_schema_store.py:test_classifier_profile_markdown_rejects_invalid_profiles",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_draws_nested_audit_boxes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_converts_multiframe_image",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_rejects_page_count_mismatch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_supports_semantic_labels_and_selected_overlay",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_nested_document_renders_layout_aware_markdown_and_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_only_rejected_blocks_are_suppressed_without_warning_callouts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_needs_review_text_remains_readable_and_auditable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_semantic_html_table_keeps_original_layout_in_markdown",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_preview_preserves_markdown_and_sanitizes_supported_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_provider_draft_accepts_unordered_coordinates_for_local_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_escapes_source_name_and_table_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_clean_markdown_renders_document_elements_and_exact_page_break",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_schema_version_and_list_marker_are_preserved_in_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_unchecked_high_confidence_content_has_truthful_audit_state",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_provider_draft_accepts_explicit_form_and_checkbox_fields",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_form_label_with_source_colon_renders_one_colon",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_form_hint_remains_visible_and_structured_in_json",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_draws_nested_audit_boxes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_converts_multiframe_image",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_rejects_page_count_mismatch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_annotated_pdf_supports_semantic_labels_and_selected_overlay",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_nested_document_renders_layout_aware_markdown_and_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_only_rejected_blocks_are_suppressed_without_warning_callouts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_needs_review_text_remains_readable_and_auditable",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_semantic_html_table_keeps_original_layout_in_markdown",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_preview_preserves_markdown_and_sanitizes_supported_html",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_provider_draft_accepts_unordered_coordinates_for_local_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_escapes_source_name_and_table_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_clean_markdown_renders_document_elements_and_exact_page_break",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_markdown_does_not_duplicate_equivalent_list_marker_in_item_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_schema_version_and_list_marker_are_preserved_in_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_unchecked_high_confidence_content_has_truthful_audit_state",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_provider_draft_accepts_explicit_form_and_checkbox_fields",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_form_label_with_source_colon_renders_one_colon",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_contract.py",
+      "target": "function:tests/test_simple_contract.py:test_form_hint_remains_visible_and_structured_in_json",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_flag_is_additive_and_fail_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:AcceptingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_parser_builds_verified_nested_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:QualityRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NoQualityScanGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:PlannedQualityCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_planner_approved_nonvisual_box_is_dispatched",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_states_reads_standalone_marker_only_within_its_row",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_merge_confirmed_form_states_changes_only_confirmed_option_cells",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_merges_only_two_scale_consensus",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_paddle_form_recovery_preserves_primary_when_scales_disagree",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_marks_resolved_unknown_and_conflicting_controls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_form_control_recovery_severity_prioritizes_dense_unknown_groups",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_merge_fills_only_aligned_blank_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_uses_high_resolution_crop_without_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_glm_form_recovery_does_not_consume_luna_document_budget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_custom_gateway_without_analysis_does_not_synthesize_scan_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ScanProbeRecoveryGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_does_not_synthesize_missing_regions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_failures_across_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_prioritizes_unresolved_form_controls",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_plan_enforces_document_and_page_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_recovery_crop_budget_scales_with_document_length",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_garbage_ratio_is_unicode_safe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ConflictingScanProbeGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_full_page_scan_recovery_is_not_attempted",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OverflowingScanProbeGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_incomplete_scanned_structures_are_repaired_without_duplicate_probes",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:UnresolvedCriticalGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_clipped_critical_literal_remains_visible_with_review_warning",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:_account_pdf",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondRoundStructuredRepairGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_rejected_form_remains_reviewable_after_one_quality_round",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_failed_quality_crop_preserves_reviewable_structured_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MalformedCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_malformed_quality_correction_preserves_reviewable_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyQualityCandidatesGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MismatchedQualityEvidenceGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_mismatched_quality_crop_evidence_fails_closed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_quality_repair_processes_all_candidates_in_batches_of_eight",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RepeatedQualityRejectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_remains_reviewable_after_one_quality_round",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:GeometryOnlyQualityGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_geometry_only_rejection_remains_visible_for_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SemanticRejectionOfClippedGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_semantic_rejection_of_clipped_content_remains_suppressed",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:DirectInspectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_risky_regions_are_inspected_directly",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidBoxGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_grounding_cannot_be_verified",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:MissingCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_missing_correction_remains_unresolved",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CorrectingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_grounded_correction_replaces_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_explicit_rejection_keeps_glm_content_reviewable",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:WrongCropRegionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_decision_for_wrong_region_remains_unresolved",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SelectiveGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_low_confidence_regions_are_sent_to_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CriticalLiteralGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_only_ambiguous_critical_literals_trigger_luna",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:InvalidCorrectionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_invalid_corrected_geometry_is_ignored_while_text_is_applied",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingVerifierGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_verifier_error_preserves_draft_text_as_needs_review",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CropBatchGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_requests_cover_all_risky_regions_in_one_batch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_render_error_preserves_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:FailingCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_crop_verifier_error_preserves_draft_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:CoverageGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_page_inspection_cannot_add_content_or_reorder_glm_manifest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:RejectedAdditionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_cannot_supersede_glm_element",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:OrderedRejectedAdditionGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_provider_order_alias_cannot_reorder_glm_elements",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_even_when_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_luna_addition_is_ignored_for_multiple_glm_predecessors",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:NormalizingGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_deterministic_cleanup_removes_soft_hyphens_and_exact_label_repetition",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ProactiveCropGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_unexpected_crop_decision_rejects_the_visual_batch",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ManyVisualsGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_all_visuals_are_enriched_in_bounded_batches",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:SecondVisualBatchFailsGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_visual_crop_batch_failure_is_isolated",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "class:tests/test_simple_pipeline.py:ExtremeOrderGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_simple_pipeline.py",
+      "target": "function:tests/test_simple_pipeline.py:test_extreme_page_reordering_is_ignored_and_audited",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

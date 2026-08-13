@@ -1,0 +1,265 @@
+{
+  "nodes": [
+    {
+      "id": "file:docs-site/agentic-document-extraction-comparison.html",
+      "type": "file",
+      "name": "agentic-document-extraction-comparison.html",
+      "filePath": "docs-site/agentic-document-extraction-comparison.html",
+      "summary": "Documentation page comparing Grounded DocParse with LandingAI ADE for agentic document extraction.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/api.html",
+      "type": "file",
+      "name": "api.html",
+      "filePath": "docs-site/api.html",
+      "summary": "Documentation page describing the public Python API for Grounded DocParse.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/architecture.html",
+      "type": "file",
+      "name": "architecture.html",
+      "filePath": "docs-site/architecture.html",
+      "summary": "Documentation page explaining the system architecture and major parser components.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/azure-bulk-fax-deployment.html",
+      "type": "file",
+      "name": "azure-bulk-fax-deployment.html",
+      "filePath": "docs-site/azure-bulk-fax-deployment.html",
+      "summary": "Deployment guide for processing bulk medical faxes with Grounded DocParse on Azure.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/business-user-extraction-workflow.html",
+      "type": "file",
+      "name": "business-user-extraction-workflow.html",
+      "filePath": "docs-site/business-user-extraction-workflow.html",
+      "summary": "Workflow guide for business users extracting large structured field sets from documents.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/changelog.html",
+      "type": "file",
+      "name": "changelog.html",
+      "filePath": "docs-site/changelog.html",
+      "summary": "Published changelog page tracking user-visible project releases and changes.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/complete-user-guide.html",
+      "type": "file",
+      "name": "complete-user-guide.html",
+      "filePath": "docs-site/complete-user-guide.html",
+      "summary": "Comprehensive documentation covering installation, configuration, workflows, and parser use.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/contributing.html",
+      "type": "file",
+      "name": "contributing.html",
+      "filePath": "docs-site/contributing.html",
+      "summary": "Contributor documentation covering how to participate in project development.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/extraction-quality-research.html",
+      "type": "file",
+      "name": "extraction-quality-research.html",
+      "filePath": "docs-site/extraction-quality-research.html",
+      "summary": "Research documentation on extraction quality methods and evaluation findings.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/how-grounded-docparse-is-agentic.html",
+      "type": "file",
+      "name": "how-grounded-docparse-is-agentic.html",
+      "filePath": "docs-site/how-grounded-docparse-is-agentic.html",
+      "summary": "Documentation explaining the project\u2019s agentic document-parsing behavior and evidence model.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/how-it-works.html",
+      "type": "file",
+      "name": "how-it-works.html",
+      "filePath": "docs-site/how-it-works.html",
+      "summary": "High-level explanation of the document parsing workflow and its outputs.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/index.html",
+      "type": "file",
+      "name": "index.html",
+      "filePath": "docs-site/index.html",
+      "summary": "Documentation-site landing page introducing Grounded DocParse and its evidence-driven parsing approach.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/issue-template--bug-report.html",
+      "type": "file",
+      "name": "issue-template--bug-report.html",
+      "filePath": "docs-site/issue-template--bug-report.html",
+      "summary": "Rendered documentation page for the bug-report issue template.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/issue-template--feature-request.html",
+      "type": "file",
+      "name": "issue-template--feature-request.html",
+      "filePath": "docs-site/issue-template--feature-request.html",
+      "summary": "Rendered documentation page for the feature-request issue template.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/layout-aware-large-field-extraction-workflow.html",
+      "type": "file",
+      "name": "layout-aware-large-field-extraction-workflow.html",
+      "filePath": "docs-site/layout-aware-large-field-extraction-workflow.html",
+      "summary": "Workflow guide for layout-aware extraction of large structured field sets.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/local-glmocr.html",
+      "type": "file",
+      "name": "local-glmocr.html",
+      "filePath": "docs-site/local-glmocr.html",
+      "summary": "Setup documentation for running the local GLM-OCR runtime.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/local-paddleocr-vl.html",
+      "type": "file",
+      "name": "local-paddleocr-vl.html",
+      "filePath": "docs-site/local-paddleocr-vl.html",
+      "summary": "Setup documentation for running the local PaddleOCR-VL runtime.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:docs-site/research.html",
+      "type": "file",
+      "name": "research.html",
+      "filePath": "docs-site/research.html",
+      "summary": "Documentation page describing the design basis and research informing the parser.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/run.html",
+      "type": "file",
+      "name": "run.html",
+      "filePath": "docs-site/run.html",
+      "summary": "Local execution guide for running Grounded DocParse.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:docs-site/security-content-excluded.html",
+      "type": "file",
+      "name": "security-content-excluded.html",
+      "filePath": "docs-site/security-content-excluded.html",
+      "summary": "Documentation notice identifying content intentionally excluded for security reasons.",
+      "tags": [
+        "documentation-site",
+        "html",
+        "static-content"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": []
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "manifest-v1.1.schema.json",
+  "title": "Grounded DocParse evaluation corpus manifest v1.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "annotation_schema_version",
+    "corpus_id",
+    "documents"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.1"
+    },
+    "annotation_schema_version": {
+      "const": "1.1"
+    },
+    "corpus_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "source",
+          "features",
+          "synthetic"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "path"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "local",
+                  "external"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "annotation_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "synthetic": {
+            "type": "boolean"
+          },
+          "expected_document_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "Invoice",
+              "Contract",
+              "Bank Statement",
+              "Report",
+              "Form",
+              "Certificate",
+              "Letter",
+              "Other",
+              null
+            ]
+          }
+        }
+      }
+    }
+  }
+}

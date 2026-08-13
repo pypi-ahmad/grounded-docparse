@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "rules": [
+    {
+      "name": "classification label coverage",
+      "path": "/classification/scored_documents",
+      "direction": "higher_is_better",
+      "minimum": 20
+    },
+    {
+      "name": "document classification accuracy",
+      "path": "/classification/accuracy",
+      "direction": "higher_is_better",
+      "minimum": 0.85,
+      "max_regression": 0.02
+    },
+    {
+      "name": "document classification review rate",
+      "path": "/classification/review/review_rate",
+      "direction": "lower_is_better",
+      "maximum": 0.25,
+      "max_regression": 0.03
+    },
+    {
+      "name": "OCR block review rate",
+      "path": "/review/ocr_blocks/review_rate",
+      "direction": "lower_is_better",
+      "maximum": 0.2,
+      "max_regression": 0.02
+    }
+  ]
+}

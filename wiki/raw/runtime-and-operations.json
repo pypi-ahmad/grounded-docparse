@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "snapshot": {
+    "id": "content-6684c0091b62",
+    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
+    "branch": "native-document-ingestion",
+    "dirty": true
+  },
+  "generated_at": "2026-08-12T16:46:34.603348+00:00",
+  "category": "runtime-and-operations",
+  "files": [
+    {
+      "path": "Launch-GLM-OCR.cmd",
+      "sha256": "e44d3bee61cd07d0de4722a7082048dc206502ec0928b5ffca6bb6b57e73a014",
+      "size": 1667
+    },
+    {
+      "path": "Launch-PaddleOCR-VL-1.6.cmd",
+      "sha256": "caa40ebb337ea5192ddd0f8a9115360b77a6809e5c91760522afb472f25e0910",
+      "size": 1714
+    },
+    {
+      "path": "Setup-GLM-OCR.cmd",
+      "sha256": "4a762fe88b2ffa4020dacdfce944f17b884c2d82aa019f34491c49fb7ec0c818",
+      "size": 210
+    },
+    {
+      "path": "installer/GroundedDocParse.iss",
+      "sha256": "7f83a6bf815916d5af0d8227aa3f283e17207241a851b0c2814ae8a0f1133941",
+      "size": 2923
+    },
+    {
+      "path": "installer/Install-GroundedDocParse.ps1",
+      "sha256": "1076797c17a601243113d57b933e2d9d14e563b57ed2c13797fce562356bb892",
+      "size": 16170
+    },
+    {
+      "path": "paddle-runtime/pyproject.toml",
+      "sha256": "185a46d6b3c66ecc194f1077537716800a07add4f3e6098f3df0fa425f79e7b8",
+      "size": 377
+    },
+    {
+      "path": "paddle-runtime/uv.lock",
+      "sha256": "6cd58b25f016d0706b0a5c49b3a74be1d8296b054a820332c92798e04cf17349",
+      "size": 319560
+    },
+    {
+      "path": "scripts/build-installer.ps1",
+      "sha256": "dd83e075b2b9cf931928aa40b4cee9ad2d0ce8bf849ca09bcb46f20e6130e9d0",
+      "size": 2008
+    },
+    {
+      "path": "scripts/build_docs_site.py",
+      "sha256": "cf3cddef81a78f4e5cfeead7d717b9a3077e9933bf0ddc97a1b899264a070b52",
+      "size": 22201
+    },
+    {
+      "path": "scripts/evaluate_corpus.py",
+      "sha256": "8199e4ad1aa1d251888e72e94f6d9d82507332b1c9ad54934630b1a5d6879aab",
+      "size": 17102
+    },
+    {
+      "path": "scripts/generate_evaluation_corpus.py",
+      "sha256": "460d8c8a1822a8fcbc9ee8dddff88c97e8066c997ff3e24d4497480086db1b9f",
+      "size": 19716
+    },
+    {
+      "path": "scripts/generate_examples.py",
+      "sha256": "c8bcf8927cdfbf946004a89874ef876955a78d03127960fa7589675496661c6e",
+      "size": 2655
+    },
+    {
+      "path": "scripts/refresh_knowledge_wiki.py",
+      "sha256": "d7d93ace85b437934fc65194e1197dae7c5c90b234092a05cbc7f1303f35a32b",
+      "size": 11875
+    },
+    {
+      "path": "scripts/wsl/benchmark_glmocr.py",
+      "sha256": "a469ad5510da259ad4ff35e93816f6bbebbd41411de7a1f3c3e2daf56e2aec60",
+      "size": 4190
+    },
+    {
+      "path": "scripts/wsl/check-glmocr-api.py",
+      "sha256": "69ee45c34369ed3371913fbea88e771df914f036ce791037529509921c1971dd",
+      "size": 3142
+    },
+    {
+      "path": "scripts/wsl/check-paddleocr-api.py",
+      "sha256": "c795e5872e2efd8973a34f3b039fa39ead745d22630d8bd204ba9326b482566e",
+      "size": 1328
+    },
+    {
+      "path": "scripts/wsl/launch-stack.sh",
+      "sha256": "87d4679044cf5ab6de49993f180900c048b84f8134df1be2c805083b66d9fde9",
+      "size": 5706
+    },
+    {
+      "path": "scripts/wsl/manage-ocr-stack.sh",
+      "sha256": "681b1f5ebfe389c199d0d9000f75a6ca611b50bc0e104f5ab4b4a80fa68af236",
+      "size": 11579
+    },
+    {
+      "path": "scripts/wsl/prepare_glmocr_runtime.py",
+      "sha256": "9d5d693640181f37a4ad6dfaef5d80f9d0858683fd1c1b92f03b62b2427f4c3e",
+      "size": 5578
+    },
+    {
+      "path": "scripts/wsl/prepare_paddleocr_runtime.py",
+      "sha256": "4de7c1064ae1d67ff8489770ec4856e405a6de932493c2b7dfd19f02f8e7dca8",
+      "size": 5178
+    },
+    {
+      "path": "scripts/wsl/run-app.sh",
+      "sha256": "4e83277ab3c01ebc417fc7408263a9c05d1d52053c04400dfe670663151b1d2e",
+      "size": 1524
+    },
+    {
+      "path": "scripts/wsl/serve-glmocr.sh",
+      "sha256": "53c89627ec971fd1e945533f90de1601bb572ff9cec711cb97b66e880c5094d2",
+      "size": 1223
+    },
+    {
+      "path": "scripts/wsl/serve-ollama.sh",
+      "sha256": "d8a5885823a93cc18507617cc4c576518eb2642b9ed8448b64a83022e4a22633",
+      "size": 437
+    },
+    {
+      "path": "scripts/wsl/setup-glmocr.sh",
+      "sha256": "5bf79f1938cc46975f57dce1ff3f491bf2a8aaee561c14146cfb74e8de918dbd",
+      "size": 3176
+    },
+    {
+      "path": "scripts/wsl/setup-ollama.sh",
+      "sha256": "312b4a41dbe2178f052aec533eff85b1dbc8fd149410b8bb1fc76a820865e4b7",
+      "size": 2275
+    },
+    {
+      "path": "scripts/wsl/setup-paddleocr.sh",
+      "sha256": "040e72fa99634450daaaf3a003ac175a078404fd343305a4cb7e4e5eaf8ba6aa",
+      "size": 2503
+    },
+    {
+      "path": "scripts/wsl/stop-stack.sh",
+      "sha256": "a14ef2770c48fe0db1317bfae3301149251a6aea2ce68275ff17f80d37babff8",
+      "size": 1861
+    }
+  ]
+}

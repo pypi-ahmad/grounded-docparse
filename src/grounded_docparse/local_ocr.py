@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import gc
+import hashlib
 import json
+import re
+import sys
+import tempfile
 import threading
 from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError, version
@@ -9,7 +14,7 @@ from typing import Any
 
 
 @dataclass(frozen=True, slots=True)
-class GlmRegion:
+class OcrRegion:
     index: int
     label: str
     content: str
@@ -21,10 +26,15 @@ class GlmRegion:
 
 
 @dataclass(frozen=True, slots=True)
-class GlmPageResult:
+class OcrPageResult:
     image_path: Path
-    regions: list[GlmRegion]
+    regions: list[OcrRegion]
     error: str | None = None
+
+
+# Backward-compatible names for callers and stored test fixtures.
+GlmRegion = OcrRegion
+GlmPageResult = OcrPageResult
 
 
 def _objects(value: Any) -> list[dict[str, Any]]:
@@ -60,13 +70,13 @@ def _bbox(item: dict[str, Any]) -> tuple[float, float, float, float] | None:
         return None
 
 
-def _regions(result: Any) -> list[GlmRegion]:
+def _regions(result: Any) -> list[OcrRegion]:
     formatted = _objects(getattr(result, "json_result", result))
     raw = _objects(getattr(result, "raw_json_result", {}))
     raw_by_index = {
         int(item.get("index", index)): item for index, item in enumerate(raw)
     }
-    output: list[GlmRegion] = []
+    output: list[OcrRegion] = []
     for position, item in enumerate(formatted):
         box = _bbox(item)
         if box is None:
@@ -90,7 +100,7 @@ def _regions(result: Any) -> list[GlmRegion]:
             else ()
         )
         output.append(
-            GlmRegion(
+            OcrRegion(
                 index=index,
                 label=str(item.get("native_label", item.get("label", "unknown"))),
                 content=str(item.get("content", item.get("text", "")) or ""),
@@ -162,6 +172,34 @@ class GlmOcrRuntime:
 _instances: dict[tuple[str, str], GlmOcrRuntime] = {}
 _instances_lock = threading.Lock()
 
+GLM_FORM_RECOVERY_MAX_PIXELS = 4_014_080
+
+
+def _form_recovery_config_path(config_path: str) -> Path:
+    """Materialize a high-resolution variant without changing the primary config."""
+
+    source = Path(config_path).resolve()
+    content = source.read_text(encoding="utf-8")
+    image_pattern = re.compile(r"(?m)^(\s*image_format:\s*)\S+(\s*)$")
+    pixels_pattern = re.compile(r"(?m)^(\s*max_pixels:\s*)\d+(\s*)$")
+    recovered, image_changes = image_pattern.subn(r"\g<1>PNG\g<2>", content, count=1)
+    recovered, pixel_changes = pixels_pattern.subn(
+        rf"\g<1>{GLM_FORM_RECOVERY_MAX_PIXELS}\g<2>", recovered, count=1
+    )
+    if image_changes != 1 or pixel_changes != 1:
+        raise RuntimeError(
+            "GLM-OCR config must contain one image_format and one max_pixels setting"
+        )
+    digest = hashlib.sha256(f"{source}\0{recovered}".encode()).hexdigest()[:16]
+    target_dir = Path(tempfile.gettempdir()) / "grounded-docparse"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / f"glmocr-form-recovery-{digest}.yaml"
+    if not target.exists() or target.read_text(encoding="utf-8") != recovered:
+        temporary = target.with_suffix(".tmp")
+        temporary.write_text(recovered, encoding="utf-8", newline="\n")
+        temporary.replace(target)
+    return target
+
 
 def get_glmocr_runtime(config_path: str, layout_device: str) -> GlmOcrRuntime:
     key = (str(Path(config_path).resolve()), layout_device)
@@ -169,6 +207,26 @@ def get_glmocr_runtime(config_path: str, layout_device: str) -> GlmOcrRuntime:
         if key not in _instances:
             _instances[key] = GlmOcrRuntime(*key)
         return _instances[key]
+
+
+def get_glmocr_form_recovery_runtime(
+    config_path: str, layout_device: str
+) -> GlmOcrRuntime:
+    return get_glmocr_runtime(
+        str(_form_recovery_config_path(config_path)), layout_device
+    )
+
+
+def clear_glmocr_runtimes() -> None:
+    """Release in-process GLM models before handing the GPU to PaddleOCR."""
+
+    with _instances_lock:
+        _instances.clear()
+    gc.collect()
+    torch = sys.modules.get("torch")
+    cuda = getattr(torch, "cuda", None)
+    if cuda is not None and callable(getattr(cuda, "empty_cache", None)):
+        cuda.empty_cache()
 
 
 def glmocr_version() -> str | None:

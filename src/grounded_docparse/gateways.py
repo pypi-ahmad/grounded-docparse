@@ -12,7 +12,7 @@ from openai import OpenAI, OpenAIError
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .config import LUNA_MODEL, ParserConfig
+from .config import LUNA_MODEL, LUNA_REASONING_EFFORT, ParserConfig
 from .ingest import PageEvidence
 from .models import (
     AgentRole,
@@ -121,6 +121,24 @@ class OpenAIDocumentGateway:
         )
         input_tokens = get("input_tokens", 0)
         output_tokens = get("output_tokens", 0)
+        input_details = get("input_tokens_details", None)
+        details_get = (
+            input_details.get
+            if isinstance(input_details, dict)
+            else lambda name, default: getattr(input_details, name, default)
+        )
+        cached_input_tokens = details_get("cached_tokens", 0)
+        valid_input_tokens = (
+            input_tokens if isinstance(input_tokens, int) and input_tokens >= 0 else 0
+        )
+        valid_cached_input_tokens = (
+            cached_input_tokens
+            if isinstance(cached_input_tokens, int) and cached_input_tokens >= 0
+            else 0
+        )
+        valid_cached_input_tokens = min(
+            valid_cached_input_tokens, valid_input_tokens
+        )
         if isinstance(input_tokens, int) and input_tokens >= 0:
             self.input_tokens += input_tokens
         if isinstance(output_tokens, int) and output_tokens >= 0:
@@ -128,9 +146,8 @@ class OpenAIDocumentGateway:
         call = AgentUsage(
             agent=agent,
             model=model,
-            input_tokens=input_tokens
-            if isinstance(input_tokens, int) and input_tokens >= 0
-            else 0,
+            input_tokens=valid_input_tokens,
+            cached_input_tokens=valid_cached_input_tokens,
             output_tokens=output_tokens
             if isinstance(output_tokens, int) and output_tokens >= 0
             else 0,
@@ -350,7 +367,7 @@ class OpenAIDocumentGateway:
                     agent=agent,
                     stage=stage,
                     model=LUNA_MODEL,
-                    reasoning={"effort": "medium"},
+                    reasoning={"effort": LUNA_REASONING_EFFORT},
                     store=False,
                     prompt_version=PROMPT_VERSION,
                     input=[
@@ -377,7 +394,7 @@ class OpenAIDocumentGateway:
             image_scope="full_page",
             source_page_path=page.image_path,
             model=LUNA_MODEL,
-            reasoning={"effort": "high"},
+            reasoning={"effort": LUNA_REASONING_EFFORT},
             store=False,
             input=[
                 {
@@ -464,7 +481,7 @@ class OpenAIDocumentGateway:
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
             repair_round=repair_round,
             model=LUNA_MODEL,
-            reasoning={"effort": "high"},
+            reasoning={"effort": LUNA_REASONING_EFFORT},
             store=False,
             input=[
                 {
@@ -491,6 +508,11 @@ class OpenAIDocumentGateway:
                         "fields. Geometry, type, reading order, confidence, and structural fields are "
                         "owned by GLM-OCR and ignored. Set confidence to at least 0.85 only when every "
                         "corrected glyph is clearly visible. "
+                        "For tables containing form controls, inspect every visible checkbox. In "
+                        "corrected_region.table_cells, prefix every existing option with [x] or [ ] "
+                        "and use the same row_index and column_index as the candidate cell. If multiple "
+                        "controls share one cell, preserve every marker and label in that cell. Never "
+                        "infer an unclear state; mark the crop inconclusive instead. "
                         "For rejections, set geometry_only=true only when rejection is exclusively caused "
                         "by invalid, missing, or clipped bounding-box geometry; set it false for semantic, "
                         "unsupported, ambiguous, or mixed failures. "
@@ -542,7 +564,7 @@ class OpenAIDocumentGateway:
             image_scope="crop_batch",
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
             model=LUNA_MODEL,
-            reasoning={"effort": "high"},
+            reasoning={"effort": LUNA_REASONING_EFFORT},
             store=False,
             input=[
                 {
@@ -607,7 +629,7 @@ class OpenAIDocumentGateway:
             image_scope="crop_batch",
             source_page_pixels=requests[0].source_page_pixels if requests else 0,
             model=LUNA_MODEL,
-            reasoning={"effort": "high"},
+            reasoning={"effort": LUNA_REASONING_EFFORT},
             store=False,
             input=[
                 {
@@ -727,7 +749,7 @@ class OpenAIDocumentGateway:
             agent="schema_architect",
             stage="schema_proposal",
             model=LUNA_MODEL,
-            reasoning={"effort": "medium"},
+            reasoning={"effort": LUNA_REASONING_EFFORT},
             store=False,
             input=[
                 {
@@ -803,7 +825,7 @@ class OpenAIDocumentGateway:
             response = self._provider_request(
                 lambda prompt=system_prompt: self._provider_responses().create(
                     model=model,
-                    reasoning={"effort": "medium"},
+                    reasoning={"effort": LUNA_REASONING_EFFORT},
                     store=False,
                     input=[
                         {"role": "system", "content": prompt},
@@ -853,7 +875,7 @@ class OpenAIDocumentGateway:
                         input_tokens=call_usage.input_tokens,
                         output_tokens=call_usage.output_tokens,
                         prompt_version=PROMPT_VERSION,
-                        reasoning_effort="medium",
+                        reasoning_effort=LUNA_REASONING_EFFORT,
                         summary=str(exc),
                     )
                 )
@@ -872,7 +894,7 @@ class OpenAIDocumentGateway:
                     input_tokens=call_usage.input_tokens,
                     output_tokens=call_usage.output_tokens,
                     prompt_version=PROMPT_VERSION,
-                    reasoning_effort="medium",
+                    reasoning_effort=LUNA_REASONING_EFFORT,
                 )
             )
             return payload

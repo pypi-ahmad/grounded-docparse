@@ -3,188 +3,161 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUNTIME_DIR="$PROJECT_ROOT/.runtime"
-VLLM_LOG="$RUNTIME_DIR/vllm.log"
 STREAMLIT_LOG="$RUNTIME_DIR/streamlit.log"
-VLLM_PID_FILE="$RUNTIME_DIR/vllm.pid"
 STREAMLIT_PID_FILE="$RUNTIME_DIR/streamlit.pid"
+STREAMLIT_PORT=8600
+START_ENGINE="${DOCPARSE_START_ENGINE:-glm-ocr}"
+PADDLE_API_PORT="${DOCPARSE_PADDLE_API_PORT:-8119}"
+export DOCPARSE_PADDLEOCR_SERVICE_URL="${DOCPARSE_PADDLEOCR_SERVICE_URL:-http://127.0.0.1:$PADDLE_API_PORT}"
 
 mkdir -p "$RUNTIME_DIR"
 cd "$PROJECT_ROOT"
-WSL_ENV="${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}"
+exec 8>"$RUNTIME_DIR/launch.lock"
+flock 8
 
-if ! [[ -x "$WSL_ENV/bin/python" && -f "$WSL_ENV/.docparse-local-ocr-ready" ]]; then
-  echo "Installing the locked GLM-OCR environment (first run only)..."
-  bash scripts/wsl/setup-glmocr.sh
-fi
-
-export HF_HUB_OFFLINE=1
-export TRANSFORMERS_OFFLINE=1
-"$WSL_ENV/bin/python" scripts/wsl/prepare_glmocr_runtime.py --offline >/dev/null
-GLMOCR_MODEL_PATH="$(<"$RUNTIME_DIR/glmocr-model-path")"
-GLMOCR_RUNTIME_CONFIG="$RUNTIME_DIR/glmocr.yaml"
-export DOCPARSE_GLMOCR_CONFIG_PATH="$GLMOCR_RUNTIME_CONFIG"
-
-pid_matches() {
-  local pid_file="$1"
-  local expected="$2"
-  [[ -f "$pid_file" ]] || return 1
-  local pid
-  pid="$(<"$pid_file")"
+process_is_running() {
+  local pid="$1"
   [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] || return 1
   [[ "$(awk '{print $3}' "/proc/$pid/stat")" != "Z" ]] || return 1
+  kill -0 "$pid" 2>/dev/null
+}
+
+pid_matches() {
+  local pid_file="$1" expected="$2" pid
+  [[ -f "$pid_file" ]] || return 1
+  pid="$(<"$pid_file")"
+  process_is_running "$pid" || return 1
   tr '\0' ' ' <"/proc/$pid/cmdline" | grep -Fq "$expected"
 }
 
-port_is_listening() {
-  local port="$1"
-  ss -ltnH "sport = :$port" | grep -q .
-}
+port_is_listening() { ss -ltnH "sport = :$1" | grep -q .; }
 
 wait_for_url() {
-  local url="$1"
-  local attempts="$2"
-  local log_file="$3"
+  local url="$1" attempts="$2" log_file="$3"
   for ((attempt = 1; attempt <= attempts; attempt++)); do
-    if curl --fail --silent --show-error "$url" >/dev/null 2>&1; then
-      return 0
-    fi
+    curl --fail --silent "$url" >/dev/null 2>&1 && return 0
     sleep 2
   done
   echo "ERROR: Timed out waiting for $url" >&2
-  echo "Last log lines from $log_file:" >&2
   tail -n 40 "$log_file" >&2 || true
   return 1
 }
 
-glm_model_is_ready() {
-  curl --fail --silent http://127.0.0.1:8080/v1/models | grep -q 'glm-ocr'
+stop_managed() {
+  local pid_file="$1" label="$2" pid
+  pid="$(<"$pid_file")"
+  kill "$pid"
+  for ((attempt = 1; attempt <= 30; attempt++)); do
+    process_is_running "$pid" || { rm -f "$pid_file"; return 0; }
+    sleep 1
+  done
+  echo "ERROR: Managed $label process $pid did not stop within 30 seconds." >&2
+  return 1
 }
 
-glm_inference_is_ready() {
-  "$WSL_ENV/bin/python" scripts/wsl/check-glmocr-api.py
+streamlit_engine() {
+  local pid entry
+  [[ -f "$STREAMLIT_PID_FILE" ]] || return 1
+  pid="$(<"$STREAMLIT_PID_FILE")"
+  [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/environ" ]] || return 1
+  while IFS= read -r -d '' entry; do
+    [[ "$entry" == DOCPARSE_OCR_ENGINE=* ]] && {
+      printf '%s' "${entry#*=}"
+      return 0
+    }
+  done <"/proc/$pid/environ"
+  return 1
 }
+
+streamlit_source_fingerprint() {
+  {
+    printf '%s\0' \
+      "$PROJECT_ROOT/streamlit_app.py" \
+      "$PROJECT_ROOT/scripts/wsl/run-app.sh" \
+      "$PROJECT_ROOT/.streamlit/config.toml" \
+      "$PROJECT_ROOT/pyproject.toml" \
+      "$PROJECT_ROOT/uv.lock"
+    find "$PROJECT_ROOT/src/grounded_docparse" -type f -name '*.py' -print0
+  } | sort -z | while IFS= read -r -d '' source_file; do
+    sha256sum "$source_file"
+  done | sha256sum | awk '{print $1}'
+}
+
+streamlit_uses_configured_port() {
+  [[ -f "$STREAMLIT_PID_FILE" ]] || return 1
+  local pid
+  pid="$(<"$STREAMLIT_PID_FILE")"
+  [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/cmdline" ]] || return 1
+  tr '\0' ' ' <"/proc/$pid/cmdline" | grep -Fq -- "--server.port $STREAMLIT_PORT"
+}
+
+if pid_matches "$STREAMLIT_PID_FILE" "streamlit run"; then
+  CURRENT_ENGINE="$(streamlit_engine || true)"
+  CURRENT_ENGINE="${CURRENT_ENGINE:-glm-ocr}"
+  if [[ "$CURRENT_ENGINE" != "$START_ENGINE" ]] || ! streamlit_uses_configured_port; then
+    echo "Stopping Streamlit before applying runtime configuration..."
+    stop_managed "$STREAMLIT_PID_FILE" "Streamlit"
+  fi
+elif port_is_listening "$STREAMLIT_PORT"; then
+  echo "ERROR: Port $STREAMLIT_PORT is occupied by an unmanaged process." >&2
+  exit 1
+fi
+
+bash scripts/wsl/manage-ocr-stack.sh ensure "$START_ENGINE" 8>&-
 
 streamlit_environment_matches() {
   [[ -f "$STREAMLIT_PID_FILE" ]] || return 1
-  local pid current_key="" current_base_url="" current_config="" entry
+  local pid current_key="" current_base_url="" current_engine=""
+  local current_source_fingerprint="" entry
   pid="$(<"$STREAMLIT_PID_FILE")"
   [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/environ" ]] || return 1
   while IFS= read -r -d '' entry; do
     case "$entry" in
       OPENAI_API_KEY=*) current_key="${entry#*=}" ;;
       OPENAI_BASE_URL=*) current_base_url="${entry#*=}" ;;
-      DOCPARSE_GLMOCR_CONFIG_PATH=*) current_config="${entry#*=}" ;;
+      DOCPARSE_OCR_ENGINE=*) current_engine="${entry#*=}" ;;
+      DOCPARSE_SOURCE_FINGERPRINT=*) current_source_fingerprint="${entry#*=}" ;;
     esac
   done <"/proc/$pid/environ"
   [[ "$current_key" == "${OPENAI_API_KEY-}" && \
     "$current_base_url" == "${OPENAI_BASE_URL-}" && \
-    "$current_config" == "$GLMOCR_RUNTIME_CONFIG" ]]
+    "$current_engine" == "$START_ENGINE" && \
+    "$current_source_fingerprint" == "$(streamlit_source_fingerprint)" ]] && \
+    streamlit_uses_configured_port
 }
 
-stop_managed_vllm() {
-  local pid
-  pid="$(<"$VLLM_PID_FILE")"
-  kill "$pid"
-  for ((attempt = 1; attempt <= 30; attempt++)); do
-    kill -0 "$pid" 2>/dev/null || {
-      rm -f "$VLLM_PID_FILE"
-      return 0
-    }
-    sleep 1
-  done
-  echo "ERROR: Managed vLLM process $pid did not stop within 30 seconds." >&2
-  return 1
+start_streamlit() {
+  echo "Starting Streamlit..."
+  local preload=false source_fingerprint
+  [[ "$START_ENGINE" == "glm-ocr" ]] && preload=true
+  source_fingerprint="$(streamlit_source_fingerprint)"
+  DOCPARSE_MANAGE_OCR_SERVICES=true \
+  DOCPARSE_OCR_ENGINE="$START_ENGINE" \
+  DOCPARSE_PRELOAD_LOCAL_OCR="$preload" \
+  DOCPARSE_SOURCE_FINGERPRINT="$source_fingerprint" \
+    nohup bash scripts/wsl/run-app.sh --server.headless true --server.port "$STREAMLIT_PORT" 8>&- \
+    >"$STREAMLIT_LOG" 2>&1 &
+  echo "$!" >"$STREAMLIT_PID_FILE"
+  wait_for_url "http://127.0.0.1:$STREAMLIT_PORT/_stcore/health" 90 "$STREAMLIT_LOG"
 }
 
-stop_managed_streamlit() {
-  local pid
-  pid="$(<"$STREAMLIT_PID_FILE")"
-  kill "$pid"
-  for ((attempt = 1; attempt <= 30; attempt++)); do
-    kill -0 "$pid" 2>/dev/null || {
-      rm -f "$STREAMLIT_PID_FILE"
-      return 0
-    }
-    sleep 1
-  done
-  echo "ERROR: Managed Streamlit process $pid did not stop within 30 seconds." >&2
-  return 1
-}
-
-start_vllm() {
-  echo "Starting vLLM..."
-  nohup bash scripts/wsl/serve-glmocr.sh >"$VLLM_LOG" 2>&1 &
-  echo "$!" >"$VLLM_PID_FILE"
-  wait_for_url http://127.0.0.1:8080/v1/models 450 "$VLLM_LOG"
-  glm_model_is_ready || {
-    echo "ERROR: vLLM is healthy but does not expose the glm-ocr model." >&2
-    return 1
-  }
-  glm_inference_is_ready
-}
-
-if glm_model_is_ready && pid_matches "$VLLM_PID_FILE" "vllm serve" && \
-  ! pid_matches "$VLLM_PID_FILE" "$GLMOCR_MODEL_PATH"; then
-  echo "Managed vLLM uses a stale or unpinned model path; restarting it..."
-  stop_managed_vllm
-  start_vllm
-  echo "vLLM is ready."
-elif glm_model_is_ready; then
-  if glm_inference_is_ready; then
-    echo "vLLM is already ready."
-  elif pid_matches "$VLLM_PID_FILE" "vllm serve"; then
-    echo "Managed vLLM failed inference validation; restarting it..."
-    stop_managed_vllm
-    start_vllm
-    echo "vLLM is ready."
+if curl --fail --silent "http://127.0.0.1:$STREAMLIT_PORT/_stcore/health" >/dev/null 2>&1; then
+  if pid_matches "$STREAMLIT_PID_FILE" "streamlit run" && streamlit_environment_matches; then
+    echo "Streamlit is already ready."
+  elif pid_matches "$STREAMLIT_PID_FILE" "streamlit run"; then
+    stop_managed "$STREAMLIT_PID_FILE" "Streamlit"
+    start_streamlit
   else
-    echo "ERROR: The unmanaged vLLM server on port 8080 failed inference validation." >&2
+    echo "ERROR: Port $STREAMLIT_PORT is occupied by an unmanaged process." >&2
     exit 1
   fi
-elif pid_matches "$VLLM_PID_FILE" "vllm serve"; then
-  echo "vLLM is already starting; waiting for readiness..."
-  wait_for_url http://127.0.0.1:8080/v1/models 450 "$VLLM_LOG"
-  if glm_model_is_ready && glm_inference_is_ready; then
-    echo "vLLM is ready."
-  else
-    echo "Managed vLLM failed inference validation; restarting it..."
-    stop_managed_vllm
-    start_vllm
-    echo "vLLM is ready."
-  fi
-elif port_is_listening 8080; then
-  echo "ERROR: Port 8080 is occupied by a process not managed by this launcher." >&2
-  exit 1
-else
-  start_vllm
-  echo "vLLM is ready."
-fi
-
-if curl --fail --silent http://127.0.0.1:8501/_stcore/health >/dev/null 2>&1 && \
-  pid_matches "$STREAMLIT_PID_FILE" "streamlit run" && \
-  ! streamlit_environment_matches; then
-  echo "Managed Streamlit environment changed; restarting it..."
-  stop_managed_streamlit
-  DOCPARSE_PRELOAD_LOCAL_OCR=true nohup bash scripts/wsl/run-app.sh \
-    --server.headless true >"$STREAMLIT_LOG" 2>&1 &
-  echo "$!" >"$STREAMLIT_PID_FILE"
-  wait_for_url http://127.0.0.1:8501/_stcore/health 90 "$STREAMLIT_LOG"
-  echo "Streamlit is ready."
-elif curl --fail --silent http://127.0.0.1:8501/_stcore/health >/dev/null 2>&1; then
-  echo "Streamlit is already ready."
 elif pid_matches "$STREAMLIT_PID_FILE" "streamlit run"; then
-  echo "Streamlit is already starting; waiting for readiness..."
-  wait_for_url http://127.0.0.1:8501/_stcore/health 90 "$STREAMLIT_LOG"
-elif port_is_listening 8501; then
-  echo "ERROR: Port 8501 is occupied by a process not managed by this launcher." >&2
+  wait_for_url "http://127.0.0.1:$STREAMLIT_PORT/_stcore/health" 90 "$STREAMLIT_LOG"
+elif port_is_listening "$STREAMLIT_PORT"; then
+  echo "ERROR: Port $STREAMLIT_PORT is occupied by an unmanaged process." >&2
   exit 1
 else
-  echo "Starting Streamlit and preloading PP-DocLayout..."
-  DOCPARSE_PRELOAD_LOCAL_OCR=true nohup bash scripts/wsl/run-app.sh \
-    --server.headless true >"$STREAMLIT_LOG" 2>&1 &
-  echo "$!" >"$STREAMLIT_PID_FILE"
-  wait_for_url http://127.0.0.1:8501/_stcore/health 90 "$STREAMLIT_LOG"
-  echo "Streamlit is ready."
+  start_streamlit
 fi
 
-echo "GLM-OCR stack ready at http://localhost:8501"
+echo "$START_ENGINE stack ready at http://localhost:$STREAMLIT_PORT"

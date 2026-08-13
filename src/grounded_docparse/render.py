@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import io
 import json
 import re
@@ -8,6 +9,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
+import nh3
 import pymupdf
 from PIL import Image, ImageOps, ImageSequence
 
@@ -20,6 +22,7 @@ from .models import (
     ExtractionResult,
     FormClassificationResult,
     NodeType,
+    OcrComparisonResult,
     PageQuality,
     ParseMetadata,
     ParseResult,
@@ -42,6 +45,20 @@ ANNOTATION_COLORS = {
 RECOVERY_ANNOTATION_COLOR = (1.0, 0.55, 0.0)
 
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
+_MARKDOWN_PREVIEW_HTML_PATTERN = re.compile(
+    r"<(?P<tag>[A-Za-z][\w:-]*)\b[^>]*>.*?</(?P=tag)\s*>"
+    r"|<(?:img|br|hr)\b[^>]*?/?>",
+    re.IGNORECASE | re.DOTALL,
+)
+_RAW_HTML_PATTERN = re.compile(
+    r"<!--.*?-->|</?[A-Za-z][^>]*>", re.IGNORECASE | re.DOTALL
+)
+_PREVIEW_HTML_TAGS = set(nh3.ALLOWED_TAGS) | {"tfoot"}
+_PREVIEW_HTML_ATTRIBUTES = {
+    tag: set(attributes) for tag, attributes in nh3.ALLOWED_ATTRIBUTES.items()
+}
+_PREVIEW_HTML_ATTRIBUTES.setdefault("table", set()).add("border")
+_PREVIEW_HTML_ATTRIBUTES["*"] = {"style"}
 
 
 def _checkbox_marker(block: Block) -> str:
@@ -137,6 +154,8 @@ def _form_residual_lines(block: Block) -> list[str]:
 
 
 def _table(block: Block) -> str:
+    if re.match(r"\s*<table\b", block.text, re.IGNORECASE):
+        return block.text
     if block.table is None or not block.table.cells:
         return block.text
     rows: dict[int, list] = {}
@@ -403,6 +422,36 @@ def render_markdown(document: Document) -> str:
     return markdown
 
 
+def sanitize_markdown_preview(markdown: str) -> str:
+    """Allow safe table and figure HTML without changing surrounding Markdown."""
+
+    def safe_text(value: str) -> str:
+        def replace(match: re.Match[str]) -> str:
+            raw = match.group(0)
+            return "" if raw.startswith("<!--") else html.escape(raw, quote=False)
+
+        return _RAW_HTML_PATTERN.sub(replace, value)
+
+    parts: list[str] = []
+    cursor = 0
+    for match in _MARKDOWN_PREVIEW_HTML_PATTERN.finditer(markdown):
+        parts.append(safe_text(markdown[cursor : match.start()]))
+        parts.append(
+            nh3.clean(
+                match.group(0),
+                tags=_PREVIEW_HTML_TAGS,
+                clean_content_tags=set(),
+                attributes=_PREVIEW_HTML_ATTRIBUTES,
+                filter_style_properties={"text-align"},
+                url_schemes=set(),
+                strip_comments=True,
+            )
+        )
+        cursor = match.end()
+    parts.append(safe_text(markdown[cursor:]))
+    return "".join(parts)
+
+
 @dataclass(frozen=True, slots=True)
 class RenderedAgenticDocument:
     markdown: str
@@ -412,6 +461,7 @@ class RenderedAgenticDocument:
 def build_elements(
     document: Document,
     recovered_element_ids: set[str] | None = None,
+    local_source: str = "glm-ocr",
 ) -> list[Element]:
     """Flatten the canonical document into the public engine-neutral contract."""
 
@@ -435,7 +485,7 @@ def build_elements(
                     source=(
                         "luna-recovery"
                         if block.id in (recovered_element_ids or set())
-                        else "glm-ocr"
+                        else local_source
                     ),
                 )
             )
@@ -688,6 +738,7 @@ def render_agentic_document(
     parse_metadata: ParseMetadata | None = None,
     markdown_override: str | None = None,
     recovery_log: list[VisualRecoveryResult] | None = None,
+    ocr_comparisons: list[OcrComparisonResult] | None = None,
 ) -> RenderedAgenticDocument:
     """Render canonical Markdown together with its grounded v4 envelope."""
 
@@ -810,7 +861,7 @@ def render_agentic_document(
         processing_time=duration_ms / 1000,
     )
     payload = {
-        "schema_version": "4.4.0",
+        "schema_version": "4.5.0",
         "markdown": markdown,
         "base_markdown": base_markdown,
         "document_type": None,
@@ -818,6 +869,9 @@ def render_agentic_document(
         "extracted_fields": {},
         "recovery_log": [
             item.model_dump(mode="json") for item in (recovery_log or [])
+        ],
+        "ocr_comparisons": [
+            item.model_dump(mode="json") for item in (ocr_comparisons or [])
         ],
         "metadata": {
             **metadata.model_dump(mode="json"),
@@ -857,7 +911,7 @@ def render_combined_result(
     """Flatten optional agentic results into the canonical v4.5 envelope."""
 
     payload = parse_result.structured_json
-    payload["schema_version"] = "4.5.0"
+    payload["schema_version"] = "4.6.0"
     payload["document_type"] = (
         analysis.classification.model_dump(mode="json")
         if analysis and analysis.classification
@@ -909,6 +963,9 @@ def render_combined_result(
     )
     payload["recovery_log"] = [
         item.model_dump(mode="json") for item in parse_result.recovery_log
+    ]
+    payload["ocr_comparisons"] = [
+        item.model_dump(mode="json") for item in parse_result.ocr_comparisons
     ]
 
     metadata = payload["metadata"]

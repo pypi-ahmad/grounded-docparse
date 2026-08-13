@@ -1,0 +1,2259 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_page_analysis.py",
+      "type": "file",
+      "name": "test_page_analysis.py",
+      "filePath": "tests/test_page_analysis.py",
+      "summary": "Contains pytest coverage for page analysis behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:page",
+      "type": "function",
+      "name": "page",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        26,
+        50
+      ],
+      "summary": "Exercises page behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:analyzer",
+      "type": "function",
+      "name": "analyzer",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        53,
+        55
+      ],
+      "summary": "Exercises analyzer behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:analyze",
+      "type": "function",
+      "name": "analyze",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        58,
+        59
+      ],
+      "summary": "Exercises analyze behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "function",
+      "name": "test_blank_page_skips_glm",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        62,
+        66
+      ],
+      "summary": "Exercises test_blank_page_skips_glm behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "function",
+      "name": "test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        69,
+        108
+      ],
+      "summary": "Exercises test_glm_regions_preserve_failed_recognition_separately_from_skipped_images behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "function",
+      "name": "test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        111,
+        134
+      ],
+      "summary": "Exercises test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "function",
+      "name": "test_low_resolution_scan",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        137,
+        147
+      ],
+      "summary": "Exercises test_low_resolution_scan behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "function",
+      "name": "test_multi_column_order_is_explicitly_ambiguous",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        150,
+        174
+      ],
+      "summary": "Exercises test_multi_column_order_is_explicitly_ambiguous behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "function",
+      "name": "test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        177,
+        207
+      ],
+      "summary": "Exercises test_dense_form_uses_spatial_order_and_defers_vertical_margin behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "function",
+      "name": "test_table_form_and_visual_complexity",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        210,
+        233
+      ],
+      "summary": "Exercises test_table_form_and_visual_complexity behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "function",
+      "name": "test_html_table_cells_preserve_spans_for_semantics",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        236,
+        272
+      ],
+      "summary": "Exercises test_html_table_cells_preserve_spans_for_semantics behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "function",
+      "name": "test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        275,
+        292
+      ],
+      "summary": "Exercises test_unresolved_checkbox_grid_is_prioritized_for_recovery behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "function",
+      "name": "test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        295,
+        320
+      ],
+      "summary": "Exercises test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "function",
+      "name": "test_recovery_uses_real_ocr_confidence_when_available",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        323,
+        340
+      ],
+      "summary": "Exercises test_recovery_uses_real_ocr_confidence_when_available behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "function",
+      "name": "test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        343,
+        374
+      ],
+      "summary": "Exercises test_paddle_uses_official_block_order_without_glm_column_ambiguity behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "function",
+      "name": "test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        377,
+        401
+      ],
+      "summary": "Exercises test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_page_analysis.py:Runtime",
+      "type": "class",
+      "name": "Runtime",
+      "filePath": "tests/test_page_analysis.py",
+      "lineRange": [
+        16,
+        23
+      ],
+      "summary": "Provides the Runtime test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_parallel_pages.py",
+      "type": "file",
+      "name": "test_parallel_pages.py",
+      "filePath": "tests/test_parallel_pages.py",
+      "summary": "Contains pytest coverage for parallel pages behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:_stub_document",
+      "type": "function",
+      "name": "_stub_document",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        22,
+        46
+      ],
+      "summary": "Exercises _stub_document behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parallel_page_config_defaults_and_environment",
+      "type": "function",
+      "name": "test_parallel_page_config_defaults_and_environment",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        127,
+        137
+      ],
+      "summary": "Exercises test_parallel_page_config_defaults_and_environment behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parallel_page_config_rejects_concurrency_above_batch_size",
+      "type": "function",
+      "name": "test_parallel_page_config_rejects_concurrency_above_batch_size",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        140,
+        142
+      ],
+      "summary": "Exercises test_parallel_page_config_rejects_concurrency_above_batch_size behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parser_processes_pages_concurrently_and_aggregates_in_page_order",
+      "type": "function",
+      "name": "test_parser_processes_pages_concurrently_and_aggregates_in_page_order",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        145,
+        168
+      ],
+      "summary": "Exercises test_parser_processes_pages_concurrently_and_aggregates_in_page_order behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parser_waits_for_a_batch_before_starting_the_next",
+      "type": "function",
+      "name": "test_parser_waits_for_a_batch_before_starting_the_next",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        171,
+        196
+      ],
+      "summary": "Exercises test_parser_waits_for_a_batch_before_starting_the_next behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parser_finalizes_cross_page_hierarchy_and_progress_on_caller_thread",
+      "type": "function",
+      "name": "test_parser_finalizes_cross_page_hierarchy_and_progress_on_caller_thread",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        199,
+        218
+      ],
+      "summary": "Exercises test_parser_finalizes_cross_page_hierarchy_and_progress_on_caller_thread behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_parallel_pages.py:test_parser_does_not_start_later_batches_after_a_fatal_page_error",
+      "type": "function",
+      "name": "test_parser_does_not_start_later_batches_after_a_fatal_page_error",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        221,
+        244
+      ],
+      "summary": "Exercises test_parser_does_not_start_later_batches_after_a_fatal_page_error behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_parallel_pages.py:ConcurrencyTracker",
+      "type": "class",
+      "name": "ConcurrencyTracker",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        49,
+        70
+      ],
+      "summary": "Provides the ConcurrencyTracker test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_parallel_pages.py:ParallelGateway",
+      "type": "class",
+      "name": "ParallelGateway",
+      "filePath": "tests/test_parallel_pages.py",
+      "lineRange": [
+        73,
+        124
+      ],
+      "summary": "Provides the ParallelGateway test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_provider_runtime.py",
+      "type": "file",
+      "name": "test_provider_runtime.py",
+      "filePath": "tests/test_provider_runtime.py",
+      "summary": "Contains pytest coverage for provider runtime behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "function",
+      "name": "_status_error",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        38,
+        42
+      ],
+      "summary": "Exercises _status_error behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "function",
+      "name": "_runtime",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        45,
+        55
+      ],
+      "summary": "Exercises _runtime behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "function",
+      "name": "test_runtime_retries_only_retryable_http_statuses",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        59,
+        73
+      ],
+      "summary": "Exercises test_runtime_retries_only_retryable_http_statuses behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "function",
+      "name": "test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        76,
+        89
+      ],
+      "summary": "Exercises test_runtime_retries_connection_errors_and_stops_at_attempt_bound behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "function",
+      "name": "test_runtime_releases_permit_after_provider_timeout",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        92,
+        106
+      ],
+      "summary": "Exercises test_runtime_releases_permit_after_provider_timeout behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "function",
+      "name": "test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        109,
+        124
+      ],
+      "summary": "Exercises test_runtime_counts_logical_calls_separately_from_retry_attempts behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "function",
+      "name": "test_runtime_does_not_retry_nonretryable_http_statuses",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        127,
+        140
+      ],
+      "summary": "Exercises test_runtime_does_not_retry_nonretryable_http_statuses behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "function",
+      "name": "test_runtime_honors_retry_after_and_capped_full_jitter",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        143,
+        164
+      ],
+      "summary": "Exercises test_runtime_honors_retry_after_and_capped_full_jitter behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "function",
+      "name": "test_runtime_honors_http_date_retry_after",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        167,
+        186
+      ],
+      "summary": "Exercises test_runtime_honors_http_date_retry_after behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "function",
+      "name": "test_runtime_shares_provider_admission_across_callers",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        189,
+        218
+      ],
+      "summary": "Exercises test_runtime_shares_provider_admission_across_callers behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "function",
+      "name": "test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        221,
+        256
+      ],
+      "summary": "Exercises test_429_halves_concurrency_then_success_window_recovers_one_slot behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "function",
+      "name": "test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        259,
+        286
+      ],
+      "summary": "Exercises test_runtime_releases_permit_after_base_exception_and_callback_failure behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "function",
+      "name": "test_default_gateway_disables_sdk_retries",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        289,
+        301
+      ],
+      "summary": "Exercises test_default_gateway_disables_sdk_retries behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "function",
+      "name": "_stub_document",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        304,
+        330
+      ],
+      "summary": "Exercises _stub_document behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "function",
+      "name": "test_parser_binds_one_runtime_without_changing_factory_signature",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        333,
+        395
+      ],
+      "summary": "Exercises test_parser_binds_one_runtime_without_changing_factory_signature behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "function",
+      "name": "test_runtime_config_defaults_environment_and_validation",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        398,
+        426
+      ],
+      "summary": "Exercises test_runtime_config_defaults_environment_and_validation behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "class",
+      "name": "FakeTime",
+      "filePath": "tests/test_provider_runtime.py",
+      "lineRange": [
+        25,
+        35
+      ],
+      "summary": "Provides the FakeTime test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_quality.py",
+      "type": "file",
+      "name": "test_quality.py",
+      "filePath": "tests/test_quality.py",
+      "summary": "Contains pytest coverage for quality behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_quality.py:_box",
+      "type": "function",
+      "name": "_box",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        28,
+        29
+      ],
+      "summary": "Exercises _box behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        32,
+        40
+      ],
+      "summary": "Exercises _page behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:_block",
+      "type": "function",
+      "name": "_block",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        43,
+        68
+      ],
+      "summary": "Exercises _block behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "function",
+      "name": "test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        71,
+        85
+      ],
+      "summary": "Exercises test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "function",
+      "name": "test_recovery_content_compares_nested_grounded_children",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        88,
+        120
+      ],
+      "summary": "Exercises test_recovery_content_compares_nested_grounded_children behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "function",
+      "name": "test_recovery_content_with_novel_literal_is_not_redundant",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        123,
+        135
+      ],
+      "summary": "Exercises test_recovery_content_with_novel_literal_is_not_redundant behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "function",
+      "name": "test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        138,
+        148
+      ],
+      "summary": "Exercises test_recovery_at_a_different_location_is_not_treated_as_duplicate behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "function",
+      "name": "test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        151,
+        164
+      ],
+      "summary": "Exercises test_scan_recovery_with_conflicting_critical_literal_is_rejected behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "function",
+      "name": "test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        167,
+        185
+      ],
+      "summary": "Exercises test_full_page_recovery_allows_line_wrapped_hyphenated_literals behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "function",
+      "name": "test_scanned_blank_page_creates_an_internal_quality_probe",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        188,
+        202
+      ],
+      "summary": "Exercises test_scanned_blank_page_creates_an_internal_quality_probe behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "function",
+      "name": "test_scanned_page_probes_untranscribed_large_visual_only",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        205,
+        220
+      ],
+      "summary": "Exercises test_scanned_page_probes_untranscribed_large_visual_only behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "function",
+      "name": "test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        223,
+        239
+      ],
+      "summary": "Exercises test_scanned_page_does_not_duplicate_repairable_structured_content behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "function",
+      "name": "test_scanned_page_probes_large_uncovered_internal_region",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        242,
+        250
+      ],
+      "summary": "Exercises test_scanned_page_probes_large_uncovered_internal_region behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "function",
+      "name": "test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        263,
+        266
+      ],
+      "summary": "Exercises test_rectangle_union_area_handles_overlap_duplicates_and_zero_area behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "function",
+      "name": "test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        269,
+        274
+      ],
+      "summary": "Exercises test_rectangle_union_area_scales_to_many_disjoint_strips behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "function",
+      "name": "test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        277,
+        297
+      ],
+      "summary": "Exercises test_degraded_scanned_table_with_codes_is_selected_for_repair behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "function",
+      "name": "test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        300,
+        345
+      ],
+      "summary": "Exercises test_only_failed_structured_content_is_selected_without_warning_keywords behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "function",
+      "name": "test_rejected_structured_block_remains_a_repair_candidate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        348,
+        369
+      ],
+      "summary": "Exercises test_rejected_structured_block_remains_a_repair_candidate behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "function",
+      "name": "test_all_structural_candidates_are_returned_for_downstream_batching",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        372,
+        390
+      ],
+      "summary": "Exercises test_all_structural_candidates_are_returned_for_downstream_batching behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "function",
+      "name": "test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        393,
+        404
+      ],
+      "summary": "Exercises test_clipped_structured_geometry_is_selected_for_quality_repair behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "function",
+      "name": "test_normalization_strips_structural_marker_duplication",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        407,
+        432
+      ],
+      "summary": "Exercises test_normalization_strips_structural_marker_duplication behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "function",
+      "name": "test_normalization_removes_repeated_ordered_markers_idempotently",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        435,
+        493
+      ],
+      "summary": "Exercises test_normalization_removes_repeated_ordered_markers_idempotently behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "function",
+      "name": "test_normalization_ignores_whitespace_only_list_marker",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        496,
+        508
+      ],
+      "summary": "Exercises test_normalization_ignores_whitespace_only_list_marker behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "function",
+      "name": "test_normalization_removes_duplicate_table_with_same_order",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        511,
+        537
+      ],
+      "summary": "Exercises test_normalization_removes_duplicate_table_with_same_order behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "function",
+      "name": "test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        540,
+        560
+      ],
+      "summary": "Exercises test_normalization_prefers_active_correction_over_rejected_duplicate behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "function",
+      "name": "test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        563,
+        583
+      ],
+      "summary": "Exercises test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "function",
+      "name": "test_normalization_rejects_conflicting_aggregate_paragraph",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        586,
+        616
+      ],
+      "summary": "Exercises test_normalization_rejects_conflicting_aggregate_paragraph behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "function",
+      "name": "test_normalization_removes_redundant_aggregate_paragraph",
+      "filePath": "tests/test_quality.py",
+      "lineRange": [
+        619,
+        634
+      ],
+      "summary": "Exercises test_normalization_removes_redundant_aggregate_paragraph behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyzer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyze",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "class:tests/test_page_analysis.py:Runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "class:tests/test_page_analysis.py:Runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyzer",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:analyze",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_blank_page_skips_glm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_regions_preserve_failed_recognition_separately_from_skipped_images",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_rotated_and_skewed_regions_keep_provenance_and_null_ocr_confidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_low_resolution_scan",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_multi_column_order_is_explicitly_ambiguous",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_dense_form_uses_spatial_order_and_defers_vertical_margin",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_table_form_and_visual_complexity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_html_table_cells_preserve_spans_for_semantics",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_unresolved_checkbox_grid_is_prioritized_for_recovery",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_glm_analysis_scales_per_mille_bbox_to_rendered_pixels",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_recovery_uses_real_ocr_confidence_when_available",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_uses_official_block_order_without_glm_column_ambiguity",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_page_analysis.py",
+      "target": "function:tests/test_page_analysis.py:test_paddle_markdown_checkbox_syntax_becomes_canonical_checkbox",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:_stub_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parallel_page_config_defaults_and_environment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parallel_page_config_rejects_concurrency_above_batch_size",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_processes_pages_concurrently_and_aggregates_in_page_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_waits_for_a_batch_before_starting_the_next",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_finalizes_cross_page_hierarchy_and_progress_on_caller_thread",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_does_not_start_later_batches_after_a_fatal_page_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "class:tests/test_parallel_pages.py:ConcurrencyTracker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "class:tests/test_parallel_pages.py:ParallelGateway",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:_stub_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "class:tests/test_parallel_pages.py:ConcurrencyTracker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "class:tests/test_parallel_pages.py:ParallelGateway",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parallel_page_config_defaults_and_environment",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parallel_page_config_rejects_concurrency_above_batch_size",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_processes_pages_concurrently_and_aggregates_in_page_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_waits_for_a_batch_before_starting_the_next",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_finalizes_cross_page_hierarchy_and_progress_on_caller_thread",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_parallel_pages.py",
+      "target": "function:tests/test_parallel_pages.py:test_parser_does_not_start_later_batches_after_a_fatal_page_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "class:tests/test_provider_runtime.py:FakeTime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_status_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_runtime",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_only_retryable_http_statuses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_retries_connection_errors_and_stops_at_attempt_bound",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_provider_timeout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_counts_logical_calls_separately_from_retry_attempts",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_does_not_retry_nonretryable_http_statuses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_retry_after_and_capped_full_jitter",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_honors_http_date_retry_after",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_shares_provider_admission_across_callers",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_429_halves_concurrency_then_success_window_recovers_one_slot",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_releases_permit_after_base_exception_and_callback_failure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_default_gateway_disables_sdk_retries",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:_stub_document",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_parser_binds_one_runtime_without_changing_factory_signature",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_provider_runtime.py",
+      "target": "function:tests/test_provider_runtime.py:test_runtime_config_defaults_environment_and_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_box",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_block",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_box",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:_block",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_is_redundant_when_existing_blocks_cover_it_in_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_compares_nested_grounded_children",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_content_with_novel_literal_is_not_redundant",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_recovery_at_a_different_location_is_not_treated_as_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scan_recovery_with_conflicting_critical_literal_is_rejected",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_full_page_recovery_allows_line_wrapped_hyphenated_literals",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_blank_page_creates_an_internal_quality_probe",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_untranscribed_large_visual_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_does_not_duplicate_repairable_structured_content",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_scanned_page_probes_large_uncovered_internal_region",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_handles_overlap_duplicates_and_zero_area",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rectangle_union_area_scales_to_many_disjoint_strips",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_degraded_scanned_table_with_codes_is_selected_for_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_only_failed_structured_content_is_selected_without_warning_keywords",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_rejected_structured_block_remains_a_repair_candidate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_all_structural_candidates_are_returned_for_downstream_batching",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_clipped_structured_geometry_is_selected_for_quality_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_strips_structural_marker_duplication",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_repeated_ordered_markers_idempotently",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_ignores_whitespace_only_list_marker",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_duplicate_table_with_same_order",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_prefers_active_correction_over_rejected_duplicate",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_preserves_legitimate_repeated_prose_at_distinct_locations",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_rejects_conflicting_aggregate_paragraph",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_quality.py",
+      "target": "function:tests/test_quality.py:test_normalization_removes_redundant_aggregate_paragraph",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "fixedSectionOk": true,
+  "nodesRecovered": 0,
+  "edgesRestored": 0,
+  "crossBatchEdgesAdded": 0,
+  "typesRemapped": 0,
+  "complexityRemapped": 0,
+  "notes": [
+    "Merge report contained no normalization, dangling-edge, or recovered-import warnings.",
+    "Assembled graph has 899 nodes and 1488 edges with valid node IDs, types, and complexity values.",
+    "All 63 import-map relationships have corresponding file-level imports edges."
+  ]
+}

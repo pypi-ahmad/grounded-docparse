@@ -30,23 +30,35 @@ def main() -> int:
     ImageDraw.Draw(image).text((40, 55), "GLM OCR READY", fill="black")
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
-    image_url = "data:image/png;base64," + base64.b64encode(buffer.getvalue()).decode()
-    payload = {
-        "model": ocr_api["model"],
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": "OCR this image."},
-                    {"type": "image_url", "image_url": {"url": image_url}},
-                ],
-            }
-        ],
-        "temperature": 0,
-        "max_tokens": config["page_loader"]["max_tokens"],
-    }
+    image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    if ocr_api.get("api_mode", "openai") == "ollama_generate":
+        payload = {
+            "model": ocr_api["model"],
+            "prompt": "Text Recognition:",
+            "images": [image_base64],
+            "stream": False,
+            "options": {"temperature": 0, "num_predict": 256},
+        }
+        url = f"http://{ocr_api['api_host']}:{ocr_api['api_port']}/api/generate"
+    else:
+        image_url = "data:image/png;base64," + image_base64
+        payload = {
+            "model": ocr_api["model"],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "OCR this image."},
+                        {"type": "image_url", "image_url": {"url": image_url}},
+                    ],
+                }
+            ],
+            "temperature": 0,
+            "max_tokens": config["page_loader"]["max_tokens"],
+        }
+        url = f"http://{ocr_api['api_host']}:{ocr_api['api_port']}/v1/chat/completions"
     request = urllib.request.Request(
-        f"http://{ocr_api['api_host']}:{ocr_api['api_port']}/v1/chat/completions",
+        url,
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"},
         method="POST",
@@ -61,8 +73,12 @@ def main() -> int:
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
         print(f"GLM-OCR inference check failed: {exc}", file=sys.stderr)
         return 1
-    choices = result.get("choices", [])
-    if not choices or not choices[0].get("message", {}).get("content"):
+    if ocr_api.get("api_mode", "openai") == "ollama_generate":
+        recognized = result.get("response")
+    else:
+        choices = result.get("choices", [])
+        recognized = choices[0].get("message", {}).get("content") if choices else None
+    if not recognized:
         print("GLM-OCR inference check returned no recognized text.", file=sys.stderr)
         return 1
     print("GLM-OCR inference check passed.")

@@ -2,27 +2,27 @@
 
 ## Purpose
 
-Document Parse Studio turns scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same workflow applies to invoices, contracts, bank statements, onboarding packets, certificates, reports, applications, compliance forms, and many other document types.
+Document Parse Studio turns native documents, scanned PDFs, faxed documents, images, and complex forms into structured information that business teams can review and export. A healthcare claims team might use it to capture Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same workflow applies to invoices, contracts, bank statements, onboarding packets, certificates, reports, applications, compliance forms, and many other document types.
 
 The process has two goals:
 
 1. Make the document readable and navigable while preserving its original page locations.
 2. Extract the requested business fields and show where each value came from.
 
-The app processes one uploaded document at a time. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
+The app processes up to 20 uploaded documents sequentially in one session. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
 
 ## The Workflow at a Glance
 
 | Phase | What the user does | What the user receives |
 |---|---|---|
 | Prepare | Define the fields and their business meaning | An approved field dictionary |
-| Upload | Select a PDF or image and relevant options | A document ready for parsing |
-| Parse | Select **Parse document** | Searchable Markdown, page structure, and an annotated PDF |
+| Upload | Select a supported document and processing type | A validated document ready for parsing |
+| Parse | Select **Parse document** | Searchable Markdown, source structure, and an annotated PDF when the route produces one |
 | Review | Check document coverage and difficult regions | Confidence that the source was read correctly |
 | Configure | Build, import, or select the extraction schema | A reusable extraction template |
 | Extract | Select a schema and run extraction | Values linked to source pages and regions |
 | Validate | Review missing, inferred, and important values | An approved business result |
-| Export | Download the required outputs | Markdown, annotated PDF, extraction JSON, or full JSON |
+| Export | Download the required outputs | Markdown, source structure, extraction JSON, full JSON, and annotated PDF when available |
 
 ## 1. Define the Business Fields First
 
@@ -52,7 +52,7 @@ For repeating information, decide in advance how the business wants it represent
 
 ## 2. Upload the Document
 
-Use **Upload document** to select one supported PDF or image. Multi-page PDFs and multi-frame image files are handled as one document.
+Use **Upload documents** to select up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images. Files run sequentially; multi-page PDFs and multi-frame images remain individual documents. A page range is available only for a single scanned PDF.
 
 Before parsing:
 
@@ -65,13 +65,15 @@ A poor source can still be processed, but missing or unreadable content cannot a
 
 ## 3. Choose the Processing Options
 
+First choose a compatible processing type for every file. Native PDFs use `pdf-inspector`; scanned PDFs and images use the selected OCR engine; Word, PowerPoint, Excel, CSV, and other native formats use Docling without OCR. For Mixed PDF, review the suggested Native/OCR route for every page and confirm the full table before parsing. Mismatched selections are blocked and never silently rerouted.
+
 For a comprehensive first parse, use **Full** ADE mode. It produces refined Markdown, document classification, and a table of contents in addition to the core parse; it does not run schema extraction. **Fast** mode is useful when speed matters and the document pattern is already familiar. **Custom** mode allows the optional features to be selected individually.
 
-For scanned, faxed, blurred, or irregular documents, leave **Enable visual recovery on hard regions** turned on. The app first relies on GLM-OCR for the complete document. Luna is used only for selected existing GLM regions that show evidence of OCR difficulty, such as low confidence, an empty detected text box, broken structure, clipping, or a recognizable OCR ambiguity. Clean, high-confidence content is left untouched. Luna does not create a region that GLM-OCR failed to detect.
+For scanned, faxed, blurred, or irregular documents, leave **Enable visual recovery on hard regions** turned on. The app first relies on the selected local OCR engine for the complete document. Luna is used only for selected existing regions that show evidence of OCR difficulty, such as low confidence, an empty detected text box, broken structure, clipping, or a recognizable OCR ambiguity. Clean, high-confidence content is left untouched. Luna does not create a region that local OCR failed to detect.
 
 Visual recovery is not a second full-document OCR pass. It is a limited repair step for difficult regions.
 
-Visual recovery and field extraction are separate choices. Turning visual recovery off does not turn extraction off; it means extraction will use the GLM-OCR result without Luna image repair. Luna must still be available when the user later selects **Run extraction**.
+Visual recovery and field extraction are separate choices. Turning visual recovery off does not turn extraction off; it means extraction will use the selected local OCR result without Luna image repair. Luna must still be available when the user later selects **Run extraction**.
 
 ## 4. Parse the Document
 
@@ -96,8 +98,9 @@ Use the available views:
 
 - **Overview**: Check the detected document type, page count, recovery count, summary statistics, and table of contents.
 - **Markdown**: Read the reconstructed document in a clean view. Use **Show raw Markdown** when the exact text representation matters.
-- **Annotated PDF**: Compare extracted regions with the original page and inspect highlighted source areas.
+- **Annotated PDF**: Compare OCR or visual PDF regions with the original page when this artifact is available.
 - **Layout Tree**: Review the page-by-page reading order and select individual regions to open their highlighted location.
+- **Source Structure**: For native results, trace text to PDF positions, paragraphs, shapes, cells, or CSV rows/columns.
 
 Look especially for:
 
@@ -122,7 +125,7 @@ Add the approved field names, descriptions, and types. For a large schema:
 - Give similar fields descriptions that clearly state the expected person, organization, date, amount, or section.
 - Avoid asking one field to represent several different concepts.
 
-For the first large schema, the fields must be entered and reviewed in the schema builder unless an authorized exported schema JSON file already exists. The current app does not bulk-import a spreadsheet or CSV field list. Once a schema is complete, save it so this setup is not repeated for every document.
+For the first large schema, import an approved CSV or XLSX field list, then review it in the schema builder. Use the columns **Field name**, **Description**, and **Type** in that order. XLSX imports read the first worksheet. Once the schema is complete, save it so this setup is not repeated for every document.
 
 The current UI runs one schema at a time and keeps only the latest extraction result in the active session. For a field set that must be split, create stable schemas by business group—for example, member details, provider details, service lines, and financial totals. Run and download each group before starting the next one, then merge the approved outputs in the downstream business process. The repository does not perform that cross-schema merge.
 
@@ -134,7 +137,7 @@ Treat the saved schema as a business template. When requirements change, use a c
 
 Open **Extract**, select or load the schema, and choose **Run extraction**. If the approved field dictionary uses multiple schemas, complete and download each schema result separately.
 
-The app reviews the parsed Markdown and page structure for every requested field. It attempts to associate each non-empty value with the document region that supports it. The result is not just a list of values; it is a list of values with review information and, where available, a direct source location.
+The app reviews the parsed representation for every requested field. OCR extraction associates values with existing document regions; native extraction uses immutable `base_text` and accepts only exact character intervals that resolve through source spans to source anchors. The result is not just a list of values; it is a list of values with review information and direct source evidence where available.
 
 The fields may come from different pages, tables, headers, footers, or form sections. The user does not need to process each page separately.
 
@@ -172,7 +175,7 @@ Chat is useful for investigation and review. The saved schema remains the repeat
 After review, download the outputs needed by the business process:
 
 - **Download Markdown** for the readable reconstructed document
-- **Download annotated PDF** for visual review and source tracing
+- **Download annotated PDF** for visual review and source tracing when available
 - **Download Extract JSON** for the extracted field result
 - **Download Full JSON** for the combined parse, layout, grounding, metadata, and extraction result
 

@@ -1,0 +1,228 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "grounded-docparse",
+    "languages": ["Python", "JavaScript"],
+    "frameworks": ["Streamlit"],
+    "description": "A workstation-oriented document parsing studio that turns PDFs and images into grounded Markdown, elements, JSON, and annotated PDFs, with optional bounded visual recovery and document-level analysis.",
+    "analyzedAt": "2026-08-11T00:00:00Z",
+    "gitCommitHash": "2c95dc4ab71dddfb134b0bb3555103dd5166c6cc"
+  },
+  "nodes": [
+    {
+      "id": "domain:grounded-document-parsing",
+      "type": "domain",
+      "name": "Grounded Document Parsing",
+      "summary": "This domain converts uploaded PDFs and images into evidence-backed document representations. It preserves the local OCR engine's layout, element identifiers, normalized geometry, confidence, and reading order while producing grounded output formats.",
+      "tags": ["document-processing", "ocr", "grounded-output"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["document", "page evidence", "layout region", "element", "parse result"],
+        "businessRules": ["PDF pages are rendered to pixels for evidence.", "Selectable or embedded PDF text is not extraction evidence.", "If nonblank pages have no local OCR layout regions, parsing stops before Luna features run."],
+        "crossDomainInteractions": ["Supplies quality findings and eligible regions to Visual Recovery.", "Supplies grounded document context to Document Intelligence."]
+      }
+    },
+    {
+      "id": "domain:visual-recovery",
+      "type": "domain",
+      "name": "Visual Recovery",
+      "summary": "This domain performs narrowly bounded recovery of text in eligible low-quality document regions. It uses selected crops with Luna but accepts only high-confidence text replacement and leaves document geometry and structure unchanged.",
+      "tags": ["visual-recovery", "quality", "bounded-ai"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["risky region", "crop", "recovery candidate", "confidence", "correction lineage"],
+        "businessRules": ["Recovered text must have confidence of at least 0.85.", "Recovery may replace text only on an existing element.", "Additions, deletions, geometry changes, type changes, and reading-order changes are ignored."],
+        "crossDomainInteractions": ["Consumes candidate regions identified during grounded document parsing.", "Returns accepted text corrections to the parsed document representation."]
+      }
+    },
+    {
+      "id": "domain:document-intelligence",
+      "type": "domain",
+      "name": "Document Intelligence",
+      "summary": "This domain applies optional document-level reasoning to recognized document context. It supports refinement, classification, table-of-contents generation, schema-guided extraction, and chat while building on the grounded parsed document.",
+      "tags": ["document-analysis", "extraction", "chat"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entities": ["prepared document context", "classification", "table of contents", "extraction schema", "chat answer"],
+        "businessRules": ["Document-level features operate on recognized document context.", "Schema validation supports object, array, string, number, integer, and boolean values."],
+        "crossDomainInteractions": ["Consumes the grounded document, elements, and rendered context from Grounded Document Parsing."]
+      }
+    },
+    {
+      "id": "flow:parse-document",
+      "type": "flow",
+      "name": "Parse Document",
+      "summary": "The primary CLI and studio workflow ingests an input document, performs selected local OCR, analyzes quality, and emits grounded representations.",
+      "tags": ["parse", "cli", "ocr"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "grounded-docparse parse",
+        "entryType": "cli"
+      }
+    },
+    {
+      "id": "flow:recover-eligible-text-regions",
+      "type": "flow",
+      "name": "Recover Eligible Text Regions",
+      "summary": "This optional flow evaluates risky regions and performs constrained visual recovery without changing a document's structure or geometry.",
+      "tags": ["recovery", "luna", "confidence"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "eligible risky region after quality analysis",
+        "entryType": "event"
+      }
+    },
+    {
+      "id": "flow:analyze-parsed-document",
+      "type": "flow",
+      "name": "Analyze Parsed Document",
+      "summary": "This optional flow prepares parsed content for document-level reasoning and returns a selected analytical result such as refinement, classification, a TOC, structured extraction, or a chat answer.",
+      "tags": ["agentic", "analysis", "structured-extraction"],
+      "complexity": "complex",
+      "domainMeta": {
+        "entryPoint": "optional document-level feature request",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:parse-document:collect-inputs",
+      "type": "step",
+      "name": "Collect Input Documents",
+      "summary": "The parse command accepts one or more input paths and an output destination, with an optional schema path.",
+      "tags": ["input", "cli"],
+      "complexity": "simple",
+      "filePath": "src/grounded_docparse/cli.py"
+    },
+    {
+      "id": "step:parse-document:raster-ingest",
+      "type": "step",
+      "name": "Raster Ingest",
+      "summary": "Supported PDFs and images are ingested as page evidence, with PDF pages rendered to pixels for extraction evidence.",
+      "tags": ["ingest", "raster"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/ingest.py"
+    },
+    {
+      "id": "step:parse-document:run-selected-local-ocr",
+      "type": "step",
+      "name": "Run Selected Local OCR",
+      "summary": "The parser uses the selected GLM-OCR or PaddleOCR-VL engine to obtain layout and recognition information for document pages.",
+      "tags": ["ocr", "layout", "recognition"],
+      "complexity": "complex",
+      "filePath": "src/grounded_docparse/pipeline.py"
+    },
+    {
+      "id": "step:parse-document:assess-document-quality",
+      "type": "step",
+      "name": "Assess Document Quality",
+      "summary": "Deterministic quality analysis evaluates OCR output and identifies conditions relevant to visual recovery.",
+      "tags": ["quality", "validation"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/quality.py"
+    },
+    {
+      "id": "step:parse-document:render-grounded-outputs",
+      "type": "step",
+      "name": "Render Grounded Outputs",
+      "summary": "The parser renders grounded Markdown, document elements, JSON, and annotated PDF output from the parsed representation.",
+      "tags": ["rendering", "markdown", "json"],
+      "complexity": "complex",
+      "filePath": "src/grounded_docparse/render.py"
+    },
+    {
+      "id": "step:recover-eligible-text-regions:identify-eligible-regions",
+      "type": "step",
+      "name": "Identify Eligible Regions",
+      "summary": "Quality findings and document geometry are used to select risky regions that are eligible for constrained recovery.",
+      "tags": ["quality", "region-selection"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/page_analysis.py"
+    },
+    {
+      "id": "step:recover-eligible-text-regions:prepare-region-crop",
+      "type": "step",
+      "name": "Prepare Region Crop",
+      "summary": "The system prepares image evidence for the selected existing region before requesting visual recovery.",
+      "tags": ["crop", "image-evidence"],
+      "complexity": "simple",
+      "filePath": "src/grounded_docparse/ingest.py"
+    },
+    {
+      "id": "step:recover-eligible-text-regions:request-bounded-recovery",
+      "type": "step",
+      "name": "Request Bounded Recovery",
+      "summary": "The gateway sends selected crop evidence for bounded Luna visual recovery using the configured reasoning effort.",
+      "tags": ["gateway", "luna", "visual-recovery"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/gateways.py"
+    },
+    {
+      "id": "step:recover-eligible-text-regions:apply-accepted-text-replacement",
+      "type": "step",
+      "name": "Apply Accepted Text Replacement",
+      "summary": "Only a recovery with sufficient confidence can replace text on an existing element; structural changes are rejected.",
+      "tags": ["confidence", "fail-closed", "correction"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/pipeline.py"
+    },
+    {
+      "id": "step:analyze-parsed-document:prepare-grounded-context",
+      "type": "step",
+      "name": "Prepare Grounded Context",
+      "summary": "The agentic layer prepares recognized document context and preserves provenance needed for document-level features.",
+      "tags": ["context", "agentic", "grounding"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/agentic.py"
+    },
+    {
+      "id": "step:analyze-parsed-document:validate-extraction-schema",
+      "type": "step",
+      "name": "Validate Extraction Schema",
+      "summary": "For structured extraction, the requested schema is validated before it is used to shape the extraction result.",
+      "tags": ["schema", "validation", "extraction"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/extraction.py"
+    },
+    {
+      "id": "step:analyze-parsed-document:run-document-level-feature",
+      "type": "step",
+      "name": "Run Document-Level Feature",
+      "summary": "The application can request optional refinement, classification, TOC generation, extraction, or chat against the prepared document context.",
+      "tags": ["classification", "toc", "chat"],
+      "complexity": "complex",
+      "filePath": "src/grounded_docparse/agentic.py"
+    },
+    {
+      "id": "step:analyze-parsed-document:return-grounded-result",
+      "type": "step",
+      "name": "Return Grounded Analytical Result",
+      "summary": "The resulting analysis is represented with the parsed document models and rendered in the requested output form.",
+      "tags": ["result", "grounding", "rendering"],
+      "complexity": "moderate",
+      "filePath": "src/grounded_docparse/render.py"
+    }
+  ],
+  "edges": [
+    {"source": "domain:grounded-document-parsing", "target": "flow:parse-document", "type": "contains_flow", "direction": "forward", "weight": 1.0},
+    {"source": "domain:visual-recovery", "target": "flow:recover-eligible-text-regions", "type": "contains_flow", "direction": "forward", "weight": 1.0},
+    {"source": "domain:document-intelligence", "target": "flow:analyze-parsed-document", "type": "contains_flow", "direction": "forward", "weight": 1.0},
+    {"source": "flow:parse-document", "target": "step:parse-document:collect-inputs", "type": "flow_step", "direction": "forward", "weight": 0.2},
+    {"source": "flow:parse-document", "target": "step:parse-document:raster-ingest", "type": "flow_step", "direction": "forward", "weight": 0.4},
+    {"source": "flow:parse-document", "target": "step:parse-document:run-selected-local-ocr", "type": "flow_step", "direction": "forward", "weight": 0.6},
+    {"source": "flow:parse-document", "target": "step:parse-document:assess-document-quality", "type": "flow_step", "direction": "forward", "weight": 0.8},
+    {"source": "flow:parse-document", "target": "step:parse-document:render-grounded-outputs", "type": "flow_step", "direction": "forward", "weight": 1.0},
+    {"source": "flow:recover-eligible-text-regions", "target": "step:recover-eligible-text-regions:identify-eligible-regions", "type": "flow_step", "direction": "forward", "weight": 0.3},
+    {"source": "flow:recover-eligible-text-regions", "target": "step:recover-eligible-text-regions:prepare-region-crop", "type": "flow_step", "direction": "forward", "weight": 0.5},
+    {"source": "flow:recover-eligible-text-regions", "target": "step:recover-eligible-text-regions:request-bounded-recovery", "type": "flow_step", "direction": "forward", "weight": 0.8},
+    {"source": "flow:recover-eligible-text-regions", "target": "step:recover-eligible-text-regions:apply-accepted-text-replacement", "type": "flow_step", "direction": "forward", "weight": 1.0},
+    {"source": "flow:analyze-parsed-document", "target": "step:analyze-parsed-document:prepare-grounded-context", "type": "flow_step", "direction": "forward", "weight": 0.3},
+    {"source": "flow:analyze-parsed-document", "target": "step:analyze-parsed-document:validate-extraction-schema", "type": "flow_step", "direction": "forward", "weight": 0.5},
+    {"source": "flow:analyze-parsed-document", "target": "step:analyze-parsed-document:run-document-level-feature", "type": "flow_step", "direction": "forward", "weight": 0.8},
+    {"source": "flow:analyze-parsed-document", "target": "step:analyze-parsed-document:return-grounded-result", "type": "flow_step", "direction": "forward", "weight": 1.0},
+    {"source": "domain:grounded-document-parsing", "target": "domain:visual-recovery", "type": "cross_domain", "direction": "forward", "description": "Parsing supplies quality findings and eligible existing regions for constrained text recovery.", "weight": 0.6},
+    {"source": "domain:visual-recovery", "target": "domain:grounded-document-parsing", "type": "cross_domain", "direction": "forward", "description": "Accepted recoveries return text-only corrections to the grounded parsed document.", "weight": 0.6},
+    {"source": "domain:grounded-document-parsing", "target": "domain:document-intelligence", "type": "cross_domain", "direction": "forward", "description": "Grounded documents and recognized context provide the basis for optional document-level features.", "weight": 0.6}
+  ],
+  "layers": [],
+  "tour": []
+}

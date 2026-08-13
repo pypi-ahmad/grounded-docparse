@@ -4,13 +4,14 @@ import math
 import re
 import time
 from collections.abc import Callable
+from html.parser import HTMLParser
 from importlib.metadata import PackageNotFoundError, version
 from itertools import pairwise
 from pathlib import Path
 
 from PIL import Image, ImageFilter, ImageStat
 
-from .config import LUNA_MODEL, ParserConfig
+from .config import LUNA_MODEL, OcrEngine, ParserConfig
 from .ingest import PageEvidence
 from .local_ocr import GlmPageResult, GlmRegion, get_glmocr_runtime, glmocr_version
 from .models import (
@@ -36,6 +37,7 @@ from .models import (
     ScanQualityEvidence,
     TableCellDraft,
 )
+from .paddle_ocr import get_paddleocr_runtime
 
 _TABLE = {"table"}
 _FORMULA = {"display_formula", "inline_formula", "formula"}
@@ -131,12 +133,47 @@ class PageAnalyzer:
     def __init__(
         self,
         config: ParserConfig,
-        runtime_factory: Callable[..., object] = get_glmocr_runtime,
+        runtime_factory: Callable[..., object] | None = None,
     ) -> None:
         self.config = config
-        self.runtime_factory = runtime_factory
+        self.runtime_factory = runtime_factory or (
+            get_paddleocr_runtime
+            if config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+            else get_glmocr_runtime
+        )
+
+    @property
+    def engine_name(self) -> str:
+        return self.config.ocr_engine.label
+
+    def _runtime(self):
+        if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+            return self.runtime_factory(
+                self.config.paddleocr_service_url,
+                self.config.paddleocr_timeout_seconds,
+            )
+        return self.runtime_factory(
+            self.config.glmocr_config_path, self.config.glmocr_layout_device
+        )
+
+    def prepare_document(self, source_path: Path, pages: list[PageEvidence]) -> None:
+        if self.config.ocr_engine is not OcrEngine.PADDLEOCR_VL_1_6:
+            return
+        runtime = self._runtime()
+        parser = getattr(runtime, "parse_document", None)
+        if not callable(parser):
+            raise TypeError("PaddleOCR runtime does not support document parsing")
+        parser(source_path, pages)
 
     def model_versions(self) -> dict[str, str]:
+        if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+            return {
+                "ocr_sdk": "PaddleOCR/PaddleX service",
+                "ocr_model": "PaddleOCR-VL-1.6-0.9B",
+                "layout_model": "PP-DocLayoutV3",
+                "vlm_backend": "vLLM",
+                "luna": LUNA_MODEL,
+            }
         try:
             vllm_version = version("vllm")
         except PackageNotFoundError:
@@ -172,13 +209,11 @@ class PageAnalyzer:
                     quality,
                     [],
                     started[page.image_path.resolve()],
-                    "GLM-OCR disabled; page analysis uncertain",
+                    f"{self.engine_name} disabled; page analysis uncertain",
                 )
             return
         try:
-            runtime = self.runtime_factory(
-                self.config.glmocr_config_path, self.config.glmocr_layout_device
-            )
+            runtime = self._runtime()
             if hasattr(runtime, "parse_many"):
                 results = runtime.parse_many(
                     [item[0].image_path for item in prepared.values()]
@@ -194,7 +229,7 @@ class PageAnalyzer:
                     continue
                 page, render, quality = item
                 warning = (
-                    f"GLM-OCR analysis unavailable: {result.error}"
+                    f"{self.engine_name} analysis unavailable: {result.error}"
                     if result.error
                     else None
                 )
@@ -206,7 +241,7 @@ class PageAnalyzer:
                 )
                 if recognition_failures:
                     recognition_warning = (
-                        "GLM-OCR recognition failed for "
+                        f"{self.engine_name} recognition failed for "
                         f"{recognition_failures} of {recognition_attempts} OCR regions"
                     )
                     warning = (
@@ -222,7 +257,9 @@ class PageAnalyzer:
                     started[page.image_path.resolve()],
                     warning,
                 )
-        except Exception as exc:  # noqa: BLE001 - OCR failure triggers bounded fallback
+        except Exception as exc:
+            if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+                raise
             warning = f"GLM-OCR analysis unavailable: {type(exc).__name__}: {exc}"
             for page, render, quality in prepared.values():
                 yield self._finish(
@@ -241,7 +278,7 @@ class PageAnalyzer:
                 quality,
                 [],
                 started[page.image_path.resolve()],
-                "GLM-OCR returned no result for page",
+                f"{self.engine_name} returned no result for page",
             )
 
     def _base(
@@ -263,8 +300,17 @@ class PageAnalyzer:
     def _finish(
         self, page, render, quality, raw, started, warning=None
     ) -> PageAnalysis:
+        paddle = self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
         engine = AnalysisEngineEvidence(
-            sdk_version=glmocr_version(), layout_device=self.config.glmocr_layout_device
+            sdk="paddleocr" if paddle else "glmocr",
+            sdk_version=None if paddle else glmocr_version(),
+            layout_model=(
+                "PP-DocLayoutV3"
+                if paddle
+                else "PaddlePaddle/PP-DocLayoutV3_safetensors"
+            ),
+            ocr_model=("PaddleOCR-VL-1.6-0.9B" if paddle else "zai-org/GLM-OCR"),
+            layout_device="cpu" if paddle else self.config.glmocr_layout_device,
         )
         if quality.blank:
             engine.latency_ms = round((time.perf_counter() - started) * 1000)
@@ -291,7 +337,7 @@ class PageAnalyzer:
                 value=skew,
                 threshold=self.config.analysis_thresholds.skew_degrees,
                 warning=skew >= self.config.analysis_thresholds.skew_degrees,
-                basis="largest non-vertical GLM region baseline angle",
+                basis=f"largest non-vertical {self.engine_name} region baseline angle",
             )
         )
         if quality.measurements[-1].warning:
@@ -508,8 +554,17 @@ class PageAnalyzer:
         self, regions: list[LayoutRegionEvidence], columns: list[list[str]]
     ) -> ReadingOrderEvidence:
         if not regions:
-            return ReadingOrderEvidence(basis="GLM-OCR returned no layout regions")
+            return ReadingOrderEvidence(
+                basis=f"{self.engine_name} returned no layout regions"
+            )
         order = [r.id for r in regions]
+        if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+            return ReadingOrderEvidence(
+                status=ReadingOrderStatus.CONFIDENT,
+                ordered_region_ids=order,
+                confidence=1.0,
+                basis="PaddleOCR block_order",
+            )
         if columns:
             membership = {
                 region_id: index
@@ -592,6 +647,7 @@ _CAPTION_LABELS = {"figure_title", "caption", "formula_number"}
 _REFERENCE_LABELS = {"reference", "reference_content"}
 _FOOTNOTE_LABELS = {"footnote", "vision_footnote"}
 _LIST_MARKER = re.compile(r"^\s*((?:[-*•]|\d+[.)]|[A-Za-z][.)]))\s+(.*)$", re.DOTALL)
+_TASK_MARKER = re.compile(r"^\s*\[([ xX])\]\s*(.*)$", re.DOTALL)
 
 
 def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
@@ -634,16 +690,26 @@ def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
         elif label == "footer":
             node_type = NodeType.FOOTER
         text = source.text
+        task = _TASK_MARKER.match(text)
+        if task:
+            checkbox_state = (
+                CheckboxState.CHECKED
+                if task.group(1).casefold() == "x"
+                else CheckboxState.UNCHECKED
+            )
+            node_type = NodeType.CHECKBOX
+            text = task.group(2)
+        else:
+            checkbox_state = None
         marker = _LIST_MARKER.match(text)
         list_marker = None
-        if marker:
+        if marker and checkbox_state is None:
             node_type, list_marker, text = (
                 NodeType.LIST_ITEM,
                 marker.group(1),
                 marker.group(2),
             )
-        checkbox_state = None
-        if text.lstrip().startswith(("☐", "□", "☑", "✓")):
+        if checkbox_state is None and text.lstrip().startswith(("☐", "□", "☑", "✓")):
             glyph = text.lstrip()[0]
             checkbox_state = (
                 CheckboxState.CHECKED
@@ -681,6 +747,8 @@ def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
 
 
 def _markdown_table_cells(text: str) -> list[TableCellDraft]:
+    if re.search(r"<table\b", text, re.IGNORECASE):
+        return _html_table_cells(text)
     rows = [
         [cell.strip() for cell in line.strip().strip("|").split("|")]
         for line in text.splitlines()
@@ -702,3 +770,92 @@ def _markdown_table_cells(text: str) -> list[TableCellDraft]:
         for row_index, row in enumerate(rows)
         for column_index, cell in enumerate(row)
     ]
+
+
+class _TableHTMLParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.rows: list[list[tuple[str, int, int, bool]]] = []
+        self._row: list[tuple[str, int, int, bool]] | None = None
+        self._cell: list[str] | None = None
+        self._row_span = 1
+        self._column_span = 1
+        self._header = False
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        tag = tag.casefold()
+        if tag == "tr":
+            self._row = []
+        elif tag in {"td", "th"}:
+            if self._row is None:
+                self._row = []
+            attributes = {name.casefold(): value for name, value in attrs}
+            self._cell = []
+            self._row_span = _positive_span(attributes.get("rowspan"))
+            self._column_span = _positive_span(attributes.get("colspan"))
+            self._header = tag == "th"
+        elif tag == "br" and self._cell is not None:
+            self._cell.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.casefold()
+        if tag in {"td", "th"} and self._cell is not None:
+            assert self._row is not None
+            self._row.append(
+                (
+                    " ".join("".join(self._cell).split()),
+                    self._row_span,
+                    self._column_span,
+                    self._header,
+                )
+            )
+            self._cell = None
+        elif tag == "tr" and self._row is not None:
+            self.rows.append(self._row)
+            self._row = None
+
+
+def _positive_span(value: str | None) -> int:
+    try:
+        return max(1, int(value or "1"))
+    except ValueError:
+        return 1
+
+
+def _html_table_cells(text: str) -> list[TableCellDraft]:
+    parser = _TableHTMLParser()
+    try:
+        parser.feed(text)
+        parser.close()
+    except (AssertionError, ValueError):
+        return []
+    occupied: set[tuple[int, int]] = set()
+    cells: list[TableCellDraft] = []
+    for row_index, row in enumerate(parser.rows):
+        column_index = 0
+        for value, row_span, column_span, header in row:
+            while (row_index, column_index) in occupied:
+                column_index += 1
+            cells.append(
+                TableCellDraft(
+                    row_index=row_index,
+                    column_index=column_index,
+                    text=value,
+                    row_span=row_span,
+                    column_span=column_span,
+                    header=header,
+                )
+            )
+            for occupied_row in range(row_index, row_index + row_span):
+                for occupied_column in range(
+                    column_index, column_index + column_span
+                ):
+                    occupied.add((occupied_row, occupied_column))
+            column_index += column_span
+    return cells

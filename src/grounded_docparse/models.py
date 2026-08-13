@@ -4,7 +4,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
@@ -343,6 +343,7 @@ class AgentUsage(BaseModel):
     agent: str
     model: str
     input_tokens: int = Field(default=0, ge=0)
+    cached_input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
 
 
@@ -355,6 +356,11 @@ class RunUsage(BaseModel):
     @property
     def input_tokens(self) -> int:
         return sum(call.input_tokens for call in self.calls)
+
+    @computed_field
+    @property
+    def cached_input_tokens(self) -> int:
+        return sum(call.cached_input_tokens for call in self.calls)
 
     @computed_field
     @property
@@ -427,12 +433,21 @@ class SchemaField(BaseModel):
 class StoredSchema(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    version: Literal[1] = 1
+    version: Literal[1, 2] = 1
     name: str = Field(min_length=1, max_length=100)
-    fields: list[SchemaField]
+    fields: list[SchemaField] = Field(default_factory=list)
+    json_schema: dict[str, Any] | None = None
 
     @model_validator(mode="after")
     def unique_fields(self) -> StoredSchema:
+        if self.version == 2:
+            if self.fields:
+                raise ValueError("raw JSON schemas cannot also define builder fields")
+            if self.json_schema is None:
+                raise ValueError("raw JSON schema is required for version 2")
+            return self
+        if self.json_schema is not None:
+            raise ValueError("version 1 schemas cannot define raw JSON schema")
         names = [field.name.casefold() for field in self.fields]
         if len(names) != len(set(names)):
             raise ValueError("schema field names must be unique")
@@ -554,19 +569,22 @@ class ExtractedField(BaseModel):
     source_text: str | None = None
 
 
+DocumentType = Literal[
+    "Invoice",
+    "Contract",
+    "Bank Statement",
+    "Report",
+    "Form",
+    "Certificate",
+    "Letter",
+    "Other",
+]
+
+
 class DocumentClassification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    primary_type: Literal[
-        "Invoice",
-        "Contract",
-        "Bank Statement",
-        "Report",
-        "Form",
-        "Certificate",
-        "Letter",
-        "Other",
-    ]
+    primary_type: DocumentType
     confidence: float = Field(ge=0, le=1)
     secondary_types: list[str] = Field(default_factory=list)
     reasoning: str = ""
@@ -622,6 +640,21 @@ class VisualRecoveryResult(BaseModel):
     recovered_text: str
     confidence: Literal["high", "medium", "low"]
     notes: str = ""
+
+
+class OcrComparisonResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    page: int = Field(ge=1)
+    block_id: str | None = None
+    bbox: tuple[float, float, float, float] | None = None
+    primary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
+    secondary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
+    primary_text: str
+    secondary_text: str | None = None
+    similarity: float | None = Field(default=None, ge=0, le=1)
+    status: Literal["agreed", "disagreed", "unavailable"]
+    reason: str = ""
 
 
 class AgenticFeatureMetadata(BaseModel):
@@ -927,7 +960,7 @@ class Element(BaseModel):
     text: str = ""
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
-    source: Literal["glm-ocr", "luna-recovery"] = "glm-ocr"
+    source: Literal["glm-ocr", "paddleocr-vl-1.6", "luna-recovery"] = "glm-ocr"
 
     @model_validator(mode="after")
     def validate_bbox(self) -> Element:
@@ -960,6 +993,14 @@ class ParseMetadata(BaseModel):
     luna_agentic_time: float = Field(default=0.0, ge=0)
     luna_time: float = Field(default=0.0, ge=0)
     recovered_regions: int = Field(default=0, ge=0)
+    ocr_comparison_enabled: bool = False
+    ocr_comparison_candidates: int = Field(default=0, ge=0)
+    ocr_comparison_crops: int = Field(default=0, ge=0)
+    ocr_comparison_disagreements: int = Field(default=0, ge=0)
+    ocr_comparison_unavailable: int = Field(default=0, ge=0)
+    ocr_comparison_deferred: int = Field(default=0, ge=0)
+    ocr_comparison_time: float = Field(default=0.0, ge=0)
+    ocr_comparison_secondary_engine: str | None = None
     model_versions: dict[str, str] = Field(default_factory=dict)
     enhancement: EnhancementMetadata = Field(default_factory=EnhancementMetadata)
 
@@ -979,6 +1020,7 @@ class ParseResult:
     elements: list[Element] = field(default_factory=list)
     metadata: ParseMetadata = field(default_factory=ParseMetadata)
     recovery_log: list[VisualRecoveryResult] = field(default_factory=list)
+    ocr_comparisons: list[OcrComparisonResult] = field(default_factory=list)
 
     @property
     def structured_json(self) -> dict:

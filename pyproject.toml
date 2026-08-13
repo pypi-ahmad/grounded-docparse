@@ -1,22 +1,44 @@
 [project]
 name = "grounded-docparse"
-version = "0.4.0"
+version = "0.6.0"
 description = "Grounded agentic document parser for structured Markdown and JSON"
 readme = "README.md"
 requires-python = ">=3.12,<3.15"
 dependencies = [
+    "defusedxml>=0.7.1,<1",
+    "nh3>=0.3.6,<0.4",
     "openai>=2.0",
+    "openpyxl>=3.1.5,<4",
     "pillow>=11.0",
     "pydantic>=2.10",
     "pymupdf>=1.25",
     "streamlit[pdf]>=1.60,<2",
 ]
 
+[project.scripts]
+grounded-docparse = "grounded_docparse.cli:main"
+
 [project.optional-dependencies]
+native = [
+    "beautifulsoup4>=4.13,<5",
+    "docling>=2.119,<3",
+    "langextract[openai]>=1.6,<2",
+    "odfdo>=3.12,<4",
+    "pdf-inspector>=1.14.1,<2",
+    "pywin32>=311; sys_platform == 'win32'",
+]
 local-ocr = [
     "glmocr[selfhosted]==0.1.5; sys_platform == 'linux'",
+    "torch==2.10.0; sys_platform == 'linux'",
+    "torchvision==0.25.0; sys_platform == 'linux'",
     "transformers>=5.3,<6; sys_platform == 'linux'",
     "vllm==0.19.1; sys_platform == 'linux'",
+]
+local-ocr-cpu = [
+    "glmocr[selfhosted]==0.1.5; sys_platform == 'linux'",
+    "torch==2.10.0; sys_platform == 'linux'",
+    "torchvision==0.25.0; sys_platform == 'linux'",
+    "transformers>=5.3,<6; sys_platform == 'linux'",
 ]
 
 [[tool.uv.index]]
@@ -24,9 +46,23 @@ name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
 
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv]
+conflicts = [[{ extra = "local-ocr" }, { extra = "local-ocr-cpu" }]]
+
 [tool.uv.sources]
-torch = [{ index = "pytorch-cu128", marker = "sys_platform == 'linux'" }]
-torchvision = [{ index = "pytorch-cu128", marker = "sys_platform == 'linux'" }]
+torch = [
+    { index = "pytorch-cu128", extra = "local-ocr" },
+    { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+]
+torchvision = [
+    { index = "pytorch-cu128", extra = "local-ocr" },
+    { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+]
 
 [dependency-groups]
 dev = [

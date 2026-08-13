@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "document:docs/codebase/.codebase-scan.txt",
+      "type": "document",
+      "name": ".codebase-scan.txt",
+      "filePath": "docs/codebase/.codebase-scan.txt",
+      "summary": "Records an automated repository scan, including the source tree and generated codebase-reference material used to support the accompanying analysis documents.",
+      "tags": [
+        "documentation",
+        "codebase-analysis",
+        "repository-scan"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/codebase/ARCHITECTURE.md",
+      "type": "document",
+      "name": "ARCHITECTURE.md",
+      "filePath": "docs/codebase/ARCHITECTURE.md",
+      "summary": "Describes the parse-then-reason ADE architecture, its OCR evidence boundaries, core module responsibilities, system flow, and known deployment limits.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "agentic",
+        "grounding"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/CONCERNS.md",
+      "type": "document",
+      "name": "CONCERNS.md",
+      "filePath": "docs/codebase/CONCERNS.md",
+      "summary": "Catalogs product-taxonomy, architectural, security, privacy, evaluation, and high-complexity-module risks for the grounded document workstation.",
+      "tags": [
+        "documentation",
+        "risks",
+        "security",
+        "architecture"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/CONVENTIONS.md",
+      "type": "document",
+      "name": "CONVENTIONS.md",
+      "filePath": "docs/codebase/CONVENTIONS.md",
+      "summary": "Documents naming, validation, error-handling, and evidence-grounding conventions used by the parser and its optional agentic features.",
+      "tags": [
+        "documentation",
+        "conventions",
+        "validation",
+        "grounding"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/INTEGRATIONS.md",
+      "type": "document",
+      "name": "INTEGRATIONS.md",
+      "filePath": "docs/codebase/INTEGRATIONS.md",
+      "summary": "Documents local GLM-OCR and PaddleOCR services, optional OpenAI integration, persistence boundaries, and intentionally excluded enterprise integrations.",
+      "tags": [
+        "documentation",
+        "integrations",
+        "ocr",
+        "openai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STACK.md",
+      "type": "document",
+      "name": "STACK.md",
+      "filePath": "docs/codebase/STACK.md",
+      "summary": "Summarizes the Python, Streamlit, OCR, OpenAI, persistence, packaging, installer, and test tooling used by the project.",
+      "tags": [
+        "documentation",
+        "technology-stack",
+        "python",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/codebase/STRUCTURE.md",
+      "type": "document",
+      "name": "STRUCTURE.md",
+      "filePath": "docs/codebase/STRUCTURE.md",
+      "summary": "Maps the repository layout, core package modules, application entry points, evaluation tooling, and supporting directories.",
+      "tags": [
+        "documentation",
+        "repository-structure",
+        "architecture",
+        "entry-points"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:docs/codebase/TESTING.md",
+      "type": "document",
+      "name": "TESTING.md",
+      "filePath": "docs/codebase/TESTING.md",
+      "summary": "Describes the pytest-based test layout, fake-gateway contract strategy, opt-in live evaluation, and principal coverage areas.",
+      "tags": [
+        "documentation",
+        "testing",
+        "pytest",
+        "evaluation"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": []
+}

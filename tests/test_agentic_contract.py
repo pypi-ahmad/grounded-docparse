@@ -66,7 +66,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     payload = json.loads(rendered.json)
 
     assert rendered.markdown == "Alpha line\nBeta line\n"
-    assert payload["schema_version"] == "4.4.0"
+    assert payload["schema_version"] == "4.5.0"
     assert payload["base_markdown"] == payload["markdown"]
     assert payload["document_type"] is None
     assert payload["sections"] == []

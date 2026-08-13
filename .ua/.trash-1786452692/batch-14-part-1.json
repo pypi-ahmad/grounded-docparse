@@ -1,0 +1,1329 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_ocr_disagreement.py",
+      "type": "file",
+      "name": "test_ocr_disagreement.py",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "summary": "Contains pytest coverage for ocr disagreement behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "function",
+      "name": "test_disagreement_check_defaults_off_with_bounded_budget",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        15,
+        21
+      ],
+      "summary": "Exercises test_disagreement_check_defaults_off_with_bounded_budget behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "function",
+      "name": "test_disagreement_config_rejects_invalid_limits",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        24,
+        26
+      ],
+      "summary": "Exercises test_disagreement_config_rejects_invalid_limits behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "function",
+      "name": "test_token_similarity_ignores_case_punctuation_and_spacing",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        29,
+        31
+      ],
+      "summary": "Exercises test_token_similarity_ignores_case_punctuation_and_spacing behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "function",
+      "name": "test_parse_json_persists_ocr_comparison_evidence",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        34,
+        58
+      ],
+      "summary": "Exercises test_parse_json_persists_ocr_comparison_evidence behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "function",
+      "name": "test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "filePath": "tests/test_ocr_disagreement.py",
+      "lineRange": [
+        61,
+        109
+      ],
+      "summary": "Exercises test_cross_check_sends_only_budgeted_crops_and_restores_primary behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_openai_vision_gateway.py",
+      "type": "file",
+      "name": "test_openai_vision_gateway.py",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "summary": "Contains pytest coverage for openai vision gateway behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "function",
+      "name": "_assert_no_prompt_cache",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        97,
+        106
+      ],
+      "summary": "Exercises _assert_no_prompt_cache behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "function",
+      "name": "_assert_no_image_payload",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        109,
+        119
+      ],
+      "summary": "Exercises _assert_no_image_payload behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "function",
+      "name": "test_gateway_records_cached_input_tokens",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        141,
+        151
+      ],
+      "summary": "Exercises test_gateway_records_cached_input_tokens behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "function",
+      "name": "test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        154,
+        165
+      ],
+      "summary": "Exercises test_gateway_defaults_missing_cached_input_tokens_to_zero behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "function",
+      "name": "_assert_untrusted_document_instruction",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        168,
+        171
+      ],
+      "summary": "Exercises _assert_untrusted_document_instruction behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "function",
+      "name": "test_markdown_refinement_is_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        174,
+        195
+      ],
+      "summary": "Exercises test_markdown_refinement_is_text_only behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "function",
+      "name": "test_agentic_analysis_requests_are_structured_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        213,
+        232
+      ],
+      "summary": "Exercises test_agentic_analysis_requests_are_structured_text_only behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "function",
+      "name": "test_document_chat_request_is_structured_and_text_only",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        235,
+        252
+      ],
+      "summary": "Exercises test_document_chat_request_is_structured_and_text_only behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "function",
+      "name": "test_structured_agentic_request_repairs_schema_failure_once",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        255,
+        275
+      ],
+      "summary": "Exercises test_structured_agentic_request_repairs_schema_failure_once behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        278,
+        287
+      ],
+      "summary": "Exercises _page behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "function",
+      "name": "test_luna_draft_uses_deterministic_structured_vision_request",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        290,
+        326
+      ],
+      "summary": "Exercises test_luna_draft_uses_deterministic_structured_vision_request behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "function",
+      "name": "test_gateway_accumulates_usage_across_requests",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        329,
+        340
+      ],
+      "summary": "Exercises test_gateway_accumulates_usage_across_requests behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "function",
+      "name": "test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        343,
+        379
+      ],
+      "summary": "Exercises test_incomplete_draft_reports_provider_context_before_schema_validation behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "function",
+      "name": "test_page_draft_schema_has_no_free_form_model_output",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        382,
+        390
+      ],
+      "summary": "Exercises test_page_draft_schema_has_no_free_form_model_output behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "function",
+      "name": "_additional_properties_values",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        393,
+        401
+      ],
+      "summary": "Exercises _additional_properties_values behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "function",
+      "name": "test_luna_crop_inspection_batches_images_in_one_request",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        404,
+        472
+      ],
+      "summary": "Exercises test_luna_crop_inspection_batches_images_in_one_request behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "function",
+      "name": "test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        475,
+        516
+      ],
+      "summary": "Exercises test_quality_crop_inspection_uses_luna_and_records_page_targets behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "function",
+      "name": "test_schema_architect_uses_luna_medium",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        519,
+        541
+      ],
+      "summary": "Exercises test_schema_architect_uses_luna_medium behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "function",
+      "name": "test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        544,
+        575
+      ],
+      "summary": "Exercises test_dynamic_extractor_uses_user_schema_and_luna_repair behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "function",
+      "name": "test_dynamic_extractor_repairs_invalid_json_once",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        578,
+        595
+      ],
+      "summary": "Exercises test_dynamic_extractor_repairs_invalid_json_once behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "function",
+      "name": "test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        598,
+        650
+      ],
+      "summary": "Exercises test_targeted_span_repair_sends_only_literal_context_and_crop behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "class",
+      "name": "RecordingResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        34,
+        47
+      ],
+      "summary": "Provides the RecordingResponses test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "class",
+      "name": "RecordingCreateResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        50,
+        63
+      ],
+      "summary": "Provides the RecordingCreateResponses test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "class",
+      "name": "RepairingResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        66,
+        77
+      ],
+      "summary": "Provides the RepairingResponses test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "class",
+      "name": "RepairingCreateResponses",
+      "filePath": "tests/test_openai_vision_gateway.py",
+      "lineRange": [
+        80,
+        94
+      ],
+      "summary": "Provides the RepairingCreateResponses test fixture or test double used by this pytest module.",
+      "tags": [
+        "test",
+        "pytest",
+        "test-double"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_paddle_ocr.py",
+      "type": "file",
+      "name": "test_paddle_ocr.py",
+      "filePath": "tests/test_paddle_ocr.py",
+      "summary": "Contains pytest coverage for paddle ocr behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:_page",
+      "type": "function",
+      "name": "_page",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        14,
+        27
+      ],
+      "summary": "Exercises _page behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "function",
+      "name": "test_paddle_regions_normalize_ordered_official_blocks",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        30,
+        60
+      ],
+      "summary": "Exercises test_paddle_regions_normalize_ordered_official_blocks behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "function",
+      "name": "test_paddle_runtime_posts_document_once_and_maps_pages",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        63,
+        127
+      ],
+      "summary": "Exercises test_paddle_runtime_posts_document_once_and_maps_pages behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "function",
+      "name": "test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        130,
+        182
+      ],
+      "summary": "Exercises test_paddle_runtime_recovery_posts_deterministic_image_without_preparing behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "function",
+      "name": "test_paddle_runtime_fails_closed_on_service_error",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        185,
+        199
+      ],
+      "summary": "Exercises test_paddle_runtime_fails_closed_on_service_error behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "function",
+      "name": "test_paddle_runtime_rejects_remote_document_destination",
+      "filePath": "tests/test_paddle_ocr.py",
+      "lineRange": [
+        202,
+        204
+      ],
+      "summary": "Exercises test_paddle_runtime_rejects_remote_document_destination behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_paddle_runtime_config.py",
+      "type": "file",
+      "name": "test_paddle_runtime_config.py",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "summary": "Contains pytest coverage for paddle runtime config behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "function",
+      "name": "_config",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        17,
+        27
+      ],
+      "summary": "Exercises _config behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "function",
+      "name": "test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        30,
+        48
+      ],
+      "summary": "Exercises test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "function",
+      "name": "test_configure_pipeline_rejects_non_v1_6_layout",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        51,
+        53
+      ],
+      "summary": "Exercises test_configure_pipeline_rejects_non_v1_6_layout behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "function",
+      "name": "test_validate_cached_assets_requires_all_runtime_downloads",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        56,
+        71
+      ],
+      "summary": "Exercises test_validate_cached_assets_requires_all_runtime_downloads behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "function",
+      "name": "test_main_defaults_an_empty_forwarded_port",
+      "filePath": "tests/test_paddle_runtime_config.py",
+      "lineRange": [
+        74,
+        87
+      ],
+      "summary": "Exercises test_main_defaults_an_empty_forwarded_port behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_check_defaults_off_with_bounded_budget",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_disagreement_config_rejects_invalid_limits",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_token_similarity_ignores_case_punctuation_and_spacing",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_parse_json_persists_ocr_comparison_evidence",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_ocr_disagreement.py",
+      "target": "function:tests/test_ocr_disagreement.py:test_cross_check_sends_only_budgeted_crops_and_restores_primary",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RecordingCreateResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "class:tests/test_openai_vision_gateway.py:RepairingCreateResponses",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_prompt_cache",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_no_image_payload",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_records_cached_input_tokens",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_defaults_missing_cached_input_tokens_to_zero",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_assert_untrusted_document_instruction",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_markdown_refinement_is_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_agentic_analysis_requests_are_structured_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_document_chat_request_is_structured_and_text_only",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_structured_agentic_request_repairs_schema_failure_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_draft_uses_deterministic_structured_vision_request",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_gateway_accumulates_usage_across_requests",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_incomplete_draft_reports_provider_context_before_schema_validation",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_page_draft_schema_has_no_free_form_model_output",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:_additional_properties_values",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_luna_crop_inspection_batches_images_in_one_request",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_quality_crop_inspection_uses_luna_and_records_page_targets",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_schema_architect_uses_luna_medium",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_uses_user_schema_and_luna_repair",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_dynamic_extractor_repairs_invalid_json_once",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_openai_vision_gateway.py",
+      "target": "function:tests/test_openai_vision_gateway.py:test_targeted_span_repair_sends_only_literal_context_and_crop",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:_page",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:_page",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_regions_normalize_ordered_official_blocks",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_posts_document_once_and_maps_pages",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_recovery_posts_deterministic_image_without_preparing",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_fails_closed_on_service_error",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_ocr.py",
+      "target": "function:tests/test_paddle_ocr.py:test_paddle_runtime_rejects_remote_document_destination",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:_config",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_preserves_full_v1_6_layout_and_uses_vllm",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_configure_pipeline_rejects_non_v1_6_layout",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_validate_cached_assets_requires_all_runtime_downloads",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_paddle_runtime_config.py",
+      "target": "function:tests/test_paddle_runtime_config.py:test_main_defaults_an_empty_forwarded_port",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "projectRoot": "D:\\AI\\Github\\grounded-docparse",
+  "batchFiles": [
+    {
+      "path": "src/grounded_docparse/__init__.py",
+      "language": "python",
+      "sizeLines": 55,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/agentic.py",
+      "language": "python",
+      "sizeLines": 1002,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/config.py",
+      "language": "python",
+      "sizeLines": 304,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/extraction.py",
+      "language": "python",
+      "sizeLines": 758,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/gateways.py",
+      "language": "python",
+      "sizeLines": 901,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/prompts.py",
+      "language": "python",
+      "sizeLines": 70,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/grounded_docparse/runtime.py",
+      "language": "python",
+      "sizeLines": 232,
+      "fileCategory": "code"
+    }
+  ],
+  "batchImportData": {
+    "src/grounded_docparse/__init__.py": [
+      "src/grounded_docparse/agentic.py",
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/extraction.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/pipeline.py",
+      "src/grounded_docparse/render.py"
+    ],
+    "src/grounded_docparse/agentic.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/extraction.py",
+      "src/grounded_docparse/gateways.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/render.py"
+    ],
+    "src/grounded_docparse/config.py": [],
+    "src/grounded_docparse/extraction.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/gateways.py",
+      "src/grounded_docparse/models.py"
+    ],
+    "src/grounded_docparse/gateways.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/ingest.py",
+      "src/grounded_docparse/models.py",
+      "src/grounded_docparse/prompts.py",
+      "src/grounded_docparse/runtime.py"
+    ],
+    "src/grounded_docparse/prompts.py": [],
+    "src/grounded_docparse/runtime.py": [
+      "src/grounded_docparse/config.py",
+      "src/grounded_docparse/models.py"
+    ]
+  }
+}

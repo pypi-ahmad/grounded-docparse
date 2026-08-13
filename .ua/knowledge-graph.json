@@ -1,0 +1,1992 @@
+{
+  "version": "1.0.0",
+  "kind": "knowledge",
+  "project": {
+    "name": "Grounded DocParse Knowledge Wiki",
+    "languages": [
+      "markdown"
+    ],
+    "frameworks": [
+      "karpathy-wiki"
+    ],
+    "description": "Knowledge graph for Grounded DocParse Knowledge Wiki",
+    "analyzedAt": "2026-08-12T13:49:46.455264+00:00",
+    "gitCommitHash": "69206db91461a397232097f878fc5394dc126c60"
+  },
+  "nodes": [
+    {
+      "id": "article:articles/engineering/adding-a-native-format",
+      "type": "article",
+      "name": "Adding a native format",
+      "filePath": "articles\\engineering\\adding-a-native-format.md",
+      "summary": "A new native format requires an explicit source-format and processing-type mapping, signature or container validation, deterministic source-unit extraction, anchor creation, base-text assembly, and...",
+      "tags": [
+        "articles\\engineering",
+        "engineering and assurance",
+        "extension",
+        "formats",
+        "parser-development"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "office-and-native-formats",
+          "docling-native-conversion",
+          "source-anchors-and-character-spans"
+        ],
+        "category": "Engineering and Assurance",
+        "content": "---\ntags: extension, formats, parser-development\nsources: src/grounded_docparse/native.py, src/grounded_docparse/native_parsers.py, src/grounded_docparse/docling_native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Adding a native format\n\nA new native format requires an explicit source-format and processing-type mapping, signature or container validation, deterministic source-unit extraction, anchor creation, base-text assembly, and character-span coverage. It must then enter exactly one native parser path.\n\nIf Docling supports conversion, the adapter must still claim every converted block against the format's original structure. Embedded images remain assets unless a future product decision introduces a separately authorized OCR route.\n\nSee [[office-and-native-formats]], [[docling-native-conversion]], and [[source-anchors-and-character-spans]].\n\n## Evidence\n\nEnums and evidence contracts are in `src/grounded_docparse/native.py`; dispatch is in `src/grounded_docparse/native_parsers.py`; deterministic format readers are in `src/grounded_docparse/docling_native.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/repository-architecture"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "type": "article",
+      "name": "Evaluation corpus and metrics",
+      "filePath": "articles\\engineering\\evaluation-corpus-and-metrics.md",
+      "summary": "The evaluation corpus records document fixtures, processing expectations, annotations, and regression policy inputs. Native fixtures extend that corpus with source anchors, exact text intervals, ro...",
+      "tags": [
+        "articles\\engineering",
+        "corpus",
+        "engineering and assurance",
+        "evaluation",
+        "metrics"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "grounding-and-evidence-contract",
+          "ocr-quality-and-recovery",
+          "testing-strategy"
+        ],
+        "category": "Engineering and Assurance",
+        "content": "---\ntags: evaluation, corpus, metrics\nsources: src/grounded_docparse/benchmark.py, benchmarks/corpus-v1/manifest.json, benchmarks/schemas/annotation-v1.1.schema.json, scripts/generate_evaluation_corpus.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Evaluation corpus and metrics\n\nThe evaluation corpus records document fixtures, processing expectations, annotations, and regression policy inputs. Native fixtures extend that corpus with source anchors, exact text intervals, route expectations, and format-specific evidence.\n\nEvaluation should distinguish routing correctness from extraction quality. Native, scanned, and mixed fixtures must reach their selected pipelines without fallback; accepted extracted values must match exact source substrings and resolve to anchors.\n\nSee [[grounding-and-evidence-contract]], [[ocr-quality-and-recovery]], and [[testing-strategy]].\n\n## Evidence\n\nBenchmark models and reporting live in `src/grounded_docparse/benchmark.py`; corpus metadata and contracts live under `benchmarks/`; deterministic fixture generation is in `scripts/generate_evaluation_corpus.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/testing-strategy",
+          "article:articles/pipelines/ocr-quality-and-recovery"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/engineering/repository-architecture",
+      "type": "article",
+      "name": "Repository architecture",
+      "filePath": "articles\\engineering\\repository-architecture.md",
+      "summary": "The repository separates core parsing under `src/grounded_docparse`, the Streamlit entry point, evaluation assets, operational scripts, installers, documentation, and tests. Public dependencies and...",
+      "tags": [
+        "architecture",
+        "articles\\engineering",
+        "development",
+        "engineering and assurance",
+        "repository"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "system-overview",
+          "adding-a-native-format",
+          "testing-strategy"
+        ],
+        "category": "Engineering and Assurance",
+        "content": "---\ntags: architecture, repository, development\nsources: docs/architecture.md, docs/codebase/ARCHITECTURE.md, pyproject.toml\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Repository architecture\n\nThe repository separates core parsing under `src/grounded_docparse`, the Streamlit entry point, evaluation assets, operational scripts, installers, documentation, and tests. Public dependencies and optional native integrations are declared in `pyproject.toml`.\n\nNative ingestion is additive: shared models and dispatch sit beside the established OCR pipeline, while format adapters and grounded extraction remain isolated modules. Interfaces converge at result rendering, persistence, and exports rather than by sharing unverified evidence.\n\nSee [[system-overview]], [[adding-a-native-format]], and [[testing-strategy]].\n\n## Evidence\n\nThe supported component map is in `docs/architecture.md`; the broader repository layout is in `docs/codebase/ARCHITECTURE.md`; dependency groups and package metadata are in `pyproject.toml`.\n",
+        "backlinks": [
+          "article:articles/product/system-overview"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "type": "article",
+      "name": "Security, privacy, and trust boundaries",
+      "filePath": "articles\\engineering\\security-privacy-and-trust-boundaries.md",
+      "summary": "Uploaded documents are untrusted. File extensions are only hints; signatures, package structure, page limits, size limits, and parser-specific validation must succeed before content is processed. A...",
+      "tags": [
+        "articles\\engineering",
+        "engineering and assurance",
+        "privacy",
+        "security",
+        "trust-boundaries"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "grounding-and-evidence-contract",
+          "langextract-grounded-extraction",
+          "installation-and-local-runtimes"
+        ],
+        "category": "Engineering and Assurance",
+        "content": "---\ntags: security, privacy, trust-boundaries\nsources: SECURITY.md, docs/spec.md, src/grounded_docparse/native_extraction.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Security, privacy, and trust boundaries\n\nUploaded documents are untrusted. File extensions are only hints; signatures, package structure, page limits, size limits, and parser-specific validation must succeed before content is processed. A user-selected mode never authorizes silent interpretation by another pipeline.\n\nNative evidence is also untrusted input to models. LangExtract output is accepted only through exact character intervals and source-span resolution. PDF Inspector and Docling cannot invoke OCR or create authoritative text outside their native source contracts.\n\nLocal OCR services and workstation persistence reduce unnecessary data movement, while optional remote reasoning remains bounded by the product's explicit recovery and extraction interfaces.\n\nSee [[grounding-and-evidence-contract]], [[langextract-grounded-extraction]], and [[installation-and-local-runtimes]].\n\n## Evidence\n\nProject security reporting is defined in `SECURITY.md`; feature trust boundaries are in `docs/spec.md`; ungrounded extraction rejection is implemented in `src/grounded_docparse/native_extraction.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/testing-strategy",
+          "article:articles/interfaces/installation-and-local-runtimes",
+          "article:articles/product/product-capabilities-and-boundaries"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/engineering/testing-strategy",
+      "type": "article",
+      "name": "Testing strategy",
+      "filePath": "articles\\engineering\\testing-strategy.md",
+      "summary": "Tests protect routing, validation, evidence, persistence, and regression boundaries. Native model tests cover immutable text and spans; Docling tests cover format-to-anchor mapping without OCR; ext...",
+      "tags": [
+        "articles\\engineering",
+        "contracts",
+        "engineering and assurance",
+        "regression",
+        "testing"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "processing-types-and-manual-routing",
+          "evaluation-corpus-and-metrics",
+          "security-privacy-and-trust-boundaries"
+        ],
+        "category": "Engineering and Assurance",
+        "content": "---\ntags: testing, regression, contracts\nsources: tests/test_native_models.py, tests/test_docling_native_parser.py, tests/test_native_extraction.py, docs/codebase/TESTING.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Testing strategy\n\nTests protect routing, validation, evidence, persistence, and regression boundaries. Native model tests cover immutable text and spans; Docling tests cover format-to-anchor mapping without OCR; extraction tests reject missing or mismatched character intervals.\n\nUI and CLI contracts verify that manual selections reach exactly one pipeline. Existing scanned and image tests remain unchanged and must continue to pass, while mixed-PDF tests verify review overrides and original page order.\n\nSee [[processing-types-and-manual-routing]], [[evaluation-corpus-and-metrics]], and [[security-privacy-and-trust-boundaries]].\n\n## Evidence\n\nFeature contracts are exercised in `tests/test_native_models.py`, `tests/test_docling_native_parser.py`, and `tests/test_native_extraction.py`; repository-wide test conventions are documented in `docs/codebase/TESTING.md`.\n",
+        "backlinks": [
+          "article:articles/engineering/evaluation-corpus-and-metrics",
+          "article:articles/engineering/repository-architecture"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/grounding/immutable-base-text",
+      "type": "article",
+      "name": "Immutable base text",
+      "filePath": "articles\\grounding\\immutable-base-text.md",
+      "summary": "`base_text` is the canonical character sequence assembled during native parsing. Its offsets are stable for the lifetime of the result and form the coordinate system for every `SourceSpan` and grou...",
+      "tags": [
+        "articles\\grounding",
+        "base-text",
+        "extraction",
+        "grounding and extraction",
+        "immutability"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "source-anchors-and-character-spans",
+          "docling-native-conversion",
+          "langextract-grounded-extraction"
+        ],
+        "category": "Grounding and Extraction",
+        "content": "---\ntags: base-text, immutability, extraction\nsources: src/grounded_docparse/native.py, src/grounded_docparse/native_parsers.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Immutable base text\n\n`base_text` is the canonical character sequence assembled during native parsing. Its offsets are stable for the lifetime of the result and form the coordinate system for every `SourceSpan` and grounded extraction interval.\n\nRendered Markdown and source-structure views may organize the same evidence differently, but they are downstream presentations. They are never fed back into grounded extraction because formatting changes would invalidate offsets or introduce text not present in the source.\n\nSee [[source-anchors-and-character-spans]], [[docling-native-conversion]], and [[langextract-grounded-extraction]].\n\n## Evidence\n\nImmutability and span lookup are enforced by `NativeDocument` in `src/grounded_docparse/native.py`; parsers assemble the original text and mappings in `src/grounded_docparse/native_parsers.py`.\n",
+        "backlinks": [
+          "article:articles/grounding/langextract-grounded-extraction",
+          "article:articles/grounding/native-document-model",
+          "article:articles/pipelines/docling-native-conversion"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "article",
+      "name": "LangExtract grounded extraction",
+      "filePath": "articles\\grounding\\langextract-grounded-extraction.md",
+      "summary": "The native extraction adapter sends immutable `base_text` and a translated saved schema to LangExtract. It accepts a candidate only when LangExtract supplies a character interval, the interval is v...",
+      "tags": [
+        "articles\\grounding",
+        "extraction",
+        "grounding",
+        "grounding and extraction",
+        "langextract"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "immutable-base-text",
+          "schema-translation-and-value-validation",
+          "grounding-and-evidence-contract"
+        ],
+        "category": "Grounding and Extraction",
+        "content": "---\ntags: langextract, extraction, grounding\nsources: src/grounded_docparse/native_extraction.py, docs/spec.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# LangExtract grounded extraction\n\nThe native extraction adapter sends immutable `base_text` and a translated saved schema to LangExtract. It accepts a candidate only when LangExtract supplies a character interval, the interval is valid, and the returned value exactly matches the corresponding source substring.\n\nAccepted intervals are mapped through covering source spans to anchors. Candidates with missing intervals, mismatched text, gaps in span coverage, or unresolved evidence are rejected and retained only as diagnostics where appropriate. LangExtract performs no OCR.\n\nSee [[immutable-base-text]], [[schema-translation-and-value-validation]], and [[grounding-and-evidence-contract]].\n\n## Evidence\n\n`LangExtractNativeExtractor.extract`, interval coverage checks, coercion, and accepted-value construction are implemented in `src/grounded_docparse/native_extraction.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/security-privacy-and-trust-boundaries",
+          "article:articles/grounding/immutable-base-text",
+          "article:articles/grounding/schema-translation-and-value-validation",
+          "article:articles/grounding/source-anchors-and-character-spans",
+          "article:articles/product/grounding-and-evidence-contract"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/grounding/native-document-model",
+      "type": "article",
+      "name": "Native document model",
+      "filePath": "articles\\grounding\\native-document-model.md",
+      "summary": "`NativeDocument` is the shared evidence model for native PDFs and non-PDF native formats. It contains immutable base text, source units, character-to-source spans, normalized elements, tables, asse...",
+      "tags": [
+        "articles\\grounding",
+        "evidence",
+        "grounding and extraction",
+        "model",
+        "native"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "source-anchors-and-character-spans",
+          "immutable-base-text",
+          "workspace-persistence-and-exports"
+        ],
+        "category": "Grounding and Extraction",
+        "content": "---\ntags: model, evidence, native\nsources: src/grounded_docparse/native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Native document model\n\n`NativeDocument` is the shared evidence model for native PDFs and non-PDF native formats. It contains immutable base text, source units, character-to-source spans, normalized elements, tables, assets, rendered views, and warnings.\n\nThe model validates its own grounding. Character ranges must be ordered and bounded, spans must point into base text, and every referenced anchor must resolve to declared source structure. Supporting result models carry previews and extraction evidence without weakening those invariants.\n\nSee [[source-anchors-and-character-spans]], [[immutable-base-text]], and [[workspace-persistence-and-exports]].\n\n## Evidence\n\nPydantic models including `NativeDocument`, `NativeElement`, `SourceUnit`, `SourceSpan`, and extraction result types are defined in `src/grounded_docparse/native.py`.\n",
+        "backlinks": [
+          "article:articles/grounding/schema-translation-and-value-validation",
+          "article:articles/grounding/source-anchors-and-character-spans",
+          "article:articles/interfaces/cli-and-python-api",
+          "article:articles/interfaces/workspace-persistence-and-exports",
+          "article:articles/pipelines/docling-native-conversion",
+          "article:articles/pipelines/native-pdf-pipeline",
+          "article:articles/product/grounding-and-evidence-contract"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/grounding/schema-translation-and-value-validation",
+      "type": "article",
+      "name": "Schema translation and value validation",
+      "filePath": "articles\\grounding\\schema-translation-and-value-validation.md",
+      "summary": "Saved extraction schemas are translated into flat field and group specifications that LangExtract can request while preserving JSON pointers, field types, descriptions, and required structure. The ...",
+      "tags": [
+        "articles\\grounding",
+        "extraction",
+        "grounding and extraction",
+        "schema",
+        "validation"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "langextract-grounded-extraction",
+          "native-document-model",
+          "cli-and-python-api"
+        ],
+        "category": "Grounding and Extraction",
+        "content": "---\ntags: schema, validation, extraction\nsources: src/grounded_docparse/native_extraction.py, src/grounded_docparse/schema_store.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Schema translation and value validation\n\nSaved extraction schemas are translated into flat field and group specifications that LangExtract can request while preserving JSON pointers, field types, descriptions, and required structure. The adapter later reconstructs the requested object shape from individually grounded values.\n\nString values must match source text exactly before type coercion. Numeric, boolean, date-like, array, and nested values are set only through their translated schema locations, and ungrounded candidates never enter the accepted result.\n\nSee [[langextract-grounded-extraction]], [[native-document-model]], and [[cli-and-python-api]].\n\n## Evidence\n\nSchema translation, JSON-pointer helpers, coercion, and result assembly live in `src/grounded_docparse/native_extraction.py`; persisted schema contracts live in `src/grounded_docparse/schema_store.py`.\n",
+        "backlinks": [
+          "article:articles/grounding/langextract-grounded-extraction",
+          "article:articles/interfaces/cli-and-python-api"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "article",
+      "name": "Source anchors and character spans",
+      "filePath": "articles\\grounding\\source-anchors-and-character-spans.md",
+      "summary": "Source anchors describe where text came from in the original format. PDF anchors carry page and bounding-box coordinates; structural anchors identify paragraphs or shapes; cell anchors identify she...",
+      "tags": [
+        "anchors",
+        "articles\\grounding",
+        "grounding and extraction",
+        "provenance",
+        "spans"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "native-document-model",
+          "langextract-grounded-extraction",
+          "office-and-native-formats"
+        ],
+        "category": "Grounding and Extraction",
+        "content": "---\ntags: anchors, spans, provenance\nsources: src/grounded_docparse/native.py, src/grounded_docparse/docling_native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Source anchors and character spans\n\nSource anchors describe where text came from in the original format. PDF anchors carry page and bounding-box coordinates; structural anchors identify paragraphs or shapes; cell anchors identify sheet and cell; CSV anchors identify row and column; text anchors cover other native structures.\n\n`SourceSpan` connects a half-open character interval in `base_text` to one or more anchors. When an extraction returns a character interval, the system selects the covering spans and therefore recovers exact source evidence without searching rendered Markdown.\n\nSee [[native-document-model]], [[langextract-grounded-extraction]], and [[office-and-native-formats]].\n\n## Evidence\n\nAnchor unions and span validation are defined in `src/grounded_docparse/native.py`; format-specific anchor construction is implemented in `src/grounded_docparse/docling_native.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/adding-a-native-format",
+          "article:articles/grounding/immutable-base-text",
+          "article:articles/grounding/native-document-model",
+          "article:articles/interfaces/workspace-persistence-and-exports",
+          "article:articles/pipelines/native-pdf-pipeline",
+          "article:articles/pipelines/office-and-native-formats",
+          "article:articles/product/grounding-and-evidence-contract"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/interfaces/cli-and-python-api",
+      "type": "article",
+      "name": "CLI and Python API",
+      "filePath": "articles\\interfaces\\cli-and-python-api.md",
+      "summary": "The command-line interface exposes the same manual routing contract through `--processing-type`. The selected value is validated against file content and dispatched once; invalid combinations fail ...",
+      "tags": [
+        "api",
+        "articles\\interfaces",
+        "cli",
+        "integration",
+        "interfaces and operations"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "processing-types-and-manual-routing",
+          "native-document-model",
+          "schema-translation-and-value-validation"
+        ],
+        "category": "Interfaces and Operations",
+        "content": "---\ntags: cli, api, integration\nsources: src/grounded_docparse/cli.py, src/grounded_docparse/__init__.py, docs/api.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# CLI and Python API\n\nThe command-line interface exposes the same manual routing contract through `--processing-type`. The selected value is validated against file content and dispatched once; invalid combinations fail before parsing rather than being reclassified.\n\nThe Python package exports native models, parsers, extraction results, and existing OCR interfaces through a single public surface. Callers can persist or render native evidence without depending on internal parser-specific objects.\n\nSee [[processing-types-and-manual-routing]], [[native-document-model]], and [[schema-translation-and-value-validation]].\n\n## Evidence\n\nArgument handling and dispatch live in `src/grounded_docparse/cli.py`; public exports are in `src/grounded_docparse/__init__.py`; usage contracts are documented in `docs/api.md`.\n",
+        "backlinks": [
+          "article:articles/grounding/schema-translation-and-value-validation",
+          "article:articles/product/processing-types-and-manual-routing"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/interfaces/installation-and-local-runtimes",
+      "type": "article",
+      "name": "Installation and local runtimes",
+      "filePath": "articles\\interfaces\\installation-and-local-runtimes.md",
+      "summary": "Grounded DocParse targets a Windows workstation with WSL-backed local OCR services. The installer prepares Python dependencies, OCR runtimes, model assets, launchers, and hardware-appropriate fallb...",
+      "tags": [
+        "articles\\interfaces",
+        "installation",
+        "interfaces and operations",
+        "runtime",
+        "windows",
+        "wsl"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "scanned-pdf-and-image-pipeline",
+          "docling-native-conversion",
+          "security-privacy-and-trust-boundaries"
+        ],
+        "category": "Interfaces and Operations",
+        "content": "---\ntags: installation, runtime, windows, wsl\nsources: scripts/wsl/setup-glmocr.sh, installer/Install-GroundedDocParse.ps1, SETUP.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Installation and local runtimes\n\nGrounded DocParse targets a Windows workstation with WSL-backed local OCR services. The installer prepares Python dependencies, OCR runtimes, model assets, launchers, and hardware-appropriate fallbacks.\n\nThe native optional dependency set adds PDF Inspector, Docling, and LangExtract. Their integration remains non-OCR: local GLM-OCR or PaddleOCR-VL services continue to handle only scanned PDFs, images, and OCR-selected mixed pages.\n\nSee [[scanned-pdf-and-image-pipeline]], [[docling-native-conversion]], and [[security-privacy-and-trust-boundaries]].\n\n## Evidence\n\nDependency installation is implemented in `scripts/wsl/setup-glmocr.sh`; Windows orchestration is in `installer/Install-GroundedDocParse.ps1`; supported setup paths are described in `SETUP.md`.\n",
+        "backlinks": [
+          "article:articles/engineering/security-privacy-and-trust-boundaries"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/interfaces/streamlit-workflow",
+      "type": "article",
+      "name": "Streamlit workflow",
+      "filePath": "articles\\interfaces\\streamlit-workflow.md",
+      "summary": "The Streamlit application requires a processing-type selection for each uploaded file. Legal choices depend on the extension, but file validation\u2014not extension guessing\u2014decides whether the chosen m...",
+      "tags": [
+        "articles\\interfaces",
+        "interfaces and operations",
+        "streamlit",
+        "ui",
+        "workflow"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "processing-types-and-manual-routing",
+          "mixed-pdf-pipeline",
+          "workspace-persistence-and-exports"
+        ],
+        "category": "Interfaces and Operations",
+        "content": "---\ntags: streamlit, ui, workflow\nsources: streamlit_app.py, src/grounded_docparse/native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Streamlit workflow\n\nThe Streamlit application requires a processing-type selection for each uploaded file. Legal choices depend on the extension, but file validation\u2014not extension guessing\u2014decides whether the chosen mode is accepted.\n\nFor Mixed PDF, the application presents a page review table containing the suggested route and the user's selected route. Processing begins only after review, then native and OCR page results are merged in source order. Native results expose Markdown, JSON, and source-structure views; annotated PDF is optional when the source is not visual.\n\nSee [[processing-types-and-manual-routing]], [[mixed-pdf-pipeline]], and [[workspace-persistence-and-exports]].\n\n## Evidence\n\nUpload state, per-file selectors, page-route review, and result presentation are implemented in `streamlit_app.py`; UI values use contracts from `src/grounded_docparse/native.py`.\n",
+        "backlinks": [
+          "article:articles/interfaces/workspace-persistence-and-exports",
+          "article:articles/pipelines/mixed-pdf-pipeline",
+          "article:articles/product/processing-types-and-manual-routing"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/interfaces/workspace-persistence-and-exports",
+      "type": "article",
+      "name": "Workspace persistence and exports",
+      "filePath": "articles\\interfaces\\workspace-persistence-and-exports.md",
+      "summary": "Workspace persistence stores native processing type, immutable base text, source spans, anchors, page routes, rendered views, assets, warnings, and grounded extraction evidence. Reloading must pres...",
+      "tags": [
+        "articles\\interfaces",
+        "exports",
+        "interfaces and operations",
+        "persistence",
+        "workspace"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "native-document-model",
+          "source-anchors-and-character-spans",
+          "streamlit-workflow"
+        ],
+        "category": "Interfaces and Operations",
+        "content": "---\ntags: workspace, persistence, exports\nsources: src/grounded_docparse/workspace_store.py, src/grounded_docparse/native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Workspace persistence and exports\n\nWorkspace persistence stores native processing type, immutable base text, source spans, anchors, page routes, rendered views, assets, warnings, and grounded extraction evidence. Reloading must preserve character offsets and evidence identity rather than rebuilding them from Markdown.\n\nExports include Markdown, JSON, and source-structure data. Visual formats may also provide an annotated PDF; nonvisual native formats can omit it without making the result incomplete.\n\nSee [[native-document-model]], [[source-anchors-and-character-spans]], and [[streamlit-workflow]].\n\n## Evidence\n\nSerialization and restoration are implemented in `src/grounded_docparse/workspace_store.py`; persisted native result types are defined in `src/grounded_docparse/native.py`.\n",
+        "backlinks": [
+          "article:articles/grounding/native-document-model",
+          "article:articles/interfaces/streamlit-workflow"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/docling-native-conversion",
+      "type": "article",
+      "name": "Docling native conversion",
+      "filePath": "articles\\pipelines\\docling-native-conversion.md",
+      "summary": "Docling supplies normalized document conversion, but source grounding is built from deterministic format-specific manifests. The adapter claims converted records against original paragraphs, shapes...",
+      "tags": [
+        "articles\\pipelines",
+        "conversion",
+        "docling",
+        "no-ocr",
+        "processing pipelines"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "office-and-native-formats",
+          "native-document-model",
+          "immutable-base-text"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: docling, conversion, no-ocr\nsources: src/grounded_docparse/docling_native.py, src/grounded_docparse/native_parsers.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Docling native conversion\n\nDocling supplies normalized document conversion, but source grounding is built from deterministic format-specific manifests. The adapter claims converted records against original paragraphs, shapes, sheets, cells, tables, or rows before emitting the common native model.\n\nOCR, VLM processing, and model enrichments are disabled. This prevents Docling from introducing text that cannot be traced to native document structure. The outputs include Markdown, JSON, and a source-structure representation derived from the same grounded document.\n\nSee [[office-and-native-formats]], [[native-document-model]], and [[immutable-base-text]].\n\n## Evidence\n\n`build_source_manifest`, asset extraction, record claiming, and the converter factory are implemented in `src/grounded_docparse/docling_native.py`; orchestration is in `DoclingNativeParser`.\n",
+        "backlinks": [
+          "article:articles/engineering/adding-a-native-format",
+          "article:articles/grounding/immutable-base-text",
+          "article:articles/interfaces/installation-and-local-runtimes",
+          "article:articles/pipelines/office-and-native-formats"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/mixed-pdf-pipeline",
+      "type": "article",
+      "name": "Mixed PDF pipeline",
+      "filePath": "articles\\pipelines\\mixed-pdf-pipeline.md",
+      "summary": "Mixed PDF mode handles documents containing both usable native pages and pages that require OCR. PDF Inspector proposes a route for each page, the UI displays those suggestions, and the user confir...",
+      "tags": [
+        "articles\\pipelines",
+        "mixed",
+        "page-routing",
+        "pdf",
+        "processing pipelines"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "native-pdf-pipeline",
+          "scanned-pdf-and-image-pipeline",
+          "streamlit-workflow"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: pdf, mixed, page-routing\nsources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, streamlit_app.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Mixed PDF pipeline\n\nMixed PDF mode handles documents containing both usable native pages and pages that require OCR. PDF Inspector proposes a route for each page, the UI displays those suggestions, and the user confirms or overrides every route before execution.\n\nNative pages are parsed through PDF Inspector; OCR pages are sent through the unchanged visual pipeline. Page results are merged by original one-based page number so output ordering cannot depend on completion order or routing group.\n\nThere is no silent fallback between page routes. A failure remains attached to its selected route and page. See [[native-pdf-pipeline]], [[scanned-pdf-and-image-pipeline]], and [[streamlit-workflow]].\n\n## Evidence\n\nPage route values and mixed-result contracts are defined in `src/grounded_docparse/native.py`; inspection and parsing live in `src/grounded_docparse/native_parsers.py`; review controls live in `streamlit_app.py`.\n",
+        "backlinks": [
+          "article:articles/interfaces/streamlit-workflow",
+          "article:articles/pipelines/native-pdf-pipeline",
+          "article:articles/product/processing-types-and-manual-routing"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/native-pdf-pipeline",
+      "type": "article",
+      "name": "Native PDF pipeline",
+      "filePath": "articles\\pipelines\\native-pdf-pipeline.md",
+      "summary": "Native PDF processing uses `PdfInspectorParser` to extract selectable text, layout items, tables, page positions, and bounding boxes without OCR. The parser constructs a `NativeDocument` whose evid...",
+      "tags": [
+        "articles\\pipelines",
+        "native",
+        "pdf",
+        "pdf-inspector",
+        "processing pipelines"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "mixed-pdf-pipeline",
+          "native-document-model",
+          "source-anchors-and-character-spans"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: pdf, native, pdf-inspector\nsources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, docs/spec.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Native PDF pipeline\n\nNative PDF processing uses `PdfInspectorParser` to extract selectable text, layout items, tables, page positions, and bounding boxes without OCR. The parser constructs a `NativeDocument` whose evidence remains tied to PDF page anchors.\n\nAll selected pages must be usable as native evidence. If inspection identifies unusable pages, processing stops and recommends Mixed PDF rather than silently rasterizing or calling an OCR engine. This makes the manual processing choice observable and preserves a single-pipeline contract.\n\nSee [[mixed-pdf-pipeline]], [[native-document-model]], and [[source-anchors-and-character-spans]].\n\n## Evidence\n\n`PdfInspectorParser.parse` and its PDF subsetting adapter are implemented in `src/grounded_docparse/native_parsers.py`; the evidence contracts are in `src/grounded_docparse/native.py`.\n",
+        "backlinks": [
+          "article:articles/pipelines/mixed-pdf-pipeline"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/ocr-quality-and-recovery",
+      "type": "article",
+      "name": "OCR quality and recovery",
+      "filePath": "articles\\pipelines\\ocr-quality-and-recovery.md",
+      "summary": "The OCR path performs deterministic quality analysis over recognized elements and page evidence. Risk signals can trigger bounded recovery while the selected local OCR engine continues to own layou...",
+      "tags": [
+        "articles\\pipelines",
+        "ocr",
+        "processing pipelines",
+        "quality",
+        "recovery"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "scanned-pdf-and-image-pipeline",
+          "grounding-and-evidence-contract",
+          "evaluation-corpus-and-metrics"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: ocr, quality, recovery\nsources: src/grounded_docparse/quality.py, src/grounded_docparse/page_analysis.py, src/grounded_docparse/pipeline.py\nsnapshot: content-2ae93e3d37db\nstatus: existing-and-preserved\n---\n\n# OCR quality and recovery\n\nThe OCR path performs deterministic quality analysis over recognized elements and page evidence. Risk signals can trigger bounded recovery while the selected local OCR engine continues to own layout and geometry.\n\nOptional visual recovery may replace text only within existing elements and only under its confidence contract. It cannot create or delete elements, change bounding boxes or types, or reorder content. Native-processing libraries do not participate in this recovery path.\n\nSee [[scanned-pdf-and-image-pipeline]], [[grounding-and-evidence-contract]], and [[evaluation-corpus-and-metrics]].\n\n## Evidence\n\nQuality metrics live in `src/grounded_docparse/quality.py`; page analysis is in `src/grounded_docparse/page_analysis.py`; orchestration and recovery boundaries are enforced in `src/grounded_docparse/pipeline.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/evaluation-corpus-and-metrics",
+          "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+          "article:articles/product/product-capabilities-and-boundaries"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/office-and-native-formats",
+      "type": "article",
+      "name": "Office and native formats",
+      "filePath": "articles\\pipelines\\office-and-native-formats.md",
+      "summary": "The native-document path supports DOCX, PPTX, XLSX, CSV, HTML, EPUB, Markdown, and selected OpenDocument formats. PDFs and standalone images are excluded from Docling dispatch because they have ded...",
+      "tags": [
+        "articles\\pipelines",
+        "csv",
+        "docx",
+        "native",
+        "pptx",
+        "processing pipelines",
+        "xlsx"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "docling-native-conversion",
+          "source-anchors-and-character-spans",
+          "product-capabilities-and-boundaries"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: docx, pptx, xlsx, csv, native\nsources: src/grounded_docparse/docling_native.py, src/grounded_docparse/native_parsers.py, docs/spec.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Office and native formats\n\nThe native-document path supports DOCX, PPTX, XLSX, CSV, HTML, EPUB, Markdown, and selected OpenDocument formats. PDFs and standalone images are excluded from Docling dispatch because they have dedicated processing modes.\n\nContainer signatures and internal structure are validated before conversion. Paragraphs, slides, shapes, sheets, cells, tables, rows, and columns become source units and anchors. Embedded media is recorded as assets but is not OCRed.\n\nSee [[docling-native-conversion]], [[source-anchors-and-character-spans]], and [[product-capabilities-and-boundaries]].\n\n## Evidence\n\nFormat-specific source manifests are built in `src/grounded_docparse/docling_native.py`; top-level dispatch and mode enforcement are implemented in `src/grounded_docparse/native_parsers.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/adding-a-native-format",
+          "article:articles/grounding/source-anchors-and-character-spans",
+          "article:articles/pipelines/docling-native-conversion",
+          "article:articles/product/product-capabilities-and-boundaries"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "type": "article",
+      "name": "Scanned PDF and image pipeline",
+      "filePath": "articles\\pipelines\\scanned-pdf-and-image-pipeline.md",
+      "summary": "Scanned PDFs and standalone images use the existing raster-and-OCR path. PDF pages are rendered to pixels, images are normalized, and the selected GLM-OCR or PaddleOCR-VL engine owns layout, recogn...",
+      "tags": [
+        "articles\\pipelines",
+        "image",
+        "ocr",
+        "processing pipelines",
+        "scanned-pdf"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "ocr-quality-and-recovery",
+          "processing-types-and-manual-routing",
+          "grounding-and-evidence-contract"
+        ],
+        "category": "Processing Pipelines",
+        "content": "---\ntags: ocr, scanned-pdf, image\nsources: src/grounded_docparse/pipeline.py, src/grounded_docparse/ingest.py, docs/architecture.md\nsnapshot: content-2ae93e3d37db\nstatus: existing-and-preserved\n---\n\n# Scanned PDF and image pipeline\n\nScanned PDFs and standalone images use the existing raster-and-OCR path. PDF pages are rendered to pixels, images are normalized, and the selected GLM-OCR or PaddleOCR-VL engine owns layout, recognition, confidence, bounding boxes, element types, and reading order.\n\nNative PDF inspection is not invoked for this mode. That isolation is a regression boundary: adding native formats must not change scanned-document behavior, provider selection, or recovery semantics.\n\nSee [[ocr-quality-and-recovery]], [[processing-types-and-manual-routing]], and [[grounding-and-evidence-contract]].\n\n## Evidence\n\nRaster ingestion is implemented in `src/grounded_docparse/ingest.py`; orchestration and OCR ownership are implemented in `src/grounded_docparse/pipeline.py` and described in `docs/architecture.md`.\n",
+        "backlinks": [
+          "article:articles/interfaces/installation-and-local-runtimes",
+          "article:articles/pipelines/mixed-pdf-pipeline",
+          "article:articles/pipelines/ocr-quality-and-recovery"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/product/grounding-and-evidence-contract",
+      "type": "article",
+      "name": "Grounding and evidence contract",
+      "filePath": "articles\\product\\grounding-and-evidence-contract.md",
+      "summary": "Every accepted native value must match exact text in an immutable `base_text` string and resolve through character spans to at least one source anchor. Anchors identify the original PDF page and bo...",
+      "tags": [
+        "articles\\product",
+        "evidence",
+        "grounding",
+        "invariants",
+        "product and principles"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "native-document-model",
+          "source-anchors-and-character-spans",
+          "langextract-grounded-extraction"
+        ],
+        "category": "Product and Principles",
+        "content": "---\ntags: grounding, evidence, invariants\nsources: docs/spec.md, docs/architecture.md, src/grounded_docparse/native.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Grounding and evidence contract\n\nEvery accepted native value must match exact text in an immutable `base_text` string and resolve through character spans to at least one source anchor. Anchors identify the original PDF page and bounding box, document paragraph or shape, spreadsheet sheet and cell, CSV row and column, or another native structural location.\n\nThe contract separates presentation from evidence. Markdown may be rendered or refined for readability, but it never replaces `base_text` as extraction input. Values without a valid character interval, exact text match, complete span coverage, or resolvable anchor are rejected.\n\nThis is the native equivalent of the OCR pipeline's element ownership rules. See [[native-document-model]], [[source-anchors-and-character-spans]], and [[langextract-grounded-extraction]].\n\n## Evidence\n\n`NativeDocument.valid_grounding` and related Pydantic models live in `src/grounded_docparse/native.py`; the system-level invariants are recorded in `docs/spec.md` and `docs/architecture.md`.\n",
+        "backlinks": [
+          "article:articles/engineering/evaluation-corpus-and-metrics",
+          "article:articles/engineering/security-privacy-and-trust-boundaries",
+          "article:articles/grounding/langextract-grounded-extraction",
+          "article:articles/pipelines/ocr-quality-and-recovery",
+          "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+          "article:articles/product/system-overview"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/product/processing-types-and-manual-routing",
+      "type": "article",
+      "name": "Processing types and manual routing",
+      "filePath": "articles\\product\\processing-types-and-manual-routing.md",
+      "summary": "`ProcessingType` defines nine user-selectable modes: native PDF, scanned PDF, mixed PDF, Word, PowerPoint, Excel, CSV, image, and other native. The file extension narrows which choices are legal, w...",
+      "tags": [
+        "articles\\product",
+        "cli",
+        "processing-types",
+        "product and principles",
+        "routing",
+        "ui"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "mixed-pdf-pipeline",
+          "streamlit-workflow",
+          "cli-and-python-api"
+        ],
+        "category": "Product and Principles",
+        "content": "---\ntags: routing, ui, cli, processing-types\nsources: src/grounded_docparse/native.py, streamlit_app.py, src/grounded_docparse/cli.py\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Processing types and manual routing\n\n`ProcessingType` defines nine user-selectable modes: native PDF, scanned PDF, mixed PDF, Word, PowerPoint, Excel, CSV, image, and other native. The file extension narrows which choices are legal, while signature and container checks verify that the selected mode matches the uploaded content.\n\nThe selection is authoritative. Batch uploads carry one independent selection per file, the CLI receives a matching `--processing-type`, and dispatch reaches exactly one top-level pipeline. There is no automatic reinterpretation after validation fails.\n\nMixed PDF is the one reviewed routing mode: PDF Inspector suggests native or OCR per page, and the user may override those page routes before processing. See [[mixed-pdf-pipeline]], [[streamlit-workflow]], and [[cli-and-python-api]].\n\n## Evidence\n\nThe enum and validation models are defined in `src/grounded_docparse/native.py`; UI and CLI propagation are implemented in `streamlit_app.py` and `src/grounded_docparse/cli.py`.\n",
+        "backlinks": [
+          "article:articles/engineering/testing-strategy",
+          "article:articles/interfaces/cli-and-python-api",
+          "article:articles/interfaces/streamlit-workflow",
+          "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+          "article:articles/product/system-overview"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/product/product-capabilities-and-boundaries",
+      "type": "article",
+      "name": "Product capabilities and boundaries",
+      "filePath": "articles\\product\\product-capabilities-and-boundaries.md",
+      "summary": "The feature accepts manually classified native PDFs, scanned PDFs, mixed PDFs, Office documents, spreadsheets, CSV, images, and other selected native formats. It preserves the existing OCR behavior...",
+      "tags": [
+        "articles\\product",
+        "formats",
+        "product",
+        "product and principles",
+        "scope"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "office-and-native-formats",
+          "ocr-quality-and-recovery",
+          "security-privacy-and-trust-boundaries"
+        ],
+        "category": "Product and Principles",
+        "content": "---\ntags: product, scope, formats\nsources: docs/spec.md, README.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# Product capabilities and boundaries\n\nThe feature accepts manually classified native PDFs, scanned PDFs, mixed PDFs, Office documents, spreadsheets, CSV, images, and other selected native formats. It preserves the existing OCR behavior while adding source-traceable native extraction and grounded schema extraction.\n\nThe first native release deliberately excludes OCR inside PDF Inspector, Docling, and LangExtract. Embedded images in native documents are recorded as assets but are not recognized. Invalid file-signature or selected-mode combinations stop with an error instead of silently switching pipelines.\n\nThese boundaries prevent convenience features from weakening traceability. See [[office-and-native-formats]], [[ocr-quality-and-recovery]], and [[security-privacy-and-trust-boundaries]].\n\n## Evidence\n\nSupported inputs, non-goals, and completion criteria are specified in `docs/spec.md`; the user-facing behavior is summarized in `README.md`.\n",
+        "backlinks": [
+          "article:articles/pipelines/office-and-native-formats"
+        ]
+      }
+    },
+    {
+      "id": "article:articles/product/system-overview",
+      "type": "article",
+      "name": "System overview",
+      "filePath": "articles\\product\\system-overview.md",
+      "summary": "Grounded DocParse is a workstation-oriented document parsing studio. A user explicitly selects how each file should be processed, after which the system produces structured Markdown, JSON, source e...",
+      "tags": [
+        "architecture",
+        "articles\\product",
+        "overview",
+        "product",
+        "product and principles"
+      ],
+      "complexity": "simple",
+      "knowledgeMeta": {
+        "wikilinks": [
+          "processing-types-and-manual-routing",
+          "grounding-and-evidence-contract",
+          "repository-architecture"
+        ],
+        "category": "Product and Principles",
+        "content": "---\ntags: product, architecture, overview\nsources: README.md, docs/architecture.md\nsnapshot: content-2ae93e3d37db\nstatus: feature-branch\n---\n\n# System overview\n\nGrounded DocParse is a workstation-oriented document parsing studio. A user explicitly selects how each file should be processed, after which the system produces structured Markdown, JSON, source evidence, and format-appropriate previews. The design combines local OCR for visual documents with native extraction for files whose embedded structure is authoritative.\n\nThe central boundary is evidence ownership. Scanned PDFs and images remain owned by the existing GLM-OCR or PaddleOCR-VL pipeline. Native PDFs use PDF inspection, while Word, PowerPoint, spreadsheet, CSV, HTML, EPUB, and selected native formats use a non-OCR Docling path. Mixed PDFs route pages individually and preserve original page order.\n\nSee [[processing-types-and-manual-routing]], [[grounding-and-evidence-contract]], and [[repository-architecture]].\n\n## Evidence\n\nThe product description is grounded in `README.md`; component boundaries and result flow are defined in `docs/architecture.md`.\n",
+        "backlinks": [
+          "article:articles/engineering/repository-architecture"
+        ]
+      }
+    },
+    {
+      "id": "topic:product-and-principles",
+      "type": "topic",
+      "name": "Product and Principles",
+      "summary": "Category from index: Product and Principles (4 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:processing-pipelines",
+      "type": "topic",
+      "name": "Processing Pipelines",
+      "summary": "Category from index: Processing Pipelines (6 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:grounding-and-extraction",
+      "type": "topic",
+      "name": "Grounding and Extraction",
+      "summary": "Category from index: Grounding and Extraction (5 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:interfaces-and-operations",
+      "type": "topic",
+      "name": "Interfaces and Operations",
+      "summary": "Category from index: Interfaces and Operations (4 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "topic:engineering-and-assurance",
+      "type": "topic",
+      "name": "Engineering and Assurance",
+      "summary": "Category from index: Engineering and Assurance (5 articles)",
+      "tags": [
+        "category"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:docling",
+      "type": "entity",
+      "name": "Docling",
+      "summary": "Native-document conversion dependency used with OCR and model enrichments disabled.",
+      "tags": [
+        "entity",
+        "engineering and assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:pdf-inspector",
+      "type": "entity",
+      "name": "PDF Inspector",
+      "summary": "Native PDF inspection dependency for selectable text, layout, tables, and positions.",
+      "tags": [
+        "entity",
+        "engineering and assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:langextract",
+      "type": "entity",
+      "name": "LangExtract",
+      "summary": "Schema-guided extraction dependency whose candidates require exact source grounding.",
+      "tags": [
+        "entity",
+        "grounding and extraction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:glm-ocr",
+      "type": "entity",
+      "name": "GLM-OCR",
+      "summary": "Local OCR service retained for scanned documents and OCR-selected mixed pages.",
+      "tags": [
+        "entity",
+        "interfaces and operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:paddleocr-vl",
+      "type": "entity",
+      "name": "PaddleOCR-VL",
+      "summary": "Local OCR service retained for scanned documents and OCR-selected mixed pages.",
+      "tags": [
+        "entity",
+        "interfaces and operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:adding-a-native-format:single-validated-native-path",
+      "type": "claim",
+      "name": "A native format has one validated parser path",
+      "summary": "A new format must map to an explicit processing type, validate its content, construct source units and spans, and enter exactly one native parser path.",
+      "tags": [
+        "claim",
+        "engineering and assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:evaluation-corpus-and-metrics:routing-and-extraction-are-distinct",
+      "type": "claim",
+      "name": "Routing correctness is distinct from extraction quality",
+      "summary": "Native evaluation must test selected pipeline routing separately from exact source-grounded extraction quality.",
+      "tags": [
+        "claim",
+        "engineering and assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:security-privacy-and-trust-boundaries:selected-mode-never-bypasses-validation",
+      "type": "claim",
+      "name": "Selected mode never bypasses validation",
+      "summary": "User selection does not authorize silent reinterpretation; content validation and bounded evidence contracts still apply.",
+      "tags": [
+        "claim",
+        "engineering and assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:immutable-base-text:presentation-never-becomes-evidence",
+      "type": "claim",
+      "name": "Presentation never becomes extraction evidence",
+      "summary": "Rendered Markdown and source-structure views are downstream presentations and must not replace immutable base text for extraction.",
+      "tags": [
+        "claim",
+        "grounding and extraction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:langextract-grounded-extraction:ungrounded-candidates-are-rejected",
+      "type": "claim",
+      "name": "Ungrounded extraction candidates are rejected",
+      "summary": "Candidates lacking a valid interval, exact substring match, full span coverage, or resolvable source evidence are not accepted.",
+      "tags": [
+        "claim",
+        "grounding and extraction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:native-document-model:model-validates-grounding",
+      "type": "claim",
+      "name": "The native model validates its grounding",
+      "summary": "NativeDocument enforces bounded ordered ranges, base-text spans, and resolvable declared source anchors.",
+      "tags": [
+        "claim",
+        "grounding and extraction"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:installation-and-local-runtimes:native-dependencies-remain-non-ocr",
+      "type": "claim",
+      "name": "Native dependencies remain non-OCR",
+      "summary": "PDF Inspector, Docling, and LangExtract do not replace local OCR ownership for scanned and OCR-selected pages.",
+      "tags": [
+        "claim",
+        "interfaces and operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "entity:streamlit",
+      "type": "entity",
+      "name": "Streamlit",
+      "summary": "Application framework providing per-file processing selection and Mixed-PDF route review.",
+      "tags": [
+        "entity",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:streamlit-workflow:per-file-selection-required",
+      "type": "claim",
+      "name": "Every upload requires an explicit processing selection",
+      "summary": "The UI requires a processing type for each uploaded file and accepts it only after file validation.",
+      "tags": [
+        "claim",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:workspace-persistence-and-exports:offsets-preserved-on-reload",
+      "type": "claim",
+      "name": "Persistence preserves evidence identity",
+      "summary": "Reloading native results must preserve character offsets and evidence identity instead of reconstructing them from Markdown.",
+      "tags": [
+        "claim",
+        "interfaces-and-operations"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:docling-native-conversion:non-ocr-conversion-only",
+      "type": "claim",
+      "name": "Docling conversion is non-OCR",
+      "summary": "Docling OCR, VLM processing, and model enrichments are disabled so converted text remains traceable to source structure.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:mixed-pdf-pipeline:reviewed-page-routes-no-fallback",
+      "type": "claim",
+      "name": "Mixed-PDF routing is reviewed and fail-closed",
+      "summary": "Users confirm or override each suggested page route, results retain original page order, and no silent route fallback occurs.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+      "type": "claim",
+      "name": "Unusable native pages require Mixed PDF",
+      "summary": "Native PDF processing stops and recommends Mixed PDF when inspection finds pages that cannot serve as native evidence.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:ocr-quality-and-recovery:recovery-cannot-alter-structure",
+      "type": "claim",
+      "name": "OCR recovery cannot alter document structure",
+      "summary": "Visual recovery may replace text within existing elements but cannot create, delete, reorder, or re-geometry elements.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:office-and-native-formats:structure-becomes-evidence",
+      "type": "claim",
+      "name": "Native structure becomes source evidence",
+      "summary": "Validated native formats map paragraphs, shapes, cells, tables, rows, and columns to source units and anchors; embedded media is recorded but not OCRed.",
+      "tags": [
+        "claim",
+        "processing-pipelines"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:grounding-and-evidence-contract:exact-evidence-required",
+      "type": "claim",
+      "name": "Accepted native values require exact evidence",
+      "summary": "A value is accepted only with a valid interval, exact source-text match, complete span coverage, and a resolvable anchor.",
+      "tags": [
+        "claim",
+        "product-and-principles"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "claim:processing-types-and-manual-routing:selection-is-authoritative",
+      "type": "claim",
+      "name": "User selection controls exactly one pipeline",
+      "summary": "Each validated file selection reaches one top-level pipeline with no automatic reinterpretation after validation fails.",
+      "tags": [
+        "claim",
+        "product-and-principles"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "article:articles/pipelines/office-and-native-formats",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "article:articles/pipelines/docling-native-conversion",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "target": "article:articles/pipelines/ocr-quality-and-recovery",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "target": "article:articles/engineering/testing-strategy",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/repository-architecture",
+      "target": "article:articles/product/system-overview",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/repository-architecture",
+      "target": "article:articles/engineering/adding-a-native-format",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/repository-architecture",
+      "target": "article:articles/engineering/testing-strategy",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "article:articles/interfaces/installation-and-local-runtimes",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/testing-strategy",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/testing-strategy",
+      "target": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/engineering/testing-strategy",
+      "target": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/immutable-base-text",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/immutable-base-text",
+      "target": "article:articles/pipelines/docling-native-conversion",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/immutable-base-text",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "article:articles/grounding/immutable-base-text",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "article:articles/grounding/schema-translation-and-value-validation",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/native-document-model",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/native-document-model",
+      "target": "article:articles/grounding/immutable-base-text",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/native-document-model",
+      "target": "article:articles/interfaces/workspace-persistence-and-exports",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/schema-translation-and-value-validation",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/schema-translation-and-value-validation",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/schema-translation-and-value-validation",
+      "target": "article:articles/interfaces/cli-and-python-api",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/source-anchors-and-character-spans",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/source-anchors-and-character-spans",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/grounding/source-anchors-and-character-spans",
+      "target": "article:articles/pipelines/office-and-native-formats",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/cli-and-python-api",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/cli-and-python-api",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/cli-and-python-api",
+      "target": "article:articles/grounding/schema-translation-and-value-validation",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "article:articles/pipelines/docling-native-conversion",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "article:articles/pipelines/mixed-pdf-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "article:articles/interfaces/workspace-persistence-and-exports",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "article:articles/interfaces/streamlit-workflow",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "article:articles/pipelines/office-and-native-formats",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "article:articles/grounding/immutable-base-text",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "article:articles/pipelines/native-pdf-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "article:articles/interfaces/streamlit-workflow",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "article:articles/pipelines/mixed-pdf-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "article:articles/pipelines/docling-native-conversion",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "article:articles/product/product-capabilities-and-boundaries",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "article:articles/pipelines/ocr-quality-and-recovery",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "article:articles/grounding/native-document-model",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "article:articles/grounding/source-anchors-and-character-spans",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "article:articles/pipelines/mixed-pdf-pipeline",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "article:articles/interfaces/streamlit-workflow",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "article:articles/interfaces/cli-and-python-api",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/product-capabilities-and-boundaries",
+      "target": "article:articles/pipelines/office-and-native-formats",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/product-capabilities-and-boundaries",
+      "target": "article:articles/pipelines/ocr-quality-and-recovery",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/product-capabilities-and-boundaries",
+      "target": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/system-overview",
+      "target": "article:articles/product/processing-types-and-manual-routing",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/system-overview",
+      "target": "article:articles/product/grounding-and-evidence-contract",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/system-overview",
+      "target": "article:articles/engineering/repository-architecture",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "article:articles/product/system-overview",
+      "target": "topic:product-and-principles",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/product/product-capabilities-and-boundaries",
+      "target": "topic:product-and-principles",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "topic:product-and-principles",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "topic:product-and-principles",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "topic:processing-pipelines",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/grounding/native-document-model",
+      "target": "topic:grounding-and-extraction",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/grounding/source-anchors-and-character-spans",
+      "target": "topic:grounding-and-extraction",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/grounding/immutable-base-text",
+      "target": "topic:grounding-and-extraction",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "topic:grounding-and-extraction",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/grounding/schema-translation-and-value-validation",
+      "target": "topic:grounding-and-extraction",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "topic:interfaces-and-operations",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/interfaces/cli-and-python-api",
+      "target": "topic:interfaces-and-operations",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "topic:interfaces-and-operations",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "topic:interfaces-and-operations",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/repository-architecture",
+      "target": "topic:engineering-and-assurance",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "topic:engineering-and-assurance",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "target": "topic:engineering-and-assurance",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/testing-strategy",
+      "target": "topic:engineering-and-assurance",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "topic:engineering-and-assurance",
+      "type": "categorized_under",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "claim:adding-a-native-format:single-validated-native-path",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article states the complete required path for adding a native format."
+    },
+    {
+      "source": "article:articles/engineering/adding-a-native-format",
+      "target": "entity:docling",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Docling is the concrete conversion adapter discussed for a new native format."
+    },
+    {
+      "source": "article:articles/engineering/evaluation-corpus-and-metrics",
+      "target": "claim:evaluation-corpus-and-metrics:routing-and-extraction-are-distinct",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article explicitly separates route expectations from grounded extraction checks."
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "claim:security-privacy-and-trust-boundaries:selected-mode-never-bypasses-validation",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article describes untrusted uploads and rejects silent interpretation by another pipeline."
+    },
+    {
+      "source": "article:articles/grounding/immutable-base-text",
+      "target": "claim:immutable-base-text:presentation-never-becomes-evidence",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article makes immutable base text the stable coordinate system and excludes rendered views from extraction input."
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "claim:langextract-grounded-extraction:ungrounded-candidates-are-rejected",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article lists the required interval, exact-match, coverage, and anchor checks."
+    },
+    {
+      "source": "article:articles/grounding/langextract-grounded-extraction",
+      "target": "entity:langextract",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "LangExtract is the extraction component constrained by the grounding checks."
+    },
+    {
+      "source": "article:articles/grounding/native-document-model",
+      "target": "claim:native-document-model:model-validates-grounding",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article describes the model's range, span, and anchor validation invariants."
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "claim:installation-and-local-runtimes:native-dependencies-remain-non-ocr",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The article preserves OCR ownership for the local OCR services while native dependencies remain non-OCR."
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "entity:glm-ocr",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "GLM-OCR is named as a retained local OCR service."
+    },
+    {
+      "source": "article:articles/interfaces/installation-and-local-runtimes",
+      "target": "entity:paddleocr-vl",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "PaddleOCR-VL is named as a retained local OCR service."
+    },
+    {
+      "source": "article:articles/engineering/security-privacy-and-trust-boundaries",
+      "target": "article:articles/grounding/langextract-grounded-extraction",
+      "type": "builds_on",
+      "direction": "forward",
+      "weight": 0.8,
+      "description": "The trust-boundary article applies LangExtract's interval and span-resolution contract as a security boundary."
+    },
+    {
+      "source": "article:articles/interfaces/streamlit-workflow",
+      "target": "claim:streamlit-workflow:per-file-selection-required",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The Streamlit workflow concretely implements required per-file processing selection."
+    },
+    {
+      "source": "article:articles/interfaces/workspace-persistence-and-exports",
+      "target": "claim:workspace-persistence-and-exports:offsets-preserved-on-reload",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "Workspace serialization and restoration exemplify preservation of grounded evidence identity."
+    },
+    {
+      "source": "article:articles/pipelines/docling-native-conversion",
+      "target": "claim:docling-native-conversion:non-ocr-conversion-only",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The Docling adapter implements the stated non-OCR conversion boundary."
+    },
+    {
+      "source": "article:articles/pipelines/mixed-pdf-pipeline",
+      "target": "claim:mixed-pdf-pipeline:reviewed-page-routes-no-fallback",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The mixed pipeline is the concrete reviewed-routing implementation."
+    },
+    {
+      "source": "article:articles/pipelines/native-pdf-pipeline",
+      "target": "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The native PDF parser enforces the unusable-page stop condition."
+    },
+    {
+      "source": "article:articles/pipelines/ocr-quality-and-recovery",
+      "target": "claim:ocr-quality-and-recovery:recovery-cannot-alter-structure",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The recovery path concretely applies the structural limits."
+    },
+    {
+      "source": "article:articles/pipelines/office-and-native-formats",
+      "target": "claim:office-and-native-formats:structure-becomes-evidence",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The supported format mapping is the concrete source-structure evidence design."
+    },
+    {
+      "source": "article:articles/product/grounding-and-evidence-contract",
+      "target": "claim:grounding-and-evidence-contract:exact-evidence-required",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The product contract states the acceptance conditions for grounded values."
+    },
+    {
+      "source": "article:articles/product/processing-types-and-manual-routing",
+      "target": "claim:processing-types-and-manual-routing:selection-is-authoritative",
+      "type": "exemplifies",
+      "direction": "forward",
+      "weight": 0.7,
+      "description": "The routing article defines the authoritative selection and single-pipeline behavior."
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:product-and-principles",
+      "name": "Product and Principles",
+      "description": "Product and Principles (7 nodes)",
+      "nodeIds": [
+        "article:articles/product/system-overview",
+        "article:articles/product/product-capabilities-and-boundaries",
+        "article:articles/product/grounding-and-evidence-contract",
+        "article:articles/product/processing-types-and-manual-routing",
+        "topic:product-and-principles",
+        "claim:grounding-and-evidence-contract:exact-evidence-required",
+        "claim:processing-types-and-manual-routing:selection-is-authoritative"
+      ]
+    },
+    {
+      "id": "layer:processing-pipelines",
+      "name": "Processing Pipelines",
+      "description": "Processing Pipelines (12 nodes)",
+      "nodeIds": [
+        "article:articles/pipelines/native-pdf-pipeline",
+        "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+        "article:articles/pipelines/mixed-pdf-pipeline",
+        "article:articles/pipelines/office-and-native-formats",
+        "article:articles/pipelines/docling-native-conversion",
+        "article:articles/pipelines/ocr-quality-and-recovery",
+        "topic:processing-pipelines",
+        "claim:docling-native-conversion:non-ocr-conversion-only",
+        "claim:mixed-pdf-pipeline:reviewed-page-routes-no-fallback",
+        "claim:native-pdf-pipeline:unusable-pages-require-mixed-mode",
+        "claim:ocr-quality-and-recovery:recovery-cannot-alter-structure",
+        "claim:office-and-native-formats:structure-becomes-evidence"
+      ]
+    },
+    {
+      "id": "layer:grounding-and-extraction",
+      "name": "Grounding and Extraction",
+      "description": "Grounding and Extraction (10 nodes)",
+      "nodeIds": [
+        "article:articles/grounding/native-document-model",
+        "article:articles/grounding/source-anchors-and-character-spans",
+        "article:articles/grounding/immutable-base-text",
+        "article:articles/grounding/langextract-grounded-extraction",
+        "article:articles/grounding/schema-translation-and-value-validation",
+        "topic:grounding-and-extraction",
+        "claim:immutable-base-text:presentation-never-becomes-evidence",
+        "claim:langextract-grounded-extraction:ungrounded-candidates-are-rejected",
+        "entity:langextract",
+        "claim:native-document-model:model-validates-grounding"
+      ]
+    },
+    {
+      "id": "layer:interfaces-and-operations",
+      "name": "Interfaces and Operations",
+      "description": "Interfaces and Operations (11 nodes)",
+      "nodeIds": [
+        "article:articles/interfaces/streamlit-workflow",
+        "article:articles/interfaces/cli-and-python-api",
+        "article:articles/interfaces/workspace-persistence-and-exports",
+        "article:articles/interfaces/installation-and-local-runtimes",
+        "topic:interfaces-and-operations",
+        "claim:installation-and-local-runtimes:native-dependencies-remain-non-ocr",
+        "entity:glm-ocr",
+        "entity:paddleocr-vl",
+        "claim:streamlit-workflow:per-file-selection-required",
+        "claim:workspace-persistence-and-exports:offsets-preserved-on-reload",
+        "entity:streamlit"
+      ]
+    },
+    {
+      "id": "layer:engineering-and-assurance",
+      "name": "Engineering and Assurance",
+      "description": "Engineering and Assurance (11 nodes)",
+      "nodeIds": [
+        "article:articles/engineering/repository-architecture",
+        "article:articles/engineering/adding-a-native-format",
+        "article:articles/engineering/evaluation-corpus-and-metrics",
+        "article:articles/engineering/testing-strategy",
+        "article:articles/engineering/security-privacy-and-trust-boundaries",
+        "topic:engineering-and-assurance",
+        "claim:adding-a-native-format:single-validated-native-path",
+        "entity:docling",
+        "claim:evaluation-corpus-and-metrics:routing-and-extraction-are-distinct",
+        "claim:security-privacy-and-trust-boundaries:selected-mode-never-bypasses-validation",
+        "entity:pdf-inspector"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "Product and Principles",
+      "description": "Explore the Product and Principles section (4 articles)",
+      "nodeIds": [
+        "article:articles/product/system-overview",
+        "article:articles/product/product-capabilities-and-boundaries",
+        "article:articles/product/grounding-and-evidence-contract"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Processing Pipelines",
+      "description": "Explore the Processing Pipelines section (6 articles)",
+      "nodeIds": [
+        "article:articles/pipelines/native-pdf-pipeline",
+        "article:articles/pipelines/scanned-pdf-and-image-pipeline",
+        "article:articles/pipelines/mixed-pdf-pipeline"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "Grounding and Extraction",
+      "description": "Explore the Grounding and Extraction section (5 articles)",
+      "nodeIds": [
+        "article:articles/grounding/native-document-model",
+        "article:articles/grounding/source-anchors-and-character-spans",
+        "article:articles/grounding/immutable-base-text"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "Interfaces and Operations",
+      "description": "Explore the Interfaces and Operations section (4 articles)",
+      "nodeIds": [
+        "article:articles/interfaces/streamlit-workflow",
+        "article:articles/interfaces/cli-and-python-api",
+        "article:articles/interfaces/workspace-persistence-and-exports"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "Engineering and Assurance",
+      "description": "Explore the Engineering and Assurance section (5 articles)",
+      "nodeIds": [
+        "article:articles/engineering/repository-architecture",
+        "article:articles/engineering/adding-a-native-format",
+        "article:articles/engineering/evaluation-corpus-and-metrics"
+      ]
+    }
+  ]
+}

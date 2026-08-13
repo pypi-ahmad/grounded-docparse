@@ -1,0 +1,4 @@
+gpu-memory-utilization: 0.70
+max-num-batched-tokens: 8192
+no-enable-prefix-caching: true
+mm-processor-cache-gb: 0

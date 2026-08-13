@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "file:tests/test_workspace_store.py",
+      "type": "file",
+      "name": "test_workspace_store.py",
+      "filePath": "tests/test_workspace_store.py",
+      "summary": "Contains pytest coverage for workspace store behavior in the grounded document parser.",
+      "tags": [
+        "test",
+        "pytest",
+        "document-processing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_workspace_store.py:test_completed_batch_round_trips_across_store_instances",
+      "type": "function",
+      "name": "test_completed_batch_round_trips_across_store_instances",
+      "filePath": "tests/test_workspace_store.py",
+      "lineRange": [
+        14,
+        64
+      ],
+      "summary": "Exercises test_completed_batch_round_trips_across_store_instances behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_workspace_store.py:test_processing_document_reopens_interrupted_with_progress",
+      "type": "function",
+      "name": "test_processing_document_reopens_interrupted_with_progress",
+      "filePath": "tests/test_workspace_store.py",
+      "lineRange": [
+        67,
+        95
+      ],
+      "summary": "Exercises test_processing_document_reopens_interrupted_with_progress behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_workspace_store.py:test_result_version_change_keeps_source_and_invalidates_results",
+      "type": "function",
+      "name": "test_result_version_change_keeps_source_and_invalidates_results",
+      "filePath": "tests/test_workspace_store.py",
+      "lineRange": [
+        98,
+        137
+      ],
+      "summary": "Exercises test_result_version_change_keeps_source_and_invalidates_results behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_workspace_store.py:test_workspace_settings_usage_and_clear_are_durable",
+      "type": "function",
+      "name": "test_workspace_settings_usage_and_clear_are_durable",
+      "filePath": "tests/test_workspace_store.py",
+      "lineRange": [
+        140,
+        156
+      ],
+      "summary": "Exercises test_workspace_settings_usage_and_clear_are_durable behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_workspace_store.py:test_corrupt_result_isolated_as_document_failure",
+      "type": "function",
+      "name": "test_corrupt_result_isolated_as_document_failure",
+      "filePath": "tests/test_workspace_store.py",
+      "lineRange": [
+        159,
+        194
+      ],
+      "summary": "Exercises test_corrupt_result_isolated_as_document_failure behavior as part of the module's pytest contract coverage.",
+      "tags": [
+        "test",
+        "pytest",
+        "contract-test"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_completed_batch_round_trips_across_store_instances",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_processing_document_reopens_interrupted_with_progress",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_result_version_change_keeps_source_and_invalidates_results",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_workspace_settings_usage_and_clear_are_durable",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_corrupt_result_isolated_as_document_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_completed_batch_round_trips_across_store_instances",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_processing_document_reopens_interrupted_with_progress",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_result_version_change_keeps_source_and_invalidates_results",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_workspace_settings_usage_and_clear_are_durable",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_workspace_store.py",
+      "target": "function:tests/test_workspace_store.py:test_corrupt_result_isolated_as_document_failure",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    }
+  ]
+}
