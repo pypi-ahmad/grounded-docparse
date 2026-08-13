@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-6684c0091b62",
-    "base_commit": "d66ceb60c269f9793b55e7c498b25698bfd34ad5",
-    "branch": "native-document-ingestion",
+    "id": "content-0efef1084957",
+    "base_commit": "8e4e3def4d5cfde2cb9de63700bc94970cb66cde",
+    "branch": "feature/read-only-live-demo",
     "dirty": true
   },
-  "generated_at": "2026-08-12T16:46:34.603348+00:00",
+  "generated_at": "2026-08-13T09:48:12.403502+00:00",
   "category": "documentation",
   "files": [
     {
@@ -21,48 +21,53 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "8f2cc65c7ce65db1003299d88d4ef99710d70733494de117d42b66fb20be113b",
-      "size": 10086
+      "sha256": "c51c3a7122edf8f0c424523946049f5ba092cd7644cd18e0eecd5df7fc5482b5",
+      "size": 10251
     },
     {
       "path": "CODE_OF_CONDUCT.md",
-      "sha256": "15a8d3f3c49799b52169ff252b6c42b9e0a8fb11f815d6553a7d57b539f6e3f9",
-      "size": 2083
+      "sha256": "37fef537c62beb2b43501557de885cc72be9e097c2df2f9367b24ff248c1655c",
+      "size": 2133
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "350248aa36240fe2d6459d929a118241c8eadc3b095a73365398a36f66f23032",
-      "size": 4855
+      "sha256": "1f2e825e0f3250468f9d0c63ba9eb4ba339773fdfcc4d32f8baee0c368b8f832",
+      "size": 4882
     },
     {
       "path": "README.md",
-      "sha256": "dbc5c34e0d6876b75c0a78513653e7a634511cf88a5a51b97923fbd9c917c85b",
-      "size": 21863
+      "sha256": "5c7f812c2864bdfe6ee3008f32f787e47fd958c5e1e29b4753bb7a3a781dfb49",
+      "size": 22696
     },
     {
       "path": "SECURITY.md",
-      "sha256": "b4bc6dcc6d14ebaa23830a879805a650f66133f51dd2c67ba8bff564d0c0b16c",
-      "size": 2937
+      "sha256": "b2544bcb086400bcbc1325eddd2f51c0b2ba16828903acf3ff08e7c8d53b591f",
+      "size": 2948
     },
     {
       "path": "SETUP.md",
-      "sha256": "59ea536b31790abc4e7f88b55348be81bd5b061c32a9fdbf81899679adfe22ef",
-      "size": 16957
+      "sha256": "0233630964ce180fcf727985b32c14f7b04860bdd23bdfa629c897ae4b313b1c",
+      "size": 16996
     },
     {
       "path": "TECHNICAL.md",
-      "sha256": "4a9b8fec042742d08669243f359713e332cfe3270a192f43dad18e3c4aebf289",
-      "size": 4093
+      "sha256": "f8f107846773ffd17bd653afb08c3f7deeb4b98442d92747516e24a3b5d27c74",
+      "size": 4192
     },
     {
       "path": "USAGE.md",
-      "sha256": "62dc12850e10c978f6efd722c8e8c04ec9757addf45c46eddd1a99987452c3a6",
-      "size": 3860
+      "sha256": "1be1353063859106df84e140ab92d9d1ad9d7af7d71c88b5a158d62c3b1bade3",
+      "size": 3955
+    },
+    {
+      "path": "demo/requirements.txt",
+      "sha256": "f38a62c13075087f5e0919bf9fa835af6624de4241d8108120039fc8300467eb",
+      "size": 18
     },
     {
       "path": "docs/ONBOARDING.md",
-      "sha256": "1820e06417bf725f0bea749fef26e161231f5203cf90b3f304824e43954dad9e",
-      "size": 5992
+      "sha256": "dc7f4c1dec78b073564dc9004eecf1324fa77c71a205c79bd20b5bab8a3424ee",
+      "size": 6008
     },
     {
       "path": "docs/agentic-document-extraction-comparison.md",
@@ -71,63 +76,63 @@
     },
     {
       "path": "docs/api.md",
-      "sha256": "445765b839dc4ef3604a55151d27c2504e2da705bd0593632264d9e5ce24730d",
-      "size": 16172
+      "sha256": "5e0bfd3032cfb9f00b4cf9d2fef83a75f6fa9cc8c1dcc38df066a503b5e88516",
+      "size": 16218
     },
     {
       "path": "docs/architecture.md",
-      "sha256": "12b54c8c453d1b83b48a0320d7e3433b1fe3b30b54d1cdf43d4875fb93a6be0c",
-      "size": 12211
+      "sha256": "726cc187cf5f99d86aa39248a9e1dda560baebf7dafc6bb4a62db52a4fea1a4b",
+      "size": 12242
     },
     {
       "path": "docs/azure-bulk-fax-deployment.md",
-      "sha256": "d95e28a6eaa954c99c6e48f2b2403ef31caa88b9684fe3e6493cc8c17aa53b57",
-      "size": 56274
+      "sha256": "1623822069113729a7183c706195371b9752a367aaaaf0dcaa5f702c37340713",
+      "size": 56276
     },
     {
       "path": "docs/business-user-extraction-workflow.md",
-      "sha256": "a77aaf5ab6536a24dbea91ad42f0cf1a830932a03b2b4a88e8df078e2f6918c0",
-      "size": 15934
+      "sha256": "bb48e569c8674d6a427157d5133bc4d303091cd543c8b78d53ee9fe1cc8495ae",
+      "size": 15947
     },
     {
       "path": "docs/codebase/ARCHITECTURE.md",
-      "sha256": "17bc5524272f32b51d34b7503ac005ac60dbf126f7a094db0b4c33fb57eb074e",
-      "size": 5156
+      "sha256": "b060df6e9081618502be124b28238a99db8ab8ea9818ca6b93392e9a8c55ae9c",
+      "size": 5238
     },
     {
       "path": "docs/codebase/CONCERNS.md",
-      "sha256": "f0a8d7542e260345afa3f194d00251ad0f2b0628be6034709e892fd650f68688",
-      "size": 5664
+      "sha256": "b3304c96f99a3fdbda8aab2255915f91e031db0797569ca5b0494890e2f3fe9a",
+      "size": 5741
     },
     {
       "path": "docs/codebase/CONVENTIONS.md",
-      "sha256": "77cd5f36624c0afdbcb61112e0f48814a5cced9d8c962988de01797978a99e12",
-      "size": 3632
+      "sha256": "225061e4508c266162ab9441c0cfde5ea61d8580e8124e8f703e3121700272ef",
+      "size": 3692
     },
     {
       "path": "docs/codebase/INTEGRATIONS.md",
-      "sha256": "ade5cb0a7ddcd64f76e4fd59f1f93ff6eff17304b79c22a7652370bc86eb7ee7",
-      "size": 4844
+      "sha256": "f517c8074adc2ccdefa5acc4149d271346ed73274302b22b247f476f9e0b8277",
+      "size": 4908
     },
     {
       "path": "docs/codebase/STACK.md",
-      "sha256": "2bb4a9021e29443aa4848462d998a95923e9134d1ff5d932c6e2009ca2d49f91",
-      "size": 3588
+      "sha256": "c9dec19e3735861df1039f0b7f3bed46d0639f6ef71c399c0e80c7f321e6153f",
+      "size": 3657
     },
     {
       "path": "docs/codebase/STRUCTURE.md",
-      "sha256": "1c30304385f8f8e107d621f3a4f3d02d5194f4ce5614bf3e5edbf1343d27671e",
-      "size": 4082
+      "sha256": "e506d5d2ea5fd06636350d4c5805f7a95cdd571f7f532c6f3e9b83f5afeb5b92",
+      "size": 4145
     },
     {
       "path": "docs/codebase/TESTING.md",
-      "sha256": "c0a5ce5376b3177395cf4200841f121d517e5b103ad5a67c689a41a288dcf66d",
-      "size": 4126
+      "sha256": "804a609379fc7571d60c2bd21ab51dc6d1e8ddbd0e66238b6e0fc3f1d67696ab",
+      "size": 4200
     },
     {
       "path": "docs/complete-user-guide.md",
-      "sha256": "aad3500868b18b196f64b16e94a10110eb6b9b88b9c4f313aaac9d0e43da8acf",
-      "size": 58898
+      "sha256": "d4b89579a088e0ca1c228f2821220688c7c01d45f1a2182e7510a1e8943397ce",
+      "size": 58956
     },
     {
       "path": "docs/extraction-quality-research.md",
@@ -141,8 +146,8 @@
     },
     {
       "path": "docs/how-it-works.md",
-      "sha256": "7731c799dfe163b536dd3aa2b74b9d6a79bd87e9cf2fe5c1bd4a61fab46c9e1e",
-      "size": 2084
+      "sha256": "043295679881e2aba2007cab4d46d0d9ba19f3f7c9dcd6fd3312f8a881d0a72d",
+      "size": 2096
     },
     {
       "path": "docs/idp-vs-ade-classification.html",
@@ -156,8 +161,8 @@
     },
     {
       "path": "docs/layout-aware-large-field-extraction-workflow.md",
-      "sha256": "b551cc692ddf65ecb2d1197bc16cbf4e3078508ef2ebc8c62d050abb4caba54a",
-      "size": 23659
+      "sha256": "44b385208798893d557d202e71f4c3216acd14b85c505c7b0324a8f2c61471ee",
+      "size": 23673
     },
     {
       "path": "docs/local-glmocr.md",
@@ -166,18 +171,18 @@
     },
     {
       "path": "docs/local-paddleocr-vl.md",
-      "sha256": "2d30ab111d67e6dfb1dc5fe01718b811136fcaa3ef6800d4453f78a416577b93",
-      "size": 5868
+      "sha256": "5522abbaf5374e24d79530f82db739cf2f09342a146c4a2e75e01af88b2bf47f",
+      "size": 5871
     },
     {
       "path": "docs/native-document-ingestion.html",
-      "sha256": "d1ce092cb163ee3d80690db08cac7f0e7315eabe542724bbb5de1b6bb4e3f727",
-      "size": 627004
+      "sha256": "3078417f11d36a7cb9d9762030d2b9b19ccdfac37d19d0b50399ce2dc2c14135",
+      "size": 627301
     },
     {
       "path": "docs/native-document-ingestion.workflow.json",
-      "sha256": "add23b3cbd8fe2c41a04784783beb4c4a5d680accc22f24e32d92c19042c6459",
-      "size": 4956
+      "sha256": "851198a2893bc397dc9ecdd5b86f47fafc2620bb3b505866e30b8a4d9c088db6",
+      "size": 5063
     },
     {
       "path": "docs/private-evaluation.md",
@@ -191,23 +196,23 @@
     },
     {
       "path": "docs/run.md",
-      "sha256": "0eee789336edf2faa234546d882c38b3a0d63a7a8df4aa8550d69de565a1228e",
-      "size": 5434
+      "sha256": "7d3a79de13b0fd43af51e37a5e5700500e69630f7f2722db2b6f5d3a9d94c83b",
+      "size": 5446
     },
     {
       "path": "docs/spec.md",
-      "sha256": "2c563739b6002f19a773f1d96babcc421b7eb1d8d3fdad7450fcd8d74c03b9d9",
-      "size": 7191
+      "sha256": "da784c71eabbc111684f62c66ed6471b86aac562ac0fa71740113e07df1f7bcd",
+      "size": 7208
     },
     {
       "path": "docs/tutorial.md",
-      "sha256": "8ad4904bd77518eaa6a194caf4572a480b8568e9d78c352b3e5d8b1019ac26c7",
-      "size": 2588
+      "sha256": "6f84ba8329307ca8b80def78894cad220746b7c0b3a299afb067354296bb8adf",
+      "size": 2605
     },
     {
       "path": "docs/zero-to-hero-tutorial.md",
-      "sha256": "142d9871ef77eb2c5c38b13e33e7022fc8aa2ad9021037eb94e6d53b9b400365",
-      "size": 55940
+      "sha256": "9a40d0c2ea0fa7fbb6f4e61e4f3d34e089d871dd5bfcb90c5671d10fe30f73d4",
+      "size": 55975
     },
     {
       "path": "presentations/grounded-docparse-business.pptx",
