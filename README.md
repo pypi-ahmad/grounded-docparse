@@ -244,7 +244,7 @@ full_json = render_combined_result(result, analysis)
 ├── config/glmocr.yaml            # Source GLM-OCR SDK configuration
 ├── scripts/wsl/                  # Locked WSL setup and launch scripts
 ├── scripts/                      # Corpus generation and evaluation utilities
-├── benchmarks/                   # Versioned corpus, schemas, rate cards, baselines
+├── benchmarks/                   # Locked corpus manifest, schemas, rate cards, baselines
 ├── examples/                     # Synthetic documents and extraction schema
 ├── tests/                        # Offline contract and behavior tests
 ├── docs/                         # Architecture, operation, API, workflows, research
@@ -307,3 +307,5 @@ absolute/baseline regression gates, use the
 and locked holdout documents remain outside the repository.
 
 Licensed under the [MIT License](LICENSE).
+
+<p align="center">Made with ❤️ by Ahmad Mujtaba</p>
