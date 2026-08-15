@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from pathlib import Path
-from io import BytesIO
 import json
+from io import BytesIO
+from pathlib import Path
 
 from PIL import Image
 
 from grounded_docparse.grounded_ocr import (
-    GroundedOcrRuntime,
     GlmVllmRecognizer,
+    GroundedOcrRuntime,
     LayoutRegion,
     crop_region,
 )

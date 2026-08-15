@@ -122,7 +122,7 @@ def temporary_alternate_ocr_engine(
                     stop_managed_vllm()
             else:
                 vllm_switcher(config.ocr_engine)
-        except Exception as exc:  # noqa: BLE001 - report restoration as one audit failure
+        except Exception as exc:
             raise RuntimeError(f"Primary OCR restoration failed: {exc}") from exc
         if cleanup_error is not None:
             raise cleanup_error

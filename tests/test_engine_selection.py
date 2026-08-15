@@ -206,16 +206,18 @@ def test_cross_check_restores_primary_after_alternate_failure(monkeypatch) -> No
         lambda model: calls.append(f"unload:{model.value}"),
     )
 
-    with pytest.raises(RuntimeError, match="alternate failed"):
-        with ocr_services.temporary_alternate_ocr_engine(
+    with (
+        pytest.raises(RuntimeError, match="alternate failed"),
+        ocr_services.temporary_alternate_ocr_engine(
             ParserConfig(
                 ocr_engine=OcrEngine.OLLAMA,
                 ollama_model="deepseek-ocr:latest",
             ),
             AlternateOcrEngine.VLLM_GLM_OCR,
             vllm_switcher=lambda engine: calls.append(f"vllm:{engine.value}"),
-        ):
-            raise RuntimeError("alternate failed")
+        ),
+    ):
+        raise RuntimeError("alternate failed")
 
     assert calls == [
         "unload:deepseek-ocr:latest",

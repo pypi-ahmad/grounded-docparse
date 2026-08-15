@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from .config import LUNA_MODEL, LUNA_REASONING_EFFORT, ParserConfig
+from .config import ParserConfig
 from .models import AgentTraceEvent, RunUsage, StoredSchema
 from .native import (
     CharacterInterval,

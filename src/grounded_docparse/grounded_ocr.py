@@ -102,7 +102,9 @@ class GlmVllmRecognizer:
         choices = result.get("choices", [])
         content = choices[0].get("message", {}).get("content") if choices else None
         if not isinstance(content, str):
-            raise RuntimeError("GLM-OCR vLLM returned no recognized text")
+            raise RuntimeError(  # noqa: TRY004 - invalid provider response, not caller input
+                "GLM-OCR vLLM returned no recognized text"
+            )
         return clean_ocr_output(content)
 
 
