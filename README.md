@@ -71,7 +71,7 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
    .\Launch-Grounded-DocParse.cmd
    ```
 
-   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. The launcher installs missing `uv`, Python 3.12, native dependencies, PP-DocLayoutV3 assets, and Windows Ollama, then opens <http://localhost:8600>.
+   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. The launcher installs missing `uv`, Python 3.12, native dependencies, PP-DocLayoutV3 assets, and Windows Ollama, then opens <http://localhost:9356>.
 
 3. Optional: enable an AI provider by saving its key in the Windows User environment. Skip this step for local-only parsing.
 

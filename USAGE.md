@@ -24,7 +24,7 @@ Run the native launcher from the repository root:
 ```
 
 It repairs the native environment, CPU PP-DocLayoutV3 assets, and Windows
-Ollama before opening <http://localhost:8600>. Use `Setup-GLM-OCR.cmd` or
+Ollama before opening <http://localhost:9356>. Use `Setup-GLM-OCR.cmd` or
 `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU service.
 
 ## Process a document
@@ -97,4 +97,4 @@ session.
 - PaddleOCR-VL runtime: [docs/local-paddleocr-vl.md](docs/local-paddleocr-vl.md)
 - Full UI and workflow help: [docs/complete-user-guide.md](docs/complete-user-guide.md)
 
-Do not expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.
+Do not expose ports `9356`, `8080`, `8118`, or `8119` to an untrusted network.

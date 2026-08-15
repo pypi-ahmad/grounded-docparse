@@ -134,7 +134,7 @@ The supported local topology is deliberately small:
 
 ```text
 Browser
-  -> Streamlit studio on 127.0.0.1:8600
+  -> Streamlit studio on 127.0.0.1:9356
        -> ingest and rasterization
        -> selected engine
             -> Windows CPU PP-DocLayoutV3 + WSL GLM vLLM or Windows Ollama
@@ -219,7 +219,7 @@ The setup process:
 3. downloads pinned CPU PP-DocLayoutV3 assets;
 4. installs or starts Windows Ollama;
 5. starts native Streamlit on loopback; and
-6. opens <http://localhost:8600>.
+6. opens <http://localhost:9356>.
 
 Later sessions use the same launcher. Use `Setup-GLM-OCR.cmd` or
 `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU backend.
@@ -255,7 +255,7 @@ Both managed services bind to loopback. Do not override that boundary on an untr
 
 ## 6. Your first successful parse
 
-Open <http://localhost:8600>, then follow this minimal path:
+Open <http://localhost:9356>, then follow this minimal path:
 
 1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
 2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
@@ -1157,7 +1157,7 @@ Requests use `store=False`. This application setting does not replace contractua
 
 ### 17.3 Keep local services local
 
-The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `8600` or `8080` to an untrusted network.
+The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `9356` or `8080` to an untrusted network.
 
 ### 17.4 Know the residual data
 
@@ -1261,7 +1261,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8600>; inspect `.runtime/streamlit.log` |
+| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:9356>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
 | AI controls are disabled | Selected model key unavailable to Streamlit | Save it in Windows User scope and rerun `Launch-Grounded-DocParse.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |
