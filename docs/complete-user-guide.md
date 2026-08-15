@@ -129,7 +129,7 @@ For complete setup, GPU, environment, and service instructions, read [SETUP.md](
 
 ### 3.3 Optional AI-provider configuration
 
-Local parsing does not need a cloud key. Optional enhancement, refinement, classification, TOC, routing, extraction, and chat require the selected provider key.
+Local parsing does not need a cloud key. Optional enhancement and refinement require the selected provider key. Provider-aware routing, extraction, and chat use their configured model path. The current classification/TOC `DocumentAgent` preflight additionally checks `OPENAI_API_KEY`, even when Gemini or Agnes is selected.
 
 An administrator can save the key in the Windows user environment:
 
@@ -248,11 +248,11 @@ Changing one of the preset-controlled switches can move the mode to **Custom**.
 
 ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; **AI ADE** remains its own explicit engine.
 
-Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
+Changing Markdown enhancement or AI-enhancement settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
-### 6.3 Enhance with gpt-5.6-luna
+### 6.3 Enhance Markdown with AI
 
-This feature improves Markdown presentation. It can adjust how existing elements are presented as headings, paragraphs, list items, or captions.
+This feature uses the selected AI model to improve Markdown presentation. It can adjust how existing elements are presented as headings, paragraphs, list items, or captions.
 
 Use it when:
 
@@ -264,7 +264,7 @@ It does not replace the source text, change element locations, or reorder the ca
 
 ### 6.4 Enable AI enhancement for failed or low-confidence regions
 
-AI enhancement is optional and defaults off. It runs after the selected grounded engine and considers recognition failures or regions below 75% confidence.
+AI enhancement is optional and defaults off. It runs after the selected grounded engine and considers recognition failures or regions below 75% confidence. The selected AI model performs the bounded crop inspection. There is no separate visual-recovery toggle.
 
 Candidates can include:
 
@@ -991,11 +991,11 @@ Annotated PDF bytes are not embedded in JSON; download the PDF separately.
 The footer summarizes:
 
 - GLM-OCR time;
-- Luna recovery time;
-- Luna agentic time;
+- AI recovery time;
+- AI agentic time;
 - parsed page count;
 - recovery crop/region activity; and
-- Luna input/output token counts.
+- selected-model input/output token counts.
 
 These values help technical users investigate performance and provider usage. They are not an accuracy score.
 
@@ -1255,7 +1255,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 ### 20.5 Handle a poor scan
 
 1. Prefer a clearer source if available.
-2. Keep visual recovery on if remote crop inspection is approved.
+2. Enable **AI enhancement for failed or <75% confidence regions** if remote crop inspection is approved.
 3. Review the Recovered metric and AI-recovery badges.
 4. Compare difficult text with the annotated source.
 5. Treat unreadable or missing source content as a manual exception.
@@ -1280,6 +1280,8 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 | Field is `not_found` | No supportable value exists | Leave empty or complete through approved manual process |
 | Saved definitions disappeared | App is using another database path | Check `DOCPARSE_STUDIO_DB_PATH` and file permissions |
 | Provider request fails | Rate limit, endpoint, network, schema, or provider issue | Review safe diagnostics and retry according to policy |
+| Gemini returns `503 UNAVAILABLE` | The selected Gemini model is temporarily capacity constrained | Retry later; the runtime retries transient provider failures, but sustained demand can still exhaust all attempts |
+| Gemini structured output reports invalid JSON or `MAX_TOKENS` | The response ended before a complete schema-valid object was returned | Retry the document; Gemini requests use JSON Schema, validate the decoded object, retry malformed/truncated responses, and cap output at 65536 tokens |
 
 ## 22. Frequently asked questions
 
@@ -1317,7 +1319,7 @@ No. GLM/deterministic code owns element identity, location, type, and order.
 
 ### Can the app recover a region local OCR never found?
 
-Not in the default workflow. Visual recovery repairs text only on an existing region.
+Not in the default workflow. AI recovery repairs text only on an existing region.
 
 ### Does a high-confidence field require review?
 

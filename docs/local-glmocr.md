@@ -30,7 +30,7 @@ DOCPARSE_LAYOUT_DETECTION_THRESHOLD=0.3
 
 Geometry remains PP-DocLayout-owned. Textual detector regions are sent through GLM recognition; pure chart/image regions can remain non-text evidence. AI enhancement cannot change detector geometry or order.
 
-For a live GLM-only regression run, activate the setup-created WSL environment, disable Luna explicitly, and retain candidate/provenance artifacts:
+For a live GLM-only regression run, activate the setup-created WSL environment, disable AI-provider processing explicitly, and retain candidate/provenance artifacts:
 
 ```bash
 source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate"
@@ -40,6 +40,6 @@ python scripts/evaluate_corpus.py --live --glm-only \
   --output output/synthetic-report-glm-only.eval.json
 ```
 
-`--glm-only` disables visual recovery, Markdown refinement, and extraction, then fails the run if Luna usage, time, or recovery entries are present.
+`--glm-only` disables AI recovery, Markdown refinement, and extraction, then fails the run if AI-provider usage, time, or recovery entries are present.
 
 Analysis thresholds use `DOCPARSE_ANALYSIS_<FIELD>`. Ratio thresholds use rendered page area; blur/contrast checks use edge variance and grayscale range; effective-resolution checks use known DPI or the rendered short edge; skew uses layout polygon baselines. Defaults live in `AnalysisThresholds` in `src/grounded_docparse/config.py`.

@@ -8,7 +8,7 @@ deep references are the [architecture guide](docs/architecture.md),
 
 The application is a synchronous Streamlit process backed by local OCR
 services in Ubuntu 24.04 under WSL2. Local services bind to loopback. Optional
-Luna calls are outbound model requests for bounded recovery and document-level
+AI-provider calls are outbound model requests for bounded recovery and document-level
 features; they do not own source geometry or evidence identity.
 
 ## Explicit routing
