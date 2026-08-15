@@ -147,7 +147,7 @@
 <h3 id="23-core-parsing-versus-optional-ai-features">2.3 Core parsing versus optional AI features<a class="heading-anchor" href="#23-core-parsing-versus-optional-ai-features" title="Copy section link">#</a></h3>
 <p>The application has two broad layers:</p>
 <ol>
-<li><strong>Document parsing:</strong> the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; pure AI is the explicit direct-agentic option.</li>
+<li><strong>Document parsing:</strong> the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; <strong>AI ADE</strong> is the explicit direct-agentic option.</li>
 <li><strong>Optional AI features:</strong> GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or Agnes 2.5 Flash can enhance failed/sub-75%-confidence regions or reason over parsed content.</li>
 </ol>
 <p>Local parsing can run without a cloud key. Optional features require the key for the selected provider and may send document content to it.</p>
@@ -242,7 +242,7 @@
 </table>
 <p>Stop if the selected provider or a configured custom destination is unexpected.</p>
 <p><strong>Important:</strong> Fast mode is not automatically local-only when classification is enabled. AI enhancement is a separate toggle and defaults off.</p>
-<p>For a local-only run, avoid pure AI and turn off:</p>
+<p>For a local-only run, avoid <strong>AI ADE</strong> and turn off:</p>
 <ul>
 <li><strong>AI enhancement for failed or &lt;75% confidence regions</strong>;</li>
 <li><strong>Classify document type</strong>;</li>
@@ -327,7 +327,7 @@
 </tbody>
 </table>
 <p>Changing one of the preset-controlled switches can move the mode to <strong>Custom</strong>.</p>
-<p>ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; pure AI remains its own explicit engine.</p>
+<p>ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; <strong>AI ADE</strong> remains its own explicit engine.</p>
 <p>Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching <strong>Use custom form routing</strong> resets current whole-document and routed extraction results.</p>
 <h3 id="63-enhance-with-gpt-56-luna">6.3 Enhance with gpt-5.6-luna<a class="heading-anchor" href="#63-enhance-with-gpt-56-luna" title="Copy section link">#</a></h3>
 <p>This feature improves Markdown presentation. It can adjust how existing elements are presented as headings, paragraphs, list items, or captions.</p>

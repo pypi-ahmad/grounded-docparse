@@ -68,7 +68,7 @@
 <li>Validate file signatures and Office/container structures after the user selects a processing type; reject invalid selections and never silently reroute a file.</li>
 <li>Use <code>pdf-inspector</code> for Native PDF text, layout, tables, and positions. If native pages are unusable, stop and require Mixed PDF.</li>
 <li>Require one confirmed Native/OCR route per Mixed PDF page and merge selected page results in original order.</li>
-<li>Use the selected grounded vLLM, Docling/RapidOCR, or Ollama engine as the source of layout, identity, geometry, type, confidence, and reading order. Pure AI is the explicit non-grounded alternative.</li>
+<li>Use the selected grounded vLLM, Docling/RapidOCR, or Ollama engine as the source of layout, identity, geometry, type, confidence, and reading order. <strong>AI ADE</strong> is the explicit non-grounded alternative.</li>
 <li>Use Docling for DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, and EPUB with OCR, VLM/model enrichments, remote services, and plugins disabled. Record embedded images without OCRing them.</li>
 <li>Process ordered 16-page windows with up to eight page workers by default.</li>
 <li>When GLM-OCR is selected, reprocess every eligible form region with local GLM first, capped at three crops per page.</li>

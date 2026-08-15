@@ -1,7 +1,7 @@
 ---
 tags: ocr, quality, recovery
 sources: src/grounded_docparse/quality.py, src/grounded_docparse/page_analysis.py, src/grounded_docparse/pipeline.py
-snapshot: content-9ccf0b9bc19d
+snapshot: content-ee679d72076c
 status: existing-and-preserved
 ---
 

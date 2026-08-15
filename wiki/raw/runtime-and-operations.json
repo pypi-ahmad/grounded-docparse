@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-9ccf0b9bc19d",
-    "base_commit": "b14c6cfe5339785a40a5cb274d5f1dea10f2d125",
+    "id": "content-ee679d72076c",
+    "base_commit": "9493e5f55ed50f8eb73f3785bd9d68423115c4e9",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T09:52:50.520885+00:00",
+  "generated_at": "2026-08-15T10:02:15.929841+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
