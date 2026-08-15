@@ -91,6 +91,61 @@ class OcrEngine(StrEnum):
         }[self]
 
 
+class AlternateOcrEngine(StrEnum):
+    OLLAMA_GLM_OCR = "ollama-glm-ocr"
+    OLLAMA_PADDLEOCR_VL_1_6 = "ollama-paddleocr-vl-1.6"
+    RAPIDOCR = "rapidocr"
+    VLLM_PADDLEOCR_VL_1_6 = "vllm-paddleocr-vl-1.6"
+    VLLM_GLM_OCR = "vllm-glm-ocr"
+
+    @property
+    def label(self) -> str:
+        return {
+            self.OLLAMA_GLM_OCR: "PP-DocLayoutV3 + Ollama GLM-OCR",
+            self.OLLAMA_PADDLEOCR_VL_1_6: (
+                "PP-DocLayoutV3 + Ollama PaddleOCR-VL-1.6"
+            ),
+            self.RAPIDOCR: "RapidOCR (CPU)",
+            self.VLLM_PADDLEOCR_VL_1_6: "WSL vLLM PaddleOCR-VL-1.6",
+            self.VLLM_GLM_OCR: "WSL vLLM GLM-OCR",
+        }[self]
+
+    @property
+    def vllm_engine(self) -> OcrEngine | None:
+        if self is self.VLLM_PADDLEOCR_VL_1_6:
+            return OcrEngine.PADDLEOCR_VL_1_6
+        if self is self.VLLM_GLM_OCR:
+            return OcrEngine.GLM_OCR
+        return None
+
+    @property
+    def ollama_model(self) -> str | None:
+        if self is self.OLLAMA_GLM_OCR:
+            return "glm-ocr:latest"
+        if self is self.OLLAMA_PADDLEOCR_VL_1_6:
+            return "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
+        return None
+
+    def matches_primary(self, engine: OcrEngine, ollama_model: str) -> bool:
+        if self.vllm_engine is not None:
+            return engine is self.vllm_engine
+        return engine is OcrEngine.OLLAMA and self.ollama_model == ollama_model
+
+
+def default_alternate_ocr_engine(
+    engine: OcrEngine, ollama_model: str
+) -> AlternateOcrEngine:
+    if engine is OcrEngine.GLM_OCR:
+        return AlternateOcrEngine.VLLM_PADDLEOCR_VL_1_6
+    if engine is OcrEngine.PADDLEOCR_VL_1_6:
+        return AlternateOcrEngine.VLLM_GLM_OCR
+    if ollama_model == AlternateOcrEngine.OLLAMA_GLM_OCR.ollama_model:
+        return AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6
+    if ollama_model == AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6.ollama_model:
+        return AlternateOcrEngine.OLLAMA_GLM_OCR
+    return AlternateOcrEngine.RAPIDOCR
+
+
 def validate_paddleocr_service_url(value: str) -> str:
     parsed = urlsplit(value)
     try:
@@ -185,6 +240,7 @@ class ParserConfig:
     luna_max_output_tokens: int = 128_000
     max_visual_recovery_crops: int = 64
     ocr_disagreement_enabled: bool = False
+    ocr_disagreement_engine: AlternateOcrEngine | None = None
     ocr_disagreement_similarity_threshold: float = 0.90
     max_ocr_disagreement_crops: int = 16
     max_ocr_disagreement_crops_per_page: int = 2
@@ -232,6 +288,14 @@ class ParserConfig:
             raise ValueError("crop_padding must be between 0 and 0.5")
         if not 0 <= self.ocr_disagreement_similarity_threshold <= 1:
             raise ValueError("ocr_disagreement_similarity_threshold must be between 0 and 1")
+        if (
+            self.ocr_disagreement_enabled
+            and self.ocr_disagreement_engine is not None
+            and self.ocr_disagreement_engine.matches_primary(
+                self.ocr_engine, self.ollama_model
+            )
+        ):
+            raise ValueError("alternate OCR engine must differ from the primary engine")
         if self.max_ocr_disagreement_crops_per_page > self.max_ocr_disagreement_crops:
             raise ValueError(
                 "max_ocr_disagreement_crops_per_page cannot exceed "
@@ -311,6 +375,13 @@ class ParserConfig:
                 "DOCPARSE_OCR_DISAGREEMENT_ENABLED", "false"
             ).casefold()
             not in {"0", "false", "no"},
+            ocr_disagreement_engine=(
+                AlternateOcrEngine(value)
+                if (
+                    value := os.getenv("DOCPARSE_OCR_DISAGREEMENT_ENGINE", "").strip()
+                )
+                else None
+            ),
             ocr_disagreement_similarity_threshold=float(
                 os.getenv(
                     "DOCPARSE_OCR_DISAGREEMENT_SIMILARITY_THRESHOLD",
