@@ -2041,8 +2041,8 @@ def test_page_inspection_cannot_add_content_or_reorder_glm_manifest(
         "Risky instructions",
     ]
     assert [block.id for block in blocks] == ["p1-b1", "p1-b2"]
-    assert any("ignored 1 Luna-added region" in warning for warning in result.document.warnings)
-    assert any("ignored Luna reading-order changes" in warning for warning in result.document.warnings)
+    assert any("ignored 1 AI-added region" in warning for warning in result.document.warnings)
+    assert any("ignored AI reading-order changes" in warning for warning in result.document.warnings)
 
 
 class RejectedAdditionGateway:
@@ -2132,7 +2132,7 @@ def test_luna_addition_cannot_supersede_glm_element(
     assert blocks[0].verification is VerificationState.NEEDS_REVIEW
     assert blocks[0].confidence == 0.4
     assert blocks[0].correction_lineage == []
-    assert any("ignored 1 Luna-added region" in warning for warning in result.document.warnings)
+    assert any("ignored 1 AI-added region" in warning for warning in result.document.warnings)
 
 
 class OrderedRejectedAdditionGateway(RejectedAdditionGateway):
@@ -2179,7 +2179,7 @@ def test_provider_order_alias_cannot_reorder_glm_elements(simple_pdf: bytes) -> 
         ("p1-b2", "Active companion"),
     ]
     assert any(
-        "ignored Luna reading-order changes" in warning
+        "ignored AI reading-order changes" in warning
         for warning in result.document.warnings
     )
 
@@ -2195,7 +2195,7 @@ def test_luna_addition_is_ignored_even_when_duplicate(simple_pdf: bytes) -> None
     assert blocks[0].confidence == 0.4
     assert blocks[0].correction_lineage == []
     assert any(
-        "ignored 1 Luna-added region" in warning
+        "ignored 1 AI-added region" in warning
         for warning in result.document.warnings
     )
 
@@ -2473,6 +2473,6 @@ def test_extreme_page_reordering_is_ignored_and_audited(simple_pdf: bytes) -> No
         f"Block {index}" for index in range(8)
     ]
     assert any(
-        "ignored Luna reading-order changes" in warning
+        "ignored AI reading-order changes" in warning
         for warning in result.document.warnings
     )

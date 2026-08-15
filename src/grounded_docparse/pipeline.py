@@ -131,10 +131,10 @@ class _UnavailableGateway:
         self.trace: list[AgentTraceEvent] = []
 
     def draft_page(self, _page: PageEvidence) -> PageDraft:
-        return PageDraft(warnings=[f"Luna visual recovery unavailable: {self.reason}"])
+        return PageDraft(warnings=[f"AI visual recovery unavailable: {self.reason}"])
 
     def inspect_crops(self, *_args, **_kwargs) -> PageInspection:
-        return PageInspection(warnings=["Luna visual recovery unavailable"])
+        return PageInspection(warnings=["AI visual recovery unavailable"])
 
 
 CRITICAL_LITERAL_PATTERN = re.compile(
@@ -688,7 +688,7 @@ def _apply_correction(
                 replace_text(existing, "text", recovered.text)
 
     block.verification_reason = (
-        None if changed else "Luna correction contained no applicable text changes"
+        None if changed else "AI correction contained no applicable text changes"
     )
     return changed
 
@@ -713,7 +713,7 @@ def _apply_decision(
             block.verification_reason = "Correction did not include a region"
         elif decision.confidence < 0.85:
             block.verification = VerificationState.NEEDS_REVIEW
-            block.verification_reason = "Luna correction confidence below 0.85"
+            block.verification_reason = "AI correction confidence below 0.85"
         elif _apply_correction(
             block,
             decision.corrected_region,
@@ -1952,7 +1952,7 @@ class DocumentParser:
                 draft = PageDraft(
                     warnings=[
                         *(analysis.warnings or ["GLM-OCR returned no layout regions"]),
-                        "Luna recovery skipped because GLM produced no grounded region",
+                        "AI recovery skipped because GLM produced no grounded region",
                     ]
                 )
             else:
@@ -2140,12 +2140,12 @@ class DocumentParser:
                 if raw_inspection.additional_regions:
                     warnings.append(
                         f"Page {page.number}: ignored "
-                        f"{len(raw_inspection.additional_regions)} Luna-added "
+                        f"{len(raw_inspection.additional_regions)} AI-added "
                         "region(s); GLM owns element identity and geometry"
                     )
                 if raw_inspection.ordered_region_ids:
                     warnings.append(
-                        f"Page {page.number}: ignored Luna reading-order changes; "
+                        f"Page {page.number}: ignored AI reading-order changes; "
                         "GLM owns reading order"
                     )
                 warnings.extend(

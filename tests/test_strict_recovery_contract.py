@@ -140,7 +140,7 @@ def test_sub_high_confidence_recovery_keeps_glm_text(simple_pdf: bytes) -> None:
     block = result.document.pages[0].blocks[0]
     assert block.text == "GLM original"
     assert block.verification is VerificationState.NEEDS_REVIEW
-    assert block.verification_reason == "Luna correction confidence below 0.85"
+    assert block.verification_reason == "AI correction confidence below 0.85"
     assert result.elements[0].source == "glm-ocr"
     assert result.recovery_log == []
 
