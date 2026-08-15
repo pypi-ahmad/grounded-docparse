@@ -24,6 +24,10 @@ class BudgetExceeded(RuntimeError):
         super().__init__(f"{budget} budget denied provider call: {detail}")
 
 
+class RetryableProviderError(RuntimeError):
+    """A provider response failed in a way that may succeed on retry."""
+
+
 class ProviderRuntime:
     """Document-scoped provider retry, concurrency, and usage state."""
 
@@ -205,11 +209,14 @@ class ProviderRuntime:
 
     @staticmethod
     def _status(exc: Exception) -> int | None:
-        return exc.status_code if isinstance(exc, APIStatusError) else None
+        if isinstance(exc, APIStatusError):
+            return exc.status_code
+        code = getattr(exc, "code", None)
+        return code if isinstance(code, int) and 100 <= code < 600 else None
 
     @classmethod
     def _is_retryable(cls, exc: Exception) -> bool:
-        if isinstance(exc, APIConnectionError):
+        if isinstance(exc, (APIConnectionError, RetryableProviderError)):
             return True
         status = cls._status(exc)
         return status in {408, 409, 429} or (status is not None and 500 <= status < 600)
