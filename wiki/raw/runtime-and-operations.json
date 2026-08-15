@@ -1,18 +1,23 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-feba9b9dbd9f",
-    "base_commit": "e5ef4759b10f3670f5f3f9213f8fd98e3f7ea9f4",
-    "branch": "main",
+    "id": "content-38d4697fdd99",
+    "base_commit": "72b56eb05172a4f329bb512febb3d7e848c2b6d5",
+    "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T09:22:15.558896+00:00",
+  "generated_at": "2026-08-15T09:47:00.738533+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
+      "path": "Launch-Grounded-DocParse-WSL-Legacy.cmd",
+      "sha256": "a8e0efa605aa918b6266a594b4695987a334b6af74dd6561f0c2a239e30d202d",
+      "size": 538
+    },
+    {
       "path": "Launch-Grounded-DocParse.cmd",
-      "sha256": "5466cd04b325ac8fe612213764bb61371655748b77921ff97ac5737d6e241ef1",
-      "size": 1687
+      "sha256": "312b21003470191fcdb24183a49586cf97e14f2c16c5e199520625a80823c90f",
+      "size": 349
     },
     {
       "path": "Setup-GLM-OCR.cmd",
@@ -26,13 +31,13 @@
     },
     {
       "path": "installer/GroundedDocParse.iss",
-      "sha256": "7d9e3a2b0b41485b2cded19cd8b7693444a6d6875d12087a2b82ef5471b45474",
-      "size": 3048
+      "sha256": "9035ea4e68324fffe79f34782e47e9f15c4e6fea89c4b0d6c4255fef4fc72615",
+      "size": 3390
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "186d745a81dbbb5ad329a54cd65e853e4f69f78ef69052e0a47fad11174a2243",
-      "size": 19896
+      "sha256": "e8f9083984175928d816b15a49b370ad1ff2eeb821fcc7ea082d9cd2c7351add",
+      "size": 18413
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -73,6 +78,11 @@
       "path": "scripts/refresh_knowledge_wiki.py",
       "sha256": "053e464723c5780364c9fd386707d1116e62a8b03839091ab023d9817ec84af9",
       "size": 12229
+    },
+    {
+      "path": "scripts/windows/launch-native.ps1",
+      "sha256": "74983995f1f7ad354a2750ebad277f8d414fbe7ce48e68b3aa9ebc32e2d6c077",
+      "size": 4309
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",

@@ -1,7 +1,7 @@
 ---
 tags: docx, pptx, xlsx, csv, native
 sources: src/grounded_docparse/docling_native.py, src/grounded_docparse/native_parsers.py, docs/spec.md
-snapshot: content-feba9b9dbd9f
+snapshot: content-38d4697fdd99
 status: released
 ---
 

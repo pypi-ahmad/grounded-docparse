@@ -1,7 +1,7 @@
 ---
 tags: model, evidence, native
 sources: src/grounded_docparse/native.py
-snapshot: content-feba9b9dbd9f
+snapshot: content-38d4697fdd99
 status: released
 ---
 

@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-feba9b9dbd9f",
-    "base_commit": "e5ef4759b10f3670f5f3f9213f8fd98e3f7ea9f4",
-    "branch": "main",
+    "id": "content-38d4697fdd99",
+    "base_commit": "72b56eb05172a4f329bb512febb3d7e848c2b6d5",
+    "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T09:22:15.558896+00:00",
+  "generated_at": "2026-08-15T09:47:00.738533+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
       "path": ".env.example",
-      "sha256": "4dc5d4da5f4da6d31f14a1962b1d900194ace590c857015b1b2a7711bf1ddcc9",
-      "size": 1276
+      "sha256": "862f6122a7c3a2a080e1157fa01715a5c03e11e485740c0c5d1750796f973174",
+      "size": 1363
     },
     {
       "path": ".gitattributes",
@@ -46,13 +46,13 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "e0a674b0e2fe4fa3171347bf5336d86a7794bd25896e761c65317b5fefe75ac3",
-      "size": 2184
+      "sha256": "52988680633bb84040a98943a58706c1b8cd2090fb81b9d7ee6f360f595be855",
+      "size": 2460
     },
     {
       "path": "uv.lock",
-      "sha256": "bc74c670a9a9835b80476a906a897b2fe50009f4a882e0c39261282f1311d8dd",
-      "size": 1215246
+      "sha256": "73c50e87b6cd8984302fa7d8fb99baa470710152c73c343bd2621a884f9a96c2",
+      "size": 1214455
     }
   ]
 }

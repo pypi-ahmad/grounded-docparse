@@ -32,7 +32,7 @@ When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for 
 
 ## Install and set up
 
-The supported installer target is Windows 11 22H2 or newer on x64 with AVX2, at least 16 GB RAM, 20 GB free disk, and network access during first setup. It installs or reuses WSL2, Ubuntu 24.04, Python, dependencies, pinned GPU models, and Windows Ollama.
+The primary app runs natively on Windows 11 22H2 or newer. Its first launch installs or reuses `uv`, Python 3.12, native dependencies, the CPU PP-DocLayoutV3 detector, and Windows Ollama. The existing GLM-OCR and PaddleOCR-VL-1.6 vLLM services remain isolated in Ubuntu 24.04 under WSL2.
 
 1. Clone the repository from PowerShell:
 
@@ -41,10 +41,10 @@ The supported installer target is Windows 11 22H2 or newer on x64 with AVX2, at 
    Set-Location grounded-docparse
    ```
 
-2. Run setup. It installs missing Windows/WSL dependencies and resumes after a required restart:
+2. Launch the native app. It checks and repairs its Windows setup automatically:
 
    ```powershell
-   .\Setup-GLM-OCR.cmd
+   .\Launch-Grounded-DocParse.cmd
    ```
 
    On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. Setup reuses a healthy Ubuntu user or securely prompts once for Linux credentials.
@@ -57,15 +57,16 @@ The supported installer target is Windows 11 22H2 or newer on x64 with AVX2, at 
    # [Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://example.com/v1", "User")
    ```
 
-4. For later sessions, start or reuse the managed services with:
+4. To prepare either optional WSL GPU service, run its dedicated setup command:
 
    ```powershell
-   .\Launch-Grounded-DocParse.cmd
+   .\Setup-GLM-OCR.cmd
+   .\Setup-PaddleOCR-VL-1.6.cmd
    ```
 
    The launcher checks and repairs setup before opening the app. Use `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` to install, activate, and warm a specific GPU engine without launching a second model.
 
-`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, and Ollama settings from Windows user scope each time. It installs missing Windows Ollama with the official installer and configures mirrored WSL networking so the loopback-only service is available to the WSL-hosted app. See [setup](SETUP.md) for details.
+`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. It does not rewrite `.wslconfig`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` keeps the former WSL-hosted app available for one migration release. See [setup](SETUP.md) for details.
 
 For a manual development install of native parsing and grounded extraction, use:
 
@@ -316,7 +317,7 @@ stack and warms GLM-OCR; selecting a non-vLLM engine releases the managed vLLM
 stack. Local Ollama is independent and offers `glm-ocr:latest`,
 `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`.
 
-AI tasks can use GPT 5.6 Luna, Gemini 3.5 Flash Lite, or Gemini Flash 3.7. Set keys
+AI tasks can use GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or free Agnes 2.5 Flash. Set keys
 as Windows User environment variables (recommended) or copy `.env.example` to
 `.env`. The app reads only its root `.env` and never overrides existing process
 environment values:
@@ -325,6 +326,8 @@ environment values:
 OPENAI_API_KEY=...
 OPENAI_BASE_URL=...  # optional
 GOOGLE_API_KEY=...
+AGNES_API_KEY=...
+AGNES_BASE_URL=...  # optional
 OLLAMA_BASE_URL=http://127.0.0.1:11434  # optional, loopback only
 ```
 

@@ -2,7 +2,7 @@
 
 > Last verified against this repository: 2026-08-12.
 
-The supported local runtime is Windows 11 22H2 or newer on x64 with Ubuntu 24.04 under WSL2. GLM-OCR and PaddleOCR-VL-1.6 use exclusive NVIDIA vLLM stacks. Local Ollama runs as an independent Windows service and is reached from WSL through mirrored networking. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer.
+The Streamlit app, CPU PP-DocLayoutV3 detector, native document parsers, and Ollama clients run on Windows 11. GLM-OCR and PaddleOCR-VL-1.6 keep their existing exclusive NVIDIA vLLM services in Ubuntu 24.04 under WSL2. PaddleOCR-VL-1.6 requires NVIDIA compute capability 8.0 or newer and CUDA 12.6 or newer.
 
 ## Prerequisites
 
@@ -22,20 +22,22 @@ The release installer bundles the application, so target computers do not need G
 
 ## Automated Windows setup
 
-From the repository root, run:
+For normal use, run:
 
 ```powershell
-.\Setup-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
-The setup assistant:
+The native launcher:
 
-1. validates Windows, AVX2, RAM, and disk;
-2. installs or reuses WSL2 and Ubuntu 24.04, resuming after restart when required;
-3. reuses the Ubuntu user or securely creates one without persisting its password;
-4. installs only missing or stale locked local-OCR and native-document dependencies;
-5. installs Windows Ollama when missing using `irm https://ollama.com/install.ps1 | iex` and enables mirrored WSL networking while preserving other `.wslconfig` settings;
-6. caches both supported GPU stacks when NVIDIA requirements pass, warms PaddleOCR-VL-1.6, starts Streamlit, and opens <http://localhost:8600>.
+1. imports supported provider settings from Windows User environment variables;
+2. installs or reuses `uv` and Python 3.12 in `%LOCALAPPDATA%\GroundedDocParse\venv`;
+3. synchronizes the locked `native` and `windows-layout` dependency sets;
+4. downloads the pinned PP-DocLayoutV3 detector for CPU inference;
+5. installs missing Windows Ollama using `irm https://ollama.com/install.ps1 | iex`;
+6. starts Streamlit on loopback port `8600` and stores logs/state under `%LOCALAPPDATA%\GroundedDocParse`.
+
+Run `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm the corresponding WSL GPU service. Switching those engines in the native UI starts one and unloads the other. `Launch-Grounded-DocParse-WSL-Legacy.cmd` is the temporary fallback for the old WSL-hosted app.
 
 Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and readiness markers skip healthy dependencies. App-owned models live under `~/.local/share/grounded-docparse`; later launches are offline.
 
@@ -106,7 +108,7 @@ Then use two WSL terminals:
 bash scripts/wsl/serve-glmocr.sh
 ```
 
-Windows Ollama is installed and started by the generic launcher. It remains bound to `127.0.0.1:11434`; mirrored WSL networking makes that loopback endpoint available inside Ubuntu.
+Windows Ollama is installed and started by the native launcher and remains bound to `127.0.0.1:11434`.
 
 ```bash
 # Terminal 2: Streamlit on port 8600
@@ -136,7 +138,7 @@ The vLLM command serves the pinned GLM-OCR snapshot as `glm-ocr`, uses three-tok
 
 `scripts/wsl/serve-glmocr.sh` binds vLLM to `127.0.0.1`, and `scripts/wsl/run-app.sh` binds Streamlit to `127.0.0.1`. These launchers support the documented single-workstation deployment only. A cloud or shared deployment requires a separate security design with authentication, TLS termination, quotas, and tenant isolation.
 
-## Luna configuration
+## AI provider configuration
 
 GLM parsing does not require an OpenAI credential. Set user-level values only when Luna recovery or agentic features are required:
 
@@ -146,6 +148,8 @@ GLM parsing does not require an OpenAI credential. Set user-level values only wh
 # [Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://.../v1", "User")
 .\Launch-Grounded-DocParse.cmd
 ```
+
+Use `GOOGLE_API_KEY` for Gemini or `AGNES_API_KEY` for Agnes 2.5 Flash. `AGNES_BASE_URL` is optional. Equivalent names may be placed in a private root `.env` on other machines; process and User environment values take precedence. Never commit real credentials.
 
 The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8600` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
 
