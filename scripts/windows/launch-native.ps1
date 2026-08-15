@@ -7,6 +7,7 @@ $LogRoot = Join-Path $DataRoot 'logs'
 $LogPath = Join-Path $LogRoot 'native-launch.log'
 $RuntimeRoot = Join-Path $DataRoot 'runtime'
 $Venv = Join-Path $DataRoot 'venv'
+$PidPath = Join-Path $RuntimeRoot 'streamlit.pid'
 New-Item -ItemType Directory -Force -Path $LogRoot, $RuntimeRoot | Out-Null
 
 function Write-LaunchLog([string]$Message) {
@@ -65,6 +66,28 @@ function Import-UserEnvironment {
     }
 }
 
+function Stop-PreviousManagedApp {
+    if (-not (Test-Path -LiteralPath $PidPath)) { return }
+    $savedPid = (Get-Content -Raw -LiteralPath $PidPath).Trim()
+    if ($savedPid -notmatch '^\d+$') {
+        throw "The managed PID file is invalid; refusing to stop it: $PidPath"
+    }
+    $managedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $savedPid" -ErrorAction SilentlyContinue
+    if (-not $managedProcess) {
+        Remove-Item -LiteralPath $PidPath -Force
+        return
+    }
+    $appPath = Join-Path $InstallRoot 'streamlit_app.py'
+    $commandLine = [string]$managedProcess.CommandLine
+    if ($commandLine -notlike '*streamlit*' -or $commandLine -notlike "*$appPath*") {
+        throw "PID $savedPid is not this Grounded DocParse app; refusing to stop it."
+    }
+    Write-LaunchLog "Stopping previous managed app session (PID $savedPid)..."
+    Stop-Process -Id ([int]$savedPid) -Force
+    Wait-Process -Id ([int]$savedPid) -Timeout 10 -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
+}
+
 try {
     Import-UserEnvironment
     $uv = Ensure-Uv
@@ -73,18 +96,20 @@ try {
     Write-LaunchLog 'Checking the native Windows Python environment...'
     & $uv python install 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.12 installation failed.' }
-    & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev
+    Stop-PreviousManagedApp
+    & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev --python 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Native dependency synchronization failed.' }
     $python = Join-Path $Venv 'Scripts\python.exe'
+    Write-LaunchLog 'Clearing previous Streamlit session cache...'
+    & $python -m streamlit cache clear
+    if ($LASTEXITCODE -ne 0) { throw 'Streamlit cache cleanup failed.' }
     Write-LaunchLog 'Checking the CPU PP-DocLayoutV3 model...'
     & $python -m grounded_docparse.windows_setup --download-layout
     if ($LASTEXITCODE -ne 0) { throw 'PP-DocLayoutV3 setup failed.' }
 
     $portOwner = Get-NetTCPConnection -LocalPort 8600 -State Listen -ErrorAction SilentlyContinue
     if ($portOwner) {
-        Write-LaunchLog 'Grounded DocParse is already listening on port 8600.'
-        Start-Process 'http://localhost:8600'
-        exit 0
+        throw 'Port 8600 is occupied by an unmanaged process; refusing to stop it.'
     }
     $env:DOCPARSE_MANAGE_OCR_SERVICES = 'true'
     $env:DOCPARSE_STUDIO_DB_PATH = Join-Path $DataRoot 'studio.sqlite3'
@@ -94,7 +119,7 @@ try {
         '-m', 'streamlit', 'run', (Join-Path $InstallRoot 'streamlit_app.py'),
         '--server.address=127.0.0.1', '--server.port=8600', '--server.headless=true'
     ) -WorkingDirectory $InstallRoot -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
-    Set-Content -LiteralPath (Join-Path $RuntimeRoot 'streamlit.pid') -Value $process.Id -Encoding ASCII
+    Set-Content -LiteralPath $PidPath -Value $process.Id -Encoding ASCII
     Write-LaunchLog "Started native Windows app (PID $($process.Id))."
     Start-Process 'http://localhost:8600'
 } catch {
