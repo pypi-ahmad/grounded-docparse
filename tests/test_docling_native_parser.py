@@ -14,7 +14,10 @@ from openpyxl import Workbook
 from pptx import Presentation
 
 from grounded_docparse.config import ParserConfig
-from grounded_docparse.docling_native import make_docling_converter
+from grounded_docparse.docling_native import (
+    make_docling_converter,
+    make_docling_rapidocr_converter,
+)
 from grounded_docparse.native import (
     CellSourceAnchor,
     CsvSourceAnchor,
@@ -143,6 +146,26 @@ def test_converter_allowlist_excludes_pdf_and_images_and_disables_models() -> No
         assert option.pipeline_options.do_picture_classification is False
         assert option.pipeline_options.do_picture_description is False
         assert option.pipeline_options.do_chart_extraction is False
+
+
+def test_rapidocr_converter_is_image_only_cpu_and_offline(tmp_path) -> None:
+    from docling.datamodel.accelerator_options import AcceleratorDevice
+    from docling.datamodel.base_models import InputFormat
+    from docling.datamodel.pipeline_options import OcrMode, RapidOcrOptions
+
+    converter = make_docling_rapidocr_converter(tmp_path)
+
+    assert set(converter.allowed_formats) == {InputFormat.IMAGE}
+    options = converter.format_to_options[InputFormat.IMAGE].pipeline_options
+    assert options.artifacts_path == tmp_path
+    assert options.accelerator_options.device is AcceleratorDevice.CPU
+    assert options.do_ocr is True
+    assert isinstance(options.ocr_options, RapidOcrOptions)
+    assert options.ocr_options.backend == "onnxruntime"
+    assert options.ocr_options.mode is OcrMode.LAYOUT_REGIONS
+    assert options.layout_options.engine_options.compile_model is False
+    assert options.enable_remote_services is False
+    assert options.allow_external_plugins is False
 
 
 def test_docx_maps_paragraph_table_and_cells_to_exact_paths() -> None:
