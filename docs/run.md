@@ -60,7 +60,7 @@ Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdo
 
 ## Stop and restart
 
-The native launcher records the Streamlit PID under `%LOCALAPPDATA%\GroundedDocParse\runtime`. Every launch verifies and stops that prior app process, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. An unrelated process on port `8600` is left untouched. To stop WSL GPU services, run:
+The native launcher records the Streamlit PID under `%LOCALAPPDATA%\GroundedDocParse\runtime`. Every launch verifies and stops that process plus any Grounded DocParse Streamlit listener active on port `8600`, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. An unrelated process on port `8600` is left untouched. To stop WSL GPU services, run:
 
 ```bash
 for file in .runtime/vllm.pid .runtime/paddle-vllm.pid .runtime/paddle-api.pid .runtime/streamlit.pid; do

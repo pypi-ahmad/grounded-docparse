@@ -182,6 +182,8 @@ def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
     assert "--extra native --extra windows-layout" in native
     assert "grounded_docparse.windows_setup --download-layout" in native
     assert "Stop-PreviousManagedApp" in native
+    assert "Stop-AppListeningOnPort" in native
+    assert "OwningProcess" in native
     assert "Win32_Process" in native
     assert "-m streamlit cache clear" in native
     assert "refusing to stop it" in native

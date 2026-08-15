@@ -66,26 +66,39 @@ function Import-UserEnvironment {
     }
 }
 
+function Stop-VerifiedGroundedDocParseProcess {
+    param([Parameter(Mandatory)][int]$ProcessId, [Parameter(Mandatory)][string]$Source)
+    $managedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $ProcessId" -ErrorAction SilentlyContinue
+    if (-not $managedProcess) { return }
+    $appPath = Join-Path $InstallRoot 'streamlit_app.py'
+    $commandLine = [string]$managedProcess.CommandLine
+    if ($commandLine -notlike '*streamlit*' -or $commandLine -notlike "*$appPath*") {
+        throw "PID $ProcessId from $Source is not this Grounded DocParse app; refusing to stop it."
+    }
+    Write-LaunchLog "Stopping previous Grounded DocParse session from $Source (PID $ProcessId)..."
+    Stop-Process -Id $ProcessId -Force
+    Wait-Process -Id $ProcessId -Timeout 10 -ErrorAction SilentlyContinue
+}
+
 function Stop-PreviousManagedApp {
     if (-not (Test-Path -LiteralPath $PidPath)) { return }
     $savedPid = (Get-Content -Raw -LiteralPath $PidPath).Trim()
     if ($savedPid -notmatch '^\d+$') {
         throw "The managed PID file is invalid; refusing to stop it: $PidPath"
     }
-    $managedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $savedPid" -ErrorAction SilentlyContinue
-    if (-not $managedProcess) {
-        Remove-Item -LiteralPath $PidPath -Force
-        return
-    }
-    $appPath = Join-Path $InstallRoot 'streamlit_app.py'
-    $commandLine = [string]$managedProcess.CommandLine
-    if ($commandLine -notlike '*streamlit*' -or $commandLine -notlike "*$appPath*") {
-        throw "PID $savedPid is not this Grounded DocParse app; refusing to stop it."
-    }
-    Write-LaunchLog "Stopping previous managed app session (PID $savedPid)..."
-    Stop-Process -Id ([int]$savedPid) -Force
-    Wait-Process -Id ([int]$savedPid) -Timeout 10 -ErrorAction SilentlyContinue
+    Stop-VerifiedGroundedDocParseProcess -ProcessId ([int]$savedPid) -Source 'PID file'
     Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
+}
+
+function Stop-AppListeningOnPort {
+    $listeners = @(
+        Get-NetTCPConnection -LocalPort 8600 -State Listen -ErrorAction SilentlyContinue
+    )
+    foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
+        if ($ownerPid) {
+            Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source 'port 8600'
+        }
+    }
 }
 
 try {
@@ -97,6 +110,7 @@ try {
     & $uv python install 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.12 installation failed.' }
     Stop-PreviousManagedApp
+    Stop-AppListeningOnPort
     & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev --python 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Native dependency synchronization failed.' }
     $python = Join-Path $Venv 'Scripts\python.exe'
