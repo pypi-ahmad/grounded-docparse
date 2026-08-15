@@ -185,7 +185,7 @@ Restart Windows if WSL requests it, then complete Ubuntu’s first-login setup.
 
 ### 5.3 Decide whether optional AI features are allowed
 
-Local parsing does not require a cloud key. If enhancement, classification, refinement, TOC, extraction, routing, or chat are required, save the selected provider key in the Windows User environment:
+Local parsing does not require a cloud key. If enhancement, refinement, extraction, routing, or chat are required, save the selected provider key in the Windows User environment. Classification and TOC currently retain an additional `OPENAI_API_KEY` compatibility preflight:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
@@ -254,7 +254,7 @@ Open <http://localhost:7137>, then follow this minimal path:
 1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
 2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
 3. For scanned PDFs and images, optionally enable **Page range**, select an OCR engine, then choose an ADE mode.
-4. Decide whether visual recovery is allowed for OCR routes.
+4. Decide whether **AI enhancement for failed or <75% confidence regions** is allowed for OCR routes.
 5. Select **Parse document**.
 6. Review Markdown, JSON, source structure, and any available annotated PDF before running extraction.
 
@@ -268,7 +268,7 @@ Open <http://localhost:7137>, then follow this minimal path:
 | Full | On | On | On |
 | Custom | User-selected | User-selected | User-selected |
 
-Visual recovery and chat are separate toggles. Extraction is never automatically run by an ADE mode.
+AI enhancement and chat are separate toggles. There is no additional visual-recovery toggle. Extraction is never automatically run by an ADE mode.
 
 Fast mode can make remote requests when classification is enabled and the selected provider key exists. AI enhancement defaults off. Disable every AI-related toggle for a local-only run.
 
@@ -1111,7 +1111,7 @@ Constraints such as `pattern`, length/range bounds, conditional schemas, and com
 | `DOCPARSE_MAX_UPLOAD_BYTES` | `262144000` | Parser upload limit |
 | `DOCPARSE_MAX_PAGES` | `500` | Page/frame limit |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Per-page pixel limit |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute AI recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |
@@ -1275,7 +1275,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 Use this sequence to move from beginner to confident contributor:
 
 1. Run a GLM-only parse and inspect every tab.
-2. Repeat with visual recovery and compare recovered elements.
+2. Repeat with **AI enhancement for failed or <75% confidence regions** and compare recovered elements.
 3. Import a three-field Markdown schema and run whole-document extraction.
 4. Trace each field from JSON to element ID to annotated source.
 5. Build the medical routing profile and classify a mixed synthetic fax.
@@ -1291,7 +1291,7 @@ You are ready to use the app when you can answer “yes” to these questions:
 
 - Can I explain why GLM owns IDs and geometry?
 - Do I know when document content leaves the workstation?
-- Can I distinguish visual recovery, Markdown refinement, classification, routing, extraction, and chat?
+- Can I distinguish AI region recovery, Markdown refinement, classification, routing, extraction, and chat?
 - Can I build/import a schema and interpret every confidence state?
 - Can I classify a mixed packet, review every segment, and extract only eligible categories?
 - Can I trace an output value to an element and annotated source box?

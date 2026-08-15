@@ -63,7 +63,7 @@ Signatures, return-model summaries, schema rules, and envelope examples are in [
 
 ## Non-goals
 
-Durable chat or review storage, durable jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review queues, cost estimation, full-page Luna fallback, missing-region synthesis, and production batch orchestration. One local sequential batch workspace and reusable schema/profile persistence are in scope.
+Durable chat or review storage, durable jobs, queues, multi-user serving, an HTTP application API, open-ended agent loops, human-review queues, cost estimation, full-page AI fallback, missing-region synthesis, and production batch orchestration. One local sequential batch workspace and reusable schema/profile persistence are in scope.
 
 ## Done when
 

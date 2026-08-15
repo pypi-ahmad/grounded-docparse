@@ -43,7 +43,7 @@ Browser
 | `src/grounded_docparse/quality.py` | Deterministic block quality, verification, and document quality aggregation |
 | `src/grounded_docparse/pipeline.py` | Parse orchestration, recovery selection, deterministic validation, hierarchy |
 | `src/grounded_docparse/gateways.py` | OpenAI, Gemini, and Agnes gateway selection, usage, and trace collection |
-| `src/grounded_docparse/prompts.py` | Versioned prompt templates for Luna document features |
+| `src/grounded_docparse/prompts.py` | Versioned prompt templates for provider-neutral AI document features |
 | `src/grounded_docparse/enhancement.py` | Bounded Markdown-refinement chunks and presentation-plan application |
 | `src/grounded_docparse/agentic.py` | Prepared contexts, classification, TOC, extraction orchestration, chat |
 | `src/grounded_docparse/extraction.py` | JSON Schema subset validation and evidence resolution |
@@ -83,8 +83,8 @@ Worker progress is queued and replayed on the Streamlit caller thread. Pages are
 | Reading order | Local OCR/deterministic pipeline | No |
 | OCR confidence | Local OCR | No |
 | Existing element text | Grounded engine initially | Yes, only for failed or sub-75%-confidence candidates passing response validation |
-| Refined Markdown presentation | Deterministic renderer from Luna directives | Yes, without changing grounded text |
-| Classification, TOC, extraction, chat | Selected AI model plus deterministic validation | Feature-specific output only |
+| Refined Markdown presentation | Deterministic renderer from selected-provider directives | Yes, without changing grounded text |
+| Classification, TOC, extraction, chat | Selected AI model plus deterministic validation; classification/TOC retain an OpenAI-key compatibility preflight | Feature-specific output only |
 
 AI additions, geometry changes, structural changes, and order changes are ignored. Enhancement never synthesizes a missing detector region or replaces a full page. If at least one page is nonblank and none of the nonblank pages contains a layout region, grounded parsing fails before enhancement.
 
@@ -116,7 +116,7 @@ Native JSON is schema version `5.0.0`; combined native/extraction JSON is `5.1.0
 
 ## Evaluation boundary
 
-`scripts/evaluate_corpus.py` performs opt-in live evaluation. `--glm-only` disables Luna recovery, refinement, and extraction, verifies zero Luna activity, and can write Markdown, parse JSON, and run-provenance artifacts with `--artifacts-dir`. Annotation schema v1.1 distinguishes `source_verified`, `synthetic_exact`, and `generated` references. Markdown references are scored as content after presentation syntax is removed. Generated references are diagnostics rather than primary accuracy evidence. The bundled corpus is a regression suite and does not establish equivalence with ADE, LandingAI, or another external benchmark.
+`scripts/evaluate_corpus.py` performs opt-in live evaluation. `--glm-only` disables AI recovery, refinement, and extraction, verifies zero AI-provider activity, and can write Markdown, parse JSON, and run-provenance artifacts with `--artifacts-dir`. Annotation schema v1.1 distinguishes `source_verified`, `synthetic_exact`, and `generated` references. Markdown references are scored as content after presentation syntax is removed. Generated references are diagnostics rather than primary accuracy evidence. The bundled corpus is a regression suite and does not establish equivalence with ADE, LandingAI, or another external benchmark.
 
 Labeled private manifests may add `expected_document_type`. Full live evaluation
 runs classification only for labeled documents, reports type accuracy,

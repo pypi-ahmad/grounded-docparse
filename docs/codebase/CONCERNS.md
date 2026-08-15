@@ -7,11 +7,12 @@
 1. **Large orchestration hotspots — medium.** `pipeline.py` and `streamlit_app.py` each exceed 3,000 lines. Both are high-churn and combine many control paths, increasing regression and review cost.
 2. **No automated repository gate — medium.** There is no checked-in CI workflow or coverage baseline. The local verification suite is strong, but enforcement depends on contributors running it.
 3. **Native adapter fidelity — medium.** Docling output is reconciled against a project-built source manifest. This correctly fails closed, but upstream conversion changes can cause valid documents to fail until adapters/tests are updated.
-4. **Split result versions — medium.** Streamlit workspace `RESULT_VERSION` is `4.6.0`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
+4. **Split result versions — medium.** Streamlit workspace `RESULT_VERSION` is `4.6.1`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
+5. **Provider preflight inconsistency — medium.** `DocumentAgent.analyze()` and CLI `--schema` validation still check `OPENAI_API_KEY` directly instead of the selected model's `api_key_name`. Region recovery and Markdown refinement are provider-neutral, but Gemini/Agnes classification or TOC can be reported unavailable unless the OpenAI compatibility key is also present.
 
 ### 2) Technical Debt
 
-- Product/output versions are split: Streamlit workspace `RESULT_VERSION` is `4.6.0`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
+- Product/output versions are split: Streamlit workspace `RESULT_VERSION` is `4.6.1`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
 - The native extra declares `pywin32`, but no current implementation imports it; its intended feature or removal is undocumented.
 - `streamlit_app.py` owns routing UI, persistence coordination, parsing orchestration, analysis, extraction, and downloads in one module.
 - Generated graph/wiki/site artifacts are tracked alongside source and inflate repository scans. Analysis metrics must exclude them to avoid misleading size/complexity conclusions.

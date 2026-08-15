@@ -58,7 +58,7 @@ The native launcher and managed OCR scripts bind their services to loopback. Do 
 5. Select **Parse document** or **Process documents**. Batch files run sequentially and failures can be retried without rerunning completed files.
 6. Review Markdown, JSON, Extract, and source structure. An annotated PDF appears only when the selected route produces a visual artifact; the ZIP includes only available artifacts.
 
-Fast runs classification without Markdown refinement or TOC generation. Full enables refinement, classification, and TOC. AI enhancement is a separate toggle and defaults off. Extraction is configured and run inside the post-parse Extract tab. Chat appears only when enabled.
+Fast runs classification without Markdown refinement or TOC generation. Full enables refinement, classification, and TOC. **Enhance Markdown with AI** and failed/sub-75%-confidence AI enhancement both use the selected AI model. Region recovery has no separate visual-recovery switch and defaults off with AI enhancement. Extraction is configured and run inside the post-parse Extract tab. Chat appears only when enabled.
 
 “ADE mode” is the UI label for optional AI-feature presets; it does not connect to an external ADE service.
 
@@ -87,6 +87,8 @@ The next engine selection restarts the requested OCR service. The service manage
 | Paddle parse fails before layout | Confirm ports `8118` and `8119` are healthy and inspect both Paddle logs under `.runtime/` |
 | AI controls are disabled | Set the key required by the selected AI model in the Windows User environment, then relaunch |
 | Provider call fails | Use the displayed request ID, stage, page, and model; optional features fail independently |
+| Gemini reports `503 UNAVAILABLE` | The model is temporarily under high demand; retry later if the built-in transient retries are exhausted |
+| Gemini reports invalid JSON or `MAX_TOKENS` | Retry the document; structured calls validate JSON Schema output, retry malformed/truncated responses, and cap provider output at 65536 tokens |
 | Block is `needs_review` | Compare its text with the highlighted source box and inspect `verification_reason` |
 | Startup fails | Read `%LOCALAPPDATA%\GroundedDocParse\logs\native-launch.log` and the relevant `.runtime` GPU-service log |
 

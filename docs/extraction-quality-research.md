@@ -58,7 +58,7 @@ metric such as [TEDS](https://arxiv.org/abs/1911.10683), not WER alone.
 2. Compare recovery blocks with spatially overlapping nested descendants before
    accepting them. Suppress only normalized, order-preserving duplicates; preserve
    novel critical literals and text at distinct locations.
-3. Test a tight span crop plus one larger context crop in the same Luna call without
+3. Test a tight span crop plus one larger context crop in the same AI-provider call without
    sending the whole page or permitting adjacent-text replacement.
 
 The crop experiment is motivated by coarse-to-fine document parsing research
@@ -66,7 +66,7 @@ The crop experiment is motivated by coarse-to-fine document parsing research
 [OpenAI's image-input guidance](https://help.openai.com/en/articles/8400551-image-inputs-for-chatgpt-faq)
 to enlarge text without cropping away relevant context. The experiment was removed
 after it failed the promotion gates below; production always sends the tight crop.
-The current strict pipeline also disables Luna full-page fallback and missing-region
+The current strict pipeline also disables AI full-page fallback and missing-region
 synthesis; references to full-page recovery below describe historical runs only.
 
 ### July 2026 targeted result

@@ -132,7 +132,7 @@ The vLLM command serves the pinned GLM-OCR snapshot as `glm-ocr`, uses three-tok
 
 ## AI provider configuration
 
-GLM parsing does not require an OpenAI credential. Set user-level values only when Luna recovery or agentic features are required:
+GLM parsing does not require an AI-provider credential. Set the user-level value for the model selected in the UI only when AI recovery or document-level AI features are required:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "...", "User")
@@ -158,8 +158,8 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 | `DOCPARSE_MAX_UPLOAD_BYTES` | `262144000` | Parser upload-byte limit |
 | `DOCPARSE_MAX_PAGES` | `500` | Maximum pages or image frames |
 | `DOCPARSE_MAX_PAGE_PIXELS` | `20000000` | Maximum rendered pixels per page |
-| `DOCPARSE_LUNA_MAX_OUTPUT_TOKENS` | `128000` | Upper bound used by Luna calls; individual stages apply smaller caps |
-| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute Luna recovery-crop ceiling per document |
+| `DOCPARSE_LUNA_MAX_OUTPUT_TOKENS` | `128000` | Legacy configuration name for the provider output-token ceiling; Gemini and Agnes requests are capped at 65536 and individual stages may apply smaller caps |
+| `DOCPARSE_MAX_VISUAL_RECOVERY_CROPS` | `64` | Absolute AI recovery-crop ceiling per document |
 | `DOCPARSE_PAGE_BATCH_SIZE` | `16` | Ordered page-window size |
 | `DOCPARSE_MAX_PAGE_CONCURRENCY` | `8` | Page worker limit; cannot exceed batch size |
 | `DOCPARSE_PROVIDER_CONCURRENCY` | `8` | Shared provider-call limit |
@@ -172,6 +172,10 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 | `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr`, `paddleocr-vl-1.6`, or `ollama` for parser API calls |
 | `DOCPARSE_OCR_DISAGREEMENT_ENABLED` | `false` | Audit uncertain regions with one alternate local OCR runtime |
 | `DOCPARSE_OCR_DISAGREEMENT_ENGINE` | automatic | `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr` |
+| `DOCPARSE_OCR_DISAGREEMENT_SIMILARITY_THRESHOLD` | `0.90` | Similarity threshold below which alternate-OCR disagreement is flagged |
+| `DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS` | `16` | Maximum alternate-OCR audit crops per document |
+| `DOCPARSE_MAX_OCR_DISAGREEMENT_CROPS_PER_PAGE` | `2` | Maximum alternate-OCR audit crops per page |
+| `DOCPARSE_GLM_FORM_RECOVERY_ENABLED` | `true` | Enables local GLM form-control recovery before optional AI recovery |
 | `DOCPARSE_GLM_VLLM_BASE_URL` | `http://127.0.0.1:8080/v1` | Loopback GLM recognition endpoint |
 | `DOCPARSE_OLLAMA_MODEL` | `glm-ocr:latest` | Selected Ollama OCR model |
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Windows Ollama endpoint; non-loopback origins are rejected |
@@ -214,7 +218,7 @@ Analysis thresholds use `DOCPARSE_ANALYSIS_<FIELD>`. These variables and default
 | `DOCPARSE_ANALYSIS_UNKNOWN_AREA_RATIO` | `0.3` | Page-area threshold for unknown-region complexity |
 | `DOCPARSE_ANALYSIS_COMPLEX_REGION_COUNT` | `10` | Region-count threshold for a complex page |
 
-`DOCPARSE_FULL_PAGE_FALLBACK_FRACTION` remains accepted by `ParserConfig` for compatibility, but the current strict application path does not perform Luna full-page fallback.
+`DOCPARSE_FULL_PAGE_FALLBACK_FRACTION` remains accepted by `ParserConfig` for compatibility, but the current strict application path does not perform AI full-page fallback.
 
 Set `GLMOCR_*` variables and `DOCPARSE_WSL_ENV` inside WSL. The native launcher imports provider and Ollama values into the Windows app process; it forwards only the repository path when managing WSL services.
 
@@ -232,7 +236,7 @@ python scripts/wsl/check-glmocr-api.py
 curl --fail --silent http://127.0.0.1:7137/_stcore/health
 ```
 
-Reproduce the warm page benchmark without Luna or model-load time:
+Reproduce the warm page benchmark without AI-provider or model-load time:
 
 ```bash
 python scripts/wsl/benchmark_glmocr.py examples/synthetic-report.pdf \
@@ -261,7 +265,7 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 | Paddle startup fails | Inspect `.runtime/paddle-vllm.log` and `.runtime/paddle-api.log`; confirm NVIDIA compute capability 8.0+ and CUDA 12.6+ |
 | GLM-OCR import fails | Rerun `scripts/wsl/setup-glmocr.sh`; do not use the native Windows environment for local OCR |
 | A pinned snapshot is missing in offline mode | Connect once and rerun `scripts/wsl/setup-glmocr.sh`; normal launch never falls back to a network download |
-| Luna controls are unavailable | Set `OPENAI_API_KEY` before starting Streamlit |
+| AI controls are unavailable | Set the credential required by the selected model (`OPENAI_API_KEY`, `GOOGLE_API_KEY`, or `AGNES_API_KEY`) before starting Streamlit |
 | Startup times out | Inspect `.runtime/vllm.log` and `%LOCALAPPDATA%\GroundedDocParse\logs\native-launch.log` |
 
 Other Paddle recognition backends and standalone recognition-only modes are not implemented or managed by this repository.
