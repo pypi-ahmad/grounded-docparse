@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-338dd11260b6",
-    "base_commit": "04732951987fb07f89ce1f6bc1d5f78112674907",
+    "id": "content-31c9fc402d46",
+    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
     "branch": "main",
-    "dirty": true
+    "dirty": false
   },
-  "generated_at": "2026-08-15T15:23:05.083489+00:00",
+  "generated_at": "2026-08-15T16:31:09.285567+00:00",
   "category": "documentation",
   "files": [
     {

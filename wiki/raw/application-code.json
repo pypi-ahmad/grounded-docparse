@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-338dd11260b6",
-    "base_commit": "04732951987fb07f89ce1f6bc1d5f78112674907",
+    "id": "content-31c9fc402d46",
+    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
     "branch": "main",
-    "dirty": true
+    "dirty": false
   },
-  "generated_at": "2026-08-15T15:23:05.083489+00:00",
+  "generated_at": "2026-08-15T16:31:09.285567+00:00",
   "category": "application-code",
   "files": [
     {
@@ -21,8 +21,8 @@
     },
     {
       "path": "src/grounded_docparse/agnes_gateway.py",
-      "sha256": "18613947a308260507434da4b14e53f14a029dc988c5fa83101e4edfec15b9cb",
-      "size": 3547
+      "sha256": "b4e0d31ef6153d8e2ee9df68179e5c9741f7b66348331424c74387d88555d3d2",
+      "size": 3745
     },
     {
       "path": "src/grounded_docparse/batch.py",
@@ -66,8 +66,8 @@
     },
     {
       "path": "src/grounded_docparse/gemini_gateway.py",
-      "sha256": "45f63feefd695bacb574b4c88a0772b5637f28769892b47019cb9d311063bbd3",
-      "size": 4208
+      "sha256": "3b31bb6ce70f41fde4b4009be9c588667d81fe1c55c3e8d3a28612c36bf649c7",
+      "size": 5191
     },
     {
       "path": "src/grounded_docparse/grounded_ocr.py",
@@ -131,8 +131,8 @@
     },
     {
       "path": "src/grounded_docparse/pipeline.py",
-      "sha256": "82e3ff3e1197ebcf4efeaf1044beee78a3fdb45ab0f59fdea3ea343c13a3af87",
-      "size": 127545
+      "sha256": "bff34a7f9b89234758074ebd206eb05be80f08c69c28fd44ec806f2244e897ee",
+      "size": 127958
     },
     {
       "path": "src/grounded_docparse/prompts.py",
@@ -156,8 +156,8 @@
     },
     {
       "path": "src/grounded_docparse/runtime.py",
-      "sha256": "4c666c412ca1356ea9743f11e530cc310e15e411842fcb790c82f4ec8b9b2b77",
-      "size": 8754
+      "sha256": "651ce7bdeee0b28b0c9f8b468489cca3124f7bc01dd3db599990872eb50b20f2",
+      "size": 9008
     },
     {
       "path": "src/grounded_docparse/runtime_control.py",
@@ -191,8 +191,8 @@
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "167d54cc093c9cf1ee1d79a41c3cc4c1917218ffe7d47d19ebd3d24e58cc4eae",
-      "size": 138006
+      "sha256": "4a6bceb19ef325e76fbfbfc99fea9f55959b547133c719a73efddbd21e03812b",
+      "size": 137785
     }
   ]
 }

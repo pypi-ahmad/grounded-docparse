@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-338dd11260b6",
-    "base_commit": "04732951987fb07f89ce1f6bc1d5f78112674907",
+    "id": "content-31c9fc402d46",
+    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
     "branch": "main",
-    "dirty": true
+    "dirty": false
   },
-  "generated_at": "2026-08-15T15:23:05.083489+00:00",
+  "generated_at": "2026-08-15T16:31:09.285567+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -186,8 +186,8 @@
     },
     {
       "path": "tests/test_agnes_gateway.py",
-      "sha256": "fda05cf5ffd1cb3df07764e318c0baa107c1197a0f9211464bb97dd361a1fb81",
-      "size": 1612
+      "sha256": "43b1dc780b27ad94be36a7d5e3dea07f159e94e7e8b335eb73cbe46b5a647f70",
+      "size": 2021
     },
     {
       "path": "tests/test_batch.py",
@@ -243,6 +243,11 @@
       "path": "tests/test_form_routing.py",
       "sha256": "648885050bca2bd1a44c5c23be72f7c5588e2c4c936794b49f38a77c35b8d273",
       "size": 9079
+    },
+    {
+      "path": "tests/test_gemini_gateway.py",
+      "sha256": "04ca74fa063aa2b7d4e90cf1787d48c0f280ecae1a8940609c3fd8bd33cba5a0",
+      "size": 2729
     },
     {
       "path": "tests/test_glmocr_runtime_config.py",
@@ -320,9 +325,14 @@
       "size": 8271
     },
     {
+      "path": "tests/test_provider_enhancement.py",
+      "sha256": "b6af24c4664bd9f42f410f74ebf0d38de0bb6511f05c02832709d46d5f0b8cf5",
+      "size": 1739
+    },
+    {
       "path": "tests/test_provider_runtime.py",
-      "sha256": "03723d00d87a6024bd89cffa38bad5607075622af0c54847a44305a00418d3fc",
-      "size": 13844
+      "sha256": "9db8b18f2201232345ea877e2803ce304445a35a77eaa0c3d878f7dccb213800",
+      "size": 14852
     },
     {
       "path": "tests/test_quality.py",
@@ -356,18 +366,18 @@
     },
     {
       "path": "tests/test_simple_pipeline.py",
-      "sha256": "2b51f4388644ab995a6e560b248fe7f0e65889ed0f3670b04d1cc55052f7257f",
-      "size": 84307
+      "sha256": "92cdabab23d5b89eea7f1b72639d43b394d514b7a15de8ac9b3a4aca41a6b00b",
+      "size": 84289
     },
     {
       "path": "tests/test_simple_streamlit.py",
-      "sha256": "9f5a32407e607351164bf41b59b9912dbd2c91f1d2f4844b40d1196e700ea284",
-      "size": 40894
+      "sha256": "3341aba4b4bc236ef914e7828067143f930c202547b3f208832bf534908e3e86",
+      "size": 40825
     },
     {
       "path": "tests/test_strict_recovery_contract.py",
-      "sha256": "e3cab50bf4bae087042fe8c29feba4d24e23c62989bb4aedf18418dcd1182a80",
-      "size": 11408
+      "sha256": "10e04cdfc53642f9d2c5615dfde8afd818a7a932bd0206e71c1374dd08727d72",
+      "size": 11405
     },
     {
       "path": "tests/test_universal_parser.py",
