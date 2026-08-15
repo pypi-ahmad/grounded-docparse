@@ -15,6 +15,23 @@ def managed_shutdown_available() -> bool:
 def schedule_managed_shutdown() -> int:
     if not managed_shutdown_available():
         raise RuntimeError("Shutdown is available only when using a managed launcher")
+    if os.name == "nt":
+        command = (
+            "Start-Sleep -Seconds 2; "
+            f"Stop-Process -Id {os.getpid()} -ErrorAction SilentlyContinue"
+        )
+        creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(
+            subprocess, "CREATE_NEW_PROCESS_GROUP", 0
+        )
+        process = subprocess.Popen(
+            ["powershell.exe", "-NoProfile", "-Command", command],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=False,
+            creationflags=creation_flags,
+        )
+        return process.pid
     script = PROJECT_ROOT / "scripts" / "wsl" / "stop-stack.sh"
     if not script.is_file():
         raise RuntimeError("Managed shutdown helper is missing")

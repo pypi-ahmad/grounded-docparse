@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import subprocess
-from pathlib import Path
 
 import pytest
 
@@ -16,7 +15,7 @@ def test_managed_shutdown_is_unavailable_outside_launcher(monkeypatch) -> None:
         runtime_control.schedule_managed_shutdown()
 
 
-def test_managed_shutdown_starts_fixed_detached_helper(monkeypatch, tmp_path) -> None:
+def test_managed_shutdown_starts_windows_detached_helper(monkeypatch, tmp_path) -> None:
     script = tmp_path / "scripts" / "wsl" / "stop-stack.sh"
     script.parent.mkdir(parents=True)
     script.write_text("#!/usr/bin/env bash\n", encoding="utf-8")
@@ -36,11 +35,10 @@ def test_managed_shutdown_starts_fixed_detached_helper(monkeypatch, tmp_path) ->
     assert runtime_control.schedule_managed_shutdown() == 123
 
     command, kwargs = calls[0]
-    assert command == ["bash", str(script), "2"]
-    assert kwargs["cwd"] == tmp_path
+    assert command[:3] == ["powershell.exe", "-NoProfile", "-Command"]
+    assert "Stop-Process" in command[3]
     assert kwargs["stdin"] is subprocess.DEVNULL
-    assert kwargs["stderr"] is subprocess.STDOUT
+    assert kwargs["stderr"] is subprocess.DEVNULL
     assert kwargs["shell"] is False
-    assert kwargs["start_new_session"] is True
-    assert kwargs["close_fds"] is True
-    assert Path(kwargs["stdout"].name) == tmp_path / ".runtime" / "stop-stack.log"
+    assert kwargs["stdout"] is subprocess.DEVNULL
+    assert kwargs["creationflags"]
