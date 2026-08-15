@@ -1,7 +1,7 @@
 ---
 tags: pdf, mixed, page-routing
 sources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, streamlit_app.py
-snapshot: content-31c9fc402d46
+snapshot: content-063b756c4b68
 status: released
 ---
 

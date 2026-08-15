@@ -1,28 +1,28 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-31c9fc402d46",
-    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
+    "id": "content-063b756c4b68",
+    "base_commit": "336cea1137b7d09855c80adafa06fe6f3398740a",
     "branch": "main",
-    "dirty": false
+    "dirty": true
   },
-  "generated_at": "2026-08-15T16:31:09.285567+00:00",
+  "generated_at": "2026-08-15T16:45:56.192248+00:00",
   "category": "documentation",
   "files": [
     {
       "path": ".github/ISSUE_TEMPLATE/bug_report.md",
-      "sha256": "b6716a264dd93ae0ae15e2c6ce274e4ffd8a678d24954d54301021e1f22f5acd",
-      "size": 1083
+      "sha256": "c4616d215821ca2632e8de80438f72cc9b98d41aa7598f4eeadd4308ddb5cf89",
+      "size": 1411
     },
     {
       "path": ".github/ISSUE_TEMPLATE/feature_request.md",
-      "sha256": "afbe863f0e12a8939379152d786c16ae5aa04540a8374b7c0175211c101d6b94",
-      "size": 721
+      "sha256": "f20fbf2fe496ff0b2a028150bf7ff6bf65a3f9aa19654954de95010281ed427a",
+      "size": 953
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "5a08fd804aaf3274d9f9328ec66cf1970bfc422f956afaa2f16bbea5e91c50ba",
-      "size": 11894
+      "sha256": "713a34a747cf30834631210a5873c8faa2168bf4f0a7a9dfec45ccd38e1d1d41",
+      "size": 12652
     },
     {
       "path": "CODE_OF_CONDUCT.md",
@@ -31,33 +31,48 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "df421ce341013a5553f5fdeb0199b0dd3de9f5561b86f27029c194671acbc6e8",
-      "size": 4900
+      "sha256": "6ef7150e0f091df779e552c0c132df1c2b79ea8b2633b6608ff3146e9eafcc98",
+      "size": 5297
+    },
+    {
+      "path": "DATA_RESPONSIBILITY.md",
+      "sha256": "6e91c04c6658b4e78d515dca7730376ebdb915d7776ff43c133d4cc55450c8ac",
+      "size": 2842
     },
     {
       "path": "README.md",
-      "sha256": "e447937b274e76e3da348d4989c2e477413f9890e483d93ba1440fe398189711",
-      "size": 26200
+      "sha256": "6e276bdc50540834db82acb6416f91b7f80be1eef2b3693740eb5cfc2064e548",
+      "size": 28444
     },
     {
       "path": "SECURITY.md",
-      "sha256": "4b295be3c91c3dfa9ac87fd59849bbd82cbb156522f354ba91eb8a438efd5577",
-      "size": 3613
+      "sha256": "72e38b3bf8d660b524c641391a2f79e71e902daa599fb2db9ad05c4915a1c606",
+      "size": 3921
     },
     {
       "path": "SETUP.md",
-      "sha256": "36d2ced302e2204ebb213445c25877aea50a771fca8723648e2a1b81f542606b",
-      "size": 19749
+      "sha256": "f7edecc98c514676ad3494e686147787b97bf874f41fa66dc6bec50343c27c3d",
+      "size": 20419
+    },
+    {
+      "path": "SUPPORT.md",
+      "sha256": "9e3a8c04d95e1852a246f6ffd8a415c9b4c27dc07755cc43afb4764bf85c7081",
+      "size": 1495
     },
     {
       "path": "TECHNICAL.md",
-      "sha256": "4c637b1f02fa7ba96f7d1a60c6e887928bf32db1634ae56539a97841bdde6a4a",
-      "size": 4300
+      "sha256": "9b6437945b326c6d83dd133488998384241894b1ffadaa75a0c8e59d4bbe329e",
+      "size": 4306
+    },
+    {
+      "path": "TESTING.md",
+      "sha256": "6f2dfaf6a29e4f0737402f13ff40c40d82cd41fdfab293d6f067c55e15659792",
+      "size": 3251
     },
     {
       "path": "USAGE.md",
-      "sha256": "994030091301d068dc78e016c9c463531b93f5dab7b66381bc178b81f56e45b4",
-      "size": 5422
+      "sha256": "e0c381e03fc0a357340f749041041f9c994beaaeffd74ea2035fac074884a77a",
+      "size": 5930
     },
     {
       "path": "docs/ONBOARDING.md",
@@ -76,8 +91,8 @@
     },
     {
       "path": "docs/architecture.md",
-      "sha256": "affc37b0481abf22bcacdfe9f3f6cab487fc12a03e93ddd06ddc32db30b822a6",
-      "size": 12186
+      "sha256": "17aa5904b18703201dfc8f1993cae296b5b07bd6e41b8be29c0906bb84046f68",
+      "size": 12280
     },
     {
       "path": "docs/azure-bulk-fax-deployment.md",
@@ -91,13 +106,13 @@
     },
     {
       "path": "docs/codebase/ARCHITECTURE.md",
-      "sha256": "c4e7953fc22e7af4a1a022589c2e3e20ea53d2cd92b6055f325e05acc0abc217",
-      "size": 5304
+      "sha256": "52d1b3db01c289ed775e8b6c4ee29359453ca9db4da904fb2325b6f81f01e9fe",
+      "size": 5337
     },
     {
       "path": "docs/codebase/CONCERNS.md",
-      "sha256": "2e0e5060a926d9847417a03dec5ef34bf0b7bf76b7a82f285281b4a897045696",
-      "size": 4718
+      "sha256": "e62bba7fc8ea0cb3e2539e9db8b13927f7c0e891a77956dafcde88a55bccd609",
+      "size": 5092
     },
     {
       "path": "docs/codebase/CONVENTIONS.md",
@@ -126,13 +141,13 @@
     },
     {
       "path": "docs/complete-user-guide.md",
-      "sha256": "95ae45743959a22ab950aaf05dcfeda475f63499b95b154ed4cf67a5a7068383",
-      "size": 59923
+      "sha256": "b1d298903c08e1a0e1974005eec044623eee7d252c6ccad21e20a779cd917dda",
+      "size": 60756
     },
     {
       "path": "docs/extraction-quality-research.md",
-      "sha256": "743dc74b3fc69ff72ece26edeac39f6578787f405fc019eebb9a6063670f4e2e",
-      "size": 5748
+      "sha256": "69f2f374946583e6b57e76457dad206c66ed7ac9ee5548d57104b5f0b8f70a44",
+      "size": 5751
     },
     {
       "path": "docs/how-grounded-docparse-is-agentic.md",
@@ -161,8 +176,8 @@
     },
     {
       "path": "docs/local-glmocr.md",
-      "sha256": "a3be9d07282fe61d2121c162b30dfa2fb052d0a481055481b92a70734bcb5faf",
-      "size": 3332
+      "sha256": "393ae02c95f8fa3fab6e9fa4b9672e4f601afaedfe8cfecdbf3b6249278e8ae3",
+      "size": 3351
     },
     {
       "path": "docs/local-paddleocr-vl.md",
@@ -186,28 +201,28 @@
     },
     {
       "path": "docs/research.md",
-      "sha256": "ea079cb9bc6154c4d1afe0e080abcfdba4374f0af7d6d616dc871d7fb10bb1d5",
-      "size": 2356
+      "sha256": "995092a3836205b7767be840e35e60cf64386b6aadb2f8eb98e1e5e277ac31bc",
+      "size": 2388
     },
     {
       "path": "docs/run.md",
-      "sha256": "1ddaac93523b76491c40dbc0824f24a7b62c71b047bcb420f0098fc962540fe7",
-      "size": 6640
+      "sha256": "7ece9d0fdf69b9048cd09730612ce24a18cea917e22928cdde1b57645ac91a37",
+      "size": 7119
     },
     {
       "path": "docs/spec.md",
-      "sha256": "365b5a9903d3ddf1183529250ff70adb62022625ea6e45bcf92e4eea4a5df5b4",
-      "size": 7209
+      "sha256": "1a9042b20b0ebeea95fa385efc60ab95b7fc45050c475691bca3cfb522f58b57",
+      "size": 7206
     },
     {
       "path": "docs/tutorial.md",
-      "sha256": "4312b515378da01d13efcd3a6a70d3de7d3ccd4758e1b53f9e7141d6de505182",
-      "size": 2703
+      "sha256": "b3bb95cedabb6764626aaba66c3d7f2a12b440db46cdcf0f6f03e15a9cec00ad",
+      "size": 2861
     },
     {
       "path": "docs/zero-to-hero-tutorial.md",
-      "sha256": "103862196a068f643a95111939dac22314b01685f5443b7cc39c059e5ec7726c",
-      "size": 56630
+      "sha256": "88f851305d3451f1f9a9d2a681dbc0fca056ab3b86ce6509372f8c421cdeae27",
+      "size": 56828
     },
     {
       "path": "presentations/grounded-docparse-business.pptx",
