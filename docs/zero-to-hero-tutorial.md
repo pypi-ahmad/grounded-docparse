@@ -6,7 +6,7 @@ The short version is:
 
 ```text
 required per-file processing type
-  -> scanned PDF/image: one selected pure-AI, vLLM, Docling/RapidOCR, or Ollama engine
+  -> scanned PDF/image: one selected AI ADE, vLLM, Docling/RapidOCR, or Ollama engine
   -> Native PDF: pdf-inspector; Mixed PDF: reviewed page routes
   -> Office/open formats: OCR-disabled Docling conversion
   -> grounded OCR elements or immutable native source spans/anchors
@@ -134,7 +134,7 @@ The supported local topology is deliberately small:
 
 ```text
 Browser
-  -> Streamlit studio on 127.0.0.1:9356
+  -> Streamlit studio on 127.0.0.1:7137
        -> ingest and rasterization
        -> selected engine
             -> Windows CPU PP-DocLayoutV3 + WSL GLM vLLM or Windows Ollama
@@ -219,7 +219,7 @@ The setup process:
 3. downloads pinned CPU PP-DocLayoutV3 assets;
 4. installs or starts Windows Ollama;
 5. starts native Streamlit on loopback; and
-6. opens <http://localhost:9356>.
+6. opens <http://localhost:7137>.
 
 Later sessions use the same launcher. Use `Setup-GLM-OCR.cmd` or
 `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU backend.
@@ -255,7 +255,7 @@ Both managed services bind to loopback. Do not override that boundary on an untr
 
 ## 6. Your first successful parse
 
-Open <http://localhost:9356>, then follow this minimal path:
+Open <http://localhost:7137>, then follow this minimal path:
 
 1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
 2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
@@ -679,7 +679,7 @@ Reusable extraction schemas, routing profiles, and the active batch workspace pe
 data/document_studio.sqlite3
 ```
 
-Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition. The sibling `workspaces/` directory stores uploaded source bytes, parse checkpoints, and annotated PDFs. The latest batch is restored after an app restart. Use **Clear saved workspace** to delete that durable batch.
+Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition. The sibling `workspaces/` directory stores uploaded source bytes, parse checkpoints, and annotated PDFs. The latest batch is restored after an app restart. The managed Windows launcher replaces the verified prior Streamlit process and clears transient Streamlit cache/session state, but preserves this durable batch and any warm WSL OCR service. Use **Clear saved workspace** to delete the durable batch.
 
 ### 12.2 What does not persist
 
@@ -1157,7 +1157,7 @@ Requests use `store=False`. This application setting does not replace contractua
 
 ### 17.3 Keep local services local
 
-The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `9356` or `8080` to an untrusted network.
+The managed scripts bind Streamlit and vLLM to `127.0.0.1`. Do not expose ports `7137` or `8080` to an untrusted network.
 
 ### 17.4 Know the residual data
 
@@ -1261,7 +1261,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:9356>; inspect `.runtime/streamlit.log` |
+| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:7137>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
 | AI controls are disabled | Selected model key unavailable to Streamlit | Save it in Windows User scope and rerun `Launch-Grounded-DocParse.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |

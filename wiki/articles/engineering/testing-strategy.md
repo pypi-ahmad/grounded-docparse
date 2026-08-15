@@ -1,7 +1,7 @@
 ---
 tags: testing, regression, contracts
 sources: tests/test_native_models.py, tests/test_docling_native_parser.py, tests/test_native_extraction.py, docs/codebase/TESTING.md
-snapshot: content-7de86a1331e2
+snapshot: content-988eedb6f7e0
 status: released
 ---
 

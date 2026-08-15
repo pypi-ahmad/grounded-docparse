@@ -24,14 +24,28 @@ Run the native launcher from the repository root:
 ```
 
 It repairs the native environment, CPU PP-DocLayoutV3 assets, and Windows
-Ollama before opening <http://localhost:9356>. Use `Setup-GLM-OCR.cmd` or
+Ollama before opening <http://localhost:7137>. Use `Setup-GLM-OCR.cmd` or
 `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU service.
+Relaunching stops only verified Grounded DocParse app processes, clears
+transient Streamlit cache/session state, and preserves the durable workspace
+and any running WSL OCR service.
+Leave the launch terminal open to watch live app and local-model logs.
+
+Local Ollama OCR bounds each request to an 8,192-token context and at most
+4,096 output tokens. Model warm-up exercises the vision path but generates only
+one token, avoiding the 131,072-token KV cache and runaway blank-image output.
+
+Choose **Session cost** in the sidebar for total input tokens, cache tokens,
+output tokens, and estimated cost. When multiple cloud models are used, the
+table splits usage and cost by model and includes a Total row. Values cover the
+current app launch only and reset when the app restarts.
 
 ## Process a document
 
 1. Upload one or more supported files.
 2. Select a processing type independently for every file.
 3. Select exactly one extraction engine and configure optional AI enhancement.
+   With a vLLM or Ollama primary, you can also enable the audit-only uncertain-region cross-check and select an Ollama, RapidOCR, or WSL vLLM alternate. GPU alternates temporarily swap models and restore the primary after the crop batch.
 4. For Mixed PDF, review or override every suggested page route.
 5. Select **Parse document**.
 6. Review grounded output and source evidence before using extracted values.
@@ -44,7 +58,7 @@ selected route.
 | Input | Processing type | Behavior |
 | --- | --- | --- |
 | Selectable-text PDF | Native PDF | Non-OCR PDF extraction with page and bounding-box anchors |
-| Image-only PDF | Scanned PDF | Selected pure-AI, vLLM, Docling/RapidOCR, or Ollama engine |
+| Image-only PDF | Scanned PDF | Selected AI ADE, vLLM, Docling/RapidOCR, or Ollama engine |
 | PDF with native and scanned pages | Mixed PDF | Reviewed page-by-page native/OCR routing |
 | DOCX | Word | OCR-disabled native conversion |
 | PPTX | PowerPoint | OCR-disabled native conversion |
@@ -97,4 +111,4 @@ session.
 - PaddleOCR-VL runtime: [docs/local-paddleocr-vl.md](docs/local-paddleocr-vl.md)
 - Full UI and workflow help: [docs/complete-user-guide.md](docs/complete-user-guide.md)
 
-Do not expose ports `9356`, `8080`, `8118`, or `8119` to an untrusted network.
+Do not expose ports `7137`, `8080`, `8118`, or `8119` to an untrusted network.

@@ -1,6 +1,6 @@
 # Tutorial
 
-1. Complete [setup](../SETUP.md) and open <http://localhost:9356>.
+1. Complete [setup](../SETUP.md) and open <http://localhost:7137>.
 2. Optionally set `OPENAI_API_KEY`, `GOOGLE_API_KEY`, or `AGNES_API_KEY` in the Windows User environment for the selected AI model. The native launcher imports these values on each start.
 3. Upload a supported PDF, Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, EPUB, or image file. Each file has its own required **Processing type** selection.
 4. Select **Native PDF**, **Scanned PDF**, or **Mixed PDF** for a PDF; select the matching Word, PowerPoint, Excel, CSV, Image, or Other Native type for every other file. The app validates the choice and blocks mismatches.

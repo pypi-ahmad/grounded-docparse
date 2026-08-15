@@ -43,7 +43,9 @@ Only one extraction engine can be active at a time. Selecting a WSL vLLM engine 
 | PDF Inspector (no OCR) | Native Windows | Selectable-text PDF structure extraction only |
 | Local Ollama | Native Windows Ollama + Windows CPU layout | PP-DocLayoutV3-grounded GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR recognition |
 
-The Ollama model choices are `glm-ocr:latest`, `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`. Models are pulled lazily, warmed when selected, and unloaded when the selection changes.
+The Ollama model choices are `glm-ocr:latest`, `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`. Models are pulled lazily, warmed when selected, and unloaded when the selection changes. Every OCR request uses an 8,192-token context and a 4,096-token output ceiling; warm-up uses the same multimodal path but generates at most one token.
+
+For vLLM and Ollama primary engines, **Cross-check uncertain regions with alternate local OCR** audits the existing bounded risk queue without replacing primary text. Choose PP-DocLayoutV3 + Ollama GLM-OCR, PP-DocLayoutV3 + Ollama PaddleOCR-VL-1.6, CPU RapidOCR, WSL vLLM PaddleOCR-VL-1.6, or WSL vLLM GLM-OCR. GPU-backed choices are loaded once for the crop batch, then the primary model is restored and warmed; this can add model-swap time.
 
 AI extraction and enhancement can use the following selectable providers:
 
@@ -71,7 +73,7 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
    .\Launch-Grounded-DocParse.cmd
    ```
 
-   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. The launcher installs missing `uv`, Python 3.12, native dependencies, PP-DocLayoutV3 assets, and Windows Ollama, then opens <http://localhost:9356>.
+   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. The launcher installs missing `uv`, Python 3.12, native dependencies, PP-DocLayoutV3 assets, and Windows Ollama, then opens <http://localhost:7137>. Keep its terminal open to follow labeled Streamlit, OCR, and Ollama logs; after the app stops it waits for a keypress.
 
 3. Optional: enable an AI provider by saving its key in the Windows User environment. Skip this step for local-only parsing.
 
@@ -94,7 +96,7 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
 
    Each setup command installs, activates, and warms its GPU engine. At runtime, selecting one WSL engine unloads the other before starting the requested service.
 
-`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. It does not rewrite `.wslconfig`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` keeps the former WSL-hosted app available for one migration release. See [setup](SETUP.md) for details.
+`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. `OLLAMA_BASE_URL` defaults to `http://127.0.0.1:11434` and accepts only a loopback origin. Each launch stops only verified Grounded DocParse Streamlit processes, clears transient Streamlit cache state, and preserves the durable workspace and WSL OCR services. It does not rewrite `.wslconfig`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` keeps the former WSL-hosted app available for one migration release. See [setup](SETUP.md) for details.
 
 For a manual development install of native parsing and grounded extraction, use:
 
@@ -125,7 +127,7 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only for one scanned PDF; native and mixed inputs process the selected document structure/pages.
 2. Select a processing type for every file in **Processing types**. For Mixed PDF, review the suggested page routes, override any page, and confirm the complete table before processing.
 3. Select exactly one extraction-engine toggle. For **Local Ollama**, also select GLM-OCR, PaddleOCR-VL-1.6, or DeepSeek-OCR. Choose the AI model separately when using **AI ADE** or optional enhancement.
-4. For every engine except **AI ADE**, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
+4. For a vLLM or Ollama engine, optionally enable the audit-only local OCR cross-check and choose its alternate engine. For every engine except **AI ADE**, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
    - **Fast**: classification is the only preset-controlled AI feature.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
@@ -134,6 +136,8 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
 
 The latest batch is saved locally and restored after an app restart. SQLite at `data/document_studio.sqlite3` (or `DOCPARSE_STUDIO_DB_PATH`) stores settings, progress, analysis, failures, usage, reusable schemas, and routing profiles. The sibling `workspaces/` directory stores source bytes, parse checkpoints, and annotated PDFs. Interrupted documents resume from the last completed parse checkpoint when **Resume batch** is selected. Use **Clear saved workspace** to remove the durable batch. Extraction, routing review, and chat remain session-only.
+
+Use the sidebar **Session cost** view to see launch-scoped input tokens, cache tokens, output tokens, and estimated API cost by model plus a combined total. Restarting the app resets this cost ledger; restored workspace usage is not added.
 
 Extraction is always on demand after parsing. Native extraction sends immutable `base_text` to LangExtract, never refined Markdown. A returned value is accepted only when it includes a `char_interval` whose exact substring resolves through the native source spans to at least one `SourceAnchor`; ungrounded values are rejected. The field builder remains available for flat scalar fields. **Raw JSON Schema** mode stores and routes the supported strict nested schema subset, including objects, arrays, enums, and nullable booleans for checkbox/selectable fields. Imported raw JSON Schemas use the filename as their saved name; saved-schema envelope imports remain backward compatible. Markdown, CSV, and XLSX imports populate the flat field builder.
 

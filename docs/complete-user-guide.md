@@ -119,7 +119,11 @@ For later sessions:
 .\Launch-Grounded-DocParse.cmd
 ```
 
-The application normally opens at <http://localhost:9356>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
+The application normally opens at <http://localhost:7137>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.
+
+The native launch terminal remains open and follows labeled Streamlit, GLM-OCR, PaddleOCR, and Ollama logs. It waits for a keypress after the app stops so the last messages remain visible.
+
+The sidebar **Session cost** view summarizes total input tokens, cache tokens, output tokens, and estimated synchronous API cost for the current app launch. It provides one row per model and a combined Total row. Restarting the app resets the ledger even when the durable document workspace is restored.
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
@@ -1111,6 +1115,8 @@ An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
 The database's sibling `workspaces` directory stores the active batch's source bytes, selected-page source, annotated PDF, and parse checkpoint. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
 
+Starting the managed Windows launcher deliberately replaces any verified native or legacy WSL Streamlit app process and clears Streamlit's transient cache. This starts a fresh UI session but does not delete the SQLite workspace, stored source/result artifacts, models, or warm WSL OCR services.
+
 ### 18.2 What is session-only
 
 The current Streamlit app keeps these in process/session state only:
@@ -1127,7 +1133,7 @@ Uploaded bytes and generated results may remain in the browser session and activ
 
 Do not treat closing a browser tab, refreshing, or restarting the app as deletion. Use **Clear saved workspace**, then apply the administrator's approved browser, host-storage, backup, and retention procedures for sensitive documents.
 
-The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. For a privacy cleanup boundary, the administrator must clear the relevant Streamlit cache or restart the managed Streamlit process, then handle host/storage remnants under the approved procedure.
+The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. The managed Windows launcher stops the verified prior process and clears this cache on every launch. This is not durable-data deletion: the administrator must still use **Clear saved workspace** and handle browser, host-storage, and backup remnants under the approved procedure.
 
 ### 18.3 Other residual data
 
@@ -1145,7 +1151,7 @@ Normal parsing removes temporary parser storage, but abnormal termination and st
 
 ### 18.4 Local-workstation boundary
 
-The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `9356` or `8080` to an untrusted network.
+The current application is intended for a trusted local workstation. The managed launch scripts bind Streamlit and vLLM to loopback. Do not expose ports `7137` or `8080` to an untrusted network.
 
 The application has no multi-user login or tenant isolation. It must not be published unchanged as a shared PHI or confidential-document service.
 

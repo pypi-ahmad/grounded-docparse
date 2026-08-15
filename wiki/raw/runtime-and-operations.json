@@ -1,23 +1,23 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-7de86a1331e2",
-    "base_commit": "50f7a20b037a09c771d6be8ff96c72b7c8cc3874",
+    "id": "content-988eedb6f7e0",
+    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:19:20.725034+00:00",
+  "generated_at": "2026-08-15T14:08:02.822559+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
       "path": "Launch-Grounded-DocParse-WSL-Legacy.cmd",
-      "sha256": "2df836e8281e21ca71f3e90841660bca50efdfeee1bb1f18c002b44f5c9eb8c7",
+      "sha256": "38d0e03f5a9aa4e8d389050d749d2f269748b3daa1387a117dee1aa1d185fb95",
       "size": 538
     },
     {
       "path": "Launch-Grounded-DocParse.cmd",
-      "sha256": "312b21003470191fcdb24183a49586cf97e14f2c16c5e199520625a80823c90f",
-      "size": 349
+      "sha256": "ec37936d151e9d4ce8a1db7c83055d86f9f17cdb712fe11e9a8182588c3b07f1",
+      "size": 452
     },
     {
       "path": "Setup-GLM-OCR.cmd",
@@ -36,7 +36,7 @@
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "b023eb92448fe25286329884268e9360e4ea96fd9f0dc0bc5fb1f3751b1886ca",
+      "sha256": "f0314807eaa3faa3f90fdb6164a99f9a7cab16eed85339d97af759a0a5034237",
       "size": 18413
     },
     {
@@ -81,8 +81,8 @@
     },
     {
       "path": "scripts/windows/launch-native.ps1",
-      "sha256": "171933c03db5ae040f7df0222d0e27587b781d9e34f54cc6776105d541973ec3",
-      "size": 7101
+      "sha256": "064737ae9eedb61012705af7335c2b17445c5b415938e0f5ca405f8f3bc51ba3",
+      "size": 13319
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",
@@ -106,7 +106,7 @@
     },
     {
       "path": "scripts/wsl/launch-stack.sh",
-      "sha256": "7739031e0c9fe1aededd513db4ef087021bc41fb261aa936e62a04c980d2561c",
+      "sha256": "efb7838954a9c0361e3f78021e28b37c272c58f02434a455f76861c0f7b60bf8",
       "size": 5786
     },
     {

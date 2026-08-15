@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-7de86a1331e2",
-    "base_commit": "50f7a20b037a09c771d6be8ff96c72b7c8cc3874",
+    "id": "content-988eedb6f7e0",
+    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:19:20.725034+00:00",
+  "generated_at": "2026-08-15T14:08:02.822559+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
       "path": ".env.example",
-      "sha256": "862f6122a7c3a2a080e1157fa01715a5c03e11e485740c0c5d1750796f973174",
-      "size": 1363
+      "sha256": "116e4b42da94250e8dba3fec8f5e7a769e9b9cf0ee69674a6e9ce9742b2c9ae6",
+      "size": 1615
     },
     {
       "path": ".gitattributes",
@@ -26,7 +26,7 @@
     },
     {
       "path": ".streamlit/config.toml",
-      "sha256": "3b37fa45718d4e799afb127d78c444bee9da943de2df8f6fb4a2acc03611066c",
+      "sha256": "70bed8bcb0be0d41f8d93079e9d68e3c4698872e582e0b106d003341abffaace",
       "size": 512
     },
     {
