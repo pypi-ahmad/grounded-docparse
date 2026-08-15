@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-ee679d72076c",
-    "base_commit": "9493e5f55ed50f8eb73f3785bd9d68423115c4e9",
+    "id": "content-7e6cbb56ddf0",
+    "base_commit": "674513ea01d3331ef750167b83c0ba388cf02d14",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:02:15.929841+00:00",
+  "generated_at": "2026-08-15T10:04:43.660836+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {

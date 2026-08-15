@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: architecture, repository, development
 sources: docs/architecture.md, docs/codebase/ARCHITECTURE.md, pyproject.toml
-snapshot: content-ee679d72076c
+snapshot: content-7e6cbb56ddf0
 status: released</code></pre></details>
         <div class="markdown-body"><p>The repository separates core parsing under <code>src/grounded_docparse</code>, the Streamlit entry point, evaluation assets, operational scripts, installers, documentation, and tests. Public dependencies and optional native integrations are declared in <code>pyproject.toml</code>.</p>
 <p>Native ingestion is additive: shared models and dispatch sit beside the established OCR pipeline, while format adapters and grounded extraction remain isolated modules. Interfaces converge at result rendering, persistence, and exports rather than by sharing unverified evidence.</p>
