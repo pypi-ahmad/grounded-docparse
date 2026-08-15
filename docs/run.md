@@ -2,7 +2,7 @@
 
 ## Recommended Windows launcher
 
-Run `Launch-Grounded-DocParse.cmd` on Windows 11 22H2 or newer. It installs or reuses `uv`, Python 3.12, the locked native environment, CPU PP-DocLayoutV3 assets, and Windows Ollama, then starts Streamlit natively on <http://localhost:8600>.
+Run `Launch-Grounded-DocParse.cmd` on Windows 11 22H2 or newer. It installs or reuses `uv`, Python 3.12, the locked native environment, CPU PP-DocLayoutV3 assets, and Windows Ollama, then starts Streamlit natively on <http://localhost:9356>.
 
 Use `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` only to install and warm an explicit WSL GPU backend. GLM lives in `.venv`; Paddle and its compatible vLLM stack live in `.paddle-venv`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` temporarily preserves the old WSL-hosted app.
 
@@ -23,7 +23,7 @@ bash scripts/wsl/serve-glmocr.sh
 
 ```powershell
 $env:UV_PROJECT_ENVIRONMENT = "$env:LOCALAPPDATA\GroundedDocParse\venv"
-uv run --extra native --extra windows-layout streamlit run streamlit_app.py --server.port 8600
+uv run --extra native --extra windows-layout streamlit run streamlit_app.py --server.port 9356
 ```
 
 The normal URLs are:
@@ -31,7 +31,7 @@ The normal URLs are:
 - GLM-OCR-compatible vLLM endpoint: <http://127.0.0.1:8080>
 - PaddleOCR-VL vLLM endpoint: <http://127.0.0.1:8118>
 - PaddleX full document parser: <http://127.0.0.1:8119>
-- Streamlit: <http://localhost:8600>
+- Streamlit: <http://localhost:9356>
 
 Set Windows user variables `DOCPARSE_PADDLE_VLLM_PORT` and
 `DOCPARSE_PADDLE_API_PORT` before launching to override the two Paddle defaults.
@@ -41,7 +41,7 @@ Cloud keys are optional. `Launch-Grounded-DocParse.cmd` reads OpenAI, Google, Ag
 
 With a selected provider key present, enabled AI features may send crops or recognized context to that provider. AI enhancement defaults off and considers only failed or sub-75%-confidence regions. Disable all AI features for fully local operation.
 
-The managed scripts bind Streamlit and OCR services to loopback. Do not expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.
+The managed scripts bind Streamlit and OCR services to loopback. Do not expose ports `9356`, `8080`, `8118`, or `8119` to an untrusted network.
 
 ## Use the studio
 
@@ -60,7 +60,7 @@ Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdo
 
 ## Stop and restart
 
-The native launcher records the Streamlit PID under `%LOCALAPPDATA%\GroundedDocParse\runtime`. Every launch verifies and stops that process plus any Grounded DocParse Streamlit listener active on port `8600`, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. An unrelated process on port `8600` is left untouched. To stop WSL GPU services, run:
+The native launcher records the Streamlit PID under `%LOCALAPPDATA%\GroundedDocParse\runtime`. Every launch verifies and stops that process plus any Grounded DocParse Streamlit listener active on port `9356`, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. It also stops a verified legacy WSL Streamlit session while preserving its GPU OCR services. Unrelated listeners are left untouched. To stop WSL GPU services, run:
 
 ```bash
 for file in .runtime/vllm.pid .runtime/paddle-vllm.pid .runtime/paddle-api.pid .runtime/streamlit.pid; do

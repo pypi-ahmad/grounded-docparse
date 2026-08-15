@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-12489de42da5",
-    "base_commit": "91399758f358b85f9f32ac46a610b491e705ac95",
+    "id": "content-7de86a1331e2",
+    "base_commit": "50f7a20b037a09c771d6be8ff96c72b7c8cc3874",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:05:27.309454+00:00",
+  "generated_at": "2026-08-15T10:19:20.725034+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -266,8 +266,8 @@
     },
     {
       "path": "tests/test_launcher_contract.py",
-      "sha256": "a7b6c3bcc1dcd672890fc9d9b825d4f26b685af371558fee43b22cc59a9bdbe9",
-      "size": 9938
+      "sha256": "4faf4254fccc03d7ab2ecafa6b27867a3a3887894013d54fd6c0a38fba9b5978",
+      "size": 10514
     },
     {
       "path": "tests/test_markdown_enhancement.py",

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-12489de42da5",
-    "base_commit": "91399758f358b85f9f32ac46a610b491e705ac95",
+    "id": "content-7de86a1331e2",
+    "base_commit": "50f7a20b037a09c771d6be8ff96c72b7c8cc3874",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:05:27.309454+00:00",
+  "generated_at": "2026-08-15T10:19:20.725034+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
       "path": "Launch-Grounded-DocParse-WSL-Legacy.cmd",
-      "sha256": "a8e0efa605aa918b6266a594b4695987a334b6af74dd6561f0c2a239e30d202d",
+      "sha256": "2df836e8281e21ca71f3e90841660bca50efdfeee1bb1f18c002b44f5c9eb8c7",
       "size": 538
     },
     {
@@ -36,7 +36,7 @@
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "e8f9083984175928d816b15a49b370ad1ff2eeb821fcc7ea082d9cd2c7351add",
+      "sha256": "b023eb92448fe25286329884268e9360e4ea96fd9f0dc0bc5fb1f3751b1886ca",
       "size": 18413
     },
     {
@@ -81,8 +81,8 @@
     },
     {
       "path": "scripts/windows/launch-native.ps1",
-      "sha256": "62a76d6b6660b00a4b3ffce84914725a7956a47af2df008c7c37627f2fbd1f15",
-      "size": 6142
+      "sha256": "171933c03db5ae040f7df0222d0e27587b781d9e34f54cc6776105d541973ec3",
+      "size": 7101
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",
@@ -106,7 +106,7 @@
     },
     {
       "path": "scripts/wsl/launch-stack.sh",
-      "sha256": "75cabcabd4cd55b0b196e6443baa568e34b5402e32652d27014a6eb86f5c4968",
+      "sha256": "7739031e0c9fe1aededd513db4ef087021bc41fb261aa936e62a04c980d2561c",
       "size": 5786
     },
     {
@@ -146,8 +146,8 @@
     },
     {
       "path": "scripts/wsl/stop-stack.sh",
-      "sha256": "a14ef2770c48fe0db1317bfae3301149251a6aea2ce68275ff17f80d37babff8",
-      "size": 1861
+      "sha256": "8a3f2a95205644f0b9236caad69874bd541f66edfa67616cf824943a2ce26ad3",
+      "size": 2482
     }
   ]
 }
