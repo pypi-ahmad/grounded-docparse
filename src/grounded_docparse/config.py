@@ -3,10 +3,66 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from enum import StrEnum
+from pathlib import Path
 from urllib.parse import urlsplit
+
+from dotenv import load_dotenv
+
+APP_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(APP_ROOT / ".env", override=False)
 
 LUNA_MODEL = "gpt-5.6-luna"
 LUNA_REASONING_EFFORT = "medium"
+
+
+class CloudModel(StrEnum):
+    GPT_5_6_LUNA = "gpt-5.6-luna"
+    GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite"
+    GEMINI_3_7_FLASH = "gemini-3.7-flash"
+
+    @property
+    def label(self) -> str:
+        return {
+            self.GPT_5_6_LUNA: "GPT 5.6 Luna",
+            self.GEMINI_3_5_FLASH_LITE: "Gemini 3.5 Flash Lite",
+            self.GEMINI_3_7_FLASH: "Gemini Flash 3.7",
+        }[self]
+
+    @property
+    def reasoning_effort(self) -> str:
+        return "minimal" if self is self.GEMINI_3_5_FLASH_LITE else "medium"
+
+    @property
+    def api_key_name(self) -> str:
+        return "OPENAI_API_KEY" if self is self.GPT_5_6_LUNA else "GOOGLE_API_KEY"
+
+
+class ExtractionEngine(StrEnum):
+    PURE_AI = "pure-ai"
+    PADDLE_VLLM = "paddle-vllm"
+    GLM_VLLM = "glm-vllm"
+    DOCLING_RAPIDOCR = "docling-rapidocr"
+    PDF_INSPECTOR = "pdf-inspector"
+    OLLAMA = "ollama"
+
+    @property
+    def label(self) -> str:
+        return {
+            self.PURE_AI: "Pure AI agentic extraction",
+            self.PADDLE_VLLM: "PaddleOCR-VL-1.6",
+            self.GLM_VLLM: "GLM-OCR",
+            self.DOCLING_RAPIDOCR: "Docling + RapidOCR",
+            self.PDF_INSPECTOR: "PDF Inspector (no OCR)",
+            self.OLLAMA: "Local Ollama",
+        }[self]
+
+    @property
+    def vllm_ocr_engine(self) -> OcrEngine | None:
+        if self is self.PADDLE_VLLM:
+            return OcrEngine.PADDLEOCR_VL_1_6
+        if self is self.GLM_VLLM:
+            return OcrEngine.GLM_OCR
+        return None
 
 
 class OcrEngine(StrEnum):
@@ -87,6 +143,7 @@ class AnalysisThresholds:
 @dataclass(frozen=True, slots=True)
 class ParserConfig:
     ocr_engine: OcrEngine = OcrEngine.GLM_OCR
+    cloud_model: CloudModel = CloudModel.GPT_5_6_LUNA
     render_dpi: int = 200
     crop_dpi: int = 450
     crop_padding: float = 0.1
@@ -181,6 +238,9 @@ class ParserConfig:
         return cls(
             ocr_engine=OcrEngine(
                 os.getenv("DOCPARSE_OCR_ENGINE", defaults.ocr_engine.value)
+            ),
+            cloud_model=CloudModel(
+                os.getenv("DOCPARSE_CLOUD_MODEL", defaults.cloud_model.value)
             ),
             render_dpi=int(os.getenv("DOCPARSE_RENDER_DPI", str(defaults.render_dpi))),
             crop_dpi=int(os.getenv("DOCPARSE_CROP_DPI", str(defaults.crop_dpi))),

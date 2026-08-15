@@ -345,6 +345,7 @@ class AgentUsage(BaseModel):
     input_tokens: int = Field(default=0, ge=0)
     cached_input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+    telemetry_available: bool = True
 
 
 class RunUsage(BaseModel):
