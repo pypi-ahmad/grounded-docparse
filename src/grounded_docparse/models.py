@@ -962,7 +962,11 @@ class Element(BaseModel):
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
     source: Literal[
-        "glm-ocr", "paddleocr-vl-1.6", "deepseek-ocr", "luna-recovery"
+        "glm-ocr",
+        "paddleocr-vl-1.6",
+        "deepseek-ocr",
+        "rapidocr",
+        "luna-recovery",
     ] = "glm-ocr"
 
     @model_validator(mode="after")

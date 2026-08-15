@@ -55,6 +55,17 @@ def analyzer(runtime: Runtime, **thresholds: object) -> PageAnalyzer:
     return PageAnalyzer(config, runtime_factory=lambda *_args: runtime)
 
 
+def test_rapidocr_model_versions_report_cpu_docling_stack() -> None:
+    versions = PageAnalyzer(
+        ParserConfig(ocr_engine=OcrEngine.RAPIDOCR)
+    ).model_versions()
+
+    assert versions["ocr_sdk"] == "Docling + RapidOCR"
+    assert versions["ocr_model"] == "RapidOCR PP-OCRv6"
+    assert versions["layout_model"] == "Docling layout"
+    assert versions["vlm_backend"] == "ONNX Runtime CPU"
+
+
 def analyze(runtime: Runtime, evidence: PageEvidence, **thresholds: object):
     return next(analyzer(runtime, **thresholds).analyze_window([evidence]))
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 
+from .docling_native import ensure_docling_models
 from .grounded_ocr import ensure_layout_model
 from .ollama_runtime import OllamaOcrModel, ensure_model
 
@@ -12,6 +13,8 @@ def prepare_models() -> None:
     for model in OllamaOcrModel:
         print(f"Checking Local Ollama OCR model: {model.value}")
         ensure_model(model)
+    print("Checking persistent Docling layout, TableFormer, and RapidOCR weights...")
+    ensure_docling_models()
 
 
 def main() -> None:

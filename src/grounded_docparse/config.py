@@ -74,6 +74,8 @@ class ExtractionEngine(StrEnum):
     def parser_ocr_engine(self) -> OcrEngine | None:
         if self is self.OLLAMA:
             return OcrEngine.OLLAMA
+        if self is self.DOCLING_RAPIDOCR:
+            return OcrEngine.RAPIDOCR
         return self.vllm_ocr_engine
 
 
@@ -81,6 +83,7 @@ class OcrEngine(StrEnum):
     GLM_OCR = "glm-ocr"
     PADDLEOCR_VL_1_6 = "paddleocr-vl-1.6"
     OLLAMA = "ollama"
+    RAPIDOCR = "rapidocr"
 
     @property
     def label(self) -> str:
@@ -88,6 +91,7 @@ class OcrEngine(StrEnum):
             self.GLM_OCR: "GLM-OCR",
             self.PADDLEOCR_VL_1_6: "PaddleOCR-VL-1.6",
             self.OLLAMA: "Local Ollama",
+            self.RAPIDOCR: "Docling + RapidOCR",
         }[self]
 
 
@@ -127,6 +131,8 @@ class AlternateOcrEngine(StrEnum):
         return None
 
     def matches_primary(self, engine: OcrEngine, ollama_model: str) -> bool:
+        if self is self.RAPIDOCR:
+            return engine is OcrEngine.RAPIDOCR
         if self.vllm_engine is not None:
             return engine is self.vllm_engine
         return engine is OcrEngine.OLLAMA and self.ollama_model == ollama_model
@@ -135,6 +141,8 @@ class AlternateOcrEngine(StrEnum):
 def default_alternate_ocr_engine(
     engine: OcrEngine, ollama_model: str
 ) -> AlternateOcrEngine:
+    if engine is OcrEngine.RAPIDOCR:
+        return AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6
     if engine is OcrEngine.GLM_OCR:
         return AlternateOcrEngine.VLLM_PADDLEOCR_VL_1_6
     if engine is OcrEngine.PADDLEOCR_VL_1_6:
