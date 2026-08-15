@@ -1,5 +1,9 @@
 # Security policy
 
+Users are responsible for authority to process documents, selecting acceptable
+providers and endpoints, reviewing outputs, and managing all retained copies.
+See [DATA_RESPONSIBILITY.md](DATA_RESPONSIBILITY.md) for the operational policy.
+
 Report vulnerabilities privately through the repository's [GitHub Security Advisory form](https://github.com/pypi-ahmad/grounded-docparse/security/advisories/new). Do not include real documents, credentials, or personal data in a public issue.
 
 For harassment or other community-conduct concerns, use the same private form,
@@ -26,4 +30,5 @@ The studio intentionally persists more than schemas. `data/document_studio.sqlit
 Extraction, routing review, and chat remain session-only. Uploaded bytes and generated results also remain in temporary parser storage, the active Streamlit process, and the browser session while a workflow is open. Normal parse completion removes the parser temporary directory, but abnormal process termination and storage recovery are outside the application's cleanup guarantee. Closing a browser tab or restarting the app is not deletion of the durable workspace. Downloads, browser state, backups, Windows/WSL model caches, runtime logs, Streamlit caches, and legacy `.docparse/` data are operator-managed residuals. Native app state defaults to `%LOCALAPPDATA%\GroundedDocParse`; WSL GPU environments remain separately operator-managed.
 
 Operational instructions are in [USAGE.md](USAGE.md); implementation trust
-boundaries are summarized in [TECHNICAL.md](TECHNICAL.md).
+boundaries are summarized in [TECHNICAL.md](TECHNICAL.md), and safe testing and
+reporting are described in [TESTING.md](TESTING.md).

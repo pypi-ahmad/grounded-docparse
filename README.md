@@ -56,6 +56,8 @@ AI extraction and enhancement can use the following selectable providers:
 | Gemini Flash 3.7 | $0.75 | $3.75 | Promotional rate represented through December 31, 2026 |
 | Agnes 2.5 Flash | Free | Free | Uses the Agnes API gateway |
 
+The selected model is used for enabled region recovery and Markdown refinement, as well as provider-aware extraction, routing, and chat paths. The current `DocumentAgent` classification/TOC preflight still checks `OPENAI_API_KEY`; selecting Gemini or Agnes for those two features therefore also requires that compatibility key until the guard is generalized. CLI `--schema` extraction likewise retains its documented OpenAI-key preflight. Transient provider failures—including integer HTTP status codes and temporary Gemini `503 UNAVAILABLE` capacity errors—are retried with bounded backoff. Gemini structured calls request JSON Schema output, validate the decoded object, retry `MAX_TOKENS`-truncated responses, and cap output at 65,536 tokens; Agnes output requests use the same cap.
+
 ## Install and set up
 
 The primary app runs natively on Windows 11 22H2 or newer. Its first launch installs or reuses `uv`, Python 3.12, native dependencies, the CPU PP-DocLayoutV3 detector, and Windows Ollama. The existing GLM-OCR and PaddleOCR-VL-1.6 vLLM services remain isolated in Ubuntu 24.04 under WSL2.
@@ -131,6 +133,8 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
    - **Fast**: classification is the only preset-controlled AI feature.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
+
+Both enhancement controls use the selected **AI model**. **AI enhancement for failed or <75% confidence regions** performs bounded crop-based text recovery during parsing. **Enhance Markdown with AI** performs final presentation refinement without rerunning OCR. There is no separate visual-recovery switch; crop recovery follows the AI-enhancement toggle.
 5. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
 6. Choose a file from **Document results**. Native results expose Overview, Markdown, JSON, source structure, Extract, optional Chat, and Layout Tree. Annotated PDF is shown only when the pipeline produces a visual artifact.
 7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
@@ -308,10 +312,26 @@ full_json = render_combined_result(result, analysis)
 | [Local PaddleOCR-VL-1.6](docs/local-paddleocr-vl.md) | Isolated Paddle runtime installation, health checks, and troubleshooting |
 | [Azure bulk medical fax deployment](docs/azure-bulk-fax-deployment.md) | Production design and operations runbook for secure bulk medical-fax processing on Azure |
 | [Security policy](SECURITY.md) | Reporting process, deployment boundary, egress, workspace retention, and deletion |
+| [Data responsibility](DATA_RESPONSIBILITY.md) | User authority, provider choices, local protection, output review, retention, and deletion |
+| [Testing](TESTING.md) | Safe manual app testing, synthetic fixtures, contributor checks, and useful bug reports |
+| [Support](SUPPORT.md) | Best-effort help channels and reporting boundaries |
 | [Knowledge wiki](wiki/index.md) | Grounded articles for routing, evidence, pipelines, and interfaces |
 | [Changelog](CHANGELOG.md) | Released behavior from v0.6.1 backward |
 | [Contributing](CONTRIBUTING.md) | Development workflow, verification, and architecture constraints |
 | [Code of conduct](CODE_OF_CONDUCT.md) | Community standards and private conduct reporting |
+
+## Open source, support, and responsibility
+
+Grounded DocParse is open-source software under the [MIT License](LICENSE).
+Questions and troubleshooting belong in [GitHub Discussions](https://github.com/pypi-ahmad/grounded-docparse/discussions),
+reproducible bugs belong in [GitHub Issues](https://github.com/pypi-ahmad/grounded-docparse/issues),
+and vulnerabilities must use the private process in [SECURITY.md](SECURITY.md).
+Contributions are welcome under [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Test with synthetic or explicitly authorized documents and review
+[DATA_RESPONSIBILITY.md](DATA_RESPONSIBILITY.md) before processing sensitive
+material. You remain responsible for document authority, provider selection,
+local and remote copies, output review, and deletion.
 
 ## Development
 
@@ -323,7 +343,7 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 git diff --check
 ```
 
-Live evaluation is opt-in and must run inside WSL with the setup-created environment while the local GLM service is available. External references default to generated-reference diagnostics unless an explicit reference basis is supplied. Use `--glm-only` to disable and verify the absence of Luna recovery, refinement, and extraction:
+Live evaluation is opt-in and must run inside WSL with the setup-created environment while the local GLM service is available. External references default to generated-reference diagnostics unless an explicit reference basis is supplied. Use `--glm-only` to disable and verify the absence of AI recovery, refinement, and extraction:
 
 ```bash
 source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate"

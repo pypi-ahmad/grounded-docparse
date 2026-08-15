@@ -5,7 +5,8 @@ Contributions should preserve source grounding, explicit uncertainty, and determ
 By participating, you agree to follow the [code of conduct](CODE_OF_CONDUCT.md).
 Review the [technical overview](TECHNICAL.md), [usage guide](USAGE.md), and
 [security policy](SECURITY.md) before changing a public contract or trust
-boundary.
+boundary. Use [TESTING.md](TESTING.md) for manual application checks, synthetic
+test-data rules, and public bug-report guidance.
 
 ## Setup
 
@@ -39,6 +40,11 @@ git diff --check
 ```
 
 Automated tests use synthetic documents and fake OpenAI gateways. The installed `grounded-docparse` command provides the explicit native/OCR `ingest` workflow; `streamlit_app.py` remains the application entry point and `scripts/evaluate_corpus.py` runs evaluation. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment. Local OCR development still requires the WSL runtime described in [SETUP.md](SETUP.md).
+
+Public test artifacts must be synthetic or explicitly redistributable. Never
+copy document content, personal data, credentials, provider responses, or
+sensitive local paths into an issue, fixture, snapshot, or pull request. Follow
+[DATA_RESPONSIBILITY.md](DATA_RESPONSIBILITY.md).
 
 For documentation changes, also verify that every relative Markdown link resolves and every fenced block has a language identifier and closing fence. The repository does not install a dedicated Markdown-link checker.
 
