@@ -181,6 +181,10 @@ def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
     assert "uv sync" in native
     assert "--extra native --extra windows-layout" in native
     assert "grounded_docparse.windows_setup --download-layout" in native
+    assert "Stop-PreviousManagedApp" in native
+    assert "Win32_Process" in native
+    assert "-m streamlit cache clear" in native
+    assert "refusing to stop it" in native
     assert "streamlit', 'run'" in native
     assert (ROOT / "Launch-Grounded-DocParse-WSL-Legacy.cmd").is_file()
 
