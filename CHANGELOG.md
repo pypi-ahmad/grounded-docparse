@@ -8,14 +8,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+No changes yet.
+
+## [0.7.0] - 2026-08-15
+
 ### Added
 
 - Six mutually exclusive extraction engines: AI ADE, PaddleOCR-VL-1.6 vLLM, GLM-OCR vLLM, Docling with RapidOCR, PDF Inspector without OCR, and local Ollama with GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR.
 - Selectable GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash providers.
 - Native Windows application setup, CPU PP-DocLayoutV3 grounding, and automatic Ollama installation.
+- Public testing, support, and data-responsibility guides, plus structured issue and discussion routing for open-source participation.
 
 ### Changed
 
+- Made region recovery and Markdown refinement use the AI model selected in the UI, including Gemini and Agnes, instead of assuming GPT 5.6 Luna.
+- Renamed the final refinement control to **Enhance Markdown with AI** and removed the separate visual-recovery toggle; bounded crop recovery now follows the existing failed/sub-75%-confidence AI-enhancement control.
+- Added retries for transient integer and provider-specific server status codes, hardened Gemini structured responses against malformed or truncated JSON, and capped Gemini and Agnes provider output requests at 65536 tokens.
 - Fixed Local Ollama element provenance, made Local Ollama with PaddleOCR-VL the fresh-workspace default, and added offline-first first-launch preparation for native PP-DocLayoutV3 plus all three supported Ollama OCR models. Model caches now survive app uninstall.
 
 - Kept GLM-OCR and PaddleOCR-VL vLLM services isolated in WSL while moving Streamlit, native parsing, Ollama, and layout grounding to Windows.

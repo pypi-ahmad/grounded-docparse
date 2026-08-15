@@ -1,8 +1,9 @@
 [project]
 name = "grounded-docparse"
-version = "0.6.1"
+version = "0.7.0"
 description = "Grounded agentic document parser for structured Markdown and JSON"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12,<3.15"
 dependencies = [
     "defusedxml>=0.7.1,<1",
@@ -16,6 +17,11 @@ dependencies = [
     "python-dotenv>=1.1,<2",
     "streamlit[pdf]>=1.60,<2",
 ]
+
+[project.urls]
+Repository = "https://github.com/pypi-ahmad/grounded-docparse"
+Issues = "https://github.com/pypi-ahmad/grounded-docparse/issues"
+Changelog = "https://github.com/pypi-ahmad/grounded-docparse/blob/main/CHANGELOG.md"
 
 [project.scripts]
 grounded-docparse = "grounded_docparse.cli:main"
