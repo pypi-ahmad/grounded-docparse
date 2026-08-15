@@ -17,7 +17,7 @@ Grounded DocParse follows a controlled workflow:
 ```text
 Source document
     -> deterministic validation and rasterization
-    -> selected local OCR document perception
+    -> selected extraction-engine document perception
     -> grounded Markdown, layout, element IDs, and bounding boxes
     -> optional specialized reasoning tasks
     -> schema and evidence validation
@@ -30,7 +30,7 @@ This is agentic because the system coordinates several goal-oriented reasoning r
 
 ## The deterministic foundation comes first
 
-The selected local GLM-OCR or PaddleOCR-VL stage owns the document's observable structure:
+The selected grounded local engine owns the document's observable structure:
 
 - recognized text;
 - page and reading order;
@@ -39,7 +39,7 @@ The selected local GLM-OCR or PaddleOCR-VL stage owns the document's observable 
 - normalized bounding boxes; and
 - OCR confidence.
 
-These values become the evidence layer used by later reasoning. Optional Luna features may interpret or propose changes around this evidence, but they do not gain authority to freely rebuild the document.
+These values become the evidence layer used by later reasoning. Optional selected-provider features may interpret or propose changes around this evidence, but do not gain authority to rebuild the document.
 
 This separation matters. The language model is used for judgment where judgment is useful, while deterministic code preserves identity, geometry, ordering, contracts, and auditability.
 
@@ -95,7 +95,7 @@ The loops are intentionally finite. If repair still fails, the application stops
 
 The optional agentic features do not run as one unavoidable chain.
 
-- Parsing remains usable without Luna or an API key.
+- Grounded parsing remains usable without a cloud AI model or API key.
 - Visual recovery, refinement, classification, TOC generation, extraction, routing, and chat are separately controlled.
 - Extraction runs only after parsing and only when a user explicitly requests it with a schema.
 - Chat sends no request until it is enabled and a question is submitted.
@@ -110,7 +110,7 @@ The routing profile is fingerprinted at classification time. If it changes after
 
 Consider a 20-page packet containing a cover sheet, a new request, an update form, and supporting records. The business wants structured data only from new requests.
 
-1. The selected local OCR engine parses every page and creates the grounded evidence layer.
+1. The selected grounded engine parses every page and creates the evidence layer; pure AI is the explicit alternative path.
 2. The user loads a routing profile defining `new_request`, `update`, `records`, and the automatic `other` fallback.
 3. The routing agent proposes contiguous page segments and cites the elements supporting each category.
 4. Deterministic validation checks complete page coverage, category names, ranges, and cited evidence.

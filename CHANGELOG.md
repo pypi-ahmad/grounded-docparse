@@ -8,9 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- Six mutually exclusive extraction engines: pure AI, PaddleOCR-VL-1.6 vLLM, GLM-OCR vLLM, Docling with RapidOCR, PDF Inspector without OCR, and local Ollama with GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR.
+- Selectable GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash providers.
+- Native Windows application setup, CPU PP-DocLayoutV3 grounding, automatic Ollama installation, and a temporary legacy WSL app launcher.
+
 ### Changed
 
-- Aligned remaining product, security, onboarding, and knowledge-wiki documentation with the released native-document ingestion contract on `main`.
+- Kept GLM-OCR and PaddleOCR-VL vLLM services isolated in WSL while moving Streamlit, native parsing, Ollama, and layout grounding to Windows.
+- Added exclusive model load/warm/unload lifecycle and optional AI enhancement for failed or sub-75%-confidence grounded regions.
 
 ## [0.6.1] - 2026-08-13
 

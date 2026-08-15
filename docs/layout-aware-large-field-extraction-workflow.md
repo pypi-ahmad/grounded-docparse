@@ -36,8 +36,8 @@ The source document is evidence. The field specification is an instruction set. 
 
 ### Plain-language terms
 
-- **Local OCR:** The selected GLM-OCR or PaddleOCR-VL system that detects page regions and reads scanned PDFs or images.
-- **Luna:** The optional model used for selected visual repair and document-level tasks such as extraction.
+- **Grounded engine:** The selected vLLM, Docling/RapidOCR, or Ollama system that detects page regions and reads scanned PDFs or images.
+- **AI model:** Optional GPT 5.6 Luna, Gemini, or Agnes used for low-confidence repair and document-level tasks.
 - **Layout tree:** An ordered list of parsed document regions with their page, type, text, and identifier.
 - **Schema:** The approved list of output fields, descriptions, and data types.
 - **Scalar field:** One value such as a name, date, amount, identifier, or yes/no answer.
@@ -46,7 +46,7 @@ The source document is evidence. The field specification is an instruction set. 
 
 ```text
 PDF or image
-  -> selected local OCR parse
+  -> selected grounded-engine parse
   -> grounded Markdown + layout tree + element IDs + bounding boxes
 
 Native PDF or Office/open format
@@ -57,7 +57,7 @@ Field definitions
   -> approved extraction schema
 
 Parsed document + approved schema
-  -> Luna extraction
+  -> selected-provider extraction
   -> deterministic evidence validation
   -> structured JSON with grounding metadata
 ```
@@ -110,7 +110,7 @@ Choose the required OCR engine and parse options, then select **Parse document**
 - OCR confidence and review state; and
 - an annotated PDF for visual inspection.
 
-Optional Luna visual recovery can inspect a limited number of weak existing local OCR regions. It can repair eligible text but cannot create a missing region or alter canonical IDs, geometry, type, confidence, or reading order.
+Optional AI enhancement can inspect failed or sub-75%-confidence grounded regions. It can repair eligible text but cannot create a missing region or alter canonical IDs, geometry, type, confidence, or reading order.
 
 ### 4. Review the parse before extraction
 
@@ -167,13 +167,13 @@ The output should enter a business system only after the organization applies it
 
 ### Stage 1: Source ingestion and visual parsing
 
-The source PDF or image is validated and rasterized. The selected GLM-OCR or PaddleOCR-VL pipeline supplies detected geometry and recognized region content. Deterministic pipeline code normalizes the result, assigns block IDs, and may correct dense-form reading order. In this guide, “local-OCR-owned” means owned by this complete local parse stage rather than by Luna.
+The source PDF or image is validated and rasterized. The selected grounded pipeline supplies detected geometry and recognized region content. Deterministic code normalizes the result, assigns block IDs, and may correct dense-form reading order. “Local-engine-owned” means owned by this complete local parse stage rather than by the optional AI model.
 
 The result is a `ParseResult` containing both presentation Markdown and grounded base Markdown, structured document pages and blocks, public elements, metadata, and annotated PDF bytes. Block IDs are canonical within that parse result. They are not durable business identifiers and are not guaranteed to remain unchanged after reparsing, selecting a different page range, or upgrading the parser.
 
 ### Stage 2: Optional bounded visual recovery
 
-Deterministic quality signals identify weak existing local OCR regions. If enabled and credentialed, Luna receives only selected crops. Accepted recovery can replace text on an existing element, while geometry and identity remain local-OCR-owned.
+Deterministic signals identify failed or sub-75%-confidence grounded regions. If enabled and credentialed, the selected AI model receives only selected crops. Accepted recovery can replace text on an existing element, while geometry and identity remain local-engine-owned.
 
 ### Stage 3: Extraction context preparation
 
@@ -186,7 +186,7 @@ The raw PDF or page image is not part of this extraction request.
 
 ### Stage 4: Schema-constrained extraction
 
-Luna returns data that conforms to the approved schema plus evidence references to known block or atom IDs. Structured output controls the JSON shape, while deterministic validation checks the field values and evidence relationships.
+The selected AI model returns data conforming to the approved schema plus evidence references to known block or atom IDs. Deterministic validation checks values and evidence relationships.
 
 For long documents, the current agent can split the **document context** for one scalar schema and merge the strongest grounded result for each field. This does not split a 100-field schema into smaller field groups. Nested object or array schemas use the direct extraction path and do not receive this scalar context merge.
 
@@ -405,7 +405,7 @@ Visible source-document text can also contain instructions intended to manipulat
 
 For the proposed Markdown uploader, parse the file as UTF-8 field-definition text. Do not fetch remote links or embedded resources, and do not render raw HTML from the uploaded specification. Display a sanitized preview before schema approval.
 
-When Luna features are used, selected recovery crops or recognized Markdown/layout context leave the workstation for the configured OpenAI-compatible endpoint. Operators must use an approved endpoint and verify its retention, residency, and access policies. Application requests set `store=False`, but that setting does not control intermediary proxies or a custom endpoint. Provider timeout or credential failure should leave the completed local OCR parse intact and mark the optional extraction attempt as failed rather than fabricating a result.
+When AI features are used, selected recovery crops or recognized Markdown/layout context leave the workstation for the selected OpenAI, Google, or Agnes provider. Operators must approve its retention, residency, and access policies. Provider timeout or credential failure leaves a completed local parse intact and marks the optional attempt failed rather than fabricating a result.
 
 ## General Applicability
 
@@ -430,8 +430,8 @@ Add Markdown field-specification upload as an optional post-parse schema-authori
 
 This design preserves the current architecture:
 
-- The selected local OCR parse remains the source of document structure and geometry.
-- Luna interprets the approved field requirements and extracts from structured text context.
+- The selected grounded-engine parse remains the source of document structure and geometry.
+- The selected AI model interprets approved field requirements and extracts from structured text context.
 - Deterministic code validates evidence and supplies bounding boxes.
 - The source PDF or image is never reread during schema extraction.
 

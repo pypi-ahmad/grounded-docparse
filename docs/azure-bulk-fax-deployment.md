@@ -204,7 +204,7 @@ Events may arrive before or after the manifest and in any order. The database re
 
 ### 7. Add a provider factory
 
-The current gateway requires `OPENAI_API_KEY`, constructs the official `OpenAI` client, and hardcodes `gpt-5.6-luna`. Replace that startup contract with administrator-owned configuration:
+The workstation gateway supports OpenAI, Google Gemini, and Agnes credentials selected in the UI. A production deployment should replace workstation environment discovery with administrator-owned secret and model configuration:
 
 | Setting | Meaning |
 | --- | --- |

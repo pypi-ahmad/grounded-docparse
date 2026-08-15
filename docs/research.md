@@ -7,7 +7,7 @@ The accuracy strategy is intentionally bounded.
 For scanned PDFs, images, and Mixed PDF OCR pages:
 
 - rasterize those pages and ignore selectable PDF text on the OCR route;
-- use the selected local GLM-OCR or PaddleOCR-VL pipeline for every element, box, and reading-order decision;
+- use the selected grounded local engine for every element, box, and reading-order decision;
 - rank weak existing regions with deterministic quality signals;
 - send only selected crops to Luna for medium-effort visual recovery; and
 - accept only high-confidence text corrections while preserving local OCR structure.

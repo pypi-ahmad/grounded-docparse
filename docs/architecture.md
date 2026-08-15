@@ -2,20 +2,21 @@
 
 ## System boundary
 
-The application is one synchronous Streamlit process with explicit per-file document routing. Scanned PDFs and images use one selected local OCR stack: GLM-OCR/vLLM (or Ollama fallback) or PaddleOCR-VL-1.6 with its PaddleX API. Native PDFs use `pdf-inspector`; Office and open formats use Docling without OCR. There is no HTTP application API, queue, worker service, production job service, remote artifact store, or multi-user authentication layer. One active local batch workspace survives process restarts: SQLite stores metadata while sibling filesystem artifacts store sources and parse outputs. SQLite also persists reusable extraction schemas and routing profiles.
+The application is one synchronous native-Windows Streamlit process with explicit per-file routing and six mutually exclusive extraction engines. GLM-OCR and PaddleOCR-VL keep their existing WSL vLLM services; Ollama, CPU PP-DocLayoutV3, Docling/RapidOCR, and PDF Inspector run on Windows. There is no HTTP application API, queue, worker service, production job service, remote artifact store, or multi-user authentication layer.
 
 ```text
 Browser
   -> Streamlit (`streamlit_app.py`)
      -> required processing-type selection and signature/container validation
-     -> scanned PDF/image: rasterization -> selected local OCR
-        -> GLM-OCR SDK -> vLLM/Ollama (`glm-ocr`, port 8080)
+     -> scanned PDF/image: rasterization -> selected extraction engine
+        -> Windows CPU PP-DocLayoutV3 -> GLM vLLM (port 8080) or Windows Ollama
         -> PaddleX API (port 8119) -> PaddleOCR-VL vLLM (port 8118)
+        -> Docling + RapidOCR, or direct pure-AI extraction
      -> native PDF: `pdf-inspector` text/layout/table positions
      -> mixed PDF: confirmed per-page native/OCR merge
      -> Office/open formats: Docling SimplePipeline without OCR or enrichments
      -> immutable native source spans or OCR elements
-     -> optional Luna/LangExtract document features
+     -> optional selected-provider enhancement and LangExtract features
   -> downloads and source highlighting
 ```
 
@@ -23,7 +24,8 @@ Browser
 
 | Path | Responsibility |
 | --- | --- |
-| `Setup-GLM-OCR.cmd` / `Launch-*.cmd` | Windows bootstrap and engine-selecting launch entry points |
+| `Launch-Grounded-DocParse.cmd` / `scripts/windows/` | Native Windows setup, launch, and process lifecycle |
+| `Setup-GLM-OCR.cmd` / `Setup-PaddleOCR-VL-1.6.cmd` | WSL GPU-service provisioning and warmup |
 | `streamlit_app.py` | Batch upload, engine selection, modes, progress, tabs, schema UI, chat, downloads |
 | `src/grounded_docparse/batch.py` | Upload limits, stable document identity, and batch archive records |
 | `src/grounded_docparse/cli.py` | Installed synchronous batch parsing, schema loading, manifests, and filesystem outputs |
@@ -32,14 +34,15 @@ Browser
 | `src/grounded_docparse/native_parsers.py` / `docling_native.py` | `pdf-inspector` and OCR-disabled Docling adapters |
 | `src/grounded_docparse/workspace_store.py` | Durable active-batch metadata, parse checkpoints, progress, and local artifacts |
 | `src/grounded_docparse/__init__.py` | Package-root public exports |
-| `src/grounded_docparse/config.py` | `ParserConfig`, analysis thresholds, environment parsing, fixed Luna model |
+| `src/grounded_docparse/config.py` | Engine/model enums, parser thresholds, endpoints, and environment parsing |
 | `src/grounded_docparse/ingest.py` | Input validation, PDF/image rasterization, region rerendering |
-| `src/grounded_docparse/local_ocr.py` | Process-wide GLM-OCR runtime and SDK-result normalization |
+| `src/grounded_docparse/grounded_ocr.py` | CPU PP-DocLayoutV3 detection and crop-grounded GLM/Ollama recognition |
+| `src/grounded_docparse/ollama_runtime.py` | Ollama model lifecycle and region recognition |
 | `src/grounded_docparse/paddle_ocr.py` | PaddleX document-parser client and result normalization |
 | `src/grounded_docparse/page_analysis.py` | Page quality signals and selected-engine region conversion |
 | `src/grounded_docparse/quality.py` | Deterministic block quality, verification, and document quality aggregation |
 | `src/grounded_docparse/pipeline.py` | Parse orchestration, recovery selection, deterministic validation, hierarchy |
-| `src/grounded_docparse/gateways.py` | OpenAI Responses API calls, Structured Outputs, usage and trace collection |
+| `src/grounded_docparse/gateways.py` | OpenAI, Gemini, and Agnes gateway selection, usage, and trace collection |
 | `src/grounded_docparse/prompts.py` | Versioned prompt templates for Luna document features |
 | `src/grounded_docparse/enhancement.py` | Bounded Markdown-refinement chunks and presentation-plan application |
 | `src/grounded_docparse/agentic.py` | Prepared contexts, classification, TOC, extraction orchestration, chat |
@@ -72,20 +75,20 @@ Worker progress is queued and replayed on the Streamlit caller thread. Pages are
 
 ## Ownership and recovery contract
 
-| Data | Owner | Luna recovery may change it? |
+| Data | Owner | AI enhancement may change it? |
 | --- | --- | --- |
 | Element ID | Local OCR/deterministic pipeline | No |
 | Normalized bounding box | Local OCR | No |
 | Type and structure | Local OCR/deterministic pipeline | No |
 | Reading order | Local OCR/deterministic pipeline | No |
 | OCR confidence | Local OCR | No |
-| Existing element text | Local OCR initially | Yes, with a crop-backed confidence of at least `0.85` |
+| Existing element text | Grounded engine initially | Yes, only for failed or sub-75%-confidence candidates passing response validation |
 | Refined Markdown presentation | Deterministic renderer from Luna directives | Yes, without changing grounded text |
-| Classification, TOC, extraction, chat | Luna plus deterministic validation | Feature-specific output only |
+| Classification, TOC, extraction, chat | Selected AI model plus deterministic validation | Feature-specific output only |
 
-Luna additions, rejections, geometry changes, structural changes, and order changes are ignored. The default application never asks Luna to synthesize a missing local OCR region or replace a full page. If at least one page is nonblank and none of the nonblank pages contains a layout region, parsing fails before recovery. An isolated failed page remains in partial output with warnings.
+AI additions, geometry changes, structural changes, and order changes are ignored. Enhancement never synthesizes a missing detector region or replaces a full page. If at least one page is nonblank and none of the nonblank pages contains a layout region, grounded parsing fails before enhancement.
 
-Recovery candidates include OCR confidence below `0.55`, empty large regions, low character density, high garbage ratio, and weak table structure. Selection is document-wide and severity-ranked. Recovery is optional and unavailable without `OPENAI_API_KEY`.
+The UI's AI-enhancement phase considers recognition failures and confidence below `0.75`. It is optional and unavailable without the key required by the selected cloud model.
 
 ## Agentic layer
 
@@ -107,7 +110,7 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 Parse JSON schema version is `4.5.0`. Full JSON is `4.6.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 
-Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes always remain owned by the selected local OCR engine.
+Markdown source spans target `base_markdown`, not presentation-refined Markdown. Normalized boxes remain owned by the selected grounded engine.
 
 Native JSON is schema version `5.0.0`; combined native/extraction JSON is `5.1.0`. Its canonical evidence is frozen `base_text`, with Unicode-codepoint source spans resolving to `SourceAnchor` values. Native nonvisual results do not contain annotated-PDF bytes.
 

@@ -66,7 +66,7 @@ Do not include API keys, bearer tokens, source documents, crops, local data, or 
 ## Architecture constraints
 
 - Models may propose typed evidence; deterministic code derives stable IDs from local OCR regions and owns validation, hierarchy, and export policy.
-- Selected local OCR originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. Luna recovery may change only high-confidence text on existing elements.
+- A grounded local engine originates element identity, geometry, type, confidence, and reading order; deterministic code may normalize IDs and correct dense-form ordering. AI enhancement may change only text on failed or sub-75%-confidence existing regions.
 - Native formats require an explicit compatible `ProcessingType`; preserve signature/container validation and never add a silent route or OCR fallback. Mixed PDFs require one reviewed route per page and retain original page order.
 - Native parsers must preserve immutable `base_text`, exact character spans, and `SourceAnchor` evidence. Docling native conversion must keep OCR, VLM/model enrichments, remote services, and external plugins disabled; embedded images are assets, not OCR input.
 - Unsupported text must remain unresolved or rejected in strict outputs.

@@ -151,7 +151,7 @@ GLM parsing does not require an OpenAI credential. Set user-level values only wh
 
 Use `GOOGLE_API_KEY` for Gemini or `AGNES_API_KEY` for Agnes 2.5 Flash. `AGNES_BASE_URL` is optional. Equivalent names may be placed in a private root `.env` on other machines; process and User environment values take precedence. Never commit real credentials.
 
-The Windows launcher reads user scope directly, so a newly saved value does not require reopening the terminal. It restarts a managed Streamlit process when either Luna value changes. An unmanaged process on port `8600` is never restarted or adopted. Never store a real key in `.env`, Markdown, scripts, commits, or issue reports. The model identifier is fixed in code as `gpt-5.6-luna`.
+The Windows launcher reads User scope directly, so a newly saved value does not require reopening the terminal. Restart the managed app after changing provider values. A process already listening on port `8600` is not terminated or adopted. Never store a real key in committed files, logs, or issue reports. The UI selects among GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash.
 
 ## Configuration reference
 
@@ -176,7 +176,11 @@ The Windows launcher reads user scope directly, so a newly saved value does not 
 | `DOCPARSE_PROVIDER_COOLDOWN_SECONDS` | `1.0` | Minimum cooldown after HTTP 429 |
 | `DOCPARSE_PROVIDER_SUCCESS_WINDOW` | `10` | Successes before reduced concurrency increases |
 | `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Enables local GLM analysis |
-| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr` or `paddleocr-vl-1.6` |
+| `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr`, `paddleocr-vl-1.6`, or `ollama` for parser API calls |
+| `DOCPARSE_GLM_VLLM_BASE_URL` | `http://127.0.0.1:8080/v1` | Loopback GLM recognition endpoint |
+| `DOCPARSE_OLLAMA_MODEL` | `glm-ocr:latest` | Selected Ollama OCR model |
+| `DOCPARSE_GROUNDED_OCR_TIMEOUT_SECONDS` | `900` | Per-region GLM/Ollama recognition timeout |
+| `DOCPARSE_LAYOUT_DETECTION_THRESHOLD` | `0.3` | Native CPU PP-DocLayoutV3 detection threshold |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM-OCR SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout-model device |
 | `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback-only full PaddleX document-parser API; remote origins are rejected because document bytes are posted here |
@@ -189,8 +193,8 @@ Additional application/runtime variables:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `DOCPARSE_PRELOAD_LOCAL_OCR` | `false` | Preloads GLM-OCR at Streamlit startup; WSL launcher sets `true` |
-| `DOCPARSE_STUDIO_DB_PATH` | `data/document_studio.sqlite3` | Reusable schema database |
+| `DOCPARSE_PRELOAD_LOCAL_OCR` | `false` | Legacy WSL app preload control |
+| `DOCPARSE_STUDIO_DB_PATH` | `%LOCALAPPDATA%\GroundedDocParse\studio.sqlite3` under the native launcher | Reusable schemas and durable workspace |
 | `DOCPARSE_WSL_ENV` | `~/.local/share/grounded-docparse/.venv` | WSL virtual-environment path |
 | `GLMOCR_GPU_MEMORY_UTILIZATION` | `0.85` | vLLM GPU-memory fraction |
 | `GLMOCR_MAX_MODEL_LEN` | `32768` | vLLM context length; must accommodate the 8192-token OCR output allowance plus input tokens |
@@ -216,7 +220,7 @@ Analysis thresholds use `DOCPARSE_ANALYSIS_<FIELD>`. These variables and default
 
 `DOCPARSE_FULL_PAGE_FALLBACK_FRACTION` remains accepted by `ParserConfig` for compatibility, but the current strict application path does not perform Luna full-page fallback.
 
-Set `GLMOCR_*` variables and `DOCPARSE_WSL_ENV` inside WSL. The Windows launchers forward only `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and the repository path.
+Set `GLMOCR_*` variables and `DOCPARSE_WSL_ENV` inside WSL. The native launcher imports provider and Ollama values into the Windows app process; it forwards only the repository path when managing WSL services.
 
 ## Verification
 

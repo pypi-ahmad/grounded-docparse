@@ -29,8 +29,9 @@ another route.
 
 ### Scanned PDFs and images
 
-Pages are rasterized and sent to the selected GLM-OCR or PaddleOCR-VL stack.
-The local OCR engine owns layout, element identity, type, confidence, bounding
+Pages are rasterized and sent to the selected extraction engine. Native Windows
+PP-DocLayoutV3 grounds GLM-OCR vLLM and Ollama crops; PaddleOCR-VL retains its
+full WSL Paddle pipeline. The grounded engine owns layout, element identity, type, confidence, bounding
 boxes, and reading order. Deterministic quality analysis may request bounded
 text recovery, but recovery cannot add regions or alter geometry.
 
