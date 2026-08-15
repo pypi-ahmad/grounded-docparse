@@ -7,6 +7,7 @@ import pymupdf
 import pytest
 
 from grounded_docparse.config import ParserConfig
+from grounded_docparse.content_range import AppliedContentRange, ContentUnit
 from grounded_docparse.models import Block, BoundingBox, Document, Page, ParseResult
 from grounded_docparse.native import PageRoute, ProcessingType
 from grounded_docparse.native_parsers import PdfInspectorParser
@@ -191,3 +192,34 @@ def test_mixed_ocr_to_native_override_fails_without_ocr_fallback() -> None:
         )
 
     assert legacy.calls == 0
+
+
+def test_mixed_pdf_range_keeps_original_page_indices() -> None:
+    parser = PdfInspectorParser(
+        ParserConfig(), FakeLegacyParser(), pdf_module=FakePdfInspector()
+    )
+    selected = AppliedContentRange(
+        start=2,
+        end=3,
+        unit=ContentUnit.PAGE,
+        total=3,
+    )
+
+    result = parser.parse(
+        _pdf(),
+        "mixed.pdf",
+        processing_type=ProcessingType.MIXED_PDF,
+        page_routes={1: PageRoute.NATIVE, 2: PageRoute.OCR, 3: PageRoute.NATIVE},
+        inspection=PdfInspection(
+            pdf_type="mixed",
+            page_count=3,
+            pages_needing_ocr=frozenset({2}),
+        ),
+        content_range=selected,
+    )
+
+    assert [unit.index for unit in result.document.units] == [2, 3]
+    assert [element.source.anchor.page for element in result.document.elements] == [2, 3]
+    assert result.document.content_range == selected
+    with pymupdf.open(stream=result.annotated_pdf, filetype="pdf") as annotated:
+        assert annotated.page_count == 3

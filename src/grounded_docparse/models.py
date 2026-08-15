@@ -8,6 +8,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, model_validator
 
+from .content_range import AppliedContentRange
+
 
 class NodeType(StrEnum):
     HEADING = "heading"
@@ -1010,6 +1012,7 @@ class ParseMetadata(BaseModel):
     ocr_comparison_secondary_engine: str | None = None
     model_versions: dict[str, str] = Field(default_factory=dict)
     enhancement: EnhancementMetadata = Field(default_factory=EnhancementMetadata)
+    content_range: AppliedContentRange | None = None
 
 
 @dataclass(slots=True)

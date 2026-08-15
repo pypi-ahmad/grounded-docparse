@@ -2,6 +2,7 @@
 
 from .agentic import DocumentAgent, PreparedDocumentContext
 from .config import AlternateOcrEngine, OcrEngine, ParserConfig
+from .content_range import AppliedContentRange, ContentRange, ContentRangeInfo, ContentUnit
 from .extraction import DocumentExtractor
 from .models import (
     AgenticAnalysis,
@@ -56,10 +57,12 @@ from .universal import (
     PdfInspection,
     ProcessingTypeMismatch,
     UniversalDocumentParser,
+    inspect_content_range,
 )
 
 __all__ = [
     "AgenticAnalysis",
+    "AppliedContentRange",
     "AlternateOcrEngine",
     "CellSourceAnchor",
     "CharacterInterval",
@@ -67,6 +70,9 @@ __all__ = [
     "ChatSource",
     "ClassifierCategory",
     "ClassifierProfile",
+    "ContentRange",
+    "ContentRangeInfo",
+    "ContentUnit",
     "CsvSourceAnchor",
     "Document",
     "DocumentAgent",
@@ -114,4 +120,5 @@ __all__ = [
     "render_native_combined_result",
     "render_native_document",
     "translate_stored_schema",
+    "inspect_content_range",
 ]
