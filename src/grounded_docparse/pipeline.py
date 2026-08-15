@@ -1715,12 +1715,18 @@ class DocumentParser:
         self,
         config: ParserConfig | None = None,
         *,
-        gateway_factory: Callable[[ParserConfig], object] = OpenAIDocumentGateway,
+        gateway_factory: Callable[[ParserConfig], object] | None = None,
         ocr_service_switcher: Callable[[OcrEngine], None] = ensure_managed_ocr_engine,
     ) -> None:
         self.config = config or ParserConfig.from_env()
-        self.gateway_factory = gateway_factory
+        self._uses_default_gateway = gateway_factory is None
+        self.gateway_factory = gateway_factory or OpenAIDocumentGateway
         self.ocr_service_switcher = ocr_service_switcher
+
+    def _provider_available(self) -> bool:
+        return not self._uses_default_gateway or bool(
+            os.getenv(self.config.cloud_model.api_key_name)
+        )
 
     def _cross_check_uncertain_regions(
         self,
@@ -1894,19 +1900,16 @@ class DocumentParser:
         glm_recovery_statuses: dict[RecoveryBoxKey, str] | None = None,
         ocr_comparisons: dict[RecoveryBoxKey, OcrComparisonResult] | None = None,
     ) -> _ProcessedPage:
-        recovery_available = visual_recovery and (
-            self.gateway_factory is not OpenAIDocumentGateway
-            or bool(os.getenv("OPENAI_API_KEY"))
-        )
+        recovery_available = visual_recovery and self._provider_available()
         gateway = (
             _UnavailableGateway(
                 "disabled by user"
                 if not visual_recovery
-                else "OPENAI_API_KEY is not set"
+                else f"{self.config.cloud_model.api_key_name} is not set"
             )
             if not visual_recovery
             or (
-                self.gateway_factory is OpenAIDocumentGateway
+                self._uses_default_gateway
                 and not recovery_available
             )
             else self.gateway_factory(self.config)
@@ -2636,27 +2639,37 @@ class DocumentParser:
         if not enabled:
             return (
                 base_markdown,
-                EnhancementMetadata(enabled=False, status="off"),
+                EnhancementMetadata(
+                    enabled=False,
+                    status="off",
+                    model=self.config.cloud_model.value,
+                ),
                 RunUsage(),
                 [],
                 0.0,
             )
-        if self.gateway_factory is not OpenAIDocumentGateway:
+        if not self._uses_default_gateway:
             return (
                 base_markdown,
                 EnhancementMetadata(
                     status="unavailable",
+                    model=self.config.cloud_model.value,
                     warnings=["Custom gateway does not enable Markdown refinement"],
                 ),
                 RunUsage(),
                 [],
                 0.0,
             )
-        if not os.getenv("OPENAI_API_KEY"):
-            warning = "Markdown refinement unavailable: OPENAI_API_KEY is not set"
+        if not self._provider_available():
+            api_key_name = self.config.cloud_model.api_key_name
+            warning = f"Markdown refinement unavailable: {api_key_name} is not set"
             return (
                 base_markdown,
-                EnhancementMetadata(status="unavailable", warnings=[warning]),
+                EnhancementMetadata(
+                    status="unavailable",
+                    model=self.config.cloud_model.value,
+                    warnings=[warning],
+                ),
                 RunUsage(),
                 [],
                 0.0,
@@ -2673,6 +2686,7 @@ class DocumentParser:
                 base_markdown,
                 EnhancementMetadata(
                     status=status,
+                    model=self.config.cloud_model.value,
                     chunks_total=len(skipped_pages),
                     warnings=warnings,
                 ),
@@ -2735,6 +2749,7 @@ class DocumentParser:
             combine_page_markdown(document, refined_pages),
             EnhancementMetadata(
                 status=status,
+                model=self.config.cloud_model.value,
                 chunks_total=len(chunks) + len(skipped_pages),
                 chunks_enhanced=succeeded,
                 warnings=warnings,
@@ -2758,7 +2773,7 @@ class DocumentParser:
         analyzer = PageAnalyzer(self.config)
         local_analysis_enabled = (
             self.config.local_ocr_enabled
-            and self.gateway_factory is OpenAIDocumentGateway
+            and self._uses_default_gateway
         )
         with tempfile.TemporaryDirectory(prefix="docparse-") as temporary:
             workdir = Path(temporary)
@@ -2783,10 +2798,7 @@ class DocumentParser:
             recovered_region_ids: set[str] = set()
             visual_recovery_crops = 0
             total = len(source.pages)
-            effective_visual_recovery = visual_recovery and (
-                self.gateway_factory is not OpenAIDocumentGateway
-                or bool(os.getenv("OPENAI_API_KEY"))
-            )
+            effective_visual_recovery = visual_recovery and self._provider_available()
             progress_events: SimpleQueue[ProgressEvent] = SimpleQueue()
 
             def queue_progress(event: ProgressEvent) -> None:
