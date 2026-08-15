@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-ddfa7664ade5",
-    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
+    "id": "content-c93637e72f7d",
+    "base_commit": "bff17eec66afe7633d629fc193ef275cc09b19d9",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:44:11.328906+00:00",
+  "generated_at": "2026-08-15T15:20:47.110236+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -211,13 +211,13 @@
     },
     {
       "path": "tests/test_docling_native_parser.py",
-      "sha256": "3df54de29f89885ad2cb887bc717e126a886fcf88140ff4d5968ad3abbea3f1a",
-      "size": 10944
+      "sha256": "1e09762ecb31b992f6fad9c2b4f4048eea1e15a5f7c4392587639a8fc2d5ba2b",
+      "size": 11978
     },
     {
       "path": "tests/test_engine_selection.py",
-      "sha256": "83bdd8359ec6728db1e82cb74ae7c0a00740bdf049d71fed4e376f79d449fe5a",
-      "size": 6320
+      "sha256": "9fe780850710d053afe603204bf81a3bd87004774072a66c8d11b604c20c1df9",
+      "size": 7787
     },
     {
       "path": "tests/test_evaluation_calibration.py",
@@ -311,8 +311,8 @@
     },
     {
       "path": "tests/test_page_analysis.py",
-      "sha256": "178795c76c4053da5fabd35bf837a71aa6ec4fa89a81af23b369ceef7379b120",
-      "size": 13141
+      "sha256": "9b4ebce26eaf675f9f74b0f13bdbc35cb7cdaabd1a62155d49afc3697faaddcb",
+      "size": 13538
     },
     {
       "path": "tests/test_parallel_pages.py",
@@ -331,8 +331,8 @@
     },
     {
       "path": "tests/test_rapidocr_runtime.py",
-      "sha256": "cfaf31683439a61217ba26be55395b54b5a5e3a9f3603bfa0c54d8cc812477a3",
-      "size": 853
+      "sha256": "cfc860768b807196edefa782f419294f3435cb260fa69bc830cc47253ac274fc",
+      "size": 4063
     },
     {
       "path": "tests/test_regression_policy.py",
@@ -386,8 +386,8 @@
     },
     {
       "path": "tests/test_windows_setup.py",
-      "sha256": "0ab1e727817eb76a6aa4cd18ecad26236ed0aed47407db4016d56f12b4c22ddd",
-      "size": 1339
+      "sha256": "987d18349b43f0065d790abe5f6915b9f3610ccee689b102c6cfb788f6094de6",
+      "size": 2359
     },
     {
       "path": "tests/test_workspace_store.py",
