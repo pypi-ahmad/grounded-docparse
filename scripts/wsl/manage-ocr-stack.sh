@@ -93,17 +93,6 @@ stop_managed() {
   return 1
 }
 
-glm_backend() {
-  local backend="${DOCPARSE_LOCAL_OCR_BACKEND:-}"
-  if [[ -z "$backend" && -f "$WSL_ENV/.docparse-local-ocr-backend" ]]; then
-    backend="$(<"$WSL_ENV/.docparse-local-ocr-backend")"
-  fi
-  if [[ -z "$backend" ]]; then
-    if nvidia-smi >/dev/null 2>&1; then backend="vllm"; else backend="ollama"; fi
-  fi
-  printf '%s' "$backend"
-}
-
 glm_environment_current() {
   local backend="$1" lock_marker lock_hash
   lock_marker="$WSL_ENV/.docparse-lock-$backend"
@@ -116,8 +105,7 @@ glm_environment_current() {
 
 stop_glm() {
   stop_managed "$RUNTIME_DIR/vllm.pid" "vllm serve" "GLM vLLM"
-  stop_managed "$RUNTIME_DIR/ollama.pid" "ollama serve" "GLM Ollama"
-  for port in 8080 11434; do
+  for port in 8080; do
     if port_is_listening "$port"; then
       echo "ERROR: Port $port remains occupied by an unmanaged process." >&2
       return 1
@@ -137,10 +125,11 @@ stop_paddle() {
 }
 
 ensure_glm() {
-  local backend port log pid_file command ready_url
-  backend="$(glm_backend)"
-  if [[ "$backend" != "vllm" && "$backend" != "ollama" ]]; then
-    echo "ERROR: Invalid GLM backend: $backend" >&2
+  local backend=vllm port=8080 log="$RUNTIME_DIR/vllm.log"
+  local pid_file="$RUNTIME_DIR/vllm.pid" command="vllm serve"
+  local ready_url="http://127.0.0.1:8080/v1/models"
+  if ! nvidia-smi >/dev/null 2>&1; then
+    echo "ERROR: GLM-OCR vLLM requires a supported NVIDIA GPU; select Local Ollama explicitly for CPU/local inference." >&2
     return 1
   fi
   stop_paddle || return 1
@@ -153,13 +142,6 @@ ensure_glm() {
   export HF_HOME="${HF_HOME:-$APP_DATA_DIR/huggingface}"
   export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
   "$WSL_ENV/bin/python" scripts/wsl/prepare_glmocr_runtime.py --offline --backend "$backend" >/dev/null || return 1
-  if [[ "$backend" == "vllm" ]]; then
-    port=8080; log="$RUNTIME_DIR/vllm.log"; pid_file="$RUNTIME_DIR/vllm.pid"
-    command="vllm serve"; ready_url="http://127.0.0.1:8080/v1/models"
-  else
-    port=11434; log="$RUNTIME_DIR/ollama.log"; pid_file="$RUNTIME_DIR/ollama.pid"
-    command="ollama serve"; ready_url="http://127.0.0.1:11434/api/tags"
-  fi
   if curl --fail --silent "$ready_url" | grep -q 'glm-ocr'; then
     "$WSL_ENV/bin/python" scripts/wsl/check-glmocr-api.py || return 1
     printf '%s\n' "glm-ocr" >"$ACTIVE_FILE"
@@ -171,12 +153,8 @@ ensure_glm() {
     echo "ERROR: Port $port is occupied by an unmanaged process." >&2
     return 1
   fi
-  echo "Starting GLM-OCR with $backend..."
-  if [[ "$backend" == "vllm" ]]; then
-    nohup bash scripts/wsl/serve-glmocr.sh 9>&- >"$log" 2>&1 &
-  else
-    nohup bash scripts/wsl/serve-ollama.sh 9>&- >"$log" 2>&1 &
-  fi
+  echo "Starting GLM-OCR with vLLM..."
+  nohup bash scripts/wsl/serve-glmocr.sh 9>&- >"$log" 2>&1 &
   echo "$!" >"$pid_file"
   wait_for_url "$ready_url" 450 "$log" || return 1
   "$WSL_ENV/bin/python" scripts/wsl/check-glmocr-api.py || return 1

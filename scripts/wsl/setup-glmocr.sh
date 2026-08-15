@@ -59,7 +59,6 @@ if [[ -f "$WSL_ENV/.docparse-local-ocr-ready-$BACKEND" && \
     "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers, vllm'
   else
     "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers'
-    bash scripts/wsl/setup-ollama.sh
   fi
   if HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
     "$WSL_ENV/bin/python" scripts/wsl/prepare_glmocr_runtime.py \
@@ -74,7 +73,6 @@ if [[ "$BACKEND" == "vllm" ]]; then
 else
   "$UV_BIN" sync --locked --extra local-ocr-cpu --extra native
   "$WSL_ENV/bin/python" -c 'import docling, glmocr, langextract, pdf_inspector, torch, transformers'
-  bash scripts/wsl/setup-ollama.sh
 fi
 echo "Downloading and pinning GLM-OCR model snapshots..."
 HF_HUB_OFFLINE=0 TRANSFORMERS_OFFLINE=0 \
