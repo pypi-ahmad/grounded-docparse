@@ -10,7 +10,7 @@
    - **Full**: Markdown refinement, classification, and TOC.
    - **Custom**: change individual refinement, classification, or TOC toggles.
    “ADE mode” is only a preset selector for optional AI features.
-7. For every engine except **AI ADE**, enable **AI enhancement for failed or <75% confidence regions** only when remote crop repair is wanted. **Enhance Markdown with AI** uses the same selected model for presentation refinement without rerunning OCR. There is no separate visual-recovery switch. Enable document chat only if needed.
+7. Optionally select a format-specific content range. For every engine except **AI ADE**, enable **AI enhancement for failed or <75% confidence regions** only when remote crop repair is wanted. **Enhance Markdown with AI** uses the same selected model for presentation refinement without rerunning OCR. There is no separate visual-recovery switch. Enable document chat only if needed.
 8. Select **Parse document**. Native results expose Markdown, JSON, and **Source Structure**; an **Annotated PDF** tab appears only when the selected route produces one.
 9. Open Extract. Native extraction uses immutable `base_text` and accepts only values with exact intervals that resolve to source anchors. OCR extraction continues to use existing element evidence.
 10. For a mixed-form scanned PDF, enable **Use custom form routing**. Create or import a routing profile, review the suggested segments, and extract only approved eligible categories.

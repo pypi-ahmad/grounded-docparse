@@ -1,7 +1,7 @@
 ---
 tags: security, privacy, trust-boundaries
 sources: SECURITY.md, docs/spec.md, src/grounded_docparse/native_extraction.py
-snapshot: content-063b756c4b68
+snapshot: content-0724dc478444
 status: released
 ---
 

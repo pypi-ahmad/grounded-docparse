@@ -99,7 +99,7 @@ The current app runs one extraction schema at a time and retains only the latest
 
 ### 3. Upload and parse the source document
 
-Upload one supported document and select its required processing type. For scanned PDFs, select an inclusive page range when only part of the document is relevant. For Mixed PDF, confirm every Native/OCR page route.
+Upload one supported document and select its required processing type. Select an inclusive format-specific content range when only part of the document is relevant. For Mixed PDF, confirm the Native/OCR routes used by the selected pages.
 
 Choose the required OCR engine and parse options, then select **Parse document**. Local OCR reads the complete page layout and produces:
 

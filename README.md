@@ -126,7 +126,7 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 
 ## How to use the app
 
-1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only for one scanned PDF; native and mixed inputs process the selected document structure/pages.
+1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. Every file has an optional inclusive content range stored independently in its workspace: pages, TIFF frames, slides, sheets, EPUB sections, document blocks, or CSV rows as appropriate.
 2. Select a processing type for every file in **Processing types**. For Mixed PDF, review the suggested page routes, override any page, and confirm the complete table before processing.
 3. Select exactly one extraction-engine toggle. For **Local Ollama**, also select GLM-OCR, PaddleOCR-VL-1.6, or DeepSeek-OCR. Choose the AI model separately when using **AI ADE** or optional enhancement.
 4. For a vLLM or Ollama engine, optionally enable the audit-only local OCR cross-check and choose its alternate engine. For every engine except **AI ADE**, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
@@ -135,7 +135,7 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
    - **Custom**: any other combination of those toggles.
 
 Both enhancement controls use the selected **AI model**. **AI enhancement for failed or <75% confidence regions** performs bounded crop-based text recovery during parsing. **Enhance Markdown with AI** performs final presentation refinement without rerunning OCR. There is no separate visual-recovery switch; crop recovery follows the AI-enhancement toggle.
-5. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
+5. Select **Parse document** or **Process documents**. The progress bar shows the overall batch percentage. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
 6. Choose a file from **Document results**. Native results expose Overview, Markdown, JSON, source structure, Extract, optional Chat, and Layout Tree. Annotated PDF is shown only when the pipeline produces a visual artifact.
 7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
 
@@ -230,7 +230,7 @@ Annotated PDF bytes are downloaded separately and are not embedded in JSON. Nati
 
 ## Public Python API
 
-The package exports `DocumentParser`, `UniversalDocumentParser`, `DocumentAgent`, `DocumentExtractor`, `ParserConfig`, `ProcessingType`, `SourceAnchor` models, result models, and native/legacy render helpers.
+The package exports `DocumentParser`, `UniversalDocumentParser`, `ContentRange`, `ContentUnit`, `DocumentAgent`, `DocumentExtractor`, `ParserConfig`, `ProcessingType`, `SourceAnchor` models, result models, and native/legacy render helpers.
 
 ```python
 from pathlib import Path
@@ -238,6 +238,7 @@ from pathlib import Path
 from grounded_docparse import (
     DocumentAgent,
     DocumentParser,
+    ContentRange,
     ProcessingType,
     UniversalDocumentParser,
     render_combined_result,
@@ -255,6 +256,7 @@ native_result = UniversalDocumentParser().parse(
     source.read_bytes(),
     source.name,
     processing_type=ProcessingType.NATIVE_PDF,
+    content_range=ContentRange(start=2, end=4),
 )
 
 agent = DocumentAgent()

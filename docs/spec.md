@@ -8,7 +8,7 @@ Parse native documents, scanned PDFs, and images into grounded Markdown and stru
 
 - Up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, and images; 250 MB per file and 1 GB combined
 - Required independent processing type for every file: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`
-- Optional inclusive contiguous page range when exactly one scanned PDF is uploaded
+- Optional inclusive contiguous per-document range for every supported format, using natural pages, frames, slides, sheets, sections, blocks, or rows
 - Selectable AI model and optional AI-feature toggles
 - Optional reusable scalar extraction schemas and custom form-routing profiles
 - Optional document-chat questions after parsing
@@ -47,8 +47,8 @@ Parse native documents, scanned PDFs, and images into grounded Markdown and stru
 ## Public interfaces
 
 - Streamlit entry point: `streamlit_app.py`
-- Parse API: `DocumentParser.parse(data, filename, progress_callback=None, *, refine_markdown=True, visual_recovery=True)`
-- Universal parse API: `UniversalDocumentParser.parse(data, filename, *, processing_type, page_routes=None, ...)`
+- Parse API: `DocumentParser.parse(data, filename, progress_callback=None, *, refine_markdown=True, visual_recovery=True, content_range=None)`
+- Universal parse API: `UniversalDocumentParser.parse(data, filename, *, processing_type, page_routes=None, content_range=None, ...)`
 - Prepared context: `DocumentAgent.prepare(parse_result)`
 - Document analysis: `DocumentAgent.analyze(parse_result, *, classify=True, generate_toc=True, prepared_context=None)`
 - Extraction: `DocumentAgent.extract(parse_result, schema, *, prepared_context=None)`

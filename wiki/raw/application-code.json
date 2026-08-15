@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-063b756c4b68",
-    "base_commit": "336cea1137b7d09855c80adafa06fe6f3398740a",
+    "id": "content-0724dc478444",
+    "base_commit": "77f4e870a0e04e98a5003a2273d9c4708dbfd7dc",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-15T16:45:56.192248+00:00",
+  "generated_at": "2026-08-15T17:16:28.135348+00:00",
   "category": "application-code",
   "files": [
     {
       "path": "src/grounded_docparse/__init__.py",
-      "sha256": "3ef6d2f80776b7f8eee4b0049ab25ad2e6b6962b5d7a34048645b052b0042410",
-      "size": 2910
+      "sha256": "8df42c63c5c2595cec83e1edd813819f2981a10394848d5e1eb32e4208fb409d",
+      "size": 3140
     },
     {
       "path": "src/grounded_docparse/agentic.py",
@@ -21,8 +21,8 @@
     },
     {
       "path": "src/grounded_docparse/agnes_gateway.py",
-      "sha256": "b4e0d31ef6153d8e2ee9df68179e5c9741f7b66348331424c74387d88555d3d2",
-      "size": 3745
+      "sha256": "53d8e64c9d5faa5102362a8eaf8767e5822a5abdcbe397555341466de3386a45",
+      "size": 3766
     },
     {
       "path": "src/grounded_docparse/batch.py",
@@ -41,13 +41,18 @@
     },
     {
       "path": "src/grounded_docparse/config.py",
-      "sha256": "aa066fb603b0db927f9943040531343563f055d77ee76fc32fe3fe29bee99204",
-      "size": 19134
+      "sha256": "077371986769cc971e2b185ace51a2d586f02b62c05c6873e6bb70a46e4db53e",
+      "size": 18896
+    },
+    {
+      "path": "src/grounded_docparse/content_range.py",
+      "sha256": "8aa7da9e8bbaea9b57ee8cafe17c5145bfda8166e6ac3325c32f7f40b28f1dc0",
+      "size": 1406
     },
     {
       "path": "src/grounded_docparse/docling_native.py",
-      "sha256": "5f50aa63e60b8555e16705995777b9a53bdc07420132a68a4da2b2d46dc28e88",
-      "size": 30221
+      "sha256": "d98e305c8870bcdf99dc5e1adebf74b7fd103397af04735a687f17268a207bbf",
+      "size": 30228
     },
     {
       "path": "src/grounded_docparse/enhancement.py",
@@ -66,18 +71,18 @@
     },
     {
       "path": "src/grounded_docparse/gemini_gateway.py",
-      "sha256": "0532f0f84966c357cc24a0ccf0cd4612b7f48d443c3f10d2d55a2067c2a5b638",
-      "size": 5178
+      "sha256": "81785398e2cd77397f1cbeb001d7f3d742dd4b80007c2baf1700beee5e994f65",
+      "size": 5226
     },
     {
       "path": "src/grounded_docparse/grounded_ocr.py",
-      "sha256": "966bdb8ea5756b5d9dd58dd5fabbd41bd420c2780316eb21e3caaca8137e4044",
-      "size": 12501
+      "sha256": "f4617d9f1a8eb28444d683e11bb0c0fc1b508db16575a023067a25775f016e27",
+      "size": 12508
     },
     {
       "path": "src/grounded_docparse/ingest.py",
-      "sha256": "28683a7d41ff153435786204eafb28846e8b06dae26ff4d7591db2a47dd1f85c",
-      "size": 7795
+      "sha256": "b477e755eb470cc46d0d236718f651e2a3ce60e076a470387cc74b72ef731f81",
+      "size": 8844
     },
     {
       "path": "src/grounded_docparse/local_ocr.py",
@@ -86,13 +91,13 @@
     },
     {
       "path": "src/grounded_docparse/models.py",
-      "sha256": "861af8049e0b8389c892ed8708612746d76317dfc8754306a5c40ea7d43acf09",
-      "size": 32437
+      "sha256": "f63bb34b2c07789faf28a1ff1ab7ac3a0e16fab898a476e3ce4fb9862256be8f",
+      "size": 32523
     },
     {
       "path": "src/grounded_docparse/native.py",
-      "sha256": "2442b64427f03b25757c4844126f4698c4658664010b51c4721851096d5a1069",
-      "size": 9593
+      "sha256": "209c03e5fab7300bc45983a80e3438d28a7fd045d8761e409f3c4108f10a06df",
+      "size": 9876
     },
     {
       "path": "src/grounded_docparse/native_extraction.py",
@@ -101,8 +106,8 @@
     },
     {
       "path": "src/grounded_docparse/native_parsers.py",
-      "sha256": "9d29b1ba049285056e3f30a421987749e63b4de45df58d97687c909ec0733b36",
-      "size": 23301
+      "sha256": "347ede34c18b8622e1ebb639b3cc80e5cf815b37bca87fac520d70bdf2b1315e",
+      "size": 26063
     },
     {
       "path": "src/grounded_docparse/ocr_disagreement.py",
@@ -131,8 +136,8 @@
     },
     {
       "path": "src/grounded_docparse/pipeline.py",
-      "sha256": "31390ce681958c4a0eab14aa3f41af7141e0a1c65a84b4213d0331bb655b7122",
-      "size": 127941
+      "sha256": "2405c0aac5aad0f32a81eec230449bf93b92579e2685e060f45a9aaedaaedfdd",
+      "size": 128327
     },
     {
       "path": "src/grounded_docparse/prompts.py",
@@ -146,8 +151,8 @@
     },
     {
       "path": "src/grounded_docparse/rapidocr_runtime.py",
-      "sha256": "271b3b9061b0177a27ec803058ec50b4e72f4d6838083b4d16362b2057f9858b",
-      "size": 6550
+      "sha256": "01771fa95143a905f163310d7166ca30f1bc30b4ea221032aff9fe3b71767ca6",
+      "size": 6395
     },
     {
       "path": "src/grounded_docparse/render.py",
@@ -156,13 +161,13 @@
     },
     {
       "path": "src/grounded_docparse/runtime.py",
-      "sha256": "651ce7bdeee0b28b0c9f8b468489cca3124f7bc01dd3db599990872eb50b20f2",
-      "size": 9008
+      "sha256": "0ddbdcf6a956511759ebab21e24a53526d3e76e81ac8b19449746d7cfa8eaa23",
+      "size": 9028
     },
     {
       "path": "src/grounded_docparse/runtime_control.py",
-      "sha256": "112d3d7ac24ea5a6305d145bc6d14476e18004076d825a126d1a8c055c2a14de",
-      "size": 1074
+      "sha256": "7344a7a02c7404250561c454b0fbaa6f188cf9fb9616930d05eb0b6416240a97",
+      "size": 1044
     },
     {
       "path": "src/grounded_docparse/schema_store.py",
@@ -171,18 +176,18 @@
     },
     {
       "path": "src/grounded_docparse/universal.py",
-      "sha256": "b1d3ab913ad2df3769fbb80e3b9f95ecc1b5068a9dfd60070eef2059ad8e06f8",
-      "size": 11821
+      "sha256": "6e07175ad4595e368e468694012300191b204798f156689e00c1734fa669c0d0",
+      "size": 14515
     },
     {
       "path": "src/grounded_docparse/usage_costs.py",
-      "sha256": "63d3959a40bbdc3772258545cc81c633776ce8b0b41cfde901c52f207114860b",
-      "size": 3860
+      "sha256": "d475d6921d619539b26d137cf0679264a30cc4a88808f2b8e7b8cae8b024df00",
+      "size": 3750
     },
     {
       "path": "src/grounded_docparse/windows_setup.py",
-      "sha256": "628fad956f59b7a0e374ec55bea0aa53784b65bcc3f162666b80f6258eeb6590",
-      "size": 891
+      "sha256": "d6ed245bc8b62e780796f941a01b19edb7a27ff2ebf911bb0f4543e5fd38def1",
+      "size": 862
     },
     {
       "path": "src/grounded_docparse/workspace_store.py",
@@ -191,8 +196,8 @@
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "4a6bceb19ef325e76fbfbfc99fea9f55959b547133c719a73efddbd21e03812b",
-      "size": 137785
+      "sha256": "d3a0f775c3498e4b8ff41fac6b1e19946763a557393cd4a45c12dfbda4e31df0",
+      "size": 139846
     }
   ]
 }

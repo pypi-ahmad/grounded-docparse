@@ -106,7 +106,7 @@ All text-only structured features use medium reasoning effort and retry one sche
 
 ## Result contracts
 
-`DocumentParser.parse` returns the legacy OCR `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log. `UniversalDocumentParser.parse` accepts an explicit `ProcessingType` and returns either that OCR result or a `NativeParseResult`.
+`DocumentParser.parse` returns the legacy OCR `ParseResult` with `document`, refined `markdown`, grounded `base_markdown`, parse JSON, elements, annotated PDF bytes, usage, trace, metadata, and recovery log. `UniversalDocumentParser.parse` accepts an explicit `ProcessingType` plus an optional natural-unit `ContentRange` and returns either that OCR result or a `NativeParseResult`; selected units retain original source indices.
 
 Parse JSON schema version is `4.5.0`. Full JSON is `4.6.0`, preserving the existing envelope and adding `custom_classification` and `form_extractions`. Legacy extraction JSON remains `1.1.0`; routed multi-form extraction JSON uses `2.0.0`.
 

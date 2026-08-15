@@ -253,7 +253,7 @@ Open <http://localhost:7137>, then follow this minimal path:
 
 1. Upload one supported document. For a safe OCR practice run, use the bundled `examples/synthetic-report.pdf`.
 2. Select a compatible processing type. For a PDF choose Native, Scanned, or Mixed; for Mixed PDF confirm every Native/OCR page route.
-3. For scanned PDFs and images, optionally enable **Page range**, select an OCR engine, then choose an ADE mode.
+3. For any upload, optionally enable its page, frame, slide, sheet, section, block, or row range; then select the extraction engine and ADE mode.
 4. Decide whether **AI enhancement for failed or <75% confidence regions** is allowed for OCR routes.
 5. Select **Parse document**.
 6. Review Markdown, JSON, source structure, and any available annotated PDF before running extraction.
@@ -292,7 +292,7 @@ The exact parser flow is:
 
 For GLM-OCR, pages are prepared/finalized concurrently within ordered windows while the process-wide SDK runtime serializes model access. Default page concurrency is eight. PaddleOCR-VL submits the complete document to its local API.
 
-The UI implements a page range by creating a new subset PDF before parsing. Output page 1 therefore means the first selected page, not necessarily page 1 of the original PDF. If downstream users need original-file page numbers, retain the selected start-page offset or another explicit mapping outside the current result.
+The UI passes the selected range into the parser without creating a subset PDF. Output page numbers therefore remain aligned with the original file, and annotated output retains the original page count.
 
 ### 6.3 Recovery invariants
 

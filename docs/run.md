@@ -53,7 +53,7 @@ The native launcher and managed OCR scripts bind their services to loopback. Do 
 
 1. Upload up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images (250 MB each and 1 GB combined).
 2. Choose a compatible **Processing type** for every file. Files are validated by signature and container structure; the app never silently changes a selection.
-3. For Mixed PDF, review the Native/OCR suggestion for each page, choose every page route, and confirm the table. For one scanned PDF, an inclusive contiguous page range remains available.
+3. Optionally choose an inclusive content range for each upload. For Mixed PDF, review the Native/OCR suggestion, choose routes, and confirm the table; only selected pages require routes during parsing.
 4. Fresh workspaces start with Local Ollama and PaddleOCR-VL selected; restored workspaces keep their saved choice. All Local Ollama choices use native Windows CPU PP-DocLayoutV3. Choose GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR, then configure Fast, Full, or Custom mode and optional AI enhancement/chat.
 5. Select **Parse document** or **Process documents**. Batch files run sequentially and failures can be retried without rerunning completed files.
 6. Review Markdown, JSON, Extract, and source structure. An annotated PDF appears only when the selected route produces a visual artifact; the ZIP includes only available artifacts.
