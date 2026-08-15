@@ -8,9 +8,25 @@ from typing import Any
 
 from google import genai
 from google.genai import types
+from pydantic import ValidationError
 
 from .config import ParserConfig
 from .gateways import OpenAIDocumentGateway
+from .runtime import RetryableProviderError
+
+GEMINI_MAX_OUTPUT_TOKENS = 65_536
+
+
+def _max_output_tokens(value: Any) -> Any:
+    return min(value, GEMINI_MAX_OUTPUT_TOKENS) if isinstance(value, int) else value
+
+
+def _finish_reason(response: Any) -> str | None:
+    candidates = getattr(response, "candidates", None)
+    if not candidates:
+        return None
+    reason = getattr(candidates[0], "finish_reason", None)
+    return getattr(reason, "name", None)
 
 
 def _parts(value: Any) -> list[Any]:
@@ -62,12 +78,24 @@ class _GeminiResponses:
             config=types.GenerateContentConfig(
                 system_instruction=system,
                 response_mime_type="application/json",
-                response_schema=text_format,
-                max_output_tokens=kwargs.get("max_output_tokens"),
+                response_json_schema=text_format.model_json_schema(),
+                max_output_tokens=_max_output_tokens(kwargs.get("max_output_tokens")),
                 thinking_config=types.ThinkingConfig(thinking_level=effort),
             ),
         )
-        parsed = getattr(response, "parsed", None) or text_format.model_validate_json(response.text)
+        try:
+            sdk_parsed = getattr(response, "parsed", None)
+            parsed = (
+                text_format.model_validate(sdk_parsed)
+                if sdk_parsed is not None
+                else text_format.model_validate_json(response.text)
+            )
+        except ValidationError as exc:
+            if _finish_reason(response) == "MAX_TOKENS":
+                raise RetryableProviderError(
+                    "Gemini reached its output token limit before completing JSON"
+                ) from exc
+            raise
         return SimpleNamespace(output_parsed=parsed, output=[], usage=self._usage(response))
 
     def create(self, **kwargs: Any) -> Any:
@@ -80,7 +108,7 @@ class _GeminiResponses:
                 system_instruction=system,
                 response_mime_type="application/json",
                 response_json_schema=schema,
-                max_output_tokens=kwargs.get("max_output_tokens"),
+                max_output_tokens=_max_output_tokens(kwargs.get("max_output_tokens")),
             ),
         )
         return SimpleNamespace(output_text=response.text, output=[], usage=self._usage(response))
