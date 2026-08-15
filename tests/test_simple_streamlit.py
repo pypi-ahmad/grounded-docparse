@@ -12,6 +12,7 @@ from grounded_docparse import ollama_runtime, pipeline, runtime_control, univers
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
 from grounded_docparse.config import LUNA_MODEL, ExtractionEngine
+from grounded_docparse.content_range import AppliedContentRange, ContentUnit
 from grounded_docparse.models import (
     AgenticAnalysis,
     AgentUsage,
@@ -610,7 +611,7 @@ def test_local_ocr_cross_check_exposes_compatible_alternates(monkeypatch) -> Non
     }.issubset(set(alternate.options))
 
 
-def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
+def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> None:
     source = pymupdf.open()
     source.new_page().insert_text((72, 72), "First page")
     source.new_page().insert_text((72, 72), "Second page")
@@ -618,6 +619,7 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     source.close()
     captured_page_counts: list[int] = []
     captured_recovery: list[bool] = []
+    captured_ranges = []
 
     class FakeParser:
         def __init__(self, config=None):
@@ -631,9 +633,11 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
             *,
             refine_markdown=True,
             visual_recovery=True,
+            content_range=None,
         ):
             del refine_markdown
             captured_recovery.append(visual_recovery)
+            captured_ranges.append(content_range)
             with pymupdf.open(stream=data, filetype="pdf") as selected:
                 captured_page_counts.append(selected.page_count)
             document = Document(
@@ -649,6 +653,14 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
                 input_tokens=0,
                 output_tokens=0,
                 annotated_pdf=data,
+                metadata=ParseMetadata(
+                    content_range=AppliedContentRange(
+                        start=2,
+                        end=2,
+                        unit=ContentUnit.PAGE,
+                        total=2,
+                    )
+                ),
             )
 
     monkeypatch.setenv("OPENAI_API_KEY", "test-key")
@@ -672,8 +684,10 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     ).click().run(timeout=20)
 
     assert not app.exception
-    assert captured_page_counts == [1]
+    assert captured_page_counts == [2]
     assert captured_recovery == [False]
+    assert captured_ranges[0].start == 2
+    assert captured_ranges[0].end == 2
     assert app.session_state.overview_page == 1
 
 
@@ -729,13 +743,14 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
     app = _select_scanned(app, "second.pdf")
 
     page_range = next(box for box in app.checkbox if box.label == "Page range")
-    assert page_range.disabled is True
+    assert page_range.disabled is False
     app = next(
         button for button in app.button if button.label == "Process 2 documents"
     ).click().run(timeout=20)
 
     assert not app.exception
     assert parsed_names == ["first.pdf", "second.pdf"]
+    assert app.get("progress")[0].text.startswith("100% ·")
     assert [
         workspace["status"]
         for workspace in app.session_state["batch_workspaces"].values()
