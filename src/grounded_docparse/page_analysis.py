@@ -172,7 +172,7 @@ class PageAnalyzer:
                 "ocr_model": "PaddleOCR-VL-1.6-0.9B",
                 "layout_model": "PP-DocLayoutV3",
                 "vlm_backend": "vLLM",
-                "luna": LUNA_MODEL,
+                "ai_model": self.config.cloud_model.value,
             }
         try:
             vllm_version = version("vllm")
@@ -183,7 +183,7 @@ class PageAnalyzer:
             "ocr_model": "zai-org/GLM-OCR",
             "layout_model": "PaddlePaddle/PP-DocLayoutV3_safetensors",
             "vllm": vllm_version,
-            "luna": LUNA_MODEL,
+            "ai_model": self.config.cloud_model.value,
         }
 
     def analyze_window(self, pages: list[PageEvidence]):

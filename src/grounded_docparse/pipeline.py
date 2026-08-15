@@ -90,7 +90,7 @@ VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
 MAX_VISUAL_RECOVERY_CROPS_PER_PAGE = 3
 MIN_VISUAL_RECOVERY_CROPS_PER_DOCUMENT = 8
-RECOVERY_OCR_CONFIDENCE_THRESHOLD = 0.55
+RECOVERY_OCR_CONFIDENCE_THRESHOLD = 0.75
 RECOVERY_LARGE_REGION_AREA = 0.02
 RECOVERY_MIN_CHARACTER_DENSITY = 50.0
 RECOVERY_GARBAGE_RATIO = 0.35
@@ -2454,7 +2454,7 @@ class DocumentParser:
                                         repaired_block,
                                         batch_targets,
                                         decisions,
-                                        repair_source=LUNA_MODEL,
+                                        repair_source=self.config.cloud_model.value,
                                     )
                                     if any(
                                         decision.action is SpanRepairAction.REPLACE
@@ -3022,7 +3022,7 @@ class DocumentParser:
                     "enhance",
                     1,
                     1,
-                    "Refining Markdown structure with gpt-5.6-luna",
+                    f"Refining Markdown structure with {self.config.cloud_model.value}",
                 )
             (
                 final_markdown,
@@ -3051,7 +3051,7 @@ class DocumentParser:
             ) / 1000
             metadata = ParseMetadata(
                 engine=(
-                    f"{self.config.ocr_engine.value} + gpt-5.6-luna"
+                    f"{self.config.ocr_engine.value} + {self.config.cloud_model.value}"
                     if trace
                     else self.config.ocr_engine.value
                 ),

@@ -12,7 +12,7 @@ from openai import OpenAI, OpenAIError
 from PIL import Image
 from pydantic import BaseModel, ValidationError
 
-from .config import LUNA_MODEL, LUNA_REASONING_EFFORT, ParserConfig
+from .config import ParserConfig
 from .ingest import PageEvidence
 from .models import (
     AgentRole,
@@ -60,10 +60,28 @@ class OpenAIDocumentGateway:
         client: Any | None = None,
         runtime: ProviderRuntime | None = None,
     ) -> None:
-        if client is None and not os.getenv("OPENAI_API_KEY"):
-            raise RuntimeError("OPENAI_API_KEY is not set")
+        if client is None and not os.getenv(config.cloud_model.api_key_name):
+            raise RuntimeError(f"{config.cloud_model.api_key_name} is not set")
         self.config = config
-        self.client = client or OpenAI(max_retries=0)
+        if client is None and config.cloud_model.value.startswith("gemini-"):
+            from google import genai
+            from types import SimpleNamespace
+
+            from .gemini_gateway import _GeminiResponses
+
+            client = SimpleNamespace(
+                responses=_GeminiResponses(
+                    genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
+                )
+            )
+        if client is None:
+            client_options: dict[str, Any] = {"max_retries": 0}
+            if os.getenv("OPENAI_BASE_URL"):
+                client_options["base_url"] = os.environ["OPENAI_BASE_URL"]
+            client = OpenAI(**client_options)
+        self.client = client
+        self.model = config.cloud_model.value
+        self.reasoning_effort = config.cloud_model.reasoning_effort
         self.runtime = runtime or ProviderRuntime(config)
         self.input_tokens = 0
         self.output_tokens = 0
@@ -111,7 +129,7 @@ class OpenAIDocumentGateway:
             else getattr(response, "usage", None)
         )
         if usage is None:
-            call = AgentUsage(agent=agent, model=model)
+            call = AgentUsage(agent=agent, model=model, telemetry_available=False)
             self.usage.calls.append(call)
             return call
         get = (
@@ -366,8 +384,8 @@ class OpenAIDocumentGateway:
                     expected,
                     agent=agent,
                     stage=stage,
-                    model=LUNA_MODEL,
-                    reasoning={"effort": LUNA_REASONING_EFFORT},
+                    model=self.model,
+                    reasoning={"effort": self.reasoning_effort},
                     store=False,
                     prompt_version=PROMPT_VERSION,
                     input=[
@@ -393,8 +411,8 @@ class OpenAIDocumentGateway:
             image_paths=[page.image_path],
             image_scope="full_page",
             source_page_path=page.image_path,
-            model=LUNA_MODEL,
-            reasoning={"effort": LUNA_REASONING_EFFORT},
+            model=self.model,
+            reasoning={"effort": self.reasoning_effort},
             store=False,
             input=[
                 {
@@ -480,8 +498,8 @@ class OpenAIDocumentGateway:
             image_scope="crop_batch",
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
             repair_round=repair_round,
-            model=LUNA_MODEL,
-            reasoning={"effort": LUNA_REASONING_EFFORT},
+            model=self.model,
+            reasoning={"effort": self.reasoning_effort},
             store=False,
             input=[
                 {
@@ -563,8 +581,8 @@ class OpenAIDocumentGateway:
             image_paths=[Path(crop.crop_path) for crop in crops],
             image_scope="crop_batch",
             source_page_pixels=crops[0].source_page_pixels if crops else 0,
-            model=LUNA_MODEL,
-            reasoning={"effort": LUNA_REASONING_EFFORT},
+            model=self.model,
+            reasoning={"effort": self.reasoning_effort},
             store=False,
             input=[
                 {
@@ -628,8 +646,8 @@ class OpenAIDocumentGateway:
             image_paths=image_paths,
             image_scope="crop_batch",
             source_page_pixels=requests[0].source_page_pixels if requests else 0,
-            model=LUNA_MODEL,
-            reasoning={"effort": LUNA_REASONING_EFFORT},
+            model=self.model,
+            reasoning={"effort": self.reasoning_effort},
             store=False,
             input=[
                 {
@@ -748,8 +766,8 @@ class OpenAIDocumentGateway:
             SchemaProposalWire,
             agent="schema_architect",
             stage="schema_proposal",
-            model=LUNA_MODEL,
-            reasoning={"effort": LUNA_REASONING_EFFORT},
+            model=self.model,
+            reasoning={"effort": self.reasoning_effort},
             store=False,
             input=[
                 {
@@ -806,7 +824,7 @@ class OpenAIDocumentGateway:
             "additionalProperties": False,
         }
         agent = "extraction_critic" if repair else "extractor"
-        model = LUNA_MODEL
+        model = self.model
         for format_attempt in range(2):
             started = time.perf_counter()
             call_usage: AgentUsage | None = None
@@ -825,7 +843,7 @@ class OpenAIDocumentGateway:
             response = self._provider_request(
                 lambda prompt=system_prompt: self._provider_responses().create(
                     model=model,
-                    reasoning={"effort": LUNA_REASONING_EFFORT},
+                    reasoning={"effort": self.reasoning_effort},
                     store=False,
                     input=[
                         {"role": "system", "content": prompt},
@@ -875,7 +893,7 @@ class OpenAIDocumentGateway:
                         input_tokens=call_usage.input_tokens,
                         output_tokens=call_usage.output_tokens,
                         prompt_version=PROMPT_VERSION,
-                        reasoning_effort=LUNA_REASONING_EFFORT,
+                        reasoning_effort=self.reasoning_effort,
                         summary=str(exc),
                     )
                 )
@@ -894,7 +912,7 @@ class OpenAIDocumentGateway:
                     input_tokens=call_usage.input_tokens,
                     output_tokens=call_usage.output_tokens,
                     prompt_version=PROMPT_VERSION,
-                    reasoning_effort=LUNA_REASONING_EFFORT,
+                    reasoning_effort=self.reasoning_effort,
                 )
             )
             return payload
