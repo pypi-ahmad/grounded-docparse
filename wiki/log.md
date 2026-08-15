@@ -1,5 +1,10 @@
 # Wiki operation log
 
+## 2026-08-15 — Native-only application hosting
+
+- Removed the temporary WSL-hosted Streamlit launcher and lifecycle sources.
+- Retained WSL as the isolated runtime for GLM-OCR and PaddleOCR-VL services.
+
 ## 2026-08-13 — Released on main as v0.6.1
 
 - Promoted native-document ingestion articles from `feature-branch` to `released`.

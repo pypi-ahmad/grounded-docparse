@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-988eedb6f7e0",
-    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:08:02.822559+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "documentation",
   "files": [
     {
@@ -21,8 +21,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "371f81dcfdabfd8b2647cc1576edda2cae69c6cfcdfb87b6ec4f1fb6cbbe3df5",
-      "size": 11493
+      "sha256": "931a47276bcd5fce6597cd846d6de3921be662926bec201c4a2d78c2f31f2c6c",
+      "size": 11873
     },
     {
       "path": "CODE_OF_CONDUCT.md",
@@ -36,8 +36,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "e590fbcf94e0fc9340413f4e9539dd5fe4e273b1ee9da02ac1b016a81c042551",
-      "size": 25537
+      "sha256": "480ef612be641a67dfab3eea184870bb1e922881bb76f4070970b7e216bfe83e",
+      "size": 25858
     },
     {
       "path": "SECURITY.md",
@@ -46,8 +46,8 @@
     },
     {
       "path": "SETUP.md",
-      "sha256": "7df37a446d6fa363f0b8906c66f403f33b11dfad460f016668a6f59bcbf9da34",
-      "size": 19689
+      "sha256": "8c1565c31cc7bcc0c21f6df1931935c56aaaea1bc29421d989e196f4b9aaec36",
+      "size": 19518
     },
     {
       "path": "TECHNICAL.md",
@@ -71,8 +71,8 @@
     },
     {
       "path": "docs/api.md",
-      "sha256": "b7804df322d637f119aec9df25f7b5b90814badd253984ca7977d0be5e5f3739",
-      "size": 16837
+      "sha256": "4c7cf095529d90e955d292d978fd2c7beda16bfac9d285aea2269be2054f290e",
+      "size": 16852
     },
     {
       "path": "docs/architecture.md",
@@ -116,8 +116,8 @@
     },
     {
       "path": "docs/codebase/STRUCTURE.md",
-      "sha256": "aca8f6a1c3bd045786559033bea390d9357e9206df5b4c2f4de9666c07f372e3",
-      "size": 4364
+      "sha256": "4178b011e5044a12b9168c6575d8ba539255e462f7c9b6b9fa95a5a77e1f162e",
+      "size": 4274
     },
     {
       "path": "docs/codebase/TESTING.md",
@@ -126,8 +126,8 @@
     },
     {
       "path": "docs/complete-user-guide.md",
-      "sha256": "5b6698e84094baa82341e0d7d27d27f78b328bc9bd1404d8a0aa08dd8b7eb2f7",
-      "size": 59881
+      "sha256": "c5c75ae6e38ab820a31852606d81c8503448f17cd845e3ffbb60abc5bc3a545f",
+      "size": 59867
     },
     {
       "path": "docs/extraction-quality-research.md",
@@ -166,8 +166,8 @@
     },
     {
       "path": "docs/local-paddleocr-vl.md",
-      "sha256": "514116477c7b34c94f981988a81713fc350840b4e5024bdd037f93957da49b38",
-      "size": 5703
+      "sha256": "e0ec595dfb2ff1f9e61e88014d778a532ec298eb27aab8ad8e724824f0861882",
+      "size": 5690
     },
     {
       "path": "docs/native-document-ingestion.html",
@@ -191,8 +191,8 @@
     },
     {
       "path": "docs/run.md",
-      "sha256": "13ab8e24139418ad8c2ecd9b3a45a0d6ff6828b96498bd781e7aadc378985db8",
-      "size": 6401
+      "sha256": "cdaf12c2854060d4960c1deed8e5a9d20b040cf51ed37df5239afe02bee78089",
+      "size": 6605
     },
     {
       "path": "docs/spec.md",
@@ -206,8 +206,8 @@
     },
     {
       "path": "docs/zero-to-hero-tutorial.md",
-      "sha256": "2c681455aad5d2b44363cb0c1296619f4f3fa371803a06257d24dcb525ca0762",
-      "size": 56616
+      "sha256": "d7fc8bd4e578d5655ef714d6255abc7b57558705b87ec01571c927eb71cc9665",
+      "size": 56563
     },
     {
       "path": "presentations/grounded-docparse-business.pptx",

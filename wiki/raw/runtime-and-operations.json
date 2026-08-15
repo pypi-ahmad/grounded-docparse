@@ -1,19 +1,14 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-988eedb6f7e0",
-    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:08:02.822559+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "runtime-and-operations",
   "files": [
-    {
-      "path": "Launch-Grounded-DocParse-WSL-Legacy.cmd",
-      "sha256": "38d0e03f5a9aa4e8d389050d749d2f269748b3daa1387a117dee1aa1d185fb95",
-      "size": 538
-    },
     {
       "path": "Launch-Grounded-DocParse.cmd",
       "sha256": "ec37936d151e9d4ce8a1db7c83055d86f9f17cdb712fe11e9a8182588c3b07f1",
@@ -31,13 +26,13 @@
     },
     {
       "path": "installer/GroundedDocParse.iss",
-      "sha256": "9035ea4e68324fffe79f34782e47e9f15c4e6fea89c4b0d6c4255fef4fc72615",
-      "size": 3390
+      "sha256": "2dec596d7a6df0bc8ee3c0d9b972ba5a17702a0031133e48042c55425ebbe7f4",
+      "size": 3473
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "f0314807eaa3faa3f90fdb6164a99f9a7cab16eed85339d97af759a0a5034237",
-      "size": 18413
+      "sha256": "de5c506d4a1f08599307a03d90719bcf37de063de1401e1f03a9414550edf9fd",
+      "size": 18377
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -81,8 +76,8 @@
     },
     {
       "path": "scripts/windows/launch-native.ps1",
-      "sha256": "064737ae9eedb61012705af7335c2b17445c5b415938e0f5ca405f8f3bc51ba3",
-      "size": 13319
+      "sha256": "3144e8421ceb604f699a038dd228b3e92e4249d1fe4581d0ef48afb3ab31e6c7",
+      "size": 11742
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",
@@ -105,11 +100,6 @@
       "size": 1328
     },
     {
-      "path": "scripts/wsl/launch-stack.sh",
-      "sha256": "efb7838954a9c0361e3f78021e28b37c272c58f02434a455f76861c0f7b60bf8",
-      "size": 5786
-    },
-    {
       "path": "scripts/wsl/manage-ocr-stack.sh",
       "sha256": "30e3f5dd166adb3bd1ef5ab91a0ecfd6a4de042f010f197d3bf7f30a313715ac",
       "size": 10826
@@ -125,11 +115,6 @@
       "size": 5184
     },
     {
-      "path": "scripts/wsl/run-app.sh",
-      "sha256": "4e83277ab3c01ebc417fc7408263a9c05d1d52053c04400dfe670663151b1d2e",
-      "size": 1524
-    },
-    {
       "path": "scripts/wsl/serve-glmocr.sh",
       "sha256": "53c89627ec971fd1e945533f90de1601bb572ff9cec711cb97b66e880c5094d2",
       "size": 1223
@@ -143,11 +128,6 @@
       "path": "scripts/wsl/setup-paddleocr.sh",
       "sha256": "040e72fa99634450daaaf3a003ac175a078404fd343305a4cb7e4e5eaf8ba6aa",
       "size": 2503
-    },
-    {
-      "path": "scripts/wsl/stop-stack.sh",
-      "sha256": "8a3f2a95205644f0b9236caad69874bd541f66edfa67616cf824943a2ce26ad3",
-      "size": 2482
     }
   ]
 }

@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-988eedb6f7e0",
-    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:08:02.822559+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
       "path": ".env.example",
-      "sha256": "116e4b42da94250e8dba3fec8f5e7a769e9b9cf0ee69674a6e9ce9742b2c9ae6",
-      "size": 1615
+      "sha256": "7f62e8d1a28c8595052c601462b121df9d928a9bd479e801bb2d47ead5b59982",
+      "size": 1581
     },
     {
       "path": ".gitattributes",

@@ -21,9 +21,9 @@
 
 - `streamlit_app.py`: interactive upload, manual processing-type selection, mixed-PDF page review, parsing, extraction, and downloads.
 - `src/grounded_docparse/cli.py`: installed `grounded-docparse parse` and `grounded-docparse ingest` commands.
-- `Launch-Grounded-DocParse.cmd`: native Windows app/setup launcher; `Launch-Grounded-DocParse-WSL-Legacy.cmd` is the temporary fallback; `Setup-*.cmd` installs and warms a selected WSL GPU stack.
+- `Launch-Grounded-DocParse.cmd`: native Windows app/setup launcher; `Setup-*.cmd` installs and warms a selected WSL GPU stack.
 - `scripts/windows/launch-native.ps1`: locked Windows environment, CPU layout assets, Ollama, Streamlit, logs, and PID lifecycle.
-- `scripts/wsl/launch-stack.sh`, `scripts/wsl/manage-ocr-stack.sh`: WSL service lifecycle.
+- `scripts/wsl/manage-ocr-stack.sh`: WSL GLM/Paddle service lifecycle.
 - `installer/Install-GroundedDocParse.ps1`: workstation installation entry point.
 - `scripts/evaluate_corpus.py`: offline/live evaluation and regression reporting.
 

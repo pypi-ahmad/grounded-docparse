@@ -1,7 +1,7 @@
 ---
 tags: grounding, evidence, invariants
 sources: docs/spec.md, docs/architecture.md, src/grounded_docparse/native.py
-snapshot: content-988eedb6f7e0
+snapshot: content-ddfa7664ade5
 status: released
 ---
 
