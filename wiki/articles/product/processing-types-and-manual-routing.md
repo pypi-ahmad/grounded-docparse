@@ -1,7 +1,7 @@
 ---
 tags: routing, ui, cli, processing-types
 sources: src/grounded_docparse/native.py, streamlit_app.py, src/grounded_docparse/cli.py
-snapshot: content-c97be855760c
+snapshot: content-9ccf0b9bc19d
 status: released
 ---
 
