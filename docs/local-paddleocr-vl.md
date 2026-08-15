@@ -48,7 +48,7 @@ The managed stack runs:
 
 - PaddleOCR-VL-1.6-0.9B recognition through `paddleocr genai_server` on `127.0.0.1:8118`;
 - PP-DocLayoutV3 and the full PaddleX document parser on CPU at `127.0.0.1:8119`; and
-- Streamlit at <http://localhost:9356>.
+- Streamlit at <http://localhost:7137>.
 
 Keeping layout on CPU reserves the supported 8 GB GPU profile for vLLM recognition. The generated pipeline configuration is `.runtime/paddleocr-vl-1.6.yaml`; vLLM settings are defined in `config/paddle-vllm.yaml`.
 
@@ -97,6 +97,6 @@ When launching from Windows, set port overrides as Windows user environment vari
 | Port `8118` or `8119` is occupied | Stop the process deliberately or configure two unused ports. The manager refuses unmanaged listeners. |
 | Recognition service does not become healthy | Inspect `.runtime/paddle-vllm.log`. |
 | PaddleX starts but parsing fails | Inspect `.runtime/paddle-api.log`, then run `scripts/wsl/check-paddleocr-api.py`. |
-| Streamlit does not open | Inspect `.runtime/streamlit.log` and check <http://127.0.0.1:9356/_stcore/health>. |
+| Streamlit does not open | Inspect `.runtime/streamlit.log` and check <http://127.0.0.1:7137/_stcore/health>. |
 
 Runtime PID files and generated configurations live under `.runtime/`. Model assets remain in `PADDLE_PDX_CACHE_HOME`, and the isolated environment remains at `DOCPARSE_PADDLE_WSL_ENV`; stopping services does not remove either location.

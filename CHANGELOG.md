@@ -18,7 +18,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Kept GLM-OCR and PaddleOCR-VL vLLM services isolated in WSL while moving Streamlit, native parsing, Ollama, and layout grounding to Windows.
 - Added exclusive model load/warm/unload lifecycle and optional AI enhancement for failed or sub-75%-confidence grounded regions.
-- Moved the managed Streamlit UI from loopback port `8600` to `9356`; native launch now safely clears a verified legacy WSL app session without stopping its OCR services.
+- Moved the managed Streamlit UI from loopback port `8600` to `7137`; native launch now safely clears verified prior app sessions without stopping WSL OCR services.
+- Kept the native launcher terminal open with live Streamlit, GLM-OCR, PaddleOCR, and Ollama logs, plus a final keypress pause after the app stops.
+- Added a launch-scoped Session cost view with per-model input, cached-input, output-token, and estimated-cost totals.
 
 ## [0.6.1] - 2026-08-13
 

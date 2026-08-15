@@ -11,7 +11,7 @@ Browser
      -> scanned PDF/image: rasterization -> selected extraction engine
         -> Windows CPU PP-DocLayoutV3 -> GLM vLLM (port 8080) or Windows Ollama
         -> PaddleX API (port 8119) -> PaddleOCR-VL vLLM (port 8118)
-        -> Docling + RapidOCR, or direct pure-AI extraction
+        -> Docling + RapidOCR, or direct AI ADE extraction
      -> native PDF: `pdf-inspector` text/layout/table positions
      -> mixed PDF: confirmed per-page native/OCR merge
      -> Office/open formats: Docling SimplePipeline without OCR or enrichments

@@ -35,7 +35,7 @@ The native launcher:
 3. synchronizes the locked `native` and `windows-layout` dependency sets;
 4. downloads the pinned PP-DocLayoutV3 detector for CPU inference;
 5. installs missing Windows Ollama using `irm https://ollama.com/install.ps1 | iex`;
-6. starts Streamlit on loopback port `9356` and stores logs/state under `%LOCALAPPDATA%\GroundedDocParse`.
+6. starts Streamlit on loopback port `7137`, stores logs/state under `%LOCALAPPDATA%\GroundedDocParse`, and keeps the terminal open with live app and OCR logs.
 
 Run `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm the corresponding WSL GPU service. Switching those engines in the native UI starts one and unloads the other. `Launch-Grounded-DocParse-WSL-Legacy.cmd` is the temporary fallback for the old WSL-hosted app.
 
@@ -89,7 +89,9 @@ For first and later sessions:
 
 The single launcher validates setup and repairs missing or stale dependencies before opening the app. Use `.\Setup-GLM-OCR.cmd` or `.\Setup-PaddleOCR-VL-1.6.cmd` to install and warm one explicit GPU stack. The manager stops the other GPU service first, so only one VLM is resident.
 
-Each native launch verifies and stops the previously recorded process and any Grounded DocParse Streamlit process actively listening on port `9356`, clears Streamlit's application cache, and starts a fresh browser session. It also safely stops a verified legacy WSL Streamlit session, including one left on the former port `8600`, without stopping WSL OCR services. It preserves the durable workspace database and stored source/result artifacts. Unrelated processes are never stopped.
+Each native launch treats its PID file as advisory, stops verified Grounded DocParse listeners on port `7137` or the former ports `8600` and `9356`, clears Streamlit's application cache, and starts a fresh browser session. Stale PID entries are discarded and unrelated processes are left untouched, while the durable workspace database, stored source/result artifacts, and WSL OCR services are preserved.
+
+The terminal follows new Streamlit, GLM-OCR, PaddleOCR, and Ollama log entries with source labels. When **Stop app** is confirmed or Streamlit exits, final output is flushed and the terminal waits for a keypress before closing.
 
 To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration. Layout uses `cuda:0` with vLLM and `cpu` with Ollama.
 
@@ -113,7 +115,7 @@ bash scripts/wsl/serve-glmocr.sh
 Windows Ollama is installed and started by the native launcher and remains bound to `127.0.0.1:11434`.
 
 ```bash
-# Terminal 2: Streamlit on port 9356
+# Terminal 2: Streamlit on port 7137
 bash scripts/wsl/run-app.sh
 ```
 
@@ -153,7 +155,7 @@ GLM parsing does not require an OpenAI credential. Set user-level values only wh
 
 Use `GOOGLE_API_KEY` for Gemini or `AGNES_API_KEY` for Agnes 2.5 Flash. `AGNES_BASE_URL` is optional. Equivalent names may be placed in a private root `.env` on other machines; process and User environment values take precedence. Never commit real credentials.
 
-The Windows launcher reads User scope directly, so a newly saved value does not require reopening the terminal. Restart the managed app after changing provider values. An unrelated process already listening on port `9356` is not terminated or adopted. Never store a real key in committed files, logs, or issue reports. The UI selects among GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash.
+The Windows launcher reads User scope directly, so a newly saved value does not require reopening the terminal. Restart the managed app after changing provider values. An unrelated process already listening on port `7137` is not terminated or adopted. Never store a real key in committed files, logs, or issue reports. The UI selects among GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash.
 
 ## Configuration reference
 
@@ -161,6 +163,7 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 
 | Variable | Default | Purpose |
 | --- | ---: | --- |
+| `DOCPARSE_CLOUD_MODEL` | `gpt-5.6-luna` | Default AI model for parser/API calls; the Streamlit model selector controls the active UI session |
 | `DOCPARSE_RENDER_DPI` | `200` | Raster DPI for PDF pages |
 | `DOCPARSE_CROP_DPI` | `450` | Rerender DPI for source crops |
 | `DOCPARSE_CROP_PADDING` | `0.1` | Fractional padding around a crop |
@@ -179,8 +182,11 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 | `DOCPARSE_PROVIDER_SUCCESS_WINDOW` | `10` | Successes before reduced concurrency increases |
 | `DOCPARSE_LOCAL_OCR_ENABLED` | `true` | Enables local GLM analysis |
 | `DOCPARSE_OCR_ENGINE` | `glm-ocr` | `glm-ocr`, `paddleocr-vl-1.6`, or `ollama` for parser API calls |
+| `DOCPARSE_OCR_DISAGREEMENT_ENABLED` | `false` | Audit uncertain regions with one alternate local OCR runtime |
+| `DOCPARSE_OCR_DISAGREEMENT_ENGINE` | automatic | `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr` |
 | `DOCPARSE_GLM_VLLM_BASE_URL` | `http://127.0.0.1:8080/v1` | Loopback GLM recognition endpoint |
 | `DOCPARSE_OLLAMA_MODEL` | `glm-ocr:latest` | Selected Ollama OCR model |
+| `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Windows Ollama endpoint; non-loopback origins are rejected |
 | `DOCPARSE_GROUNDED_OCR_TIMEOUT_SECONDS` | `900` | Per-region GLM/Ollama recognition timeout |
 | `DOCPARSE_LAYOUT_DETECTION_THRESHOLD` | `0.3` | Native CPU PP-DocLayoutV3 detection threshold |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM-OCR SDK configuration |
@@ -195,6 +201,7 @@ Additional application/runtime variables:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
+| `DOCPARSE_MANAGE_OCR_SERVICES` | `false` | Allows the app to start, switch, and stop its verified WSL vLLM services; the managed Windows and legacy WSL launchers set it to `true` |
 | `DOCPARSE_PRELOAD_LOCAL_OCR` | `false` | Legacy WSL app preload control |
 | `DOCPARSE_STUDIO_DB_PATH` | `%LOCALAPPDATA%\GroundedDocParse\studio.sqlite3` under the native launcher | Reusable schemas and durable workspace |
 | `DOCPARSE_WSL_ENV` | `~/.local/share/grounded-docparse/.venv` | WSL virtual-environment path |
@@ -224,6 +231,8 @@ Analysis thresholds use `DOCPARSE_ANALYSIS_<FIELD>`. These variables and default
 
 Set `GLMOCR_*` variables and `DOCPARSE_WSL_ENV` inside WSL. The native launcher imports provider and Ollama values into the Windows app process; it forwards only the repository path when managing WSL services.
 
+To stop only a verified WSL-hosted Streamlit session while keeping GLM/Paddle services warm, run `bash scripts/wsl/stop-stack.sh 0 --app-only`. Omit `--app-only` to stop Streamlit and every managed WSL OCR service. Both modes verify the recorded Streamlit PID, command, and repository working directory before signaling it.
+
 ## Verification
 
 Check the services:
@@ -233,7 +242,7 @@ Check the services:
 source ~/.local/share/grounded-docparse/.venv/bin/activate
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 python scripts/wsl/prepare_glmocr_runtime.py --offline
 python scripts/wsl/check-glmocr-api.py
-curl --fail --silent http://127.0.0.1:9356/_stcore/health
+curl --fail --silent http://127.0.0.1:7137/_stcore/health
 ```
 
 Reproduce the warm page benchmark without Luna or model-load time:
@@ -260,7 +269,7 @@ uv run python -m compileall -q src streamlit_app.py tests scripts
 | `nvidia-smi` fails inside WSL | Update the Windows NVIDIA driver and WSL; do not install a separate Linux display driver inside WSL |
 | vLLM runs out of memory | Stop competing GPU processes and inspect `.runtime/vllm.log`; do not lower the 32768 context while `page_loader.max_tokens` remains 8192 |
 | `/v1/models` works but recognition fails | Run `scripts/wsl/check-glmocr-api.py`; `launch-stack.sh` automatically restarts a managed server that fails this inference check |
-| Port `8080` or `9356` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
+| Port `8080` or `7137` is occupied | Stop the unrelated listener; the launcher refuses to take over unmanaged processes |
 | Port `8118` or `8119` is occupied | Stop the unrelated listener; Paddle services are never adopted when ownership cannot be verified |
 | Paddle startup fails | Inspect `.runtime/paddle-vllm.log` and `.runtime/paddle-api.log`; confirm NVIDIA compute capability 8.0+ and CUDA 12.6+ |
 | GLM-OCR import fails | Rerun `scripts/wsl/setup-glmocr.sh`; do not use the native Windows environment for local OCR |
