@@ -649,8 +649,8 @@ class OcrComparisonResult(BaseModel):
     page: int = Field(ge=1)
     block_id: str | None = None
     bbox: tuple[float, float, float, float] | None = None
-    primary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
-    secondary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
+    primary_engine: str = Field(min_length=1)
+    secondary_engine: str = Field(min_length=1)
     primary_text: str
     secondary_text: str | None = None
     similarity: float | None = Field(default=None, ge=0, le=1)

@@ -10,6 +10,10 @@ from urllib.request import Request, urlopen
 
 from PIL import Image
 
+OLLAMA_CONTEXT_TOKENS = 8_192
+OLLAMA_MAX_OUTPUT_TOKENS = 4_096
+OLLAMA_WARMUP_OUTPUT_TOKENS = 1
+
 
 class OllamaOcrModel(StrEnum):
     GLM_OCR = "glm-ocr:latest"
@@ -57,12 +61,32 @@ def warm_model(model: OllamaOcrModel) -> None:
     image = Image.new("RGB", (16, 16), "white")
     output = BytesIO()
     image.save(output, format="PNG")
-    recognize_region(model, output.getvalue(), "text")
+    _generate_region(
+        model,
+        output.getvalue(),
+        "text",
+        max_output_tokens=OLLAMA_WARMUP_OUTPUT_TOKENS,
+    )
 
 
 def recognize_region(model: OllamaOcrModel, image_bytes: bytes, region_type: str) -> str:
     """Recognize one detector-owned crop; the model cannot alter its box or order."""
 
+    return _generate_region(
+        model,
+        image_bytes,
+        region_type,
+        max_output_tokens=OLLAMA_MAX_OUTPUT_TOKENS,
+    )
+
+
+def _generate_region(
+    model: OllamaOcrModel,
+    image_bytes: bytes,
+    region_type: str,
+    *,
+    max_output_tokens: int,
+) -> str:
     payload = json.dumps(
         {
             "model": model.value,
@@ -70,6 +94,10 @@ def recognize_region(model: OllamaOcrModel, image_bytes: bytes, region_type: str
             "images": [base64.b64encode(image_bytes).decode("ascii")],
             "stream": False,
             "keep_alive": "10m",
+            "options": {
+                "num_ctx": OLLAMA_CONTEXT_TOKENS,
+                "num_predict": max_output_tokens,
+            },
         }
     ).encode()
     request = Request(f"{_base_url()}/api/generate", data=payload, headers={"Content-Type": "application/json"})

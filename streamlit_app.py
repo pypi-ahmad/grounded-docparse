@@ -5,8 +5,8 @@ import io
 import json
 import math
 import os
-from datetime import date
 from dataclasses import replace
+from datetime import datetime
 from pathlib import Path
 
 import pymupdf
@@ -23,19 +23,14 @@ from grounded_docparse.batch import (
     build_split_archive,
 )
 from grounded_docparse.config import (
-    LUNA_MODEL,
+    AlternateOcrEngine,
     CloudModel,
     ExtractionEngine,
     OcrEngine,
     ParserConfig,
+    default_alternate_ocr_engine,
 )
 from grounded_docparse.docling_native import make_docling_rapidocr_converter
-from grounded_docparse.ocr_services import switch_extraction_engine
-from grounded_docparse.ollama_runtime import (
-    OllamaOcrModel,
-    unload_model,
-    warm_model,
-)
 from grounded_docparse.models import (
     ClassifierCategory,
     ClassifierProfile,
@@ -53,8 +48,14 @@ from grounded_docparse.native import (
     ProcessingType,
     render_native_combined_result,
 )
-from grounded_docparse.native_parsers import DoclingNativeParser
 from grounded_docparse.native_extraction import LangExtractNativeExtractor
+from grounded_docparse.native_parsers import DoclingNativeParser
+from grounded_docparse.ocr_services import switch_extraction_engine
+from grounded_docparse.ollama_runtime import (
+    OllamaOcrModel,
+    unload_model,
+    warm_model,
+)
 from grounded_docparse.render import (
     build_elements,
     render_annotated_pdf,
@@ -69,7 +70,16 @@ from grounded_docparse.schema_store import (
     parse_markdown_schema,
     parse_tabular_schema,
 )
-from grounded_docparse.universal import UniversalDocumentParser, detect_source_format, inspect_pdf_content
+from grounded_docparse.universal import (
+    UniversalDocumentParser,
+    detect_source_format,
+    inspect_pdf_content,
+)
+from grounded_docparse.usage_costs import (
+    SessionUsageLedger,
+    UsageCostSummary,
+    summarize_calls,
+)
 from grounded_docparse.workspace_store import WorkspaceStore
 
 SUPPORTED_TYPES = [
@@ -116,6 +126,8 @@ WORKSPACE_SETTING_KEYS = (
     "classify_document",
     "generate_toc",
     "visual_recovery",
+    "ocr_disagreement",
+    "ocr_disagreement_engine",
     "ocr_engine_label",
     "use_page_range",
     "range_start",
@@ -180,21 +192,6 @@ HTML_PREVIEW_STYLES = """
 }
 </style>
 """
-LUNA_INPUT_USD_PER_MILLION = 0.20
-LUNA_CACHED_INPUT_USD_PER_MILLION = 0.02
-LUNA_OUTPUT_USD_PER_MILLION = 1.20
-MODEL_PRICING = {
-    CloudModel.GPT_5_6_LUNA.value: (0.20, 1.20, 0.02),
-    CloudModel.GEMINI_3_5_FLASH_LITE.value: (0.30, 2.50, None),
-    CloudModel.GEMINI_3_7_FLASH.value: (
-        0.75 if date.today() <= date(2026, 12, 31) else 1.50,
-        3.75 if date.today() <= date(2026, 12, 31) else 7.50,
-        None,
-    ),
-    CloudModel.AGNES_2_5_FLASH.value: (0.0, 0.0, None),
-}
-
-
 def processing_labels_for(suffix: str) -> list[str]:
     return {
         ".pdf": ["Native PDF", "Scanned PDF", "Mixed PDF"],
@@ -254,44 +251,90 @@ def cached_pdf_inspection(data: bytes):
 def append_session_usage(usage: RunUsage | None, *, skip_calls: int = 0) -> None:
     if usage is None:
         return
+    calls = [call.model_copy(deep=True) for call in usage.calls[skip_calls:]]
     session_usage = st.session_state.setdefault("session_usage", RunUsage())
-    session_usage.calls.extend(
-        call.model_copy(deep=True) for call in usage.calls[skip_calls:]
+    session_usage.calls.extend(calls)
+    launch_session_usage_ledger().extend(calls)
+
+
+@st.cache_resource
+def _launch_session_usage_ledger(session_id: str) -> SessionUsageLedger:
+    return SessionUsageLedger()
+
+
+def launch_session_usage_ledger() -> SessionUsageLedger:
+    session_id = os.getenv("DOCPARSE_APP_SESSION_ID", f"process-{os.getpid()}")
+    return _launch_session_usage_ledger(session_id)
+
+
+def launch_usage_summary() -> UsageCostSummary:
+    return summarize_calls(launch_session_usage_ledger().snapshot())
+
+
+def render_usage_metrics(summary: UsageCostSummary) -> None:
+    usage_columns = st.columns(4)
+    usage_columns[0].metric("Input tokens", f"{summary.input_tokens:,}")
+    usage_columns[1].metric("Cache tokens", f"{summary.cached_input_tokens:,}")
+    usage_columns[2].metric("Output tokens", f"{summary.output_tokens:,}")
+    usage_columns[3].metric("Estimated cost", f"${summary.estimated_cost:.6f}")
+
+
+def render_session_cost_page() -> None:
+    st.title("Session cost")
+    st.caption("Metered AI usage for the current Grounded DocParse app launch.")
+    summary = launch_usage_summary()
+    render_usage_metrics(summary)
+    if summary.unavailable_calls:
+        st.warning(
+            f"Usage telemetry was unavailable for {summary.unavailable_calls} "
+            "model call(s), so the estimate may be incomplete."
+        )
+    if not summary.models:
+        st.info("No metered AI calls in this app session yet.")
+        return
+    rows = [
+        {
+            "Model": next(
+                (item.label for item in CloudModel if item.value == row.model),
+                row.model,
+            ),
+            "Input tokens": row.input_tokens,
+            "Cache tokens": row.cached_input_tokens,
+            "Output tokens": row.output_tokens,
+            "Estimated cost": row.estimated_cost,
+        }
+        for row in summary.models
+    ]
+    rows.append(
+        {
+            "Model": "Total",
+            "Input tokens": summary.input_tokens,
+            "Cache tokens": summary.cached_input_tokens,
+            "Output tokens": summary.output_tokens,
+            "Estimated cost": summary.estimated_cost,
+        }
     )
-
-
-def luna_usage_summary(usage: RunUsage) -> tuple[int, int, int, float]:
-    calls = [call for call in usage.calls if call.model == LUNA_MODEL]
-    input_tokens = sum(call.input_tokens for call in calls)
-    cached_input_tokens = min(
-        sum(getattr(call, "cached_input_tokens", 0) for call in calls), input_tokens
+    st.dataframe(
+        rows,
+        hide_index=True,
+        width="stretch",
+        column_config={
+            "Estimated cost": st.column_config.NumberColumn(format="$%.6f")
+        },
     )
-    output_tokens = sum(call.output_tokens for call in calls)
-    uncached_input_tokens = input_tokens - cached_input_tokens
-    cost = (
-        uncached_input_tokens * LUNA_INPUT_USD_PER_MILLION
-        + cached_input_tokens * LUNA_CACHED_INPUT_USD_PER_MILLION
-        + output_tokens * LUNA_OUTPUT_USD_PER_MILLION
-    ) / 1_000_000
-    return input_tokens, cached_input_tokens, output_tokens, cost
-
-
-def model_usage_summaries(usage: RunUsage) -> list[tuple[str, int, int, int, float]]:
-    summaries = []
-    for model in sorted({call.model for call in usage.calls}):
-        calls = [
-            call for call in usage.calls
-            if call.model == model and getattr(call, "telemetry_available", True)
-        ]
-        if not calls:
-            continue
-        input_tokens = sum(call.input_tokens for call in calls)
-        cached = min(sum(getattr(call, "cached_input_tokens", 0) for call in calls), input_tokens)
-        output_tokens = sum(call.output_tokens for call in calls)
-        input_rate, output_rate, cached_rate = MODEL_PRICING.get(model, (0.0, 0.0, None))
-        cost = ((input_tokens - cached) * input_rate + cached * (cached_rate or input_rate) + output_tokens * output_rate) / 1_000_000
-        summaries.append((model, input_tokens, cached, output_tokens, cost))
-    return summaries
+    for row in summary.models:
+        cached_rate = (
+            row.pricing.cached_input_per_million
+            if row.pricing.cached_input_per_million is not None
+            else row.pricing.input_per_million
+        )
+        st.caption(
+            f"{row.model}: ${row.pricing.input_per_million:.2f}/M input, "
+            f"${cached_rate:.2f}/M cached input, "
+            f"${row.pricing.output_per_million:.2f}/M output"
+        )
+    pricing_date = datetime.now().astimezone().date().isoformat()
+    st.caption(f"Pricing as of {pricing_date}; synchronous API rates.")
 
 
 DOCUMENT_STATE_KEYS = (
@@ -1261,6 +1304,15 @@ if not st.session_state.get("durable_workspace_loaded"):
         load_workspace(first_document_id)
         st.session_state.workspace_restored_at = durable_workspace.updated_at
     st.session_state.durable_workspace_loaded = True
+app_view = st.sidebar.segmented_control(
+    "View",
+    ("Studio", "Session cost"),
+    default="Studio",
+    key="app-view",
+)
+if app_view == "Session cost":
+    render_session_cost_page()
+    st.stop()
 st.session_state.setdefault("extraction_engine", ExtractionEngine.PADDLE_VLLM.value)
 st.session_state.setdefault("active_extraction_engine", None)
 st.session_state.setdefault("cloud_model", CloudModel.GPT_5_6_LUNA.value)
@@ -1281,6 +1333,17 @@ ocr_engines = {engine.label: engine for engine in OcrEngine}
 selected_ocr_engine = ocr_engines.get(
     st.session_state.ocr_engine_label, default_ocr_engine
 )
+available_alternate_ocr_engines = [
+    engine
+    for engine in AlternateOcrEngine
+    if not engine.matches_primary(selected_ocr_engine, st.session_state.ollama_model)
+]
+default_alternate = default_alternate_ocr_engine(
+    selected_ocr_engine, st.session_state.ollama_model
+)
+available_alternate_values = {engine.value for engine in available_alternate_ocr_engines}
+if st.session_state.get("ocr_disagreement_engine") not in available_alternate_values:
+    st.session_state.ocr_disagreement_engine = default_alternate.value
 
 preload_error = st.session_state.get("engine_switch_error")
 
@@ -1671,14 +1734,36 @@ with st.sidebar:
             )
         ),
     )
+    cross_check_supported = selected_extraction_engine in {
+        ExtractionEngine.PADDLE_VLLM,
+        ExtractionEngine.GLM_VLLM,
+        ExtractionEngine.OLLAMA,
+    }
+    if not cross_check_supported:
+        st.session_state.ocr_disagreement = False
     st.toggle(
         "Cross-check uncertain regions with alternate local OCR",
         key="ocr_disagreement",
+        disabled=not cross_check_supported,
         help=(
             "Audits at most 16 uncertain crops (2 per page). Disagreements are "
             "flagged for review; primary OCR text is never replaced."
         ),
     )
+    if st.session_state.ocr_disagreement:
+        alternate_labels = {
+            engine.value: engine.label for engine in available_alternate_ocr_engines
+        }
+        st.selectbox(
+            "Alternate local OCR",
+            [engine.value for engine in available_alternate_ocr_engines],
+            format_func=alternate_labels.__getitem__,
+            key="ocr_disagreement_engine",
+            help=(
+                "The app batches uncertain crops, temporarily swaps GPU models when "
+                "needed, and restores the selected primary engine afterward."
+            ),
+        )
     st.toggle(
         "Classify document type",
         key="classify_document",
@@ -1715,7 +1800,9 @@ with st.sidebar:
         return (
             f"{document.id}:{page_selection}:{refine_markdown}:"
             f"{visual_recovery}:{has_environment}:{selected_extraction_engine.value}:"
-            f"{selected_cloud_model.value}:"
+            f"{selected_cloud_model.value}:{st.session_state.ollama_model}:"
+            f"{st.session_state.ocr_disagreement}:"
+            f"{st.session_state.ocr_disagreement_engine}:"
             f"{processing_type.value if processing_type else 'unselected'}:"
             f"{route_key}:{RESULT_VERSION}"
         )
@@ -1876,6 +1963,9 @@ if parse_clicked and batch_documents:
                     selected_extraction_engine is not ExtractionEngine.PURE_AI
                 ),
                 ocr_disagreement_enabled=bool(st.session_state.ocr_disagreement),
+                ocr_disagreement_engine=AlternateOcrEngine(
+                    st.session_state.ocr_disagreement_engine
+                ),
             )
             parser = UniversalDocumentParser(
                 parser_config,
@@ -2499,7 +2589,7 @@ else:
                         for item in result.ocr_comparisons
                     ],
                     hide_index=True,
-                    use_container_width=True,
+                    width="stretch",
                 )
 
             if analysis is not None and analysis.classification is not None:
@@ -3230,26 +3320,6 @@ if batch_documents:
             )
 
 with session_usage_slot:
-    summaries = model_usage_summaries(st.session_state.session_usage)
-    if summaries:
-        total_input = sum(item[1] for item in summaries)
-        total_cached = sum(item[2] for item in summaries)
-        total_output = sum(item[3] for item in summaries)
-        total_cost = sum(item[4] for item in summaries)
-        usage_columns = st.columns(4)
-        usage_columns[0].metric("Input tokens", f"{total_input:,}")
-        usage_columns[1].metric("Cached input", f"{total_cached:,}")
-        usage_columns[2].metric("Output tokens", f"{total_output:,}")
-        usage_columns[3].metric("Estimated cost", f"${total_cost:.6f}")
-        for model, input_tokens, cached, output_tokens, cost in summaries:
-            input_rate, output_rate, cached_rate = MODEL_PRICING.get(
-                model, (0.0, 0.0, None)
-            )
-            rate_note = f"${input_rate:.2f}/M input, ${output_rate:.2f}/M output"
-            if cached_rate is not None:
-                rate_note += f", ${cached_rate:.2f}/M cached input"
-            st.caption(
-                f"{model}: {input_tokens:,} input ({cached:,} cached), "
-                f"{output_tokens:,} output · estimated ${cost:.6f} · {rate_note}"
-            )
-        st.caption(f"Pricing as of {date.today().isoformat()}; synchronous API rates.")
+    summary = launch_usage_summary()
+    if summary.models or summary.unavailable_calls:
+        render_usage_metrics(summary)

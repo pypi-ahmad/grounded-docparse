@@ -1,7 +1,7 @@
 """Grounded document parsing pipeline."""
 
 from .agentic import DocumentAgent, PreparedDocumentContext
-from .config import OcrEngine, ParserConfig
+from .config import AlternateOcrEngine, OcrEngine, ParserConfig
 from .extraction import DocumentExtractor
 from .models import (
     AgenticAnalysis,
@@ -60,6 +60,7 @@ from .universal import (
 
 __all__ = [
     "AgenticAnalysis",
+    "AlternateOcrEngine",
     "CellSourceAnchor",
     "CharacterInterval",
     "ChatAnswer",
