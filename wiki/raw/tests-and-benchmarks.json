@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f03a0de2c1a2",
-    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
+    "id": "content-feba9b9dbd9f",
+    "base_commit": "e5ef4759b10f3670f5f3f9213f8fd98e3f7ea9f4",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-13T13:54:04.812099+00:00",
+  "generated_at": "2026-08-15T09:22:15.558896+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -210,6 +210,11 @@
       "size": 10944
     },
     {
+      "path": "tests/test_engine_selection.py",
+      "sha256": "e33a3df46e7d2b423a9bf6178c138ad8c7520093f91943ea837efce268a2819a",
+      "size": 1371
+    },
+    {
       "path": "tests/test_evaluation_calibration.py",
       "sha256": "7197c9187df33d360ecb48037e75964ba2793685536eb326effae50da51f9264",
       "size": 4680
@@ -236,8 +241,8 @@
     },
     {
       "path": "tests/test_glmocr_runtime_config.py",
-      "sha256": "fed6dfcccb35bac7b51803c4495f9aff0b7ce9b32d12a7f31ea2f2d57b529432",
-      "size": 4883
+      "sha256": "1a87c6cbb0ae6924314dd495d9d627f1d79df6d9b76593bfe35471c9802274ae",
+      "size": 4884
     },
     {
       "path": "tests/test_ingest.py",
@@ -251,8 +256,8 @@
     },
     {
       "path": "tests/test_launcher_contract.py",
-      "sha256": "33f96f263dbbfab1829c721a5adef87a59cb419f286d19727f3d96d9abbe8b53",
-      "size": 9545
+      "sha256": "7999ae89f4eb9e7a4ae73619541659ceeeb7f5d304f77c88434ee396a01ed7f3",
+      "size": 9830
     },
     {
       "path": "tests/test_markdown_enhancement.py",
@@ -356,8 +361,8 @@
     },
     {
       "path": "tests/test_windows_installer.py",
-      "sha256": "287dc817f7c4bb5c7c50070693cd0ac272760c4716488ba3802ef245b29beb2a",
-      "size": 2513
+      "sha256": "9bcd01983eb11e77d63ed6b07dfb95e528beae1395f03dbad4ce5998c7e3134f",
+      "size": 2613
     },
     {
       "path": "tests/test_workspace_store.py",

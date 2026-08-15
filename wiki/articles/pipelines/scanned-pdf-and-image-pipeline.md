@@ -1,7 +1,7 @@
 ---
 tags: ocr, scanned-pdf, image
 sources: src/grounded_docparse/pipeline.py, src/grounded_docparse/ingest.py, docs/architecture.md
-snapshot: content-f03a0de2c1a2
+snapshot: content-feba9b9dbd9f
 status: existing-and-preserved
 ---
 

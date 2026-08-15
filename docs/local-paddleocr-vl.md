@@ -15,7 +15,7 @@ Run the main setup once from PowerShell in the repository root. It installs or v
 Then launch PaddleOCR-VL:
 
 ```powershell
-.\Launch-PaddleOCR-VL-1.6.cmd
+.\Setup-PaddleOCR-VL-1.6.cmd
 ```
 
 The first Paddle launch creates the isolated environment, installs the locked dependencies, and downloads the PaddleOCR-VL-1.6-0.9B model, PP-DocLayoutV3, and required font. It starts both Paddle services, performs an end-to-end image probe, starts Streamlit, and opens <http://localhost:8600>. Later launches validate and reuse the cached environment and assets.
@@ -93,7 +93,7 @@ When launching from Windows, set port overrides as Windows user environment vari
 | --- | --- |
 | `uv is unavailable in WSL` | Run `.\Setup-GLM-OCR.cmd` once, then retry the Paddle launcher. |
 | CUDA or compute-capability check fails | Update the NVIDIA Windows driver and confirm `nvidia-smi` works inside Ubuntu 24.04. Paddle recognition has no CPU fallback. |
-| Cache is incomplete | Run `.\Launch-PaddleOCR-VL-1.6.cmd` once while online. Keep `PADDLE_PDX_CACHE_HOME` unchanged afterward. |
+| Cache is incomplete | Run `.\Setup-PaddleOCR-VL-1.6.cmd` once while online. Keep `PADDLE_PDX_CACHE_HOME` unchanged afterward. |
 | Port `8118` or `8119` is occupied | Stop the process deliberately or configure two unused ports. The manager refuses unmanaged listeners. |
 | Recognition service does not become healthy | Inspect `.runtime/paddle-vllm.log`. |
 | PaddleX starts but parsing fails | Inspect `.runtime/paddle-api.log`, then run `scripts/wsl/check-paddleocr-api.py`. |

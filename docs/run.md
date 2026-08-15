@@ -4,7 +4,7 @@
 
 Run `Setup-GLM-OCR.cmd` once on a supported Windows 10 22H2 or Windows 11 machine. It validates WSL2 and available OCR capability, creates the locked WSL environment with the native-document extra, starts the selected local OCR stack and Streamlit, waits for health checks, and opens <http://localhost:8600>.
 
-Use `Launch-GLM-OCR.cmd` afterward, or `Launch-PaddleOCR-VL-1.6.cmd` to start with Paddle selected. Both open the same app and the in-app dropdown can switch the exclusive managed GPU backend. GLM lives in `.venv`; Paddle and its compatible vLLM stack live in `.paddle-venv`.
+Use `Launch-Grounded-DocParse.cmd` for normal startup. Use `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` to install and warm one explicit managed GPU backend. GLM lives in `.venv`; Paddle and its compatible vLLM stack live in `.paddle-venv`.
 
 ## Manual commands
 
@@ -36,7 +36,7 @@ Set Windows user variables `DOCPARSE_PADDLE_VLLM_PORT` and
 `DOCPARSE_PADDLE_API_PORT` before launching to override the two Paddle defaults.
 The ports must be distinct integers from 1 through 65535.
 
-`OPENAI_API_KEY` is optional. `Launch-GLM-OCR.cmd` reads it and optional `OPENAI_BASE_URL` from the Windows user environment on every launch and restarts managed Streamlit when those values change. Without a key, GLM-OCR parsing still runs and all Luna controls are disabled or reported unavailable. Use a custom endpoint only when it is trusted and compatible.
+`OPENAI_API_KEY` is optional. `Launch-Grounded-DocParse.cmd` reads OpenAI, Google, and Ollama settings from the Windows user environment on every launch and restarts managed Streamlit when those values change. Use custom endpoints only when trusted and compatible.
 
 With a key present, the default Fast preset performs remote classification and visual recovery is enabled. Selecting **Parse document** can therefore send selected recovery crops and recognized document context to the configured endpoint. Disable the corresponding toggles for GLM-only operation.
 
@@ -62,7 +62,7 @@ Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdo
 The launch scripts start detached WSL processes. To stop them, open WSL in the repository root and run:
 
 ```bash
-for file in .runtime/vllm.pid .runtime/ollama.pid .runtime/paddle-vllm.pid .runtime/paddle-api.pid .runtime/streamlit.pid; do
+for file in .runtime/vllm.pid .runtime/paddle-vllm.pid .runtime/paddle-api.pid .runtime/streamlit.pid; do
   if [[ -f "$file" ]]; then
     kill "$(cat "$file")" 2>/dev/null || true
   fi
@@ -88,7 +88,7 @@ Then relaunch. A healthy reused process keeps its existing environment.
 | Browser is blank | Open the exact local URL and confirm `/_stcore/health` responds |
 | Parse fails before layout | Confirm GLM-OCR is installed in WSL and vLLM exposes `glm-ocr` on port `8080` |
 | Paddle parse fails before layout | Confirm ports `8118` and `8119` are healthy and inspect both Paddle logs under `.runtime/` |
-| Luna controls are disabled | Set `OPENAI_API_KEY` in the Windows user environment, then run `Launch-GLM-OCR.cmd` |
+| Luna controls are disabled | Set `OPENAI_API_KEY` in the Windows user environment, then run `Launch-Grounded-DocParse.cmd` |
 | Provider call fails | Use the displayed request ID, stage, page, and model; optional features fail independently |
 | Block is `needs_review` | Compare its text with the highlighted source box and inspect `verification_reason` |
 | Startup fails | Read `.runtime/vllm.log` and `.runtime/streamlit.log` |
