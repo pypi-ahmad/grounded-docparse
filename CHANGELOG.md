@@ -8,7 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+
+- Independent natural-unit content ranges for every supported upload, with original source indices preserved.
+- Whole-number percentages in the batch progress bar.
 
 ## [0.7.0] - 2026-08-15
 

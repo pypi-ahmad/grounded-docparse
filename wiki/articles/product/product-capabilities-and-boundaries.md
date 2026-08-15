@@ -1,7 +1,7 @@
 ---
 tags: product, scope, formats
 sources: docs/spec.md, README.md
-snapshot: content-063b756c4b68
+snapshot: content-0724dc478444
 status: released
 ---
 

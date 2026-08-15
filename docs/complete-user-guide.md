@@ -47,7 +47,7 @@ Grounded DocParse can:
 - process native, scanned, and mixed PDFs; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB documents; and PNG, JPEG, and TIFF images;
 - process up to 20 files sequentially in one durable local workspace;
 - handle multi-page PDFs and multi-frame images;
-- process an optional continuous page range from a PDF;
+- process an optional continuous natural-unit range from any supported upload;
 - detect document regions such as text, headings, tables, forms, figures, formulas, and seals;
 - reconstruct the document in reading order;
 - show every known region on an annotated page;
@@ -192,20 +192,20 @@ For a safe practice run, use:
 
 In the Windows file picker, open the cloned `grounded-docparse` repository folder, then open its `examples` folder and select the file.
 
-### 5.2 Page range
+### 5.2 Content range
 
-For PDFs, enable **Page range** and choose **Start** and **End** if only one continuous section is needed.
+Enable the format-specific range control and choose **Start** and **End** when only one continuous section is needed. The label changes between Page, Frame, Slide, Sheet, Section, Block, and Row range. Each file in a batch keeps its own range.
 
-Use a page range when:
+Use a content range when:
 
 - a large PDF contains irrelevant appendices;
 - only one known form is required;
 - cost and processing time should be reduced; or
 - a user is testing a small part of a document.
 
-The application creates a new temporary PDF containing only the selected pages. Parsed page 1 therefore means the first selected page, not necessarily page 1 of the original file. Keep the original start-page offset if downstream users need original PDF page numbers.
+The parser keeps original source indices. Selecting PDF pages 4–6 therefore produces evidence and annotations on pages 4–6, and the annotated file retains the original page count.
 
-**Download before changing scope:** choosing a different upload or changing the page range resets the current parse, extraction, routing, and chat state.
+**Download before changing scope:** choosing a different upload or changing the content range resets the current parse, extraction, routing, and chat state.
 
 ### 5.3 Show reading order
 
@@ -414,7 +414,7 @@ Use this view to check:
 - clipping;
 - fax artifacts;
 - unexpected attachments; and
-- whether the selected page range was correct.
+- whether the selected content range was correct.
 
 ## 9. Use the Markdown tab
 

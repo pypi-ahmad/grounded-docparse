@@ -66,6 +66,7 @@ DocumentParser.parse(
     *,
     refine_markdown: bool = True,
     visual_recovery: bool = True,
+    content_range: AppliedContentRange | None = None,
 ) -> ParseResult
 ```
 
@@ -85,7 +86,7 @@ result = DocumentParser().parse(
 
 `filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and no nonblank page contains a grounded layout region, the default parser raises `RuntimeError`. Optional AI failures otherwise fall back to the successful local result or a feature warning/status.
 
-The Python parse API has no page-range argument. Slice a PDF before calling it or use the Streamlit range control.
+`DocumentParser.parse` and `UniversalDocumentParser.parse` accept an optional `content_range`. Ranges are inclusive and one-based, and selected pages or frames retain their original source indices.
 
 ## Universal document parsing
 
@@ -101,10 +102,11 @@ UniversalDocumentParser.parse(
     page_routes: dict[int, PageRoute] | None = None,
     refine_markdown: bool = True,
     visual_recovery: bool = True,
+    content_range: ContentRange | None = None,
 ) -> ParseResult | NativeParseResult
 ```
 
-`ProcessingType` is mandatory: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`. File signatures and container parts are checked before routing. Scanned PDFs and images go only to the existing OCR parser; Native PDFs use `pdf-inspector`; Mixed PDFs need every page route; supported non-PDF native formats use Docling with OCR, VLM/model enrichments, remote services, and external plugins disabled.
+`ProcessingType` is mandatory: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`. `ContentRange(start, end)` selects natural units: PDF/image pages, TIFF frames, slides, sheets, EPUB sections, ordered document blocks, or CSV rows. `inspect_content_range(data, filename)` returns the unit and total. Mixed PDFs need a route for each selected page; extra routes are accepted. File signatures and container parts are checked before routing.
 
 `NativeParseResult` contains immutable `document.base_text`, native Markdown/JSON, source units, elements, character spans, and `SourceAnchor` values. `annotated_pdf` is optional. `render_native_combined_result` produces JSON v5.1.0 when optional native extraction has run.
 

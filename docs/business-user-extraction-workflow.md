@@ -52,7 +52,7 @@ For repeating information, decide in advance how the business wants it represent
 
 ## 2. Upload the Document
 
-Use **Upload documents** to select up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images. Files run sequentially; multi-page PDFs and multi-frame images remain individual documents. A page range is available only for a single scanned PDF.
+Use **Upload documents** to select up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images. Files run sequentially. Every document has an independent optional range using its natural units, such as pages, frames, slides, sheets, sections, blocks, or rows.
 
 Before parsing:
 
