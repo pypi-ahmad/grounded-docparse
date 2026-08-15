@@ -9,5 +9,5 @@ wsl.exe -d Ubuntu-24.04 -- bash -lc "cd \"$DOCPARSE_WINDOWS_ROOT\" && exec scrip
 set "DOCPARSE_EXIT=%ERRORLEVEL%"
 set "WSLENV=%DOCPARSE_OLD_WSLENV%"
 if not "%DOCPARSE_EXIT%"=="0" exit /b %DOCPARSE_EXIT%
-start "" "http://localhost:9356"
+start "" "http://localhost:7137"
 exit /b 0
