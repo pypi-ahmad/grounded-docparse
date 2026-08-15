@@ -497,6 +497,10 @@ def toggle_extraction_engine(target_value: str) -> None:
     if st.session_state.get("engine_switch_error"):
         for engine in ExtractionEngine:
             st.session_state[f"engine-toggle-{engine.value}"] = engine is previous
+    else:
+        selected_ocr = target.parser_ocr_engine or OcrEngine.PADDLEOCR_VL_1_6
+        st.session_state.ocr_engine_label = selected_ocr.label
+        st.session_state.pop("ocr_disagreement_engine", None)
 
 
 def change_ollama_model() -> None:
@@ -528,7 +532,7 @@ def request_managed_shutdown() -> None:
 
 
 @st.dialog(
-    "Stop app and background services",
+    "Stop app",
     icon=":material/power_settings_new:",
 )
 def confirm_managed_shutdown() -> None:
@@ -538,10 +542,10 @@ def confirm_managed_shutdown() -> None:
     if st.session_state.get("shutdown_error"):
         st.error(st.session_state.shutdown_error)
     st.warning(
-        "This stops Streamlit and all GLM-OCR, PaddleOCR, vLLM, and Ollama "
-        "processes managed by this project."
+        "This stops the native Streamlit session. WSL OCR services and Ollama "
+        "remain available."
     )
-    st.caption("Saved workspace data is kept. Use either Windows launcher to restart.")
+    st.caption("Saved workspace data is kept. Use the Windows launcher to restart.")
     st.button(
         "Stop now",
         key="confirm-managed-shutdown",
@@ -1313,11 +1317,11 @@ app_view = st.sidebar.segmented_control(
 if app_view == "Session cost":
     render_session_cost_page()
     st.stop()
-st.session_state.setdefault("extraction_engine", ExtractionEngine.PADDLE_VLLM.value)
+st.session_state.setdefault("extraction_engine", ExtractionEngine.OLLAMA.value)
 st.session_state.setdefault("active_extraction_engine", None)
 st.session_state.setdefault("cloud_model", CloudModel.GPT_5_6_LUNA.value)
 st.session_state.setdefault("cloud_model_label", CloudModel.GPT_5_6_LUNA.label)
-st.session_state.setdefault("ollama_model", OllamaOcrModel.GLM_OCR.value)
+st.session_state.setdefault("ollama_model", OllamaOcrModel.PADDLEOCR_VL.value)
 if st.session_state.active_extraction_engine is None:
     apply_engine_selection()
 selected_extraction_engine = ExtractionEngine(st.session_state.extraction_engine)

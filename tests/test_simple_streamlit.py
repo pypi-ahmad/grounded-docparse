@@ -8,7 +8,7 @@ import pytest
 from openpyxl import Workbook
 from streamlit.testing.v1 import AppTest
 
-from grounded_docparse import pipeline, runtime_control, universal
+from grounded_docparse import ollama_runtime, pipeline, runtime_control, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
 from grounded_docparse.config import LUNA_MODEL, ExtractionEngine
@@ -44,6 +44,7 @@ from grounded_docparse.workspace_store import WorkspaceStore
 def isolated_studio_database(monkeypatch, tmp_path) -> None:
     monkeypatch.setenv("DOCPARSE_STUDIO_DB_PATH", str(tmp_path / "studio.sqlite3"))
     monkeypatch.setenv("DOCPARSE_APP_SESSION_ID", str(tmp_path))
+    monkeypatch.setattr(ollama_runtime, "warm_model", lambda _model: None)
     monkeypatch.setattr(
         universal,
         "inspect_pdf_content",
@@ -66,6 +67,17 @@ def _select_scanned(app: AppTest, filename: str) -> AppTest:
 def _select_engine(app: AppTest, label: str) -> AppTest:
     toggle = next(item for item in app.toggle if item.label == label)
     return app if toggle.value else toggle.set_value(True).run(timeout=20)
+
+
+def test_fresh_studio_defaults_to_local_ollama_paddleocr() -> None:
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    assert not app.exception
+    assert app.session_state["extraction_engine"] == ExtractionEngine.OLLAMA.value
+    assert (
+        app.session_state["ollama_model"]
+        == "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
+    )
 
 
 def test_studio_allows_glm_without_openai_environment(
@@ -1103,6 +1115,8 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
             "generate_toc": False,
             "visual_recovery": True,
             "ocr_engine_label": "GLM-OCR",
+            "ollama_model": "glm-ocr:latest",
+            "ocr_disagreement_engine": "vllm-paddleocr-vl-1.6",
         },
         result_version="4.6.0",
     )

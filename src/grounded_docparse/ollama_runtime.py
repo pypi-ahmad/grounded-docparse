@@ -5,6 +5,7 @@ import json
 import os
 from enum import StrEnum
 from io import BytesIO
+from typing import Literal
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -19,6 +20,14 @@ class OllamaOcrModel(StrEnum):
     GLM_OCR = "glm-ocr:latest"
     PADDLEOCR_VL = "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
     DEEPSEEK_OCR = "deepseek-ocr:latest"
+
+    @property
+    def element_source(self) -> Literal["glm-ocr", "paddleocr-vl-1.6", "deepseek-ocr"]:
+        return {
+            OllamaOcrModel.GLM_OCR: "glm-ocr",
+            OllamaOcrModel.PADDLEOCR_VL: "paddleocr-vl-1.6",
+            OllamaOcrModel.DEEPSEEK_OCR: "deepseek-ocr",
+        }[self]
 
 
 def _base_url() -> str:

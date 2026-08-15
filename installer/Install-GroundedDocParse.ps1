@@ -377,9 +377,8 @@ function Invoke-Provision {
         $script:Progress.Value = 100
         Set-Step 'Installation complete.'
         if (-not $NoAppLaunch) {
-            $projectRoot = Get-WslProjectRoot -User $user
-            Invoke-WslShell -Command "cd '$projectRoot' && bash scripts/wsl/launch-stack.sh" -User $user | Out-Null
-            Start-Process 'http://localhost:7137'
+            $launcher = Join-Path $InstallRoot 'Launch-Grounded-DocParse.cmd'
+            Start-Process -FilePath $launcher -WorkingDirectory $InstallRoot
             [System.Windows.Forms.MessageBox]::Show('Grounded DocParse is installed and ready.', 'Setup complete') | Out-Null
         }
     } catch {
@@ -401,10 +400,11 @@ function Invoke-Uninstall {
 set -e
 data="$HOME/.local/share/grounded-docparse"
 case "$data" in "$HOME/.local/share/grounded-docparse") ;; *) exit 1 ;; esac
-for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/paddle-vllm.pid" "$PWD/.runtime/paddle-api.pid" "$PWD/.runtime/streamlit.pid"; do
+for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/paddle-vllm.pid" "$PWD/.runtime/paddle-api.pid"; do
   [[ -f "$pid_file" ]] && kill "$(<"$pid_file")" 2>/dev/null || true
 done
-rm -rf -- "$data"
+rm -rf -- "$data/.venv" "$data/.paddle-venv"
+rmdir -- "$data" 2>/dev/null || true
 '@
     Invoke-WslShell -Command $command -AllowFailure | Out-Null
 }

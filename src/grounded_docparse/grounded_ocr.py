@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import math
 import base64
 import json
+import math
 import re
 import threading
 from dataclasses import dataclass
@@ -14,8 +14,8 @@ from urllib.request import Request, urlopen
 
 from PIL import Image
 
-from .local_ocr import OcrPageResult, OcrRegion
 from .config import OcrEngine, ParserConfig, validate_loopback_origin
+from .local_ocr import OcrPageResult, OcrRegion
 
 LAYOUT_MODEL_ID = "PaddlePaddle/PP-DocLayoutV3_safetensors"
 LAYOUT_MODEL_REVISION = "97d101e6db2642e162a1d05392d1b0231c91033e"
@@ -222,14 +222,23 @@ def get_layout_detector(
     return PPDocLayoutV3Detector(threshold=threshold)
 
 
-def ensure_layout_model(*, download: bool) -> None:
+def _snapshot_layout_model(*, local_files_only: bool) -> None:
     from huggingface_hub import snapshot_download
 
     snapshot_download(
         repo_id=LAYOUT_MODEL_ID,
         revision=LAYOUT_MODEL_REVISION,
-        local_files_only=not download,
+        local_files_only=local_files_only,
     )
+
+
+def ensure_layout_model() -> None:
+    from huggingface_hub.errors import LocalEntryNotFoundError
+
+    try:
+        _snapshot_layout_model(local_files_only=True)
+    except LocalEntryNotFoundError:
+        _snapshot_layout_model(local_files_only=False)
 
 
 def crop_region(

@@ -46,20 +46,10 @@ def test_streamlit_uses_port_7137_everywhere_it_launches() -> None:
     native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
         encoding="utf-8"
     )
-    stack = (ROOT / "scripts" / "wsl" / "launch-stack.sh").read_text(
-        encoding="utf-8"
-    )
     config = (ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8")
-    installer = (
-        ROOT / "installer" / "Install-GroundedDocParse.ps1"
-    ).read_text(encoding="utf-8")
 
     assert "http://localhost:7137" in native_launcher
-    assert "STREAMLIT_PORT=7137" in stack
-    assert '--server.port "$STREAMLIT_PORT"' in stack
-    assert "streamlit_uses_configured_port()" in stack
     assert "port = 7137" in config
-    assert "http://localhost:7137" in installer
 
 
 def test_native_launcher_treats_pid_file_as_advisory_and_records_listener() -> None:
@@ -67,9 +57,8 @@ def test_native_launcher_treats_pid_file_as_advisory_and_records_listener() -> N
         encoding="utf-8"
     )
 
-    assert "$LegacyStreamlitPorts = @(8600, 9356)" in launcher
+    assert "$LegacyStreamlitPorts" not in launcher
     assert "Removing stale managed PID file" in launcher
-    assert "Leaving unrelated process" in launcher
     assert "Wait-AppHealthy" in launcher
     assert "Set-Content -LiteralPath $PidPath -Value $listenerPid" in launcher
     assert "occupied by an unmanaged process; refusing to stop it" in launcher
@@ -97,57 +86,28 @@ def test_native_launcher_follows_app_and_local_ocr_logs_until_exit() -> None:
     assert "pause" in command
 
 
-def test_native_launcher_stops_only_the_verified_wsl_streamlit_session() -> None:
+def test_native_launcher_has_no_wsl_app_lifecycle() -> None:
     native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
         encoding="utf-8"
     )
-    stopper = (ROOT / "scripts/wsl/stop-stack.sh").read_text(encoding="utf-8")
 
-    assert "Stop-WslManagedApp" in native_launcher
-    assert "--app-only" in native_launcher
-    assert "--app-only" in stopper
-    assert '[[ "$STOP_MODE" == "all" ]]' in stopper
-    assert 'manage-ocr-stack.sh" stop all' in stopper
-    assert '"$WSL_ENV/bin/python" -m streamlit cache clear' in stopper
-
-
-def test_wsl_launcher_restarts_streamlit_on_luna_environment_drift() -> None:
-    launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
-
-    assert "streamlit_environment_matches" in launcher
-    assert 'OPENAI_API_KEY' in launcher
-    assert 'OPENAI_BASE_URL' in launcher
-
-
-def test_wsl_launcher_restarts_streamlit_on_application_source_drift() -> None:
-    launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
-
-    assert "streamlit_source_fingerprint" in launcher
-    assert "DOCPARSE_SOURCE_FINGERPRINT" in launcher
-    assert '"$PROJECT_ROOT/streamlit_app.py"' in launcher
-    assert '"$PROJECT_ROOT/src/grounded_docparse"' in launcher
-    assert '"$PROJECT_ROOT/uv.lock"' in launcher
-    assert 'process_is_running "$pid"' in launcher
+    assert "Stop-WslManagedApp" not in native_launcher
+    assert "Stop-LegacyAppListeners" not in native_launcher
+    assert "stop-stack.sh" not in native_launcher
 
 
 def test_managed_stack_has_a_safe_stop_all_command() -> None:
     manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
-    stopper = (ROOT / "scripts/wsl/stop-stack.sh").read_text(encoding="utf-8")
 
-    assert 'manage-ocr-stack.sh" stop all' in stopper
-    assert '"streamlit run streamlit_app.py"' in stopper
-    assert 'readlink -f "/proc/$pid/cwd"' in stopper
     assert '[[ "$action" == "stop"' in manager
     assert "stop_glm" in manager
     assert "stop_paddle" in manager
 
 
 def test_wsl_services_bind_to_loopback() -> None:
-    run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
     serve_glmocr = (ROOT / "scripts/wsl/serve-glmocr.sh").read_text(encoding="utf-8")
     installer = (ROOT / "installer/Install-GroundedDocParse.ps1").read_text(encoding="utf-8")
 
-    assert '"$@" --server.address=127.0.0.1' in run_app
     assert "--host 127.0.0.1" in serve_glmocr
     assert "http://127.0.0.1:11434/api/tags" in installer
 
@@ -219,13 +179,8 @@ def test_paddle_cuda_check_accepts_current_wsl_nvidia_smi_format() -> None:
 
 def test_detached_services_do_not_inherit_launcher_locks() -> None:
     manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
-    launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
 
     assert manager.count("9>&-") == 3
-    assert (
-        'run-app.sh --server.headless true --server.port "$STREAMLIT_PORT" 8>&-'
-        in launcher
-    )
 
 
 def test_paddle_readiness_probe_generates_its_png() -> None:
@@ -242,7 +197,7 @@ def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
     assert "launch-native.ps1" in launcher
     assert "uv sync" in native
     assert "--extra native --extra windows-layout" in native
-    assert "grounded_docparse.windows_setup --download-layout" in native
+    assert "grounded_docparse.windows_setup --prepare-models" in native
     assert "Stop-PreviousManagedApp" in native
     assert "Stop-AppListeningOnPort" in native
     assert "OwningProcess" in native
@@ -250,7 +205,7 @@ def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
     assert "-m streamlit cache clear" in native
     assert "refusing to stop it" in native
     assert "streamlit', 'run'" in native
-    assert (ROOT / "Launch-Grounded-DocParse-WSL-Legacy.cmd").is_file()
+    assert not (ROOT / "Launch-Grounded-DocParse-WSL-Legacy.cmd").exists()
 
 
 def test_launcher_set_is_consolidated_and_setup_commands_warm_requested_gpu() -> None:
@@ -268,15 +223,21 @@ def test_launchers_repair_shared_environment_and_use_current_worktree() -> None:
     manager = (ROOT / "scripts" / "wsl" / "manage-ocr-stack.sh").read_text(
         encoding="utf-8"
     )
-    run_app = (ROOT / "scripts" / "wsl" / "run-app.sh").read_text(
-        encoding="utf-8"
-    )
 
     assert "glm_environment_current()" in manager
     assert 'sha256sum "$PROJECT_ROOT/uv.lock"' in manager
     assert 'glm_environment_current "$backend"' in manager
     assert "glm_environment_current vllm" in manager
-    assert 'export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"' in run_app
+
+
+def test_legacy_wsl_app_launchers_are_removed() -> None:
+    for relative_path in (
+        "Launch-Grounded-DocParse-WSL-Legacy.cmd",
+        "scripts/wsl/launch-stack.sh",
+        "scripts/wsl/run-app.sh",
+        "scripts/wsl/stop-stack.sh",
+    ):
+        assert not (ROOT / relative_path).exists()
 
 
 def test_installer_reuses_dependencies_and_has_windows_ollama_profile() -> None:

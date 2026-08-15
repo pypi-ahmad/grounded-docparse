@@ -28,8 +28,8 @@ from .enhancement import (
     render_chunk_plan,
 )
 from .gateways import OpenAIDocumentGateway
-from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
 from .grounded_ocr import get_grounded_ocr_runtime
+from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
 from .local_ocr import GlmPageResult, OcrPageResult
 from .models import (
     AgentRole,
@@ -75,6 +75,7 @@ from .models import (
 )
 from .ocr_disagreement import token_edit_similarity
 from .ocr_services import ensure_managed_ocr_engine, temporary_alternate_ocr_engine
+from .ollama_runtime import OllamaOcrModel
 from .paddle_ocr import get_paddleocr_runtime
 from .page_analysis import PageAnalyzer, draft_from_analysis
 from .quality import (
@@ -85,13 +86,13 @@ from .quality import (
     select_repair_blocks,
     semantic_text,
 )
+from .rapidocr_runtime import get_rapidocr_runtime
 from .render import (
     build_elements,
     materialize_document_quality,
     render_agentic_document,
     render_annotated_pdf,
 )
-from .rapidocr_runtime import get_rapidocr_runtime
 from .runtime import ProviderRuntime
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
@@ -2753,6 +2754,10 @@ class DocumentParser:
         started = time.perf_counter()
         runtime = ProviderRuntime(self.config)
         analyzer = PageAnalyzer(self.config)
+        local_analysis_enabled = (
+            self.config.local_ocr_enabled
+            and self.gateway_factory is OpenAIDocumentGateway
+        )
         with tempfile.TemporaryDirectory(prefix="docparse-") as temporary:
             workdir = Path(temporary)
             source = ingest_document(
@@ -2766,10 +2771,7 @@ class DocumentParser:
             )
             if self.config.ocr_disagreement_enabled:
                 self.ocr_service_switcher(self.config.ocr_engine)
-            if (
-                self.gateway_factory is OpenAIDocumentGateway
-                and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
-            ):
+            if local_analysis_enabled and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
                 analyzer.prepare_document(source.source_path, source.pages)
             pages: list[Page] = []
             warnings: list[str] = []
@@ -2811,7 +2813,7 @@ class DocumentParser:
                     total,
                     f"Processing pages {batch[0].number}-{batch[-1].number}",
                 )
-                if self.gateway_factory is OpenAIDocumentGateway:
+                if local_analysis_enabled:
                     for analysis in analyzer.analyze_window(batch):
                         page_number = analysis.render.source_page
                         analyses_by_page[page_number] = analysis
@@ -2827,7 +2829,7 @@ class DocumentParser:
                     for page in batch:
                         analyses_by_page[page.number] = None
 
-            if self.gateway_factory is OpenAIDocumentGateway:
+            if local_analysis_enabled:
                 nonblank = [
                     analysis
                     for analysis in analyses_by_page.values()
@@ -2869,12 +2871,14 @@ class DocumentParser:
                     workdir,
                     self.config,
                 )
-                if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+                if local_analysis_enabled
+                and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
                 else _PaddleFormRecovery()
             )
             warnings.extend(paddle_form_recovery.warnings)
             effective_glm_form_recovery = (
-                self.config.ocr_engine is OcrEngine.GLM_OCR
+                local_analysis_enabled
+                and self.config.ocr_engine is OcrEngine.GLM_OCR
                 and visual_recovery
                 and self.config.glm_form_recovery_enabled
             )
@@ -2919,7 +2923,7 @@ class DocumentParser:
                 ceiling=self.config.max_visual_recovery_crops,
             )
 
-            planning_applies = self.gateway_factory is OpenAIDocumentGateway
+            planning_applies = local_analysis_enabled
             if planning_applies:
                 recovery_plan = _visual_recovery_plan(
                     source.pages,
@@ -3035,7 +3039,13 @@ class DocumentParser:
             elements = build_elements(
                 document,
                 recovered_region_ids,
-                local_source=self.config.ocr_engine.value,
+                local_source=(
+                    "luna-recovery"
+                    if not self.config.local_ocr_enabled
+                    else OllamaOcrModel(self.config.ollama_model).element_source
+                    if self.config.ocr_engine is OcrEngine.OLLAMA
+                    else self.config.ocr_engine.value
+                ),
             )
             base_markdown = render_agentic_document(document).markdown
             _emit(

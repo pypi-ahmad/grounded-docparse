@@ -119,6 +119,32 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
         assert len(rendered[0].get_drawings()) == 4
 
 
+def test_ai_ade_skips_local_ocr_and_records_luna_provenance(
+    simple_pdf: bytes, monkeypatch
+) -> None:
+    class AiGateway(AcceptingGateway):
+        def __init__(self, _config) -> None:
+            pass
+
+    monkeypatch.setattr(pipeline_module, "OpenAIDocumentGateway", AiGateway)
+    monkeypatch.setattr(
+        pipeline_module.PageAnalyzer,
+        "analyze_window",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("AI ADE must not call local OCR")
+        ),
+    )
+    parser = DocumentParser(
+        ParserConfig(render_dpi=72, local_ocr_enabled=False),
+        gateway_factory=AiGateway,
+    )
+
+    result = parser.parse(simple_pdf, "notice.pdf")
+
+    assert result.elements
+    assert {element.source for element in result.elements} == {"luna-recovery"}
+
+
 class QualityRecoveryGateway:
     input_tokens = 0
     output_tokens = 0
