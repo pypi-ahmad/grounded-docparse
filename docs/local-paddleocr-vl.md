@@ -1,15 +1,15 @@
 # Local PaddleOCR-VL-1.6 runtime
 
-The supported PaddleOCR-VL runtime is Windows 10 22H2 or Windows 11 x64 with Ubuntu 24.04 under WSL2. It requires an NVIDIA GPU with compute capability 8.0 or newer and CUDA 12.6 or newer. Unlike GLM-OCR, this runtime has no Ollama, CPU, or AMD recognition fallback.
+The PaddleOCR-VL vLLM runtime remains in Ubuntu 24.04 under WSL2 while the app runs natively on Windows 11. It requires an NVIDIA GPU with compute capability 8.0 or newer and CUDA 12.6 or newer.
 
 PaddleOCR-VL uses a separate locked Python 3.12.10 environment so its PaddlePaddle and vLLM dependencies do not conflict with the main GLM environment. The default path is `~/.local/share/grounded-docparse/.paddle-venv`; override it with `DOCPARSE_PADDLE_WSL_ENV`.
 
 ## Recommended Windows installation
 
-Run the main setup once from PowerShell in the repository root. It installs or validates WSL2, Ubuntu 24.04, `uv`, and NVIDIA access:
+Launch the native app from PowerShell, then provision Paddle when needed:
 
 ```powershell
-.\Setup-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
 Then launch PaddleOCR-VL:
@@ -18,7 +18,7 @@ Then launch PaddleOCR-VL:
 .\Setup-PaddleOCR-VL-1.6.cmd
 ```
 
-The first Paddle launch creates the isolated environment, installs the locked dependencies, and downloads the PaddleOCR-VL-1.6-0.9B model, PP-DocLayoutV3, and required font. It starts both Paddle services, performs an end-to-end image probe, starts Streamlit, and opens <http://localhost:8600>. Later launches validate and reuse the cached environment and assets.
+The first Paddle setup creates the isolated WSL environment, downloads the PaddleOCR-VL-1.6-0.9B model, PP-DocLayoutV3, and required font, starts both Paddle services, and performs an end-to-end image probe. The native Streamlit process remains separate. Later starts validate and reuse cached assets.
 
 The launcher fails closed if WSL, the GPU runtime, model assets, health checks, or required ports are unavailable. It does not silently switch the parse to GLM-OCR.
 
@@ -91,7 +91,7 @@ When launching from Windows, set port overrides as Windows user environment vari
 
 | Symptom | Action |
 | --- | --- |
-| `uv is unavailable in WSL` | Run `.\Setup-GLM-OCR.cmd` once, then retry the Paddle launcher. |
+| `uv is unavailable in WSL` | Rerun `.\Setup-PaddleOCR-VL-1.6.cmd`; its provisioner installs missing WSL prerequisites. |
 | CUDA or compute-capability check fails | Update the NVIDIA Windows driver and confirm `nvidia-smi` works inside Ubuntu 24.04. Paddle recognition has no CPU fallback. |
 | Cache is incomplete | Run `.\Setup-PaddleOCR-VL-1.6.cmd` once while online. Keep `PADDLE_PDX_CACHE_HOME` unchanged afterward. |
 | Port `8118` or `8119` is occupied | Stop the process deliberately or configure two unused ports. The manager refuses unmanaged listeners. |

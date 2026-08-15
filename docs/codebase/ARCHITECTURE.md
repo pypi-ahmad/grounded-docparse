@@ -40,7 +40,7 @@ For native extraction, LangExtract receives only `NativeDocument.base_text`. A v
 |---|---|---|
 | Interface | Per-file selection, mixed-page review, batch status, CLI binding, exports | `streamlit_app.py`, `cli.py` |
 | Dispatch/validation | Size, extension, signature, ZIP structure, processing compatibility, one route | `universal.py` |
-| OCR parsing | Render, local OCR, deterministic assembly, optional Luna recovery | `pipeline.py`, `ingest.py`, `local_ocr.py`, `paddle_ocr.py` |
+| OCR parsing | Render, selected engine, deterministic assembly, optional AI enhancement | `pipeline.py`, `ingest.py`, `grounded_ocr.py`, `ollama_runtime.py`, `paddle_ocr.py` |
 | Native parsing | Native PDF positions/tables; Docling conversion; exact structure claims | `native_parsers.py`, `docling_native.py` |
 | Contracts/grounding | Pydantic output models, frozen base text, source units/elements/spans/anchors | `models.py`, `native.py` |
 | Provider operations | OpenAI requests plus document-scoped retry/concurrency diagnostics | `gateways.py`, `runtime.py`, `agentic.py` |

@@ -83,10 +83,10 @@ It processes up to 20 uploaded files sequentially in one active local workspace,
 
 The application has two broad layers:
 
-1. **Local document parsing:** the user selects one compatible processing type per file. Scanned PDFs and images use the selected GLM-OCR or PaddleOCR-VL-1.6 engine; native PDFs use `pdf-inspector`; structured native formats use Docling without OCR.
-2. **Optional Luna features:** `gpt-5.6-luna` can inspect selected difficult OCR crops or reason over parsed content. Native field extraction uses LangExtract over immutable source text.
+1. **Document parsing:** the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; pure AI is the explicit direct-agentic option.
+2. **Optional AI features:** GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or Agnes 2.5 Flash can enhance failed/sub-75%-confidence regions or reason over parsed content.
 
-Local parsing can run without an OpenAI key. The optional features require `OPENAI_API_KEY` and may send document content to the configured provider.
+Local parsing can run without a cloud key. Optional features require the key for the selected provider and may send document content to it.
 
 ## 3. Before you use the application
 
@@ -96,7 +96,7 @@ Ask the technical owner to confirm:
 
 - the application is running at an approved URL;
 - you are using the correct environment;
-- the Luna destination shown in the application is approved;
+- the selected AI provider and any custom destination are approved;
 - the document is allowed to be processed in that environment;
 - your extraction schema and routing profile are approved; and
 - you know where approved outputs must be stored.
@@ -105,12 +105,12 @@ Do not upload real personal, financial, confidential, or health information into
 
 ### 3.2 Technical setup summary
 
-The supported local setup uses Windows 11, WSL2 with Ubuntu 24.04, and an NVIDIA GPU available inside WSL.
+The primary app, CPU layout detector, native parsers, and Ollama run on Windows 11. Optional GLM-OCR and PaddleOCR-VL GPU services remain in WSL2 Ubuntu 24.04.
 
 For first-time setup from the repository root in PowerShell:
 
 ```powershell
-.\Setup-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
 For later sessions:
@@ -123,14 +123,16 @@ The application normally opens at <http://localhost:8600>. GLM-OCR uses loopback
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
-### 3.3 Optional Luna configuration
+### 3.3 Optional AI-provider configuration
 
-Local OCR parsing does not need an OpenAI key. Optional visual recovery, Markdown enhancement, classification, TOC, routing, extraction, and chat do.
+Local parsing does not need a cloud key. Optional enhancement, refinement, classification, TOC, routing, extraction, and chat require the selected provider key.
 
 An administrator can save the key in the Windows user environment:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
+[Environment]::SetEnvironmentVariable("GOOGLE_API_KEY", "your-key", "User")
+[Environment]::SetEnvironmentVariable("AGNES_API_KEY", "your-key", "User")
 ```
 
 An optional `OPENAI_BASE_URL` redirects the same sensitive requests to another compatible endpoint. Only use an approved destination.
@@ -143,8 +145,8 @@ This is important for business, privacy, and technical users.
 
 | Feature | Runs locally? | What may be sent remotely when enabled? |
 | --- | --- | --- |
-| Native parsing and local layout/OCR | Yes | Nothing to Luna |
-| Visual recovery | Candidate selection is local; Luna inspection is remote | Selected difficult image crops and nearby context |
+| Native parsing and grounded layout/OCR | Yes | Nothing to a cloud provider |
+| AI enhancement | Candidate selection is local; provider inspection is remote | Failed or sub-75%-confidence region crops and context |
 | Markdown enhancement | No | Grounded Markdown and compact layout information |
 | Document classification | No | Recognized content/layout from the first two parsed pages |
 | Table of contents | No | Recognized content/layout across the document |
@@ -153,19 +155,18 @@ This is important for business, privacy, and technical users.
 | Native field extraction | No | Immutable `base_text` plus the extraction schema |
 | Document chat | No | Question, recent chat history, and relevant document context |
 
-The application displays the Luna destination near the top of the screen. Stop if the destination is unexpected.
+Stop if the selected provider or a configured custom destination is unexpected.
 
-**Important:** Fast mode is not automatically local-only. When a key is available, Fast enables document classification, and visual recovery normally starts enabled.
+**Important:** Fast mode is not automatically local-only when classification is enabled. AI enhancement is a separate toggle and defaults off.
 
-For a local-only run with either OCR engine, turn off:
+For a local-only run, avoid pure AI and turn off:
 
-- **Enhance with gpt-5.6-luna**;
-- **Enable visual recovery on hard regions**;
+- **AI enhancement for failed or <75% confidence regions**;
 - **Classify document type**;
 - **Generate table of contents**; and
 - **Enable document chat**.
 
-Do not run extraction or custom form routing in a local-only workflow because those features require Luna.
+Do not run AI extraction or custom form routing in a local-only workflow.
 
 ## 5. Upload a document
 
@@ -231,7 +232,7 @@ A Native PDF with pages that need OCR stops and asks you to select Mixed PDF. Em
 
 ### 6.2 ADE mode
 
-ADE mode is a group of presets for optional Luna features. It is not a connection to an external ADE product.
+ADE mode is a group of presets for optional AI features. It is not a connection to an external ADE product.
 
 | Mode | What it enables | Good for |
 | --- | --- | --- |
@@ -241,7 +242,7 @@ ADE mode is a group of presets for optional Luna features. It is not a connectio
 
 Changing one of the preset-controlled switches can move the mode to **Custom**.
 
-For scanned PDFs and images, every mode still runs the same selected local OCR parse. Native routes preserve their selected native structure before optional document features run.
+ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; pure AI remains its own explicit engine.
 
 Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
@@ -257,9 +258,9 @@ Use it when:
 
 It does not replace the source text, change element locations, or reorder the canonical document.
 
-### 6.4 Enable visual recovery on hard regions
+### 6.4 Enable AI enhancement for failed or low-confidence regions
 
-Visual recovery inspects difficult source regions. Engine-specific local recovery runs first: GLM-OCR revisits eligible form regions, while PaddleOCR-VL may recover missing checkbox states in PDFs only when 190 and 200 DPI parses agree. Luna's independent medium-effort budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
+AI enhancement is optional and defaults off. It runs after the selected grounded engine and considers recognition failures or regions below 75% confidence.
 
 Candidates can include:
 
@@ -270,7 +271,7 @@ Candidates can include:
 - clipped content; or
 - a likely OCR ambiguity.
 
-Luna may replace the text of an existing element only when its crop-backed confidence is at least `0.85`.
+The selected AI model may propose replacement text only for an existing grounded region; provider output is validated before acceptance.
 
 It cannot change:
 
@@ -303,7 +304,7 @@ Use it for:
 - manuals; or
 - any long document with headings.
 
-If Luna TOC generation fails, the application may fall back to headings already found by local OCR.
+If AI TOC generation fails, the application may fall back to headings already found by the grounded engine.
 
 ### 6.7 Enable document chat
 
@@ -319,10 +320,10 @@ For OCR routes, the progress area shows stages such as:
 
 1. Layout detection
 2. Region recognition
-3. Luna visual recovery
+3. Optional AI enhancement
 4. Base Markdown
 5. Annotated PDF when a visual artifact is available
-6. Luna Markdown refinement
+6. AI Markdown refinement
 7. Document classification
 8. Table of contents
 
@@ -346,7 +347,7 @@ Native PDFs preserve selectable-text evidence through page and bounding-box anch
 
 ### 7.2 What happens when an optional feature fails
 
-Optional Luna failures normally do not erase a successful local OCR parse. The application displays warnings or an unavailable/failed feature status.
+Optional AI failures normally do not erase a successful local parse. The application displays warnings or an unavailable/failed feature status.
 
 Parsing can stop if the source is invalid, password protected, over a configured limit, or if all nonblank pages lack usable local OCR regions. One failed page does not by itself trigger this document-wide empty-layout failure; isolated page failures can remain visible as warnings/partial output.
 
@@ -379,7 +380,7 @@ The top metrics show:
 - **Tables:** detected table regions;
 - **Figures:** detected figures, images, or charts;
 - **Time:** total processing time; and
-- **Recovered:** elements whose text was repaired by Luna.
+- **Recovered:** elements whose text was repaired by AI enhancement.
 
 These metrics describe the parse; they do not by themselves prove accuracy.
 
@@ -427,7 +428,7 @@ Enable **Show raw Markdown** to inspect or copy the exact text representation.
 
 ### 9.1 Refined Markdown versus grounded Markdown
 
-The displayed/downloaded Markdown may include optional Luna presentation improvements. The application also retains `base_markdown`, a canonical version tied to source elements.
+The displayed/downloaded Markdown may include optional AI presentation improvements. The application also retains `base_markdown`, a canonical version tied to source elements.
 
 Technical users should use the Full JSON when they need both representations and provenance.
 
@@ -456,7 +457,7 @@ The legend identifies common region groups:
 - orange: figures;
 - violet: formulas;
 - red: seals; and
-- dashed orange: Luna-recovered text.
+- dashed orange: AI-recovered text.
 
 ### 10.2 Page controls
 
@@ -491,7 +492,7 @@ Each item shows:
 - reading-order number;
 - element type;
 - a text preview; and
-- a **Luna** badge when the text was recovered.
+- an AI-recovery badge when the text was recovered.
 
 Select an item to open its highlighted annotated page. Use **Clear selection** to remove the current highlight.
 
@@ -821,7 +822,7 @@ Exact steps:
 
 ### 13.6 Classify forms
 
-Select **Classify forms**. Luna receives grounded Markdown/layout plus the category definitions and returns contiguous page segments.
+Select **Classify forms**. The selected AI model receives grounded Markdown/layout plus category definitions and returns contiguous page segments.
 
 The application validates:
 
@@ -1052,7 +1053,7 @@ A successful run does not mean every requested value is populated. It means:
 
 ### 17.1 Source ownership
 
-For scanned PDFs and images, the selected local OCR engine and deterministic code own:
+For grounded scanned-PDF and image routes, the selected local engine and deterministic code own:
 
 - element IDs;
 - normalized bounding boxes;
@@ -1061,7 +1062,7 @@ For scanned PDFs and images, the selected local OCR engine and deterministic cod
 - reading order; and
 - initial OCR confidence.
 
-Luna can reason about existing elements, but it does not own their geometry. For native results, immutable `base_text` and `SourceAnchor` values own the evidence: PDF page/bounding-box positions, document paragraphs/shapes, sheet cells, table cells, or CSV rows/columns.
+AI models can reason about existing elements, but do not own their geometry. For native results, immutable `base_text` and `SourceAnchor` values own the evidence: PDF page/bounding-box positions, document paragraphs/shapes, sheet cells, table cells, or CSV rows/columns.
 
 ### 17.2 Grounding
 
@@ -1162,7 +1163,7 @@ Developers can use the Python package directly through:
 - `ParserConfig` for configuration; and
 - `render_combined_result` for Full JSON.
 
-Actual parsing must run with the selected GLM-OCR or PaddleOCR-VL stack available in Linux/WSL. The Python API is synchronous and does not provide a page-range argument.
+The Python API is synchronous and does not provide a page-range argument. WSL is required only when the selected engine is GLM-OCR or PaddleOCR-VL vLLM; native and Ollama engines run on Windows.
 
 Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-to-hero-tutorial.md) for examples.
 
@@ -1229,7 +1230,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 1. Confirm the document is approved for the local workstation.
 2. Select Custom mode.
-3. Disable every Luna feature.
+3. Disable every AI feature.
 4. Parse with local GLM-OCR.
 5. Review Markdown, Annotated PDF, and Layout Tree.
 6. Download Markdown, annotated PDF, and Full JSON. Extract JSON will not appear because extraction was not run.
@@ -1249,7 +1250,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 1. Prefer a clearer source if available.
 2. Keep visual recovery on if remote crop inspection is approved.
-3. Review the Recovered metric and Luna badges.
+3. Review the Recovered metric and AI-recovery badges.
 4. Compare difficult text with the annotated source.
 5. Treat unreadable or missing source content as a manual exception.
 
@@ -1259,9 +1260,9 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 | --- | --- | --- |
 | Browser is blank | Streamlit did not start or is unhealthy | Open the exact local URL and inspect `.runtime/streamlit.log` |
 | Parse fails before layout | Local GLM service/model is unavailable | Check `.runtime/vllm.log`, WSL GPU access, and service health |
-| Luna controls are disabled | `OPENAI_API_KEY` is unavailable | Configure it in approved user scope and relaunch |
-| Luna destination is unexpected | Custom `OPENAI_BASE_URL` is active | Stop and verify/remove the value |
-| Extraction says a key is required | Extraction is an optional Luna feature | Configure an approved key or remain GLM-only |
+| AI controls are disabled | The selected model's API key is unavailable | Configure it in approved User scope and relaunch |
+| AI destination is unexpected | A custom provider base URL is active | Stop and verify/remove the value |
+| Extraction says a key is required | Extraction needs the selected AI provider | Configure its approved key or remain local-only |
 | File is rejected | Invalid, unsupported, encrypted, oversized, or over configured limits | Use a valid supported source or reduce/split it outside the app |
 | Markdown has missing content | OCR missed or could not read a source region | Check annotated source and use a clearer scan |
 | Reading order is wrong | Complex layout or hierarchy problem | Inspect reading-order labels and Layout Tree |
@@ -1278,7 +1279,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 ### Does Fast mode mean no external API calls?
 
-No. Fast enables document classification, and visual recovery may also be enabled. Use Custom mode and disable all Luna options for a local-only run.
+No. Fast enables document classification when a provider is configured. Use Custom mode and disable all AI options for a local-only run.
 
 ### Is extraction automatic after parsing?
 
@@ -1304,7 +1305,7 @@ Yes. Mark only `newauth` as extractable and assign its schema. Keep `medical_rec
 
 No. Approval confirms the routing decision. Eligibility comes only from the saved profile.
 
-### Can Luna change a bounding box?
+### Can AI enhancement change a bounding box?
 
 No. GLM/deterministic code owns element identity, location, type, and order.
 
@@ -1328,7 +1329,7 @@ Schemas and routing profiles are saved in SQLite. The active batch's sources, pa
 
 | Term | Plain-language meaning |
 | --- | --- |
-| ADE mode | UI preset for optional Luna features |
+| ADE mode | UI preset for optional AI features |
 | Annotated PDF | Source document with detected-region overlays |
 | Bounding box | Normalized location of a page region |
 | Category | Business label used for form routing |
@@ -1338,7 +1339,7 @@ Schemas and routing profiles are saved in SQLite. The active batch's sources, pa
 | Extraction | Collecting requested fields from parsed content |
 | GLM-OCR | Local layout and text-recognition system |
 | Grounding | Linking a result to known source evidence |
-| Luna | Optional model used for recovery and document reasoning |
+| AI model | Selectable GPT 5.6 Luna, Gemini, or Agnes model used for enhancement and document reasoning |
 | Markdown | Readable text format produced by the parser |
 | Routing profile | Reusable form categories and extraction rules |
 | Schema | Field names, descriptions, and types to extract |
@@ -1352,7 +1353,7 @@ Schemas and routing profiles are saved in SQLite. The active batch's sources, pa
 Before ending a document session, confirm:
 
 - [ ] The correct file and page range were processed.
-- [ ] The Luna destination and feature settings were approved.
+- [ ] The selected AI provider, destination, and feature settings were approved.
 - [ ] All expected pages and important regions are present.
 - [ ] Markdown and reading order are usable.
 - [ ] Every routed segment is reviewed and approved.

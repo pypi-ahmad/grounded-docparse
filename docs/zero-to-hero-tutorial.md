@@ -6,14 +6,14 @@ The short version is:
 
 ```text
 required per-file processing type
-  -> scanned PDF/image: selected local GLM-OCR or PaddleOCR-VL
+  -> scanned PDF/image: one selected pure-AI, vLLM, Docling/RapidOCR, or Ollama engine
   -> Native PDF: pdf-inspector; Mixed PDF: reviewed page routes
   -> Office/open formats: OCR-disabled Docling conversion
   -> grounded OCR elements or immutable native source spans/anchors
   -> Markdown, JSON, optional annotated PDF, and optional extraction/chat
 ```
 
-The most important design rule is that the selected local OCR engine and deterministic code own document structure. Optional language-model features can reason over that structure, but they cannot silently move evidence, invent a missing page region, or replace the source geometry.
+The most important grounded-path rule is that the selected local engine and deterministic code own document structure. Optional AI enhancement can reason over that structure, but cannot move evidence, invent a missing detector region, or replace source geometry. Pure AI is an explicit separate engine.
 
 ## 1. Choose your path through this tutorial
 
@@ -69,7 +69,7 @@ Why this matters: the user explicitly selects the evidence route. Native PDF tex
 
 Layout analysis finds regions such as headings, paragraphs, tables, form areas, and images. OCR recognizes text inside those regions.
 
-The selected local OCR engine owns:
+For grounded routes, the selected local engine owns:
 
 - element identity;
 - normalized bounding boxes;
@@ -136,17 +136,18 @@ The supported local topology is deliberately small:
 Browser
   -> Streamlit studio on 127.0.0.1:8600
        -> ingest and rasterization
-       -> GLM-OCR SDK
-            -> local vLLM service on 127.0.0.1:8080
+       -> selected engine
+            -> Windows CPU PP-DocLayoutV3 + WSL GLM vLLM or Windows Ollama
+            -> PaddleX/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or pure AI
        -> deterministic quality and recovery planning
-       -> optional gpt-5.6-luna requests
+       -> optional selected-provider requests
        -> renderers, tabs, highlighting, and downloads
 ```
 
 There are two AI execution boundaries:
 
-1. **Local OCR:** GLM-OCR or PaddleOCR-VL-1.6 layout and recognition run inside WSL against loopback-only services.
-2. **Optional Luna:** selected crops or recognized document context go to the configured OpenAI-compatible destination only when the associated feature is enabled and `OPENAI_API_KEY` is available.
+1. **Local extraction:** native Windows components handle PP-DocLayoutV3, Ollama, Docling/RapidOCR, and PDF Inspector; GLM/Paddle vLLM recognition remains in WSL on loopback-only services.
+2. **Optional AI:** selected crops or document context go to OpenAI, Google, or Agnes only when the associated feature is enabled and its key is available.
 
 There is no open-ended agent loop. Optional features use bounded, typed requests followed by deterministic validation.
 
@@ -154,16 +155,15 @@ There is no open-ended agent loop. Optional features use bounded, typed requests
 
 ### 5.1 Prerequisites
 
-The supported setup is:
+The supported primary setup is:
 
 - Windows 11;
-- WSL2 with Ubuntu 24.04;
-- an NVIDIA Windows driver with WSL GPU passthrough;
+- optional WSL2 Ubuntu 24.04 and NVIDIA passthrough for the two vLLM engines;
 - Git;
 - network access during the first dependency/model download; and
 - enough disk space for the WSL environment and model cache.
 
-Python package metadata supports Python 3.12 through 3.14, but the automated WSL setup installs the repository’s verified Python 3.12.10 runtime.
+Python package metadata supports Python 3.12 through 3.14; the native launcher installs Python 3.12 under `%LOCALAPPDATA%\GroundedDocParse`.
 
 The repository does not publish universal minimum RAM, VRAM, or disk figures because page size, model cache, and concurrency change the requirement. The checked-in workstation profile was tuned around an 8 GB GPU and an 18 GB WSL memory limit; treat that as a verified reference profile, not a guarantee for every document. Confirm GPU visibility and leave capacity for the WSL environment, Python packages, and pinned model snapshots before setup.
 
@@ -183,12 +183,14 @@ wsl -d Ubuntu-24.04 -- nvidia-smi
 
 Restart Windows if WSL requests it, then complete Ubuntu’s first-login setup.
 
-### 5.3 Decide whether optional Luna features are allowed
+### 5.3 Decide whether optional AI features are allowed
 
-Local GLM parsing does not require an OpenAI key. If visual recovery, classification, refinement, TOC, extraction, routing, or chat are required, save the key in the Windows user environment:
+Local parsing does not require a cloud key. If enhancement, classification, refinement, TOC, extraction, routing, or chat are required, save the selected provider key in the Windows User environment:
 
 ```powershell
 [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
+[Environment]::SetEnvironmentVariable("GOOGLE_API_KEY", "your-key", "User")
+[Environment]::SetEnvironmentVariable("AGNES_API_KEY", "your-key", "User")
 
 # Optional trusted OpenAI-compatible endpoint:
 # [Environment]::SetEnvironmentVariable(
@@ -200,34 +202,33 @@ Local GLM parsing does not require an OpenAI key. If visual recovery, classifica
 
 Do not place real credentials in `.env`, Markdown, scripts, source code, commits, logs, screenshots, or issue reports.
 
-The configured base URL receives the same sensitive content that would otherwise go to OpenAI. Verify the **Luna destination** displayed by the UI before processing real documents.
+A configured custom base URL receives the same sensitive content as its default provider. Verify the destination before processing real documents.
 
 ### 5.4 Run first-time setup
 
 From PowerShell in the repository root:
 
 ```powershell
-.\Setup-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
 The setup process:
 
-1. validates WSL and GPU visibility;
-2. installs or reuses `uv` inside WSL;
-3. installs the locked Python environment and Linux-only local OCR dependencies;
-4. downloads pinned GLM-OCR and PP-DocLayoutV3 model revisions;
-5. writes the resolved runtime configuration under `.runtime/`;
-6. starts local vLLM and Streamlit;
-7. validates a real image-recognition request; and
-8. opens <http://localhost:8600>.
+1. installs or reuses Windows `uv` and Python 3.12;
+2. synchronizes the locked native and `windows-layout` dependencies;
+3. downloads pinned CPU PP-DocLayoutV3 assets;
+4. installs or starts Windows Ollama;
+5. starts native Streamlit on loopback; and
+6. opens <http://localhost:8600>.
 
-Later sessions default to GLM-OCR:
+Later sessions use the same launcher. Use `Setup-GLM-OCR.cmd` or
+`Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU backend.
 
 ```powershell
 .\Launch-Grounded-DocParse.cmd
 ```
 
-Use `.\Setup-PaddleOCR-VL-1.6.cmd` to install and warm PaddleOCR-VL explicitly. The generic launcher reuses healthy managed processes, refreshes user-scope provider settings, and opens the app.
+The generic launcher refreshes User-scope provider settings and opens the app. The UI keeps the two WSL GPU models mutually exclusive.
 
 ### 5.5 Manual WSL launch
 
@@ -265,7 +266,7 @@ Open <http://localhost:8600>, then follow this minimal path:
 
 ### 6.1 ADE modes
 
-“ADE mode” is only a UI preset for optional Luna features. It is not an integration with an external ADE product. Every mode uses the same selected local OCR parse.
+“ADE mode” is only a UI preset for optional AI features. It is not an integration with an external ADE product.
 
 | Mode | Markdown refinement | Document classification | TOC |
 | --- | --- | --- | --- |
@@ -275,7 +276,7 @@ Open <http://localhost:8600>, then follow this minimal path:
 
 Visual recovery and chat are separate toggles. Extraction is never automatically run by an ADE mode.
 
-If an OpenAI key is present, Fast mode can still make remote requests because classification is enabled and visual recovery defaults on. Disable every Luna-related toggle for a local-only run.
+Fast mode can make remote requests when classification is enabled and the selected provider key exists. AI enhancement defaults off. Disable every AI-related toggle for a local-only run.
 
 ### 6.2 What happens after selecting Parse document?
 
@@ -301,7 +302,7 @@ The UI implements a page range by creating a new subset PDF before parsing. Outp
 
 ### 6.3 Recovery invariants
 
-Luna recovery may replace text on an existing element. It may not change:
+AI enhancement may replace text on a failed or sub-75%-confidence existing element. It may not change:
 
 - element ID;
 - bounding box;
@@ -311,9 +312,9 @@ Luna recovery may replace text on an existing element. It may not change:
 - local OCR confidence; or
 - document structure.
 
-Luna additions, rejected regions, geometry changes, and structural changes are ignored. If local OCR misses a source region entirely, the default recovery path does not synthesize it.
+AI additions, geometry changes, and structural changes are ignored. If the detector misses a source region entirely, enhancement does not synthesize it.
 
-If at least one page is nonblank but no nonblank page contains any local OCR layout region, the parser stops before Luna. An isolated page failure can remain visible as partial output with warnings.
+If at least one page is nonblank but no nonblank page contains any grounded layout region, the parser stops before enhancement. An isolated page failure can remain visible as partial output with warnings.
 
 ## 7. Learn the Streamlit studio
 
@@ -699,14 +700,14 @@ The repository installs `grounded-docparse`. Use `grounded-docparse ingest` for 
 
 The snippets below are incremental: later examples assume the `result` produced in Section 13.1 unless they explicitly parse a different example. Save the combined imports and statements as `scratch.py` in the repository root.
 
-Actual GLM parsing must run inside the setup-created WSL environment because the `local-ocr` dependency is Linux-only. With the managed services already started, open WSL in the repository directory and run:
+GLM recognition requires the setup-created WSL vLLM service, while the parser and CPU layout stage run on Windows. Legacy evaluation commands still run in the WSL environment:
 
 ```bash
 source "${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}/bin/activate"
 python scratch.py
 ```
 
-Native Windows `uv run python scratch.py` can perform native parsing after `uv sync --locked --extra native`; Linux-only local OCR still requires the setup-created WSL runtime.
+Native Windows `uv run python scratch.py` can parse after `uv sync --locked --extra native --extra windows-layout`; GLM and Paddle vLLM additionally require their WSL services.
 
 ### 13.1 Parse a document
 
@@ -988,7 +989,7 @@ The fastest way to understand the implementation is to follow the user request t
 | File | Responsibility |
 | --- | --- |
 | `streamlit_app.py` | Upload, modes, progress, tabs, schema/profile editors, review, downloads |
-| `src/grounded_docparse/config.py` | Environment parsing, parser limits, analysis thresholds, fixed Luna model |
+| `src/grounded_docparse/config.py` | Engine/model selection, endpoints, parser limits, and thresholds |
 | `src/grounded_docparse/ingest.py` | Input validation, page rasterization, crop rerendering |
 | `src/grounded_docparse/local_ocr.py` | Process-wide GLM-OCR runtime and SDK normalization |
 | `src/grounded_docparse/page_analysis.py` | Page signals and GLM region conversion |
@@ -1182,7 +1183,7 @@ From PowerShell:
 uv sync --locked
 ```
 
-Native Windows installs the core/test dependencies but not Linux-only `local-ocr`. Actual local GLM parsing uses the WSL environment created by setup.
+Native Windows installs the core, native, and CPU-layout dependencies. GLM and Paddle recognition use the WSL services created by their setup commands; Ollama recognition remains native.
 
 ### 18.2 Run the standard checks
 
@@ -1262,16 +1263,16 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 | --- | --- | --- |
 | Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8600>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
-| Luna controls are disabled | `OPENAI_API_KEY` unavailable to Streamlit | Save it in Windows user scope and rerun `Launch-Grounded-DocParse.cmd` |
+| AI controls are disabled | Selected model key unavailable to Streamlit | Save it in Windows User scope and rerun `Launch-Grounded-DocParse.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |
-| Extraction tab says key required | Extraction is a Luna feature | Configure an approved key or remain GLM-only |
+| Extraction tab says key required | AI extraction needs the selected provider | Configure its approved key or remain local-only |
 | Markdown schema is rejected | Mixed table/bullets, invalid field, encoding, or size | Use one supported format, UTF-8 `.md`, under 1 MB |
 | Routing profile is unusable | Extractable category references an unsaved schema | Save the named extraction schema first |
 | Extract eligible forms is disabled | Unapproved segment, no eligible segment, or changed profile | Apply review to every segment or rerun classification |
 | Segment requires review | Confidence below `0.85` or window-boundary merge | Verify pages/category and approve or correct it |
 | Extracted field is inferred | Exact evidence match failed | Inspect source; do not treat it as verified |
 | Block is `needs_review` | Deterministic quality/verification concern | Compare text with its highlighted source region |
-| Page content is missing | GLM did not detect the region | Use a clearer source; Luna recovery cannot create missing regions |
+| Page content is missing | The selected detector did not find the region | Use a clearer source; AI enhancement cannot create missing regions |
 | Saved schemas disappeared | Different SQLite path/process environment | Check `DOCPARSE_STUDIO_DB_PATH` and database permissions |
 | Provider request fails | Rate limit, endpoint, schema, or network error | Use displayed request/stage diagnostics; inspect safe logs without document text |
 

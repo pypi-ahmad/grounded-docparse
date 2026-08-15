@@ -69,11 +69,11 @@ First choose a compatible processing type for every file. Native PDFs use `pdf-i
 
 For a comprehensive first parse, use **Full** ADE mode. It produces refined Markdown, document classification, and a table of contents in addition to the core parse; it does not run schema extraction. **Fast** mode is useful when speed matters and the document pattern is already familiar. **Custom** mode allows the optional features to be selected individually.
 
-For scanned, faxed, blurred, or irregular documents, leave **Enable visual recovery on hard regions** turned on. The app first relies on the selected local OCR engine for the complete document. Luna is used only for selected existing regions that show evidence of OCR difficulty, such as low confidence, an empty detected text box, broken structure, clipping, or a recognizable OCR ambiguity. Clean, high-confidence content is left untouched. Luna does not create a region that local OCR failed to detect.
+For scanned, faxed, blurred, or irregular documents, optionally enable **AI enhancement for failed or <75% confidence regions**. The app first relies on the selected grounded engine. The selected AI model is used only for failed or low-confidence existing regions; clean, high-confidence content is left untouched, and enhancement cannot create a detector region that does not exist.
 
 Visual recovery is not a second full-document OCR pass. It is a limited repair step for difficult regions.
 
-Visual recovery and field extraction are separate choices. Turning visual recovery off does not turn extraction off; it means extraction will use the selected local OCR result without Luna image repair. Luna must still be available when the user later selects **Run extraction**.
+AI enhancement and field extraction are separate choices. Turning enhancement off does not turn extraction off; extraction then uses the selected engine result without remote image repair. A configured AI provider is still required for AI extraction.
 
 ## 4. Parse the Document
 
@@ -82,13 +82,13 @@ Select **Parse document**. The progress area shows the major stages while the ap
 1. Finds the page layout and reading order.
 2. Reads text, tables, fields, and other document regions.
 3. Checks existing detected regions for weak, empty, or malformed OCR output.
-4. Uses Luna on eligible hard regions when visual recovery is enabled.
+4. Uses the selected AI model on eligible failed or sub-75%-confidence regions when enhancement is enabled.
 5. Builds layout-aware Markdown and the annotated PDF.
 6. Runs the selected optional classification, refinement, and table-of-contents features.
 
-The source locations and reading order remain fixed. Luna may repair eligible text, but it does not move content to a different place on the page.
+The source locations and reading order remain fixed. AI enhancement may repair eligible text, but does not move content.
 
-If an optional Luna feature is unavailable or inconclusive, the core GLM-OCR parse remains available. Schema extraction itself requires Luna to be available.
+If an optional AI feature is unavailable or inconclusive, a successful grounded parse remains available. AI schema extraction requires the selected provider.
 
 ## 5. Review the Parse Before Extracting
 

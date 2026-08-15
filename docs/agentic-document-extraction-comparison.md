@@ -2,7 +2,7 @@
 
 Agentic document extraction is more than OCR followed by a prompt. It is a controlled document-understanding workflow that can perceive visual structure, choose among specialized tasks, reason from user instructions, validate its outputs, preserve uncertainty, and connect results back to source evidence.
 
-LandingAI calls its managed platform **Agentic Document Extraction (ADE)**. Grounded DocParse implements a related pattern with selectable local GLM-OCR or PaddleOCR-VL-1.6, optional bounded Luna reasoning, deterministic validation, and review controls. The products are not connected, and their contracts are not identical, but comparing them helps clarify what “agentic” means in practical document processing.
+LandingAI calls its managed platform **Agentic Document Extraction (ADE)**. Grounded DocParse implements a related pattern with six selectable extraction engines, optional bounded OpenAI/Gemini/Agnes reasoning, deterministic validation, and review controls. The products are not connected, and their contracts are not identical.
 
 > **Reference date:** LandingAI product descriptions in this page were verified against its official documentation on 30 July 2026. Product APIs can change; follow the linked LandingAI documentation for current behavior.
 
@@ -53,13 +53,13 @@ Grounded DocParse uses a parse-then-reason architecture:
 PDF or image
     -> local rasterization and GLM-OCR
     -> grounded Markdown + hierarchical JSON + layout elements
-    -> optional bounded Luna reasoning
+    -> optional bounded selected-provider reasoning
     -> deterministic validation and evidence resolution
     -> conditional review
     -> cited result, warning, or safe failure
 ```
 
-The selected local OCR engine owns the canonical document evidence: text regions, element IDs, types, pages, reading order, confidence, and normalized bounding boxes. Optional Luna stages can interpret that evidence, but they cannot freely redefine its identity or geometry.
+The selected grounded engine owns canonical document evidence: text regions, element IDs, types, pages, reading order, confidence, and normalized bounding boxes. Optional AI stages can interpret that evidence, but cannot freely redefine its identity or geometry.
 
 The application coordinates several specialized goals:
 
@@ -78,7 +78,7 @@ For the implementation details and control boundaries, see [How Grounded DocPars
 | Area | LandingAI ADE | Grounded DocParse |
 |---|---|---|
 | Primary delivery model | Managed platform with APIs and client libraries | Workstation-oriented Streamlit application and Python package |
-| Visual parser | LandingAI parsing models exposed through ADE Parse | Selectable local GLM-OCR or PaddleOCR-VL-1.6 service |
+| Visual parser | LandingAI parsing models exposed through ADE Parse | Pure AI, WSL GLM/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or grounded Windows Ollama |
 | Parse representation | Markdown, hierarchical JSON, chunks, pages, and coordinates | Base/refined Markdown, hierarchical JSON, blocks, atoms, elements, pages, and normalized boxes |
 | Classification | User-defined page classification can run independently of Parse | Whole-document classification and user-defined form segmentation run after the local parse |
 | Mixed packets | Split returns classified sub-documents and their Markdown | Form routing produces contiguous logical segments and runs assigned schemas against in-memory subsets |
@@ -210,7 +210,7 @@ The application has no open-ended planner, arbitrary tool execution, durable age
 ## What this comparison does not claim
 
 - Grounded DocParse does not call, embed, or reproduce LandingAI ADE.
-- The **ADE mode** label in Grounded DocParse is only a preset for optional Luna features; it is not a LandingAI integration.
+- The **ADE mode** label in Grounded DocParse is only a preset for optional AI features; it is not a LandingAI integration.
 - Similar functions do not imply identical model architecture, output contracts, accuracy, scale, or production maturity.
 - The current logical form router does not replace a separate-document export feature.
 - Public LandingAI API behavior does not reveal or prove an undocumented internal autonomous-agent architecture.
