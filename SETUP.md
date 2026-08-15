@@ -89,7 +89,7 @@ For first and later sessions:
 
 The single launcher validates setup and repairs missing or stale dependencies before opening the app. Use `.\Setup-GLM-OCR.cmd` or `.\Setup-PaddleOCR-VL-1.6.cmd` to install and warm one explicit GPU stack. The manager stops the other GPU service first, so only one VLM is resident.
 
-Each native launch verifies and stops only the previously recorded Grounded DocParse Streamlit process, clears Streamlit's application cache, and starts a fresh browser session. It preserves the durable workspace database and stored source/result artifacts. An unrelated process on port `8600` is never stopped.
+Each native launch verifies and stops the previously recorded process and any Grounded DocParse Streamlit process actively listening on port `8600`, clears Streamlit's application cache, and starts a fresh browser session. It preserves the durable workspace database and stored source/result artifacts. An unrelated process on port `8600` is never stopped.
 
 To keep using the Windows launcher with custom parser/provider settings, add the required `export NAME=value` lines to the WSL user's `~/.profile`, then restart the affected managed process. `scripts/wsl/run-app.sh` forces local OCR on and uses the generated runtime configuration. Layout uses `cuda:0` with vLLM and `cpu` with Ollama.
 
