@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: routing, ui, cli, processing-types
 sources: src/grounded_docparse/native.py, streamlit_app.py, src/grounded_docparse/cli.py
-snapshot: content-7e6cbb56ddf0
+snapshot: content-12489de42da5
 status: released</code></pre></details>
         <div class="markdown-body"><p><code>ProcessingType</code> defines nine user-selectable modes: native PDF, scanned PDF, mixed PDF, Word, PowerPoint, Excel, CSV, image, and other native. The file extension narrows which choices are legal, while signature and container checks verify that the selected mode matches the uploaded content.</p>
 <p>The selection is authoritative. Batch uploads carry one independent selection per file, the CLI receives a matching <code>--processing-type</code>, and dispatch reaches exactly one top-level pipeline. There is no automatic reinterpretation after validation fails.</p>

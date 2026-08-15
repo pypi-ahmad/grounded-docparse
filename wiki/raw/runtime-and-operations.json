@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-7e6cbb56ddf0",
-    "base_commit": "674513ea01d3331ef750167b83c0ba388cf02d14",
+    "id": "content-12489de42da5",
+    "base_commit": "91399758f358b85f9f32ac46a610b491e705ac95",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:04:43.660836+00:00",
+  "generated_at": "2026-08-15T10:05:27.309454+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
@@ -81,8 +81,8 @@
     },
     {
       "path": "scripts/windows/launch-native.ps1",
-      "sha256": "3404e621010d0528b66bf0dc2df8c6ba7d13b19bfe436a5aab486b9d9b296257",
-      "size": 5562
+      "sha256": "62a76d6b6660b00a4b3ffce84914725a7956a47af2df008c7c37627f2fbd1f15",
+      "size": 6142
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",

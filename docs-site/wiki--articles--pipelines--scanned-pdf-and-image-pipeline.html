@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: ocr, scanned-pdf, image
 sources: src/grounded_docparse/pipeline.py, src/grounded_docparse/ingest.py, docs/architecture.md
-snapshot: content-7e6cbb56ddf0
+snapshot: content-12489de42da5
 status: existing-and-preserved</code></pre></details>
         <div class="markdown-body"><p>Scanned PDFs and standalone images use the existing raster-and-OCR path. PDF pages are rendered to pixels, images are normalized, and the selected GLM-OCR or PaddleOCR-VL engine owns layout, recognition, confidence, bounding boxes, element types, and reading order.</p>
 <p>Native PDF inspection is not invoked for this mode. That isolation is a regression boundary: adding native formats must not change scanned-document behavior, provider selection, or recovery semantics.</p>

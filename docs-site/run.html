@@ -46,7 +46,7 @@
           <p class="document-path">docs/run.md</p>
           <h1>Run locally</h1>
           <div class="document-meta">
-            <span>788 words</span>
+            <span>796 words</span>
             <span>4 min read</span>
             <a href="https://github.com/pypi-ahmad/grounded-docparse/blob/main/docs/run.md">View Markdown source ↗</a>
           </div>
@@ -92,7 +92,7 @@ The ports must be distinct integers from 1 through 65535.</p>
 <p>“ADE mode” is the UI label for optional AI-feature presets; it does not connect to an external ADE service.</p>
 <p>Native PDFs use <code>pdf-inspector</code>; Word, PowerPoint, Excel, CSV, ODF, HTML, Markdown, and EPUB use Docling without OCR. Native extraction is optional and sends immutable <code>base_text</code>, never refined Markdown, to LangExtract. An accepted field must have an exact character interval that resolves to source anchors.</p>
 <h2 id="stop-and-restart">Stop and restart<a class="heading-anchor" href="#stop-and-restart" title="Copy section link">#</a></h2>
-<p>The native launcher records the Streamlit PID under <code>%LOCALAPPDATA%\GroundedDocParse\runtime</code>. Every launch verifies and stops that prior app process, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. An unrelated process on port <code>8600</code> is left untouched. To stop WSL GPU services, run:</p>
+<p>The native launcher records the Streamlit PID under <code>%LOCALAPPDATA%\GroundedDocParse\runtime</code>. Every launch verifies and stops that process plus any Grounded DocParse Streamlit listener active on port <code>8600</code>, clears Streamlit cache state, and starts a fresh session without deleting the durable workspace. An unrelated process on port <code>8600</code> is left untouched. To stop WSL GPU services, run:</p>
 <pre><code class="language-bash">for file in .runtime/vllm.pid .runtime/paddle-vllm.pid .runtime/paddle-api.pid .runtime/streamlit.pid; do
   if [[ -f &quot;$file&quot; ]]; then
     kill &quot;$(cat &quot;$file&quot;)&quot; 2&gt;/dev/null || true
