@@ -4,7 +4,17 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUNTIME_DIR="$PROJECT_ROOT/.runtime"
 STREAMLIT_PID_FILE="$RUNTIME_DIR/streamlit.pid"
-DELAY_SECONDS="${1:-2}"
+WSL_ENV="${DOCPARSE_WSL_ENV:-$HOME/.local/share/grounded-docparse/.venv}"
+DELAY_SECONDS=2
+STOP_MODE=all
+
+for argument in "$@"; do
+  case "$argument" in
+    --app-only) STOP_MODE=app ;;
+    [0-9]*) DELAY_SECONDS="$argument" ;;
+    *) echo "ERROR: Unknown shutdown option: $argument" >&2; exit 2 ;;
+  esac
+done
 
 if [[ ! "$DELAY_SECONDS" =~ ^[0-9]+$ || "$DELAY_SECONDS" -gt 10 ]]; then
   echo "ERROR: Shutdown delay must be an integer from 0 to 10 seconds." >&2
@@ -52,11 +62,23 @@ stop_streamlit() {
   return 1
 }
 
+clear_streamlit_cache() {
+  [[ -x "$WSL_ENV/bin/python" ]] || return 0
+  "$WSL_ENV/bin/python" -m streamlit cache clear
+}
+
 status=0
 stop_streamlit || status=1
-bash "$PROJECT_ROOT/scripts/wsl/manage-ocr-stack.sh" stop all || status=1
+clear_streamlit_cache || status=1
+if [[ "$STOP_MODE" == "all" ]]; then
+  bash "$PROJECT_ROOT/scripts/wsl/manage-ocr-stack.sh" stop all || status=1
+fi
 if [[ "$status" -eq 0 ]]; then
-  echo "Grounded DocParse and all managed background services stopped."
+  if [[ "$STOP_MODE" == "all" ]]; then
+    echo "Grounded DocParse and all managed background services stopped."
+  else
+    echo "Grounded DocParse Streamlit session stopped; OCR services remain active."
+  fi
 else
   echo "ERROR: One or more managed services could not be stopped." >&2
 fi
