@@ -110,7 +110,7 @@ PROCESSING_LABELS = {
     "Image": ProcessingType.IMAGE,
     "Other Native": ProcessingType.OTHER_NATIVE,
 }
-RESULT_VERSION = "4.6.0"
+RESULT_VERSION = "4.6.1"
 THUMBNAILS_PER_GROUP = 12
 WORKSPACE_SETTING_KEYS = (
     "extraction_engine",
@@ -122,7 +122,6 @@ WORKSPACE_SETTING_KEYS = (
     "refine_markdown",
     "classify_document",
     "generate_toc",
-    "visual_recovery",
     "ocr_disagreement",
     "ocr_disagreement_engine",
     "ocr_engine_label",
@@ -145,16 +144,16 @@ ADE_PRESETS = {
 STAGE_LABELS = (
     ("layout", "Layout detection"),
     ("recognize", "Region recognition"),
-    ("recover", "Luna visual recovery"),
+    ("recover", "AI visual recovery"),
     ("cross_check", "Local OCR cross-check"),
     ("assemble", "Base Markdown"),
     ("annotate", "Annotated PDF"),
-    ("enhance", "Luna Markdown refinement"),
+    ("enhance", "AI Markdown refinement"),
     ("classify", "Document classification"),
     ("toc", "Table of contents"),
 )
-LUNA_REVIEW_WARNING = (
-    "Luna output may be incorrect or influenced by instructions inside the document. "
+AI_REVIEW_WARNING = (
+    "AI output may be incorrect or influenced by instructions inside the document. "
     "Review confidence and cited source regions before consequential use."
 )
 HTML_PREVIEW_STYLES = """
@@ -434,7 +433,6 @@ def initialize_ade_mode() -> None:
     for key, value in preset.items():
         st.session_state.setdefault(key, value)
     st.session_state.setdefault("enable_chat", False)
-    st.session_state.setdefault("visual_recovery", True)
     st.session_state.setdefault("ocr_disagreement", False)
 
 
@@ -1665,6 +1663,16 @@ with st.sidebar:
         value=False,
         disabled=selected_extraction_engine is ExtractionEngine.PURE_AI,
         key="ai_enhancement",
+        help=(
+            "Uses the selected AI model to recover failed, low-confidence, or "
+            "otherwise difficult regions. The budget scales from 8 to 64 crops by "
+            "document length, with at most 3 per page; "
+            + (
+                "local GLM recovery runs first."
+                if selected_ocr_engine is OcrEngine.GLM_OCR
+                else "local OCR output is used directly before AI recovery."
+            )
+        ),
     )
     single_pdf = (
         len(batch_documents) == 1
@@ -1710,29 +1718,15 @@ with st.sidebar:
         ["Fast", "Full", "Custom"],
         key="ade_mode",
         on_change=apply_ade_preset,
-        help="Fast minimizes Luna calls. Full adds refinement and a table of contents.",
+        help="Fast minimizes AI calls. Full adds refinement and a table of contents.",
     )
     st.toggle(
-        "Enhance with gpt-5.6-luna",
+        "Enhance Markdown with AI",
         key="refine_markdown",
         on_change=mark_ade_custom,
         help=(
-            "Controls final Markdown refinement only. Visual recovery is configured "
-            "separately below."
-        ),
-    )
-    st.toggle(
-        "Enable visual recovery on hard regions",
-        key="visual_recovery",
-        disabled=not has_environment,
-        help=(
-            "Uses medium-effort Luna vision on prioritized hard regions. The budget "
-            "scales from 8 to 64 crops by document length, with at most 3 per page; "
-            + (
-                "local GLM recovery runs first."
-                if selected_ocr_engine is OcrEngine.GLM_OCR
-                else "PaddleOCR output is used directly before Luna recovery."
-            )
+            "Uses the selected AI model to refine final Markdown structure only. "
+            "It does not rerun OCR or recover regions."
         ),
     )
     cross_check_supported = selected_extraction_engine in {
@@ -2176,7 +2170,7 @@ if parse_clicked and batch_documents:
                         "stage": "classify",
                         "current": 0,
                         "total": 1,
-                        "message": "Running Luna document analysis",
+                        "message": "Running AI document analysis",
                     }
                     workspace["progress"] = analysis_progress
                     workspace_store.save_progress(
@@ -2188,7 +2182,7 @@ if parse_clicked and batch_documents:
                         (document_index - 0.03) / total_documents,
                         text=(
                             f"{document_index}/{total_documents} "
-                            f"{document.display_name}: running Luna document analysis"
+                            f"{document.display_name}: running AI document analysis"
                         ),
                     )
                     stage_log.markdown(
@@ -2491,7 +2485,7 @@ if has_result:
         for feature in analysis.features.values():
             for warning in feature.warnings:
                 st.warning(warning)
-    has_luna_output = (
+    has_ai_output = (
         result.metadata.visual_recovery_crops > 0
         or bool(result.usage and result.usage.calls)
         or bool(analysis and analysis.usage.calls)
@@ -2500,8 +2494,8 @@ if has_result:
         or bool(routed_extraction_result and routed_extraction_result.usage.calls)
         or any(turn.get("confidence") for turn in st.session_state.chat_history)
     )
-    if has_luna_output:
-        st.warning(LUNA_REVIEW_WARNING)
+    if has_ai_output:
+        st.warning(AI_REVIEW_WARNING)
 elif active_document is not None:
     active_workspace = st.session_state.batch_workspaces[active_document.id]
     if active_workspace["status"] == "failed":
@@ -2692,7 +2686,7 @@ else:
             st.markdown(
                 ":blue[■] Text / title · :green[■] Table / form · "
                 ":orange[■] Figure · :violet[■] Formula · :red[■] Seal · "
-                ":orange[--] Luna recovery"
+                ":orange[--] AI recovery"
             )
             page_columns = st.columns([1, 2, 1])
             if page_columns[0].button("Previous", disabled=st.session_state.annotated_page <= 1):
@@ -3091,7 +3085,7 @@ else:
                             )
                             if elements_by_id[block.id].source == "luna-recovery":
                                 st.badge(
-                                    "Luna",
+                                    "AI",
                                     icon=":material/auto_fix_high:",
                                     color="violet",
                                 )
@@ -3186,8 +3180,8 @@ else:
             )
         )
         st.caption(
-            f"GLM-OCR: {result.metadata.glm_time:.1f}s · Luna recovery: "
-            f"{result.metadata.luna_recovery_time:.1f}s · Luna agentic: "
+            f"GLM-OCR: {result.metadata.glm_time:.1f}s · AI recovery: "
+            f"{result.metadata.luna_recovery_time:.1f}s · AI agentic: "
             f"{luna_agentic_time:.1f}s · Pages: {parsed_pages} · "
             f"Visual recovery: {recovery_status}"
         )

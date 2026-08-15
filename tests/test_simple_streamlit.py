@@ -119,18 +119,21 @@ def test_studio_allows_glm_without_openai_environment(
     assert not next(
         toggle.value
         for toggle in app.toggle
-        if toggle.label == "Enhance with gpt-5.6-luna"
+        if toggle.label == "Enhance Markdown with AI"
     )
-    recovery = next(
+    enhancement = next(
         toggle
         for toggle in app.toggle
-        if toggle.label == "Enable visual recovery on hard regions"
+        if toggle.label == "AI enhancement for failed or <75% confidence regions"
     )
-    assert recovery.disabled is True
-    assert recovery.help == (
-        "Uses medium-effort Luna vision on prioritized hard regions. The budget "
-        "scales from 8 to 64 crops by document length, with at most 3 per page; "
-        "local GLM recovery runs first."
+    assert enhancement.disabled is False
+    assert enhancement.help == (
+        "Uses the selected AI model to recover failed, low-confidence, or otherwise "
+        "difficult regions. The budget scales from 8 to 64 crops by document length, "
+        "with at most 3 per page; local GLM recovery runs first."
+    )
+    assert not any(
+        toggle.label == "Enable visual recovery on hard regions" for toggle in app.toggle
     )
     assert [tab.label for tab in app.tabs] == [
         "Overview",
@@ -188,7 +191,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
-    assert app.session_state["result_version"] == "4.6.0"
+    assert app.session_state["result_version"] == "4.6.1"
     assert app.session_state["session_usage"].calls == []
 
 
@@ -280,11 +283,11 @@ def test_ade_presets_default_fast_and_allow_full_or_custom(monkeypatch) -> None:
     assert mode.value == "Fast"
     app = mode.select("Full").run(timeout=20)
     toggles = {item.label: item for item in app.toggle}
-    assert toggles["Enhance with gpt-5.6-luna"].value is True
+    assert toggles["Enhance Markdown with AI"].value is True
     assert toggles["Classify document type"].value is True
     assert toggles["Generate table of contents"].value is True
     assert toggles["Enable document chat"].value is False
-    assert toggles["Enable visual recovery on hard regions"].value is True
+    assert "Enable visual recovery on hard regions" not in toggles
 
     app = toggles["Generate table of contents"].set_value(False).run(timeout=20)
     assert next(item for item in app.selectbox if item.label == "ADE mode").value == "Custom"
@@ -558,7 +561,7 @@ def test_studio_shows_results_and_only_requested_tools(
     app.session_state["studio_tab"] = "Layout Tree"
     app = app.run(timeout=20)
     assert any(button.label.startswith("1 · Heading") for button in app.button)
-    assert any("Luna" in item.value for item in app.markdown)
+    assert any("AI" in item.value for item in app.markdown)
 
     app.session_state.enable_chat = True
     app.session_state.chat_history = [
@@ -664,11 +667,6 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     app = next(item for item in app.number_input if item.label == "Start").set_value(
         2
     ).run(timeout=20)
-    app = next(
-        item
-        for item in app.toggle
-        if item.label == "Enable visual recovery on hard regions"
-    ).set_value(False).run(timeout=20)
     app = next(
         button for button in app.button if button.label == "Parse document"
     ).click().run(timeout=20)
@@ -1101,7 +1099,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
     )
     selection_key = (
         f"{document.id}:all:False:True:True:glm-vllm:gpt-5.6-luna:"
-        "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.0"
+        "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.1"
     )
     store = WorkspaceStore(database)
     store.sync_documents(
@@ -1113,12 +1111,11 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
             "refine_markdown": False,
             "classify_document": True,
             "generate_toc": False,
-            "visual_recovery": True,
             "ocr_engine_label": "GLM-OCR",
             "ollama_model": "glm-ocr:latest",
             "ocr_disagreement_engine": "vllm-paddleocr-vl-1.6",
         },
-        result_version="4.6.0",
+        result_version="4.6.1",
     )
     store.save_document(
         document.id,
@@ -1130,7 +1127,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
             "stage": "classify",
             "current": 0,
             "total": 1,
-            "message": "Running Luna document analysis",
+            "message": "Running AI document analysis",
         },
     )
     analysis_calls = 0
