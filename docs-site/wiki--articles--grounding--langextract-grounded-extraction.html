@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: langextract, extraction, grounding
 sources: src/grounded_docparse/native_extraction.py, docs/spec.md
-snapshot: content-7e6cbb56ddf0
+snapshot: content-12489de42da5
 status: released</code></pre></details>
         <div class="markdown-body"><p>The native extraction adapter sends immutable <code>base_text</code> and a translated saved schema to LangExtract. It accepts a candidate only when LangExtract supplies a character interval, the interval is valid, and the returned value exactly matches the corresponding source substring.</p>
 <p>Accepted intervals are mapped through covering source spans to anchors. Candidates with missing intervals, mismatched text, gaps in span coverage, or unresolved evidence are rejected and retained only as diagnostics where appropriate. LangExtract performs no OCR.</p>

@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: pdf, native, pdf-inspector
 sources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, docs/spec.md
-snapshot: content-7e6cbb56ddf0
+snapshot: content-12489de42da5
 status: released</code></pre></details>
         <div class="markdown-body"><p>Native PDF processing uses <code>PdfInspectorParser</code> to extract selectable text, layout items, tables, page positions, and bounding boxes without OCR. The parser constructs a <code>NativeDocument</code> whose evidence remains tied to PDF page anchors.</p>
 <p>All selected pages must be usable as native evidence. If inspection identifies unusable pages, processing stops and recommends Mixed PDF rather than silently rasterizing or calling an OCR engine. This makes the manual processing choice observable and preserves a single-pipeline contract.</p>

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-7e6cbb56ddf0",
-    "base_commit": "674513ea01d3331ef750167b83c0ba388cf02d14",
+    "id": "content-12489de42da5",
+    "base_commit": "91399758f358b85f9f32ac46a610b491e705ac95",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T10:04:43.660836+00:00",
+  "generated_at": "2026-08-15T10:05:27.309454+00:00",
   "category": "application-code",
   "files": [
     {
