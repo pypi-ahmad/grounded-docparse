@@ -30,6 +30,7 @@ from grounded_docparse.config import (
     ParserConfig,
     default_alternate_ocr_engine,
 )
+from grounded_docparse.content_range import ContentRange, ContentRangeInfo
 from grounded_docparse.models import (
     ClassifierCategory,
     ClassifierProfile,
@@ -70,6 +71,7 @@ from grounded_docparse.schema_store import (
 )
 from grounded_docparse.universal import (
     UniversalDocumentParser,
+    inspect_content_range,
     inspect_pdf_content,
 )
 from grounded_docparse.usage_costs import (
@@ -125,9 +127,6 @@ WORKSPACE_SETTING_KEYS = (
     "ocr_disagreement",
     "ocr_disagreement_engine",
     "ocr_engine_label",
-    "use_page_range",
-    "range_start",
-    "range_end",
 )
 ADE_PRESETS = {
     "Fast": {
@@ -351,6 +350,14 @@ DOCUMENT_STATE_KEYS = (
     "prepared_agentic_context",
     "use_custom_routing",
     "studio_tab",
+    "content_range_enabled",
+    "content_range_start",
+    "content_range_end",
+)
+CONTENT_RANGE_STATE_KEYS = (
+    "content_range_enabled",
+    "content_range_start",
+    "content_range_end",
 )
 
 
@@ -373,21 +380,37 @@ def default_document_state() -> dict[str, object]:
         "prepared_agentic_context": None,
         "use_custom_routing": False,
         "studio_tab": "Overview",
+        "content_range_enabled": False,
+        "content_range_start": 1,
+        "content_range_end": 1,
     }
 
 
 def reset_document_state(*, clear_session_usage: bool = False) -> None:
-    st.session_state.update(default_document_state())
+    st.session_state.update(
+        {
+            key: value
+            for key, value in default_document_state().items()
+            if key not in CONTENT_RANGE_STATE_KEYS
+        }
+    )
     if clear_session_usage:
         st.session_state.session_usage = RunUsage()
 
 
-def capture_document_state() -> dict[str, object]:
+def capture_document_state(
+    *, range_state: dict[str, object] | None = None
+) -> dict[str, object]:
     defaults = default_document_state()
-    return {
+    state = {
         key: st.session_state.get(key, defaults[key])
         for key in DOCUMENT_STATE_KEYS
     }
+    if range_state is not None:
+        state.update(
+            {key: range_state.get(key, defaults[key]) for key in CONTENT_RANGE_STATE_KEYS}
+        )
+    return state
 
 
 def save_active_workspace() -> None:
@@ -397,11 +420,16 @@ def save_active_workspace() -> None:
         workspace["state"] = capture_document_state()
 
 
-def load_workspace(document_id: str | None) -> None:
+def load_workspace(document_id: str | None, *, load_range_state: bool = True) -> None:
     reset_document_state()
     workspace = st.session_state.get("batch_workspaces", {}).get(document_id)
     if workspace is not None:
-        st.session_state.update(workspace["state"])
+        state = workspace["state"]
+        st.session_state.update(
+            state
+            if load_range_state
+            else {key: value for key, value in state.items() if key not in CONTENT_RANGE_STATE_KEYS}
+        )
 
 
 def switch_active_document() -> None:
@@ -557,17 +585,9 @@ def pdf_page_count(data: bytes) -> int:
         return document.page_count
 
 
-@st.cache_data(max_entries=16)
-def select_pdf_pages(data: bytes, start: int, end: int) -> bytes:
-    with pymupdf.open(stream=data, filetype="pdf") as source:
-        if not 1 <= start <= end <= source.page_count:
-            raise ValueError(f"page range must be within 1-{source.page_count}")
-        output = pymupdf.open()
-        output.insert_pdf(source, from_page=start - 1, to_page=end - 1)
-        try:
-            return output.tobytes(garbage=3, deflate=True)
-        finally:
-            output.close()
+@st.cache_data(max_entries=64)
+def content_range_info(data: bytes, filename: str) -> ContentRangeInfo:
+    return inspect_content_range(data, filename)
 
 
 @st.cache_data(max_entries=64)
@@ -649,6 +669,12 @@ def stage_markdown(active: str | None, completed: set[str]) -> str:
         marker = "✓" if key in completed else "→" if key == active else "○"
         lines.append(f"{marker} {label}")
     return "  \n".join(lines)
+
+
+def progress_label(fraction: float, message: str) -> str:
+    bounded = min(1.0, max(0.0, fraction))
+    percentage = int(bounded * 100 + 0.5)
+    return f"{percentage}% · {message}"
 
 
 def render_grounded_html_preview(markdown: str, *, key: str) -> None:
@@ -1464,7 +1490,7 @@ if batch_error is None and document_ids != previous_ids:
     st.session_state.batch_document_selector = active_document_id
     if active_document_id != previous_active_id:
         load_workspace(active_document_id)
-        for key in ("range_start", "range_end", "thumbnail_group"):
+        for key in ("thumbnail_group",):
             st.session_state.pop(key, None)
 
 documents_by_id = {document.id: document for document in batch_documents}
@@ -1618,13 +1644,13 @@ processing_ready = bool(batch_documents) and (
     len(processing_types) == len(batch_documents) and not processing_errors
 )
 
-if source is not None and suffix == ".pdf" and len(batch_documents) == 1:
+if source is not None and active_document is not None:
     try:
-        total_source_pages = pdf_page_count(source)
+        active_range_info = content_range_info(source, active_document.display_name)
     except Exception:  # noqa: BLE001 - parsing reports malformed input per document
-        total_source_pages = 1
+        active_range_info = None
 else:
-    total_source_pages = 1
+    active_range_info = None
 
 with st.sidebar:
     st.subheader("Options")
@@ -1674,43 +1700,47 @@ with st.sidebar:
             )
         ),
     )
-    single_pdf = (
-        len(batch_documents) == 1
-        and suffix == ".pdf"
-        and active_document is not None
-        and processing_types.get(active_document.id) is ProcessingType.SCANNED_PDF
+    range_unit = active_range_info.unit.value if active_range_info is not None else "content"
+    range_total = active_range_info.total if active_range_info is not None else 1
+    st.session_state.content_range_start = min(
+        max(1, int(st.session_state.get("content_range_start", 1))), range_total
     )
-    use_page_range = st.checkbox(
-        "Page range",
-        disabled=not single_pdf,
-        help=(
-            "Parse one inclusive, contiguous page range. Multiple-file batches "
-            "always process every page."
+    st.session_state.content_range_end = min(
+        max(
+            st.session_state.content_range_start,
+            int(st.session_state.get("content_range_end", range_total)),
         ),
+        range_total,
     )
-    use_page_range = bool(use_page_range and single_pdf)
-    if use_page_range and source is not None:
+    use_content_range = st.checkbox(
+        f"{range_unit.title()} range",
+        key="content_range_enabled",
+        disabled=active_range_info is None,
+        help="Parse one inclusive, contiguous range for the selected document.",
+    )
+    if use_content_range and active_range_info is not None:
         range_columns = st.columns(2)
-        start_page = int(
+        range_start = int(
             range_columns[0].number_input(
                 "Start",
                 min_value=1,
-                max_value=total_source_pages,
-                value=1,
-                key="range_start",
+                max_value=range_total,
+                key="content_range_start",
             )
         )
-        end_page = int(
+        st.session_state.content_range_end = max(
+            st.session_state.content_range_end, range_start
+        )
+        range_end = int(
             range_columns[1].number_input(
                 "End",
-                min_value=start_page,
-                max_value=total_source_pages,
-                value=total_source_pages,
-                key="range_end",
+                min_value=range_start,
+                max_value=range_total,
+                key="content_range_end",
             )
         )
     else:
-        start_page, end_page = 1, total_source_pages
+        range_start, range_end = 1, range_total
 
     show_reading_order = st.checkbox("Show reading order", value=True)
     st.selectbox(
@@ -1782,10 +1812,13 @@ with st.sidebar:
         disabled=not has_environment,
     )
     enable_chat = st.session_state.enable_chat
+    save_active_workspace()
+
     def document_selection_key(document: BatchDocument) -> str:
-        page_selection = (
-            f"{start_page}:{end_page}"
-            if use_page_range and document.id == st.session_state.active_document_id
+        state = st.session_state.batch_workspaces[document.id]["state"]
+        content_selection = (
+            f"{state.get('content_range_start', 1)}:{state.get('content_range_end', 1)}"
+            if state.get("content_range_enabled")
             else "all"
         )
         processing_type = processing_types.get(document.id)
@@ -1794,7 +1827,7 @@ with st.sidebar:
             f"{page}:{route.value}" for page, route in sorted(routes.items())
         )
         return (
-            f"{document.id}:{page_selection}:{refine_markdown}:"
+            f"{document.id}:{content_selection}:{refine_markdown}:"
             f"{visual_recovery}:{has_environment}:{selected_extraction_engine.value}:"
             f"{selected_cloud_model.value}:{st.session_state.ollama_model}:"
             f"{st.session_state.ocr_disagreement}:"
@@ -1826,7 +1859,7 @@ with st.sidebar:
             workspace_store.save_document(document.id, status="pending")
             active_was_invalidated |= document.id == st.session_state.active_document_id
     if active_was_invalidated:
-        load_workspace(st.session_state.active_document_id)
+        load_workspace(st.session_state.active_document_id, load_range_state=False)
     if batch_error is None and isinstance(st.session_state.session_usage, RunUsage):
         workspace_store.save_workspace(
             settings=workspace_settings(),
@@ -1894,7 +1927,10 @@ with st.sidebar:
     )
     progress_bar = st.progress(
         1.0 if cached_result_matches else retained_fraction,
-        text="Parsing complete" if cached_result_matches else retained_text,
+        text=progress_label(
+            1.0 if cached_result_matches else retained_fraction,
+            "Parsing complete" if cached_result_matches else retained_text,
+        ),
     )
     stage_log = st.empty()
     stage_log.markdown(
@@ -1971,7 +2007,7 @@ if parse_clicked and batch_documents:
             parser = None
     except Exception as exc:  # noqa: BLE001 - provider diagnostics are user-facing
         parser = None
-        progress_bar.progress(0, text="OCR service is unavailable")
+        progress_bar.progress(0, text=progress_label(0, "OCR service is unavailable"))
         header_status_slot.markdown("Status: :red[● **Error**]")
         st.error(f"OCR service startup failed: {type(exc).__name__}: {str(exc)[:1000]}")
     else:
@@ -1991,9 +2027,10 @@ if parse_clicked and batch_documents:
             ):
                 progress_bar.progress(
                     document_index / total_documents,
-                    text=(
+                    text=progress_label(
+                        document_index / total_documents,
                         f"{document_index}/{total_documents} "
-                        f"{document.display_name}: already complete"
+                        f"{document.display_name}: already complete",
                     ),
                 )
                 continue
@@ -2015,13 +2052,19 @@ if parse_clicked and batch_documents:
                 progress=initial_progress,
             )
             reset_document_state()
-            st.session_state.update(state)
+            st.session_state.update(
+                {key: value for key, value in state.items() if key not in CONTENT_RANGE_STATE_KEYS}
+            )
             completed_stages: set[str] = set()
             progress_state: dict[str, str | None] = {"active": None}
-            parsed_document_source = (
-                select_pdf_pages(document.source, start_page, end_page)
-                if use_page_range and document.id == st.session_state.active_document_id
-                else document.source
+            parsed_document_source = document.source
+            requested_content_range = (
+                ContentRange(
+                    start=int(state.get("content_range_start", 1)),
+                    end=int(state.get("content_range_end", 1)),
+                )
+                if state.get("content_range_enabled")
+                else None
             )
 
             def show_progress(
@@ -2075,9 +2118,10 @@ if parse_clicked and batch_documents:
                     ) / total_documents
                     progress_bar.progress(
                         overall_progress,
-                        text=(
+                        text=progress_label(
+                            overall_progress,
                             f"{index}/{total_documents} {item.display_name}: "
-                            f"{event.message}"
+                            f"{event.message}",
                         ),
                     )
                     durable_progress = {
@@ -2119,6 +2163,7 @@ if parse_clicked and batch_documents:
                         page_routes=page_routes_by_document.get(document.id),
                         refine_markdown=refine_markdown,
                         visual_recovery=visual_recovery,
+                        content_range=requested_content_range,
                     )
                     st.session_state.result = result
                     append_session_usage(result.usage)
@@ -2134,7 +2179,7 @@ if parse_clicked and batch_documents:
                         if isinstance(result, NativeParseResult)
                         else DocumentAgent.prepare(result)
                     )
-                    workspace["state"] = capture_document_state()
+                    workspace["state"] = capture_document_state(range_state=state)
                     workspace_store.save_document(
                         document.id,
                         status="processing",
@@ -2180,9 +2225,10 @@ if parse_clicked and batch_documents:
                     )
                     progress_bar.progress(
                         (document_index - 0.03) / total_documents,
-                        text=(
+                        text=progress_label(
+                            (document_index - 0.03) / total_documents,
                             f"{document_index}/{total_documents} "
-                            f"{document.display_name}: running AI document analysis"
+                            f"{document.display_name}: running AI document analysis",
                         ),
                     )
                     stage_log.markdown(
@@ -2208,7 +2254,7 @@ if parse_clicked and batch_documents:
                         "total": 1,
                         "message": "Parsing complete",
                     },
-                    state=capture_document_state(),
+                    state=capture_document_state(range_state=state),
                 )
                 workspace_store.save_document(
                     document.id,
@@ -2227,9 +2273,10 @@ if parse_clicked and batch_documents:
                 )
                 progress_bar.progress(
                     document_index / total_documents,
-                    text=(
+                    text=progress_label(
+                        document_index / total_documents,
                         f"{document_index}/{total_documents} "
-                        f"{document.display_name}: complete"
+                        f"{document.display_name}: complete",
                     ),
                 )
             except Exception as exc:  # noqa: BLE001 - isolate per-document failures
@@ -2239,7 +2286,7 @@ if parse_clicked and batch_documents:
                     error=error,
                     selection_key=expected_selection_key,
                     progress=workspace.get("progress"),
-                    state=capture_document_state(),
+                    state=capture_document_state(range_state=state),
                 )
                 workspace_store.save_document(
                     document.id,
@@ -2259,13 +2306,14 @@ if parse_clicked and batch_documents:
                 )
                 progress_bar.progress(
                     document_index / total_documents,
-                    text=(
+                    text=progress_label(
+                        document_index / total_documents,
                         f"{document_index}/{total_documents} "
-                        f"{document.display_name}: failed"
+                        f"{document.display_name}: failed",
                     ),
                 )
 
-        load_workspace(st.session_state.active_document_id)
+        load_workspace(st.session_state.active_document_id, load_range_state=False)
         statuses = [workspace["status"] for workspace in st.session_state.batch_workspaces.values()]
         failed_count = statuses.count("failed")
         if failed_count == 0:
@@ -2532,7 +2580,11 @@ else:
         recovered_element_ids,
         ensure_ascii=False,
     )
-    parsed_pages = len(result.document.pages)
+    parsed_pages = (
+        result.metadata.content_range.total
+        if result.metadata.content_range is not None
+        else len(result.document.pages)
+    )
     stem = Path(result.document.source_name).stem
     selected_element_id = st.session_state.get("selected_element_id")
 
