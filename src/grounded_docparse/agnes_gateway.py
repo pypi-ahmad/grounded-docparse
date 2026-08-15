@@ -4,6 +4,12 @@ import json
 from types import SimpleNamespace
 from typing import Any
 
+_AGNES_MAX_OUTPUT_TOKENS = 65_536
+
+
+def _max_output_tokens(value: int | None) -> int | None:
+    return min(value, _AGNES_MAX_OUTPUT_TOKENS) if value is not None else None
+
 
 def _chat_messages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     output: list[dict[str, Any]] = []
@@ -60,7 +66,7 @@ class AgnesResponses:
                 },
             },
             temperature=0,
-            max_tokens=kwargs.get("max_output_tokens"),
+            max_tokens=_max_output_tokens(kwargs.get("max_output_tokens")),
         )
         content = completion.choices[0].message.content
         parsed = text_format.model_validate_json(content)
@@ -76,7 +82,7 @@ class AgnesResponses:
             "model": kwargs["model"],
             "messages": _chat_messages(kwargs["input"]),
             "temperature": 0,
-            "max_tokens": kwargs.get("max_output_tokens"),
+            "max_tokens": _max_output_tokens(kwargs.get("max_output_tokens")),
         }
         if schema is not None:
             request["response_format"] = {
