@@ -8,6 +8,8 @@ $LogPath = Join-Path $LogRoot 'native-launch.log'
 $RuntimeRoot = Join-Path $DataRoot 'runtime'
 $Venv = Join-Path $DataRoot 'venv'
 $PidPath = Join-Path $RuntimeRoot 'streamlit.pid'
+$StreamlitPort = 9356
+$StreamlitUrl = 'http://localhost:9356'
 New-Item -ItemType Directory -Force -Path $LogRoot, $RuntimeRoot | Out-Null
 
 function Write-LaunchLog([string]$Message) {
@@ -90,13 +92,29 @@ function Stop-PreviousManagedApp {
     Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
 }
 
+function Stop-WslManagedApp {
+    if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) { return }
+    $distros = @(& wsl.exe --list --quiet 2>$null) -replace "`0", ''
+    if ($LASTEXITCODE -ne 0 -or $distros -notcontains 'Ubuntu-24.04') { return }
+    $windowsRoot = $InstallRoot -replace '\\', '/'
+    $wslRoot = @(& wsl.exe -d Ubuntu-24.04 -- wslpath -a $windowsRoot 2>$null)[0]
+    if ($LASTEXITCODE -ne 0 -or -not $wslRoot) {
+        throw 'Could not resolve the Grounded DocParse path in Ubuntu-24.04.'
+    }
+    Write-LaunchLog 'Stopping any previous Grounded DocParse WSL app session...'
+    & wsl.exe -d Ubuntu-24.04 -- bash "$($wslRoot.Trim())/scripts/wsl/stop-stack.sh" 0 --app-only
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The previous Grounded DocParse WSL app session could not be stopped safely.'
+    }
+}
+
 function Stop-AppListeningOnPort {
     $listeners = @(
-        Get-NetTCPConnection -LocalPort 8600 -State Listen -ErrorAction SilentlyContinue
+        Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
     )
     foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
         if ($ownerPid) {
-            Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source 'port 8600'
+            Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "port $StreamlitPort"
         }
     }
 }
@@ -110,6 +128,7 @@ try {
     & $uv python install 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.12 installation failed.' }
     Stop-PreviousManagedApp
+    Stop-WslManagedApp
     Stop-AppListeningOnPort
     & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev --python 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Native dependency synchronization failed.' }
@@ -121,9 +140,9 @@ try {
     & $python -m grounded_docparse.windows_setup --download-layout
     if ($LASTEXITCODE -ne 0) { throw 'PP-DocLayoutV3 setup failed.' }
 
-    $portOwner = Get-NetTCPConnection -LocalPort 8600 -State Listen -ErrorAction SilentlyContinue
+    $portOwner = Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
     if ($portOwner) {
-        throw 'Port 8600 is occupied by an unmanaged process; refusing to stop it.'
+        throw "Port $StreamlitPort is occupied by an unmanaged process; refusing to stop it."
     }
     $env:DOCPARSE_MANAGE_OCR_SERVICES = 'true'
     $env:DOCPARSE_STUDIO_DB_PATH = Join-Path $DataRoot 'studio.sqlite3'
@@ -131,11 +150,11 @@ try {
     $stderr = Join-Path $LogRoot 'streamlit.err.log'
     $process = Start-Process $python -ArgumentList @(
         '-m', 'streamlit', 'run', (Join-Path $InstallRoot 'streamlit_app.py'),
-        '--server.address=127.0.0.1', '--server.port=8600', '--server.headless=true'
+        '--server.address=127.0.0.1', "--server.port=$StreamlitPort", '--server.headless=true'
     ) -WorkingDirectory $InstallRoot -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
     Set-Content -LiteralPath $PidPath -Value $process.Id -Encoding ASCII
     Write-LaunchLog "Started native Windows app (PID $($process.Id))."
-    Start-Process 'http://localhost:8600'
+    Start-Process $StreamlitUrl
 } catch {
     Write-LaunchLog "ERROR: $($_.Exception.Message)"
     exit 1

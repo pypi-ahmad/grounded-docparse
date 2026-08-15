@@ -29,7 +29,7 @@ def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
     assert "GetEnvironmentVariable($name, 'User')" in native_launcher
 
 
-def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
+def test_streamlit_uses_port_9356_everywhere_it_launches() -> None:
     native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
         encoding="utf-8"
     )
@@ -41,12 +41,26 @@ def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
     ).read_text(encoding="utf-8")
 
-    assert "http://localhost:8600" in native_launcher
-    assert "STREAMLIT_PORT=8600" in stack
+    assert "http://localhost:9356" in native_launcher
+    assert "STREAMLIT_PORT=9356" in stack
     assert '--server.port "$STREAMLIT_PORT"' in stack
     assert "streamlit_uses_configured_port()" in stack
-    assert "port = 8600" in config
-    assert "http://localhost:8600" in installer
+    assert "port = 9356" in config
+    assert "http://localhost:9356" in installer
+
+
+def test_native_launcher_stops_only_the_verified_wsl_streamlit_session() -> None:
+    native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
+        encoding="utf-8"
+    )
+    stopper = (ROOT / "scripts/wsl/stop-stack.sh").read_text(encoding="utf-8")
+
+    assert "Stop-WslManagedApp" in native_launcher
+    assert "--app-only" in native_launcher
+    assert "--app-only" in stopper
+    assert '[[ "$STOP_MODE" == "all" ]]' in stopper
+    assert 'manage-ocr-stack.sh" stop all' in stopper
+    assert '"$WSL_ENV/bin/python" -m streamlit cache clear' in stopper
 
 
 def test_wsl_launcher_restarts_streamlit_on_luna_environment_drift() -> None:
