@@ -11,7 +11,9 @@ from grounded_docparse.config import (
     ExtractionEngine,
     OcrEngine,
     ParserConfig,
+    default_alternate_ocr_engine,
 )
+from grounded_docparse.models import Element
 from grounded_docparse.ollama_runtime import (
     OllamaOcrModel,
     recognize_region,
@@ -25,6 +27,33 @@ def test_engine_catalog_has_one_vllm_mapping_per_gpu_engine() -> None:
     assert ExtractionEngine.GLM_VLLM.vllm_ocr_engine.value == "glm-ocr"
     assert ExtractionEngine.OLLAMA.vllm_ocr_engine is None
     assert ExtractionEngine.OLLAMA.parser_ocr_engine.value == "ollama"
+    assert ExtractionEngine.DOCLING_RAPIDOCR.vllm_ocr_engine is None
+    assert ExtractionEngine.DOCLING_RAPIDOCR.parser_ocr_engine is OcrEngine.RAPIDOCR
+
+
+def test_rapidocr_is_valid_element_provenance() -> None:
+    element = Element(
+        id="p1-r1",
+        type="text",
+        page=1,
+        text="OCR text",
+        reading_order=1,
+        source="rapidocr",
+    )
+
+    assert element.source == "rapidocr"
+
+
+def test_rapidocr_primary_uses_ollama_as_its_default_cross_check() -> None:
+    assert AlternateOcrEngine.RAPIDOCR.matches_primary(
+        OcrEngine.RAPIDOCR, "glm-ocr:latest"
+    )
+    assert (
+        default_alternate_ocr_engine(
+            OcrEngine.RAPIDOCR, "glm-ocr:latest"
+        )
+        is AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6
+    )
 
 
 def test_engine_switch_rolls_back_previous_vllm(monkeypatch) -> None:
@@ -194,3 +223,22 @@ def test_cross_check_restores_primary_after_alternate_failure(monkeypatch) -> No
         "stop-vllm",
         "warm:deepseek-ocr:latest",
     ]
+
+
+def test_rapidocr_primary_never_starts_wsl_and_stops_temporary_vllm(monkeypatch) -> None:
+    calls = []
+    monkeypatch.setattr(
+        ocr_services,
+        "stop_managed_vllm",
+        lambda: calls.append("stop-vllm"),
+    )
+
+    ocr_services.ensure_managed_ocr_engine(OcrEngine.RAPIDOCR)
+    with ocr_services.temporary_alternate_ocr_engine(
+        ParserConfig(ocr_engine=OcrEngine.RAPIDOCR),
+        AlternateOcrEngine.VLLM_GLM_OCR,
+        vllm_switcher=lambda engine: calls.append(f"vllm:{engine.value}"),
+    ):
+        calls.append("parse")
+
+    assert calls == ["vllm:glm-ocr", "parse", "stop-vllm"]
