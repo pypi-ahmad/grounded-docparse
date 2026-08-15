@@ -46,7 +46,7 @@
           <p class="document-path">SETUP.md</p>
           <h1>Setup</h1>
           <div class="document-meta">
-            <span>2,249 words</span>
+            <span>2,293 words</span>
             <span>10 min read</span>
             <a href="https://github.com/pypi-ahmad/grounded-docparse/blob/main/SETUP.md">View Markdown source ↗</a>
           </div>
@@ -110,6 +110,7 @@ Set-Location grounded-docparse
 <pre><code class="language-powershell">.\Launch-Grounded-DocParse.cmd
 </code></pre>
 <p>The single launcher validates setup and repairs missing or stale dependencies before opening the app. Use <code>.\Setup-GLM-OCR.cmd</code> or <code>.\Setup-PaddleOCR-VL-1.6.cmd</code> to install and warm one explicit GPU stack. The manager stops the other GPU service first, so only one VLM is resident.</p>
+<p>Each native launch verifies and stops only the previously recorded Grounded DocParse Streamlit process, clears Streamlit's application cache, and starts a fresh browser session. It preserves the durable workspace database and stored source/result artifacts. An unrelated process on port <code>8600</code> is never stopped.</p>
 <p>To keep using the Windows launcher with custom parser/provider settings, add the required <code>export NAME=value</code> lines to the WSL user's <code>~/.profile</code>, then restart the affected managed process. <code>scripts/wsl/run-app.sh</code> forces local OCR on and uses the generated runtime configuration. Layout uses <code>cuda:0</code> with vLLM and <code>cpu</code> with Ollama.</p>
 <h2 id="manual-wsl-setup-and-launch">Manual WSL setup and launch<a class="heading-anchor" href="#manual-wsl-setup-and-launch" title="Copy section link">#</a></h2>
 <p>Run the following inside Ubuntu from the repository mounted under <code>/mnt/&lt;drive&gt;/...</code>:</p>
