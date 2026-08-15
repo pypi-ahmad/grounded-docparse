@@ -44,11 +44,25 @@ def test_agnes_responses_adapter_preserves_schema_images_and_usage() -> None:
                 ],
             },
         ],
-        max_output_tokens=100,
+        max_output_tokens=100_000,
     )
 
     assert result.output_parsed == Result(value="ok")
     assert result.usage.input_tokens == 12
     call = completions.calls[0]
+    assert call["max_tokens"] == 65_536
     assert call["response_format"]["type"] == "json_schema"
     assert call["messages"][1]["content"][1]["type"] == "image_url"
+
+
+def test_agnes_responses_adapter_caps_plain_response_output_tokens() -> None:
+    completions = Completions()
+    responses = AgnesResponses(completions)
+
+    responses.create(
+        model="agnes-2.5-flash",
+        input=[{"role": "user", "content": "Return JSON"}],
+        max_output_tokens=100_000,
+    )
+
+    assert completions.calls[0]["max_tokens"] == 65_536
