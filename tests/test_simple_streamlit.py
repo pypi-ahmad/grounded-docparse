@@ -8,10 +8,10 @@ import pytest
 from openpyxl import Workbook
 from streamlit.testing.v1 import AppTest
 
-from grounded_docparse import pipeline, runtime_control, universal
+from grounded_docparse import ollama_runtime, pipeline, runtime_control, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
-from grounded_docparse.config import LUNA_MODEL
+from grounded_docparse.config import LUNA_MODEL, ExtractionEngine
 from grounded_docparse.models import (
     AgenticAnalysis,
     AgentUsage,
@@ -43,6 +43,8 @@ from grounded_docparse.workspace_store import WorkspaceStore
 @pytest.fixture(autouse=True)
 def isolated_studio_database(monkeypatch, tmp_path) -> None:
     monkeypatch.setenv("DOCPARSE_STUDIO_DB_PATH", str(tmp_path / "studio.sqlite3"))
+    monkeypatch.setenv("DOCPARSE_APP_SESSION_ID", str(tmp_path))
+    monkeypatch.setattr(ollama_runtime, "warm_model", lambda _model: None)
     monkeypatch.setattr(
         universal,
         "inspect_pdf_content",
@@ -62,6 +64,22 @@ def _select_scanned(app: AppTest, filename: str) -> AppTest:
     ).select("Scanned PDF").run(timeout=20)
 
 
+def _select_engine(app: AppTest, label: str) -> AppTest:
+    toggle = next(item for item in app.toggle if item.label == label)
+    return app if toggle.value else toggle.set_value(True).run(timeout=20)
+
+
+def test_fresh_studio_defaults_to_local_ollama_paddleocr() -> None:
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+
+    assert not app.exception
+    assert app.session_state["extraction_engine"] == ExtractionEngine.OLLAMA.value
+    assert (
+        app.session_state["ollama_model"]
+        == "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
+    )
+
+
 def test_studio_allows_glm_without_openai_environment(
     monkeypatch, simple_pdf: bytes
 ) -> None:
@@ -69,6 +87,7 @@ def test_studio_allows_glm_without_openai_environment(
     monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
 
     assert not app.exception
     assert len(app.file_uploader) == 1
@@ -82,11 +101,21 @@ def test_studio_allows_glm_without_openai_environment(
     parse = next(button for button in app.button if button.label == "Parse document")
     assert parse.disabled is False
     assert next(item for item in app.selectbox if item.label == "ADE mode").value == "Fast"
-    model = next(
-        item for item in app.selectbox if item.label == "Document extraction model"
-    )
-    assert model.options == ["GLM-OCR", "PaddleOCR-VL-1.6"]
-    assert model.value == "GLM-OCR"
+    engine_toggles = {
+        item.label: item.value
+        for item in app.toggle
+        if item.label
+        in {
+            "AI ADE",
+            "PaddleOCR-VL-1.6",
+            "GLM-OCR",
+            "Docling + RapidOCR",
+            "PDF Inspector (no OCR)",
+            "Local Ollama",
+        }
+    }
+    assert engine_toggles["GLM-OCR"] is True
+    assert sum(engine_toggles.values()) == 1
     assert not next(
         toggle.value
         for toggle in app.toggle
@@ -109,7 +138,7 @@ def test_studio_allows_glm_without_openai_environment(
         "HTML View",
         "Annotated PDF",
         "Layout Tree",
-    ]
+    ], dict(app.session_state.filtered_state)
     stop_app = next(button for button in app.button if button.label == "Stop app")
     assert stop_app.disabled is True
 
@@ -163,7 +192,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
     assert app.session_state["session_usage"].calls == []
 
 
-def test_legacy_session_usage_defaults_missing_cached_tokens_to_zero(monkeypatch) -> None:
+def test_restored_usage_does_not_populate_launch_session_cost(monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
@@ -185,8 +214,27 @@ def test_legacy_session_usage_defaults_missing_cached_tokens_to_zero(monkeypatch
 
     assert not app.exception
     metrics = {item.label: item.value for item in app.metric}
-    assert metrics["Cached input"] == "0"
-    assert metrics["Estimated cost"] == "$0.000032"
+    assert "Cache tokens" not in metrics
+    assert "Estimated cost" not in metrics
+
+
+def test_session_cost_view_starts_empty_without_warming_an_engine() -> None:
+    app = AppTest.from_file("streamlit_app.py")
+    app.session_state["app-view"] = "Session cost"
+
+    app.run(timeout=20)
+
+    assert not app.exception
+    assert "active_extraction_engine" not in app.session_state
+    assert {item.label: item.value for item in app.metric} == {
+        "Input tokens": "0",
+        "Cache tokens": "0",
+        "Output tokens": "0",
+        "Estimated cost": "$0.000000",
+    }
+    assert any(
+        "No metered AI calls" in item.value for item in app.get("info")
+    )
 
 
 def test_studio_shows_default_luna_destination(monkeypatch) -> None:
@@ -205,14 +253,11 @@ def test_ocr_model_selection_updates_the_active_ui_engine(monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
-    model = next(
-        item for item in app.selectbox if item.label == "Document extraction model"
-    )
-    app = model.select("PaddleOCR-VL-1.6").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
 
     assert not app.exception
     assert any(
-        "Powered by PaddleOCR-VL-1.6 + gpt-5.6-luna" in item.value
+        "Powered by GLM-OCR + GPT 5.6 Luna" in item.value
         for item in app.get("caption")
     )
 
@@ -330,6 +375,12 @@ def test_studio_shows_results_and_only_requested_tools(
     monkeypatch.setattr(DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis())
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
+    app = next(
+        toggle
+        for toggle in app.toggle
+        if toggle.label == "AI enhancement for failed or <75% confidence regions"
+    ).set_value(True).run(timeout=20)
     app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
@@ -347,11 +398,13 @@ def test_studio_shows_results_and_only_requested_tools(
         "Extract",
         "Layout Tree",
     ]
+
+
     assert next(item for item in app.metric if item.label == "Recovered").value == "1"
     metrics = {item.label: item.value for item in app.metric}
     assert metrics == {
         "Input tokens": "1,234",
-        "Cached input": "234",
+        "Cache tokens": "234",
         "Output tokens": "56",
         "Estimated cost": "$0.000272",
         "Pages": "1",
@@ -368,7 +421,6 @@ def test_studio_shows_results_and_only_requested_tools(
         "Download Full JSON",
         "Download all outputs",
     ]
-    assert any("$0.02/M cached input" in item.value for item in app.get("caption"))
     assert any(
         "Review confidence and cited source regions" in item.value
         for item in app.warning
@@ -517,6 +569,43 @@ def test_studio_shows_results_and_only_requested_tools(
     app = app.run(timeout=20)
     assert any("Confidence: high" in item.value for item in app.get("caption"))
 
+    view = next(item for item in app.segmented_control if item.label == "View")
+    app = view.set_value("Session cost").run(timeout=20)
+    cost_rows = app.dataframe[0].value.to_dict(orient="records")
+    assert cost_rows[-1] == {
+        "Model": "Total",
+        "Input tokens": 1_234,
+        "Cache tokens": 234,
+        "Output tokens": 56,
+        "Estimated cost": pytest.approx(0.00027188),
+    }
+    assert any("$0.02/M cached input" in item.value for item in app.get("caption"))
+
+
+def test_local_ocr_cross_check_exposes_compatible_alternates(monkeypatch) -> None:
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
+    toggle = next(
+        item
+        for item in app.toggle
+        if item.label == "Cross-check uncertain regions with alternate local OCR"
+    )
+
+    app = toggle.set_value(True).run(timeout=20)
+
+    alternate = next(
+        item for item in app.selectbox if item.label == "Alternate local OCR"
+    )
+    assert alternate.value == "vllm-paddleocr-vl-1.6"
+    assert "WSL vLLM GLM-OCR" not in alternate.options
+    assert {
+        "PP-DocLayoutV3 + Ollama GLM-OCR",
+        "PP-DocLayoutV3 + Ollama PaddleOCR-VL-1.6",
+        "RapidOCR (CPU)",
+        "WSL vLLM PaddleOCR-VL-1.6",
+    }.issubset(set(alternate.options))
+
 
 def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     source = pymupdf.open()
@@ -564,6 +653,7 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     monkeypatch.setattr(DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis())
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app.file_uploader[0].upload(
         "two-pages.pdf", source_bytes, "application/pdf"
     ).run(timeout=20)
@@ -632,6 +722,7 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     uploader = app.file_uploader[0]
     uploader.upload("first.pdf", simple_pdf, "application/pdf")
     uploader.upload("second.pdf", simple_pdf + b"\n", "application/pdf")
@@ -722,6 +813,7 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     uploader = app.file_uploader[0]
     uploader.upload("good.pdf", simple_pdf, "application/pdf")
     uploader.upload("bad.pdf", simple_pdf + b"\n", "application/pdf")
@@ -959,6 +1051,7 @@ def test_completed_batch_restores_after_app_restart_without_reparsing(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app = app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
@@ -1007,18 +1100,23 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
         annotated_pdf=simple_pdf,
     )
     selection_key = (
-        f"{document.id}:all:False:True:True:glm-ocr:scanned-pdf::4.6.0"
+        f"{document.id}:all:False:True:True:glm-vllm:gpt-5.6-luna:"
+        "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.0"
     )
     store = WorkspaceStore(database)
     store.sync_documents(
         [document],
         settings={
+            "extraction_engine": ExtractionEngine.GLM_VLLM.value,
+            "ai_enhancement": True,
             "ade_mode": "Fast",
             "refine_markdown": False,
             "classify_document": True,
             "generate_toc": False,
             "visual_recovery": True,
             "ocr_engine_label": "GLM-OCR",
+            "ollama_model": "glm-ocr:latest",
+            "ocr_disagreement_engine": "vllm-paddleocr-vl-1.6",
         },
         result_version="4.6.0",
     )
@@ -1054,6 +1152,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
     monkeypatch.setattr(DocumentAgent, "analyze", analyze)
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app = next(
         button for button in app.button if button.label == "Resume batch"
     ).click().run(timeout=20)

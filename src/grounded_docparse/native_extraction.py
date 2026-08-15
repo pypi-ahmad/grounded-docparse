@@ -479,16 +479,25 @@ class LangExtractNativeExtractor:
         parse_result: NativeParseResult,
         schema: StoredSchema,
     ) -> NativeExtractionResult:
-        api_key = os.getenv("OPENAI_API_KEY")
+        model = self.config.cloud_model.value
+        api_key = os.getenv(self.config.cloud_model.api_key_name)
         if not api_key:
-            raise ValueError("OPENAI_API_KEY is required for native extraction")
+            raise ValueError(f"{self.config.cloud_model.api_key_name} is required for native extraction")
         translated = translate_stored_schema(schema)
         provider_kwargs = {
             "api_key": api_key,
-            "base_url": os.getenv("OPENAI_BASE_URL") or None,
-            "reasoning_effort": LUNA_REASONING_EFFORT,
             "max_workers": self.config.provider_concurrency,
         }
+        provider = "gemini" if model.startswith("gemini-") else "openai"
+        if provider == "openai":
+            provider_kwargs.update(
+                base_url=(
+                    os.getenv("AGNES_BASE_URL", "https://apihub.agnes-ai.com/v1")
+                    if model == "agnes-2.5-flash"
+                    else os.getenv("OPENAI_BASE_URL") or None
+                ),
+                reasoning_effort=self.config.cloud_model.reasoning_effort,
+            )
         if self.extract_func is None:
             try:
                 import langextract as lx
@@ -499,15 +508,15 @@ class LangExtractNativeExtractor:
                 ) from exc
             extract_func = lx.extract
             model_config = ModelConfig(
-                model_id=LUNA_MODEL,
-                provider="openai",
+                model_id=model,
+                provider=provider,
                 provider_kwargs=provider_kwargs,
             )
         else:
             extract_func = self.extract_func
             model_config = {
-                "model_id": LUNA_MODEL,
-                "provider": "openai",
+                "model_id": model,
+                "provider": provider,
                 "provider_kwargs": provider_kwargs,
             }
 
@@ -551,12 +560,12 @@ class LangExtractNativeExtractor:
         trace = [
             AgentTraceEvent(
                 agent="langextract",
-                model=LUNA_MODEL,
+                model=model,
                 action="native_extraction",
                 status="completed",
                 target_ids=[item.pointer for item in values],
                 duration_ms=round((time.perf_counter() - started) * 1000),
-                reasoning_effort=LUNA_REASONING_EFFORT,
+                reasoning_effort=self.config.cloud_model.reasoning_effort,
                 prompt_version="langextract-native-v1",
                 summary=f"accepted={len(values)} rejected={len(warnings)}",
             )
@@ -570,8 +579,8 @@ class LangExtractNativeExtractor:
             "evidence": evidence_by_pointer,
             "warnings": warnings,
             "metadata": {
-                "model": LUNA_MODEL,
-                "reasoning_effort": LUNA_REASONING_EFFORT,
+                "model": model,
+                "reasoning_effort": self.config.cloud_model.reasoning_effort,
                 "range_target": "base_text",
                 "range_units": "unicode_codepoints",
                 "usage": usage.model_dump(mode="json"),

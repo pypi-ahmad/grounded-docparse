@@ -4,7 +4,7 @@
 
 #define AppName "Grounded DocParse"
 #define AppPublisher "Ahmad"
-#define AppExeName "Launch-GLM-OCR.cmd"
+#define AppExeName "Launch-Grounded-DocParse.cmd"
 
 [Setup]
 AppId={{3E90B911-6294-4FE8-A067-CB6A949DFDB3}
@@ -29,26 +29,36 @@ Source: "..\streamlit_app.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\pyproject.toml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\uv.lock"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Launch-GLM-OCR.cmd"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\Launch-PaddleOCR-VL-1.6.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Launch-Grounded-DocParse.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\Setup-GLM-OCR.cmd"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\Setup-PaddleOCR-VL-1.6.cmd"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\paddle-runtime\pyproject.toml"; DestDir: "{app}\paddle-runtime"; Flags: ignoreversion
 Source: "..\paddle-runtime\uv.lock"; DestDir: "{app}\paddle-runtime"; Flags: ignoreversion
 Source: "..\src\*"; DestDir: "{app}\src"; Excludes: "__pycache__\*,*.pyc,*.pyo"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\config\*"; DestDir: "{app}\config"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\scripts\wsl\*"; DestDir: "{app}\scripts\wsl"; Excludes: "__pycache__\*,*.pyc,*.pyo"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\scripts\windows\*"; DestDir: "{app}\scripts\windows"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "Install-GroundedDocParse.ps1"; DestDir: "{app}\installer"; Flags: ignoreversion
 Source: "..\.streamlit\config.toml"; DestDir: "{app}\.streamlit"; Flags: ignoreversion skipifsourcedoesntexist
 
 [Icons]
-Name: "{group}\Grounded DocParse"; Filename: "{app}\Launch-GLM-OCR.cmd"; WorkingDir: "{app}"
-Name: "{autodesktop}\Grounded DocParse"; Filename: "{app}\Launch-GLM-OCR.cmd"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{group}\Grounded DocParse"; Filename: "{app}\Launch-Grounded-DocParse.cmd"; WorkingDir: "{app}"
+Name: "{group}\Setup GLM-OCR"; Filename: "{app}\Setup-GLM-OCR.cmd"; WorkingDir: "{app}"
+Name: "{group}\Setup PaddleOCR-VL-1.6"; Filename: "{app}\Setup-PaddleOCR-VL-1.6.cmd"; WorkingDir: "{app}"
+Name: "{autodesktop}\Grounded DocParse"; Filename: "{app}\Launch-Grounded-DocParse.cmd"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Shortcuts:"; Flags: checkedonce
 
 [Run]
-Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\installer\Install-GroundedDocParse.ps1"" -Provision -InstallRoot ""{app}"""; Description: "Install dependencies and models"; Flags: postinstall skipifsilent
+Filename: "{app}\Launch-Grounded-DocParse.cmd"; Description: "Set up and launch Grounded DocParse"; Flags: postinstall skipifsilent nowait
+
+[InstallDelete]
+Type: files; Name: "{app}\Launch-Grounded-DocParse-WSL-Legacy.cmd"
+Type: files; Name: "{app}\scripts\wsl\launch-stack.sh"
+Type: files; Name: "{app}\scripts\wsl\run-app.sh"
+Type: files; Name: "{app}\scripts\wsl\stop-stack.sh"
+Type: files; Name: "{group}\Grounded DocParse (WSL legacy app).lnk"
 
 [UninstallRun]
 Filename: "powershell.exe"; Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\installer\Install-GroundedDocParse.ps1"" -Uninstall -InstallRoot ""{app}"""; RunOnceId: "GroundedDocParseCleanup"; Flags: runhidden waituntilterminated

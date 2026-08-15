@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f03a0de2c1a2",
-    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
-    "branch": "main",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
+    "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-13T13:54:04.812099+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -185,6 +185,11 @@
       "size": 7593
     },
     {
+      "path": "tests/test_agnes_gateway.py",
+      "sha256": "1735eb5eb151ca4910bab01a9dfcd05c0ab8c0c76e047b80aa1135862a05635b",
+      "size": 1558
+    },
+    {
       "path": "tests/test_batch.py",
       "sha256": "15956b687c0dd5e13e1158fdf9ca9b958b818cf053b0c63c7c4caf1b03977a18",
       "size": 7287
@@ -208,6 +213,11 @@
       "path": "tests/test_docling_native_parser.py",
       "sha256": "3df54de29f89885ad2cb887bc717e126a886fcf88140ff4d5968ad3abbea3f1a",
       "size": 10944
+    },
+    {
+      "path": "tests/test_engine_selection.py",
+      "sha256": "83bdd8359ec6728db1e82cb74ae7c0a00740bdf049d71fed4e376f79d449fe5a",
+      "size": 6320
     },
     {
       "path": "tests/test_evaluation_calibration.py",
@@ -236,8 +246,13 @@
     },
     {
       "path": "tests/test_glmocr_runtime_config.py",
-      "sha256": "fed6dfcccb35bac7b51803c4495f9aff0b7ce9b32d12a7f31ea2f2d57b529432",
-      "size": 4883
+      "sha256": "1a87c6cbb0ae6924314dd495d9d627f1d79df6d9b76593bfe35471c9802274ae",
+      "size": 4884
+    },
+    {
+      "path": "tests/test_grounded_ocr.py",
+      "sha256": "88425859db2eb861807b0e4f1ab261f10dc60dea7b512d857b201c6d8b602ecd",
+      "size": 3161
     },
     {
       "path": "tests/test_ingest.py",
@@ -251,8 +266,8 @@
     },
     {
       "path": "tests/test_launcher_contract.py",
-      "sha256": "33f96f263dbbfab1829c721a5adef87a59cb419f286d19727f3d96d9abbe8b53",
-      "size": 9545
+      "sha256": "6677b01805282489a1171b02cd54b4030e7d00e72297e6a35a5c86cb84c7fd29",
+      "size": 10152
     },
     {
       "path": "tests/test_markdown_enhancement.py",
@@ -276,8 +291,8 @@
     },
     {
       "path": "tests/test_ocr_disagreement.py",
-      "sha256": "a498b77534f069b98ad5093d8302eb66c2289c1d92cea8e4065a26eefb895afa",
-      "size": 3755
+      "sha256": "0aa546c388122961b9fd618d934a16fa88b58f6fb091bed1468ccf1351c7b936",
+      "size": 4348
     },
     {
       "path": "tests/test_openai_vision_gateway.py",
@@ -296,8 +311,8 @@
     },
     {
       "path": "tests/test_page_analysis.py",
-      "sha256": "48db9d6ab1b9bc2d419f10bd30420fa4ff9c3d27ad54eace6f7bd02f1c3929b5",
-      "size": 13058
+      "sha256": "178795c76c4053da5fabd35bf837a71aa6ec4fa89a81af23b369ceef7379b120",
+      "size": 13141
     },
     {
       "path": "tests/test_parallel_pages.py",
@@ -306,13 +321,18 @@
     },
     {
       "path": "tests/test_provider_runtime.py",
-      "sha256": "6208369813532ccad81d5f020ac0a393f268cfdf81fa1fcdde2542cbe09a30e3",
-      "size": 13786
+      "sha256": "f4f722307a4536cd170031f27cbd55b986fe0a07f102978eab0f8d32cf1195d6",
+      "size": 13842
     },
     {
       "path": "tests/test_quality.py",
       "sha256": "a3a5cd4205422dc660228a88f67fd6c0dc68ff84d21a77c2961a572bcebef2ac",
       "size": 18768
+    },
+    {
+      "path": "tests/test_rapidocr_runtime.py",
+      "sha256": "cfaf31683439a61217ba26be55395b54b5a5e3a9f3603bfa0c54d8cc812477a3",
+      "size": 853
     },
     {
       "path": "tests/test_regression_policy.py",
@@ -321,8 +341,8 @@
     },
     {
       "path": "tests/test_runtime_control.py",
-      "sha256": "2079b282c4d4ec743e52ce6d0d9e66002b5e318c4049b44d035a09ef9fbb715b",
-      "size": 1627
+      "sha256": "ac14294207e3d359ff21897e11352180bcdee4dc82a72abb08754ffd34ebb30f",
+      "size": 1688
     },
     {
       "path": "tests/test_schema_store.py",
@@ -336,13 +356,13 @@
     },
     {
       "path": "tests/test_simple_pipeline.py",
-      "sha256": "1964bad0ef2b9b39826c7b5b954c5a35764445126c79a64f4778c4d72f27af14",
-      "size": 83492
+      "sha256": "cd4ddf068cb316213292cb6de1e5896a27007a2ac992ed1977e79b6444d13c02",
+      "size": 84277
     },
     {
       "path": "tests/test_simple_streamlit.py",
-      "sha256": "dbc6246931e34b6c176437bb4c2e95b0c0d2a77b5471ef0cb4363216627b800e",
-      "size": 37351
+      "sha256": "a9b3a56c997e55d3ccddeade9a3c5b90866ce159bad13483361690ed9dc8d393",
+      "size": 40725
     },
     {
       "path": "tests/test_strict_recovery_contract.py",
@@ -355,9 +375,19 @@
       "size": 6901
     },
     {
+      "path": "tests/test_usage_costs.py",
+      "sha256": "13b330f3738f90f011b9365046519268ae9c6e509062da6d8896a53bdcbe8457",
+      "size": 2034
+    },
+    {
       "path": "tests/test_windows_installer.py",
-      "sha256": "287dc817f7c4bb5c7c50070693cd0ac272760c4716488ba3802ef245b29beb2a",
-      "size": 2513
+      "sha256": "10cb3ca2365d51967403afae67f910c42c8cf0a200f997f26d4336bac8f96b83",
+      "size": 3813
+    },
+    {
+      "path": "tests/test_windows_setup.py",
+      "sha256": "0ab1e727817eb76a6aa4cd18ecad26236ed0aed47407db4016d56f12b4c22ddd",
+      "size": 1339
     },
     {
       "path": "tests/test_workspace_store.py",

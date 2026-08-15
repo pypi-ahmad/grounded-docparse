@@ -8,10 +8,12 @@ dependencies = [
     "defusedxml>=0.7.1,<1",
     "nh3>=0.3.6,<0.4",
     "openai>=2.0",
+    "google-genai>=2.13,<3",
     "openpyxl>=3.1.5,<4",
     "pillow>=11.0",
     "pydantic>=2.10",
     "pymupdf>=1.25",
+    "python-dotenv>=1.1,<2",
     "streamlit[pdf]>=1.60,<2",
 ]
 
@@ -21,7 +23,7 @@ grounded-docparse = "grounded_docparse.cli:main"
 [project.optional-dependencies]
 native = [
     "beautifulsoup4>=4.13,<5",
-    "docling>=2.119,<3",
+    "docling[rapidocr]>=2.119,<3",
     "langextract[openai]>=1.6,<2",
     "odfdo>=3.12,<4",
     "pdf-inspector>=1.14.1,<2",
@@ -39,6 +41,11 @@ local-ocr-cpu = [
     "torch==2.10.0; sys_platform == 'linux'",
     "torchvision==0.25.0; sys_platform == 'linux'",
     "transformers>=5.3,<6; sys_platform == 'linux'",
+]
+windows-layout = [
+    "torch==2.10.0; sys_platform == 'win32'",
+    "torchvision==0.25.0; sys_platform == 'win32'",
+    "transformers>=5.3,<6; sys_platform == 'win32'",
 ]
 
 [[tool.uv.index]]
@@ -58,10 +65,12 @@ conflicts = [[{ extra = "local-ocr" }, { extra = "local-ocr-cpu" }]]
 torch = [
     { index = "pytorch-cu128", extra = "local-ocr" },
     { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+    { index = "pytorch-cpu", extra = "windows-layout" },
 ]
 torchvision = [
     { index = "pytorch-cu128", extra = "local-ocr" },
     { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+    { index = "pytorch-cpu", extra = "windows-layout" },
 ]
 
 [dependency-groups]

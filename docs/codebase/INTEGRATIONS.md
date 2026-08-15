@@ -6,8 +6,11 @@
 
 | Integration | Direction | Data/role | Boundary and constraints |
 |---|---|---|---|
-| OpenAI API / compatible base URL | Outbound HTTPS | Luna classification, recovery, refinement, chat, schema work, native LangExtract | `OPENAI_API_KEY`; optional `OPENAI_BASE_URL`; fixed project model settings; provider output is validated |
-| GLM-OCR | Local in-process/WSL | Default scanned PDF/image recognition and layout | Linux extras; process-wide serialized runtime because model loading is expensive |
+| OpenAI API / compatible base URL | Outbound HTTPS | GPT 5.6 Luna extraction, enhancement, refinement, chat, and schema work | `OPENAI_API_KEY`; optional `OPENAI_BASE_URL`; output is validated |
+| Google Gemini | Outbound HTTPS | Gemini 3.5 Flash Lite or Gemini Flash 3.7 for the same AI tasks | `GOOGLE_API_KEY` |
+| Agnes AI | Outbound HTTPS | Agnes 2.5 Flash for the same AI tasks | `AGNES_API_KEY`; optional `AGNES_BASE_URL` |
+| GLM-OCR vLLM | Windows-to-WSL loopback | Crop recognition grounded by Windows CPU PP-DocLayoutV3 | Port `8080`; mutually exclusive with Paddle vLLM |
+| Windows Ollama | Local loopback | GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR crop recognition | `OLLAMA_BASE_URL`; independent of WSL services |
 | PaddleOCR-VL | Local HTTP | Alternate OCR and disagreement checks | Default endpoint `http://127.0.0.1:8119`; URL is validated; bounded timeout |
 | pdf-inspector | In-process optional library | PDF type/page suggestions, native Markdown, text positions, structure roles | PDFs only; never performs OCR in this project; unusable pages fail or require explicit mixed routing |
 | Docling | In-process optional library | DOCX/PPTX/XLSX/CSV/HTML/EPUB/ODF/Markdown conversion | `SimplePipeline`; remote services, external plugins, picture classification/description, and chart extraction disabled |
@@ -27,7 +30,7 @@ The `native` extra declares `pywin32` on Windows, but no source path currently i
 ### 3) Secrets and Credentials Handling
 
 - Secrets come from environment variables; `.env` is ignored and `.env.example` contains empty placeholders only.
-- Code checks whether `OPENAI_API_KEY` exists but does not persist it in SQLite or output contracts.
+- Code checks whether the selected provider key exists but does not persist credentials in SQLite or output contracts.
 - A custom `OPENAI_BASE_URL` receives the same document context/crops as OpenAI; the UI surfaces that trust boundary.
 - Fixtures use synthetic keys and fake clients; credentials and raw provider responses must not be committed.
 

@@ -7,36 +7,45 @@ JSON, and source evidence. Start with this page, then use the
 
 ## Before you start
 
-The supported local environment is Windows 10 22H2 or Windows 11 x64 with WSL2
-and Ubuntu 24.04. Complete [setup](SETUP.md) before launching the application.
-PaddleOCR-VL-1.6 additionally requires supported NVIDIA hardware; GLM-OCR can
-use its documented Ollama fallback.
+The primary application runs natively on Windows 11 22H2 or newer. Optional
+GLM-OCR and PaddleOCR-VL-1.6 GPU services remain in Ubuntu 24.04 under WSL2;
+PaddleOCR-VL-1.6 additionally requires supported NVIDIA hardware.
 
-Optional Luna features require `OPENAI_API_KEY` in the Windows user
-environment. Keep all Luna options disabled when document content must remain
-local. See the [security policy](SECURITY.md) before processing sensitive data.
+Optional AI features require the selected provider's `OPENAI_API_KEY`,
+`GOOGLE_API_KEY`, or `AGNES_API_KEY`. Keep AI enhancement and other agentic
+options disabled when document content must remain local.
 
 ## Start the application
 
-Choose one launcher from the repository root:
+Run the native launcher from the repository root:
 
 ```powershell
-.\Launch-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
-```powershell
-.\Launch-PaddleOCR-VL-1.6.cmd
-```
+It repairs the native environment, CPU PP-DocLayoutV3 assets, and Windows
+Ollama before opening <http://localhost:7137>. Use `Setup-GLM-OCR.cmd` or
+`Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm a WSL GPU service.
+Relaunching stops only verified Grounded DocParse app processes, clears
+transient Streamlit cache/session state, and preserves the durable workspace
+and any running WSL OCR service.
+Leave the launch terminal open to watch live app and local-model logs.
 
-The launcher starts the selected local OCR stack and Streamlit, then opens
-<http://localhost:8600>. Both launchers use the same application; the selected
-OCR engine changes only scanned-PDF and image processing.
+Local Ollama OCR bounds each request to an 8,192-token context and at most
+4,096 output tokens. Model warm-up exercises the vision path but generates only
+one token, avoiding the 131,072-token KV cache and runaway blank-image output.
+
+Choose **Session cost** in the sidebar for total input tokens, cache tokens,
+output tokens, and estimated cost. When multiple cloud models are used, the
+table splits usage and cost by model and includes a Total row. Values cover the
+current app launch only and reset when the app restarts.
 
 ## Process a document
 
 1. Upload one or more supported files.
 2. Select a processing type independently for every file.
-3. Configure page range and optional Luna features.
+3. Select exactly one extraction engine and configure optional AI enhancement.
+   With a vLLM or Ollama primary, you can also enable the audit-only uncertain-region cross-check and select an Ollama, RapidOCR, or WSL vLLM alternate. GPU alternates temporarily swap models and restore the primary after the crop batch.
 4. For Mixed PDF, review or override every suggested page route.
 5. Select **Parse document**.
 6. Review grounded output and source evidence before using extracted values.
@@ -49,14 +58,14 @@ selected route.
 | Input | Processing type | Behavior |
 | --- | --- | --- |
 | Selectable-text PDF | Native PDF | Non-OCR PDF extraction with page and bounding-box anchors |
-| Image-only PDF | Scanned PDF | Selected GLM-OCR or PaddleOCR-VL pipeline |
+| Image-only PDF | Scanned PDF | Selected AI ADE, vLLM, Docling/RapidOCR, or Ollama engine |
 | PDF with native and scanned pages | Mixed PDF | Reviewed page-by-page native/OCR routing |
 | DOCX | Word | OCR-disabled native conversion |
 | PPTX | PowerPoint | OCR-disabled native conversion |
 | XLSX | Excel | OCR-disabled native conversion |
 | CSV | CSV | Deterministic row and column grounding |
 | Supported HTML, EPUB, Markdown, or OpenDocument file | Other Native | OCR-disabled native conversion |
-| PNG, JPEG, TIFF, or other supported image | Image | Selected local OCR pipeline |
+| PNG, JPEG, TIFF, or other supported image | Image | Selected extraction engine |
 
 Embedded images in native Office and document formats are recorded as assets;
 they are not OCRed in the native pipeline.
@@ -102,4 +111,4 @@ session.
 - PaddleOCR-VL runtime: [docs/local-paddleocr-vl.md](docs/local-paddleocr-vl.md)
 - Full UI and workflow help: [docs/complete-user-guide.md](docs/complete-user-guide.md)
 
-Do not expose ports `8600`, `8080`, `8118`, or `8119` to an untrusted network.
+Do not expose ports `7137`, `8080`, `8118`, or `8119` to an untrusted network.

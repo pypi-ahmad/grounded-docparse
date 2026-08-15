@@ -6,7 +6,7 @@
 
 - Python package and local Streamlit application targeting Python `>=3.12,<3.15`.
 - `uv` owns dependency resolution, locked environments, and command execution; Hatchling builds the wheel.
-- The primary host is Windows 11. GPU OCR runtimes execute in WSL/Linux, while the Streamlit app, CLI, installer, and SQLite state can run on Windows.
+- The primary host is Windows 11. Streamlit, CLI, SQLite, CPU PP-DocLayoutV3, native parsers, and Ollama run on Windows; the two GPU vLLM runtimes execute in WSL/Linux.
 - The project version is `0.6.1`; the installed console command is `grounded-docparse`.
 
 ### 2) Production Frameworks and Dependencies
@@ -18,11 +18,12 @@
 | PDF | `pymupdf`, `pdf-inspector` | Rendering/annotation and optional native PDF inspection/extraction |
 | Native documents | `docling`, `beautifulsoup4`, `odfdo`, `openpyxl` | Non-OCR conversion plus source-structure manifests |
 | Grounded extraction | `langextract[openai]` | Optional schema extraction over immutable `base_text` |
-| Provider | `openai` | Luna classification, recovery, refinement, chat, and extraction calls |
+| Providers | `openai`, `google-genai` | OpenAI, Gemini, and Agnes-compatible classification, enhancement, refinement, chat, and extraction |
 | Safety/rendering | `defusedxml`, `nh3`, `pillow` | Safer XML parsing, HTML sanitization, and image operations |
-| Local OCR extras | `glmocr`, `torch`, `torchvision`, `transformers`, `vllm` | WSL-hosted GLM-OCR GPU or CPU runtime |
+| Windows layout extra | `torch`, `torchvision`, `transformers` | CPU PP-DocLayoutV3 grounding for GLM vLLM and Ollama |
+| WSL OCR extras | `glmocr`, `vllm`, PaddleOCR/PaddleX | Isolated GLM-OCR and PaddleOCR-VL GPU services |
 
-The `native` extra enables native PDF/Office/text formats. `local-ocr` and `local-ocr-cpu` are mutually exclusive Linux extras with separate PyTorch indexes. `pywin32` is declared in the native extra on Windows, but no current source module imports it.
+The `native` extra enables native PDF/Office/text formats. `windows-layout` installs CPU detector dependencies. `local-ocr` and `local-ocr-cpu` remain mutually exclusive Linux extras for WSL service provisioning.
 
 ### 3) Development Toolchain
 
@@ -49,7 +50,7 @@ The legacy OCR CLI remains available as `grounded-docparse parse`. Evaluation ru
 
 ### 5) Environment and Config
 
-- `OPENAI_API_KEY` enables Luna-backed operations; `OPENAI_BASE_URL` optionally redirects the same provider payloads.
+- `OPENAI_API_KEY`, `GOOGLE_API_KEY`, and `AGNES_API_KEY` enable their selectable AI models; OpenAI and Agnes support optional base-URL overrides.
 - `DOCPARSE_STUDIO_DB_PATH` defaults to `data/document_studio.sqlite3` and controls schemas, profiles, and durable workspace state.
 - `DOCPARSE_*` variables control upload/page limits, rendering, OCR engine, concurrency, retries, crop recovery, and service endpoints.
 - `config/glmocr.yaml` and `config/paddle-vllm.yaml` configure local OCR runtimes.

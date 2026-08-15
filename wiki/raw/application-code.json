@@ -1,23 +1,28 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f03a0de2c1a2",
-    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
-    "branch": "main",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
+    "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-13T13:54:04.812099+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "application-code",
   "files": [
     {
       "path": "src/grounded_docparse/__init__.py",
-      "sha256": "7bff8e9d34353fc876053f5c7d7ce116164e4d1fc78ee7379a87032f8914b642",
-      "size": 2863
+      "sha256": "2e282eea5f1a8f6833ce1d56c0252cdca43925ec0a628ecb2994d741ea977ef9",
+      "size": 2907
     },
     {
       "path": "src/grounded_docparse/agentic.py",
       "sha256": "20fdbacd1041a252230433ab8b2685d3a0a977ec6ee852229b891e5d5b4ac243",
       "size": 41510
+    },
+    {
+      "path": "src/grounded_docparse/agnes_gateway.py",
+      "sha256": "eaa4ad4f14656ccc8bab5d0d4b23168826f12f5ab2d22d71ee6d5968f5379e63",
+      "size": 3450
     },
     {
       "path": "src/grounded_docparse/batch.py",
@@ -36,13 +41,13 @@
     },
     {
       "path": "src/grounded_docparse/config.py",
-      "sha256": "ac6c4499ca5b84f057e5d47a3e40b3a6977a58729013c822029d805e52404996",
-      "size": 11871
+      "sha256": "9f8000bd2731a0c1aa9391ce5571677226a17a798a5782cae660603fadf62f99",
+      "size": 18564
     },
     {
       "path": "src/grounded_docparse/docling_native.py",
-      "sha256": "70180cdd2be4dc54f650e0de4bc1637d00fb01ef867d4d780deb06384f5d43e0",
-      "size": 26093
+      "sha256": "112d7e5730b21932354af9015e404127c1afef50b859d2ac0d94e4672cf55abf",
+      "size": 27035
     },
     {
       "path": "src/grounded_docparse/enhancement.py",
@@ -56,8 +61,18 @@
     },
     {
       "path": "src/grounded_docparse/gateways.py",
-      "sha256": "4e615c7600ba63c9436cd7f1b5f8a53f5b27838c2c73b440e202b8ed374f6fed",
-      "size": 38809
+      "sha256": "d0059f0ef92ea43cfc68f746fba9940bd5274e080d38a5a172664521b8fff660",
+      "size": 40112
+    },
+    {
+      "path": "src/grounded_docparse/gemini_gateway.py",
+      "sha256": "ca793a31c0d2bf3f9b1f6cd2e657bd994daa4a05b89e82c4d2164af50992d7c4",
+      "size": 4107
+    },
+    {
+      "path": "src/grounded_docparse/grounded_ocr.py",
+      "sha256": "c118851601513f41bfc332f36f622dd347c52dfd583233749e7c47e12e686c7f",
+      "size": 12062
     },
     {
       "path": "src/grounded_docparse/ingest.py",
@@ -71,8 +86,8 @@
     },
     {
       "path": "src/grounded_docparse/models.py",
-      "sha256": "e871953f2b8413be7b26cd8ab36b18320cb81e6f8726b52c2a615e9e301765cb",
-      "size": 32344
+      "sha256": "44a356c7efaaef9938af61feb5733d5f90aecdd4381941b494ff25e4b866314b",
+      "size": 32380
     },
     {
       "path": "src/grounded_docparse/native.py",
@@ -81,8 +96,8 @@
     },
     {
       "path": "src/grounded_docparse/native_extraction.py",
-      "sha256": "4504135bae2807f0d80cd8790841fe66df32d212648563fde069cdc3e2d95a4c",
-      "size": 21995
+      "sha256": "7daa72eef2aac08515ea04460b4f51eab5a7f889263b0bf4573ee62d6b8824dc",
+      "size": 22443
     },
     {
       "path": "src/grounded_docparse/native_parsers.py",
@@ -96,8 +111,13 @@
     },
     {
       "path": "src/grounded_docparse/ocr_services.py",
-      "sha256": "42c27a9b80bdb78be1574b7c800620b585e484b01e4fa7ad9351d0bc518b68da",
-      "size": 775
+      "sha256": "2c8ea573394c2fe92c6f3d7a87fd98194fd56e857ec3ef606fdd733b720cc302",
+      "size": 4911
+    },
+    {
+      "path": "src/grounded_docparse/ollama_runtime.py",
+      "sha256": "c0bcb06d483f9e7fa5fa338ec00eb41cf03320fc196615560ca1e60056159aa4",
+      "size": 4578
     },
     {
       "path": "src/grounded_docparse/paddle_ocr.py",
@@ -106,13 +126,13 @@
     },
     {
       "path": "src/grounded_docparse/page_analysis.py",
-      "sha256": "044fa3c6c6b43365fdf9c9f5982350f3f157163c3678dc9c45ed222cc2ee876d",
-      "size": 32747
+      "sha256": "61b8e2d95aa459a1d628d20157efeefcd7a7f28e96c1f39d260e93699b2dc850",
+      "size": 33506
     },
     {
       "path": "src/grounded_docparse/pipeline.py",
-      "sha256": "5c9a0fd883afe917641cdd13ef9d562337dfa2f3a293540f3d76f3e29739ec41",
-      "size": 125527
+      "sha256": "766c9b8328263ac1d1362fec5d1bb4952d444ae7a03e387777d73d8ec1f4a8fe",
+      "size": 127265
     },
     {
       "path": "src/grounded_docparse/prompts.py",
@@ -123,6 +143,11 @@
       "path": "src/grounded_docparse/quality.py",
       "sha256": "f4262146fe355a231be46b0961d4cb5ef2fee7230475e8700cdbb7feef953971",
       "size": 18333
+    },
+    {
+      "path": "src/grounded_docparse/rapidocr_runtime.py",
+      "sha256": "c7abda209a829efa7a6a059e170381f76e17d5b78e67fff1eed8a87a4dcbf534",
+      "size": 1901
     },
     {
       "path": "src/grounded_docparse/render.py",
@@ -136,8 +161,8 @@
     },
     {
       "path": "src/grounded_docparse/runtime_control.py",
-      "sha256": "86878d5dd920219cd04f9ebf08a5e406e9f93cfce16638a1d308d3395e4c9de2",
-      "size": 1153
+      "sha256": "7344a7a02c7404250561c454b0fbaa6f188cf9fb9616930d05eb0b6416240a97",
+      "size": 1044
     },
     {
       "path": "src/grounded_docparse/schema_store.py",
@@ -150,14 +175,24 @@
       "size": 11821
     },
     {
+      "path": "src/grounded_docparse/usage_costs.py",
+      "sha256": "d475d6921d619539b26d137cf0679264a30cc4a88808f2b8e7b8cae8b024df00",
+      "size": 3750
+    },
+    {
+      "path": "src/grounded_docparse/windows_setup.py",
+      "sha256": "c21e1159e589a629fa4a69563d55ea43055a7e7f4c64479651241d27c5b171eb",
+      "size": 698
+    },
+    {
       "path": "src/grounded_docparse/workspace_store.py",
       "sha256": "0acba0e0c733dff4a8057e845b4884c10eb2ba3a8234de6eae5001671c11de63",
       "size": 21830
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "fa383b5180d76811f154aecf83cf4725a6362beb4fffbf1c9a1eeaf4641ea308",
-      "size": 130235
+      "sha256": "3fba9e712c082b96f91a4c25d7635507ebde6a5cce29670bbaa10a79a55a8807",
+      "size": 138436
     }
   ]
 }

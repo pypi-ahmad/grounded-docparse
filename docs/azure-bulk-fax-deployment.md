@@ -4,7 +4,7 @@
 
 This document is an implementation design and operations runbook for a single-organization, production deployment that processes protected health information (PHI). It covers browser batch uploads, automated Azure Blob Storage intake, local GLM-OCR on Azure GPU workers, optional classification and extraction, human review, and either Azure OpenAI or the official OpenAI API.
 
-The repository is **not deployable in this form as a shared PHI service**. Its supported runtime is a trusted single-user workstation, the UI processes up to 20 files sequentially in session state, reusable definitions use local SQLite, and it has no durable jobs, multi-user authorization, or tenant isolation. Complete the application changes and acceptance gates in this document before exposing the service. Do not publish ports `8600`, `8080`, `8118`, or `8119` from the current launch scripts.
+The repository is **not deployable in this form as a shared PHI service**. Its supported runtime is a trusted single-user workstation, the UI processes up to 20 files sequentially in session state, reusable definitions use local SQLite, and it has no durable jobs, multi-user authorization, or tenant isolation. Complete the application changes and acceptance gates in this document before exposing the service. Do not publish ports `7137`, `8080`, `8118`, or `8119` from the current launch scripts.
 
 This design does not make an organization HIPAA compliant by itself. Microsoft describes HIPAA as a shared responsibility and states that a Business Associate Agreement (BAA) does not by itself establish customer compliance. The organization must approve the architecture, contracts, data flows, retention, access policy, incident response, and operating procedures before PHI is used. See [Microsoft HIPAA/HITECH guidance](https://learn.microsoft.com/compliance/regulatory/offering-hipaa-hitech).
 
@@ -204,7 +204,7 @@ Events may arrive before or after the manifest and in any order. The database re
 
 ### 7. Add a provider factory
 
-The current gateway requires `OPENAI_API_KEY`, constructs the official `OpenAI` client, and hardcodes `gpt-5.6-luna`. Replace that startup contract with administrator-owned configuration:
+The workstation gateway supports OpenAI, Google Gemini, and Agnes credentials selected in the UI. A production deployment should replace workstation environment discovery with administrator-owned secret and model configuration:
 
 | Setting | Meaning |
 | --- | --- |
@@ -329,7 +329,7 @@ Publish an immutable Compute Gallery version. Pin the VMSS to that version; neve
 
 ### 5. Build and publish application images
 
-Create separate web, intake, and worker artifacts even if they share a Python package. Build from the locked dependency graph, run tests, generate an SBOM, scan dependencies/container layers, sign the image, and push an immutable digest to ACR. Deploy by digest, not a mutable tag. The web image exposes only Streamlit port `8600`; set App Service `WEBSITES_PORT=8600`.
+Create separate web, intake, and worker artifacts even if they share a Python package. Build from the locked dependency graph, run tests, generate an SBOM, scan dependencies/container layers, sign the image, and push an immutable digest to ACR. Deploy by digest, not a mutable tag. The web image exposes only Streamlit port `7137`; set App Service `WEBSITES_PORT=7137`.
 
 ### 6. Run database migrations
 

@@ -19,6 +19,7 @@ def test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes() -> None:
     assert {source["extra"] for source in sources["torch"]} == {
         "local-ocr",
         "local-ocr-cpu",
+        "windows-layout",
     }
     assert manifest["tool"]["uv"]["conflicts"] == [
         [{"extra": "local-ocr"}, {"extra": "local-ocr-cpu"}]
@@ -38,9 +39,30 @@ def test_installer_payload_is_allowlisted_and_excludes_secrets() -> None:
     assert ".env" not in installer
     assert ".git" not in installer
     assert "secrets.toml" not in installer
+    assert 'Source: "..\\Launch-Grounded-DocParse-WSL-Legacy.cmd"' not in installer
+    assert 'Name: "{group}\\Grounded DocParse (WSL legacy app)";' not in installer
 
 
-def test_provisioner_handles_reboot_credentials_and_hardware_fallback() -> None:
+def test_installer_removes_legacy_wsl_app_and_launches_native_app() -> None:
+    installer = (ROOT / "installer" / "GroundedDocParse.iss").read_text(
+        encoding="utf-8"
+    )
+    provisioner = (
+        ROOT / "installer" / "Install-GroundedDocParse.ps1"
+    ).read_text(encoding="utf-8")
+
+    for relative_path in (
+        "Launch-Grounded-DocParse-WSL-Legacy.cmd",
+        "scripts\\wsl\\launch-stack.sh",
+        "scripts\\wsl\\run-app.sh",
+        "scripts\\wsl\\stop-stack.sh",
+    ):
+        assert relative_path in installer
+    assert "Launch-Grounded-DocParse.cmd" in provisioner
+    assert "launch-stack.sh" not in provisioner
+
+
+def test_provisioner_handles_reboot_credentials_and_gpu_or_windows_ollama() -> None:
     provisioner = (
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
     ).read_text(encoding="utf-8")
@@ -48,20 +70,33 @@ def test_provisioner_handles_reboot_credentials_and_hardware_fallback() -> None:
     assert "RunOnce" in provisioner
     assert "RedirectStandardInput" in provisioner
     assert "chpasswd" in provisioner
-    assert "Windows 10 22H2 or Windows 11" in provisioner
+    assert "Windows 11 22H2 or newer" in provisioner
     assert "At least 16 GB RAM" in provisioner
     assert "At least 20 GB free disk" in provisioner
-    assert "NVIDIA runtime validation failed; switching to Ollama CPU fallback" in provisioner
+    assert "Windows Ollama/local CPU profile" in provisioner
     assert "AMD|Radeon" in provisioner
 
 
-def test_ollama_downloads_are_versioned_and_verified() -> None:
-    setup = (ROOT / "scripts" / "wsl" / "setup-ollama.sh").read_text(
+def test_host_setup_installs_windows_ollama_without_reconfiguring_wsl() -> None:
+    provisioner = (ROOT / "installer" / "Install-GroundedDocParse.ps1").read_text(
+        encoding="utf-8"
+    )
+    assert "irm https://ollama.com/install.ps1 | iex" in provisioner
+    assert "http://127.0.0.1:11434/api/tags" in provisioner
+    assert "wsl.exe --shutdown" not in provisioner
+
+
+def test_wsl_private_ollama_runtime_is_removed() -> None:
+    assert not (ROOT / "scripts" / "wsl" / "setup-ollama.sh").exists()
+    assert not (ROOT / "scripts" / "wsl" / "serve-ollama.sh").exists()
+
+
+def test_uninstaller_preserves_downloaded_model_weights() -> None:
+    provisioner = (ROOT / "installer" / "Install-GroundedDocParse.ps1").read_text(
         encoding="utf-8"
     )
 
-    assert 'OLLAMA_VERSION="0.32.0"' in setup
-    assert 'OLLAMA_MODEL="glm-ocr:bf16"' in setup
-    assert "56362d7609dfa9e35aaebb7c9cab25605d8f0528ec3d5d585dc83d6642002bab" in setup
-    assert "f0fad39e184daab11d172a855580abd7338b2f049afa462435fee15d76b4e437" in setup
-    assert "sha256sum -c -" in setup
+    assert 'rm -rf -- "$data"' not in provisioner
+    assert 'rm -rf -- "$data/.venv" "$data/.paddle-venv"' in provisioner
+    assert 'rm -rf -- "$data/huggingface"' not in provisioner
+    assert "ollama rm" not in provisioner

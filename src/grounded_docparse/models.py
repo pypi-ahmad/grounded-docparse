@@ -345,6 +345,7 @@ class AgentUsage(BaseModel):
     input_tokens: int = Field(default=0, ge=0)
     cached_input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
+    telemetry_available: bool = True
 
 
 class RunUsage(BaseModel):
@@ -648,8 +649,8 @@ class OcrComparisonResult(BaseModel):
     page: int = Field(ge=1)
     block_id: str | None = None
     bbox: tuple[float, float, float, float] | None = None
-    primary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
-    secondary_engine: Literal["glm-ocr", "paddleocr-vl-1.6"]
+    primary_engine: str = Field(min_length=1)
+    secondary_engine: str = Field(min_length=1)
     primary_text: str
     secondary_text: str | None = None
     similarity: float | None = Field(default=None, ge=0, le=1)
@@ -960,7 +961,9 @@ class Element(BaseModel):
     text: str = ""
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
-    source: Literal["glm-ocr", "paddleocr-vl-1.6", "luna-recovery"] = "glm-ocr"
+    source: Literal[
+        "glm-ocr", "paddleocr-vl-1.6", "deepseek-ocr", "luna-recovery"
+    ] = "glm-ocr"
 
     @model_validator(mode="after")
     def validate_bbox(self) -> Element:
