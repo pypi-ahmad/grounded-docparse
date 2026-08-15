@@ -55,35 +55,6 @@ function Set-Step {
     Write-InstallLog $Message
 }
 
-function Ensure-MirroredWslNetworking {
-    $configPath = Join-Path $env:USERPROFILE '.wslconfig'
-    $content = if (Test-Path -LiteralPath $configPath) {
-        Get-Content -Raw -LiteralPath $configPath
-    } else { '' }
-    if ($content -match '(?im)^\s*networkingMode\s*=\s*mirrored\s*$') { return $false }
-    if ($content -match '(?im)^\s*networkingMode\s*=.*$') {
-        $updated = [regex]::Replace(
-            $content,
-            '(?im)^\s*networkingMode\s*=.*$',
-            'networkingMode=mirrored',
-            1
-        )
-    } elseif ($content -match '(?im)^\s*\[wsl2\]\s*$') {
-        $updated = [regex]::Replace(
-            $content,
-            '(?im)^\s*\[wsl2\]\s*$',
-            "[wsl2]`r`nnetworkingMode=mirrored",
-            1
-        )
-    } else {
-        $separator = if ($content -and -not $content.EndsWith("`n")) { "`r`n" } else { '' }
-        $updated = "$content$separator[wsl2]`r`nnetworkingMode=mirrored`r`n"
-    }
-    Set-Content -LiteralPath $configPath -Value $updated -Encoding utf8 -NoNewline
-    Write-InstallLog 'Enabled WSL mirrored networking while preserving existing .wslconfig settings.'
-    $true
-}
-
 function Ensure-WindowsOllama {
     if (-not (Get-Command ollama.exe -ErrorAction SilentlyContinue)) {
         Set-Step 'Installing Windows Ollama...'
@@ -116,13 +87,7 @@ function Ensure-WindowsOllama {
 }
 
 function Invoke-EnsureHost {
-    $networkChanged = Ensure-MirroredWslNetworking
     Ensure-WindowsOllama
-    if ($networkChanged -and (Get-Command wsl.exe -ErrorAction SilentlyContinue)) {
-        Set-Step 'Restarting WSL to apply mirrored networking...'
-        & wsl.exe --shutdown
-        if ($LASTEXITCODE -ne 0) { throw 'Could not restart WSL.' }
-    }
 }
 
 function Invoke-External {
@@ -259,7 +224,7 @@ function Test-Preflight {
     Set-Step 'Checking Windows and hardware requirements...'
     if (-not [Environment]::Is64BitOperatingSystem) { throw '64-bit Windows is required.' }
     $build = [Environment]::OSVersion.Version.Build
-    if ($build -lt 22621) { throw 'Windows 11 22H2 or newer is required for mirrored WSL networking.' }
+    if ($build -lt 22621) { throw 'Windows 11 22H2 or newer is required.' }
     $memoryGb = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB
     if ($memoryGb -lt 15.5) { throw 'At least 16 GB RAM is required.' }
     $drive = Get-PSDrive -Name ([IO.Path]::GetPathRoot($InstallRoot).Substring(0, 1))

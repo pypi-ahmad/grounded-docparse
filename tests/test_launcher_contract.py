@@ -13,22 +13,26 @@ def test_wsl_shell_scripts_use_unix_line_endings() -> None:
 
 def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
     launcher = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
-    installer = (
-        ROOT / "installer" / "Install-GroundedDocParse.ps1"
+    native_launcher = (
+        ROOT / "scripts" / "windows" / "launch-native.ps1"
     ).read_text(encoding="utf-8")
 
-    assert "for %%K in (OPENAI_API_KEY OPENAI_BASE_URL GOOGLE_API_KEY OLLAMA_BASE_URL)" in launcher
-    assert "GetEnvironmentVariable('%%K','User')" in launcher
-    assert "OPENAI_API_KEY:OPENAI_BASE_URL" in launcher
-    assert "GOOGLE_API_KEY:OLLAMA_BASE_URL" in launcher
-    assert "GetEnvironmentVariable('OPENAI_API_KEY', 'User')" in installer
-    assert "GetEnvironmentVariable('OPENAI_BASE_URL', 'User')" in installer
+    assert "scripts\\windows\\launch-native.ps1" in launcher
+    for name in (
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
+        "GOOGLE_API_KEY",
+        "AGNES_API_KEY",
+        "OLLAMA_BASE_URL",
+    ):
+        assert name in native_launcher
+    assert "GetEnvironmentVariable($name, 'User')" in native_launcher
 
 
 def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
-    launchers = [
-        (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8"),
-    ]
+    native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
+        encoding="utf-8"
+    )
     stack = (ROOT / "scripts" / "wsl" / "launch-stack.sh").read_text(
         encoding="utf-8"
     )
@@ -37,7 +41,7 @@ def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
     ).read_text(encoding="utf-8")
 
-    assert all("http://localhost:8600" in launcher for launcher in launchers)
+    assert "http://localhost:8600" in native_launcher
     assert "STREAMLIT_PORT=8600" in stack
     assert '--server.port "$STREAMLIT_PORT"' in stack
     assert "streamlit_uses_configured_port()" in stack
@@ -171,15 +175,14 @@ def test_paddle_readiness_probe_generates_its_png() -> None:
 
 def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
     launcher = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
-    stack = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
+    native = (ROOT / "scripts/windows/launch-native.ps1").read_text(encoding="utf-8")
 
-    assert "check-installation.sh" in launcher
-    assert "-WarmEngine paddleocr-vl-1.6" in launcher
-    assert "launch-stack.sh" in launcher
-    run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
-    assert run_app.index("export DOCPARSE_GLMOCR_CONFIG_PATH") < run_app.index(
-        'if [[ "$DOCPARSE_OCR_ENGINE" == "glm-ocr" ]]'
-    )
+    assert "launch-native.ps1" in launcher
+    assert "uv sync" in native
+    assert "--extra native --extra windows-layout" in native
+    assert "grounded_docparse.windows_setup --download-layout" in native
+    assert "streamlit', 'run'" in native
+    assert (ROOT / "Launch-Grounded-DocParse-WSL-Legacy.cmd").is_file()
 
 
 def test_launcher_set_is_consolidated_and_setup_commands_warm_requested_gpu() -> None:

@@ -19,6 +19,7 @@ def test_cpu_and_gpu_extras_use_conflicting_pytorch_indexes() -> None:
     assert {source["extra"] for source in sources["torch"]} == {
         "local-ocr",
         "local-ocr-cpu",
+        "windows-layout",
     }
     assert manifest["tool"]["uv"]["conflicts"] == [
         [{"extra": "local-ocr"}, {"extra": "local-ocr-cpu"}]
@@ -55,14 +56,13 @@ def test_provisioner_handles_reboot_credentials_and_gpu_or_windows_ollama() -> N
     assert "AMD|Radeon" in provisioner
 
 
-def test_host_setup_installs_windows_ollama_and_preserves_loopback() -> None:
+def test_host_setup_installs_windows_ollama_without_reconfiguring_wsl() -> None:
     provisioner = (ROOT / "installer" / "Install-GroundedDocParse.ps1").read_text(
         encoding="utf-8"
     )
     assert "irm https://ollama.com/install.ps1 | iex" in provisioner
-    assert "networkingMode=mirrored" in provisioner
     assert "http://127.0.0.1:11434/api/tags" in provisioner
-    assert "wsl.exe --shutdown" in provisioner
+    assert "wsl.exe --shutdown" not in provisioner
 
 
 def test_wsl_private_ollama_runtime_is_removed() -> None:
