@@ -19,7 +19,7 @@ from grounded_docparse.models import (
     PageInspection,
     RegionDraft,
 )
-from grounded_docparse.runtime import ProviderRuntime
+from grounded_docparse.runtime import ProviderRuntime, RetryableProviderError
 
 
 class FakeTime:
@@ -71,6 +71,41 @@ def test_runtime_retries_only_retryable_http_statuses(status: int) -> None:
     assert calls == 3
     assert runtime.diagnostics().http_attempts == 3
     assert runtime.diagnostics().retries == 2
+
+
+def test_runtime_retries_provider_errors_with_integer_code() -> None:
+    runtime = _runtime(ParserConfig(provider_retry_attempts=3))
+    calls = 0
+
+    class ProviderError(Exception):
+        code = 503
+
+    def request() -> str:
+        nonlocal calls
+        calls += 1
+        if calls < 3:
+            raise ProviderError("temporarily unavailable")
+        return "ok"
+
+    assert runtime.request(request, model="gemini", stage="draft") == "ok"
+    assert calls == 3
+    assert runtime.diagnostics().retries == 2
+
+
+def test_runtime_retries_explicit_retryable_provider_errors() -> None:
+    runtime = _runtime(ParserConfig(provider_retry_attempts=2))
+    calls = 0
+
+    def request() -> str:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            raise RetryableProviderError("truncated response")
+        return "ok"
+
+    assert runtime.request(request, model="gemini", stage="draft") == "ok"
+    assert calls == 2
+    assert runtime.diagnostics().retries == 1
 
 
 def test_runtime_retries_connection_errors_and_stops_at_attempt_bound() -> None:
