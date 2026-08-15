@@ -7,6 +7,7 @@ from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .content_range import AppliedContentRange
 from .models import AgentTraceEvent, RunUsage, StoredSchema
 
 
@@ -205,6 +206,7 @@ class NativeDocument(BaseModel):
     elements: list[NativeElement]
     assets: list[NativeAsset] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+    content_range: AppliedContentRange | None = None
 
     @model_validator(mode="after")
     def valid_grounding(self) -> NativeDocument:
@@ -299,6 +301,11 @@ def render_native_document(
             "range_units": "unicode_codepoints",
             "range_target": "base_text",
             "warnings": document.warnings,
+            "content_range": (
+                document.content_range.model_dump(mode="json")
+                if document.content_range is not None
+                else None
+            ),
         },
         "elements": [element.model_dump(mode="json") for element in document.elements],
         "assets": [asset.model_dump(mode="json") for asset in document.assets],

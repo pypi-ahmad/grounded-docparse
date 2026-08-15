@@ -564,22 +564,26 @@ def _odf(data: bytes, source_format: SourceFormat) -> SourceManifest:
             units.append(unit)
             tables = [node for node in root.iter() if _local(node.tag) == "table"]
             table_descendants = {id(node) for table in tables for node in table.iter()}
-            for table_index, table in enumerate(tables, start=1):
-                value = _text(table)
-                if value:
-                    records.append(
-                        SourceRecord(
-                            value,
-                            "table",
-                            StructuralSourceAnchor(
-                                unit_id=unit.id,
-                                path=f"/office:text/table[{table_index}]",
-                            ),
-                        )
-                    )
             paragraph = 0
+            table_index = 0
             for node in root.iter():
-                if _local(node.tag) not in {"p", "h"} or id(node) in table_descendants:
+                node_type = _local(node.tag)
+                if node_type == "table":
+                    table_index += 1
+                    value = _text(node)
+                    if value:
+                        records.append(
+                            SourceRecord(
+                                value,
+                                "table",
+                                StructuralSourceAnchor(
+                                    unit_id=unit.id,
+                                    path=f"/office:text/table[{table_index}]",
+                                ),
+                            )
+                        )
+                    continue
+                if node_type not in {"p", "h"} or id(node) in table_descendants:
                     continue
                 paragraph += 1
                 value = _text(node)

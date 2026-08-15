@@ -36,6 +36,7 @@ class IngestedDocument:
     sha256: str
     source_path: Path
     pages: list[PageEvidence]
+    total_pages: int = 0
 
 
 def render_region_crop(
@@ -129,6 +130,7 @@ def ingest_document(
     max_bytes: int,
     max_pages: int = 500,
     max_page_pixels: int = 20_000_000,
+    page_range: tuple[int, int] | None = None,
 ) -> IngestedDocument:
     suffix = _validate_input(data, filename, max_bytes)
     digest = hashlib.sha256(data).hexdigest()
@@ -137,29 +139,42 @@ def ingest_document(
     pages_dir = workdir / "pages"
     pages_dir.mkdir(parents=True, exist_ok=True)
 
-    pages = (
-        _ingest_pdf(data, pages_dir, dpi, max_pages, max_page_pixels)
+    pages, total_pages = (
+        _ingest_pdf(data, pages_dir, dpi, max_pages, max_page_pixels, page_range)
         if suffix == ".pdf"
-        else _ingest_image(data, pages_dir, dpi, max_pages, max_page_pixels)
+        else _ingest_image(data, pages_dir, dpi, max_pages, max_page_pixels, page_range)
     )
     if not pages:
         raise ValueError("Document contains no readable pages")
-    return IngestedDocument(filename, digest, source_path, pages)
+    return IngestedDocument(filename, digest, source_path, pages, total_pages)
 
 
 def _ingest_pdf(
-    data: bytes, pages_dir: Path, dpi: int, max_pages: int, max_page_pixels: int
-) -> list[PageEvidence]:
+    data: bytes,
+    pages_dir: Path,
+    dpi: int,
+    max_pages: int,
+    max_page_pixels: int,
+    page_range: tuple[int, int] | None,
+) -> tuple[list[PageEvidence], int]:
     pages: list[PageEvidence] = []
     with pymupdf.open(stream=data, filetype="pdf") as document:
         if document.needs_pass:
             raise ValueError("Password-protected PDFs are not supported")
         if document.page_count > max_pages:
             raise ValueError(f"Document exceeds page limit of {max_pages}")
+        selected = range(1, document.page_count + 1)
+        if page_range is not None:
+            start, end = page_range
+            if not 1 <= start <= end <= document.page_count:
+                raise ValueError(f"page range must be within 1-{document.page_count}")
+            selected = range(start, end + 1)
         scale = dpi / 72
         matrix = pymupdf.Matrix(scale, scale)
         for index, page in enumerate(document):
             page_number = index + 1
+            if page_number not in selected:
+                continue
             width, height = float(page.rect.width), float(page.rect.height)
             if int(width * scale) * int(height * scale) > max_page_pixels:
                 raise ValueError(f"Page {page_number} exceeds rendered pixel limit")
@@ -183,18 +198,31 @@ def _ingest_pdf(
                     source_rotation_degrees=int(page.rotation),
                 )
             )
-    return pages
+        total_pages = document.page_count
+    return pages, total_pages
 
 
 def _ingest_image(
-    data: bytes, pages_dir: Path, dpi: int, max_pages: int, max_page_pixels: int
-) -> list[PageEvidence]:
+    data: bytes,
+    pages_dir: Path,
+    dpi: int,
+    max_pages: int,
+    max_page_pixels: int,
+    page_range: tuple[int, int] | None,
+) -> tuple[list[PageEvidence], int]:
     pages: list[PageEvidence] = []
     with Image.open(io.BytesIO(data)) as image:
+        total_pages = int(getattr(image, "n_frames", 1))
+        if page_range is not None:
+            start, end = page_range
+            if not 1 <= start <= end <= total_pages:
+                raise ValueError(f"frame range must be within 1-{total_pages}")
         for index, frame in enumerate(ImageSequence.Iterator(image)):
             page_number = index + 1
             if page_number > max_pages:
                 raise ValueError(f"Document exceeds page limit of {max_pages}")
+            if page_range is not None and not start <= page_number <= end:
+                continue
             if frame.width * frame.height > max_page_pixels:
                 raise ValueError(f"Page {page_number} exceeds pixel limit")
             rgb = ImageOps.exif_transpose(frame).convert("RGB")
@@ -215,4 +243,4 @@ def _ingest_image(
                     source_unit="pixels",
                 )
             )
-    return pages
+    return pages, total_pages

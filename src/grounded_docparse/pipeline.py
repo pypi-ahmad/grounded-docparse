@@ -21,6 +21,7 @@ from .config import (
     ParserConfig,
     default_alternate_ocr_engine,
 )
+from .content_range import AppliedContentRange
 from .enhancement import (
     build_enhancement_chunks,
     combine_page_markdown,
@@ -2766,6 +2767,7 @@ class DocumentParser:
         *,
         refine_markdown: bool = True,
         visual_recovery: bool = True,
+        content_range: AppliedContentRange | None = None,
     ) -> ParseResult:
         started = time.perf_counter()
         runtime = ProviderRuntime(self.config)
@@ -2784,6 +2786,11 @@ class DocumentParser:
                 max_bytes=self.config.max_upload_bytes,
                 max_pages=self.config.max_pages,
                 max_page_pixels=self.config.max_page_pixels,
+                page_range=(
+                    (content_range.start, content_range.end)
+                    if content_range is not None
+                    else None
+                ),
             )
             if self.config.ocr_disagreement_enabled:
                 self.ocr_service_switcher(self.config.ocr_engine)
@@ -3072,7 +3079,7 @@ class DocumentParser:
                 data,
                 source.name,
                 elements,
-                page_count=len(document.pages),
+                page_count=source.total_pages,
             )
             visual_parse_time = time.perf_counter() - started
             if refine_markdown:
@@ -3168,6 +3175,7 @@ class DocumentParser:
                 ),
                 model_versions=model_versions,
                 enhancement=enhancement,
+                content_range=content_range,
             )
             rendered = render_agentic_document(
                 document,

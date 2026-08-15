@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import re
 from collections import defaultdict
-from io import BytesIO
+from io import BytesIO, StringIO
 from types import ModuleType, SimpleNamespace
 
 import pymupdf
 
 from .config import ParserConfig
+from .content_range import AppliedContentRange, ContentUnit
 from .models import Element, RunUsage
 from .native import (
     CellSourceAnchor,
@@ -85,11 +87,17 @@ class PdfInspectorParser:
         progress_callback=None,
         refine_markdown: bool = True,
         visual_recovery: bool = True,
+        content_range: AppliedContentRange | None = None,
     ) -> NativeParseResult:
+        selected_pages = (
+            list(range(content_range.start, content_range.end + 1))
+            if content_range is not None
+            else list(range(1, inspection.page_count + 1))
+        )
         routes = (
-            {page: PageRoute.NATIVE for page in range(1, inspection.page_count + 1)}
+            {page: PageRoute.NATIVE for page in selected_pages}
             if processing_type is ProcessingType.NATIVE_PDF
-            else dict(page_routes or {})
+            else {page: (page_routes or {})[page] for page in selected_pages}
         )
         native_pages = [page for page, route in routes.items() if route is PageRoute.NATIVE]
         ocr_pages = [page for page, route in routes.items() if route is PageRoute.OCR]
@@ -224,12 +232,12 @@ class PdfInspectorParser:
                     (item.reading_order, item.text, str(item.type), item.bbox)
                 )
 
-        for page in range(1, inspection.page_count + 1):
+        for page in selected_pages:
             for _order, text, kind, bbox in sorted(candidates[page]):
                 add_element(page=page, text=text, kind=kind, bbox=bbox)
 
         units = []
-        for page in range(1, inspection.page_count + 1):
+        for page in selected_pages:
             warnings = []
             if page in inspection.pages_with_tables:
                 warnings.append("table layout detected")
@@ -258,10 +266,11 @@ class PdfInspectorParser:
             base_text="".join(base_parts),
             units=units,
             elements=elements,
+            content_range=content_range,
         )
         markdown = "\n\n".join(
             f"<!-- Page {page} -->\n\n{page_markdown.get(page, '').strip()}"
-            for page in range(1, inspection.page_count + 1)
+            for page in selected_pages
         ).rstrip()
         rendered = render_native_document(document, markdown=markdown)
         annotated_pdf = render_annotated_pdf(
@@ -299,6 +308,7 @@ class DoclingNativeParser:
         *,
         source_format: SourceFormat,
         processing_type: ProcessingType,
+        content_range: AppliedContentRange | None = None,
     ) -> NativeParseResult:
         from .docling_native import (
             DOCLING_FORMAT_NAMES,
@@ -309,7 +319,46 @@ class DoclingNativeParser:
 
         if source_format not in DOCLING_FORMAT_NAMES:
             raise ValueError(f"Docling native parsing does not support {source_format.value}")
-        manifest = build_source_manifest(data, source_format)
+        conversion_data = data
+        if content_range is not None and content_range.unit is ContentUnit.ROW:
+            rows = list(csv.reader(StringIO(data.decode("utf-8-sig"))))
+            selected_rows = rows[content_range.start - 1 : content_range.end]
+            buffer = StringIO(newline="")
+            csv.writer(buffer).writerows(selected_rows)
+            conversion_data = buffer.getvalue().encode("utf-8")
+        manifest = build_source_manifest(conversion_data, source_format)
+        if content_range is not None and content_range.unit is ContentUnit.ROW:
+            for record in manifest.records:
+                if isinstance(record.anchor, CsvSourceAnchor):
+                    record.anchor = record.anchor.model_copy(
+                        update={
+                            "row_start": content_range.start,
+                            "row_end": content_range.end,
+                        }
+                    )
+        selected_unit_ids = {unit.id for unit in manifest.units}
+        selected_record_ids = {id(record) for record in manifest.records}
+        if content_range is not None and content_range.unit in {
+            ContentUnit.SLIDE,
+            ContentUnit.SHEET,
+            ContentUnit.SECTION,
+        }:
+            selected_unit_ids = {
+                unit.id
+                for unit in manifest.units
+                if content_range.start <= unit.index <= content_range.end
+            }
+            selected_record_ids = {
+                id(record)
+                for record in manifest.records
+                if record.anchor.unit_id in selected_unit_ids
+            }
+        elif content_range is not None and content_range.unit is ContentUnit.BLOCK:
+            selected_record_ids = {
+                id(record)
+                for index, record in enumerate(manifest.records, start=1)
+                if content_range.start <= index <= content_range.end
+            }
         converter = self.converter or make_docling_converter()
         self.converter = converter
         try:
@@ -320,7 +369,7 @@ class DoclingNativeParser:
                 "native document parsing requires grounded-docparse[native]"
             ) from exc
         result = converter.convert(
-            DocumentStream(name=filename, stream=BytesIO(data)),
+            DocumentStream(name=filename, stream=BytesIO(conversion_data)),
             raises_on_error=True,
             max_file_size=self.config.max_upload_bytes,
         )
@@ -384,6 +433,10 @@ class DoclingNativeParser:
                             ),
                         )
                     )
+                if id(record) not in selected_record_ids and not isinstance(record, SimpleNamespace):
+                    continue
+                if isinstance(record, SimpleNamespace) and record.anchor.unit_id not in selected_unit_ids:
+                    continue
                 start, end = append_text(value)
                 element_id = f"element-{len(elements) + 1}"
                 elements.append(
@@ -414,6 +467,8 @@ class DoclingNativeParser:
                     unit_id=unit_for(item),
                     record_type="table",
                 )
+                if id(record) not in selected_record_ids:
+                    continue
                 if record.cells is not None:
                     cells = [
                         SimpleNamespace(
@@ -524,9 +579,10 @@ class DoclingNativeParser:
             source_format=source_format,
             requested_processing_type=processing_type,
             base_text="".join(base_parts),
-            units=manifest.units,
+            units=[unit for unit in manifest.units if unit.id in selected_unit_ids],
             elements=elements,
-            assets=manifest.assets,
+            assets=[asset for asset in manifest.assets if asset.anchor.unit_id in selected_unit_ids],
+            content_range=content_range,
         )
         child_ids = {child for element in elements for child in element.children}
         markdown_parts = []
