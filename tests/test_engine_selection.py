@@ -49,6 +49,18 @@ def test_ollama_prompts_are_model_and_region_specific() -> None:
     assert region_prompt(OllamaOcrModel.DEEPSEEK_OCR, "figure") == "Parse the figure."
 
 
+@pytest.mark.parametrize(
+    ("model", "source"),
+    [
+        (OllamaOcrModel.GLM_OCR, "glm-ocr"),
+        (OllamaOcrModel.PADDLEOCR_VL, "paddleocr-vl-1.6"),
+        (OllamaOcrModel.DEEPSEEK_OCR, "deepseek-ocr"),
+    ],
+)
+def test_ollama_models_expose_element_provenance(model, source) -> None:
+    assert model.element_source == source
+
+
 def test_ollama_ocr_request_bounds_context_and_output(monkeypatch) -> None:
     captured = {}
 

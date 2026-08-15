@@ -39,6 +39,27 @@ def test_installer_payload_is_allowlisted_and_excludes_secrets() -> None:
     assert ".env" not in installer
     assert ".git" not in installer
     assert "secrets.toml" not in installer
+    assert 'Source: "..\\Launch-Grounded-DocParse-WSL-Legacy.cmd"' not in installer
+    assert 'Name: "{group}\\Grounded DocParse (WSL legacy app)";' not in installer
+
+
+def test_installer_removes_legacy_wsl_app_and_launches_native_app() -> None:
+    installer = (ROOT / "installer" / "GroundedDocParse.iss").read_text(
+        encoding="utf-8"
+    )
+    provisioner = (
+        ROOT / "installer" / "Install-GroundedDocParse.ps1"
+    ).read_text(encoding="utf-8")
+
+    for relative_path in (
+        "Launch-Grounded-DocParse-WSL-Legacy.cmd",
+        "scripts\\wsl\\launch-stack.sh",
+        "scripts\\wsl\\run-app.sh",
+        "scripts\\wsl\\stop-stack.sh",
+    ):
+        assert relative_path in installer
+    assert "Launch-Grounded-DocParse.cmd" in provisioner
+    assert "launch-stack.sh" not in provisioner
 
 
 def test_provisioner_handles_reboot_credentials_and_gpu_or_windows_ollama() -> None:
@@ -68,3 +89,14 @@ def test_host_setup_installs_windows_ollama_without_reconfiguring_wsl() -> None:
 def test_wsl_private_ollama_runtime_is_removed() -> None:
     assert not (ROOT / "scripts" / "wsl" / "setup-ollama.sh").exists()
     assert not (ROOT / "scripts" / "wsl" / "serve-ollama.sh").exists()
+
+
+def test_uninstaller_preserves_downloaded_model_weights() -> None:
+    provisioner = (ROOT / "installer" / "Install-GroundedDocParse.ps1").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'rm -rf -- "$data"' not in provisioner
+    assert 'rm -rf -- "$data/.venv" "$data/.paddle-venv"' in provisioner
+    assert 'rm -rf -- "$data/huggingface"' not in provisioner
+    assert "ollama rm" not in provisioner

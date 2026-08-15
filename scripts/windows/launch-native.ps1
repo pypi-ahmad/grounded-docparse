@@ -12,7 +12,6 @@ $PidPath = Join-Path $RuntimeRoot 'streamlit.pid'
 $StreamlitPort = 7137
 $StreamlitUrl = 'http://localhost:7137'
 $StreamlitHealthUrl = 'http://127.0.0.1:7137/_stcore/health'
-$LegacyStreamlitPorts = @(8600, 9356)
 New-Item -ItemType Directory -Force -Path $LogRoot, $RuntimeRoot | Out-Null
 
 function Write-LaunchLog([string]$Message) {
@@ -112,22 +111,6 @@ function Stop-PreviousManagedApp {
     Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
 }
 
-function Stop-WslManagedApp {
-    if (-not (Get-Command wsl.exe -ErrorAction SilentlyContinue)) { return }
-    $distros = @(& wsl.exe --list --quiet 2>$null) -replace "`0", ''
-    if ($LASTEXITCODE -ne 0 -or $distros -notcontains 'Ubuntu-24.04') { return }
-    $windowsRoot = $InstallRoot -replace '\\', '/'
-    $wslRoot = @(& wsl.exe -d Ubuntu-24.04 -- wslpath -a $windowsRoot 2>$null)[0]
-    if ($LASTEXITCODE -ne 0 -or -not $wslRoot) {
-        throw 'Could not resolve the Grounded DocParse path in Ubuntu-24.04.'
-    }
-    Write-LaunchLog 'Stopping any previous Grounded DocParse WSL app session...'
-    & wsl.exe -d Ubuntu-24.04 -- bash "$($wslRoot.Trim())/scripts/wsl/stop-stack.sh" 0 --app-only
-    if ($LASTEXITCODE -ne 0) {
-        throw 'The previous Grounded DocParse WSL app session could not be stopped safely.'
-    }
-}
-
 function Stop-AppListeningOnPort {
     param([int]$Port = $StreamlitPort)
     $listeners = @(
@@ -136,22 +119,6 @@ function Stop-AppListeningOnPort {
     foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
         if ($ownerPid) {
             Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "port $Port"
-        }
-    }
-}
-
-function Stop-LegacyAppListeners {
-    foreach ($port in $LegacyStreamlitPorts) {
-        $listeners = @(
-            Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
-        )
-        foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
-            if (-not $ownerPid) { continue }
-            if (Get-VerifiedGroundedDocParseProcess -ProcessId $ownerPid) {
-                Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "legacy port $port"
-            } else {
-                Write-LaunchLog "Leaving unrelated process PID $ownerPid on legacy port $port untouched."
-            }
         }
     }
 }
@@ -273,8 +240,6 @@ try {
     & $uv python install 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.12 installation failed.' }
     Stop-PreviousManagedApp
-    Stop-WslManagedApp
-    Stop-LegacyAppListeners
     Stop-AppListeningOnPort
     & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev --python 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Native dependency synchronization failed.' }
@@ -282,9 +247,9 @@ try {
     Write-LaunchLog 'Clearing previous Streamlit session cache...'
     & $python -m streamlit cache clear
     if ($LASTEXITCODE -ne 0) { throw 'Streamlit cache cleanup failed.' }
-    Write-LaunchLog 'Checking the CPU PP-DocLayoutV3 model...'
-    & $python -m grounded_docparse.windows_setup --download-layout
-    if ($LASTEXITCODE -ne 0) { throw 'PP-DocLayoutV3 setup failed.' }
+    Write-LaunchLog 'Checking persistent layout and Local Ollama OCR models...'
+    & $python -m grounded_docparse.windows_setup --prepare-models
+    if ($LASTEXITCODE -ne 0) { throw 'Persistent OCR model setup failed.' }
 
     $portOwner = Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
     if ($portOwner) {
