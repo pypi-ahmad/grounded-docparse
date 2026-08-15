@@ -32,7 +32,7 @@ When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for 
 
 ## Install and set up
 
-The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, at least 16 GB RAM, 20 GB free disk, and network access during first setup. It installs or reuses WSL2, Ubuntu 24.04, Python, dependencies, and pinned models. NVIDIA CUDA uses vLLM; AMD uses Ollama acceleration when supported; every failed or unavailable GPU path falls back to Ollama CPU.
+The supported installer target is Windows 11 22H2 or newer on x64 with AVX2, at least 16 GB RAM, 20 GB free disk, and network access during first setup. It installs or reuses WSL2, Ubuntu 24.04, Python, dependencies, pinned GPU models, and Windows Ollama.
 
 1. Clone the repository from PowerShell:
 
@@ -60,12 +60,12 @@ The supported installer target is Windows 10 22H2 or Windows 11 x64 with AVX2, a
 4. For later sessions, start or reuse the managed services with:
 
    ```powershell
-   .\Launch-GLM-OCR.cmd
+   .\Launch-Grounded-DocParse.cmd
    ```
 
-   To start with PaddleOCR-VL-1.6 selected, use `Launch-PaddleOCR-VL-1.6.cmd`. Either launcher can switch the exclusive GPU backend later from the in-app model dropdown.
+   The launcher checks and repairs setup before opening the app. Use `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` to install, activate, and warm a specific GPU engine without launching a second model.
 
-`Launch-GLM-OCR.cmd` refreshes `OPENAI_API_KEY` and optional `OPENAI_BASE_URL` from Windows user scope each time. See [setup](SETUP.md) for manual WSL installation, configuration, security boundaries, and troubleshooting, or [run commands](docs/run.md) for service lifecycle commands.
+`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, and Ollama settings from Windows user scope each time. It installs missing Windows Ollama with the official installer and configures mirrored WSL networking so the loopback-only service is available to the WSL-hosted app. See [setup](SETUP.md) for details.
 
 For a manual development install of native parsing and grounded extraction, use:
 
@@ -232,8 +232,9 @@ full_json = render_combined_result(result, analysis)
 ```text
 .
 ├── Setup-GLM-OCR.cmd             # First-run Windows/WSL bootstrap and launch
-├── Launch-GLM-OCR.cmd            # Subsequent Windows launcher
-├── Launch-PaddleOCR-VL-1.6.cmd   # Start with PaddleOCR selected
+├── Launch-Grounded-DocParse.cmd   # Check setup and launch the app
+├── Setup-GLM-OCR.cmd              # Install and warm GLM-OCR on GPU
+├── Setup-PaddleOCR-VL-1.6.cmd     # Install and warm PaddleOCR-VL on GPU
 ├── paddle-runtime/               # Isolated locked Paddle/vLLM environment
 ├── streamlit_app.py              # Streamlit entry point
 ├── src/grounded_docparse/        # OCR, native parsers, models, gateways, renderers, agentic layer
@@ -307,3 +308,25 @@ absolute/baseline regression gates, use the
 and locked holdout documents remain outside the repository.
 
 Licensed under the [MIT License](LICENSE).
+# Engine and AI model selection
+
+The Streamlit sidebar owns the active extraction engine. A new session selects and
+warms PP-DocLayoutV3 + PaddleOCR-VL-1.6 by default. Selecting GLM-OCR unloads that
+stack and warms GLM-OCR; selecting a non-vLLM engine releases the managed vLLM
+stack. Local Ollama is independent and offers `glm-ocr:latest`,
+`AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`.
+
+AI tasks can use GPT 5.6 Luna, Gemini 3.5 Flash Lite, or Gemini Flash 3.7. Set keys
+as Windows User environment variables (recommended) or copy `.env.example` to
+`.env`. The app reads only its root `.env` and never overrides existing process
+environment values:
+
+```text
+OPENAI_API_KEY=...
+OPENAI_BASE_URL=...  # optional
+GOOGLE_API_KEY=...
+OLLAMA_BASE_URL=http://127.0.0.1:11434  # optional, loopback only
+```
+
+Use `Launch-Grounded-DocParse.cmd` for normal startup. It installs or starts the
+independent Windows Ollama service when required; Ollama model downloads remain lazy.

@@ -1,38 +1,38 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f03a0de2c1a2",
-    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
+    "id": "content-feba9b9dbd9f",
+    "base_commit": "e5ef4759b10f3670f5f3f9213f8fd98e3f7ea9f4",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-13T13:54:04.812099+00:00",
+  "generated_at": "2026-08-15T09:22:15.558896+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
-      "path": "Launch-GLM-OCR.cmd",
-      "sha256": "eb7819f5e93d7a7cbeb62b3bd8c5470062902010b284976eebd7f8cb848df736",
-      "size": 1668
-    },
-    {
-      "path": "Launch-PaddleOCR-VL-1.6.cmd",
-      "sha256": "838f81d6c487781353dd32e9768b7a602acd7088bccc9467c7e2be3d93fca2e2",
-      "size": 1715
+      "path": "Launch-Grounded-DocParse.cmd",
+      "sha256": "5466cd04b325ac8fe612213764bb61371655748b77921ff97ac5737d6e241ef1",
+      "size": 1687
     },
     {
       "path": "Setup-GLM-OCR.cmd",
-      "sha256": "4a762fe88b2ffa4020dacdfce944f17b884c2d82aa019f34491c49fb7ec0c818",
-      "size": 210
+      "sha256": "91ab1523d7da320c01ea6afa57f25ea89c11b207138f15b51cb370a417993e56",
+      "size": 1181
+    },
+    {
+      "path": "Setup-PaddleOCR-VL-1.6.cmd",
+      "sha256": "1cb4c5547623e914a47d6b1fd9504f36fa9f33bef3b9c89423fe4d9e5e3b8ead",
+      "size": 1226
     },
     {
       "path": "installer/GroundedDocParse.iss",
-      "sha256": "6b9fc12b0b802859f9a61903b57a5ae793b6e5534b1433dbf1074120699d420a",
-      "size": 2930
+      "sha256": "7d9e3a2b0b41485b2cded19cd8b7693444a6d6875d12087a2b82ef5471b45474",
+      "size": 3048
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "aa935806e9d9beeaf6c13969b411a147293d5bc5436f78958adcfd1a92f64c06",
-      "size": 16171
+      "sha256": "186d745a81dbbb5ad329a54cd65e853e4f69f78ef69052e0a47fad11174a2243",
+      "size": 19896
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -85,29 +85,34 @@
       "size": 3142
     },
     {
+      "path": "scripts/wsl/check-installation.sh",
+      "sha256": "81ec4ab2d0d42d2d82b92b8cb8b31420c41cba02b8b6eb17371ddf20eb39f5ef",
+      "size": 1599
+    },
+    {
       "path": "scripts/wsl/check-paddleocr-api.py",
       "sha256": "c795e5872e2efd8973a34f3b039fa39ead745d22630d8bd204ba9326b482566e",
       "size": 1328
     },
     {
       "path": "scripts/wsl/launch-stack.sh",
-      "sha256": "87d4679044cf5ab6de49993f180900c048b84f8134df1be2c805083b66d9fde9",
-      "size": 5706
+      "sha256": "75cabcabd4cd55b0b196e6443baa568e34b5402e32652d27014a6eb86f5c4968",
+      "size": 5786
     },
     {
       "path": "scripts/wsl/manage-ocr-stack.sh",
-      "sha256": "681b1f5ebfe389c199d0d9000f75a6ca611b50bc0e104f5ab4b4a80fa68af236",
-      "size": 11579
+      "sha256": "30e3f5dd166adb3bd1ef5ab91a0ecfd6a4de042f010f197d3bf7f30a313715ac",
+      "size": 10826
     },
     {
       "path": "scripts/wsl/prepare_glmocr_runtime.py",
-      "sha256": "9d5d693640181f37a4ad6dfaef5d80f9d0858683fd1c1b92f03b62b2427f4c3e",
-      "size": 5578
+      "sha256": "8cff3cf3f509f217b5468b2fef782aaf6683f02475cc90abb78cc331cec881b2",
+      "size": 5581
     },
     {
       "path": "scripts/wsl/prepare_paddleocr_runtime.py",
-      "sha256": "9eab116d1aa0387939f6ee8e07f8a93452924bf8dcd1c51597a366029d36118a",
-      "size": 5186
+      "sha256": "403926e543cd87917e04e2311924ad8ff64fb3574be9efbc013e77c5d77e045c",
+      "size": 5184
     },
     {
       "path": "scripts/wsl/run-app.sh",
@@ -120,19 +125,9 @@
       "size": 1223
     },
     {
-      "path": "scripts/wsl/serve-ollama.sh",
-      "sha256": "d8a5885823a93cc18507617cc4c576518eb2642b9ed8448b64a83022e4a22633",
-      "size": 437
-    },
-    {
       "path": "scripts/wsl/setup-glmocr.sh",
-      "sha256": "5bf79f1938cc46975f57dce1ff3f491bf2a8aaee561c14146cfb74e8de918dbd",
-      "size": 3176
-    },
-    {
-      "path": "scripts/wsl/setup-ollama.sh",
-      "sha256": "312b4a41dbe2178f052aec533eff85b1dbc8fd149410b8bb1fc76a820865e4b7",
-      "size": 2275
+      "sha256": "3a120840b18f40e0618aa1938abd390e1e12d505d968d69a60f19e4876c890de",
+      "size": 3104
     },
     {
       "path": "scripts/wsl/setup-paddleocr.sh",

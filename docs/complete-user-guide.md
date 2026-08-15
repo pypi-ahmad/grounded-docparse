@@ -116,7 +116,7 @@ For first-time setup from the repository root in PowerShell:
 For later sessions:
 
 ```powershell
-.\Launch-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
 The application normally opens at <http://localhost:8600>. GLM-OCR uses loopback port `8080`; PaddleOCR-VL uses loopback ports `8118` and `8119`.

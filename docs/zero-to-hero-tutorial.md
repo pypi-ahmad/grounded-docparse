@@ -224,10 +224,10 @@ The setup process:
 Later sessions default to GLM-OCR:
 
 ```powershell
-.\Launch-GLM-OCR.cmd
+.\Launch-Grounded-DocParse.cmd
 ```
 
-Use `.\Launch-PaddleOCR-VL-1.6.cmd` to start with PaddleOCR-VL selected. Both launchers reuse healthy managed processes, refresh Windows user-scope OpenAI settings, and can switch the exclusive GPU backend from the app.
+Use `.\Setup-PaddleOCR-VL-1.6.cmd` to install and warm PaddleOCR-VL explicitly. The generic launcher reuses healthy managed processes, refreshes user-scope provider settings, and opens the app.
 
 ### 5.5 Manual WSL launch
 
@@ -1262,7 +1262,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 | --- | --- | --- |
 | Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:8600>; inspect `.runtime/streamlit.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
-| Luna controls are disabled | `OPENAI_API_KEY` unavailable to Streamlit | Save it in Windows user scope and rerun `Launch-GLM-OCR.cmd` |
+| Luna controls are disabled | `OPENAI_API_KEY` unavailable to Streamlit | Save it in Windows user scope and rerun `Launch-Grounded-DocParse.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |
 | Extraction tab says key required | Extraction is a Luna feature | Configure an approved key or remain GLM-only |
 | Markdown schema is rejected | Mixed table/bullets, invalid field, encoding, or size | Use one supported format, UTF-8 `.md`, under 1 MB |
