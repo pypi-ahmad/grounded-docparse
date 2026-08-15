@@ -5,15 +5,18 @@ import re
 import time
 from collections.abc import Callable
 from html.parser import HTMLParser
-from importlib.metadata import PackageNotFoundError, version
 from itertools import pairwise
 from pathlib import Path
 
 from PIL import Image, ImageFilter, ImageStat
 
 from .config import LUNA_MODEL, OcrEngine, ParserConfig
+from .grounded_ocr import (
+    LAYOUT_MODEL_ID,
+    get_grounded_ocr_runtime,
+)
 from .ingest import PageEvidence
-from .local_ocr import GlmPageResult, GlmRegion, get_glmocr_runtime, glmocr_version
+from .local_ocr import GlmPageResult, GlmRegion
 from .models import (
     AnalysisEngineEvidence,
     AnalysisRegionType,
@@ -136,25 +139,30 @@ class PageAnalyzer:
         runtime_factory: Callable[..., object] | None = None,
     ) -> None:
         self.config = config
-        self.runtime_factory = runtime_factory or (
-            get_paddleocr_runtime
-            if config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
-            else get_glmocr_runtime
-        )
+        self.runtime_factory = runtime_factory
 
     @property
     def engine_name(self) -> str:
         return self.config.ocr_engine.label
 
     def _runtime(self):
+        if self.runtime_factory is None:
+            if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+                return get_paddleocr_runtime(
+                    self.config.paddleocr_service_url,
+                    self.config.paddleocr_timeout_seconds,
+                )
+            return get_grounded_ocr_runtime(self.config)
         if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
             return self.runtime_factory(
                 self.config.paddleocr_service_url,
                 self.config.paddleocr_timeout_seconds,
             )
-        return self.runtime_factory(
-            self.config.glmocr_config_path, self.config.glmocr_layout_device
-        )
+        if self.config.ocr_engine is OcrEngine.GLM_OCR:
+            return self.runtime_factory(
+                self.config.glmocr_config_path, self.config.glmocr_layout_device
+            )
+        return self.runtime_factory(self.config)
 
     def prepare_document(self, source_path: Path, pages: list[PageEvidence]) -> None:
         if self.config.ocr_engine is not OcrEngine.PADDLEOCR_VL_1_6:
@@ -174,15 +182,17 @@ class PageAnalyzer:
                 "vlm_backend": "vLLM",
                 "ai_model": self.config.cloud_model.value,
             }
-        try:
-            vllm_version = version("vllm")
-        except PackageNotFoundError:
-            vllm_version = "unavailable"
         return {
-            "glmocr_sdk": glmocr_version() or "unavailable",
-            "ocr_model": "zai-org/GLM-OCR",
-            "layout_model": "PaddlePaddle/PP-DocLayoutV3_safetensors",
-            "vllm": vllm_version,
+            "ocr_sdk": "grounded-docparse",
+            "ocr_model": (
+                "zai-org/GLM-OCR"
+                if self.config.ocr_engine is OcrEngine.GLM_OCR
+                else self.config.ollama_model
+            ),
+            "layout_model": LAYOUT_MODEL_ID,
+            "vlm_backend": (
+                "vLLM" if self.config.ocr_engine is OcrEngine.GLM_OCR else "Ollama"
+            ),
             "ai_model": self.config.cloud_model.value,
         }
 
@@ -260,7 +270,7 @@ class PageAnalyzer:
         except Exception as exc:
             if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
                 raise
-            warning = f"GLM-OCR analysis unavailable: {type(exc).__name__}: {exc}"
+            warning = f"{self.engine_name} analysis unavailable: {type(exc).__name__}: {exc}"
             for page, render, quality in prepared.values():
                 yield self._finish(
                     page,
@@ -301,16 +311,23 @@ class PageAnalyzer:
         self, page, render, quality, raw, started, warning=None
     ) -> PageAnalysis:
         paddle = self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+        ollama = self.config.ocr_engine is OcrEngine.OLLAMA
         engine = AnalysisEngineEvidence(
-            sdk="paddleocr" if paddle else "glmocr",
-            sdk_version=None if paddle else glmocr_version(),
+            sdk="paddleocr" if paddle else "grounded-docparse",
+            sdk_version=None,
             layout_model=(
                 "PP-DocLayoutV3"
                 if paddle
                 else "PaddlePaddle/PP-DocLayoutV3_safetensors"
             ),
-            ocr_model=("PaddleOCR-VL-1.6-0.9B" if paddle else "zai-org/GLM-OCR"),
-            layout_device="cpu" if paddle else self.config.glmocr_layout_device,
+            ocr_model=(
+                "PaddleOCR-VL-1.6-0.9B"
+                if paddle
+                else self.config.ollama_model
+                if ollama
+                else "zai-org/GLM-OCR"
+            ),
+            layout_device="cpu",
         )
         if quality.blank:
             engine.latency_ms = round((time.perf_counter() - started) * 1000)
@@ -558,12 +575,20 @@ class PageAnalyzer:
                 basis=f"{self.engine_name} returned no layout regions"
             )
         order = [r.id for r in regions]
-        if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
+        if self.config.ocr_engine in {
+            OcrEngine.PADDLEOCR_VL_1_6,
+            OcrEngine.GLM_OCR,
+            OcrEngine.OLLAMA,
+        }:
             return ReadingOrderEvidence(
                 status=ReadingOrderStatus.CONFIDENT,
                 ordered_region_ids=order,
                 confidence=1.0,
-                basis="PaddleOCR block_order",
+                basis=(
+                    "PaddleOCR block_order"
+                    if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+                    else "PP-DocLayoutV3 detector order"
+                ),
             )
         if columns:
             membership = {

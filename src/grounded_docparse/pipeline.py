@@ -9,7 +9,7 @@ import time
 import unicodedata
 from collections.abc import Callable
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Empty, SimpleQueue
 
@@ -23,7 +23,8 @@ from .enhancement import (
 )
 from .gateways import OpenAIDocumentGateway
 from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
-from .local_ocr import GlmPageResult, OcrPageResult, get_glmocr_form_recovery_runtime
+from .grounded_ocr import get_grounded_ocr_runtime
+from .local_ocr import GlmPageResult, OcrPageResult
 from .models import (
     AgentRole,
     AgentTraceEvent,
@@ -1268,8 +1269,8 @@ def _recover_glm_form_regions(
         return outcome
 
     try:
-        runtime = get_glmocr_form_recovery_runtime(
-            config.glmocr_config_path, config.glmocr_layout_device
+        runtime = get_grounded_ocr_runtime(
+            replace(config, ocr_engine=OcrEngine.GLM_OCR)
         )
         if hasattr(runtime, "parse_many"):
             results = runtime.parse_many(list(requests))
@@ -1754,9 +1755,8 @@ class DocumentParser:
         try:
             self.ocr_service_switcher(secondary)
             if secondary is OcrEngine.GLM_OCR:
-                runtime = get_glmocr_form_recovery_runtime(
-                    self.config.glmocr_config_path,
-                    self.config.glmocr_layout_device,
+                runtime = get_grounded_ocr_runtime(
+                    replace(self.config, ocr_engine=OcrEngine.GLM_OCR)
                 )
             else:
                 runtime = get_paddleocr_runtime(

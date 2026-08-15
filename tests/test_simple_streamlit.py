@@ -11,7 +11,7 @@ from streamlit.testing.v1 import AppTest
 from grounded_docparse import pipeline, runtime_control, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
-from grounded_docparse.config import LUNA_MODEL
+from grounded_docparse.config import LUNA_MODEL, ExtractionEngine
 from grounded_docparse.models import (
     AgenticAnalysis,
     AgentUsage,
@@ -62,6 +62,11 @@ def _select_scanned(app: AppTest, filename: str) -> AppTest:
     ).select("Scanned PDF").run(timeout=20)
 
 
+def _select_engine(app: AppTest, label: str) -> AppTest:
+    toggle = next(item for item in app.toggle if item.label == label)
+    return app if toggle.value else toggle.set_value(True).run(timeout=20)
+
+
 def test_studio_allows_glm_without_openai_environment(
     monkeypatch, simple_pdf: bytes
 ) -> None:
@@ -69,6 +74,7 @@ def test_studio_allows_glm_without_openai_environment(
     monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
 
     assert not app.exception
     assert len(app.file_uploader) == 1
@@ -82,11 +88,21 @@ def test_studio_allows_glm_without_openai_environment(
     parse = next(button for button in app.button if button.label == "Parse document")
     assert parse.disabled is False
     assert next(item for item in app.selectbox if item.label == "ADE mode").value == "Fast"
-    model = next(
-        item for item in app.selectbox if item.label == "Document extraction model"
-    )
-    assert model.options == ["GLM-OCR", "PaddleOCR-VL-1.6"]
-    assert model.value == "GLM-OCR"
+    engine_toggles = {
+        item.label: item.value
+        for item in app.toggle
+        if item.label
+        in {
+            "Pure AI agentic extraction",
+            "PaddleOCR-VL-1.6",
+            "GLM-OCR",
+            "Docling + RapidOCR",
+            "PDF Inspector (no OCR)",
+            "Local Ollama",
+        }
+    }
+    assert engine_toggles["GLM-OCR"] is True
+    assert sum(engine_toggles.values()) == 1
     assert not next(
         toggle.value
         for toggle in app.toggle
@@ -109,7 +125,7 @@ def test_studio_allows_glm_without_openai_environment(
         "HTML View",
         "Annotated PDF",
         "Layout Tree",
-    ]
+    ], dict(app.session_state.filtered_state)
     stop_app = next(button for button in app.button if button.label == "Stop app")
     assert stop_app.disabled is True
 
@@ -205,14 +221,11 @@ def test_ocr_model_selection_updates_the_active_ui_engine(monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
-    model = next(
-        item for item in app.selectbox if item.label == "Document extraction model"
-    )
-    app = model.select("PaddleOCR-VL-1.6").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
 
     assert not app.exception
     assert any(
-        "Powered by PaddleOCR-VL-1.6 + gpt-5.6-luna" in item.value
+        "Powered by GLM-OCR + GPT 5.6 Luna" in item.value
         for item in app.get("caption")
     )
 
@@ -330,6 +343,12 @@ def test_studio_shows_results_and_only_requested_tools(
     monkeypatch.setattr(DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis())
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
+    app = next(
+        toggle
+        for toggle in app.toggle
+        if toggle.label == "AI enhancement for failed or <75% confidence regions"
+    ).set_value(True).run(timeout=20)
     app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
@@ -564,6 +583,7 @@ def test_page_range_parses_a_renumbered_pdf_subset(monkeypatch) -> None:
     monkeypatch.setattr(DocumentAgent, "analyze", lambda self, *args, **kwargs: AgenticAnalysis())
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app.file_uploader[0].upload(
         "two-pages.pdf", source_bytes, "application/pdf"
     ).run(timeout=20)
@@ -632,6 +652,7 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     uploader = app.file_uploader[0]
     uploader.upload("first.pdf", simple_pdf, "application/pdf")
     uploader.upload("second.pdf", simple_pdf + b"\n", "application/pdf")
@@ -722,6 +743,7 @@ def test_batch_continues_after_failure_and_retry_skips_completed_document(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     uploader = app.file_uploader[0]
     uploader.upload("good.pdf", simple_pdf, "application/pdf")
     uploader.upload("bad.pdf", simple_pdf + b"\n", "application/pdf")
@@ -959,6 +981,7 @@ def test_completed_batch_restores_after_app_restart_without_reparsing(
     )
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app = app.file_uploader[0].upload(
         "notice.pdf", simple_pdf, "application/pdf"
     ).run(timeout=20)
@@ -1007,12 +1030,15 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
         annotated_pdf=simple_pdf,
     )
     selection_key = (
-        f"{document.id}:all:False:True:True:glm-ocr:scanned-pdf::4.6.0"
+        f"{document.id}:all:False:True:True:glm-vllm:gpt-5.6-luna:"
+        "scanned-pdf::4.6.0"
     )
     store = WorkspaceStore(database)
     store.sync_documents(
         [document],
         settings={
+            "extraction_engine": ExtractionEngine.GLM_VLLM.value,
+            "ai_enhancement": True,
             "ade_mode": "Fast",
             "refine_markdown": False,
             "classify_document": True,
@@ -1054,6 +1080,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
     monkeypatch.setattr(DocumentAgent, "analyze", analyze)
 
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
     app = next(
         button for button in app.button if button.label == "Resume batch"
     ).click().run(timeout=20)

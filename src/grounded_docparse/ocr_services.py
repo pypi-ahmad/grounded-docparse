@@ -7,11 +7,47 @@ from pathlib import Path
 from .config import ExtractionEngine, OcrEngine
 from .local_ocr import clear_glmocr_runtimes
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _manager_command(*arguments: str) -> tuple[list[str], dict[str, str]]:
+    manager = PROJECT_ROOT / "scripts" / "wsl" / "manage-ocr-stack.sh"
+    environment = os.environ.copy()
+    if os.name != "nt":
+        return ["bash", str(manager), *arguments], environment
+    environment["DOCPARSE_WINDOWS_ROOT"] = str(PROJECT_ROOT)
+    forwarded = [item for item in environment.get("WSLENV", "").split(":") if item]
+    if "DOCPARSE_WINDOWS_ROOT/p" not in forwarded:
+        forwarded.append("DOCPARSE_WINDOWS_ROOT/p")
+    environment["WSLENV"] = ":".join(forwarded)
+    distro = environment.get("DOCPARSE_WSL_DISTRO", "Ubuntu-24.04")
+    argument_text = " ".join(arguments)
+    command = (
+        'cd "$DOCPARSE_WINDOWS_ROOT" && '
+        f"bash scripts/wsl/manage-ocr-stack.sh {argument_text}"
+    )
+    return ["wsl.exe", "-d", distro, "--", "bash", "-lc", command], environment
+
+
+def _run_manager(*arguments: str, timeout: float) -> None:
+    command, environment = _manager_command(*arguments)
+    subprocess.run(
+        command,
+        cwd=PROJECT_ROOT,
+        env=environment,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+
 
 def ensure_managed_ocr_engine(engine: OcrEngine) -> None:
     """Activate one local OCR service when managed-service mode is enabled."""
 
-    if os.getenv("DOCPARSE_MANAGE_OCR_SERVICES", "false").casefold() in {
+    if engine is OcrEngine.OLLAMA or os.getenv(
+        "DOCPARSE_MANAGE_OCR_SERVICES", "false"
+    ).casefold() in {
         "0",
         "false",
         "no",
@@ -19,21 +55,13 @@ def ensure_managed_ocr_engine(engine: OcrEngine) -> None:
         return
     if engine is OcrEngine.PADDLEOCR_VL_1_6:
         clear_glmocr_runtimes()
-    script = Path("scripts/wsl/manage-ocr-stack.sh")
-    subprocess.run(
-        ["bash", str(script), "ensure", engine.value],
-        check=True,
-        capture_output=True,
-        text=True,
-        timeout=1800,
-    )
+    _run_manager("ensure", engine.value, timeout=1800)
 
 
 def stop_managed_vllm() -> None:
     if os.getenv("DOCPARSE_MANAGE_OCR_SERVICES", "false").casefold() not in {"1", "true", "yes"}:
         return
-    script = Path("scripts/wsl/manage-ocr-stack.sh")
-    subprocess.run(["bash", str(script), "stop"], check=True, capture_output=True, text=True, timeout=300)
+    _run_manager("stop", "all", timeout=300)
 
 
 def switch_extraction_engine(target: ExtractionEngine, previous: ExtractionEngine | None = None) -> None:

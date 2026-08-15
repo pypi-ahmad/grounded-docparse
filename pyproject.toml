@@ -42,6 +42,11 @@ local-ocr-cpu = [
     "torchvision==0.25.0; sys_platform == 'linux'",
     "transformers>=5.3,<6; sys_platform == 'linux'",
 ]
+windows-layout = [
+    "torch==2.10.0; sys_platform == 'win32'",
+    "torchvision==0.25.0; sys_platform == 'win32'",
+    "transformers>=5.3,<6; sys_platform == 'win32'",
+]
 
 [[tool.uv.index]]
 name = "pytorch-cu128"
@@ -60,10 +65,12 @@ conflicts = [[{ extra = "local-ocr" }, { extra = "local-ocr-cpu" }]]
 torch = [
     { index = "pytorch-cu128", extra = "local-ocr" },
     { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+    { index = "pytorch-cpu", extra = "windows-layout" },
 ]
 torchvision = [
     { index = "pytorch-cu128", extra = "local-ocr" },
     { index = "pytorch-cpu", extra = "local-ocr-cpu" },
+    { index = "pytorch-cpu", extra = "windows-layout" },
 ]
 
 [dependency-groups]
