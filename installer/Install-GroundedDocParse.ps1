@@ -379,7 +379,7 @@ function Invoke-Provision {
         if (-not $NoAppLaunch) {
             $projectRoot = Get-WslProjectRoot -User $user
             Invoke-WslShell -Command "cd '$projectRoot' && bash scripts/wsl/launch-stack.sh" -User $user | Out-Null
-            Start-Process 'http://localhost:9356'
+            Start-Process 'http://localhost:7137'
             [System.Windows.Forms.MessageBox]::Show('Grounded DocParse is installed and ready.', 'Setup complete') | Out-Null
         }
     } catch {

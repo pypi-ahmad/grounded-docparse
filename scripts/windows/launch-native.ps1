@@ -2,14 +2,17 @@
 param([Parameter(Mandatory)][string]$InstallRoot)
 
 $ErrorActionPreference = 'Stop'
+$InstallRoot = [IO.Path]::GetFullPath($InstallRoot.Trim('"'))
 $DataRoot = Join-Path $env:LOCALAPPDATA 'GroundedDocParse'
 $LogRoot = Join-Path $DataRoot 'logs'
 $LogPath = Join-Path $LogRoot 'native-launch.log'
 $RuntimeRoot = Join-Path $DataRoot 'runtime'
 $Venv = Join-Path $DataRoot 'venv'
 $PidPath = Join-Path $RuntimeRoot 'streamlit.pid'
-$StreamlitPort = 9356
-$StreamlitUrl = 'http://localhost:9356'
+$StreamlitPort = 7137
+$StreamlitUrl = 'http://localhost:7137'
+$StreamlitHealthUrl = 'http://127.0.0.1:7137/_stcore/health'
+$LegacyStreamlitPorts = @(8600, 9356)
 New-Item -ItemType Directory -Force -Path $LogRoot, $RuntimeRoot | Out-Null
 
 function Write-LaunchLog([string]$Message) {
@@ -68,13 +71,22 @@ function Import-UserEnvironment {
     }
 }
 
-function Stop-VerifiedGroundedDocParseProcess {
-    param([Parameter(Mandatory)][int]$ProcessId, [Parameter(Mandatory)][string]$Source)
+function Get-VerifiedGroundedDocParseProcess {
+    param([Parameter(Mandatory)][int]$ProcessId)
     $managedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $ProcessId" -ErrorAction SilentlyContinue
-    if (-not $managedProcess) { return }
+    if (-not $managedProcess) { return $null }
     $appPath = Join-Path $InstallRoot 'streamlit_app.py'
     $commandLine = [string]$managedProcess.CommandLine
     if ($commandLine -notlike '*streamlit*' -or $commandLine -notlike "*$appPath*") {
+        return $null
+    }
+    $managedProcess
+}
+
+function Stop-VerifiedGroundedDocParseProcess {
+    param([Parameter(Mandatory)][int]$ProcessId, [Parameter(Mandatory)][string]$Source)
+    $managedProcess = Get-VerifiedGroundedDocParseProcess -ProcessId $ProcessId
+    if (-not $managedProcess) {
         throw "PID $ProcessId from $Source is not this Grounded DocParse app; refusing to stop it."
     }
     Write-LaunchLog "Stopping previous Grounded DocParse session from $Source (PID $ProcessId)..."
@@ -86,9 +98,17 @@ function Stop-PreviousManagedApp {
     if (-not (Test-Path -LiteralPath $PidPath)) { return }
     $savedPid = (Get-Content -Raw -LiteralPath $PidPath).Trim()
     if ($savedPid -notmatch '^\d+$') {
-        throw "The managed PID file is invalid; refusing to stop it: $PidPath"
+        Write-LaunchLog "Removing stale managed PID file with invalid content: $PidPath"
+        Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
+        return
     }
-    Stop-VerifiedGroundedDocParseProcess -ProcessId ([int]$savedPid) -Source 'PID file'
+    $processId = [int]$savedPid
+    if (-not (Get-VerifiedGroundedDocParseProcess -ProcessId $processId)) {
+        Write-LaunchLog "Removing stale managed PID file for PID $processId; the process is absent or unrelated."
+        Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
+        return
+    }
+    Stop-VerifiedGroundedDocParseProcess -ProcessId $processId -Source 'PID file'
     Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
 }
 
@@ -109,15 +129,140 @@ function Stop-WslManagedApp {
 }
 
 function Stop-AppListeningOnPort {
+    param([int]$Port = $StreamlitPort)
     $listeners = @(
-        Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
+        Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
     )
     foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
         if ($ownerPid) {
-            Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "port $StreamlitPort"
+            Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "port $Port"
         }
     }
 }
+
+function Stop-LegacyAppListeners {
+    foreach ($port in $LegacyStreamlitPorts) {
+        $listeners = @(
+            Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+        )
+        foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
+            if (-not $ownerPid) { continue }
+            if (Get-VerifiedGroundedDocParseProcess -ProcessId $ownerPid) {
+                Stop-VerifiedGroundedDocParseProcess -ProcessId $ownerPid -Source "legacy port $port"
+            } else {
+                Write-LaunchLog "Leaving unrelated process PID $ownerPid on legacy port $port untouched."
+            }
+        }
+    }
+}
+
+function Wait-AppHealthy {
+    for ($attempt = 0; $attempt -lt 60; $attempt++) {
+        try {
+            $response = Invoke-WebRequest $StreamlitHealthUrl -UseBasicParsing -TimeoutSec 2
+            if ($response.StatusCode -eq 200) {
+                $listeners = @(
+                    Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
+                )
+                foreach ($ownerPid in @($listeners.OwningProcess | Sort-Object -Unique)) {
+                    if ($ownerPid -and (Get-VerifiedGroundedDocParseProcess -ProcessId $ownerPid)) {
+                        return [int]$ownerPid
+                    }
+                }
+            }
+        } catch { }
+        Start-Sleep -Seconds 1
+    }
+    throw "Grounded DocParse did not become healthy at $StreamlitHealthUrl."
+}
+
+function New-LogCursor {
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Label,
+        [switch]$StartAtEnd
+    )
+    $offset = 0L
+    if ($StartAtEnd -and (Test-Path -LiteralPath $Path)) {
+        $offset = (Get-Item -LiteralPath $Path).Length
+    }
+    [pscustomobject]@{
+        Path = $Path
+        Label = $Label
+        Offset = $offset
+        Pending = ''
+        StartAtEnd = [bool]$StartAtEnd
+    }
+}
+
+function Write-NewLogContent {
+    param([Parameter(Mandatory)]$Cursor, [switch]$Flush)
+    if (-not (Test-Path -LiteralPath $Cursor.Path)) { return }
+    $length = (Get-Item -LiteralPath $Cursor.Path).Length
+    if ($length -lt $Cursor.Offset) {
+        $Cursor.Offset = 0L
+        $Cursor.Pending = ''
+    }
+    if ($length -gt $Cursor.Offset) {
+        $stream = [IO.File]::Open(
+            $Cursor.Path,
+            [IO.FileMode]::Open,
+            [IO.FileAccess]::Read,
+            [IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete
+        )
+        try {
+            [void]$stream.Seek($Cursor.Offset, [IO.SeekOrigin]::Begin)
+            $reader = [IO.StreamReader]::new($stream, [Text.Encoding]::UTF8, $true, 4096, $true)
+            try { $text = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            $Cursor.Offset = $stream.Position
+        } finally {
+            $stream.Dispose()
+        }
+        $text = $Cursor.Pending + ($text -replace "`r`n", "`n")
+        $lines = $text -split "`n", -1
+        if ($lines.Count -gt 1) {
+            foreach ($line in $lines[0..($lines.Count - 2)]) {
+                if ($line) { Write-Host "[$($Cursor.Label)] $line" }
+            }
+        }
+        $Cursor.Pending = $lines[-1]
+    }
+    if ($Flush -and $Cursor.Pending) {
+        Write-Host "[$($Cursor.Label)] $($Cursor.Pending)"
+        $Cursor.Pending = ''
+    }
+}
+
+function Follow-ManagedAppLogs {
+    param(
+        [Parameter(Mandatory)][int]$ListenerPid,
+        [Parameter(Mandatory)][string]$StdoutPath,
+        [Parameter(Mandatory)][string]$StderrPath
+    )
+    $projectRuntime = Join-Path $InstallRoot '.runtime'
+    $cursors = @(
+        (New-LogCursor -Path $StdoutPath -Label 'APP'),
+        (New-LogCursor -Path $StderrPath -Label 'APP-ERR'),
+        (New-LogCursor -Path (Join-Path $projectRuntime 'vllm.log') -Label 'GLM' -StartAtEnd),
+        (New-LogCursor -Path (Join-Path $projectRuntime 'paddle-vllm.log') -Label 'PADDLE-VLLM' -StartAtEnd),
+        (New-LogCursor -Path (Join-Path $projectRuntime 'paddle-api.log') -Label 'PADDLE-API' -StartAtEnd),
+        (New-LogCursor -Path (Join-Path $env:LOCALAPPDATA 'Ollama\server.log') -Label 'OLLAMA' -StartAtEnd)
+    )
+    Write-LaunchLog 'Following live app and OCR logs. Use Stop app in the UI to end the session.'
+    while (Get-Process -Id $ListenerPid -ErrorAction SilentlyContinue) {
+        foreach ($cursor in $cursors) { Write-NewLogContent -Cursor $cursor }
+        Start-Sleep -Milliseconds 250
+    }
+    Start-Sleep -Milliseconds 250
+    foreach ($cursor in $cursors) { Write-NewLogContent -Cursor $cursor -Flush }
+    if ((Test-Path -LiteralPath $PidPath) -and
+        ((Get-Content -LiteralPath $PidPath -Raw).Trim() -eq [string]$ListenerPid)) {
+        Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
+    }
+    Write-LaunchLog 'Grounded DocParse app session ended.'
+}
+
+$startedProcessId = $null
 
 try {
     Import-UserEnvironment
@@ -129,6 +274,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Python 3.12 installation failed.' }
     Stop-PreviousManagedApp
     Stop-WslManagedApp
+    Stop-LegacyAppListeners
     Stop-AppListeningOnPort
     & $uv sync --directory $InstallRoot --frozen --extra native --extra windows-layout --no-dev --python 3.12
     if ($LASTEXITCODE -ne 0) { throw 'Native dependency synchronization failed.' }
@@ -145,6 +291,7 @@ try {
         throw "Port $StreamlitPort is occupied by an unmanaged process; refusing to stop it."
     }
     $env:DOCPARSE_MANAGE_OCR_SERVICES = 'true'
+    $env:DOCPARSE_APP_SESSION_ID = [guid]::NewGuid().ToString('N')
     $env:DOCPARSE_STUDIO_DB_PATH = Join-Path $DataRoot 'studio.sqlite3'
     $stdout = Join-Path $LogRoot 'streamlit.out.log'
     $stderr = Join-Path $LogRoot 'streamlit.err.log'
@@ -152,10 +299,17 @@ try {
         '-m', 'streamlit', 'run', (Join-Path $InstallRoot 'streamlit_app.py'),
         '--server.address=127.0.0.1', "--server.port=$StreamlitPort", '--server.headless=true'
     ) -WorkingDirectory $InstallRoot -WindowStyle Hidden -RedirectStandardOutput $stdout -RedirectStandardError $stderr -PassThru
-    Set-Content -LiteralPath $PidPath -Value $process.Id -Encoding ASCII
-    Write-LaunchLog "Started native Windows app (PID $($process.Id))."
+    $startedProcessId = $process.Id
+    $listenerPid = Wait-AppHealthy
+    Set-Content -LiteralPath $PidPath -Value $listenerPid -Encoding ASCII
+    Write-LaunchLog "Started native Windows app (listener PID $listenerPid)."
     Start-Process $StreamlitUrl
+    Follow-ManagedAppLogs -ListenerPid $listenerPid -StdoutPath $stdout -StderrPath $stderr
 } catch {
+    if ($startedProcessId) {
+        try { Stop-VerifiedGroundedDocParseProcess -ProcessId $startedProcessId -Source 'failed startup' } catch { }
+        try { Stop-AppListeningOnPort } catch { }
+    }
     Write-LaunchLog "ERROR: $($_.Exception.Message)"
     exit 1
 }

@@ -29,7 +29,20 @@ def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
     assert "GetEnvironmentVariable($name, 'User')" in native_launcher
 
 
-def test_streamlit_uses_port_9356_everywhere_it_launches() -> None:
+def test_windows_launcher_passes_and_normalizes_a_quote_safe_install_root() -> None:
+    launcher = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
+    native_launcher = (
+        ROOT / "scripts" / "windows" / "launch-native.ps1"
+    ).read_text(encoding="utf-8")
+
+    assert '-InstallRoot "%~dp0."' in launcher
+    assert (
+        "$InstallRoot = [IO.Path]::GetFullPath($InstallRoot.Trim('\"'))"
+        in native_launcher
+    )
+
+
+def test_streamlit_uses_port_7137_everywhere_it_launches() -> None:
     native_launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
         encoding="utf-8"
     )
@@ -41,12 +54,47 @@ def test_streamlit_uses_port_9356_everywhere_it_launches() -> None:
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
     ).read_text(encoding="utf-8")
 
-    assert "http://localhost:9356" in native_launcher
-    assert "STREAMLIT_PORT=9356" in stack
+    assert "http://localhost:7137" in native_launcher
+    assert "STREAMLIT_PORT=7137" in stack
     assert '--server.port "$STREAMLIT_PORT"' in stack
     assert "streamlit_uses_configured_port()" in stack
-    assert "port = 9356" in config
-    assert "http://localhost:9356" in installer
+    assert "port = 7137" in config
+    assert "http://localhost:7137" in installer
+
+
+def test_native_launcher_treats_pid_file_as_advisory_and_records_listener() -> None:
+    launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
+        encoding="utf-8"
+    )
+
+    assert "$LegacyStreamlitPorts = @(8600, 9356)" in launcher
+    assert "Removing stale managed PID file" in launcher
+    assert "Leaving unrelated process" in launcher
+    assert "Wait-AppHealthy" in launcher
+    assert "Set-Content -LiteralPath $PidPath -Value $listenerPid" in launcher
+    assert "occupied by an unmanaged process; refusing to stop it" in launcher
+
+
+def test_native_launcher_follows_app_and_local_ocr_logs_until_exit() -> None:
+    launcher = (ROOT / "scripts/windows/launch-native.ps1").read_text(
+        encoding="utf-8"
+    )
+    command = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
+
+    for label in (
+        "APP",
+        "APP-ERR",
+        "GLM",
+        "PADDLE-VLLM",
+        "PADDLE-API",
+        "OLLAMA",
+    ):
+        assert label in launcher
+    assert "Follow-ManagedAppLogs" in launcher
+    assert "StartAtEnd" in launcher
+    assert "Get-Process -Id $ListenerPid" in launcher
+    assert "Grounded DocParse stopped" in command
+    assert "pause" in command
 
 
 def test_native_launcher_stops_only_the_verified_wsl_streamlit_session() -> None:
