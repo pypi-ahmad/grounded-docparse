@@ -53,7 +53,7 @@
         </header>
         <details class="front-matter"><summary>Document metadata</summary><pre><code>tags: anchors, spans, provenance
 sources: src/grounded_docparse/native.py, src/grounded_docparse/docling_native.py
-snapshot: content-9ccf0b9bc19d
+snapshot: content-ee679d72076c
 status: released</code></pre></details>
         <div class="markdown-body"><p>Source anchors describe where text came from in the original format. PDF anchors carry page and bounding-box coordinates; structural anchors identify paragraphs or shapes; cell anchors identify sheet and cell; CSV anchors identify row and column; text anchors cover other native structures.</p>
 <p><code>SourceSpan</code> connects a half-open character interval in <code>base_text</code> to one or more anchors. When an extraction returns a character interval, the system selects the covering spans and therefore recovers exact source evidence without searching rendered Markdown.</p>

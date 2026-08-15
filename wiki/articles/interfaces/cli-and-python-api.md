@@ -1,7 +1,7 @@
 ---
 tags: cli, api, integration
 sources: src/grounded_docparse/cli.py, src/grounded_docparse/__init__.py, docs/api.md
-snapshot: content-9ccf0b9bc19d
+snapshot: content-ee679d72076c
 status: released
 ---
 
