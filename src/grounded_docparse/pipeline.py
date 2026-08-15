@@ -16,7 +16,6 @@ from queue import Empty, SimpleQueue
 from PIL import Image
 
 from .config import (
-    LUNA_MODEL,
     AlternateOcrEngine,
     OcrEngine,
     ParserConfig,

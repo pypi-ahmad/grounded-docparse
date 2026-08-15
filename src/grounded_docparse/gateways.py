@@ -64,8 +64,9 @@ class OpenAIDocumentGateway:
             raise RuntimeError(f"{config.cloud_model.api_key_name} is not set")
         self.config = config
         if client is None and config.cloud_model.value.startswith("gemini-"):
-            from google import genai
             from types import SimpleNamespace
+
+            from google import genai
 
             from .gemini_gateway import _GeminiResponses
 

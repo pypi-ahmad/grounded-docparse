@@ -10,7 +10,7 @@ from pathlib import Path
 
 from PIL import Image, ImageFilter, ImageStat
 
-from .config import LUNA_MODEL, OcrEngine, ParserConfig
+from .config import OcrEngine, ParserConfig
 from .grounded_ocr import (
     LAYOUT_MODEL_ID,
     get_grounded_ocr_runtime,

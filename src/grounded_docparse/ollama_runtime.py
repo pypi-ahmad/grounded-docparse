@@ -40,7 +40,7 @@ def _base_url() -> str:
 def unload_model(model: OllamaOcrModel) -> None:
     payload = json.dumps({"model": model.value, "keep_alive": 0}).encode()
     request = Request(f"{_base_url()}/api/generate", data=payload, headers={"Content-Type": "application/json"})
-    with urlopen(request, timeout=30):  # noqa: S310 - URL is restricted to loopback above
+    with urlopen(request, timeout=30):
         pass
 
 
@@ -51,7 +51,7 @@ def ensure_model(model: OllamaOcrModel) -> None:
         headers={"Content-Type": "application/json"},
     )
     try:
-        with urlopen(show, timeout=30):  # noqa: S310 - loopback only
+        with urlopen(show, timeout=30):
             return
     except HTTPError as exc:
         if exc.code != 404:
@@ -61,7 +61,7 @@ def ensure_model(model: OllamaOcrModel) -> None:
         data=json.dumps({"model": model.value, "stream": False}).encode(),
         headers={"Content-Type": "application/json"},
     )
-    with urlopen(pull, timeout=3600):  # noqa: S310 - loopback only
+    with urlopen(pull, timeout=3600):
         pass
 
 
@@ -110,7 +110,7 @@ def _generate_region(
         }
     ).encode()
     request = Request(f"{_base_url()}/api/generate", data=payload, headers={"Content-Type": "application/json"})
-    with urlopen(request, timeout=900) as response:  # noqa: S310 - loopback only
+    with urlopen(request, timeout=900) as response:
         result = json.load(response)
     return str(result.get("response", "")).strip()
 
