@@ -6,7 +6,7 @@
 
 Grounded DocParse is a Python 3.12+ document parser that produces grounded Markdown, structured JSON, OCR elements or native source anchors, and annotated PDFs when a visual artifact exists.
 
-Its main stack is Streamlit, Pydantic, and Pytest. Manual processing-type selection routes scanned PDFs/images to GLM-OCR or PaddleOCR-VL, Native PDFs to `pdf-inspector`, and Office/open formats to OCR-disabled Docling. Optional OpenAI processing performs bounded visual recovery, document analysis, and LangExtract grounding without replacing source evidence.
+Its main stack is Streamlit, Pydantic, and Pytest. Manual processing-type selection and one exclusive engine route scanned PDFs/images through AI ADE, WSL vLLM, native Docling/RapidOCR, PDF Inspector, or Windows Ollama. Selectable OpenAI, Gemini, and Agnes processing performs bounded enhancement and document analysis without replacing source evidence.
 
 ## Architecture layers
 
@@ -51,7 +51,7 @@ Root launchers, `scripts/`, `installer/`, runtime YAML files, and project manife
 - Local OCR owns layout, geometry, element IDs, confidence, element types, and reading order for scanned PDFs and images.
 - Native PDFs preserve selectable-text evidence through page/bounding-box anchors; Docling formats preserve exact structural anchors without OCR.
 - Every upload has a compatible manual processing type; validation blocks mismatches and no path silently reroutes.
-- Luna recovery may replace text only on an existing element above the confidence threshold.
+- AI enhancement may replace text only on a failed or sub-75%-confidence existing grounded element.
 - Structural additions, deletions, geometry changes, type changes, and reading-order changes fail closed.
 - Pydantic models define contracts shared across pipeline stages.
 - OCR implementations normalize engine-specific output into common region and page models.

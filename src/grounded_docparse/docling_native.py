@@ -654,3 +654,27 @@ def make_docling_converter():
         for source_format in allowed
     }
     return DocumentConverter(allowed_formats=allowed, format_options=format_options)
+
+
+def make_docling_rapidocr_converter():
+    """Create the explicit OCR engine; normal native parsing remains OCR-free."""
+
+    try:
+        from docling.datamodel.base_models import InputFormat
+        from docling.datamodel.pipeline_options import PdfPipelineOptions, RapidOcrOptions
+        from docling.document_converter import DocumentConverter, PdfFormatOption
+    except ImportError as exc:
+        raise RuntimeError("Docling RapidOCR requires grounded-docparse[native]") from exc
+    options = PdfPipelineOptions(
+        do_ocr=True,
+        ocr_options=RapidOcrOptions(),
+        enable_remote_services=False,
+        allow_external_plugins=False,
+        do_picture_classification=False,
+        do_picture_description=False,
+        do_chart_extraction=False,
+    )
+    return DocumentConverter(
+        allowed_formats=[InputFormat.PDF],
+        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=options)},
+    )

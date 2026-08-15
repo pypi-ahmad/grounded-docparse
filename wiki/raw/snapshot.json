@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f03a0de2c1a2",
-    "base_commit": "9e9be915ee49fcd2e39d4e344b52eca7b355e09e",
-    "branch": "main",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
+    "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-13T13:54:04.812099+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "categories": {
-    "application-code": 30,
+    "application-code": 37,
     "documentation": 43,
-    "tests-and-benchmarks": 71,
-    "runtime-and-operations": 27,
+    "tests-and-benchmarks": 77,
+    "runtime-and-operations": 24,
     "contracts-and-configuration": 9
   },
-  "total_files": 180
+  "total_files": 190
 }

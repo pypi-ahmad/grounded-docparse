@@ -147,7 +147,7 @@ def test_low_resolution_scan(tmp_path: Path) -> None:
     assert "effective_resolution" in result.quality.warnings
 
 
-def test_multi_column_order_is_explicitly_ambiguous(tmp_path: Path) -> None:
+def test_multi_column_order_preserves_detector_sequence(tmp_path: Path) -> None:
     regions = [
         GlmRegion(0, "text", "Left alpha", (50, 100, 400, 200)),
         GlmRegion(1, "text", "Right alpha", (600, 100, 950, 200)),
@@ -162,8 +162,13 @@ def test_multi_column_order_is_explicitly_ambiguous(tmp_path: Path) -> None:
         min_contrast_range=0,
         clipping_border_ratio=1,
     )
-    assert result.reading_order.status is ReadingOrderStatus.AMBIGUOUS
-    assert not result.reading_order.ordered_region_ids
+    assert result.reading_order.status is ReadingOrderStatus.CONFIDENT
+    assert result.reading_order.ordered_region_ids == [
+        "p1-analysis-1",
+        "p1-analysis-2",
+        "p1-analysis-3",
+        "p1-analysis-4",
+    ]
     assert result.complexity is PageComplexity.COMPLEX_LAYOUT
     candidates = _page_recovery_candidates(evidence, result)
     reading_order_candidates = [
@@ -174,7 +179,7 @@ def test_multi_column_order_is_explicitly_ambiguous(tmp_path: Path) -> None:
     assert reading_order_candidates == []
 
 
-def test_dense_form_uses_spatial_order_and_defers_vertical_margin(tmp_path: Path) -> None:
+def test_dense_form_keeps_detector_owned_order(tmp_path: Path) -> None:
     regions = [GlmRegion(0, "text", "Sidebar:", (10, 100, 50, 850))]
     for row in range(6):
         y0 = 100 + row * 100
@@ -202,9 +207,9 @@ def test_dense_form_uses_spatial_order_and_defers_vertical_margin(tmp_path: Path
         clipping_border_ratio=1,
     )
 
-    assert result.reading_order.status is ReadingOrderStatus.AMBIGUOUS
-    assert result.reading_order.ordered_region_ids[-1] == "p1-analysis-1"
-    assert draft_from_analysis(result).regions[-1].text == "Sidebar:"
+    assert result.reading_order.status is ReadingOrderStatus.CONFIDENT
+    assert result.reading_order.ordered_region_ids[0] == "p1-analysis-1"
+    assert draft_from_analysis(result).regions[0].text == "Sidebar:"
 
 
 def test_table_form_and_visual_complexity(tmp_path: Path) -> None:

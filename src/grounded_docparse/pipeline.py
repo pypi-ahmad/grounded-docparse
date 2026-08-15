@@ -9,21 +9,28 @@ import time
 import unicodedata
 from collections.abc import Callable
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from queue import Empty, SimpleQueue
 
 from PIL import Image
 
-from .config import LUNA_MODEL, OcrEngine, ParserConfig
+from .config import (
+    LUNA_MODEL,
+    AlternateOcrEngine,
+    OcrEngine,
+    ParserConfig,
+    default_alternate_ocr_engine,
+)
 from .enhancement import (
     build_enhancement_chunks,
     combine_page_markdown,
     render_chunk_plan,
 )
 from .gateways import OpenAIDocumentGateway
+from .grounded_ocr import get_grounded_ocr_runtime
 from .ingest import IngestedDocument, PageEvidence, ingest_document, render_region_crop
-from .local_ocr import GlmPageResult, OcrPageResult, get_glmocr_form_recovery_runtime
+from .local_ocr import GlmPageResult, OcrPageResult
 from .models import (
     AgentRole,
     AgentTraceEvent,
@@ -67,7 +74,8 @@ from .models import (
     VisualRecoveryResult,
 )
 from .ocr_disagreement import token_edit_similarity
-from .ocr_services import ensure_managed_ocr_engine
+from .ocr_services import ensure_managed_ocr_engine, temporary_alternate_ocr_engine
+from .ollama_runtime import OllamaOcrModel
 from .paddle_ocr import get_paddleocr_runtime
 from .page_analysis import PageAnalyzer, draft_from_analysis
 from .quality import (
@@ -78,6 +86,7 @@ from .quality import (
     select_repair_blocks,
     semantic_text,
 )
+from .rapidocr_runtime import get_rapidocr_runtime
 from .render import (
     build_elements,
     materialize_document_quality,
@@ -90,7 +99,7 @@ VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
 MAX_VISUAL_RECOVERY_CROPS_PER_PAGE = 3
 MIN_VISUAL_RECOVERY_CROPS_PER_DOCUMENT = 8
-RECOVERY_OCR_CONFIDENCE_THRESHOLD = 0.55
+RECOVERY_OCR_CONFIDENCE_THRESHOLD = 0.75
 RECOVERY_LARGE_REGION_AREA = 0.02
 RECOVERY_MIN_CHARACTER_DENSITY = 50.0
 RECOVERY_GARBAGE_RATIO = 0.35
@@ -1268,8 +1277,8 @@ def _recover_glm_form_regions(
         return outcome
 
     try:
-        runtime = get_glmocr_form_recovery_runtime(
-            config.glmocr_config_path, config.glmocr_layout_device
+        runtime = get_grounded_ocr_runtime(
+            replace(config, ocr_engine=OcrEngine.GLM_OCR)
         )
         if hasattr(runtime, "parse_many"):
             results = runtime.parse_many(list(requests))
@@ -1743,70 +1752,101 @@ class DocumentParser:
             return [], len(candidates), 0.0
 
         started = time.perf_counter()
-        primary = self.config.ocr_engine
-        secondary = (
-            OcrEngine.PADDLEOCR_VL_1_6
-            if primary is OcrEngine.GLM_OCR
-            else OcrEngine.GLM_OCR
+        alternate = (
+            self.config.ocr_disagreement_engine
+            or default_alternate_ocr_engine(
+                self.config.ocr_engine, self.config.ollama_model
+            )
+        )
+        primary_engine = (
+            f"ollama:{self.config.ollama_model}"
+            if self.config.ocr_engine is OcrEngine.OLLAMA
+            else f"vllm-{self.config.ocr_engine.value}"
         )
         page_by_number = {page.number: page for page in pages}
         results: list[OcrComparisonResult] = []
         try:
-            self.ocr_service_switcher(secondary)
-            if secondary is OcrEngine.GLM_OCR:
-                runtime = get_glmocr_form_recovery_runtime(
-                    self.config.glmocr_config_path,
-                    self.config.glmocr_layout_device,
-                )
-            else:
-                runtime = get_paddleocr_runtime(
-                    self.config.paddleocr_service_url,
-                    self.config.paddleocr_timeout_seconds,
-                )
-            for index, candidate in enumerate(selected):
-                crop = render_region_crop(
-                    source,
-                    page_by_number[candidate.page],
-                    BoundingBox(
-                        x0=candidate.bbox[0],
-                        y0=candidate.bbox[1],
-                        x1=candidate.bbox[2],
-                        y1=candidate.bbox[3],
-                    ),
-                    workdir / "ocr-disagreement" / f"{candidate.page}-{index}.png",
-                    dpi=self.config.crop_dpi,
-                    padding=self.config.crop_padding,
-                )
-                parsed = (
-                    runtime.parse(crop)
-                    if secondary is OcrEngine.GLM_OCR
-                    else runtime.parse_recovery_image(crop).regions
-                )
-                texts = [region.content.strip() for region in parsed if region.content.strip()]
-                alternatives = [*texts, "\n".join(texts)] if texts else [""]
-                secondary_text = max(
-                    alternatives,
-                    key=lambda text: token_edit_similarity(candidate.primary_text, text),
-                )
-                similarity = token_edit_similarity(candidate.primary_text, secondary_text)
-                disagreed = similarity < self.config.ocr_disagreement_similarity_threshold
-                results.append(
-                    OcrComparisonResult(
-                        page=candidate.page,
-                        bbox=candidate.bbox,
-                        primary_engine=primary.value,
-                        secondary_engine=secondary.value,
-                        primary_text=candidate.primary_text,
-                        secondary_text=secondary_text,
-                        similarity=similarity,
-                        status="disagreed" if disagreed else "agreed",
-                        reason=(
-                            "Local OCR engines disagreed on uncertain region"
-                            if disagreed
-                            else "Local OCR engines agreed"
+            with temporary_alternate_ocr_engine(
+                self.config,
+                alternate,
+                vllm_switcher=self.ocr_service_switcher,
+            ):
+                if alternate is AlternateOcrEngine.RAPIDOCR:
+                    runtime = get_rapidocr_runtime()
+                elif alternate.vllm_engine is OcrEngine.PADDLEOCR_VL_1_6:
+                    runtime = get_paddleocr_runtime(
+                        self.config.paddleocr_service_url,
+                        self.config.paddleocr_timeout_seconds,
+                    )
+                else:
+                    runtime = get_grounded_ocr_runtime(
+                        replace(
+                            self.config,
+                            ocr_engine=alternate.vllm_engine or OcrEngine.OLLAMA,
+                            ollama_model=(
+                                alternate.ollama_model or self.config.ollama_model
+                            ),
+                            ocr_disagreement_enabled=False,
+                            ocr_disagreement_engine=None,
+                        )
+                    )
+                for index, candidate in enumerate(selected):
+                    crop = render_region_crop(
+                        source,
+                        page_by_number[candidate.page],
+                        BoundingBox(
+                            x0=candidate.bbox[0],
+                            y0=candidate.bbox[1],
+                            x1=candidate.bbox[2],
+                            y1=candidate.bbox[3],
+                        ),
+                        workdir
+                        / "ocr-disagreement"
+                        / f"{candidate.page}-{index}.png",
+                        dpi=self.config.crop_dpi,
+                        padding=self.config.crop_padding,
+                    )
+                    parsed = (
+                        runtime.parse_recovery_image(crop).regions
+                        if alternate.vllm_engine is OcrEngine.PADDLEOCR_VL_1_6
+                        else runtime.parse(crop)
+                    )
+                    texts = [
+                        region.content.strip()
+                        for region in parsed
+                        if region.content.strip()
+                    ]
+                    alternatives = [*texts, "\n".join(texts)] if texts else [""]
+                    secondary_text = max(
+                        alternatives,
+                        key=lambda text: token_edit_similarity(
+                            candidate.primary_text, text
                         ),
                     )
-                )
+                    similarity = token_edit_similarity(
+                        candidate.primary_text, secondary_text
+                    )
+                    disagreed = (
+                        similarity
+                        < self.config.ocr_disagreement_similarity_threshold
+                    )
+                    results.append(
+                        OcrComparisonResult(
+                            page=candidate.page,
+                            bbox=candidate.bbox,
+                            primary_engine=primary_engine,
+                            secondary_engine=alternate.value,
+                            primary_text=candidate.primary_text,
+                            secondary_text=secondary_text,
+                            similarity=similarity,
+                            status="disagreed" if disagreed else "agreed",
+                            reason=(
+                                "Local OCR engines disagreed on uncertain region"
+                                if disagreed
+                                else "Local OCR engines agreed"
+                            ),
+                        )
+                    )
         except Exception as exc:  # noqa: BLE001 - comparison is audit-only
             reason = f"Alternate OCR unavailable: {type(exc).__name__}: {exc}"
             completed = {(item.page, item.bbox) for item in results}
@@ -1816,25 +1856,22 @@ class DocumentParser:
                         OcrComparisonResult(
                             page=candidate.page,
                             bbox=candidate.bbox,
-                            primary_engine=primary.value,
-                            secondary_engine=secondary.value,
+                            primary_engine=primary_engine,
+                            secondary_engine=alternate.value,
                             primary_text=candidate.primary_text,
                             status="unavailable",
                             reason=reason,
                         )
                     )
-        finally:
-            try:
-                self.ocr_service_switcher(primary)
-            except Exception as exc:  # noqa: BLE001 - primary result remains authoritative
+            if len(completed) == len(selected):
                 results.append(
                     OcrComparisonResult(
                         page=selected[0].page,
-                        primary_engine=primary.value,
-                        secondary_engine=secondary.value,
+                        primary_engine=primary_engine,
+                        secondary_engine=alternate.value,
                         primary_text="",
                         status="unavailable",
-                        reason=f"Primary OCR restoration failed: {type(exc).__name__}: {exc}",
+                        reason=reason,
                     )
                 )
         return results, len(candidates), time.perf_counter() - started
@@ -2454,7 +2491,7 @@ class DocumentParser:
                                         repaired_block,
                                         batch_targets,
                                         decisions,
-                                        repair_source=LUNA_MODEL,
+                                        repair_source=self.config.cloud_model.value,
                                     )
                                     if any(
                                         decision.action is SpanRepairAction.REPLACE
@@ -2717,6 +2754,10 @@ class DocumentParser:
         started = time.perf_counter()
         runtime = ProviderRuntime(self.config)
         analyzer = PageAnalyzer(self.config)
+        local_analysis_enabled = (
+            self.config.local_ocr_enabled
+            and self.gateway_factory is OpenAIDocumentGateway
+        )
         with tempfile.TemporaryDirectory(prefix="docparse-") as temporary:
             workdir = Path(temporary)
             source = ingest_document(
@@ -2730,10 +2771,7 @@ class DocumentParser:
             )
             if self.config.ocr_disagreement_enabled:
                 self.ocr_service_switcher(self.config.ocr_engine)
-            if (
-                self.gateway_factory is OpenAIDocumentGateway
-                and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
-            ):
+            if local_analysis_enabled and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
                 analyzer.prepare_document(source.source_path, source.pages)
             pages: list[Page] = []
             warnings: list[str] = []
@@ -2775,7 +2813,7 @@ class DocumentParser:
                     total,
                     f"Processing pages {batch[0].number}-{batch[-1].number}",
                 )
-                if self.gateway_factory is OpenAIDocumentGateway:
+                if local_analysis_enabled:
                     for analysis in analyzer.analyze_window(batch):
                         page_number = analysis.render.source_page
                         analyses_by_page[page_number] = analysis
@@ -2791,7 +2829,7 @@ class DocumentParser:
                     for page in batch:
                         analyses_by_page[page.number] = None
 
-            if self.gateway_factory is OpenAIDocumentGateway:
+            if local_analysis_enabled:
                 nonblank = [
                     analysis
                     for analysis in analyses_by_page.values()
@@ -2833,12 +2871,14 @@ class DocumentParser:
                     workdir,
                     self.config,
                 )
-                if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
+                if local_analysis_enabled
+                and self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
                 else _PaddleFormRecovery()
             )
             warnings.extend(paddle_form_recovery.warnings)
             effective_glm_form_recovery = (
-                self.config.ocr_engine is OcrEngine.GLM_OCR
+                local_analysis_enabled
+                and self.config.ocr_engine is OcrEngine.GLM_OCR
                 and visual_recovery
                 and self.config.glm_form_recovery_enabled
             )
@@ -2883,7 +2923,7 @@ class DocumentParser:
                 ceiling=self.config.max_visual_recovery_crops,
             )
 
-            planning_applies = self.gateway_factory is OpenAIDocumentGateway
+            planning_applies = local_analysis_enabled
             if planning_applies:
                 recovery_plan = _visual_recovery_plan(
                     source.pages,
@@ -2999,7 +3039,13 @@ class DocumentParser:
             elements = build_elements(
                 document,
                 recovered_region_ids,
-                local_source=self.config.ocr_engine.value,
+                local_source=(
+                    "luna-recovery"
+                    if not self.config.local_ocr_enabled
+                    else OllamaOcrModel(self.config.ollama_model).element_source
+                    if self.config.ocr_engine is OcrEngine.OLLAMA
+                    else self.config.ocr_engine.value
+                ),
             )
             base_markdown = render_agentic_document(document).markdown
             _emit(
@@ -3022,7 +3068,7 @@ class DocumentParser:
                     "enhance",
                     1,
                     1,
-                    "Refining Markdown structure with gpt-5.6-luna",
+                    f"Refining Markdown structure with {self.config.cloud_model.value}",
                 )
             (
                 final_markdown,
@@ -3051,7 +3097,7 @@ class DocumentParser:
             ) / 1000
             metadata = ParseMetadata(
                 engine=(
-                    f"{self.config.ocr_engine.value} + gpt-5.6-luna"
+                    f"{self.config.ocr_engine.value} + {self.config.cloud_model.value}"
                     if trace
                     else self.config.ocr_engine.value
                 ),
@@ -3099,9 +3145,10 @@ class DocumentParser:
                 ocr_comparison_time=ocr_comparison_time,
                 ocr_comparison_secondary_engine=(
                     (
-                        OcrEngine.PADDLEOCR_VL_1_6
-                        if self.config.ocr_engine is OcrEngine.GLM_OCR
-                        else OcrEngine.GLM_OCR
+                        self.config.ocr_disagreement_engine
+                        or default_alternate_ocr_engine(
+                            self.config.ocr_engine, self.config.ollama_model
+                        )
                     ).value
                     if self.config.ocr_disagreement_enabled
                     else None

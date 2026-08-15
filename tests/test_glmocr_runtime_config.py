@@ -143,7 +143,7 @@ def test_ollama_runtime_uses_cpu_layout_and_bf16_model() -> None:
         "api_port": 11434,
         "api_mode": "ollama_generate",
         "api_path": "/api/generate",
-        "model": "glm-ocr:bf16",
+        "model": "glm-ocr:latest",
         "connect_timeout": 120,
         "request_timeout": 600,
         "connection_pool_size": 1,

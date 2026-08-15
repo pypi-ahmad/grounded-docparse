@@ -294,6 +294,7 @@ def test_default_gateway_disables_sdk_retries(monkeypatch) -> None:
         return SimpleNamespace(responses=object())
 
     monkeypatch.setenv("OPENAI_API_KEY", "test")
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
     monkeypatch.setattr("grounded_docparse.gateways.OpenAI", client)
 
     OpenAIDocumentGateway(ParserConfig())

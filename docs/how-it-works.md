@@ -6,9 +6,9 @@
 4. **Mixed PDF** shows a Native/OCR suggestion for every page. The user confirms or overrides every route; native and OCR pages merge in original page order.
 5. **Word**, **PowerPoint**, **Excel**, **CSV**, and **Other Native** formats use Docling with OCR, VLM/model enrichments, remote services, and plugins disabled. Embedded images are assets, not OCR input.
 6. Native parsing produces immutable `base_text`, character spans, and `SourceAnchor` evidence. OCR parsing retains local-engine-owned elements, boxes, confidence, and reading order.
-7. Deterministic quality analysis and optional Luna crop recovery apply only to OCR routes. Recovery accepts only crop-backed text corrections with confidence at least `0.85` and never changes existing geometry, types, order, or structure.
+7. Optional AI enhancement applies only to failed or sub-75%-confidence grounded regions and never changes existing geometry, types, order, or structure.
 8. Optional classification, TOC, refinement, and chat use the parsed result. Their failures do not invalidate a successful parse.
 9. Native extraction sends immutable `base_text`, never refined Markdown, to LangExtract. An accepted value needs an exact `char_interval` that resolves through source spans to one or more anchors; fuzzy, mismatched, partial, and unanchored values are rejected.
 10. The app downloads Markdown, full JSON, extraction JSON when present, source structure for native results, and an annotated PDF only when a visual artifact exists.
 
-There is no open-ended autonomous loop. Native parsing and local OCR remain usable without Luna; every optional remote feature is isolated from the core parse.
+There is no open-ended autonomous loop. Native parsing and local engines remain usable without a cloud provider; every optional remote feature is isolated from the core parse.

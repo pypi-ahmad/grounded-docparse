@@ -1,6 +1,6 @@
 # Python API
 
-The package requires Python 3.12–3.14. Install native parsing with `uv sync --locked --extra native`. Scanned-PDF and image OCR additionally require the GLM-OCR or PaddleOCR-VL-1.6 stack described in [setup](../SETUP.md).
+The package requires Python 3.12–3.14. On Windows, install native parsing and CPU layout with `uv sync --locked --extra native --extra windows-layout`. WSL vLLM engines require their dedicated setup commands; Ollama recognition uses the native Windows service.
 
 ## CLI batch command
 
@@ -11,7 +11,7 @@ grounded-docparse ingest INPUT [INPUT ...] --processing-type PATH=TYPE [--proces
 grounded-docparse parse INPUT [INPUT ...] --output DIR [--schema SCHEMA] [--overwrite]
 ```
 
-`ingest` supports PDFs, DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, EPUB, PNG, JPEG, and TIFF. Directory discovery is non-recursive and deterministic; duplicate resolved paths are processed once. `parse` remains the legacy OCR command for PDFs and images. The optional `.json` or `.md` schema applies to every document and requires `OPENAI_API_KEY`. JSON accepts either the strict extraction schema itself or an exported `StoredSchema` envelope.
+`ingest` supports PDFs, DOCX, PPTX, XLSX, CSV, ODF, HTML, Markdown, EPUB, PNG, JPEG, and TIFF. Directory discovery is non-recursive and deterministic; duplicate resolved paths are processed once. `parse` remains the legacy OCR command for PDFs and images. Optional AI extraction requires the key for the selected cloud model. JSON accepts either the strict extraction schema itself or an exported `StoredSchema` envelope.
 
 Each document receives a `<stem>-<sha256-prefix>` folder with Markdown, Full JSON, and optional extraction JSON. OCR routes add an annotated PDF; native nonvisual formats do not. Native v5 results use `LangExtractNativeExtractor.extract(parse_result, stored_schema)` and emit exact source text, Unicode-codepoint `char_interval`, and resolved `SourceSpan` anchors. Missing, fuzzy, mismatched, or unanchored intervals are rejected. `manifest.json` reports the source hash, generated files, status, failed stage, and safe error. The command continues after document failures and returns `0` for complete success, `1` for partial/total document failure, or `2` for argument and preflight errors.
 
@@ -83,7 +83,7 @@ result = DocumentParser().parse(
 )
 ```
 
-`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and none of the nonblank pages contains a local OCR layout region, the default parser raises `RuntimeError`. Optional Luna failures otherwise fall back to the successful local OCR result or feature warning/status.
+`filename` must end in `.pdf`, `.png`, `.jpg`, `.jpeg`, `.tif`, or `.tiff`. Input validation raises `ValueError` for empty, oversized, invalid, unsupported, password-protected, over-page-limit, or over-pixel-limit input. If at least one page is nonblank and no nonblank page contains a grounded layout region, the default parser raises `RuntimeError`. Optional AI failures otherwise fall back to the successful local result or a feature warning/status.
 
 The Python parse API has no page-range argument. Slice a PDF before calling it or use the Streamlit range control.
 
@@ -273,7 +273,7 @@ The most frequently consumed exported models have these fields:
 
 | Model | Fields |
 | --- | --- |
-| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, or `luna-recovery`) |
+| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, `deepseek-ocr`, or `luna-recovery`) |
 | `ChatSource` | `element_id`, `page`, `text` |
 | `ChatAnswer` | `answer`, `sources`, `confidence` (`high`, `medium`, `low`), `usage`, `trace` |
 | `SchemaProposal` | `instruction`, `json_schema`, `usage` |
@@ -348,7 +348,7 @@ These examples define the stable top-level envelopes, not complete JSON Schemas 
 
 ## Configuration and test doubles
 
-Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. Invalid numeric values or invalid bounds fail during configuration construction.
+Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_CLOUD_MODEL` accepts `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`, or `agnes-2.5-flash`. `DOCPARSE_OCR_ENGINE` accepts `glm-ocr`, `paddleocr-vl-1.6`, or `ollama`; `DOCPARSE_OLLAMA_MODEL` selects the Ollama recognizer. `DOCPARSE_OCR_DISAGREEMENT_ENABLED` enables audit-only uncertain-region comparison, and `DOCPARSE_OCR_DISAGREEMENT_ENGINE` selects `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr`; omitting it chooses a compatible alternate automatically. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. GLM, Paddle, and Ollama service origins must remain loopback-only. Invalid enum values, numeric values, bounds, or service origins fail during configuration construction.
 
 `gateway_factory` is a test/compatibility seam rather than a published protocol. The constructor signatures show its internal `OpenAIDocumentGateway` default for fidelity; normal callers should omit this argument. A custom factory receives `ParserConfig` and must provide the methods exercised by the selected workflow, so requirements depend on enabled features. The package does not promise thread-safe reuse of parser/agent instances; create them per workflow. The process-wide `GlmOcrRuntime` serializes SDK model access.
 

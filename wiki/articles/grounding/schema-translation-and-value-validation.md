@@ -1,7 +1,7 @@
 ---
 tags: schema, validation, extraction
 sources: src/grounded_docparse/native_extraction.py, src/grounded_docparse/schema_store.py
-snapshot: content-f03a0de2c1a2
+snapshot: content-ddfa7664ade5
 status: released
 ---
 

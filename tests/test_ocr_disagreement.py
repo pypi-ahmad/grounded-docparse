@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from grounded_docparse import pipeline
-from grounded_docparse.config import ParserConfig
+from grounded_docparse.config import AlternateOcrEngine, OcrEngine, ParserConfig
 from grounded_docparse.models import Document, OcrComparisonResult, Page
 from grounded_docparse.ocr_disagreement import token_edit_similarity
 from grounded_docparse.render import render_agentic_document
@@ -19,6 +19,23 @@ def test_disagreement_check_defaults_off_with_bounded_budget() -> None:
     assert config.ocr_disagreement_similarity_threshold == 0.90
     assert config.max_ocr_disagreement_crops == 16
     assert config.max_ocr_disagreement_crops_per_page == 2
+
+
+def test_disagreement_engine_loads_from_environment(monkeypatch) -> None:
+    monkeypatch.setenv("DOCPARSE_OCR_DISAGREEMENT_ENGINE", "rapidocr")
+
+    config = ParserConfig.from_env()
+
+    assert config.ocr_disagreement_engine is AlternateOcrEngine.RAPIDOCR
+
+
+def test_disagreement_engine_cannot_match_primary() -> None:
+    with pytest.raises(ValueError, match="must differ"):
+        ParserConfig(
+            ocr_engine=OcrEngine.GLM_OCR,
+            ocr_disagreement_enabled=True,
+            ocr_disagreement_engine=AlternateOcrEngine.VLLM_GLM_OCR,
+        )
 
 
 def test_disagreement_config_rejects_invalid_limits() -> None:

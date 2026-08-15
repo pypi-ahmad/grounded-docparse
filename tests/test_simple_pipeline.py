@@ -119,6 +119,32 @@ def test_parser_builds_verified_nested_document(simple_pdf: bytes) -> None:
         assert len(rendered[0].get_drawings()) == 4
 
 
+def test_ai_ade_skips_local_ocr_and_records_luna_provenance(
+    simple_pdf: bytes, monkeypatch
+) -> None:
+    class AiGateway(AcceptingGateway):
+        def __init__(self, _config) -> None:
+            pass
+
+    monkeypatch.setattr(pipeline_module, "OpenAIDocumentGateway", AiGateway)
+    monkeypatch.setattr(
+        pipeline_module.PageAnalyzer,
+        "analyze_window",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("AI ADE must not call local OCR")
+        ),
+    )
+    parser = DocumentParser(
+        ParserConfig(render_dpi=72, local_ocr_enabled=False),
+        gateway_factory=AiGateway,
+    )
+
+    result = parser.parse(simple_pdf, "notice.pdf")
+
+    assert result.elements
+    assert {element.source for element in result.elements} == {"luna-recovery"}
+
+
 class QualityRecoveryGateway:
     input_tokens = 0
     output_tokens = 0
@@ -564,7 +590,7 @@ def test_glm_form_recovery_uses_high_resolution_crop_without_luna(
 
     monkeypatch.setattr(
         pipeline_module,
-        "get_glmocr_form_recovery_runtime",
+        "get_grounded_ocr_runtime",
         lambda *_args: RecoveryRuntime(),
     )
 
@@ -657,7 +683,7 @@ def test_glm_form_recovery_does_not_consume_luna_document_budget(
     monkeypatch.setattr(pipeline_module, "render_region_crop", render_crop)
     monkeypatch.setattr(
         pipeline_module,
-        "get_glmocr_form_recovery_runtime",
+        "get_grounded_ocr_runtime",
         lambda *_args: RecoveryRuntime(),
     )
 

@@ -57,7 +57,7 @@ def validate_cached_assets(cache_root: Path) -> dict[str, Path]:
         missing_names = ", ".join(str(path) for path in missing)
         raise RuntimeError(
             "PaddleOCR cache is incomplete. Missing: "
-            f"{missing_names}. Run Launch-PaddleOCR-VL-1.6.cmd once while online "
+            f"{missing_names}. Run Setup-PaddleOCR-VL-1.6.cmd once while online "
             "to populate the cache."
         )
     return {

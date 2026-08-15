@@ -95,7 +95,7 @@ def _runtime_config(
                 "api_port": 11434,
                 "api_mode": "ollama_generate",
                 "api_path": "/api/generate",
-                "model": "glm-ocr:bf16",
+                "model": "glm-ocr:latest",
                 "connect_timeout": 120,
                 "request_timeout": 600,
                 "connection_pool_size": 1,
@@ -122,13 +122,13 @@ def prepare(*, offline: bool, backend: str = "vllm") -> dict[str, str | int]:
     _atomic_write(RUNTIME_CONFIG, yaml.safe_dump(config, sort_keys=False))
     _atomic_write(
         MODEL_PATH_FILE,
-        f"{glm_path}\n" if glm_path is not None else "glm-ocr:bf16\n",
+        f"{glm_path}\n" if glm_path is not None else "glm-ocr:latest\n",
     )
     manifest: dict[str, str | int] = {
         "backend": backend,
         "glmocr_repo": GLMOCR_REPO,
         "glmocr_revision": GLMOCR_REVISION,
-        "glmocr_path": str(glm_path) if glm_path is not None else "glm-ocr:bf16",
+        "glmocr_path": str(glm_path) if glm_path is not None else "glm-ocr:latest",
         "layout_repo": LAYOUT_REPO,
         "layout_revision": LAYOUT_REVISION,
         "layout_path": str(layout_path),
