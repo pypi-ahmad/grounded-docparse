@@ -13,7 +13,7 @@ required per-file processing type
   -> Markdown, JSON, optional annotated PDF, and optional extraction/chat
 ```
 
-The most important grounded-path rule is that the selected local engine and deterministic code own document structure. Optional AI enhancement can reason over that structure, but cannot move evidence, invent a missing detector region, or replace source geometry. Pure AI is an explicit separate engine.
+The most important grounded-path rule is that the selected local engine and deterministic code own document structure. Optional AI enhancement can reason over that structure, but cannot move evidence, invent a missing detector region, or replace source geometry. **AI ADE** is an explicit separate engine.
 
 ## 1. Choose your path through this tutorial
 
@@ -138,7 +138,7 @@ Browser
        -> ingest and rasterization
        -> selected engine
             -> Windows CPU PP-DocLayoutV3 + WSL GLM vLLM or Windows Ollama
-            -> PaddleX/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or pure AI
+            -> PaddleX/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or AI ADE
        -> deterministic quality and recovery planning
        -> optional selected-provider requests
        -> renderers, tabs, highlighting, and downloads

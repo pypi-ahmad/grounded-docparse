@@ -54,7 +54,7 @@ class ExtractionEngine(StrEnum):
     @property
     def label(self) -> str:
         return {
-            self.PURE_AI: "Pure AI agentic extraction",
+            self.PURE_AI: "AI ADE",
             self.PADDLE_VLLM: "PaddleOCR-VL-1.6",
             self.GLM_VLLM: "GLM-OCR",
             self.DOCLING_RAPIDOCR: "Docling + RapidOCR",

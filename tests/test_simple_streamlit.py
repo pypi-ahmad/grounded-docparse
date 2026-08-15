@@ -93,7 +93,7 @@ def test_studio_allows_glm_without_openai_environment(
         for item in app.toggle
         if item.label
         in {
-            "Pure AI agentic extraction",
+            "AI ADE",
             "PaddleOCR-VL-1.6",
             "GLM-OCR",
             "Docling + RapidOCR",

@@ -6,7 +6,7 @@
 
 Grounded DocParse is a Python 3.12+ document parser that produces grounded Markdown, structured JSON, OCR elements or native source anchors, and annotated PDFs when a visual artifact exists.
 
-Its main stack is Streamlit, Pydantic, and Pytest. Manual processing-type selection and one exclusive engine route scanned PDFs/images through pure AI, WSL vLLM, native Docling/RapidOCR, PDF Inspector, or Windows Ollama. Selectable OpenAI, Gemini, and Agnes processing performs bounded enhancement and document analysis without replacing source evidence.
+Its main stack is Streamlit, Pydantic, and Pytest. Manual processing-type selection and one exclusive engine route scanned PDFs/images through AI ADE, WSL vLLM, native Docling/RapidOCR, PDF Inspector, or Windows Ollama. Selectable OpenAI, Gemini, and Agnes processing performs bounded enhancement and document analysis without replacing source evidence.
 
 ## Architecture layers
 

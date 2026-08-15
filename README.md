@@ -36,7 +36,7 @@ Only one extraction engine can be active at a time. Selecting a WSL vLLM engine 
 
 | Engine | Runtime | Behavior |
 | --- | --- | --- |
-| Pure AI agentic extraction | Selected cloud AI provider | Direct agentic extraction without a local OCR stage |
+| AI ADE | Selected cloud AI provider | Direct agentic extraction without a local OCR stage |
 | PaddleOCR-VL-1.6 | Existing WSL vLLM/PaddleX services | Full PP-DocLayoutV3 plus PaddleOCR-VL-1.6 pipeline |
 | GLM-OCR | WSL vLLM recognition + Windows CPU layout | PP-DocLayoutV3-grounded region recognition through loopback port `8080` |
 | Docling + RapidOCR | Native Windows | Docling conversion with RapidOCR |
@@ -124,8 +124,8 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 
 1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only for one scanned PDF; native and mixed inputs process the selected document structure/pages.
 2. Select a processing type for every file in **Processing types**. For Mixed PDF, review the suggested page routes, override any page, and confirm the complete table before processing.
-3. Select exactly one extraction-engine toggle. For **Local Ollama**, also select GLM-OCR, PaddleOCR-VL-1.6, or DeepSeek-OCR. Choose the AI model separately when using pure AI extraction or optional enhancement.
-4. For every engine except pure AI, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
+3. Select exactly one extraction-engine toggle. For **Local Ollama**, also select GLM-OCR, PaddleOCR-VL-1.6, or DeepSeek-OCR. Choose the AI model separately when using **AI ADE** or optional enhancement.
+4. For every engine except **AI ADE**, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
    - **Fast**: classification is the only preset-controlled AI feature.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
