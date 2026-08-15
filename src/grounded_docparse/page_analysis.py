@@ -41,6 +41,7 @@ from .models import (
     TableCellDraft,
 )
 from .paddle_ocr import get_paddleocr_runtime
+from .rapidocr_runtime import get_docling_rapidocr_runtime
 
 _TABLE = {"table"}
 _FORMULA = {"display_formula", "inline_formula", "formula"}
@@ -152,6 +153,8 @@ class PageAnalyzer:
                     self.config.paddleocr_service_url,
                     self.config.paddleocr_timeout_seconds,
                 )
+            if self.config.ocr_engine is OcrEngine.RAPIDOCR:
+                return get_docling_rapidocr_runtime()
             return get_grounded_ocr_runtime(self.config)
         if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
             return self.runtime_factory(
@@ -162,6 +165,8 @@ class PageAnalyzer:
             return self.runtime_factory(
                 self.config.glmocr_config_path, self.config.glmocr_layout_device
             )
+        if self.config.ocr_engine is OcrEngine.RAPIDOCR:
+            return self.runtime_factory()
         return self.runtime_factory(self.config)
 
     def prepare_document(self, source_path: Path, pages: list[PageEvidence]) -> None:
@@ -174,6 +179,14 @@ class PageAnalyzer:
         parser(source_path, pages)
 
     def model_versions(self) -> dict[str, str]:
+        if self.config.ocr_engine is OcrEngine.RAPIDOCR:
+            return {
+                "ocr_sdk": "Docling + RapidOCR",
+                "ocr_model": "RapidOCR PP-OCRv6",
+                "layout_model": "Docling layout",
+                "vlm_backend": "ONNX Runtime CPU",
+                "ai_model": self.config.cloud_model.value,
+            }
         if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
             return {
                 "ocr_sdk": "PaddleOCR/PaddleX service",
@@ -312,16 +325,27 @@ class PageAnalyzer:
     ) -> PageAnalysis:
         paddle = self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
         ollama = self.config.ocr_engine is OcrEngine.OLLAMA
+        rapidocr = self.config.ocr_engine is OcrEngine.RAPIDOCR
         engine = AnalysisEngineEvidence(
-            sdk="paddleocr" if paddle else "grounded-docparse",
+            sdk=(
+                "paddleocr"
+                if paddle
+                else "docling+rapidocr"
+                if rapidocr
+                else "grounded-docparse"
+            ),
             sdk_version=None,
             layout_model=(
-                "PP-DocLayoutV3"
+                "Docling layout"
+                if rapidocr
+                else "PP-DocLayoutV3"
                 if paddle
                 else "PaddlePaddle/PP-DocLayoutV3_safetensors"
             ),
             ocr_model=(
-                "PaddleOCR-VL-1.6-0.9B"
+                "RapidOCR PP-OCRv6"
+                if rapidocr
+                else "PaddleOCR-VL-1.6-0.9B"
                 if paddle
                 else self.config.ollama_model
                 if ollama
@@ -579,13 +603,16 @@ class PageAnalyzer:
             OcrEngine.PADDLEOCR_VL_1_6,
             OcrEngine.GLM_OCR,
             OcrEngine.OLLAMA,
+            OcrEngine.RAPIDOCR,
         }:
             return ReadingOrderEvidence(
                 status=ReadingOrderStatus.CONFIDENT,
                 ordered_region_ids=order,
                 confidence=1.0,
                 basis=(
-                    "PaddleOCR block_order"
+                    "Docling document order"
+                    if self.config.ocr_engine is OcrEngine.RAPIDOCR
+                    else "PaddleOCR block_order"
                     if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6
                     else "PP-DocLayoutV3 detector order"
                 ),

@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-a3c6bf27aca5",
-    "base_commit": "e87ba1eac6b4d36a216dd596720c7649063af02d",
+    "id": "content-338dd11260b6",
+    "base_commit": "04732951987fb07f89ce1f6bc1d5f78112674907",
     "branch": "main",
-    "dirty": false
+    "dirty": true
   },
-  "generated_at": "2026-08-15T14:49:18.092174+00:00",
+  "generated_at": "2026-08-15T15:23:05.083489+00:00",
   "category": "application-code",
   "files": [
     {
@@ -41,13 +41,13 @@
     },
     {
       "path": "src/grounded_docparse/config.py",
-      "sha256": "5ac4bf71ced6e06d26df3cbea31230c4bec5b7312e60c7c07e227f50a87fd052",
-      "size": 18794
+      "sha256": "aa066fb603b0db927f9943040531343563f055d77ee76fc32fe3fe29bee99204",
+      "size": 19134
     },
     {
       "path": "src/grounded_docparse/docling_native.py",
-      "sha256": "4b6703536a3020f15c30a1e30cf0a81f6e8bf21f0573c557f67199887c154e5e",
-      "size": 27061
+      "sha256": "5f50aa63e60b8555e16705995777b9a53bdc07420132a68a4da2b2d46dc28e88",
+      "size": 30221
     },
     {
       "path": "src/grounded_docparse/enhancement.py",
@@ -86,8 +86,8 @@
     },
     {
       "path": "src/grounded_docparse/models.py",
-      "sha256": "e85929136db7c9ee2dba6b08bacd29fe14f1a7c0760b12c46e23081836d7d1d5",
-      "size": 32388
+      "sha256": "861af8049e0b8389c892ed8708612746d76317dfc8754306a5c40ea7d43acf09",
+      "size": 32437
     },
     {
       "path": "src/grounded_docparse/native.py",
@@ -111,8 +111,8 @@
     },
     {
       "path": "src/grounded_docparse/ocr_services.py",
-      "sha256": "a014d86b773a2cb0906d3124d7abf4fa2deca4b6da0a42d13304f5a8f9997eee",
-      "size": 5039
+      "sha256": "9da68730ca9ce9c6e8e5d6b1faf26febd497462d1314da82e2ae8098433f97bc",
+      "size": 5216
     },
     {
       "path": "src/grounded_docparse/ollama_runtime.py",
@@ -126,13 +126,13 @@
     },
     {
       "path": "src/grounded_docparse/page_analysis.py",
-      "sha256": "f499edef0b4752c8a6f4c345d5555c9df2c36531a040b2961936c3fdd629ac6b",
-      "size": 33569
+      "sha256": "d71f8322fae188a26f41ad880c284c54220516794d82c1273bc4cf7d48e942ce",
+      "size": 34701
     },
     {
       "path": "src/grounded_docparse/pipeline.py",
-      "sha256": "b8130f7303f0093febd1258fc7ba8cb9aab28360df5084d32dd04df8ec6e8d3f",
-      "size": 127455
+      "sha256": "82e3ff3e1197ebcf4efeaf1044beee78a3fdb45ab0f59fdea3ea343c13a3af87",
+      "size": 127545
     },
     {
       "path": "src/grounded_docparse/prompts.py",
@@ -146,8 +146,8 @@
     },
     {
       "path": "src/grounded_docparse/rapidocr_runtime.py",
-      "sha256": "3eb1545c2e0c0d59f8d819d7998d2986299eb6ce2c30d07f3a838b7cc62c356a",
-      "size": 1959
+      "sha256": "271b3b9061b0177a27ec803058ec50b4e72f4d6838083b4d16362b2057f9858b",
+      "size": 6550
     },
     {
       "path": "src/grounded_docparse/render.py",
@@ -181,8 +181,8 @@
     },
     {
       "path": "src/grounded_docparse/windows_setup.py",
-      "sha256": "f3c631a2b6593606bf4d2626a9fd3d64c42cb3beece3fe6d79a96e96c28fd184",
-      "size": 724
+      "sha256": "628fad956f59b7a0e374ec55bea0aa53784b65bcc3f162666b80f6258eeb6590",
+      "size": 891
     },
     {
       "path": "src/grounded_docparse/workspace_store.py",
@@ -191,8 +191,8 @@
     },
     {
       "path": "streamlit_app.py",
-      "sha256": "59f55e0543c0d6fa637862d72a9d2e360b8dec209c9025dcd779bb968bc9cfb0",
-      "size": 138816
+      "sha256": "167d54cc093c9cf1ee1d79a41c3cc4c1917218ffe7d47d19ebd3d24e58cc4eae",
+      "size": 138006
     }
   ]
 }

@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import json
 import posixpath
 import re
 from dataclasses import dataclass
 from io import BytesIO, StringIO
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any
 from zipfile import ZipFile
 
@@ -656,18 +657,46 @@ def make_docling_converter():
     return DocumentConverter(allowed_formats=allowed, format_options=format_options)
 
 
-def make_docling_rapidocr_converter():
+def docling_artifacts_path() -> Path:
+    from docling.datamodel.settings import settings
+
+    return Path(settings.cache_dir) / "models"
+
+
+def make_docling_rapidocr_converter(artifacts_path: Path | None = None):
     """Create the explicit OCR engine; normal native parsing remains OCR-free."""
 
     try:
+        from docling.datamodel.accelerator_options import (
+            AcceleratorDevice,
+            AcceleratorOptions,
+        )
         from docling.datamodel.base_models import InputFormat
-        from docling.datamodel.pipeline_options import PdfPipelineOptions, RapidOcrOptions
-        from docling.document_converter import DocumentConverter, PdfFormatOption
+        from docling.datamodel.object_detection_engine_options import (
+            TransformersObjectDetectionEngineOptions,
+        )
+        from docling.datamodel.pipeline_options import (
+            LayoutObjectDetectionOptions,
+            OcrMode,
+            PdfPipelineOptions,
+            RapidOcrOptions,
+        )
+        from docling.document_converter import DocumentConverter, ImageFormatOption
     except ImportError as exc:
         raise RuntimeError("Docling RapidOCR requires grounded-docparse[native]") from exc
     options = PdfPipelineOptions(
+        accelerator_options=AcceleratorOptions(device=AcceleratorDevice.CPU),
+        artifacts_path=artifacts_path or docling_artifacts_path(),
         do_ocr=True,
-        ocr_options=RapidOcrOptions(),
+        ocr_options=RapidOcrOptions(
+            mode=OcrMode.LAYOUT_REGIONS,
+            backend="onnxruntime",
+        ),
+        layout_options=LayoutObjectDetectionOptions(
+            engine_options=TransformersObjectDetectionEngineOptions(
+                compile_model=False
+            )
+        ),
         enable_remote_services=False,
         allow_external_plugins=False,
         do_picture_classification=False,
@@ -675,6 +704,71 @@ def make_docling_rapidocr_converter():
         do_chart_extraction=False,
     )
     return DocumentConverter(
-        allowed_formats=[InputFormat.PDF],
-        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=options)},
+        allowed_formats=[InputFormat.IMAGE],
+        format_options={InputFormat.IMAGE: ImageFormatOption(pipeline_options=options)},
     )
+
+
+def ensure_docling_models() -> Path:
+    """Download the CPU Docling OCR assets once and reuse them until removed."""
+
+    from importlib.metadata import version
+
+    from docling.utils.model_downloader import download_models
+
+    artifacts = docling_artifacts_path()
+    manifest_path = artifacts / ".grounded-docparse-models.json"
+    package_version = version("docling")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        files = manifest.get("files", [])
+        if (
+            manifest.get("docling_version") == package_version
+            and files
+            and all(
+                (candidate := artifacts / relative).is_file()
+                and candidate.stat().st_size > 0
+                for relative in files
+            )
+        ):
+            return artifacts
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        pass
+
+    artifacts.mkdir(parents=True, exist_ok=True)
+    download_models(
+        output_dir=artifacts,
+        force=False,
+        progress=False,
+        with_layout=True,
+        with_tableformer=True,
+        with_tableformer_v2=False,
+        with_code_formula=False,
+        with_picture_classifier=False,
+        with_smolvlm=False,
+        with_granitedocling=False,
+        with_granitedocling_mlx=False,
+        with_granitedocling_2stage=False,
+        with_smoldocling=False,
+        with_smoldocling_mlx=False,
+        with_granite_vision=False,
+        with_granite_chart_extraction=False,
+        with_granite_chart_extraction_v4=False,
+        with_rapidocr=True,
+        with_easyocr=False,
+        with_nemotron_ocr=False,
+    )
+    files = sorted(
+        str(path.relative_to(artifacts)).replace("\\", "/")
+        for path in artifacts.rglob("*")
+        if path.is_file() and path != manifest_path and path.stat().st_size > 0
+    )
+    manifest_path.write_text(
+        json.dumps(
+            {"docling_version": package_version, "files": files},
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    return artifacts

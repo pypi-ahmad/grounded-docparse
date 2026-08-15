@@ -1761,6 +1761,8 @@ class DocumentParser:
         primary_engine = (
             f"ollama:{self.config.ollama_model}"
             if self.config.ocr_engine is OcrEngine.OLLAMA
+            else "rapidocr"
+            if self.config.ocr_engine is OcrEngine.RAPIDOCR
             else f"vllm-{self.config.ocr_engine.value}"
         )
         page_by_number = {page.number: page for page in pages}

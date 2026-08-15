@@ -48,7 +48,7 @@ def _run_manager(*arguments: str, timeout: float) -> None:
 def ensure_managed_ocr_engine(engine: OcrEngine) -> None:
     """Activate one local OCR service when managed-service mode is enabled."""
 
-    if engine is OcrEngine.OLLAMA or os.getenv(
+    if engine in {OcrEngine.OLLAMA, OcrEngine.RAPIDOCR} or os.getenv(
         "DOCPARSE_MANAGE_OCR_SERVICES", "false"
     ).casefold() in {
         "0",
@@ -117,6 +117,9 @@ def temporary_alternate_ocr_engine(
                 if alternate.vllm_engine is not None:
                     stop_managed_vllm()
                 warm_model(primary_ollama)
+            elif config.ocr_engine is OcrEngine.RAPIDOCR:
+                if alternate.vllm_engine is not None:
+                    stop_managed_vllm()
             else:
                 vllm_switcher(config.ocr_engine)
         except Exception as exc:  # noqa: BLE001 - report restoration as one audit failure

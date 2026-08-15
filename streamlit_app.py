@@ -30,7 +30,6 @@ from grounded_docparse.config import (
     ParserConfig,
     default_alternate_ocr_engine,
 )
-from grounded_docparse.docling_native import make_docling_rapidocr_converter
 from grounded_docparse.models import (
     ClassifierCategory,
     ClassifierProfile,
@@ -49,7 +48,6 @@ from grounded_docparse.native import (
     render_native_combined_result,
 )
 from grounded_docparse.native_extraction import LangExtractNativeExtractor
-from grounded_docparse.native_parsers import DoclingNativeParser
 from grounded_docparse.ocr_services import switch_extraction_engine
 from grounded_docparse.ollama_runtime import (
     OllamaOcrModel,
@@ -72,7 +70,6 @@ from grounded_docparse.schema_store import (
 )
 from grounded_docparse.universal import (
     UniversalDocumentParser,
-    detect_source_format,
     inspect_pdf_content,
 )
 from grounded_docparse.usage_costs import (
@@ -1741,6 +1738,7 @@ with st.sidebar:
     cross_check_supported = selected_extraction_engine in {
         ExtractionEngine.PADDLE_VLLM,
         ExtractionEngine.GLM_VLLM,
+        ExtractionEngine.DOCLING_RAPIDOCR,
         ExtractionEngine.OLLAMA,
     }
     if not cross_check_supported:
@@ -2114,31 +2112,20 @@ if parse_clicked and batch_documents:
                 if result is None:
                     if parser is None:
                         raise RuntimeError("OCR parser did not start")
-                    if selected_extraction_engine is ExtractionEngine.DOCLING_RAPIDOCR:
-                        result = DoclingNativeParser(
-                            parser_config,
-                            converter=make_docling_rapidocr_converter(),
-                        ).parse(
-                            parsed_document_source,
-                            document.name,
-                            source_format=detect_source_format(parsed_document_source, document.name),
-                            processing_type=processing_types[document.id],
-                        )
-                    else:
-                        effective_processing_type = (
-                            ProcessingType.NATIVE_PDF
-                            if selected_extraction_engine is ExtractionEngine.PDF_INSPECTOR
-                            else processing_types[document.id]
-                        )
-                        result = parser.parse(
-                            parsed_document_source,
-                            document.name,
-                            progress_callback=show_progress,
-                            processing_type=effective_processing_type,
-                            page_routes=page_routes_by_document.get(document.id),
-                            refine_markdown=refine_markdown,
-                            visual_recovery=visual_recovery,
-                        )
+                    effective_processing_type = (
+                        ProcessingType.NATIVE_PDF
+                        if selected_extraction_engine is ExtractionEngine.PDF_INSPECTOR
+                        else processing_types[document.id]
+                    )
+                    result = parser.parse(
+                        parsed_document_source,
+                        document.name,
+                        progress_callback=show_progress,
+                        processing_type=effective_processing_type,
+                        page_routes=page_routes_by_document.get(document.id),
+                        refine_markdown=refine_markdown,
+                        visual_recovery=visual_recovery,
+                    )
                     st.session_state.result = result
                     append_session_usage(result.usage)
                     st.session_state.result_source_hash = expected_selection_key
