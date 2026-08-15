@@ -6,7 +6,7 @@ RUNTIME_DIR="$PROJECT_ROOT/.runtime"
 STREAMLIT_LOG="$RUNTIME_DIR/streamlit.log"
 STREAMLIT_PID_FILE="$RUNTIME_DIR/streamlit.pid"
 STREAMLIT_PORT=8600
-START_ENGINE="${DOCPARSE_START_ENGINE:-glm-ocr}"
+START_ENGINE="${DOCPARSE_START_ENGINE:-paddleocr-vl-1.6}"
 PADDLE_API_PORT="${DOCPARSE_PADDLE_API_PORT:-8119}"
 export DOCPARSE_PADDLEOCR_SERVICE_URL="${DOCPARSE_PADDLEOCR_SERVICE_URL:-http://127.0.0.1:$PADDLE_API_PORT}"
 
@@ -103,11 +103,9 @@ elif port_is_listening "$STREAMLIT_PORT"; then
   exit 1
 fi
 
-bash scripts/wsl/manage-ocr-stack.sh ensure "$START_ENGINE" 8>&-
-
 streamlit_environment_matches() {
   [[ -f "$STREAMLIT_PID_FILE" ]] || return 1
-  local pid current_key="" current_base_url="" current_engine=""
+  local pid current_key="" current_base_url="" current_google_key="" current_engine=""
   local current_source_fingerprint="" entry
   pid="$(<"$STREAMLIT_PID_FILE")"
   [[ "$pid" =~ ^[0-9]+$ && -r "/proc/$pid/environ" ]] || return 1
@@ -115,12 +113,14 @@ streamlit_environment_matches() {
     case "$entry" in
       OPENAI_API_KEY=*) current_key="${entry#*=}" ;;
       OPENAI_BASE_URL=*) current_base_url="${entry#*=}" ;;
+      GOOGLE_API_KEY=*) current_google_key="${entry#*=}" ;;
       DOCPARSE_OCR_ENGINE=*) current_engine="${entry#*=}" ;;
       DOCPARSE_SOURCE_FINGERPRINT=*) current_source_fingerprint="${entry#*=}" ;;
     esac
   done <"/proc/$pid/environ"
   [[ "$current_key" == "${OPENAI_API_KEY-}" && \
     "$current_base_url" == "${OPENAI_BASE_URL-}" && \
+    "$current_google_key" == "${GOOGLE_API_KEY-}" && \
     "$current_engine" == "$START_ENGINE" && \
     "$current_source_fingerprint" == "$(streamlit_source_fingerprint)" ]] && \
     streamlit_uses_configured_port

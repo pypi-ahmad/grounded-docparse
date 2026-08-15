@@ -1,6 +1,10 @@
 [CmdletBinding()]
 param(
     [switch]$Provision,
+    [switch]$EnsureHost,
+    [switch]$NoAppLaunch,
+    [ValidateSet('glm-ocr', 'paddleocr-vl-1.6')]
+    [string]$WarmEngine = 'paddleocr-vl-1.6',
     [switch]$Uninstall,
     [switch]$PlanOnly,
     [string]$InstallRoot
@@ -19,7 +23,9 @@ $script:Progress = $null
 
 $env:OPENAI_API_KEY = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
 $env:OPENAI_BASE_URL = [Environment]::GetEnvironmentVariable('OPENAI_BASE_URL', 'User')
-$forwarded = @('OPENAI_API_KEY', 'OPENAI_BASE_URL')
+$env:GOOGLE_API_KEY = [Environment]::GetEnvironmentVariable('GOOGLE_API_KEY', 'User')
+$env:OLLAMA_BASE_URL = [Environment]::GetEnvironmentVariable('OLLAMA_BASE_URL', 'User')
+$forwarded = @('OPENAI_API_KEY', 'OPENAI_BASE_URL', 'GOOGLE_API_KEY', 'OLLAMA_BASE_URL')
 $existingWslenv = @($env:WSLENV -split ':' | Where-Object { $_ })
 $env:WSLENV = (($existingWslenv + $forwarded | Select-Object -Unique) -join ':')
 
@@ -47,6 +53,76 @@ function Set-Step {
         [System.Windows.Forms.Application]::DoEvents()
     }
     Write-InstallLog $Message
+}
+
+function Ensure-MirroredWslNetworking {
+    $configPath = Join-Path $env:USERPROFILE '.wslconfig'
+    $content = if (Test-Path -LiteralPath $configPath) {
+        Get-Content -Raw -LiteralPath $configPath
+    } else { '' }
+    if ($content -match '(?im)^\s*networkingMode\s*=\s*mirrored\s*$') { return $false }
+    if ($content -match '(?im)^\s*networkingMode\s*=.*$') {
+        $updated = [regex]::Replace(
+            $content,
+            '(?im)^\s*networkingMode\s*=.*$',
+            'networkingMode=mirrored',
+            1
+        )
+    } elseif ($content -match '(?im)^\s*\[wsl2\]\s*$') {
+        $updated = [regex]::Replace(
+            $content,
+            '(?im)^\s*\[wsl2\]\s*$',
+            "[wsl2]`r`nnetworkingMode=mirrored",
+            1
+        )
+    } else {
+        $separator = if ($content -and -not $content.EndsWith("`n")) { "`r`n" } else { '' }
+        $updated = "$content$separator[wsl2]`r`nnetworkingMode=mirrored`r`n"
+    }
+    Set-Content -LiteralPath $configPath -Value $updated -Encoding utf8 -NoNewline
+    Write-InstallLog 'Enabled WSL mirrored networking while preserving existing .wslconfig settings.'
+    $true
+}
+
+function Ensure-WindowsOllama {
+    if (-not (Get-Command ollama.exe -ErrorAction SilentlyContinue)) {
+        Set-Step 'Installing Windows Ollama...'
+        $install = Start-Process powershell.exe -ArgumentList @(
+            '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command',
+            'irm https://ollama.com/install.ps1 | iex'
+        ) -Wait -PassThru
+        if ($install.ExitCode -ne 0) { throw 'Windows Ollama installation failed.' }
+        $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        $env:Path = "$machinePath;$userPath"
+    }
+    if (-not (Get-Command ollama.exe -ErrorAction SilentlyContinue)) {
+        throw 'ollama.exe is unavailable after installation.'
+    }
+    $tags = try {
+        Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 3
+    } catch { $null }
+    if (-not $tags) {
+        Start-Process ollama.exe -ArgumentList 'serve' -WindowStyle Hidden
+        for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            Start-Sleep -Milliseconds 500
+            try {
+                Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:11434/api/tags' -TimeoutSec 2 | Out-Null
+                return
+            } catch { }
+        }
+        throw 'Windows Ollama did not become ready on 127.0.0.1:11434.'
+    }
+}
+
+function Invoke-EnsureHost {
+    $networkChanged = Ensure-MirroredWslNetworking
+    Ensure-WindowsOllama
+    if ($networkChanged -and (Get-Command wsl.exe -ErrorAction SilentlyContinue)) {
+        Set-Step 'Restarting WSL to apply mirrored networking...'
+        & wsl.exe --shutdown
+        if ($LASTEXITCODE -ne 0) { throw 'Could not restart WSL.' }
+    }
 }
 
 function Invoke-External {
@@ -183,7 +259,7 @@ function Test-Preflight {
     Set-Step 'Checking Windows and hardware requirements...'
     if (-not [Environment]::Is64BitOperatingSystem) { throw '64-bit Windows is required.' }
     $build = [Environment]::OSVersion.Version.Build
-    if ($build -lt 19045) { throw 'Windows 10 22H2 or Windows 11 is required.' }
+    if ($build -lt 22621) { throw 'Windows 11 22H2 or newer is required for mirrored WSL networking.' }
     $memoryGb = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB
     if ($memoryGb -lt 15.5) { throw 'At least 16 GB RAM is required.' }
     $drive = Get-PSDrive -Name ([IO.Path]::GetPathRoot($InstallRoot).Substring(0, 1))
@@ -259,7 +335,7 @@ function Get-HardwareMode {
     if ($hasNvidia) {
         $probe = Invoke-External 'wsl.exe' "-d `"$Distro`" -- nvidia-smi"
         if ($probe.ExitCode -eq 0) { return [pscustomobject]@{ Backend = 'vllm'; Amd = $hasAmd } }
-        Write-InstallLog 'NVIDIA adapter found, but CUDA is unavailable inside WSL; selecting Ollama.'
+        Write-InstallLog 'NVIDIA adapter found, but CUDA is unavailable inside WSL; selecting the Windows Ollama/local CPU profile.'
     }
     [pscustomobject]@{ Backend = 'ollama'; Amd = $hasAmd }
 }
@@ -278,9 +354,6 @@ function Install-Runtime {
     Set-Step "Installing or repairing $Backend runtime..."
     $setup = "cd '$projectRoot' && DOCPARSE_LOCAL_OCR_BACKEND='$Backend' DOCPARSE_AMD_GPU='$amdValue' bash scripts/wsl/setup-glmocr.sh"
     Invoke-WslShell -Command $setup -User $User | Out-Null
-    Set-Step "Validating $Backend OCR and Streamlit..."
-    $launch = "cd '$projectRoot' && DOCPARSE_LOCAL_OCR_BACKEND='$Backend' bash scripts/wsl/launch-stack.sh"
-    Invoke-WslShell -Command $launch -User $User | Out-Null
 }
 
 function Install-PaddleRuntime {
@@ -303,31 +376,47 @@ function Save-State {
     } | ConvertTo-Json | Set-Content -LiteralPath $StatePath -Encoding UTF8
 }
 
+function Warm-GpuRuntime {
+    param([string]$User, [string]$Engine)
+    $projectRoot = Get-WslProjectRoot -User $User
+    Set-Step "Starting and warming $Engine..."
+    $command = "cd '$projectRoot' && bash scripts/wsl/manage-ocr-stack.sh ensure '$Engine'"
+    Invoke-WslShell -Command $command -User $User | Out-Null
+}
+
+function Test-WslOllama {
+    param([string]$User)
+    Set-Step 'Checking Windows Ollama from WSL...'
+    Invoke-WslShell -Command "curl --fail --silent http://127.0.0.1:11434/api/tags >/dev/null" -User $User | Out-Null
+}
+
 function Invoke-Provision {
     $window = Show-MainWindow
     try {
+        Invoke-EnsureHost
         Test-Preflight
         if (-not (Ensure-Wsl)) { $window.Close(); return }
         $user = Ensure-LinuxUser
         Install-LinuxPrerequisites
         $mode = Get-HardwareMode
-        try {
-            Install-Runtime -User $user -Backend $mode.Backend -Amd $mode.Amd
-        } catch {
-            if ($mode.Backend -ne 'vllm') { throw }
-            Write-InstallLog 'NVIDIA runtime validation failed; switching to Ollama CPU fallback.'
-            Install-Runtime -User $user -Backend 'ollama' -Amd $mode.Amd
-            $mode.Backend = 'ollama'
-        }
         if ($mode.Backend -eq 'vllm') {
+            Install-Runtime -User $user -Backend 'vllm' -Amd $mode.Amd
             Install-PaddleRuntime -User $user
+            Warm-GpuRuntime -User $user -Engine $WarmEngine
+        } else {
+            Install-Runtime -User $user -Backend 'ollama' -Amd $mode.Amd
         }
+        Test-WslOllama -User $user
         Save-State -Backend $mode.Backend -Amd $mode.Amd
         $script:Progress.Style = 'Continuous'
         $script:Progress.Value = 100
-        Set-Step 'Installation complete. Opening Grounded DocParse...'
-        Start-Process 'http://localhost:8600'
-        [System.Windows.Forms.MessageBox]::Show('Grounded DocParse is installed and ready.', 'Setup complete') | Out-Null
+        Set-Step 'Installation complete.'
+        if (-not $NoAppLaunch) {
+            $projectRoot = Get-WslProjectRoot -User $user
+            Invoke-WslShell -Command "cd '$projectRoot' && bash scripts/wsl/launch-stack.sh" -User $user | Out-Null
+            Start-Process 'http://localhost:8600'
+            [System.Windows.Forms.MessageBox]::Show('Grounded DocParse is installed and ready.', 'Setup complete') | Out-Null
+        }
     } catch {
         Write-InstallLog "ERROR: $($_.Exception.Message)"
         [System.Windows.Forms.MessageBox]::Show("Setup failed. Review:`n$LogPath", 'Setup failed') | Out-Null
@@ -347,7 +436,7 @@ function Invoke-Uninstall {
 set -e
 data="$HOME/.local/share/grounded-docparse"
 case "$data" in "$HOME/.local/share/grounded-docparse") ;; *) exit 1 ;; esac
-for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/ollama.pid" "$PWD/.runtime/paddle-vllm.pid" "$PWD/.runtime/paddle-api.pid" "$PWD/.runtime/streamlit.pid"; do
+for pid_file in "$PWD/.runtime/vllm.pid" "$PWD/.runtime/paddle-vllm.pid" "$PWD/.runtime/paddle-api.pid" "$PWD/.runtime/streamlit.pid"; do
   [[ -f "$pid_file" ]] && kill "$(<"$pid_file")" 2>/dev/null || true
 done
 rm -rf -- "$data"
@@ -364,6 +453,8 @@ if ($PlanOnly) {
         minimum_ram_gb = 16
         minimum_disk_gb = 20
     } | ConvertTo-Json -Depth 3
+} elseif ($EnsureHost) {
+    Invoke-EnsureHost
 } elseif ($Uninstall) {
     Invoke-Uninstall
 } else {

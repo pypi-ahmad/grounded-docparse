@@ -12,22 +12,22 @@ def test_wsl_shell_scripts_use_unix_line_endings() -> None:
 
 
 def test_windows_launcher_reads_openai_values_from_user_environment() -> None:
-    launcher = (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8")
+    launcher = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
     installer = (
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
     ).read_text(encoding="utf-8")
 
-    assert "GetEnvironmentVariable('OPENAI_API_KEY','User')" in launcher
-    assert "GetEnvironmentVariable('OPENAI_BASE_URL','User')" in launcher
+    assert "for %%K in (OPENAI_API_KEY OPENAI_BASE_URL GOOGLE_API_KEY OLLAMA_BASE_URL)" in launcher
+    assert "GetEnvironmentVariable('%%K','User')" in launcher
     assert "OPENAI_API_KEY:OPENAI_BASE_URL" in launcher
+    assert "GOOGLE_API_KEY:OLLAMA_BASE_URL" in launcher
     assert "GetEnvironmentVariable('OPENAI_API_KEY', 'User')" in installer
     assert "GetEnvironmentVariable('OPENAI_BASE_URL', 'User')" in installer
 
 
 def test_streamlit_uses_port_8600_everywhere_it_launches() -> None:
     launchers = [
-        (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8"),
-        (ROOT / "Launch-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8"),
+        (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8"),
     ]
     stack = (ROOT / "scripts" / "wsl" / "launch-stack.sh").read_text(
         encoding="utf-8"
@@ -79,22 +79,22 @@ def test_managed_stack_has_a_safe_stop_all_command() -> None:
 def test_wsl_services_bind_to_loopback() -> None:
     run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
     serve_glmocr = (ROOT / "scripts/wsl/serve-glmocr.sh").read_text(encoding="utf-8")
-    serve_ollama = (ROOT / "scripts/wsl/serve-ollama.sh").read_text(encoding="utf-8")
+    installer = (ROOT / "installer/Install-GroundedDocParse.ps1").read_text(encoding="utf-8")
 
     assert '"$@" --server.address=127.0.0.1' in run_app
     assert "--host 127.0.0.1" in serve_glmocr
-    assert 'OLLAMA_HOST="127.0.0.1:11434"' in serve_ollama
+    assert "http://127.0.0.1:11434/api/tags" in installer
 
 
 def test_paddle_launcher_and_service_manager_use_official_full_pipeline() -> None:
-    launcher = (ROOT / "Launch-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8")
+    launcher = (ROOT / "Setup-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8")
     manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
     runtime_config = (ROOT / "scripts/wsl/prepare_paddleocr_runtime.py").read_text(
         encoding="utf-8"
     )
     backend_config = (ROOT / "config/paddle-vllm.yaml").read_text(encoding="utf-8")
 
-    assert "DOCPARSE_START_ENGINE=paddleocr-vl-1.6" in launcher
+    assert "manage-ocr-stack.sh ensure paddleocr-vl-1.6" in launcher
     assert "PaddleOCR-VL-1.6-0.9B" in manager
     assert "paddleocr genai_server" in manager
     assert "--backend vllm" in manager
@@ -108,8 +108,6 @@ def test_paddle_launcher_and_service_manager_use_official_full_pipeline() -> Non
     assert '--port "$PADDLE_API_PORT"' in manager
     assert "/layout-parsing" in manager
     assert "flock" in manager
-    assert "DOCPARSE_PADDLE_VLLM_PORT" in launcher
-    assert "DOCPARSE_PADDLE_API_PORT" in launcher
     assert "DOCPARSE_PADDLE_VLLM_PORT" in runtime_config
     setup = (ROOT / "scripts/wsl/setup-paddleocr.sh").read_text(encoding="utf-8")
     assert "--get_pipeline_config PaddleOCR-VL-1.6" in setup
@@ -142,7 +140,7 @@ def test_paddle_runtime_project_is_complete_and_packaged() -> None:
     assert 'PADDLE_PROJECT="$PROJECT_ROOT/paddle-runtime"' in setup
     assert 'sha256sum "$PADDLE_PROJECT/uv.lock"' in setup
     assert '--project "$PADDLE_PROJECT" --locked' in setup
-    assert "Launch-PaddleOCR-VL-1.6.cmd" in installer
+    assert "Setup-PaddleOCR-VL-1.6.cmd" in installer
     assert "paddle-runtime\\pyproject.toml" in installer
     assert "paddle-runtime\\uv.lock" in installer
 
@@ -157,8 +155,7 @@ def test_detached_services_do_not_inherit_launcher_locks() -> None:
     manager = (ROOT / "scripts/wsl/manage-ocr-stack.sh").read_text(encoding="utf-8")
     launcher = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
 
-    assert manager.count("9>&-") == 4
-    assert "manage-ocr-stack.sh ensure \"$START_ENGINE\" 8>&-" in launcher
+    assert manager.count("9>&-") == 3
     assert (
         'run-app.sh --server.headless true --server.port "$STREAMLIT_PORT" 8>&-'
         in launcher
@@ -172,19 +169,28 @@ def test_paddle_readiness_probe_generates_its_png() -> None:
     assert "base64.b64decode" not in probe
 
 
-def test_primary_launcher_defaults_to_glm_but_supports_runtime_switching() -> None:
-    launcher = (ROOT / "Launch-GLM-OCR.cmd").read_text(encoding="utf-8")
+def test_primary_launcher_checks_setup_then_starts_streamlit() -> None:
+    launcher = (ROOT / "Launch-Grounded-DocParse.cmd").read_text(encoding="utf-8")
     stack = (ROOT / "scripts/wsl/launch-stack.sh").read_text(encoding="utf-8")
 
-    assert "DOCPARSE_START_ENGINE=glm-ocr" in launcher
-    assert "manage-ocr-stack.sh" in stack
-    assert stack.index(
-        "Stopping Streamlit before applying runtime configuration"
-    ) < stack.index("manage-ocr-stack.sh")
+    assert "check-installation.sh" in launcher
+    assert "-WarmEngine paddleocr-vl-1.6" in launcher
+    assert "launch-stack.sh" in launcher
     run_app = (ROOT / "scripts/wsl/run-app.sh").read_text(encoding="utf-8")
     assert run_app.index("export DOCPARSE_GLMOCR_CONFIG_PATH") < run_app.index(
         'if [[ "$DOCPARSE_OCR_ENGINE" == "glm-ocr" ]]'
     )
+
+
+def test_launcher_set_is_consolidated_and_setup_commands_warm_requested_gpu() -> None:
+    assert not (ROOT / "Launch-GLM-OCR.cmd").exists()
+    assert not (ROOT / "Launch-PaddleOCR-VL-1.6.cmd").exists()
+    assert not (ROOT / "Launch-Ollama.cmd").exists()
+    assert (ROOT / "Launch-Grounded-DocParse.cmd").is_file()
+    glm = (ROOT / "Setup-GLM-OCR.cmd").read_text(encoding="utf-8")
+    paddle = (ROOT / "Setup-PaddleOCR-VL-1.6.cmd").read_text(encoding="utf-8")
+    assert "manage-ocr-stack.sh ensure glm-ocr" in glm
+    assert "manage-ocr-stack.sh ensure paddleocr-vl-1.6" in paddle
 
 
 def test_launchers_repair_shared_environment_and_use_current_worktree() -> None:
@@ -202,7 +208,7 @@ def test_launchers_repair_shared_environment_and_use_current_worktree() -> None:
     assert 'export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"' in run_app
 
 
-def test_installer_reuses_dependencies_and_has_cpu_fallback() -> None:
+def test_installer_reuses_dependencies_and_has_windows_ollama_profile() -> None:
     setup = (ROOT / "scripts/wsl/setup-glmocr.sh").read_text(encoding="utf-8")
     installer = (
         ROOT / "installer" / "Install-GroundedDocParse.ps1"
@@ -214,5 +220,5 @@ def test_installer_reuses_dependencies_and_has_cpu_fallback() -> None:
     assert "import docling" in setup
     assert "langextract" in setup
     assert "pdf_inspector" in setup
-    assert "NVIDIA runtime validation failed; switching to Ollama CPU fallback" in installer
+    assert "Windows Ollama/local CPU profile" in installer
     assert "DOCPARSE_AMD_GPU" in installer
