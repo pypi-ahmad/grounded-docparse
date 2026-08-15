@@ -19,6 +19,7 @@ class CloudModel(StrEnum):
     GPT_5_6_LUNA = "gpt-5.6-luna"
     GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite"
     GEMINI_3_7_FLASH = "gemini-3.7-flash"
+    AGNES_2_5_FLASH = "agnes-2.5-flash"
 
     @property
     def label(self) -> str:
@@ -26,6 +27,7 @@ class CloudModel(StrEnum):
             self.GPT_5_6_LUNA: "GPT 5.6 Luna",
             self.GEMINI_3_5_FLASH_LITE: "Gemini 3.5 Flash Lite",
             self.GEMINI_3_7_FLASH: "Gemini Flash 3.7",
+            self.AGNES_2_5_FLASH: "Agnes 2.5 Flash",
         }[self]
 
     @property
@@ -34,7 +36,11 @@ class CloudModel(StrEnum):
 
     @property
     def api_key_name(self) -> str:
-        return "OPENAI_API_KEY" if self is self.GPT_5_6_LUNA else "GOOGLE_API_KEY"
+        if self is self.GPT_5_6_LUNA:
+            return "OPENAI_API_KEY"
+        if self is self.AGNES_2_5_FLASH:
+            return "AGNES_API_KEY"
+        return "GOOGLE_API_KEY"
 
 
 class ExtractionEngine(StrEnum):
@@ -64,18 +70,25 @@ class ExtractionEngine(StrEnum):
             return OcrEngine.GLM_OCR
         return None
 
+    @property
+    def parser_ocr_engine(self) -> OcrEngine | None:
+        if self is self.OLLAMA:
+            return OcrEngine.OLLAMA
+        return self.vllm_ocr_engine
+
 
 class OcrEngine(StrEnum):
     GLM_OCR = "glm-ocr"
     PADDLEOCR_VL_1_6 = "paddleocr-vl-1.6"
+    OLLAMA = "ollama"
 
     @property
     def label(self) -> str:
-        return (
-            "GLM-OCR"
-            if self is OcrEngine.GLM_OCR
-            else "PaddleOCR-VL-1.6"
-        )
+        return {
+            self.GLM_OCR: "GLM-OCR",
+            self.PADDLEOCR_VL_1_6: "PaddleOCR-VL-1.6",
+            self.OLLAMA: "Local Ollama",
+        }[self]
 
 
 def validate_paddleocr_service_url(value: str) -> str:
@@ -99,6 +112,25 @@ def validate_paddleocr_service_url(value: str) -> str:
         raise ValueError(
             "paddleocr_service_url must be an HTTP loopback origin with an explicit port"
         )
+    return value.rstrip("/")
+
+
+def validate_loopback_origin(value: str, *, name: str) -> str:
+    parsed = urlsplit(value)
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(f"{name} must use a valid loopback port") from exc
+    if (
+        parsed.scheme != "http"
+        or parsed.hostname not in {"127.0.0.1", "localhost", "::1"}
+        or port is None
+        or parsed.username is not None
+        or parsed.password is not None
+        or parsed.query
+        or parsed.fragment
+    ):
+        raise ValueError(f"{name} must be an HTTP loopback URL with an explicit port")
     return value.rstrip("/")
 
 
@@ -171,6 +203,10 @@ class ParserConfig:
     glmocr_layout_device: str = "cuda:0"
     paddleocr_service_url: str = "http://127.0.0.1:8119"
     paddleocr_timeout_seconds: float = 900.0
+    glm_vllm_base_url: str = "http://127.0.0.1:8080/v1"
+    ollama_model: str = "glm-ocr:latest"
+    grounded_ocr_timeout_seconds: float = 900.0
+    layout_detection_threshold: float = 0.3
     analysis_thresholds: AnalysisThresholds = field(default_factory=AnalysisThresholds)
 
     def __post_init__(self) -> None:
@@ -218,7 +254,12 @@ class ParserConfig:
             raise ValueError("full_page_fallback_fraction must be in (0,1]")
         if self.paddleocr_timeout_seconds <= 0:
             raise ValueError("paddleocr_timeout_seconds must be positive")
+        if self.grounded_ocr_timeout_seconds <= 0:
+            raise ValueError("grounded_ocr_timeout_seconds must be positive")
+        if not 0 < self.layout_detection_threshold <= 1:
+            raise ValueError("layout_detection_threshold must be in (0,1]")
         validate_paddleocr_service_url(self.paddleocr_service_url)
+        validate_loopback_origin(self.glm_vllm_base_url, name="glm_vllm_base_url")
 
     @classmethod
     def from_env(cls) -> ParserConfig:
@@ -358,6 +399,22 @@ class ParserConfig:
                 os.getenv(
                     "DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS",
                     str(defaults.paddleocr_timeout_seconds),
+                )
+            ),
+            glm_vllm_base_url=os.getenv(
+                "DOCPARSE_GLM_VLLM_BASE_URL", defaults.glm_vllm_base_url
+            ).rstrip("/"),
+            ollama_model=os.getenv("DOCPARSE_OLLAMA_MODEL", defaults.ollama_model),
+            grounded_ocr_timeout_seconds=float(
+                os.getenv(
+                    "DOCPARSE_GROUNDED_OCR_TIMEOUT_SECONDS",
+                    str(defaults.grounded_ocr_timeout_seconds),
+                )
+            ),
+            layout_detection_threshold=float(
+                os.getenv(
+                    "DOCPARSE_LAYOUT_DETECTION_THRESHOLD",
+                    str(defaults.layout_detection_threshold),
                 )
             ),
             analysis_thresholds=thresholds,

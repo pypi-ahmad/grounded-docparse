@@ -5,7 +5,6 @@ import io
 import json
 import math
 import os
-import subprocess
 from datetime import date
 from dataclasses import replace
 from pathlib import Path
@@ -30,10 +29,13 @@ from grounded_docparse.config import (
     OcrEngine,
     ParserConfig,
 )
-from grounded_docparse.local_ocr import clear_glmocr_runtimes, get_glmocr_runtime
 from grounded_docparse.docling_native import make_docling_rapidocr_converter
 from grounded_docparse.ocr_services import switch_extraction_engine
-from grounded_docparse.ollama_runtime import OllamaOcrModel, unload_model
+from grounded_docparse.ollama_runtime import (
+    OllamaOcrModel,
+    unload_model,
+    warm_model,
+)
 from grounded_docparse.models import (
     ClassifierCategory,
     ClassifierProfile,
@@ -104,6 +106,11 @@ PROCESSING_LABELS = {
 RESULT_VERSION = "4.6.0"
 THUMBNAILS_PER_GROUP = 12
 WORKSPACE_SETTING_KEYS = (
+    "extraction_engine",
+    "cloud_model",
+    "cloud_model_label",
+    "ollama_model",
+    "ai_enhancement",
     "ade_mode",
     "refine_markdown",
     "classify_document",
@@ -184,6 +191,7 @@ MODEL_PRICING = {
         3.75 if date.today() <= date(2026, 12, 31) else 7.50,
         None,
     ),
+    CloudModel.AGNES_2_5_FLASH.value: (0.0, 0.0, None),
 }
 
 
@@ -409,44 +417,8 @@ def mark_ade_custom() -> None:
     )
 
 
-@st.cache_resource
-def preload_local_ocr() -> object:
-    return get_glmocr_runtime(
-        os.getenv("DOCPARSE_GLMOCR_CONFIG_PATH", "config/glmocr.yaml"),
-        os.getenv("DOCPARSE_GLMOCR_LAYOUT_DEVICE", "cuda:0"),
-    )
-
-
-def ensure_ocr_engine(engine: OcrEngine) -> None:
-    if os.getenv("DOCPARSE_MANAGE_OCR_SERVICES", "false").casefold() not in {
-        "1",
-        "true",
-        "yes",
-    }:
-        return
-    if engine is OcrEngine.PADDLEOCR_VL_1_6:
-        preload_local_ocr.clear()
-        clear_glmocr_runtimes()
-    manager = Path(__file__).resolve().parent / "scripts" / "wsl" / "manage-ocr-stack.sh"
-    completed = subprocess.run(
-        ["bash", str(manager), "ensure", engine.value],
-        cwd=manager.parents[2],
-        capture_output=True,
-        text=True,
-        timeout=1800,
-        check=False,
-    )
-    if completed.returncode:
-        detail = (completed.stderr or completed.stdout).strip()[-2000:]
-        raise RuntimeError(f"Could not start {engine.label}: {detail}")
-
-
-def apply_engine_selection() -> None:
-    target = next(
-        engine
-        for engine in ExtractionEngine
-        if engine.label == st.session_state.extraction_engine_label
-    )
+def apply_engine_selection(target: ExtractionEngine | None = None) -> None:
+    target = target or ExtractionEngine(st.session_state.extraction_engine)
     previous_value = st.session_state.get("active_extraction_engine")
     previous = ExtractionEngine(previous_value) if previous_value else None
     if target is previous:
@@ -455,13 +427,50 @@ def apply_engine_selection() -> None:
         if previous is ExtractionEngine.OLLAMA and st.session_state.get("active_ollama_model"):
             unload_model(OllamaOcrModel(st.session_state.active_ollama_model))
         switch_extraction_engine(target, previous)
+        if target is ExtractionEngine.OLLAMA:
+            model = OllamaOcrModel(st.session_state.ollama_model)
+            warm_model(model)
+            st.session_state.active_ollama_model = model.value
     except Exception as exc:  # noqa: BLE001 - lifecycle failures must restore UI state
         st.session_state.engine_switch_error = str(exc)
-        if previous is not None:
-            st.session_state.extraction_engine_label = previous.label
         return
     st.session_state.extraction_engine = target.value
     st.session_state.active_extraction_engine = target.value
+    st.session_state.pop("engine_switch_error", None)
+
+
+def toggle_extraction_engine(target_value: str) -> None:
+    target = ExtractionEngine(target_value)
+    key = f"engine-toggle-{target.value}"
+    previous_value = st.session_state.get("active_extraction_engine")
+    previous = ExtractionEngine(previous_value) if previous_value else None
+    if not st.session_state[key]:
+        if previous is target:
+            st.session_state[key] = True
+        return
+    for engine in ExtractionEngine:
+        st.session_state[f"engine-toggle-{engine.value}"] = engine is target
+    apply_engine_selection(target)
+    if st.session_state.get("engine_switch_error"):
+        for engine in ExtractionEngine:
+            st.session_state[f"engine-toggle-{engine.value}"] = engine is previous
+
+
+def change_ollama_model() -> None:
+    selected = OllamaOcrModel(st.session_state.ollama_model)
+    previous_value = st.session_state.get("active_ollama_model")
+    if previous_value == selected.value:
+        return
+    try:
+        if previous_value:
+            unload_model(OllamaOcrModel(previous_value))
+        warm_model(selected)
+    except Exception as exc:  # noqa: BLE001 - model lifecycle errors are user-facing
+        st.session_state.engine_switch_error = str(exc)
+        if previous_value:
+            st.session_state.ollama_model = previous_value
+        return
+    st.session_state.active_ollama_model = selected.value
     st.session_state.pop("engine_switch_error", None)
 
 
@@ -1253,7 +1262,6 @@ if not st.session_state.get("durable_workspace_loaded"):
         st.session_state.workspace_restored_at = durable_workspace.updated_at
     st.session_state.durable_workspace_loaded = True
 st.session_state.setdefault("extraction_engine", ExtractionEngine.PADDLE_VLLM.value)
-st.session_state.setdefault("extraction_engine_label", ExtractionEngine.PADDLE_VLLM.label)
 st.session_state.setdefault("active_extraction_engine", None)
 st.session_state.setdefault("cloud_model", CloudModel.GPT_5_6_LUNA.value)
 st.session_state.setdefault("cloud_model_label", CloudModel.GPT_5_6_LUNA.label)
@@ -1261,25 +1269,20 @@ st.session_state.setdefault("ollama_model", OllamaOcrModel.GLM_OCR.value)
 if st.session_state.active_extraction_engine is None:
     apply_engine_selection()
 selected_extraction_engine = ExtractionEngine(st.session_state.extraction_engine)
-default_ocr_engine = selected_extraction_engine.vllm_ocr_engine or OcrEngine.PADDLEOCR_VL_1_6
+for engine in ExtractionEngine:
+    st.session_state.setdefault(
+        f"engine-toggle-{engine.value}", engine is selected_extraction_engine
+    )
+default_ocr_engine = (
+    selected_extraction_engine.parser_ocr_engine or OcrEngine.PADDLEOCR_VL_1_6
+)
 st.session_state.setdefault("ocr_engine_label", default_ocr_engine.label)
-st.session_state.setdefault("active_ocr_engine", default_ocr_engine.value)
 ocr_engines = {engine.label: engine for engine in OcrEngine}
 selected_ocr_engine = ocr_engines.get(
     st.session_state.ocr_engine_label, default_ocr_engine
 )
 
-preload_error: str | None = None
-if (
-    selected_ocr_engine is OcrEngine.GLM_OCR
-    and st.session_state.active_ocr_engine == OcrEngine.GLM_OCR.value
-    and os.getenv("DOCPARSE_PRELOAD_LOCAL_OCR", "false").casefold()
-    in {"1", "true", "yes"}
-):
-    try:
-        preload_local_ocr()
-    except Exception as exc:  # noqa: BLE001 - startup diagnostics belong in the UI
-        preload_error = f"Local OCR preload failed: {type(exc).__name__}: {exc}"
+preload_error = st.session_state.get("engine_switch_error")
 
 selected_cloud_model = next(model for model in CloudModel if model.label == st.session_state.cloud_model_label)
 has_environment = bool(os.getenv(selected_cloud_model.api_key_name))
@@ -1299,7 +1302,7 @@ if not has_environment:
         f"{selected_cloud_model.api_key_name} is not set. Local parsing remains "
         "available; AI extraction and enhancement will be skipped."
     )
-elif not os.getenv("OPENAI_BASE_URL"):
+elif selected_cloud_model is CloudModel.GPT_5_6_LUNA and not os.getenv("OPENAI_BASE_URL"):
     st.caption("Luna destination: OpenAI default endpoint")
 if preload_error is not None:
     st.error(preload_error)
@@ -1563,16 +1566,18 @@ else:
 
 with st.sidebar:
     st.subheader("Options")
-    st.selectbox(
-        "Document extraction model",
-        [engine.label for engine in ExtractionEngine],
-        key="extraction_engine_label",
-        on_change=apply_engine_selection,
-        help="Only one engine is active. Managed vLLM models switch and warm immediately.",
-    )
+    with st.container(border=True):
+        st.caption("Document extraction engine — one active at a time")
+        for engine in ExtractionEngine:
+            st.toggle(
+                engine.label,
+                key=f"engine-toggle-{engine.value}",
+                on_change=toggle_extraction_engine,
+                args=(engine.value,),
+            )
     selected_extraction_engine = ExtractionEngine(st.session_state.extraction_engine)
     selected_ocr_engine = (
-        selected_extraction_engine.vllm_ocr_engine or OcrEngine.PADDLEOCR_VL_1_6
+        selected_extraction_engine.parser_ocr_engine or OcrEngine.PADDLEOCR_VL_1_6
     )
     st.session_state.ocr_engine_label = selected_ocr_engine.label
     if st.session_state.get("engine_switch_error"):
@@ -1589,11 +1594,8 @@ with st.sidebar:
             "Ollama OCR model",
             [model.value for model in OllamaOcrModel],
             key="ollama_model",
+            on_change=change_ollama_model,
         )
-        previous_ollama = st.session_state.get("active_ollama_model")
-        if previous_ollama and previous_ollama != selected_ollama_model:
-            unload_model(OllamaOcrModel(previous_ollama))
-        st.session_state.active_ollama_model = selected_ollama_model
     ai_enhancement = st.toggle(
         "AI enhancement for failed or <75% confidence regions",
         value=False,
@@ -1869,6 +1871,7 @@ if parse_clicked and batch_documents:
                 ParserConfig.from_env(),
                 ocr_engine=selected_ocr_engine,
                 cloud_model=CloudModel(st.session_state.cloud_model),
+                ollama_model=st.session_state.ollama_model,
                 local_ocr_enabled=(
                     selected_extraction_engine is not ExtractionEngine.PURE_AI
                 ),
@@ -3239,8 +3242,14 @@ with session_usage_slot:
         usage_columns[2].metric("Output tokens", f"{total_output:,}")
         usage_columns[3].metric("Estimated cost", f"${total_cost:.6f}")
         for model, input_tokens, cached, output_tokens, cost in summaries:
+            input_rate, output_rate, cached_rate = MODEL_PRICING.get(
+                model, (0.0, 0.0, None)
+            )
+            rate_note = f"${input_rate:.2f}/M input, ${output_rate:.2f}/M output"
+            if cached_rate is not None:
+                rate_note += f", ${cached_rate:.2f}/M cached input"
             st.caption(
                 f"{model}: {input_tokens:,} input ({cached:,} cached), "
-                f"{output_tokens:,} output · estimated ${cost:.6f}"
+                f"{output_tokens:,} output · estimated ${cost:.6f} · {rate_note}"
             )
         st.caption(f"Pricing as of {date.today().isoformat()}; synchronous API rates.")

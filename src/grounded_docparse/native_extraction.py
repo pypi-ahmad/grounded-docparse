@@ -491,7 +491,11 @@ class LangExtractNativeExtractor:
         provider = "gemini" if model.startswith("gemini-") else "openai"
         if provider == "openai":
             provider_kwargs.update(
-                base_url=os.getenv("OPENAI_BASE_URL") or None,
+                base_url=(
+                    os.getenv("AGNES_BASE_URL", "https://apihub.agnes-ai.com/v1")
+                    if model == "agnes-2.5-flash"
+                    else os.getenv("OPENAI_BASE_URL") or None
+                ),
                 reasoning_effort=self.config.cloud_model.reasoning_effort,
             )
         if self.extract_func is None:

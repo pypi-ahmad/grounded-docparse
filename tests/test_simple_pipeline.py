@@ -564,7 +564,7 @@ def test_glm_form_recovery_uses_high_resolution_crop_without_luna(
 
     monkeypatch.setattr(
         pipeline_module,
-        "get_glmocr_form_recovery_runtime",
+        "get_grounded_ocr_runtime",
         lambda *_args: RecoveryRuntime(),
     )
 
@@ -657,7 +657,7 @@ def test_glm_form_recovery_does_not_consume_luna_document_budget(
     monkeypatch.setattr(pipeline_module, "render_region_crop", render_crop)
     monkeypatch.setattr(
         pipeline_module,
-        "get_glmocr_form_recovery_runtime",
+        "get_grounded_ocr_runtime",
         lambda *_args: RecoveryRuntime(),
     )
 

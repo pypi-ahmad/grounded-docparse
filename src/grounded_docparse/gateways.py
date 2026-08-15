@@ -74,6 +74,21 @@ class OpenAIDocumentGateway:
                     genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
                 )
             )
+        if client is None and config.cloud_model.value == "agnes-2.5-flash":
+            from types import SimpleNamespace
+
+            from .agnes_gateway import AgnesResponses
+
+            agnes = OpenAI(
+                api_key=os.environ["AGNES_API_KEY"],
+                base_url=os.getenv(
+                    "AGNES_BASE_URL", "https://apihub.agnes-ai.com/v1"
+                ),
+                max_retries=0,
+            )
+            client = SimpleNamespace(
+                responses=AgnesResponses(agnes.chat.completions)
+            )
         if client is None:
             client_options: dict[str, Any] = {"max_retries": 0}
             if os.getenv("OPENAI_BASE_URL"):
