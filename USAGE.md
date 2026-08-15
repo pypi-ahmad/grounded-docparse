@@ -7,6 +7,12 @@ JSON, and source evidence. Start with this page, then use the
 
 ## Before you start
 
+Use only documents that you are authorized to process. You are responsible for
+applicable consent, contractual and regulatory requirements, provider choices,
+local and remote copies, output review, retention, and deletion. Review
+[data responsibility](DATA_RESPONSIBILITY.md) and [security](SECURITY.md)
+before uploading sensitive material.
+
 The primary application runs natively on Windows 11 22H2 or newer. Optional
 GLM-OCR and PaddleOCR-VL-1.6 GPU services remain in Ubuntu 24.04 under WSL2;
 PaddleOCR-VL-1.6 additionally requires supported NVIDIA hardware.
@@ -44,7 +50,7 @@ current app launch only and reset when the app restarts.
 
 1. Upload one or more supported files.
 2. Select a processing type independently for every file.
-3. Select exactly one extraction engine and configure optional AI enhancement.
+3. Select exactly one extraction engine and configure optional AI enhancement. The selected AI model powers both bounded failed/low-confidence-region recovery and **Enhance Markdown with AI**; region recovery has no separate visual-recovery switch.
    With a vLLM or Ollama primary, you can also enable the audit-only uncertain-region cross-check and select an Ollama, RapidOCR, or WSL vLLM alternate. GPU alternates temporarily swap models and restore the primary after the crop batch.
 4. For Mixed PDF, review or override every suggested page route.
 5. Select **Parse document**.

@@ -21,7 +21,13 @@ labels: enhancement
 - ADE modes affected: Fast / Full / Custom / not applicable
 - Backward-compatibility expectations:
 
-## Security, retention, and cost impact
+## Security, data responsibility, retention, and cost impact
+
+<!-- Describe provider egress, data authority, storage/deletion, review, and cost consequences. -->
+
+## Testing approach
+
+<!-- Describe synthetic fixtures, acceptance checks, and affected regression coverage. -->
 
 ## Alternatives considered
 
