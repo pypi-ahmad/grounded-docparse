@@ -110,7 +110,7 @@ The routing profile is fingerprinted at classification time. If it changes after
 
 Consider a 20-page packet containing a cover sheet, a new request, an update form, and supporting records. The business wants structured data only from new requests.
 
-1. The selected grounded engine parses every page and creates the evidence layer; pure AI is the explicit alternative path.
+1. The selected grounded engine parses every page and creates the evidence layer; **AI ADE** is the explicit alternative path.
 2. The user loads a routing profile defining `new_request`, `update`, `records`, and the automatic `other` fallback.
 3. The routing agent proposes contiguous page segments and cites the elements supporting each category.
 4. Deterministic validation checks complete page coverage, category names, ranges, and cited evidence.

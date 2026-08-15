@@ -78,7 +78,7 @@ For the implementation details and control boundaries, see [How Grounded DocPars
 | Area | LandingAI ADE | Grounded DocParse |
 |---|---|---|
 | Primary delivery model | Managed platform with APIs and client libraries | Workstation-oriented Streamlit application and Python package |
-| Visual parser | LandingAI parsing models exposed through ADE Parse | Pure AI, WSL GLM/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or grounded Windows Ollama |
+| Visual parser | LandingAI parsing models exposed through ADE Parse | AI ADE, WSL GLM/Paddle vLLM, Docling/RapidOCR, PDF Inspector, or grounded Windows Ollama |
 | Parse representation | Markdown, hierarchical JSON, chunks, pages, and coordinates | Base/refined Markdown, hierarchical JSON, blocks, atoms, elements, pages, and normalized boxes |
 | Classification | User-defined page classification can run independently of Parse | Whole-document classification and user-defined form segmentation run after the local parse |
 | Mixed packets | Split returns classified sub-documents and their Markdown | Form routing produces contiguous logical segments and runs assigned schemas against in-memory subsets |

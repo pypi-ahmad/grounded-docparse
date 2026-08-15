@@ -83,7 +83,7 @@ It processes up to 20 uploaded files sequentially in one active local workspace,
 
 The application has two broad layers:
 
-1. **Document parsing:** the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; pure AI is the explicit direct-agentic option.
+1. **Document parsing:** the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; **AI ADE** is the explicit direct-agentic option.
 2. **Optional AI features:** GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or Agnes 2.5 Flash can enhance failed/sub-75%-confidence regions or reason over parsed content.
 
 Local parsing can run without a cloud key. Optional features require the key for the selected provider and may send document content to it.
@@ -159,7 +159,7 @@ Stop if the selected provider or a configured custom destination is unexpected.
 
 **Important:** Fast mode is not automatically local-only when classification is enabled. AI enhancement is a separate toggle and defaults off.
 
-For a local-only run, avoid pure AI and turn off:
+For a local-only run, avoid **AI ADE** and turn off:
 
 - **AI enhancement for failed or <75% confidence regions**;
 - **Classify document type**;
@@ -242,7 +242,7 @@ ADE mode is a group of presets for optional AI features. It is not a connection 
 
 Changing one of the preset-controlled switches can move the mode to **Custom**.
 
-ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; pure AI remains its own explicit engine.
+ADE presets do not change the selected extraction engine. Grounded routes preserve their engine-owned structure before optional document features run; **AI ADE** remains its own explicit engine.
 
 Changing Markdown enhancement or visual-recovery settings changes the parse identity and resets current document results. Download anything needed before changing them. Changing classification or TOC settings reruns optional document analysis against the reusable parse. Switching **Use custom form routing** resets current whole-document and routed extraction results.
 
