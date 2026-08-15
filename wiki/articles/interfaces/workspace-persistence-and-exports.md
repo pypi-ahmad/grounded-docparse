@@ -1,7 +1,7 @@
 ---
 tags: workspace, persistence, exports
 sources: src/grounded_docparse/workspace_store.py, src/grounded_docparse/native.py
-snapshot: content-38d4697fdd99
+snapshot: content-c97be855760c
 status: released
 ---
 

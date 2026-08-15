@@ -1,10 +1,10 @@
 # Grounded Document Parser
 
-A workstation-oriented Streamlit studio that parses native documents, scanned PDFs, and images with explicit per-file routing. Native PDFs use `pdf-inspector`; Word, PowerPoint, Excel, CSV, HTML, EPUB, and other supported native formats use Docling without OCR. Scanned PDFs and images retain the local GLM-OCR or PaddleOCR-VL-1.6 pipeline. Optional LangExtract extraction is grounded back to immutable source text and anchors.
+A workstation-oriented Streamlit studio with six mutually exclusive document-extraction engines, explicit per-file routing, and optional AI enhancement. The application runs natively on Windows; its existing GLM-OCR and PaddleOCR-VL-1.6 vLLM services remain isolated in WSL.
 
 Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ahmad/grounded-docparse)
 
-For OCR inputs, the selected local OCR engine owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. PaddleOCR-VL-1.6 uses the full PP-DocLayoutV3 plus PaddleOCR-VL-1.6-0.9B pipeline with a local vLLM recognition backend. Luna visual recovery can replace only text on an existing element when the returned confidence is at least `0.85`; additions, deletions, geometry changes, type changes, and reading-order changes are ignored. Every Luna request uses medium reasoning effort.
+For grounded OCR inputs, the selected local engine owns layout, element IDs, normalized bounding boxes, types, confidence, and reading order. Optional AI enhancement runs only for failed regions or regions below 75% confidence. It may replace text on an existing grounded element, but cannot add or remove regions or change geometry, type, or reading order.
 
 Native inputs preserve their original structure. Each element has an immutable `base_text` span and a `SourceAnchor` that identifies its page, paragraph, slide, shape, sheet/cell, table, or CSV row/column. Embedded native-document images are recorded as assets and are not OCRed in v1.
 
@@ -12,7 +12,7 @@ Native inputs preserve their original structure. Each element has an immutable `
 upload
   -> required processing-type selection for every file
   -> signature/container validation
-  -> native PDF / mixed PDF / Docling / scanned-image pipeline
+  -> selected extraction engine and explicit document route
   -> immutable base_text, source spans, and anchors
   -> Markdown, JSON, and source-structure outputs
   -> optional grounded LangExtract, classification, TOC, refinement, and chat
@@ -24,11 +24,35 @@ Supported processing types are `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`,
 
 ![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
 
-Scanned PDFs and images are rendered to pixels. Native PDFs use `pdf-inspector` for native text, layout, tables, and positions; `pdf-inspector` never performs OCR. Docling handles supported native Office, CSV, HTML, EPUB, and related formats with OCR, VLM, remote services, plugins, and model enrichments disabled. If at least one scanned page is nonblank and none of the nonblank pages contains a local OCR layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
+Scanned PDFs and images are rendered to pixels. Native PDFs can use `pdf-inspector` for text, layout, tables, and positions without OCR. Docling handles supported native Office, CSV, HTML, EPUB, and related formats; its RapidOCR engine provides the OCR-enabled Docling option. If a scanned document has no usable grounded layout regions, parsing stops before optional AI features run; isolated page failures remain visible as warnings.
 
 For a Mixed PDF, `pdf-inspector` suggests a Native or OCR route per page. The user reviews the page table, may override suggestions, confirms every page, and receives the merged result in original page order. A Native PDF with unusable pages stops and suggests Mixed PDF instead of silently falling back.
 
-When GLM-OCR is selected, form-heavy scans receive a GLM-only recovery pass for every eligible risky region, capped at three per page. For PDFs parsed with PaddleOCR-VL, incomplete checkbox tables may receive a conservative local recovery pass; a state is accepted only when independent 190 and 200 DPI parses agree. Both engines then enter the same deterministic quality and optional Luna-recovery stages.
+The native CPU PP-DocLayoutV3 detector grounds region crops for GLM-OCR vLLM and all three Ollama recognizers. PaddleOCR-VL-1.6 vLLM retains its existing full Paddle layout-parsing service. Detector geometry and order remain authoritative even when recognition for one region fails.
+
+## Extraction engines and AI models
+
+Only one extraction engine can be active at a time. Selecting a WSL vLLM engine stops the other GPU model before loading and warming the requested model. Ollama lifecycle is independent of the WSL services.
+
+| Engine | Runtime | Behavior |
+| --- | --- | --- |
+| Pure AI agentic extraction | Selected cloud AI provider | Direct agentic extraction without a local OCR stage |
+| PaddleOCR-VL-1.6 | Existing WSL vLLM/PaddleX services | Full PP-DocLayoutV3 plus PaddleOCR-VL-1.6 pipeline |
+| GLM-OCR | WSL vLLM recognition + Windows CPU layout | PP-DocLayoutV3-grounded region recognition through loopback port `8080` |
+| Docling + RapidOCR | Native Windows | Docling conversion with RapidOCR |
+| PDF Inspector (no OCR) | Native Windows | Selectable-text PDF structure extraction only |
+| Local Ollama | Native Windows Ollama + Windows CPU layout | PP-DocLayoutV3-grounded GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR recognition |
+
+The Ollama model choices are `glm-ocr:latest`, `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`. Models are pulled lazily, warmed when selected, and unloaded when the selection changes.
+
+AI extraction and enhancement can use the following selectable providers:
+
+| Model | Input / 1M tokens | Output / 1M tokens | Notes |
+| --- | ---: | ---: | --- |
+| GPT 5.6 Luna | $0.20 | $1.20 | Cached input: $0.02 / 1M tokens |
+| Gemini 3.5 Flash Lite | $0.30 | $2.50 | Lowest-cost Gemini option; batch pricing is not used by this synchronous app |
+| Gemini Flash 3.7 | $0.75 | $3.75 | Promotional rate represented through December 31, 2026 |
+| Agnes 2.5 Flash | Free | Free | Uses the Agnes API gateway |
 
 ## Install and set up
 
@@ -47,14 +71,18 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
    .\Launch-Grounded-DocParse.cmd
    ```
 
-   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. Setup reuses a healthy Ubuntu user or securely prompts once for Linux credentials.
+   On a release, run `GroundedDocParse-<version>-Setup.exe` instead; Git is not required. The launcher installs missing `uv`, Python 3.12, native dependencies, PP-DocLayoutV3 assets, and Windows Ollama, then opens <http://localhost:8600>.
 
-3. Optional: enable Luna visual recovery and document reasoning by saving the OpenAI values in the Windows user environment. Skip this step for local-only parsing.
+3. Optional: enable an AI provider by saving its key in the Windows User environment. Skip this step for local-only parsing.
 
    ```powershell
    [Environment]::SetEnvironmentVariable("OPENAI_API_KEY", "your-key", "User")
    # Optional OpenAI-compatible endpoint:
    # [Environment]::SetEnvironmentVariable("OPENAI_BASE_URL", "https://example.com/v1", "User")
+   [Environment]::SetEnvironmentVariable("GOOGLE_API_KEY", "your-key", "User")
+   [Environment]::SetEnvironmentVariable("AGNES_API_KEY", "your-key", "User")
+   # Optional Agnes-compatible endpoint:
+   # [Environment]::SetEnvironmentVariable("AGNES_BASE_URL", "https://example.com/v1", "User")
    ```
 
 4. To prepare either optional WSL GPU service, run its dedicated setup command:
@@ -64,17 +92,17 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
    .\Setup-PaddleOCR-VL-1.6.cmd
    ```
 
-   The launcher checks and repairs setup before opening the app. Use `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` to install, activate, and warm a specific GPU engine without launching a second model.
+   Each setup command installs, activates, and warms its GPU engine. At runtime, selecting one WSL engine unloads the other before starting the requested service.
 
 `Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. It does not rewrite `.wslconfig`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` keeps the former WSL-hosted app available for one migration release. See [setup](SETUP.md) for details.
 
 For a manual development install of native parsing and grounded extraction, use:
 
 ```powershell
-uv sync --locked --extra native
+uv sync --locked --extra native --extra windows-layout
 ```
 
-The native extra provides `pdf-inspector`, Docling, and LangExtract. Native parsing itself does not OCR embedded images.
+The native extra provides `pdf-inspector`, Docling, RapidOCR, and LangExtract. The `windows-layout` extra installs the CPU PP-DocLayoutV3 dependencies.
 
 ## Supported inputs and routing
 
@@ -82,7 +110,7 @@ Every uploaded file has its own required processing-type selector. Batch files m
 
 | File | Required selection | Pipeline |
 | --- | --- | --- |
-| `invoice.pdf` | Native PDF / Scanned PDF / Mixed PDF | `pdf-inspector`, existing OCR, or reviewed per-page merge |
+| `invoice.pdf` | Native PDF / Scanned PDF / Mixed PDF | `pdf-inspector`, selected extraction engine, or reviewed per-page merge |
 | `report.docx` | Word | Docling native extraction |
 | `slides.pptx` | PowerPoint | Docling native extraction |
 | `accounts.xlsx` | Excel | Docling native extraction |
@@ -96,11 +124,11 @@ Wrong combinations are blocked. For example, a DOCX cannot be selected as Native
 
 1. Upload up to 20 supported files (250 MB per file and 1 GB combined). Files are processed sequentially. An optional inclusive page range is available only for one scanned PDF; native and mixed inputs process the selected document structure/pages.
 2. Select a processing type for every file in **Processing types**. For Mixed PDF, review the suggested page routes, override any page, and confirm the complete table before processing.
-3. For scanned PDFs and images, choose **GLM-OCR** or **PaddleOCR-VL-1.6** from **Document extraction model**, then choose an **ADE mode** for optional Luna features:
-   - **Fast**: classification is the only preset-controlled Luna feature; visual recovery is a separate toggle and defaults on when a key is available.
+3. Select exactly one extraction-engine toggle. For **Local Ollama**, also select GLM-OCR, PaddleOCR-VL-1.6, or DeepSeek-OCR. Choose the AI model separately when using pure AI extraction or optional enhancement.
+4. For every engine except pure AI, optionally enable **AI enhancement for failed or <75% confidence regions**. Then choose an **ADE mode** for other AI features:
+   - **Fast**: classification is the only preset-controlled AI feature.
    - **Full**: Markdown refinement, classification, and TOC generation.
    - **Custom**: any other combination of those toggles.
-4. Keep visual recovery enabled to inspect prioritized hard regions. The Luna budget scales from eight crops to the configured ceiling of 64 based on document length and remains capped at three crops per page.
 5. Select **Parse document** or **Process documents**. A failed file does not stop the rest of the queue; running the batch again retries failures and skips unchanged completed files.
 6. Choose a file from **Document results**. Native results expose Overview, Markdown, JSON, source structure, Extract, optional Chat, and Layout Tree. Annotated PDF is shown only when the pipeline produces a visual artifact.
 7. Download individual results or **Download all outputs**. The ZIP includes every original, a manifest, Markdown, full JSON, extraction JSON when requested, and annotated PDF only when available.
@@ -129,7 +157,7 @@ Markdown supports a table or bullet list (not both), with an optional H1 schema 
 
 Supported types are `string`, `number`, `integer`, `boolean`, and `date`. Imports populate an editable draft and do not save automatically. Without a Markdown H1, the filename becomes the schema name.
 
-For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. Luna classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. After all segments are approved, **Download split documents** exports every segment as separate PDF, Markdown, and JSON files in a dedicated ZIP. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
+For mixed-form PDFs, enable **Use custom form routing** in Extract. A reusable routing profile defines category keys and descriptions, which categories are extractable, and the saved extraction schema assigned to each eligible category. The selected AI model classifies contiguous page ranges from grounded Markdown/layout; results below 85% confidence require review. Users may correct ranges and categories before selecting **Extract eligible forms**. Only approved, eligible segments are sent for extraction. After all segments are approved, **Download split documents** exports every segment as separate PDF, Markdown, and JSON files in a dedicated ZIP. Routing profiles support the same editable, JSON, and Markdown workflows as extraction schemas; `other` is always a non-extractable fallback.
 
 Chat is off by default and sends no request until enabled and a question is submitted. **Show source** actions open the cited annotated page and highlight the local-OCR-owned box.
 
@@ -187,8 +215,8 @@ grounded-docparse parse .\incoming --schema invoice.md --output results --overwr
 - Native document JSON schema 5.0.0, or combined native/extraction JSON schema 5.1.0, with units, elements, assets, source spans, `SourceAnchor` values, and requested/effective routes
 - Extraction JSON v1.1.0 with values, evidence, `element_id`, source text, confidence, and local-OCR-owned normalized boxes
 - Native extraction JSON with exact `char_interval` evidence and resolved source anchors
-- Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed Luna-recovery boxes when a visual artifact is available
-- Run metadata including GLM, Luna recovery, and Luna agentic timing
+- Annotated PDF with semantic colors, reading-order labels, selected-element highlighting, and dashed AI-recovery boxes when a visual artifact is available
+- Run metadata including local-engine, AI recovery, and agentic timing
 
 Annotated PDF bytes are downloaded separately and are not embedded in JSON. Native nonvisual formats may have no annotated PDF at all. Reusable extraction schemas, routing profiles, and the active batch workspace persist in the gitignored SQLite database at `data/document_studio.sqlite3` unless `DOCPARSE_STUDIO_DB_PATH` overrides it. Source bytes and parse artifacts live beside that database under `workspaces/`.
 
@@ -226,14 +254,14 @@ analysis = agent.analyze(result, classify=True, generate_toc=False)
 full_json = render_combined_result(result, analysis)
 ```
 
-`DocumentParser.parse` is synchronous for the legacy OCR pipeline. `UniversalDocumentParser.parse` is synchronous for manually selected native, scanned, mixed, and image routes. Luna failures do not invalidate a successful local OCR parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
+`DocumentParser.parse` is synchronous for the grounded OCR pipeline. `UniversalDocumentParser.parse` is synchronous for manually selected native, scanned, mixed, and image routes. AI-provider failures do not invalidate a successful local parse; unavailable or failed optional features expose warnings or feature statuses. See the complete [Python API contract](docs/api.md).
 
 ## Repository layout
 
 ```text
 .
-├── Setup-GLM-OCR.cmd             # First-run Windows/WSL bootstrap and launch
-├── Launch-Grounded-DocParse.cmd   # Check setup and launch the app
+├── Launch-Grounded-DocParse.cmd   # Repair and launch the native Windows app
+├── Launch-Grounded-DocParse-WSL-Legacy.cmd # Temporary WSL app fallback
 ├── Setup-GLM-OCR.cmd              # Install and warm GLM-OCR on GPU
 ├── Setup-PaddleOCR-VL-1.6.cmd     # Install and warm PaddleOCR-VL on GPU
 ├── paddle-runtime/               # Isolated locked Paddle/vLLM environment
@@ -244,6 +272,7 @@ full_json = render_combined_result(result, analysis)
 │   ├── native_parsers.py         # pdf-inspector and Docling native pipelines
 │   └── native_extraction.py      # Grounded LangExtract integration
 ├── config/glmocr.yaml            # Source GLM-OCR SDK configuration
+├── scripts/windows/              # Native Windows setup and app lifecycle
 ├── scripts/wsl/                  # Locked WSL setup and launch scripts
 ├── scripts/                      # Corpus generation and evaluation utilities
 ├── benchmarks/                   # Versioned corpus, schemas, rate cards, baselines
@@ -309,27 +338,3 @@ absolute/baseline regression gates, use the
 and locked holdout documents remain outside the repository.
 
 Licensed under the [MIT License](LICENSE).
-# Engine and AI model selection
-
-The Streamlit sidebar owns the active extraction engine. A new session selects and
-warms PP-DocLayoutV3 + PaddleOCR-VL-1.6 by default. Selecting GLM-OCR unloads that
-stack and warms GLM-OCR; selecting a non-vLLM engine releases the managed vLLM
-stack. Local Ollama is independent and offers `glm-ocr:latest`,
-`AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`.
-
-AI tasks can use GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or free Agnes 2.5 Flash. Set keys
-as Windows User environment variables (recommended) or copy `.env.example` to
-`.env`. The app reads only its root `.env` and never overrides existing process
-environment values:
-
-```text
-OPENAI_API_KEY=...
-OPENAI_BASE_URL=...  # optional
-GOOGLE_API_KEY=...
-AGNES_API_KEY=...
-AGNES_BASE_URL=...  # optional
-OLLAMA_BASE_URL=http://127.0.0.1:11434  # optional, loopback only
-```
-
-Use `Launch-Grounded-DocParse.cmd` for normal startup. It installs or starts the
-independent Windows Ollama service when required; Ollama model downloads remain lazy.
