@@ -28,7 +28,7 @@ From the repository mounted inside Ubuntu 24.04:
 
 ```bash
 bash scripts/wsl/setup-paddleocr.sh
-DOCPARSE_START_ENGINE=paddleocr-vl-1.6 bash scripts/wsl/launch-stack.sh
+bash scripts/wsl/manage-ocr-stack.sh ensure paddleocr-vl-1.6
 ```
 
 The setup uses `paddle-runtime/pyproject.toml` and `paddle-runtime/uv.lock`. The locked runtime includes PaddleOCR 3.7.0, PaddlePaddle 3.3.1, PaddleX 3.7.0, and their compatible vLLM server stack. Do not install these packages into the main project environment.

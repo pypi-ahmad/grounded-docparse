@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-988eedb6f7e0",
-    "base_commit": "528a912da5fefad77b30c13850ddc46ceb5851ea",
+    "id": "content-ddfa7664ade5",
+    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:08:02.822559+00:00",
+  "generated_at": "2026-08-15T14:44:11.328906+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -216,8 +216,8 @@
     },
     {
       "path": "tests/test_engine_selection.py",
-      "sha256": "fdd53524e35cc9e027dbf32c737a7783dddff2ccad4030f36116c58c7b49d517",
-      "size": 5978
+      "sha256": "83bdd8359ec6728db1e82cb74ae7c0a00740bdf049d71fed4e376f79d449fe5a",
+      "size": 6320
     },
     {
       "path": "tests/test_evaluation_calibration.py",
@@ -266,8 +266,8 @@
     },
     {
       "path": "tests/test_launcher_contract.py",
-      "sha256": "d7718d67b52efdbcd28bb702feb2e010daa6cfdd6347e509e303ccd9bbf286db",
-      "size": 12181
+      "sha256": "6677b01805282489a1171b02cd54b4030e7d00e72297e6a35a5c86cb84c7fd29",
+      "size": 10152
     },
     {
       "path": "tests/test_markdown_enhancement.py",
@@ -341,8 +341,8 @@
     },
     {
       "path": "tests/test_runtime_control.py",
-      "sha256": "af0f44f459b69d5b42fb6fae487bff6151c44a70e631f604eeef37f041b7124b",
-      "size": 1535
+      "sha256": "ac14294207e3d359ff21897e11352180bcdee4dc82a72abb08754ffd34ebb30f",
+      "size": 1688
     },
     {
       "path": "tests/test_schema_store.py",
@@ -356,13 +356,13 @@
     },
     {
       "path": "tests/test_simple_pipeline.py",
-      "sha256": "8a9529dac4be2481cd6e1bd80f711e2dfaed78a2936cf9103693be5ef1da2828",
-      "size": 83474
+      "sha256": "cd4ddf068cb316213292cb6de1e5896a27007a2ac992ed1977e79b6444d13c02",
+      "size": 84277
     },
     {
       "path": "tests/test_simple_streamlit.py",
-      "sha256": "b6e89433a733abfab02e019894791a5fe59d44921f71737ed4935baf59e70527",
-      "size": 40169
+      "sha256": "a9b3a56c997e55d3ccddeade9a3c5b90866ce159bad13483361690ed9dc8d393",
+      "size": 40725
     },
     {
       "path": "tests/test_strict_recovery_contract.py",
@@ -381,8 +381,13 @@
     },
     {
       "path": "tests/test_windows_installer.py",
-      "sha256": "91a33f1362cf2ca24020308118c10d038a115e26a7d1a19bfd75d04160bcb8f0",
-      "size": 2591
+      "sha256": "10cb3ca2365d51967403afae67f910c42c8cf0a200f997f26d4336bac8f96b83",
+      "size": 3813
+    },
+    {
+      "path": "tests/test_windows_setup.py",
+      "sha256": "0ab1e727817eb76a6aa4cd18ecad26236ed0aed47407db4016d56f12b4c22ddd",
+      "size": 1339
     },
     {
       "path": "tests/test_workspace_store.py",

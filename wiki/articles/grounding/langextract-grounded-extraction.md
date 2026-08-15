@@ -1,7 +1,7 @@
 ---
 tags: langextract, extraction, grounding
 sources: src/grounded_docparse/native_extraction.py, docs/spec.md
-snapshot: content-988eedb6f7e0
+snapshot: content-ddfa7664ade5
 status: released
 ---
 

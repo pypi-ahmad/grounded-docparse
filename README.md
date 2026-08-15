@@ -43,7 +43,7 @@ Only one extraction engine can be active at a time. Selecting a WSL vLLM engine 
 | PDF Inspector (no OCR) | Native Windows | Selectable-text PDF structure extraction only |
 | Local Ollama | Native Windows Ollama + Windows CPU layout | PP-DocLayoutV3-grounded GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR recognition |
 
-The Ollama model choices are `glm-ocr:latest`, `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`. Models are pulled lazily, warmed when selected, and unloaded when the selection changes. Every OCR request uses an 8,192-token context and a 4,096-token output ceiling; warm-up uses the same multimodal path but generates at most one token.
+Fresh workspaces default to Local Ollama with `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`; restored workspaces keep their saved engine and model. The first native launch downloads the app's three OCR choices (`glm-ocr:latest`, `AuditAid/PaddleOCR-VL-1.6-0.9B:latest`, and `deepseek-ocr:latest`) plus PP-DocLayoutV3. Later launches reuse those disk caches offline-first. All three Ollama recognizers use native Windows CPU PP-DocLayoutV3 for authoritative layout and crops. Switching models unloads VRAM only—it does not delete weights—and uninstall preserves the caches until they are manually removed. Every OCR request uses an 8,192-token context and a 4,096-token output ceiling; warm-up uses the same multimodal path but generates at most one token.
 
 For vLLM and Ollama primary engines, **Cross-check uncertain regions with alternate local OCR** audits the existing bounded risk queue without replacing primary text. Choose PP-DocLayoutV3 + Ollama GLM-OCR, PP-DocLayoutV3 + Ollama PaddleOCR-VL-1.6, CPU RapidOCR, WSL vLLM PaddleOCR-VL-1.6, or WSL vLLM GLM-OCR. GPU-backed choices are loaded once for the crop batch, then the primary model is restored and warmed; this can add model-swap time.
 
@@ -96,7 +96,7 @@ The primary app runs natively on Windows 11 22H2 or newer. Its first launch inst
 
    Each setup command installs, activates, and warms its GPU engine. At runtime, selecting one WSL engine unloads the other before starting the requested service.
 
-`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. `OLLAMA_BASE_URL` defaults to `http://127.0.0.1:11434` and accepts only a loopback origin. Each launch stops only verified Grounded DocParse Streamlit processes, clears transient Streamlit cache state, and preserves the durable workspace and WSL OCR services. It does not rewrite `.wslconfig`. `Launch-Grounded-DocParse-WSL-Legacy.cmd` keeps the former WSL-hosted app available for one migration release. See [setup](SETUP.md) for details.
+`Launch-Grounded-DocParse.cmd` refreshes OpenAI, Google, Agnes, and Ollama settings from Windows user scope each time. `OLLAMA_BASE_URL` defaults to `http://127.0.0.1:11434` and accepts only a loopback origin. Each launch stops only verified Grounded DocParse Streamlit processes, clears transient Streamlit cache state, and preserves the durable workspace and WSL OCR services. It does not rewrite `.wslconfig`. Streamlit runs only on native Windows; WSL remains dedicated to the optional GLM-OCR and PaddleOCR-VL services. See [setup](SETUP.md) for details.
 
 For a manual development install of native parsing and grounded extraction, use:
 
@@ -265,7 +265,6 @@ full_json = render_combined_result(result, analysis)
 ```text
 .
 ├── Launch-Grounded-DocParse.cmd   # Repair and launch the native Windows app
-├── Launch-Grounded-DocParse-WSL-Legacy.cmd # Temporary WSL app fallback
 ├── Setup-GLM-OCR.cmd              # Install and warm GLM-OCR on GPU
 ├── Setup-PaddleOCR-VL-1.6.cmd     # Install and warm PaddleOCR-VL on GPU
 ├── paddle-runtime/               # Isolated locked Paddle/vLLM environment

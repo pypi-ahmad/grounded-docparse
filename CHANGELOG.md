@@ -12,15 +12,21 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Six mutually exclusive extraction engines: AI ADE, PaddleOCR-VL-1.6 vLLM, GLM-OCR vLLM, Docling with RapidOCR, PDF Inspector without OCR, and local Ollama with GLM-OCR, PaddleOCR-VL, or DeepSeek-OCR.
 - Selectable GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash providers.
-- Native Windows application setup, CPU PP-DocLayoutV3 grounding, automatic Ollama installation, and a temporary legacy WSL app launcher.
+- Native Windows application setup, CPU PP-DocLayoutV3 grounding, and automatic Ollama installation.
 
 ### Changed
+
+- Fixed Local Ollama element provenance, made Local Ollama with PaddleOCR-VL the fresh-workspace default, and added offline-first first-launch preparation for native PP-DocLayoutV3 plus all three supported Ollama OCR models. Model caches now survive app uninstall.
 
 - Kept GLM-OCR and PaddleOCR-VL vLLM services isolated in WSL while moving Streamlit, native parsing, Ollama, and layout grounding to Windows.
 - Added exclusive model load/warm/unload lifecycle and optional AI enhancement for failed or sub-75%-confidence grounded regions.
 - Moved the managed Streamlit UI from loopback port `8600` to `7137`; native launch now safely clears verified prior app sessions without stopping WSL OCR services.
 - Kept the native launcher terminal open with live Streamlit, GLM-OCR, PaddleOCR, and Ollama logs, plus a final keypress pause after the app stops.
 - Added a launch-scoped Session cost view with per-model input, cached-input, output-token, and estimated-cost totals.
+
+### Removed
+
+- Removed the temporary WSL-hosted Streamlit launcher and lifecycle scripts; WSL remains dedicated to GLM-OCR and PaddleOCR-VL services.
 
 ## [0.6.1] - 2026-08-13
 

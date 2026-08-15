@@ -273,7 +273,7 @@ The most frequently consumed exported models have these fields:
 
 | Model | Fields |
 | --- | --- |
-| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, or `luna-recovery`) |
+| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, `deepseek-ocr`, or `luna-recovery`) |
 | `ChatSource` | `element_id`, `page`, `text` |
 | `ChatAnswer` | `answer`, `sources`, `confidence` (`high`, `medium`, `low`), `usage`, `trace` |
 | `SchemaProposal` | `instruction`, `json_schema`, `usage` |

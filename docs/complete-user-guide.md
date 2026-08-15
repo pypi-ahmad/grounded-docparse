@@ -1115,7 +1115,7 @@ An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
 The database's sibling `workspaces` directory stores the active batch's source bytes, selected-page source, annotated PDF, and parse checkpoint. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
 
-Starting the managed Windows launcher deliberately replaces any verified native or legacy WSL Streamlit app process and clears Streamlit's transient cache. This starts a fresh UI session but does not delete the SQLite workspace, stored source/result artifacts, models, or warm WSL OCR services.
+Starting the managed Windows launcher deliberately replaces any verified native Streamlit app process and clears Streamlit's transient cache. This starts a fresh UI session but does not delete the SQLite workspace, stored source/result artifacts, models, or warm WSL OCR services.
 
 ### 18.2 What is session-only
 

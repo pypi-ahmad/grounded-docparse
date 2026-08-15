@@ -230,28 +230,22 @@ Later sessions use the same launcher. Use `Setup-GLM-OCR.cmd` or
 
 The generic launcher refreshes User-scope provider settings and opens the app. The UI keeps the two WSL GPU models mutually exclusive.
 
-### 5.5 Manual WSL launch
+### 5.5 Manual WSL GPU service launch
 
-Inside Ubuntu, setup and launch both services with:
+Inside Ubuntu, setup and launch GLM-OCR with:
 
 ```bash
 bash scripts/wsl/setup-glmocr.sh
-bash scripts/wsl/launch-stack.sh
+bash scripts/wsl/manage-ocr-stack.sh ensure glm-ocr
 ```
 
-For foreground development, use two WSL terminals:
+For foreground GPU-service development, run:
 
 ```bash
-# Terminal 1
 bash scripts/wsl/serve-glmocr.sh
 ```
 
-```bash
-# Terminal 2
-bash scripts/wsl/run-app.sh
-```
-
-Both managed services bind to loopback. Do not override that boundary on an untrusted network.
+The GPU service and native Windows app bind to loopback. Do not override that boundary on an untrusted network.
 
 ## 6. Your first successful parse
 
