@@ -1,7 +1,7 @@
 ---
 tags: installation, runtime, windows, wsl
 sources: scripts/wsl/setup-glmocr.sh, installer/Install-GroundedDocParse.ps1, SETUP.md
-snapshot: content-ddfa7664ade5
+snapshot: content-a3c6bf27aca5
 status: released
 ---
 
