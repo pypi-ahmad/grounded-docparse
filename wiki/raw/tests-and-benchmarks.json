@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-31c9fc402d46",
-    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
+    "id": "content-063b756c4b68",
+    "base_commit": "336cea1137b7d09855c80adafa06fe6f3398740a",
     "branch": "main",
-    "dirty": false
+    "dirty": true
   },
-  "generated_at": "2026-08-15T16:31:09.285567+00:00",
+  "generated_at": "2026-08-15T16:45:56.192248+00:00",
   "category": "tests-and-benchmarks",
   "files": [
     {
@@ -216,8 +216,8 @@
     },
     {
       "path": "tests/test_engine_selection.py",
-      "sha256": "84684bcfed2560d9ec4c119d4c612bafbf9fed8873424bdcea45c4fc72ba3461",
-      "size": 8031
+      "sha256": "c8d81118df9fe18c15b060e062511209871ea52c62dd3985b761a6687a4ccc22",
+      "size": 8030
     },
     {
       "path": "tests/test_evaluation_calibration.py",
@@ -256,7 +256,7 @@
     },
     {
       "path": "tests/test_grounded_ocr.py",
-      "sha256": "fea6d0de271aeec93c92e9276dacf3362c0ef3af28393f5379faefd90543f285",
+      "sha256": "f8ce39618a776085d576e4ec483950c25167553053d3f66f69d873063fd4c54f",
       "size": 3260
     },
     {

@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-31c9fc402d46",
-    "base_commit": "08e8d0b0a5c1e08e692a6aa978b1aece7dc18c68",
+    "id": "content-063b756c4b68",
+    "base_commit": "336cea1137b7d09855c80adafa06fe6f3398740a",
     "branch": "main",
-    "dirty": false
+    "dirty": true
   },
-  "generated_at": "2026-08-15T16:31:09.285567+00:00",
+  "generated_at": "2026-08-15T16:45:56.192248+00:00",
   "categories": {
     "application-code": 37,
-    "documentation": 43,
+    "documentation": 46,
     "tests-and-benchmarks": 79,
     "runtime-and-operations": 24,
-    "contracts-and-configuration": 9
+    "contracts-and-configuration": 10
   },
-  "total_files": 192
+  "total_files": 196
 }

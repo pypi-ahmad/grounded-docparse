@@ -1,7 +1,7 @@
 ---
 tags: anchors, spans, provenance
 sources: src/grounded_docparse/native.py, src/grounded_docparse/docling_native.py
-snapshot: content-31c9fc402d46
+snapshot: content-063b756c4b68
 status: released
 ---
 
