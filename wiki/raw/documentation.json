@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-ddfa7664ade5",
-    "base_commit": "425e60725935262a67599e2013607ab6b16ae496",
+    "id": "content-c93637e72f7d",
+    "base_commit": "bff17eec66afe7633d629fc193ef275cc09b19d9",
     "branch": "feature/multi-engine-document-extraction",
     "dirty": true
   },
-  "generated_at": "2026-08-15T14:44:11.328906+00:00",
+  "generated_at": "2026-08-15T15:20:47.110236+00:00",
   "category": "documentation",
   "files": [
     {
@@ -36,8 +36,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "480ef612be641a67dfab3eea184870bb1e922881bb76f4070970b7e216bfe83e",
-      "size": 25858
+      "sha256": "8510ca573e25af069d1640149caa60bf2bfffef31958410b7668f6b9c2ab256a",
+      "size": 26061
     },
     {
       "path": "SECURITY.md",
@@ -46,8 +46,8 @@
     },
     {
       "path": "SETUP.md",
-      "sha256": "8c1565c31cc7bcc0c21f6df1931935c56aaaea1bc29421d989e196f4b9aaec36",
-      "size": 19518
+      "sha256": "0911e082db7c92b3e462485cb0b04219ce3dbbf285818500cd31b3f12b481df0",
+      "size": 19677
     },
     {
       "path": "TECHNICAL.md",

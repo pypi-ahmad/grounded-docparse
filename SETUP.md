@@ -33,13 +33,13 @@ The native launcher:
 1. imports supported provider settings from Windows User environment variables;
 2. installs or reuses `uv` and Python 3.12 in `%LOCALAPPDATA%\GroundedDocParse\venv`;
 3. synchronizes the locked `native` and `windows-layout` dependency sets;
-4. downloads the pinned PP-DocLayoutV3 detector and all three supported Local Ollama OCR models on first launch, then reuses their persistent disk caches;
+4. downloads the pinned PP-DocLayoutV3 detector, all three supported Local Ollama OCR models, and the Docling layout/TableFormer/RapidOCR assets on first launch, then validates and reuses their persistent disk caches;
 5. installs missing Windows Ollama using `irm https://ollama.com/install.ps1 | iex`;
 6. starts Streamlit on loopback port `7137`, stores logs/state under `%LOCALAPPDATA%\GroundedDocParse`, and keeps the terminal open with live app and OCR logs.
 
 Run `Setup-GLM-OCR.cmd` or `Setup-PaddleOCR-VL-1.6.cmd` only to provision and warm the corresponding WSL GPU service. Switching those engines in the native UI starts one and unloads the other. Streamlit itself runs only on native Windows.
 
-Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and local-cache checks skip healthy dependencies. Native layout weights use the Windows Hugging Face cache and Ollama weights use Ollama's model store; WSL service weights remain in their existing persistent caches. Launches and workspace clearing do not delete them, and uninstall preserves them for manual removal.
+Setup pins `uv` 0.11.32, Python 3.12.10, GLM-OCR, PP-DocLayoutV3, and Ollama 0.32.0. GPU installs use both the `local-ocr` and `native` extras; CPU/AMD installs use `local-ocr-cpu` and `native`. The native extra installs `pdf-inspector`, Docling, and LangExtract. Lock hashes and local-cache manifests skip healthy dependencies and model assets. Native layout weights use the Windows Hugging Face cache, Ollama weights use Ollama's model store, and Docling layout/TableFormer/RapidOCR weights use the Windows Docling cache; WSL service weights remain in their existing persistent caches. Launches and workspace clearing do not delete them, and uninstall preserves them for manual removal.
 
 ## Native document ingestion
 

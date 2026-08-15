@@ -1,7 +1,7 @@
 ---
 tags: pdf, native, pdf-inspector
 sources: src/grounded_docparse/native_parsers.py, src/grounded_docparse/native.py, docs/spec.md
-snapshot: content-ddfa7664ade5
+snapshot: content-c93637e72f7d
 status: released
 ---
 
