@@ -846,6 +846,9 @@ def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> 
     app = next(box for box in app.checkbox if box.label == "Page range").check().run(
         timeout=20
     )
+    app = next(item for item in app.number_input if item.label == "End").set_value(
+        2
+    ).run(timeout=20)
     app = next(item for item in app.number_input if item.label == "Start").set_value(
         2
     ).run(timeout=20)
