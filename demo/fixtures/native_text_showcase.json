@@ -1,0 +1,129 @@
+{
+  "document": {
+    "source_name": "native-text.pdf",
+    "source_sha256": "febf76d9e7f03f4ec84aa7e3a6b841801e7ba8f523021659b6d537850aa10dbf",
+    "source_format": "pdf",
+    "requested_processing_type": "native-pdf",
+    "base_text": "Synthetic Native Text Fixture\nRecord NATIVE-001 is public test data.\nStatus: complete",
+    "units": [
+      {
+        "id": "page-1",
+        "kind": "page",
+        "index": 1,
+        "label": "Page 1",
+        "requested_route": "native",
+        "effective_route": "native",
+        "parser": "pdf-inspector",
+        "warnings": []
+      }
+    ],
+    "elements": [
+      {
+        "id": "title",
+        "type": "heading",
+        "text": "Synthetic Native Text Fixture",
+        "reading_order": 0,
+        "source": {
+          "start": 0,
+          "end": 29,
+          "element_id": "title",
+          "anchor": {
+            "kind": "pdf",
+            "unit_id": "page-1",
+            "page": 1,
+            "bbox": [0.1, 0.1, 0.9, 0.2]
+          }
+        }
+      },
+      {
+        "id": "record-line",
+        "type": "paragraph",
+        "text": "Record NATIVE-001 is public test data.",
+        "reading_order": 1,
+        "source": {
+          "start": 30,
+          "end": 68,
+          "element_id": "record-line",
+          "anchor": {
+            "kind": "pdf",
+            "unit_id": "page-1",
+            "page": 1,
+            "bbox": [0.1, 0.25, 0.9, 0.35]
+          }
+        }
+      },
+      {
+        "id": "status-line",
+        "type": "paragraph",
+        "text": "Status: complete",
+        "reading_order": 2,
+        "source": {
+          "start": 69,
+          "end": 85,
+          "element_id": "status-line",
+          "anchor": {
+            "kind": "pdf",
+            "unit_id": "page-1",
+            "page": 1,
+            "bbox": [0.1, 0.4, 0.9, 0.5]
+          }
+        }
+      }
+    ],
+    "assets": [],
+    "warnings": []
+  },
+  "markdown": "# Synthetic Native Text Fixture\n\n**Record:** NATIVE-001\n\n**Status:** complete",
+  "extraction": {
+    "data": {
+      "record_id": "NATIVE-001",
+      "status": "complete"
+    },
+    "values": [
+      {
+        "pointer": "/record_id",
+        "extraction_class": "record_id",
+        "value": "NATIVE-001",
+        "evidence": {
+          "source_text": "NATIVE-001",
+          "char_interval": {"start": 37, "end": 47},
+          "source_spans": [
+            {
+              "start": 30,
+              "end": 68,
+              "element_id": "record-line",
+              "anchor": {
+                "kind": "pdf",
+                "unit_id": "page-1",
+                "page": 1,
+                "bbox": [0.1, 0.25, 0.9, 0.35]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "pointer": "/status",
+        "extraction_class": "status",
+        "value": "complete",
+        "evidence": {
+          "source_text": "complete",
+          "char_interval": {"start": 77, "end": 85},
+          "source_spans": [
+            {
+              "start": 69,
+              "end": 85,
+              "element_id": "status-line",
+              "anchor": {
+                "kind": "pdf",
+                "unit_id": "page-1",
+                "page": 1,
+                "bbox": [0.1, 0.4, 0.9, 0.5]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

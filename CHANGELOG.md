@@ -8,6 +8,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- A deployment-ready, read-only Streamlit showcase backed by contract-checked synthetic native
+  document and extraction fixtures.
+
 ## [0.6.0] - 2026-08-12
 
 ### Added

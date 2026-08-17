@@ -24,6 +24,23 @@ Supported processing types are `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`,
 
 ![Document Parse Studio ready for a document upload](docs/images/document-parse-studio-full.png)
 
+## Interactive showcase
+
+The deployment-ready showcase presents explicit Native PDF routing, grounded Markdown, source
+structure, and exact evidence-backed extraction using the repository's public synthetic fixture.
+It is read-only: it accepts no uploads and performs no OCR, provider calls, network requests, or
+persistence.
+
+Run the lightweight showcase without installing the OCR or native-parsing stacks:
+
+```powershell
+uvx --from streamlit==1.60.0 streamlit run demo/streamlit_app.py
+```
+
+For Streamlit Community Cloud, select `native-document-ingestion`, `demo/streamlit_app.py`, and
+Python 3.12. The entrypoint-local `demo/requirements.txt` installs only Streamlit. No secrets are
+required.
+
 Scanned PDFs and images are rendered to pixels. Native PDFs use `pdf-inspector` for native text, layout, tables, and positions; `pdf-inspector` never performs OCR. Docling handles supported native Office, CSV, HTML, EPUB, and related formats with OCR, VLM, remote services, plugins, and model enrichments disabled. If at least one scanned page is nonblank and none of the nonblank pages contains a local OCR layout region, parsing stops before Luna features run; isolated page failures remain visible as warnings.
 
 For a Mixed PDF, `pdf-inspector` suggests a Native or OCR route per page. The user reviews the page table, may override suggestions, confirms every page, and receives the merged result in original page order. A Native PDF with unusable pages stops and suggests Mixed PDF instead of silently falling back.
