@@ -3,7 +3,7 @@ from __future__ import annotations
 import threading
 from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 
 from .config import CloudModel
 from .models import AgentUsage
@@ -52,14 +52,11 @@ class SessionUsageLedger:
 
 
 def pricing_for(model: str, *, pricing_date: date | None = None) -> ModelPricing:
-    pricing_date = pricing_date or datetime.now().astimezone().date()
+    del pricing_date
     pricing = {
         CloudModel.GPT_5_6_LUNA.value: ModelPricing(0.20, 1.20, 0.02),
         CloudModel.GEMINI_3_5_FLASH_LITE.value: ModelPricing(0.30, 2.50),
-        CloudModel.GEMINI_3_7_FLASH.value: ModelPricing(
-            0.75 if pricing_date <= date(2026, 12, 31) else 1.50,
-            3.75 if pricing_date <= date(2026, 12, 31) else 7.50,
-        ),
+        CloudModel.GEMINI_3_7_FLASH.value: ModelPricing(0.75, 3.75),
         CloudModel.AGNES_2_5_FLASH.value: ModelPricing(0.0, 0.0),
     }
     return pricing.get(model, ModelPricing(0.0, 0.0))

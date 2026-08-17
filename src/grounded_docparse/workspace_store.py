@@ -31,7 +31,7 @@ from .native import (
     NativeParseResult,
 )
 
-WorkspaceStatus = Literal["pending", "processing", "interrupted", "complete", "failed"]
+WorkspaceStatus = Literal["pending", "processing", "complete", "failed"]
 
 
 @dataclass(slots=True)
@@ -441,6 +441,20 @@ class WorkspaceStore:
                 )
         documents: list[StoredWorkspaceDocument] = []
         for row in rows:
+            unfinished = row["status"] in {"processing", "interrupted"}
+            if unfinished:
+                with self._connect() as connection:
+                    connection.execute(
+                        """
+                        UPDATE batch_workspace_documents SET
+                            status='pending', error=NULL, selection_key=NULL,
+                            analysis_key=NULL, progress_json=NULL,
+                            result_json=NULL, analysis_json=NULL, extraction_json=NULL,
+                            updated_at=?
+                        WHERE document_id=?
+                        """,
+                        (_now(), row["document_id"]),
+                    )
             directory = self._directory(row["document_id"])
             source = (directory / "source.bin").read_bytes()
             result = None
@@ -454,6 +468,7 @@ class WorkspaceStore:
             if (
                 row["result_json"] is not None
                 and not incompatible
+                and not unfinished
                 and restore_error is None
             ):
                 try:
@@ -489,20 +504,9 @@ class WorkspaceStore:
                         """,
                         (restore_error, _now(), row["document_id"]),
                     )
-            status = "pending" if incompatible else row["status"]
+            status = "pending" if incompatible or unfinished else row["status"]
             if restore_error is not None:
                 status = "failed"
-            if status == "processing":
-                status = "interrupted"
-                with self._connect() as connection:
-                    connection.execute(
-                        """
-                        UPDATE batch_workspace_documents
-                        SET status='interrupted', updated_at=?
-                        WHERE document_id=?
-                        """,
-                        (_now(), row["document_id"]),
-                    )
             documents.append(
                 StoredWorkspaceDocument(
                     document=BatchDocument(
@@ -517,17 +521,19 @@ class WorkspaceStore:
                     error=(
                         restore_error
                         if restore_error is not None
-                        else (None if incompatible else row["error"])
+                        else (None if incompatible or unfinished else row["error"])
                     ),
-                    selection_key=None if incompatible else row["selection_key"],
+                    selection_key=(
+                        None if incompatible or unfinished else row["selection_key"]
+                    ),
                     analysis_key=(
                         None
-                        if incompatible or restore_error is not None
+                        if incompatible or unfinished or restore_error is not None
                         else row["analysis_key"]
                     ),
                     progress=(
                         json.loads(row["progress_json"])
-                        if row["progress_json"] and not incompatible
+                        if row["progress_json"] and not incompatible and not unfinished
                         else None
                     ),
                     parsed_source=parsed_source,

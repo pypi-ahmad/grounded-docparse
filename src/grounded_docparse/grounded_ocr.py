@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import math
 import re
 import threading
+import time
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import lru_cache
 from io import BytesIO
@@ -23,6 +26,8 @@ LAYOUT_THRESHOLD = 0.3
 MAX_REGIONS_PER_PAGE = 256
 _CONTROL_TOKEN = re.compile(r"<\|(?:im_end|md_continue|endofsentence)\|>")
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True, slots=True)
 class LayoutRegion:
@@ -32,6 +37,15 @@ class LayoutRegion:
     bbox: tuple[float, float, float, float]
 
 
+@dataclass(frozen=True, slots=True)
+class OcrProgressEvent:
+    image_path: Path
+    stage: str
+    current: int
+    total: int
+    message: str
+
+
 class LayoutDetector(Protocol):
     def detect(self, image_path: Path) -> list[LayoutRegion]: ...
 
@@ -39,7 +53,14 @@ class LayoutDetector(Protocol):
 class RegionRecognizer(Protocol):
     name: str
 
-    def recognize(self, image_bytes: bytes, region_type: str) -> str: ...
+    def recognize(
+        self,
+        image_bytes: bytes,
+        region_type: str,
+        *,
+        region_area: float = 0.0,
+        timeout_seconds: float | None = None,
+    ) -> str: ...
 
 
 def clean_ocr_output(value: str) -> str:
@@ -75,7 +96,15 @@ class GlmVllmRecognizer:
         self.timeout_seconds = timeout_seconds
         self._opener = opener
 
-    def recognize(self, image_bytes: bytes, region_type: str) -> str:
+    def recognize(
+        self,
+        image_bytes: bytes,
+        region_type: str,
+        *,
+        region_area: float = 0.0,
+        timeout_seconds: float | None = None,
+    ) -> str:
+        del region_area
         image_url = "data:image/png;base64," + base64.b64encode(image_bytes).decode()
         payload = {
             "model": "glm-ocr",
@@ -97,7 +126,9 @@ class GlmVllmRecognizer:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with self._opener(request, timeout=self.timeout_seconds) as response:
+        with self._opener(
+            request, timeout=timeout_seconds or self.timeout_seconds
+        ) as response:
             result = json.load(response)
         choices = result.get("choices", [])
         content = choices[0].get("message", {}).get("content") if choices else None
@@ -260,7 +291,10 @@ def crop_region(
         min(height, math.ceil((bottom + region_height * padding) * height - epsilon)),
     )
     crop = image.crop(pixel_box)
-    if region.label.casefold() in {"aside_text", "vertical_text"}:
+    if (
+        region.label.casefold() in {"aside_text", "vertical_text"}
+        and crop.height > crop.width * 2
+    ):
         crop = crop.rotate(-90, expand=True)
     return crop
 
@@ -277,30 +311,128 @@ class GroundedOcrRuntime:
         self,
         detector: LayoutDetector,
         recognizer: RegionRecognizer,
+        *,
+        page_timeout_seconds: float | None = None,
     ) -> None:
         self.detector = detector
         self.recognizer = recognizer
+        self.page_timeout_seconds = page_timeout_seconds
 
     def parse(self, image_path: Path) -> list[OcrRegion]:
         return next(self.parse_many([image_path])).regions
 
-    def parse_many(self, image_paths: list[Path]):
+    def parse_many(
+        self,
+        image_paths: list[Path],
+        progress_callback: Callable[[OcrProgressEvent], None] | None = None,
+    ):
         for image_path in image_paths:
+            page_started = time.perf_counter()
+            deadline = (
+                page_started + self.page_timeout_seconds
+                if self.page_timeout_seconds is not None
+                else None
+            )
             try:
+                logger.info(
+                    "PP-DocLayoutV3 detection started: image=%s revision=%s threshold=%.2f",
+                    image_path.name,
+                    LAYOUT_MODEL_REVISION,
+                    getattr(self.detector, "_threshold", LAYOUT_THRESHOLD),
+                )
                 detected = self.detector.detect(image_path)
+                logger.info(
+                    "PP-DocLayoutV3 detection completed: image=%s regions=%d elapsed_ms=%.1f",
+                    image_path.name,
+                    len(detected),
+                    (time.perf_counter() - page_started) * 1000,
+                )
+                if progress_callback is not None:
+                    progress_callback(
+                        OcrProgressEvent(
+                            image_path,
+                            "layout",
+                            1,
+                            1,
+                            f"Detected {len(detected)} regions",
+                        )
+                    )
                 with Image.open(image_path) as source:
                     image = source.convert("RGB")
                 regions: list[OcrRegion] = []
-                for item in detected:
+                for position, item in enumerate(detected, start=1):
+                    if deadline is not None:
+                        remaining = deadline - time.perf_counter()
+                        if remaining <= 0:
+                            raise TimeoutError(
+                                f"Ollama OCR page exceeded {self.page_timeout_seconds:g} seconds"
+                            )
+                    else:
+                        remaining = None
+                    if progress_callback is not None:
+                        progress_callback(
+                            OcrProgressEvent(
+                                image_path,
+                                "recognize",
+                                position - 1,
+                                len(detected),
+                                f"Recognizing region {position}/{len(detected)} ({item.label})",
+                            )
+                        )
+                    logger.info(
+                        "OCR region started: image=%s region=%d/%d index=%d label=%s "
+                        "confidence=%.4f box=%s",
+                        image_path.name,
+                        position,
+                        len(detected),
+                        item.index,
+                        item.label,
+                        item.confidence,
+                        item.bbox,
+                    )
+                    region_started = time.perf_counter()
                     failed = False
                     try:
                         content = self.recognizer.recognize(
-                            _crop_png(image, item), item.label
+                            _crop_png(image, item),
+                            item.label,
+                            region_area=(item.bbox[2] - item.bbox[0])
+                            * (item.bbox[3] - item.bbox[1]),
+                            timeout_seconds=(
+                                min(
+                                    float(getattr(self.recognizer, "timeout_seconds", remaining)),
+                                    remaining,
+                                )
+                                if remaining is not None
+                                else None
+                            ),
                         ).strip()
                         failed = not bool(content)
-                    except Exception:  # noqa: BLE001 - retain region geometry on backend failure
+                    except Exception:
+                        logger.exception(
+                            "OCR region failed: image=%s region=%d/%d index=%d label=%s",
+                            image_path.name,
+                            position,
+                            len(detected),
+                            item.index,
+                            item.label,
+                        )
+                        if getattr(self.recognizer, "fail_fast", False):
+                            raise
                         content = ""
                         failed = True
+                    logger.info(
+                        "OCR region completed: image=%s region=%d/%d index=%d label=%s "
+                        "elapsed_ms=%.1f output_characters=%d failed=%s",
+                        image_path.name,
+                        position,
+                        len(detected),
+                        item.index,
+                        item.label,
+                        (time.perf_counter() - region_started) * 1000,
+                        len(content),
+                        failed,
+                    )
                     regions.append(
                         OcrRegion(
                             index=item.index,
@@ -312,8 +444,23 @@ class GroundedOcrRuntime:
                             recognition_failed=failed,
                         )
                     )
+                    if progress_callback is not None:
+                        progress_callback(
+                            OcrProgressEvent(
+                                image_path,
+                                "recognize",
+                                position,
+                                len(detected),
+                                f"Recognized region {position}/{len(detected)} ({item.label})",
+                            )
+                        )
                 yield OcrPageResult(image_path=image_path, regions=regions)
-            except Exception as exc:  # noqa: BLE001 - detector failures are page evidence
+            except Exception as exc:
+                logger.exception(
+                    "Grounded OCR page failed: image=%s elapsed_ms=%.1f",
+                    image_path.name,
+                    (time.perf_counter() - page_started) * 1000,
+                )
                 yield OcrPageResult(
                     image_path=image_path,
                     regions=[],
@@ -336,12 +483,25 @@ def _cached_grounded_runtime(
             timeout_seconds=timeout_seconds,
         )
     elif engine is OcrEngine.OLLAMA:
-        from .ollama_runtime import OllamaOcrModel, OllamaRegionRecognizer
+        from .ollama_runtime import (
+            OLLAMA_PAGE_TIMEOUT_SECONDS,
+            OllamaOcrModel,
+            OllamaRegionRecognizer,
+        )
 
-        recognizer = OllamaRegionRecognizer(OllamaOcrModel(ollama_model))
+        recognizer = OllamaRegionRecognizer(
+            OllamaOcrModel(ollama_model),
+            timeout_seconds=timeout_seconds,
+        )
     else:
         raise ValueError(f"Grounded OCR does not support {engine.value}")
-    return GroundedOcrRuntime(detector, recognizer)
+    return GroundedOcrRuntime(
+        detector,
+        recognizer,
+        page_timeout_seconds=(
+            OLLAMA_PAGE_TIMEOUT_SECONDS if engine is OcrEngine.OLLAMA else None
+        ),
+    )
 
 
 def get_grounded_ocr_runtime(config: ParserConfig) -> GroundedOcrRuntime:

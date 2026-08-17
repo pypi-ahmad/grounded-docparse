@@ -266,10 +266,10 @@ class ParserConfig:
     glmocr_config_path: str = "config/glmocr.yaml"
     glmocr_layout_device: str = "cuda:0"
     paddleocr_service_url: str = "http://127.0.0.1:8119"
-    paddleocr_timeout_seconds: float = 900.0
+    paddleocr_timeout_seconds: float = 120.0
     glm_vllm_base_url: str = "http://127.0.0.1:8080/v1"
     ollama_model: str = "glm-ocr:latest"
-    grounded_ocr_timeout_seconds: float = 900.0
+    grounded_ocr_timeout_seconds: float = 120.0
     layout_detection_threshold: float = 0.3
     analysis_thresholds: AnalysisThresholds = field(default_factory=AnalysisThresholds)
 

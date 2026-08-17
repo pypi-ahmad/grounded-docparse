@@ -182,7 +182,7 @@ def test_glm_failure_on_all_nonblank_pages_stops_before_luna(
         def __init__(self, _config):
             pass
 
-        def analyze_window(self, pages):
+        def analyze_window(self, pages, progress_callback=None):
             for page in pages:
                 yield PageAnalysis(
                     render=PageRenderEvidence(
@@ -218,7 +218,7 @@ def test_glm_recognition_failure_is_not_exported_as_an_image_only_success(
         def __init__(self, _config):
             pass
 
-        def analyze_window(self, pages):
+        def analyze_window(self, pages, progress_callback=None):
             for page in pages:
                 yield PageAnalysis(
                     render=PageRenderEvidence(

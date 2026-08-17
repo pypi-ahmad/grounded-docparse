@@ -28,7 +28,12 @@ class Recognizer:
     def __init__(self) -> None:
         self.calls: list[tuple[str, tuple[int, int]]] = []
 
-    def recognize(self, image_bytes: bytes, region_type: str) -> str:
+    def recognize(
+        self,
+        image_bytes: bytes,
+        region_type: str,
+        **_kwargs,
+    ) -> str:
         from io import BytesIO
 
         with Image.open(BytesIO(image_bytes)) as image:
@@ -56,6 +61,28 @@ def test_grounded_runtime_preserves_detector_geometry_and_failures(tmp_path: Pat
     assert result.regions[1].content == ""
     assert result.regions[1].recognition_failed is True
     assert recognizer.calls == [("table", (440, 110)), ("text", (440, 110))]
+
+
+def test_grounded_runtime_reports_region_progress(tmp_path: Path) -> None:
+    image_path = tmp_path / "page.png"
+    Image.new("RGB", (1000, 500), "white").save(image_path)
+    events = []
+
+    next(
+        GroundedOcrRuntime(Detector(), Recognizer()).parse_many(
+            [image_path], progress_callback=events.append
+        )
+    )
+
+    assert events[0].stage == "layout"
+    assert events[0].message == "Detected 2 regions"
+    assert [event.current for event in events if event.stage == "recognize"] == [
+        0,
+        1,
+        1,
+        2,
+    ]
+    assert events[-1].message == "Recognized region 2/2 (text)"
 
 
 def test_crop_padding_never_changes_detector_box_or_crosses_page_edges() -> None:

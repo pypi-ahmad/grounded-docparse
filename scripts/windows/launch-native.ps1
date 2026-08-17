@@ -6,6 +6,8 @@ $InstallRoot = [IO.Path]::GetFullPath($InstallRoot.Trim('"'))
 $DataRoot = Join-Path $env:LOCALAPPDATA 'GroundedDocParse'
 $LogRoot = Join-Path $DataRoot 'logs'
 $LogPath = Join-Path $LogRoot 'native-launch.log'
+$OllamaStdoutPath = Join-Path $LogRoot 'ollama.out.log'
+$OllamaStderrPath = Join-Path $LogRoot 'ollama.err.log'
 $RuntimeRoot = Join-Path $DataRoot 'runtime'
 $Venv = Join-Path $DataRoot 'venv'
 $PidPath = Join-Path $RuntimeRoot 'streamlit.pid'
@@ -48,7 +50,10 @@ function Ensure-Ollama {
     try {
         Invoke-RestMethod http://127.0.0.1:11434/api/tags -TimeoutSec 2 | Out-Null
     } catch {
-        Start-Process ollama.exe -ArgumentList 'serve' -WindowStyle Hidden
+        $ollama = (Get-Command ollama.exe).Source
+        Start-Process $ollama -ArgumentList 'serve' -WindowStyle Hidden `
+            -RedirectStandardOutput $OllamaStdoutPath `
+            -RedirectStandardError $OllamaStderrPath
         for ($attempt = 0; $attempt -lt 30; $attempt++) {
             Start-Sleep -Milliseconds 500
             try {
@@ -147,9 +152,10 @@ function New-LogCursor {
     param(
         [Parameter(Mandatory)][string]$Path,
         [Parameter(Mandatory)][string]$Label,
+        [long]$InitialOffset = 0L,
         [switch]$StartAtEnd
     )
-    $offset = 0L
+    $offset = $InitialOffset
     if ($StartAtEnd -and (Test-Path -LiteralPath $Path)) {
         $offset = (Get-Item -LiteralPath $Path).Length
     }
@@ -204,18 +210,23 @@ function Follow-ManagedAppLogs {
     param(
         [Parameter(Mandatory)][int]$ListenerPid,
         [Parameter(Mandatory)][string]$StdoutPath,
-        [Parameter(Mandatory)][string]$StderrPath
+        [Parameter(Mandatory)][string]$StderrPath,
+        [Parameter(Mandatory)][long]$StdoutOffset,
+        [Parameter(Mandatory)][long]$StderrOffset
     )
     $projectRuntime = Join-Path $InstallRoot '.runtime'
     $cursors = @(
-        (New-LogCursor -Path $StdoutPath -Label 'APP'),
-        (New-LogCursor -Path $StderrPath -Label 'APP-ERR'),
+        (New-LogCursor -Path $StdoutPath -Label 'APP' -InitialOffset $StdoutOffset),
+        (New-LogCursor -Path $StderrPath -Label 'APP-ERR' -InitialOffset $StderrOffset),
         (New-LogCursor -Path (Join-Path $projectRuntime 'vllm.log') -Label 'GLM' -StartAtEnd),
         (New-LogCursor -Path (Join-Path $projectRuntime 'paddle-vllm.log') -Label 'PADDLE-VLLM' -StartAtEnd),
         (New-LogCursor -Path (Join-Path $projectRuntime 'paddle-api.log') -Label 'PADDLE-API' -StartAtEnd),
+        (New-LogCursor -Path $OllamaStdoutPath -Label 'OLLAMA' -StartAtEnd),
+        (New-LogCursor -Path $OllamaStderrPath -Label 'OLLAMA-ERR' -StartAtEnd),
         (New-LogCursor -Path (Join-Path $env:LOCALAPPDATA 'Ollama\server.log') -Label 'OLLAMA' -StartAtEnd)
     )
     Write-LaunchLog 'Following live app and OCR logs. Use Stop app in the UI to end the session.'
+    Write-LaunchLog "Log files: $StdoutPath ; $StderrPath ; $OllamaStdoutPath ; $OllamaStderrPath"
     while (Get-Process -Id $ListenerPid -ErrorAction SilentlyContinue) {
         foreach ($cursor in $cursors) { Write-NewLogContent -Cursor $cursor }
         Start-Sleep -Milliseconds 250
@@ -260,6 +271,12 @@ try {
     $env:DOCPARSE_STUDIO_DB_PATH = Join-Path $DataRoot 'studio.sqlite3'
     $stdout = Join-Path $LogRoot 'streamlit.out.log'
     $stderr = Join-Path $LogRoot 'streamlit.err.log'
+    $stdoutOffset = if (Test-Path -LiteralPath $stdout) {
+        (Get-Item -LiteralPath $stdout).Length
+    } else { 0L }
+    $stderrOffset = if (Test-Path -LiteralPath $stderr) {
+        (Get-Item -LiteralPath $stderr).Length
+    } else { 0L }
     $process = Start-Process $python -ArgumentList @(
         '-m', 'streamlit', 'run', (Join-Path $InstallRoot 'streamlit_app.py'),
         '--server.address=127.0.0.1', "--server.port=$StreamlitPort", '--server.headless=true'
@@ -269,7 +286,8 @@ try {
     Set-Content -LiteralPath $PidPath -Value $listenerPid -Encoding ASCII
     Write-LaunchLog "Started native Windows app (listener PID $listenerPid)."
     Start-Process $StreamlitUrl
-    Follow-ManagedAppLogs -ListenerPid $listenerPid -StdoutPath $stdout -StderrPath $stderr
+    Follow-ManagedAppLogs -ListenerPid $listenerPid -StdoutPath $stdout -StderrPath $stderr `
+        -StdoutOffset $stdoutOffset -StderrOffset $stderrOffset
 } catch {
     if ($startedProcessId) {
         try { Stop-VerifiedGroundedDocParseProcess -ProcessId $startedProcessId -Source 'failed startup' } catch { }

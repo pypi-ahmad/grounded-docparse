@@ -3,8 +3,10 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import logging
 import math
 import os
+import sys
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -49,7 +51,7 @@ from grounded_docparse.native import (
     render_native_combined_result,
 )
 from grounded_docparse.native_extraction import LangExtractNativeExtractor
-from grounded_docparse.ocr_services import switch_extraction_engine
+from grounded_docparse.ocr_services import ocr_operation, switch_extraction_engine
 from grounded_docparse.ollama_runtime import (
     OllamaOcrModel,
     unload_model,
@@ -80,6 +82,26 @@ from grounded_docparse.usage_costs import (
     summarize_calls,
 )
 from grounded_docparse.workspace_store import WorkspaceStore
+
+
+def configure_app_logging() -> logging.Logger:
+    package_logger = logging.getLogger("grounded_docparse")
+    if not any(getattr(handler, "name", None) == "grounded-docparse-terminal" for handler in package_logger.handlers):
+        handler = logging.StreamHandler(sys.stdout)
+        handler.name = "grounded-docparse-terminal"
+        handler.setFormatter(
+            logging.Formatter(
+                "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S",
+            )
+        )
+        package_logger.addHandler(handler)
+    package_logger.setLevel(logging.INFO)
+    package_logger.propagate = False
+    return logging.getLogger("grounded_docparse.streamlit")
+
+
+logger = configure_app_logging()
 
 SUPPORTED_TYPES = [
     "pdf",
@@ -112,7 +134,7 @@ PROCESSING_LABELS = {
     "Image": ProcessingType.IMAGE,
     "Other Native": ProcessingType.OTHER_NATIVE,
 }
-RESULT_VERSION = "4.6.1"
+RESULT_VERSION = "4.6.5"
 THUMBNAILS_PER_GROUP = 12
 WORKSPACE_SETTING_KEYS = (
     "extraction_engine",
@@ -484,25 +506,26 @@ def mark_ade_custom() -> None:
 
 
 def apply_engine_selection(target: ExtractionEngine | None = None) -> None:
-    target = target or ExtractionEngine(st.session_state.extraction_engine)
-    previous_value = st.session_state.get("active_extraction_engine")
-    previous = ExtractionEngine(previous_value) if previous_value else None
-    if target is previous:
-        return
-    try:
-        if previous is ExtractionEngine.OLLAMA and st.session_state.get("active_ollama_model"):
-            unload_model(OllamaOcrModel(st.session_state.active_ollama_model))
-        switch_extraction_engine(target, previous)
-        if target is ExtractionEngine.OLLAMA:
-            model = OllamaOcrModel(st.session_state.ollama_model)
-            warm_model(model)
-            st.session_state.active_ollama_model = model.value
-    except Exception as exc:  # noqa: BLE001 - lifecycle failures must restore UI state
-        st.session_state.engine_switch_error = str(exc)
-        return
-    st.session_state.extraction_engine = target.value
-    st.session_state.active_extraction_engine = target.value
-    st.session_state.pop("engine_switch_error", None)
+    with ocr_operation():
+        target = target or ExtractionEngine(st.session_state.extraction_engine)
+        previous_value = st.session_state.get("active_extraction_engine")
+        previous = ExtractionEngine(previous_value) if previous_value else None
+        if target is previous:
+            return
+        try:
+            if previous is ExtractionEngine.OLLAMA and st.session_state.get("active_ollama_model"):
+                unload_model(OllamaOcrModel(st.session_state.active_ollama_model))
+            switch_extraction_engine(target, previous)
+            if target is ExtractionEngine.OLLAMA:
+                model = OllamaOcrModel(st.session_state.ollama_model)
+                warm_model(model)
+                st.session_state.active_ollama_model = model.value
+        except Exception as exc:  # noqa: BLE001 - lifecycle failures must restore UI state
+            st.session_state.engine_switch_error = str(exc)
+            return
+        st.session_state.extraction_engine = target.value
+        st.session_state.active_extraction_engine = target.value
+        st.session_state.pop("engine_switch_error", None)
 
 
 def toggle_extraction_engine(target_value: str) -> None:
@@ -527,21 +550,22 @@ def toggle_extraction_engine(target_value: str) -> None:
 
 
 def change_ollama_model() -> None:
-    selected = OllamaOcrModel(st.session_state.ollama_model)
-    previous_value = st.session_state.get("active_ollama_model")
-    if previous_value == selected.value:
-        return
-    try:
-        if previous_value:
-            unload_model(OllamaOcrModel(previous_value))
-        warm_model(selected)
-    except Exception as exc:  # noqa: BLE001 - model lifecycle errors are user-facing
-        st.session_state.engine_switch_error = str(exc)
-        if previous_value:
-            st.session_state.ollama_model = previous_value
-        return
-    st.session_state.active_ollama_model = selected.value
-    st.session_state.pop("engine_switch_error", None)
+    with ocr_operation():
+        selected = OllamaOcrModel(st.session_state.ollama_model)
+        previous_value = st.session_state.get("active_ollama_model")
+        if previous_value == selected.value:
+            return
+        try:
+            if previous_value:
+                unload_model(OllamaOcrModel(previous_value))
+            warm_model(selected)
+        except Exception as exc:  # noqa: BLE001 - model lifecycle errors are user-facing
+            st.session_state.engine_switch_error = str(exc)
+            if previous_value:
+                st.session_state.ollama_model = previous_value
+            return
+        st.session_state.active_ollama_model = selected.value
+        st.session_state.pop("engine_switch_error", None)
 
 
 def request_managed_shutdown() -> None:
@@ -1285,6 +1309,7 @@ initialize_ade_mode()
 st.session_state.setdefault("session_usage", RunUsage())
 st.session_state.setdefault("batch_workspaces", {})
 st.session_state.setdefault("active_document_id", None)
+st.session_state.setdefault("restored_batch_documents", [])
 st.session_state.setdefault("workspace_upload_revision", 0)
 if not st.session_state.get("durable_workspace_loaded"):
     try:
@@ -1410,23 +1435,14 @@ with st.sidebar:
     restored_documents = st.session_state.get("restored_batch_documents", [])
     if restored_documents and not uploaded_files:
         st.caption(f"Restored {len(restored_documents)} document(s) from local storage.")
-    confirm_clear_workspace = st.checkbox(
-        "Confirm clearing saved workspace",
-        key="confirm_clear_workspace",
-        disabled=not bool(restored_documents),
-    )
-    if st.button(
-        "Clear saved workspace",
-        disabled=not (restored_documents and confirm_clear_workspace),
-        icon=":material/delete:",
+    if restored_documents and st.button(
+        "Start new session",
+        icon=":material/restart_alt:",
+        help="Clear the current documents, results, progress, usage, and settings.",
+        width="stretch",
     ):
         workspace_store.clear()
-        st.session_state.restored_batch_documents = []
-        st.session_state.batch_workspaces = {}
-        st.session_state.active_document_id = None
-        st.session_state.pop("batch_document_selector", None)
-        st.session_state.workspace_upload_revision += 1
-        reset_document_state(clear_session_usage=True)
+        st.session_state.clear()
         st.rerun()
 
 batch_error: str | None = None
@@ -1805,7 +1821,11 @@ with st.sidebar:
     refine_markdown = st.session_state.refine_markdown
     classify_document = st.session_state.classify_document
     generate_toc = st.session_state.generate_toc
-    visual_recovery = bool(ai_enhancement and has_environment)
+    visual_recovery = bool(
+        selected_extraction_engine is not ExtractionEngine.PURE_AI
+        and ai_enhancement
+        and has_environment
+    )
     st.toggle(
         "Enable document chat",
         key="enable_chat",
@@ -1868,16 +1888,9 @@ with st.sidebar:
 
     parse_clicked = st.button(
         (
-            "Resume batch"
-            if any(
-                workspace["status"] == "interrupted"
-                for workspace in st.session_state.batch_workspaces.values()
-            )
-            else (
-                "Parse document"
-                if len(batch_documents) <= 1
-                else f"Process {len(batch_documents)} documents"
-            )
+            "Parse document"
+            if len(batch_documents) <= 1
+            else f"Process {len(batch_documents)} documents"
         ),
         type="primary",
         icon=":material/document_scanner:",
@@ -1914,14 +1927,23 @@ with st.sidebar:
     )
     retained_progress = active_workspace.get("progress") if active_workspace else None
     retained_fraction = (
-        retained_progress.get("current", 0) / max(retained_progress.get("total", 1), 1)
+        0.01
+        if retained_progress and retained_progress.get("stage") == "batch"
+        else min(
+            max(
+                retained_progress.get("current", 0)
+                / max(retained_progress.get("total", 1), 1),
+                0.0,
+            ),
+            1.0,
+        )
         if retained_progress
         else 0
     )
     retained_text = (
-        f"Interrupted at {retained_progress.get('message', retained_progress.get('stage', 'processing'))}; resume the batch"
+        retained_progress.get("message", retained_progress.get("stage", "Processing"))
         if active_workspace
-        and active_workspace.get("status") == "interrupted"
+        and active_workspace.get("status") == "processing"
         and retained_progress
         else "Waiting for a document"
     )
@@ -2046,10 +2068,18 @@ if parse_clicked and batch_documents:
                 error=None,
                 progress=initial_progress,
             )
+            logger.info(
+                "Document parsing started: file=%s index=%d/%d engine=%s ollama_model=%s",
+                document.display_name,
+                document_index,
+                total_documents,
+                selected_extraction_engine.value,
+                st.session_state.ollama_model,
+            )
             workspace_store.save_progress(
                 document.id,
                 status="processing",
-                progress=initial_progress,
+                progress=None,
             )
             reset_document_state()
             st.session_state.update(
@@ -2077,7 +2107,10 @@ if parse_clicked and batch_documents:
                 workspace=workspace,
             ) -> None:
                 stage = event.stage
-                if stage == "layout":
+                if stage == "batch":
+                    progress_state["active"] = "layout"
+                    document_progress = 0.01
+                elif stage == "ocr_region" or stage == "layout":
                     progress_state["active"] = "layout"
                     document_progress = 0.30 * event.current / max(event.total, 1)
                 elif stage == "recognize":
@@ -2131,11 +2164,6 @@ if parse_clicked and batch_documents:
                         "message": event.message,
                     }
                     workspace["progress"] = durable_progress
-                    workspace_store.save_progress(
-                        item.id,
-                        status="processing",
-                        progress=durable_progress,
-                    )
                 stage_log.markdown(
                     stage_markdown(progress_state["active"], completed_stages)
                 )
@@ -2155,22 +2183,29 @@ if parse_clicked and batch_documents:
                         if selected_extraction_engine is ExtractionEngine.PDF_INSPECTOR
                         else processing_types[document.id]
                     )
-                    result = parser.parse(
-                        parsed_document_source,
-                        document.name,
-                        progress_callback=show_progress,
-                        processing_type=effective_processing_type,
-                        page_routes=page_routes_by_document.get(document.id),
-                        refine_markdown=refine_markdown,
-                        visual_recovery=visual_recovery,
-                        content_range=requested_content_range,
-                    )
+                    with ocr_operation():
+                        result = parser.parse(
+                            parsed_document_source,
+                            document.name,
+                            progress_callback=show_progress,
+                            processing_type=effective_processing_type,
+                            page_routes=page_routes_by_document.get(document.id),
+                            refine_markdown=refine_markdown,
+                            visual_recovery=visual_recovery,
+                            content_range=requested_content_range,
+                        )
                     st.session_state.result = result
                     append_session_usage(result.usage)
                     st.session_state.result_source_hash = expected_selection_key
                     st.session_state.parsed_source = parsed_document_source
                     st.session_state.selected_element_id = None
-                    st.session_state.annotated_page = 1
+                    first_result_page = (
+                        result.document.pages[0].number
+                        if result.document.pages
+                        else 1
+                    )
+                    st.session_state.annotated_page = first_result_page
+                    st.session_state.overview_page = first_result_page
                     st.session_state.extraction_result = None
                     st.session_state.native_extraction_result = None
                     st.session_state.chat_history = []
@@ -2221,7 +2256,7 @@ if parse_clicked and batch_documents:
                     workspace_store.save_progress(
                         document.id,
                         status="processing",
-                        progress=analysis_progress,
+                        progress=None,
                     )
                     progress_bar.progress(
                         (document_index - 0.03) / total_documents,
@@ -2256,6 +2291,13 @@ if parse_clicked and batch_documents:
                     },
                     state=capture_document_state(range_state=state),
                 )
+                logger.info(
+                    "Document parsing completed: file=%s index=%d/%d markdown_characters=%d",
+                    document.display_name,
+                    document_index,
+                    total_documents,
+                    len(getattr(st.session_state.result, "markdown", "")),
+                )
                 workspace_store.save_document(
                     document.id,
                     status="complete",
@@ -2279,7 +2321,13 @@ if parse_clicked and batch_documents:
                         f"{document.display_name}: complete",
                     ),
                 )
-            except Exception as exc:  # noqa: BLE001 - isolate per-document failures
+            except Exception as exc:
+                logger.exception(
+                    "Document parsing failed: file=%s index=%d/%d",
+                    document.display_name,
+                    document_index,
+                    total_documents,
+                )
                 error = f"{type(exc).__name__}: {str(exc)[:1000]}"
                 workspace.update(
                     status="failed",
@@ -2580,11 +2628,13 @@ else:
         recovered_element_ids,
         ensure_ascii=False,
     )
-    parsed_pages = (
+    source_page_count = (
         result.metadata.content_range.total
         if result.metadata.content_range is not None
         else len(result.document.pages)
     )
+    selected_page_numbers = tuple(page.number for page in result.document.pages)
+    parsed_pages = len(selected_page_numbers)
     stem = Path(result.document.source_name).stem
     selected_element_id = st.session_state.get("selected_element_id")
 
@@ -2678,18 +2728,22 @@ else:
                     strict=False,
                 ):
                     with column:
+                        page_number = selected_page_numbers[page_index]
                         st.image(
-                            page_thumbnail(parsed_source, upload.name, page_index),
+                            page_thumbnail(parsed_source, upload.name, page_number - 1),
                             width="stretch",
                         )
                         if st.button(
-                            f"Page {page_index + 1}",
-                            key=f"overview-page-{page_index + 1}",
+                            f"Page {page_number}",
+                            key=f"overview-page-{page_number}",
                             width="stretch",
                         ):
-                            st.session_state.overview_page = page_index + 1
+                            st.session_state.overview_page = page_number
 
-            selected_page = min(max(st.session_state.overview_page, 1), parsed_pages)
+            selected_page = st.session_state.overview_page
+            if selected_page not in selected_page_numbers:
+                selected_page = selected_page_numbers[0]
+                st.session_state.overview_page = selected_page
             st.subheader(f"Original page {selected_page}")
             if suffix == ".pdf":
                 st.pdf(
@@ -2741,18 +2795,27 @@ else:
                 ":orange[--] AI recovery"
             )
             page_columns = st.columns([1, 2, 1])
-            if page_columns[0].button("Previous", disabled=st.session_state.annotated_page <= 1):
+            first_parsed_page = selected_page_numbers[0]
+            last_parsed_page = selected_page_numbers[-1]
+            if st.session_state.annotated_page not in selected_page_numbers:
+                st.session_state.annotated_page = first_parsed_page
+            if page_columns[0].button(
+                "Previous",
+                disabled=st.session_state.annotated_page <= first_parsed_page,
+            ):
                 st.session_state.annotated_page -= 1
                 st.rerun()
             annotated_page = int(
                 page_columns[1].number_input(
                     "Page",
-                    min_value=1,
-                    max_value=parsed_pages,
+                    min_value=first_parsed_page,
+                    max_value=last_parsed_page,
                     key="annotated_page",
                 )
             )
-            if page_columns[2].button("Next", disabled=annotated_page >= parsed_pages):
+            if page_columns[2].button(
+                "Next", disabled=annotated_page >= last_parsed_page
+            ):
                 st.session_state.annotated_page += 1
                 st.rerun()
             if selected_element_id:
@@ -2761,7 +2824,7 @@ else:
                 parsed_source,
                 upload.name,
                 elements_json,
-                parsed_pages,
+                source_page_count,
                 show_annotations,
                 show_reading_order,
                 selected_element_id,
@@ -3146,7 +3209,7 @@ else:
         parsed_source,
         upload.name,
         elements_json,
-        parsed_pages,
+        source_page_count,
         True,
         show_reading_order,
         None,
@@ -3232,7 +3295,8 @@ else:
             )
         )
         st.caption(
-            f"GLM-OCR: {result.metadata.glm_time:.1f}s · AI recovery: "
+            f"{selected_extraction_engine.label}: "
+            f"{(result.metadata.visual_parse_time if selected_extraction_engine is ExtractionEngine.PURE_AI else result.metadata.glm_time):.1f}s · AI recovery: "
             f"{result.metadata.luna_recovery_time:.1f}s · AI agentic: "
             f"{luna_agentic_time:.1f}s · Pages: {parsed_pages} · "
             f"Visual recovery: {recovery_status}"
@@ -3312,7 +3376,11 @@ if batch_documents:
                         stored_source,
                         document.name,
                         stored_elements_json,
-                        len(stored_result.document.pages),
+                        (
+                            stored_result.metadata.content_range.total
+                            if stored_result.metadata.content_range is not None
+                            else len(stored_result.document.pages)
+                        ),
                         True,
                         show_reading_order,
                         None,

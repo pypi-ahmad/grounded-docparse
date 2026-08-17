@@ -968,6 +968,7 @@ class Element(BaseModel):
         "paddleocr-vl-1.6",
         "deepseek-ocr",
         "rapidocr",
+        "ai-ade",
         "luna-recovery",
     ] = "glm-ocr"
 

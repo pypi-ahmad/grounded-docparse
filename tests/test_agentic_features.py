@@ -177,6 +177,16 @@ def test_analysis_classifies_first_two_pages_and_builds_grounded_toc() -> None:
     assert {item["page"] for item in layout} == {1, 2}
 
 
+def test_toc_accepts_original_page_number_for_page_range() -> None:
+    result = _result(page_count=1)
+    result.document.pages[0].number = 4
+
+    analysis = DocumentAgent(gateway_factory=FeatureGateway).analyze(result)
+
+    assert analysis.features["toc"].status == "succeeded"
+    assert analysis.toc.sections[0].page == 4
+
+
 def test_chat_maps_only_element_ids_to_grounded_citations() -> None:
     answer = DocumentAgent(gateway_factory=FeatureGateway).chat(
         _result(),

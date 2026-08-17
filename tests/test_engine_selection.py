@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from io import BytesIO
 
 import pytest
@@ -16,6 +17,7 @@ from grounded_docparse.config import (
 from grounded_docparse.models import Element
 from grounded_docparse.ollama_runtime import (
     OllamaOcrModel,
+    OllamaRegionRecognizer,
     recognize_region,
     region_prompt,
     warm_model,
@@ -94,21 +96,28 @@ def test_ollama_ocr_request_bounds_context_and_output(monkeypatch) -> None:
     captured = {}
 
     def opener(request, *, timeout):
+        captured["url"] = request.full_url
         captured["payload"] = json.loads(request.data)
         captured["timeout"] = timeout
-        return BytesIO(b'{"response":"recognized"}')
+        return BytesIO(b'{"message":{"content":"recognized"},"eval_count":4}')
 
     monkeypatch.setattr(ollama_runtime, "urlopen", opener)
 
     assert recognize_region(OllamaOcrModel.GLM_OCR, b"crop", "table") == "recognized"
-    assert captured["timeout"] == 900
+    assert captured["timeout"] == 120
+    assert captured["url"] == "http://127.0.0.1:11434/api/chat"
     assert captured["payload"] == {
         "model": "glm-ocr:latest",
-        "prompt": "Table Recognition:",
-        "images": ["Y3JvcA=="],
+        "messages": [
+            {
+                "role": "user",
+                "content": "Table Recognition:",
+                "images": ["Y3JvcA=="],
+            }
+        ],
         "stream": False,
         "keep_alive": "10m",
-        "options": {"num_ctx": 8192, "num_predict": 4096},
+        "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 512},
     }
 
 
@@ -119,19 +128,108 @@ def test_ollama_warmup_generates_only_one_token(monkeypatch) -> None:
     def opener(request, *, timeout):
         captured["payload"] = json.loads(request.data)
         captured["timeout"] = timeout
-        return BytesIO(b'{"response":""}')
+        return BytesIO(b'{"message":{"content":""}}')
 
     monkeypatch.setattr(ollama_runtime, "urlopen", opener)
 
     warm_model(OllamaOcrModel.PADDLEOCR_VL)
 
-    assert captured["timeout"] == 900
+    assert captured["timeout"] == 120
     assert captured["payload"]["model"] == "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
-    assert captured["payload"]["images"]
+    assert captured["payload"]["messages"][0]["images"]
     assert captured["payload"]["options"] == {
-        "num_ctx": 8192,
+        "temperature": 0,
+        "num_ctx": 4096,
         "num_predict": 1,
     }
+
+
+def test_ollama_recognizer_uses_configured_timeout(monkeypatch) -> None:
+    captured = {}
+
+    def opener(request, *, timeout):
+        captured["timeout"] = timeout
+        return BytesIO(b'{"message":{"content":"recognized"}}')
+
+    monkeypatch.setattr(ollama_runtime, "urlopen", opener)
+
+    recognizer = OllamaRegionRecognizer(
+        OllamaOcrModel.GLM_OCR,
+        timeout_seconds=17,
+    )
+
+    assert recognizer.recognize(b"crop", "text") == "recognized"
+    assert captured["timeout"] == 17
+
+
+@pytest.mark.parametrize(
+    ("region_area", "expected"),
+    [(0.01, 128), (0.04, 256)],
+)
+def test_ollama_text_token_budget_scales_with_region_area(
+    monkeypatch, region_area, expected
+) -> None:
+    captured = {}
+
+    def opener(request, *, timeout):
+        captured["payload"] = json.loads(request.data)
+        return BytesIO(b'{"message":{"content":"recognized"}}')
+
+    monkeypatch.setattr(ollama_runtime, "urlopen", opener)
+
+    recognize_region(
+        OllamaOcrModel.GLM_OCR,
+        b"crop",
+        "text",
+        region_area=region_area,
+    )
+
+    assert captured["payload"]["options"]["num_predict"] == expected
+
+
+def test_ollama_output_cleanup_removes_model_loops() -> None:
+    repeated = "A long recognized sentence that should only appear once in output."
+    value = f"<|md_start|>{repeated}\n{repeated}<|md_end|><|im_end|>"
+
+    assert ollama_runtime.clean_ocr_output(value) == repeated
+
+
+def test_ocr_operation_blocks_engine_switch_until_parse_finishes(monkeypatch) -> None:
+    parse_started = threading.Event()
+    finish_parse = threading.Event()
+    switch_finished = threading.Event()
+    calls = []
+
+    monkeypatch.setattr(
+        ocr_services,
+        "stop_managed_vllm",
+        lambda: calls.append("stop-vllm"),
+    )
+
+    def parse_document() -> None:
+        with ocr_services.ocr_operation():
+            parse_started.set()
+            assert finish_parse.wait(timeout=2)
+
+    def switch_engine() -> None:
+        ocr_services.switch_extraction_engine(ExtractionEngine.DOCLING_RAPIDOCR)
+        switch_finished.set()
+
+    parse_thread = threading.Thread(target=parse_document)
+    switch_thread = threading.Thread(target=switch_engine)
+    parse_thread.start()
+    assert parse_started.wait(timeout=2)
+    switch_thread.start()
+
+    assert not switch_finished.wait(timeout=0.05)
+    assert calls == []
+
+    finish_parse.set()
+    parse_thread.join(timeout=2)
+    switch_thread.join(timeout=2)
+
+    assert switch_finished.is_set()
+    assert calls == ["stop-vllm"]
 
 
 def test_windows_manager_uses_wsl_without_forwarding_provider_keys(monkeypatch) -> None:

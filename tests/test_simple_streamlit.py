@@ -70,6 +70,155 @@ def _select_engine(app: AppTest, label: str) -> AppTest:
     return app if toggle.value else toggle.set_value(True).run(timeout=20)
 
 
+def test_processing_workspace_shows_retained_progress(simple_pdf: bytes) -> None:
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "notice.pdf", simple_pdf, "application/pdf"
+    ).run(timeout=20)
+    app = _select_scanned(app, "notice.pdf")
+    document_id = app.session_state["active_document_id"]
+    app.session_state["batch_workspaces"][document_id].update(
+        status="processing",
+        progress={
+            "stage": "layout",
+            "current": 0,
+            "total": 1,
+            "message": "Starting document",
+        },
+    )
+
+    app = app.run(timeout=20)
+
+    assert app.get("progress")[0].text == "0% · Starting document"
+
+
+def test_processing_workspace_clamps_retained_batch_progress(
+    simple_pdf: bytes,
+) -> None:
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = app.file_uploader[0].upload(
+        "notice.pdf", simple_pdf, "application/pdf"
+    ).run(timeout=20)
+    app = _select_scanned(app, "notice.pdf")
+    document_id = app.session_state["active_document_id"]
+    app.session_state["batch_workspaces"][document_id].update(
+        status="processing",
+        progress={
+            "stage": "batch",
+            "current": 4,
+            "total": 1,
+            "message": "Processing pages 4-4",
+        },
+    )
+
+    app = app.run(timeout=20)
+
+    assert not app.exception
+    assert app.get("progress")[0].text == "1% · Processing pages 4-4"
+
+
+def test_start_new_session_clears_restored_workspace_and_resets_settings(
+    simple_pdf: bytes, tmp_path
+) -> None:
+    document = build_batch_documents(
+        [("notice.pdf", simple_pdf, "application/pdf")]
+    )[0]
+    store = WorkspaceStore(tmp_path / "studio.sqlite3")
+    store.sync_documents(
+        [document],
+        settings={
+            "extraction_engine": ExtractionEngine.OLLAMA.value,
+            "ollama_model": "glm-ocr:latest",
+            "ai_enhancement": True,
+            "ade_mode": "Full",
+            "refine_markdown": True,
+            "classify_document": True,
+            "generate_toc": True,
+            "ocr_disagreement": True,
+            "ocr_engine_label": "GLM-OCR",
+        },
+        result_version="4.6.5",
+    )
+    store.save_progress(
+        document.id,
+        status="processing",
+        progress={
+            "stage": "batch",
+            "current": 4,
+            "total": 1,
+            "message": "Processing pages 4-4",
+        },
+    )
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    assert not any(button.label == "Resume batch" for button in app.button)
+    assert app.session_state["batch_workspaces"][document.id]["status"] == "pending"
+
+    app = next(
+        button for button in app.button if button.label == "Start new session"
+    ).click().run(timeout=20)
+
+    assert not app.exception
+    assert app.session_state["batch_workspaces"] == {}
+    assert app.session_state["active_document_id"] is None
+    assert app.session_state["restored_batch_documents"] == []
+    assert app.session_state["session_usage"] == RunUsage()
+    assert app.session_state["extraction_engine"] == ExtractionEngine.OLLAMA.value
+    assert (
+        app.session_state["ollama_model"]
+        == "AuditAid/PaddleOCR-VL-1.6-0.9B:latest"
+    )
+    assert app.session_state["ai_enhancement"] is False
+    assert app.session_state["ade_mode"] == "Fast"
+    assert app.session_state["refine_markdown"] is False
+    assert app.session_state["classify_document"] is True
+    assert app.session_state["generate_toc"] is False
+    assert app.session_state["ocr_disagreement"] is False
+    assert store.load(result_version="4.6.5") is None
+    assert not any(button.label == "Resume batch" for button in app.button)
+
+
+def test_batch_progress_is_retained_when_parser_fails(
+    monkeypatch, simple_pdf: bytes
+) -> None:
+    class FakeParser:
+        def __init__(self, config=None):
+            pass
+
+        def parse(self, _data, _name, progress_callback=None, **_kwargs):
+            progress_callback(
+                ProgressEvent(
+                    stage="batch",
+                    current=1,
+                    total=1,
+                    message="Processing pages 1-1",
+                )
+            )
+            raise RuntimeError("simulated OCR stall")
+
+    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
+
+    app = AppTest.from_file("streamlit_app.py").run(timeout=20)
+    app = _select_engine(app, "GLM-OCR")
+    app = app.file_uploader[0].upload(
+        "notice.pdf", simple_pdf, "application/pdf"
+    ).run(timeout=20)
+    app = _select_scanned(app, "notice.pdf")
+    app = next(
+        button for button in app.button if button.label == "Parse document"
+    ).click().run(timeout=20)
+
+    document_id = app.session_state["active_document_id"]
+    workspace = app.session_state["batch_workspaces"][document_id]
+    assert workspace["status"] == "failed"
+    assert workspace["progress"] == {
+        "stage": "batch",
+        "current": 1,
+        "total": 1,
+        "message": "Processing pages 1-1",
+    }
+
+
 def test_fresh_studio_defaults_to_local_ollama_paddleocr() -> None:
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
@@ -195,7 +344,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
 
     assert app.session_state["result"] is None
     assert app.session_state["result_source_hash"] is None
-    assert app.session_state["result_version"] == "4.6.1"
+    assert app.session_state["result_version"] == "4.6.5"
     assert app.session_state["session_usage"].calls == []
 
 
@@ -623,9 +772,6 @@ def test_local_ocr_cross_check_exposes_compatible_alternates(monkeypatch) -> Non
     }.issubset(set(alternate.options))
 
 
-@pytest.mark.xfail(
-    reason="MODERNIZATION_PLAN.md Phase 1: AppTest-based failure, likely a shared root cause (possibly a Streamlit AppTest widget-interaction/state-propagation timing change) - not yet diagnosed, tracked as a fast-follow in the plan's section 9.", strict=False,
-)
 def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> None:
     source = pymupdf.open()
     source.new_page().insert_text((72, 72), "First page")
@@ -658,7 +804,7 @@ def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> 
             document = Document(
                 source_name=name,
                 source_sha256="b" * 64,
-                pages=[Page(number=1, width=595, height=842)],
+                pages=[Page(number=2, width=595, height=842)],
             )
             rendered = render_agentic_document(document)
             return ParseResult(
@@ -703,7 +849,7 @@ def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> 
     assert captured_recovery == [False]
     assert captured_ranges[0].start == 2
     assert captured_ranges[0].end == 2
-    assert app.session_state.overview_page == 1
+    assert app.session_state.overview_page == 2
 
 
 @pytest.mark.xfail(
@@ -1115,8 +1261,8 @@ def test_completed_batch_restores_after_app_restart_without_reparsing(
     )
 
 
-def test_interrupted_analysis_resumes_from_parse_checkpoint(
-    monkeypatch, simple_pdf: bytes, tmp_path
+def test_interrupted_analysis_is_discarded_on_restart(
+    simple_pdf: bytes, tmp_path
 ) -> None:
     database = tmp_path / "studio.sqlite3"
     document = build_batch_documents(
@@ -1138,7 +1284,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
     )
     selection_key = (
         f"{document.id}:all:False:True:True:glm-vllm:gpt-5.6-luna:"
-        "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.1"
+        "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.5"
     )
     store = WorkspaceStore(database)
     store.sync_documents(
@@ -1154,7 +1300,7 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
             "ollama_model": "glm-ocr:latest",
             "ocr_disagreement_engine": "vllm-paddleocr-vl-1.6",
         },
-        result_version="4.6.1",
+        result_version="4.6.5",
     )
     store.save_document(
         document.id,
@@ -1169,30 +1315,12 @@ def test_interrupted_analysis_resumes_from_parse_checkpoint(
             "message": "Running AI document analysis",
         },
     )
-    analysis_calls = 0
-
-    class FakeParser:
-        def __init__(self, config=None):
-            assert config.ocr_engine.value == "glm-ocr"
-
-        def parse(self, *_args, **_kwargs):
-            raise AssertionError("OCR checkpoint should be reused")
-
-    def analyze(self, *args, **kwargs):
-        nonlocal analysis_calls
-        analysis_calls += 1
-        return AgenticAnalysis()
-
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
-    monkeypatch.setattr(pipeline, "DocumentParser", FakeParser)
-    monkeypatch.setattr(DocumentAgent, "analyze", analyze)
-
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
-    app = _select_engine(app, "GLM-OCR")
-    app = next(
-        button for button in app.button if button.label == "Resume batch"
-    ).click().run(timeout=20)
 
     assert not app.exception
-    assert analysis_calls == 1
-    assert app.session_state["batch_workspaces"][document.id]["status"] == "complete"
+    workspace = app.session_state["batch_workspaces"][document.id]
+    assert workspace["status"] == "pending"
+    assert workspace["progress"] is None
+    assert workspace["state"]["result"] is None
+    assert any(button.label == "Parse document" for button in app.button)
+    assert not any(button.label == "Resume batch" for button in app.button)

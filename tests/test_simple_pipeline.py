@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 
 import pymupdf
+import pytest
 from PIL import Image
 
 from grounded_docparse import pipeline as pipeline_module
@@ -139,10 +140,13 @@ def test_ai_ade_skips_local_ocr_and_records_luna_provenance(
         gateway_factory=AiGateway,
     )
 
-    result = parser.parse(simple_pdf, "notice.pdf")
+    result = parser.parse(simple_pdf, "notice.pdf", visual_recovery=False)
 
     assert result.elements
-    assert {element.source for element in result.elements} == {"luna-recovery"}
+    assert {element.source for element in result.elements} == {"ai-ade"}
+    assert result.metadata.recovered_regions == 0
+    assert result.metadata.visual_recovery_crops == 0
+    assert result.metadata.luna_recovery_time == 0
 
 
 class QualityRecoveryGateway:
@@ -700,30 +704,21 @@ def test_glm_form_recovery_does_not_consume_luna_document_budget(
     assert sum("[x] Participating" in region.text for region in regions) == 4
 
 
-def test_custom_gateway_without_analysis_does_not_synthesize_scan_probes() -> (
-    None
-):
+def test_custom_gateway_without_analysis_rejects_empty_nonblank_page() -> None:
     document = pymupdf.open()
     page = document.new_page(width=612, height=792)
     page.draw_rect((72, 72, 540, 720), color=(0, 0, 0), fill=(0.9, 0.9, 0.9))
     data = document.tobytes()
     document.close()
 
-    result = DocumentParser(
-        ParserConfig(render_dpi=72, crop_dpi=144),
-        gateway_factory=lambda _config: NoQualityScanGateway(),
-    ).parse(data, "scan.pdf")
-
-    blocks = result.document.pages[0].blocks
-    assert blocks == []
-    page_payload = json.loads(result.json)["document"]["pages"][0]
-    assert page_payload["status"] == "ok"
-    assert page_payload["blocks"] == []
-    assert page_payload["quality"]["needs_review_reasons"] == []
-    assert (
-        result.document.pages[0].quality.model_dump(mode="json")
-        == page_payload["quality"]
-    )
+    with pytest.raises(
+        RuntimeError,
+        match="AI ADE returned no document regions for nonblank page 1",
+    ):
+        DocumentParser(
+            ParserConfig(render_dpi=72, crop_dpi=144),
+            gateway_factory=lambda _config: NoQualityScanGateway(),
+        ).parse(data, "scan.pdf")
 
 
 class ScanProbeRecoveryGateway:

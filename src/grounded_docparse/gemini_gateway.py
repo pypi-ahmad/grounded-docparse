@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import os
 from types import SimpleNamespace
 from typing import Any
@@ -11,9 +12,79 @@ from pydantic import ValidationError
 
 from .config import ParserConfig
 from .gateways import OpenAIDocumentGateway
+from .models import PageDraft
 from .runtime import RetryableProviderError
 
 GEMINI_MAX_OUTPUT_TOKENS = 65_536
+
+_GEMINI_BOX_DESCRIPTION = (
+    "Required bounding box as [ymin, xmin, ymax, xmax], normalized to integer "
+    "coordinates from 0 to 1000."
+)
+
+
+def _response_schema(text_format: type) -> dict[str, Any]:
+    schema = text_format.model_json_schema()
+    if text_format is not PageDraft:
+        return schema
+    definitions = schema.get("$defs", {})
+    definitions["DraftBoundingBox"] = {
+        "type": "array",
+        "items": {"type": "integer", "minimum": 0, "maximum": 1000},
+        "minItems": 4,
+        "maxItems": 4,
+        "description": _GEMINI_BOX_DESCRIPTION,
+    }
+    for name in ("RegionDraft", "AtomicDraft", "TableCellDraft"):
+        definition = definitions[name]
+        definition["properties"]["bbox"] = {
+            "$ref": "#/$defs/DraftBoundingBox",
+            "description": _GEMINI_BOX_DESCRIPTION,
+        }
+        required = definition.setdefault("required", [])
+        if "bbox" not in required:
+            required.append("bbox")
+    return schema
+
+
+def _normalize_page_draft_boxes(value: Any) -> Any:
+    if isinstance(value, list):
+        return [_normalize_page_draft_boxes(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    normalized = {}
+    for key, item in value.items():
+        if key != "bbox" or not isinstance(item, list):
+            normalized[key] = _normalize_page_draft_boxes(item)
+            continue
+        if (
+            len(item) != 4
+            or any(isinstance(number, bool) or not isinstance(number, (int, float)) for number in item)
+            or any(number < 0 or number > 1000 for number in item)
+        ):
+            raise RetryableProviderError("Gemini returned an invalid bounding box")
+        ymin, xmin, ymax, xmax = item
+        if ymax <= ymin or xmax <= xmin:
+            raise RetryableProviderError("Gemini returned an invalid bounding box")
+        normalized[key] = {
+            "x0": xmin / 1000,
+            "y0": ymin / 1000,
+            "x1": xmax / 1000,
+            "y1": ymax / 1000,
+        }
+    return normalized
+
+
+def _validate_page_draft_grounding(draft: PageDraft) -> None:
+    missing = 0
+    for region in draft.regions:
+        missing += region.bbox is None
+        missing += sum(atom.bbox is None for atom in region.atoms)
+        missing += sum(cell.bbox is None for cell in region.table_cells)
+    if missing:
+        raise RetryableProviderError(
+            f"Gemini omitted {missing} required bounding box(es)"
+        )
 
 
 def _max_output_tokens(value: Any) -> Any:
@@ -77,19 +148,20 @@ class _GeminiResponses:
             config=types.GenerateContentConfig(
                 system_instruction=system,
                 response_mime_type="application/json",
-                response_json_schema=text_format.model_json_schema(),
+                response_json_schema=_response_schema(text_format),
                 max_output_tokens=_max_output_tokens(kwargs.get("max_output_tokens")),
                 thinking_config=types.ThinkingConfig(thinking_level=effort),
             ),
         )
         try:
             sdk_parsed = getattr(response, "parsed", None)
-            parsed = (
-                text_format.model_validate(sdk_parsed)
-                if sdk_parsed is not None
-                else text_format.model_validate_json(response.text)
-            )
-        except ValidationError as exc:
+            payload = sdk_parsed if sdk_parsed is not None else json.loads(response.text)
+            if text_format is PageDraft:
+                payload = _normalize_page_draft_boxes(payload)
+            parsed = text_format.model_validate(payload)
+            if isinstance(parsed, PageDraft):
+                _validate_page_draft_grounding(parsed)
+        except (json.JSONDecodeError, ValidationError) as exc:
             if _finish_reason(response) == "MAX_TOKENS":
                 raise RetryableProviderError(
                     "Gemini reached its output token limit before completing JSON"

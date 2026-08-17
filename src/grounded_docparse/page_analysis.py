@@ -13,6 +13,8 @@ from PIL import Image, ImageFilter, ImageStat
 from .config import OcrEngine, ParserConfig
 from .grounded_ocr import (
     LAYOUT_MODEL_ID,
+    GroundedOcrRuntime,
+    OcrProgressEvent,
     get_grounded_ocr_runtime,
 )
 from .ingest import PageEvidence
@@ -209,7 +211,11 @@ class PageAnalyzer:
             "ai_model": self.config.cloud_model.value,
         }
 
-    def analyze_window(self, pages: list[PageEvidence]):
+    def analyze_window(
+        self,
+        pages: list[PageEvidence],
+        progress_callback: Callable[[OcrProgressEvent], None] | None = None,
+    ):
         started = {page.image_path.resolve(): time.perf_counter() for page in pages}
         prepared: dict[
             Path, tuple[PageEvidence, PageRenderEvidence, ScanQualityEvidence]
@@ -238,8 +244,11 @@ class PageAnalyzer:
         try:
             runtime = self._runtime()
             if hasattr(runtime, "parse_many"):
-                results = runtime.parse_many(
-                    [item[0].image_path for item in prepared.values()]
+                image_paths = [item[0].image_path for item in prepared.values()]
+                results = (
+                    runtime.parse_many(image_paths, progress_callback=progress_callback)
+                    if isinstance(runtime, GroundedOcrRuntime)
+                    else runtime.parse_many(image_paths)
                 )
             else:
                 results = (
@@ -319,6 +328,9 @@ class PageAnalyzer:
             source_rotation_degrees=page.source_rotation_degrees,
         )
         return render, self._quality(page)
+
+    def is_blank(self, page: PageEvidence) -> bool:
+        return self._quality(page).blank
 
     def _finish(
         self, page, render, quality, raw, started, warning=None

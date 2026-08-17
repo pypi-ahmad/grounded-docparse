@@ -167,7 +167,7 @@ def test_native_extraction_round_trips_with_exact_source_anchor(tmp_path) -> Non
     assert saved.values[0].evidence.source_spans[0].anchor.unit_id == "document-1"
 
 
-def test_processing_document_reopens_interrupted_with_progress(tmp_path) -> None:
+def test_processing_document_reopens_pending_without_progress(tmp_path) -> None:
     database = tmp_path / "studio.sqlite3"
     document = build_batch_documents(
         [("packet.pdf", b"packet", "application/pdf")]
@@ -189,13 +189,10 @@ def test_processing_document_reopens_interrupted_with_progress(tmp_path) -> None
 
     assert restored is not None
     item = restored.documents[0]
-    assert item.status == "interrupted"
-    assert item.progress == {
-        "stage": "recognize",
-        "current": 4,
-        "total": 10,
-        "message": "Recognizing page 4",
-    }
+    assert item.status == "pending"
+    assert item.progress is None
+    assert item.selection_key is None
+    assert item.result is None
 
 
 def test_native_v5_result_round_trips(tmp_path) -> None:

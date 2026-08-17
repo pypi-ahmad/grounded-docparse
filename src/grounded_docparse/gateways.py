@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import os
 import time
 from collections.abc import Callable
@@ -45,7 +46,13 @@ from .prompts import (
 from .runtime import ProviderRuntime
 
 T = TypeVar("T", bound=BaseModel)
-_SCHEMA_FAILURE_MARKERS = ("schema", "validation", "no schema-valid result")
+logger = logging.getLogger(__name__)
+_SCHEMA_FAILURE_MARKERS = (
+    "schema",
+    "validation",
+    "no schema-valid result",
+    "bounding box",
+)
 
 
 def _is_schema_failure(exc: Exception) -> bool:
@@ -229,6 +236,13 @@ class OpenAIDocumentGateway:
         def record_schema_failure(exc: Exception) -> None:
             if not _is_schema_failure(exc):
                 return
+            logger.warning(
+                "Provider structured response rejected: model=%s stage=%s page=%s error=%s",
+                model,
+                stage,
+                page_number,
+                exc,
+            )
             self.trace.append(
                 AgentTraceEvent(
                     agent=agent,

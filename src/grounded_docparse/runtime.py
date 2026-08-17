@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 import random as random_module
 import threading
@@ -15,6 +16,7 @@ from .config import ParserConfig
 from .models import RuntimeDiagnostics
 
 T = TypeVar("T")
+logger = logging.getLogger(__name__)
 
 
 class BudgetExceeded(RuntimeError):
@@ -125,6 +127,16 @@ class ProviderRuntime:
             )
             if retry_after is not None:
                 delay = max(delay, retry_after)
+            logger.warning(
+                "Provider request retry scheduled: model=%s stage=%s page=%s attempt=%d/%d delay_seconds=%.2f error_type=%s",
+                model,
+                stage,
+                page_number,
+                attempt + 1,
+                self.config.provider_retry_attempts,
+                delay,
+                type(caught).__name__,
+            )
             if delay > 0:
                 with self._condition:
                     self._retry_sleep_seconds += delay

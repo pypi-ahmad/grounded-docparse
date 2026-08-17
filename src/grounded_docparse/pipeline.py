@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import inspect
+import logging
 import os
 import re
 import tempfile
@@ -94,6 +95,8 @@ from .render import (
     render_annotated_pdf,
 )
 from .runtime import ProviderRuntime
+
+logger = logging.getLogger(__name__)
 
 VERIFICATION_CONFIDENCE_THRESHOLD = 0.85
 MAX_CROPS_PER_PAGE = 8
@@ -1901,16 +1904,18 @@ class DocumentParser:
         ocr_comparisons: dict[RecoveryBoxKey, OcrComparisonResult] | None = None,
     ) -> _ProcessedPage:
         recovery_available = visual_recovery and self._provider_available()
+        primary_ai_extraction = analysis is None
+        gateway_enabled = primary_ai_extraction or visual_recovery
         gateway = (
             _UnavailableGateway(
                 "disabled by user"
-                if not visual_recovery
+                if not gateway_enabled
                 else f"{self.config.cloud_model.api_key_name} is not set"
             )
-            if not visual_recovery
+            if not gateway_enabled
             or (
                 self._uses_default_gateway
-                and not recovery_available
+                and not self._provider_available()
             )
             else self.gateway_factory(self.config)
         )
@@ -1943,6 +1948,15 @@ class DocumentParser:
         )
         if analysis is None:
             draft = gateway.draft_page(page)
+            if not draft.regions and not analyzer.is_blank(page):
+                logger.error(
+                    "AI ADE returned no regions: page=%d model=%s",
+                    page.number,
+                    self.config.cloud_model.value,
+                )
+                raise RuntimeError(
+                    f"AI ADE returned no document regions for nonblank page {page.number}"
+                )
         else:
             if analysis.quality.blank:
                 draft = PageDraft(
@@ -2681,7 +2695,9 @@ class DocumentParser:
             for page in skipped_pages
         ]
         if not chunks:
-            status = "failed" if skipped_pages else "succeeded"
+            status = "failed"
+            if not skipped_pages:
+                warnings.append("Markdown refinement had no parsed content to process")
             return (
                 base_markdown,
                 EnhancementMetadata(
@@ -2834,7 +2850,38 @@ class DocumentParser:
                     f"Processing pages {batch[0].number}-{batch[-1].number}",
                 )
                 if local_analysis_enabled:
-                    for analysis in analyzer.analyze_window(batch):
+                    page_positions = {
+                        page.image_path.resolve(): batch_start + offset
+                        for offset, page in enumerate(batch)
+                    }
+
+                    def report_local_ocr(event, page_positions=page_positions) -> None:
+                        page_position = page_positions.get(event.image_path.resolve())
+                        if page_position is None:
+                            return
+                        page_fraction = (
+                            0.025
+                            if event.stage == "layout"
+                            else 0.05
+                            + 0.95 * event.current / max(event.total, 1)
+                        )
+                        page_number = source.pages[page_position].number
+                        engine = (
+                            f"Ollama {self.config.ollama_model}"
+                            if self.config.ocr_engine is OcrEngine.OLLAMA
+                            else self.config.ocr_engine.label
+                        )
+                        _emit(
+                            progress_callback,
+                            "ocr_region",
+                            round((page_position + page_fraction) * 1000),
+                            total * 1000,
+                            f"{event.message} on page {page_number} · {engine}",
+                        )
+
+                    for analysis in analyzer.analyze_window(
+                        batch, progress_callback=report_local_ocr
+                    ):
                         page_number = analysis.render.source_page
                         analyses_by_page[page_number] = analysis
                         analyzed_count += 1
@@ -3060,7 +3107,7 @@ class DocumentParser:
                 document,
                 recovered_region_ids,
                 local_source=(
-                    "luna-recovery"
+                    "ai-ade"
                     if not self.config.local_ocr_enabled
                     else OllamaOcrModel(self.config.ollama_model).element_source
                     if self.config.ocr_engine is OcrEngine.OLLAMA
@@ -3110,7 +3157,9 @@ class DocumentParser:
             version_getter = getattr(analyzer, "model_versions", None)
             model_versions = version_getter() if callable(version_getter) else {}
             luna_recovery_time = sum(
-                event.duration_ms for event in trace if event.image_count
+                event.duration_ms
+                for event in trace
+                if event.image_count and event.action != "page_draft"
             ) / 1000
             luna_agentic_time = sum(
                 event.duration_ms for event in trace if not event.image_count
@@ -3126,7 +3175,9 @@ class DocumentParser:
                 visual_parse_time=visual_parse_time,
                 refinement_time=refinement_time,
                 visual_recovery_request_time=sum(
-                    event.duration_ms for event in trace if event.image_count
+                    event.duration_ms
+                    for event in trace
+                    if event.image_count and event.action != "page_draft"
                 )
                 / 1000
                 + glm_form_recovery.duration,
@@ -3136,7 +3187,11 @@ class DocumentParser:
                 visual_recovery_candidates=(
                     recovery_candidate_count + glm_form_recovery.candidate_count
                 ),
-                visual_recovery_crops=visual_recovery_crops,
+                visual_recovery_crops=(
+                    visual_recovery_crops
+                    if local_analysis_enabled or effective_visual_recovery
+                    else 0
+                ),
                 visual_recovery_deferred=sum(
                     len(boxes) for boxes in deferred_recovery.values()
                 ),

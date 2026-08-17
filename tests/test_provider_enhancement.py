@@ -49,5 +49,8 @@ def test_refinement_metadata_reports_selected_model(
         enabled=True,
     )
 
-    assert enhancement.status == "succeeded"
+    assert enhancement.status == "failed"
     assert enhancement.model == CloudModel.GEMINI_3_7_FLASH.value
+    assert enhancement.warnings == [
+        "Markdown refinement had no parsed content to process"
+    ]

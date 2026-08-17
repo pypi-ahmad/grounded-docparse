@@ -337,7 +337,7 @@ def _fallback_toc(result: ParseResult) -> TableOfContents:
 def _validate_toc(
     toc: TableOfContents,
     elements: dict[str, Element],
-    page_count: int,
+    valid_pages: set[int],
 ) -> TableOfContents:
     flat = []
     for section in _flatten_sections(toc.sections):
@@ -345,7 +345,7 @@ def _validate_toc(
         if not title:
             raise ValueError("TOC title is empty after Markdown normalization")
         section = section.model_copy(update={"title": title})
-        if section.page > page_count:
+        if section.page not in valid_pages:
             raise ValueError(f"TOC page {section.page} is outside the document")
         if section.element_id is not None:
             element = elements.get(section.element_id)
@@ -398,6 +398,7 @@ class DocumentAgent:
         prepared = prepared_context or self.prepare(parse_result)
         contexts = prepared.contexts
         elements = {element.id: element for element in prepared.elements}
+        valid_pages = {page.number for page in parse_result.document.pages}
 
         def classify_document():
             started = time.perf_counter()
@@ -428,7 +429,7 @@ class DocumentAgent:
             for context in contexts:
                 generated = gateway.generate_toc(context.markdown, context.layout)
                 generated = _validate_toc(
-                    generated, elements, len(parse_result.document.pages)
+                    generated, elements, valid_pages
                 )
                 sections.extend(_flatten_sections(generated.sections))
             deduplicated = []
@@ -441,7 +442,7 @@ class DocumentAgent:
             toc = _validate_toc(
                 TableOfContents(sections=_nest_sections(deduplicated)),
                 elements,
-                len(parse_result.document.pages),
+                valid_pages,
             )
             return toc, gateway, started
 
@@ -481,7 +482,7 @@ class DocumentAgent:
                 if name == "toc":
                     toc = _fallback_toc(parse_result)
                     features[name].status = "partial"
-                    features[name].warnings.append("Using grounded GLM heading fallback")
+                    features[name].warnings.append("Using detected heading fallback")
         return AgenticAnalysis(
             classification=classification,
             toc=toc,

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import threading
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -11,6 +12,15 @@ from .local_ocr import clear_glmocr_runtimes
 from .ollama_runtime import OllamaOcrModel, unload_model, warm_model
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_OCR_OPERATION_LOCK = threading.RLock()
+
+
+@contextmanager
+def ocr_operation() -> Iterator[None]:
+    """Keep process-wide OCR parsing and engine lifecycle changes exclusive."""
+
+    with _OCR_OPERATION_LOCK:
+        yield
 
 
 def _manager_command(*arguments: str) -> tuple[list[str], dict[str, str]]:
@@ -131,14 +141,15 @@ def temporary_alternate_ocr_engine(
 def switch_extraction_engine(target: ExtractionEngine, previous: ExtractionEngine | None = None) -> None:
     """Apply an exclusive engine selection and restore the prior vLLM stack on failure."""
 
-    target_ocr = target.vllm_ocr_engine
-    try:
-        if target_ocr is None:
-            stop_managed_vllm()
-        else:
-            ensure_managed_ocr_engine(target_ocr)
-    except Exception:
-        previous_ocr = previous.vllm_ocr_engine if previous is not None else None
-        if previous_ocr is not None:
-            ensure_managed_ocr_engine(previous_ocr)
-        raise
+    with ocr_operation():
+        target_ocr = target.vllm_ocr_engine
+        try:
+            if target_ocr is None:
+                stop_managed_vllm()
+            else:
+                ensure_managed_ocr_engine(target_ocr)
+        except Exception:
+            previous_ocr = previous.vllm_ocr_engine if previous is not None else None
+            if previous_ocr is not None:
+                ensure_managed_ocr_engine(previous_ocr)
+            raise

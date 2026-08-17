@@ -3,7 +3,11 @@ from datetime import date
 import pytest
 
 from grounded_docparse.models import AgentUsage
-from grounded_docparse.usage_costs import SessionUsageLedger, summarize_calls
+from grounded_docparse.usage_costs import (
+    SessionUsageLedger,
+    pricing_for,
+    summarize_calls,
+)
 
 
 def test_usage_costs_split_models_and_calculate_total() -> None:
@@ -57,6 +61,23 @@ def test_usage_costs_exclude_unavailable_telemetry() -> None:
 
     assert summary.models == ()
     assert summary.unavailable_calls == 1
+
+
+def test_model_rate_card_uses_configured_fixed_rates() -> None:
+    pricing = pricing_for("gpt-5.6-luna")
+    assert (pricing.input_per_million, pricing.output_per_million) == (0.20, 1.20)
+    gemini_lite = pricing_for("gemini-3.5-flash-lite")
+    assert (gemini_lite.input_per_million, gemini_lite.output_per_million) == (
+        0.30,
+        2.50,
+    )
+    gemini_flash = pricing_for("gemini-3.7-flash", pricing_date=date(2027, 1, 1))
+    assert (gemini_flash.input_per_million, gemini_flash.output_per_million) == (
+        0.75,
+        3.75,
+    )
+    agnes = pricing_for("agnes-2.5-flash")
+    assert (agnes.input_per_million, agnes.output_per_million) == (0.0, 0.0)
 
 
 def test_launch_session_ledger_returns_isolated_snapshots() -> None:
