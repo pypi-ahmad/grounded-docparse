@@ -251,17 +251,23 @@ fast-follow fixes (§ 9) are separately estimated.
 
 #### Verification & Exit Criteria (Definition of Done)
 
-- [ ] `uv sync --locked --extra native` installs cleanly on the CI runner.
-- [ ] `uv run python -m pytest -q` reports `519 passed, 9 xfailed` (or
-      better, if any of the 9 have been fixed by the time this lands).
-- [ ] `uvx ruff check src streamlit_app.py tests scripts` passes, OR the 2
-      known violations are fixed in the same PR (maintainer's call — either
-      is acceptable exit criteria, but state which happened).
-- [ ] `.github/workflows/ci.yml` runs and is green on this phase's own PR —
-      the authoritative signal for a lit-regime phase.
-- [ ] `CONTRIBUTING.md` and `TECHNICAL.md` both reflect the new CI reality
-      and the named quarantine list (H8 closed in the same PR).
-- [ ] No test assertion logic changed — only `xfail` markers added.
+- [x] `uv sync --locked --extra native` installs cleanly on the CI runner
+      (confirmed via the green GitHub Actions run below).
+- [x] `uv run python -m pytest -q` reports `519 passed, 9 xfailed` — verified
+      locally, exit 0.
+- [x] `uvx ruff check src streamlit_app.py tests scripts` — the 2 known
+      violations were fixed in this same phase (separate commit
+      `33f9e0e`), not deferred; ruff now reports clean.
+- [x] `.github/workflows/ci.yml` ran and is **green** on GitHub (confirmed
+      via `gh run list`, first real run after this phase's push, commit
+      `ca336ca`).
+- [x] `CONTRIBUTING.md` and `TECHNICAL.md` both updated to state CI exists
+      and link the quarantine list (H8 closed in the same commit).
+- [x] No test assertion logic changed — only `xfail` markers added.
+
+**Status: ✅ complete.** Both lint violations were fixed rather than left as
+a fast-follow (maintainer's call, made when executing this phase) — §9
+item 3's ruff half is done; the wiki-snapshot regeneration half is not.
 
 ## 7. Execution governance
 
