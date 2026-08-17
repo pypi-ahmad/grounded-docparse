@@ -26,7 +26,7 @@ Supported processing types are `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`,
 
 Scanned PDFs and images are rendered to pixels. Native PDFs can use `pdf-inspector` for text, layout, tables, and positions without OCR. Docling handles supported native Office, CSV, HTML, EPUB, and related formats; its RapidOCR engine provides the OCR-enabled Docling option. If a scanned document has no usable grounded layout regions, parsing stops before optional AI features run; isolated page failures remain visible as warnings.
 
-For a Mixed PDF, `pdf-inspector` suggests a Native or OCR route per page. The user reviews the page table, may override suggestions, confirms every page, and receives the merged result in original page order. A Native PDF with unusable pages stops and suggests Mixed PDF instead of silently falling back.
+For a Mixed PDF, `pdf-inspector` suggests a Native or OCR route per page. The user reviews the page table, may override suggestions, confirms every page, and receives the merged result in original page order. An optional page range limits which confirmed routes are parsed without renumbering the selected pages. A Native PDF with unusable pages stops and suggests Mixed PDF instead of silently falling back.
 
 The native CPU PP-DocLayoutV3 detector grounds region crops for GLM-OCR vLLM and all three Ollama recognizers. PaddleOCR-VL-1.6 vLLM retains its existing full Paddle layout-parsing service. Detector geometry and order remain authoritative even when recognition for one region fails.
 
@@ -324,7 +324,11 @@ full_json = render_combined_result(result, analysis)
 
 ## Open source, support, and responsibility
 
-Grounded DocParse is open-source software under the [MIT License](LICENSE).
+Grounded DocParse is free, open-source, community-driven software under the
+[MIT License](LICENSE). Cloning, forking, testing, filing bugs, suggesting
+features, and sending pull requests are all welcome. The project does not
+accept or want donations, sponsorship, or paid support of any kind.
+
 Questions and troubleshooting belong in [GitHub Discussions](https://github.com/pypi-ahmad/grounded-docparse/discussions),
 reproducible bugs belong in [GitHub Issues](https://github.com/pypi-ahmad/grounded-docparse/issues),
 and vulnerabilities must use the private process in [SECURITY.md](SECURITY.md).
