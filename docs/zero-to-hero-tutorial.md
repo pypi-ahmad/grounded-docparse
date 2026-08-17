@@ -661,7 +661,7 @@ The subset preserves:
 
 Non-eligible segments are skipped. One segment’s extraction failure is recorded on that segment without deleting successful results from other segments.
 
-If the user parsed a UI page-range subset, these are the subset’s renumbered pages rather than the page numbers of the original full PDF.
+If the user selected a UI page range, these remain the page numbers of the original full PDF; the range does not create or renumber a subset PDF.
 
 ## 12. Persistence, downloads, and session behavior
 

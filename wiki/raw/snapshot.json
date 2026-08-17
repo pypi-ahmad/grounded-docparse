@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-0724dc478444",
-    "base_commit": "77f4e870a0e04e98a5003a2273d9c4708dbfd7dc",
+    "id": "content-f9e253cce532",
+    "base_commit": "848313df63fe5fbc50082e255bf9f96d528ff439",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-15T17:16:28.135348+00:00",
+  "generated_at": "2026-08-15T17:19:04.493519+00:00",
   "categories": {
     "application-code": 38,
     "documentation": 46,

@@ -320,7 +320,7 @@ Use chat for investigation, not controlled repeatable extraction. A saved extrac
 
 After selecting each file's processing type and any applicable options, choose **Parse document**.
 
-For OCR routes, the progress area shows stages such as:
+The progress bar shows a whole-number batch percentage together with the current stage. For OCR routes, stages include:
 
 1. Layout detection
 2. Region recognition
@@ -883,7 +883,7 @@ When every segment is approved and the routing profile is unchanged, select **Do
 
 These are application gates, not proof of human review. Apply the organization’s review policy before selecting the button.
 
-The application creates an in-memory subset for each eligible segment and runs its assigned schema. It preserves parsed page numbers, element IDs, and source boxes. If the original upload used a page-range subset, those page numbers are relative to the subset.
+The application creates an in-memory subset for each eligible segment and runs its assigned schema. It preserves original parsed page numbers, element IDs, and source boxes. A content range does not renumber those pages.
 
 Non-eligible categories are never sent to extraction. A failed eligible segment is shown as failed without deleting successful results for other segments.
 
@@ -1113,7 +1113,7 @@ data/document_studio.sqlite3
 
 An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
-The database's sibling `workspaces` directory stores the active batch's source bytes, selected-page source, annotated PDF, and parse checkpoint. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
+The database's sibling `workspaces` directory stores the active batch's original source bytes, annotated PDF, and parse checkpoint. Per-document content-range settings are stored with the workspace state; no renumbered subset source is created. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
 
 Starting the managed Windows launcher deliberately replaces any verified native Streamlit app process and clears Streamlit's transient cache. This starts a fresh UI session but does not delete the SQLite workspace, stored source/result artifacts, models, or warm WSL OCR services.
 
