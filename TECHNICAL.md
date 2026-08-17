@@ -98,3 +98,9 @@ its signature/container, preserve exact source anchors, add public-contract and
 fixture tests, update exports and persistence, and extend the evaluation
 corpus. Follow [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [code of conduct](CODE_OF_CONDUCT.md).
+
+`.github/workflows/ci.yml` runs the same lint/compile/test commands on
+`windows-latest` for every push/PR to `main`. Nine tests are currently
+`xfail` pending investigation; see
+[MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for the current quarantine
+list and fast-follow plan.

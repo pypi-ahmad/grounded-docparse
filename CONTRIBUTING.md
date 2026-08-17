@@ -41,6 +41,14 @@ git diff --check
 
 Automated tests use synthetic documents and fake OpenAI gateways. The installed `grounded-docparse` command provides the explicit native/OCR `ingest` workflow; `streamlit_app.py` remains the application entry point and `scripts/evaluate_corpus.py` runs evaluation. Keep live OpenAI, load, and accuracy checks opt-in and document their exact environment. Local OCR development still requires the WSL runtime described in [SETUP.md](SETUP.md).
 
+`.github/workflows/ci.yml` runs `ruff check`, `compileall`, and `pytest` on
+every push/PR to `main` (`windows-latest`, matching this project's primary
+OS). Not yet an enforced required status check — that is a manual GitHub →
+Settings → Branches step. Nine tests are currently marked
+`@pytest.mark.xfail(strict=False)` pending investigation — see
+[MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) §9 for the tracked
+fast-follow list before removing any of those markers.
+
 Public test artifacts must be synthetic or explicitly redistributable. Never
 copy document content, personal data, credentials, provider responses, or
 sensitive local paths into an issue, fixture, snapshot, or pull request. Follow
