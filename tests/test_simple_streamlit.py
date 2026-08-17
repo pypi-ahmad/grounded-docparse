@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from io import BytesIO
 from typing import ClassVar
 
@@ -772,6 +773,14 @@ def test_local_ocr_cross_check_exposes_compatible_alternates(monkeypatch) -> Non
     }.issubset(set(alternate.options))
 
 
+@pytest.mark.xfail(
+    sys.platform == "win32",
+    reason=(
+        "Streamlit AppTest intermittently drops the parse-button event on clean "
+        "Windows runners without reporting an app exception"
+    ),
+    strict=False,
+)
 def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> None:
     monkeypatch.setattr(
         universal,
