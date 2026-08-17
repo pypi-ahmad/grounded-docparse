@@ -8,6 +8,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-08-17
+
+### Fixed
+
+- Made the page-range Streamlit regression deterministic on clean CI runners by matching its PDF inspection fixture to the two-page input.
+
 ## [0.9.0] - 2026-08-17
 
 ### Fixed
