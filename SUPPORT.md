@@ -1,8 +1,14 @@
 # Support
 
-Grounded DocParse is an open-source project maintained on a best-effort basis.
-There is no guaranteed response time, service-level agreement, hosted support
-service, or promise that every environment or document type can be diagnosed.
+Grounded DocParse is a free, open-source, community-driven project maintained
+on a best-effort basis. There is no guaranteed response time, service-level
+agreement, hosted support service, or promise that every environment or
+document type can be diagnosed.
+
+The project does not accept or want donations, sponsorship, or paid support of
+any kind. Reproducible bug reports, focused pull requests, and documentation
+corrections are the contributions that help — see
+[Project participation](#project-participation) below.
 
 ## Where to ask
 
