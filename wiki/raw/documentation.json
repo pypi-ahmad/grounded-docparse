@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-0724dc478444",
-    "base_commit": "77f4e870a0e04e98a5003a2273d9c4708dbfd7dc",
+    "id": "content-f9e253cce532",
+    "base_commit": "848313df63fe5fbc50082e255bf9f96d528ff439",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-15T17:16:28.135348+00:00",
+  "generated_at": "2026-08-15T17:19:04.493519+00:00",
   "category": "documentation",
   "files": [
     {
@@ -41,8 +41,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "010b6a4ae6da3dfb8901b3fb0894a1b215c927cbf58b2ef6054c8ca85e5b52cc",
-      "size": 28660
+      "sha256": "148cc3de5a26b21deaea05c24d885b2df212f62ff41c25069947d6a98bb76153",
+      "size": 28763
     },
     {
       "path": "SECURITY.md",
@@ -141,8 +141,8 @@
     },
     {
       "path": "docs/complete-user-guide.md",
-      "sha256": "1a0352766b224b68b0f74b2d2eb5b0d3c846d56500d9b64bdb0770cae60b0a79",
-      "size": 60850
+      "sha256": "2e58d0c093740a6e6eb680e56cd661ea7f6d7582662d25f2cc1add6148660191",
+      "size": 60971
     },
     {
       "path": "docs/extraction-quality-research.md",
@@ -156,8 +156,8 @@
     },
     {
       "path": "docs/how-it-works.md",
-      "sha256": "fbadceff35deb851c2c6329fc03b631b84df31d3c417b491b080acaf1cb804c0",
-      "size": 2024
+      "sha256": "5121064f17c66ade901440eec8f5052ac369ff86d4bc7767266777542ec5171b",
+      "size": 2337
     },
     {
       "path": "docs/idp-vs-ade-classification.html",
@@ -221,8 +221,8 @@
     },
     {
       "path": "docs/zero-to-hero-tutorial.md",
-      "sha256": "753b2623ea94361f6ce0525ef7388d974ee4a2eef733a832615402f38a342dc1",
-      "size": 56746
+      "sha256": "e496b171f6e34d09abb91bd994a826da84d651026361d13132ba495764e60ac8",
+      "size": 56751
     },
     {
       "path": "presentations/grounded-docparse-business.pptx",

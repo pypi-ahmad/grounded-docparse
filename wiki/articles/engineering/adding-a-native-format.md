@@ -1,7 +1,7 @@
 ---
 tags: extension, formats, parser-development
 sources: src/grounded_docparse/native.py, src/grounded_docparse/native_parsers.py, src/grounded_docparse/docling_native.py
-snapshot: content-0724dc478444
+snapshot: content-f9e253cce532
 status: released
 ---
 
