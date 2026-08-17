@@ -2,7 +2,12 @@
 
 from .agentic import DocumentAgent, PreparedDocumentContext
 from .config import AlternateOcrEngine, OcrEngine, ParserConfig
-from .content_range import AppliedContentRange, ContentRange, ContentRangeInfo, ContentUnit
+from .content_range import (
+    AppliedContentRange,
+    ContentRange,
+    ContentRangeInfo,
+    ContentUnit,
+)
 from .extraction import DocumentExtractor
 from .models import (
     AgenticAnalysis,
@@ -62,8 +67,8 @@ from .universal import (
 
 __all__ = [
     "AgenticAnalysis",
-    "AppliedContentRange",
     "AlternateOcrEngine",
+    "AppliedContentRange",
     "CellSourceAnchor",
     "CharacterInterval",
     "ChatAnswer",
@@ -116,9 +121,9 @@ __all__ = [
     "TextSourceAnchor",
     "UniversalDocumentParser",
     "VisualRecoveryResult",
+    "inspect_content_range",
     "render_combined_result",
     "render_native_combined_result",
     "render_native_document",
     "translate_stored_schema",
-    "inspect_content_range",
 ]
