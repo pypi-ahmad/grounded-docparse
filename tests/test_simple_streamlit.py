@@ -773,6 +773,15 @@ def test_local_ocr_cross_check_exposes_compatible_alternates(monkeypatch) -> Non
 
 
 def test_page_range_preserves_original_pdf_and_passes_selection(monkeypatch) -> None:
+    monkeypatch.setattr(
+        universal,
+        "inspect_pdf_content",
+        lambda _data: PdfInspection(
+            pdf_type="scanned",
+            page_count=2,
+            pages_needing_ocr=frozenset({1, 2}),
+        ),
+    )
     source = pymupdf.open()
     source.new_page().insert_text((72, 72), "First page")
     source.new_page().insert_text((72, 72), "Second page")
