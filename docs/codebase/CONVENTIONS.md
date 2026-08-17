@@ -34,7 +34,7 @@
 - CLI command boundaries convert expected `OSError`/`ValueError` failures to `error: ...` on stderr and exit code `2`; per-document execution records other exceptions as failed manifest entries.
 - Streamlit presents recoverable failures in UI state while persisting per-document status/error details.
 - Provider calls use `ProviderRuntime` for bounded retries, cooldown, concurrency, and diagnostics; SDK retries are disabled to keep one policy owner.
-- The package has no central `logging` configuration. Structured `AgentTraceEvent`, `RunUsage`, and runtime diagnostics are the main observability records; scripts/CLI use `print`.
+- The Streamlit entry point configures INFO logging for the `grounded_docparse` package. Structured `AgentTraceEvent`, `RunUsage`, and runtime diagnostics remain the durable observability records; scripts and CLI commands may use `print`.
 
 ### 5) Testing Conventions
 

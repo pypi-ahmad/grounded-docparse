@@ -83,7 +83,7 @@ DOCPARSE_PADDLEOCR_SERVICE_URL=http://127.0.0.1:8119 \
 | `DOCPARSE_PADDLE_VLLM_PORT` | `8118` | Loopback recognition-service port |
 | `DOCPARSE_PADDLE_API_PORT` | `8119` | Loopback PaddleX parser port |
 | `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Application-facing parser endpoint |
-| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `900` | Full-document request timeout |
+| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `120` | Full-document request timeout |
 
 When launching from Windows, set port overrides as Windows user environment variables before running the launcher. Both values must be distinct integers from 1 through 65535.
 
@@ -97,6 +97,6 @@ When launching from Windows, set port overrides as Windows user environment vari
 | Port `8118` or `8119` is occupied | Stop the process deliberately or configure two unused ports. The manager refuses unmanaged listeners. |
 | Recognition service does not become healthy | Inspect `.runtime/paddle-vllm.log`. |
 | PaddleX starts but parsing fails | Inspect `.runtime/paddle-api.log`, then run `scripts/wsl/check-paddleocr-api.py`. |
-| Streamlit does not open | Inspect `.runtime/streamlit.log` and check <http://127.0.0.1:7137/_stcore/health>. |
+| Streamlit does not open | Inspect `%LOCALAPPDATA%\GroundedDocParse\logs\streamlit.err.log` and check <http://127.0.0.1:7137/_stcore/health>. |
 
 Runtime PID files and generated configurations live under `.runtime/`. Model assets remain in `PADDLE_PDX_CACHE_HOME`, and the isolated environment remains at `DOCPARSE_PADDLE_WSL_ENV`; stopping services does not remove either location.

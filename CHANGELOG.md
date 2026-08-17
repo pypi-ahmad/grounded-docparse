@@ -8,6 +8,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- Restored bounded Local Ollama region recognition with visible per-region progress and request diagnostics.
+- Kept AI ADE primary extraction independent from optional visual recovery, and rejected empty AI ADE results for nonblank pages instead of reporting a successful zero-output parse.
+- Removed interrupted-batch resume state so new sessions cannot inherit stale processing progress.
+- Fixed output ZIP generation for page-range parses by validating annotations against the original document page count.
+- Required Gemini AI ADE regions to use Gemini-native bounding boxes, normalized them into the shared grounding contract, and rejected ungrounded Gemini page results.
+
 ## [0.8.0] - 2026-08-17
 
 ### Added

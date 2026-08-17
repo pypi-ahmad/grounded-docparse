@@ -1,106 +1,130 @@
 # Grounded DocParse technical overview
 
-This page is the engineering entry point for Grounded DocParse. The canonical
-deep references are the [architecture guide](docs/architecture.md),
-[product specification](docs/spec.md), and [Python API](docs/api.md).
+This explanation is the engineering entry point for new contributors. It describes the system boundaries and contracts needed to change the code safely. Use the [architecture guide](docs/architecture.md) for the full repository blueprint, [product specification](docs/spec.md) for required behavior, and [Python API reference](docs/api.md) for exact interfaces.
 
-## System boundary
+## Runtime boundary
 
-The application is a synchronous Streamlit process backed by local OCR
-services in Ubuntu 24.04 under WSL2. Local services bind to loopback. Optional
-AI-provider calls are outbound model requests for bounded recovery and document-level
-features; they do not own source geometry or evidence identity.
+Grounded DocParse is a modular Python application centered on one synchronous Streamlit process.
 
-## Explicit routing
+| Component | Runtime |
+| --- | --- |
+| Streamlit UI, CLI, persistence, native parsing | Windows |
+| PP-DocLayoutV3 layout detection | Windows CPU |
+| Ollama GLM-OCR, PaddleOCR-VL, DeepSeek-OCR | Windows Ollama |
+| Docling and RapidOCR | Windows CPU |
+| PDF Inspector | Windows |
+| GLM-OCR vLLM | Optional WSL2 service on port `8080` |
+| PaddleOCR-VL vLLM and PaddleX | Optional WSL2 services on ports `8118` and `8119` |
 
-Every file has one required `ProcessingType`:
+The application and model services bind to loopback. The product has no HTTP application API, durable worker queue, multi-user authentication, or tenant boundary.
+
+## Entry points
+
+- `streamlit_app.py` owns the interactive workflow.
+- `grounded-docparse ingest` provides explicit native and OCR batch routing.
+- `grounded-docparse parse` provides the legacy PDF and image OCR command.
+- `DocumentParser` exposes grounded OCR parsing.
+- `UniversalDocumentParser` exposes manually selected native, scanned, mixed, and image routes.
+- `DocumentAgent` and `DocumentExtractor` expose optional analysis and extraction features.
+
+## Routing contract
+
+Each file has one required `ProcessingType`: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`.
+
+The selected type is authoritative. Extension, signature, and container checks validate it. Invalid combinations fail before parsing. Native PDF does not fall back to OCR, and Mixed PDF requires a confirmed route for every selected page.
+
+`UniversalDocumentParser` dispatches to one route:
 
 ```text
-NATIVE_PDF, SCANNED_PDF, MIXED_PDF, WORD, POWERPOINT,
-EXCEL, CSV, IMAGE, OTHER_NATIVE
+Native PDF      -> PDF Inspector
+Scanned/Image   -> DocumentParser and selected extraction engine
+Mixed PDF       -> confirmed native/OCR page routes, then ordered merge
+Office/Open     -> OCR-disabled Docling or deterministic native parser
 ```
 
-The UI or CLI selection controls dispatch. Extension checks narrow legal
-choices; signature and container validation confirm the selection. Invalid
-combinations stop before parsing, and no pipeline silently falls back to
-another route.
+## Extraction engines
 
-## Processing pipelines
+`ExtractionEngine` separates product choices from lower-level `OcrEngine` values. Only one extraction engine is active at a time.
 
-### Scanned PDFs and images
+- AI ADE uses the selected cloud model directly.
+- GLM-OCR combines Windows CPU layout with the WSL vLLM recognizer.
+- PaddleOCR-VL uses the WSL PaddleX and vLLM services.
+- Docling + RapidOCR runs locally on Windows CPU.
+- PDF Inspector reads selectable PDF structure without OCR.
+- Local Ollama combines Windows CPU layout with one of three Ollama recognizers.
 
-Pages are rasterized and sent to the selected extraction engine. Native Windows
-PP-DocLayoutV3 grounds GLM-OCR vLLM and Ollama crops; PaddleOCR-VL retains its
-full WSL Paddle pipeline. The grounded engine owns layout, element identity, type, confidence, bounding
-boxes, and reading order. Deterministic quality analysis may request bounded
-text recovery, but recovery cannot add regions or alter geometry.
+Local Ollama submits detected region crops sequentially through `/api/chat`. It uses a 4,096-token context, a 120-second request timeout, and a 300-second page deadline. Output is capped at 128, 256, or 512 tokens according to region size. DeepSeek-OCR retries a failed region once and stops the page after repeated consecutive failures.
 
-### Native PDFs
+## Parse lifecycle and progress
 
-`pdf-inspector` extracts selectable text, layout, tables, page positions, and
-bounding boxes without OCR. A page that cannot provide usable native evidence
-causes Native PDF processing to stop and recommend Mixed PDF.
+`DocumentParser.parse` ingests and rasterizes the selected pages, analyzes ordered page windows, constructs deterministic page elements, applies bounded recovery, renders outputs, and runs enabled optional features.
 
-### Mixed PDFs
+Local grounded OCR reports layout completion and every region request. The pipeline maps those events into the first 30 percent of document progress. Later recognition, assembly, enhancement, and rendering stages occupy the remaining progress bands. Streamlit receives progress on its caller thread.
 
-`pdf-inspector` proposes a Native or OCR route per page. The user confirms or
-overrides every route before execution. Native and OCR page results are merged
-in original page order with no silent fallback.
+Recognition has bounded failure behavior. A page-level runtime error becomes a visible page failure. AI ADE raises an error when a nonblank page contains no returned regions. An empty nonblank document is never reported as a successful parse.
 
-### Office and other native formats
+## Evidence ownership
 
-OCR-disabled Docling conversion supports DOCX, PPTX, XLSX, CSV, HTML, EPUB,
-Markdown, selected OpenDocument formats, and other explicitly supported native
-inputs. Deterministic manifests claim converted blocks against original
-paragraphs, shapes, sheets, cells, tables, rows, or columns. Embedded images
-are recorded as assets and are not OCRed.
+### OCR evidence
 
-## Evidence model
+The grounded engine owns element identity, normalized geometry, type, confidence, and reading order. Optional AI enhancement may replace text on an existing failed or sub-75-percent-confidence element after validation. It cannot add a region or change geometry, structure, or order.
 
-`NativeDocument` stores immutable `base_text`, source spans, source anchors,
-blocks, tables, assets, warnings, and rendered views. Each source span maps a
-half-open character interval in `base_text` to one or more `SourceAnchor`
-records.
+### Native evidence
 
-LangExtract receives only `base_text`. A candidate is accepted only when it has
-an exact `char_interval`, its value matches the referenced source text, and the
-interval resolves through source spans to anchors. Refined Markdown cannot
-become evidence, and ungrounded values are rejected.
+`NativeDocument` stores immutable `base_text`, source units, elements, spans, anchors, tables, assets, and warnings. Each half-open character span maps back to one or more `SourceAnchor` records.
 
-## Interfaces and persistence
+Native extraction sends only `base_text` to LangExtract. A result is accepted only when its exact `char_interval` matches the source and resolves through spans to anchors. Refined Markdown is presentation, not evidence.
 
-- `streamlit_app.py` is the interactive application entry point.
-- `grounded-docparse ingest` is the batch CLI entry point.
-- `src/grounded_docparse/` contains public parsing models and orchestration.
-- Workspace persistence retains processing types, page routes, `base_text`,
-  spans, anchors, assets, warnings, and grounded extraction evidence.
-- Visual formats can export annotated PDFs; nonvisual native formats expose
-  Markdown, JSON, and source-structure views instead.
+## Optional AI stages
 
-## Security properties
+The selected cloud model can power direct AI ADE, failed-region enhancement, Markdown presentation refinement, classification, table of contents, extraction, routing, and chat. Each feature has its own structured contract and failure status.
 
-Uploaded files and model outputs are untrusted. Container parsing, XML
-handling, filenames, Markdown rendering, and persisted state must remain
-validated and bounded. OCR, Docling, PDF Inspector, and LangExtract must not
-gain network or OCR behavior beyond their documented route. Review
-[SECURITY.md](SECURITY.md) before changing egress, storage, or trust boundaries.
+Provider failures do not invalidate an already completed local parse. Requests use bounded concurrency and retry logic. Accepted citations must resolve to known elements or anchors.
 
-## Development and extension
+## Persistence and session lifecycle
 
-Install the locked development environment:
+SQLite stores workspace metadata, settings, reusable schemas, routing profiles, failures, usage, and completed results. Sibling workspace directories store source bytes and completed artifacts.
+
+Completed results can be restored after restart. A stored `processing` or legacy `interrupted` record is normalized to `pending`; partial progress, checkpoints, analysis, extraction state, and incomplete results are not restored. Extraction review, routing review, and chat remain session-only.
+
+## Configuration and logging
+
+`ParserConfig.from_env()` reads engine, model, rendering, threshold, concurrency, retry, endpoint, timeout, and analysis settings. Loopback validation protects local GLM, Paddle, and Ollama origins.
+
+The Streamlit entry point configures INFO logging for the `grounded_docparse` package. OCR logs record page, region, model, timing, token counts, done reason, and output length without logging OCR text or image payloads. The Windows launcher follows Streamlit, WSL OCR, managed Ollama, and Ollama server logs in one terminal.
+
+There is no external metrics, tracing, alerting, or centralized log service.
+
+## Output contracts
+
+| Output | Version |
+| --- | --- |
+| OCR parse JSON | `4.5.0` |
+| OCR Full JSON | `4.6.0` |
+| Legacy extraction JSON | `1.1.0` |
+| Routed extraction JSON | `2.0.0` |
+| Native document JSON | `5.0.0` |
+| Native document plus extraction | `5.1.0` |
+
+The Streamlit workspace compatibility version is separate from public output schema versions.
+
+## Change the system safely
+
+Before adding a format or engine:
+
+1. Define its explicit route and compatibility checks.
+2. Preserve deterministic identity and source evidence.
+3. Keep optional AI work behind validated contracts.
+4. Add focused unit and integration tests.
+5. Update public exports, persistence compatibility, docs, and evaluation fixtures where applicable.
+6. Run the repository verification commands.
 
 ```powershell
-uv sync --python 3.12.10 --locked --extra native
+uv sync --locked
+uvx ruff check src streamlit_app.py tests scripts
+uv run python -m compileall -q src streamlit_app.py tests scripts
+uv run python -m pytest -q
+uv run grounded-docparse ingest --help
 ```
 
-Before adding a native format, define its compatible processing type, validate
-its signature/container, preserve exact source anchors, add public-contract and
-fixture tests, update exports and persistence, and extend the evaluation
-corpus. Follow [CONTRIBUTING.md](CONTRIBUTING.md) and the
-[code of conduct](CODE_OF_CONDUCT.md).
-
-`.github/workflows/ci.yml` runs the same lint/compile/test commands on
-`windows-latest` for every push/PR to `main`. Nine tests are currently
-`xfail` pending investigation; see
-[MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for the current quarantine
-list and fast-follow plan.
+Follow [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and the [codebase conventions](docs/codebase/CONVENTIONS.md).

@@ -1113,7 +1113,7 @@ data/document_studio.sqlite3
 
 An administrator can override this location with `DOCPARSE_STUDIO_DB_PATH`.
 
-The database's sibling `workspaces` directory stores the active batch's original source bytes, annotated PDF, and parse checkpoint. Per-document content-range settings are stored with the workspace state; no renumbered subset source is created. The app restores its settings, progress, failures, analysis, and usage after restart. A document interrupted during OCR retries OCR; a document with a completed parse checkpoint reuses that result and retries only unfinished analysis. **Clear saved workspace** removes the active batch after confirmation.
+The database's sibling `workspaces` directory stores source bytes and completed artifacts. Per-document content-range settings are stored with the workspace state; no renumbered subset source is created. The app restores completed results, settings, failures, analysis, and usage after restart. Incomplete processing is reset to pending, and partial progress or incomplete results are discarded. Start parsing again with **Parse document** or **Process documents**. **Clear saved workspace** removes the active batch after confirmation.
 
 Starting the managed Windows launcher deliberately replaces any verified native Streamlit app process and clears Streamlit's transient cache. This starts a fresh UI session but does not delete the SQLite workspace, stored source/result artifacts, models, or warm WSL OCR services.
 
@@ -1169,7 +1169,7 @@ Developers can use the Python package directly through:
 - `ParserConfig` for configuration; and
 - `render_combined_result` for Full JSON.
 
-The Python API is synchronous and does not provide a page-range argument. WSL is required only when the selected engine is GLM-OCR or PaddleOCR-VL vLLM; native and Ollama engines run on Windows.
+The Python API is synchronous. `DocumentParser.parse` accepts an optional applied page range, while `UniversalDocumentParser.parse` accepts a natural-unit `ContentRange`. WSL is required only when the selected engine is GLM-OCR or PaddleOCR-VL vLLM; native and Ollama engines run on Windows.
 
 Read the [Python API guide](api.md) and [zero-to-hero technical tutorial](zero-to-hero-tutorial.md) for examples.
 
@@ -1264,7 +1264,7 @@ A starter `New Authorization` schema can include `patient_name`, `member_id`, `d
 
 | Problem | What it usually means | What to do |
 | --- | --- | --- |
-| Browser is blank | Streamlit did not start or is unhealthy | Open the exact local URL and inspect `.runtime/streamlit.log` |
+| Browser is blank | Streamlit did not start or is unhealthy | Open the exact local URL and inspect `%LOCALAPPDATA%\GroundedDocParse\logs\streamlit.err.log` |
 | Parse fails before layout | Local GLM service/model is unavailable | Check `.runtime/vllm.log`, WSL GPU access, and service health |
 | AI controls are disabled | The selected model's API key is unavailable | Configure it in approved User scope and relaunch |
 | AI destination is unexpected | A custom provider base URL is active | Stop and verify/remove the value |

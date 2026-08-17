@@ -403,13 +403,13 @@
       <p class="muted">From <code>docs/architecture.md</code>, <code>docs/how-it-works.md</code>, and <code>README.md</code>.</p>
       <pre><code>Browser
   → Streamlit (`streamlit_app.py`)
-     → ingest + rasterization (no selectable PDF text)
-     → selected local OCR
-        → GLM-OCR / vLLM (or Ollama)  OR  PaddleOCR-VL-1.6 / PaddleX
+     → validate uploads and select one extraction engine per file
+     → selected extraction route
+        → AI ADE | WSL vLLM OCR | Local Ollama | Docling + RapidOCR | PDF Inspector
      → deterministic quality / recovery planning
-     → optional Luna crop recovery (text-only on existing regions)
+     → optional selected-provider crop recovery (text-only on existing regions)
      → grounded Markdown + hierarchy + JSON + annotated PDF
-     → optional Luna document features:
+     → optional provider-backed document features:
           refine | classify | TOC | form routing | extract | chat
      → downloads + source highlighting</code></pre>
 
@@ -418,7 +418,7 @@
       <div class="flow-step"><div class="n">2</div><div><strong>Local OCR perception</strong> — layout + recognition. This stage owns text, type, order, IDs, boxes, confidence.</div></div>
       <div class="flow-step"><div class="n">3</div><div><strong>Deterministic quality</strong> — rank weak regions (low confidence, empty large regions, density/garbage, weak tables).</div></div>
       <div class="flow-step"><div class="n">4</div><div><strong>Optional visual recovery</strong> — engine-local form recovery + optional Luna crops; only high-confidence text replacements (≥ 0.85) accepted.</div></div>
-      <div class="flow-step"><div class="n">5</div><div><strong>Materialize parse</strong> — hierarchy, base Markdown, refined Markdown (optional), parse JSON v4.4, annotated PDF.</div></div>
+      <div class="flow-step"><div class="n">5</div><div><strong>Materialize parse</strong> - hierarchy, base Markdown, refined Markdown (optional), parse JSON v4.5, annotated PDF.</div></div>
       <div class="flow-step"><div class="n">6</div><div><strong>Optional agentic analysis</strong> — classification + TOC concurrently; failures isolated; TOC can fall back to grounded headings.</div></div>
       <div class="flow-step"><div class="n">7</div><div><strong>On-demand extraction / routing / chat</strong> — user-triggered; schema/profile driven; citations must resolve to known evidence.</div></div>
 

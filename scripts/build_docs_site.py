@@ -55,6 +55,7 @@ GROUP_ORDER = (
         (
             "SETUP.md",
             "docs/run.md",
+            "docs/local-ollama.md",
             "docs/local-glmocr.md",
             "docs/local-paddleocr-vl.md",
             "docs/azure-bulk-fax-deployment.md",

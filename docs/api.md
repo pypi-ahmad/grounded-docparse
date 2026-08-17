@@ -275,7 +275,7 @@ The most frequently consumed exported models have these fields:
 
 | Model | Fields |
 | --- | --- |
-| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, `deepseek-ocr`, or `luna-recovery`) |
+| `Element` | `id`, `type`, `page`, normalized `bbox`, `text`, one-based `reading_order`, optional OCR `confidence`, `source` (`glm-ocr`, `paddleocr-vl-1.6`, `deepseek-ocr`, `rapidocr`, `ai-ade`, or `luna-recovery`) |
 | `ChatSource` | `element_id`, `page`, `text` |
 | `ChatAnswer` | `answer`, `sources`, `confidence` (`high`, `medium`, `low`), `usage`, `trace` |
 | `SchemaProposal` | `instruction`, `json_schema`, `usage` |
@@ -350,7 +350,7 @@ These examples define the stable top-level envelopes, not complete JSON Schemas 
 
 ## Configuration and test doubles
 
-Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_CLOUD_MODEL` accepts `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`, or `agnes-2.5-flash`. `DOCPARSE_OCR_ENGINE` accepts `glm-ocr`, `paddleocr-vl-1.6`, or `ollama`; `DOCPARSE_OLLAMA_MODEL` selects the Ollama recognizer. `DOCPARSE_OCR_DISAGREEMENT_ENABLED` enables audit-only uncertain-region comparison, and `DOCPARSE_OCR_DISAGREEMENT_ENGINE` selects `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr`; omitting it chooses a compatible alternate automatically. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. GLM, Paddle, and Ollama service origins must remain loopback-only. Invalid enum values, numeric values, bounds, or service origins fail during configuration construction.
+Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_CLOUD_MODEL` accepts `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`, or `agnes-2.5-flash`. `DOCPARSE_OCR_ENGINE` accepts `glm-ocr`, `paddleocr-vl-1.6`, `ollama`, or `rapidocr`; `DOCPARSE_OLLAMA_MODEL` selects the Ollama recognizer. `DOCPARSE_OCR_DISAGREEMENT_ENABLED` enables audit-only uncertain-region comparison, and `DOCPARSE_OCR_DISAGREEMENT_ENGINE` selects `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr`; omitting it chooses a compatible alternate automatically. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. GLM, Paddle, and Ollama service origins must remain loopback-only. Invalid enum values, numeric values, bounds, or service origins fail during configuration construction.
 
 `gateway_factory` is a test/compatibility seam rather than a published protocol. The constructor signatures show its internal `OpenAIDocumentGateway` default for fidelity; normal callers should omit this argument. A custom factory receives `ParserConfig` and must provide the methods exercised by the selected workflow, so requirements depend on enabled features. The package does not promise thread-safe reuse of parser/agent instances; create them per workflow. The process-wide `GlmOcrRuntime` serializes SDK model access.
 

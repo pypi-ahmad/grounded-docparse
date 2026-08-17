@@ -179,12 +179,12 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 | `DOCPARSE_GLM_VLLM_BASE_URL` | `http://127.0.0.1:8080/v1` | Loopback GLM recognition endpoint |
 | `DOCPARSE_OLLAMA_MODEL` | `glm-ocr:latest` | Selected Ollama OCR model |
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | Windows Ollama endpoint; non-loopback origins are rejected |
-| `DOCPARSE_GROUNDED_OCR_TIMEOUT_SECONDS` | `900` | Per-region GLM/Ollama recognition timeout |
+| `DOCPARSE_GROUNDED_OCR_TIMEOUT_SECONDS` | `120` | Per-region GLM/Ollama recognition timeout |
 | `DOCPARSE_LAYOUT_DETECTION_THRESHOLD` | `0.3` | Native CPU PP-DocLayoutV3 detection threshold |
 | `DOCPARSE_GLMOCR_CONFIG_PATH` | `config/glmocr.yaml` | GLM-OCR SDK configuration |
 | `DOCPARSE_GLMOCR_LAYOUT_DEVICE` | `cuda:0` | Layout-model device |
 | `DOCPARSE_PADDLEOCR_SERVICE_URL` | `http://127.0.0.1:8119` | Loopback-only full PaddleX document-parser API; remote origins are rejected because document bytes are posted here |
-| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `900` | Local full-document request timeout |
+| `DOCPARSE_PADDLEOCR_TIMEOUT_SECONDS` | `120` | Local full-document request timeout |
 | `DOCPARSE_PADDLE_VLLM_PORT` | `8118` | Loopback port for PaddleOCR-VL recognition |
 | `DOCPARSE_PADDLE_API_PORT` | `8119` | Loopback port for the full PaddleX parser; launchers derive the service URL from it |
 | `PADDLE_PDX_CACHE_HOME` | `~/.paddlex` | Persistent Paddle model/font cache; keep this path stable to avoid downloading assets again |

@@ -673,7 +673,7 @@ Reusable extraction schemas, routing profiles, and the active batch workspace pe
 data/document_studio.sqlite3
 ```
 
-Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition. The sibling `workspaces/` directory stores uploaded source bytes, parse checkpoints, and annotated PDFs. The latest batch is restored after an app restart. The managed Windows launcher replaces the verified prior Streamlit process and clears transient Streamlit cache/session state, but preserves this durable batch and any warm WSL OCR service. Use **Clear saved workspace** to delete the durable batch.
+Override the path with `DOCPARSE_STUDIO_DB_PATH`. SQLite uses WAL mode and case-insensitive definition names. Saving the same name updates the existing mutable definition. The sibling `workspaces/` directory stores uploaded source bytes and completed artifacts. Completed results are restored after an app restart. Incomplete processing is reset to pending and partial progress is discarded. The managed Windows launcher replaces the verified prior Streamlit process and clears transient Streamlit cache/session state, but preserves durable completed work and any warm WSL OCR service. Use **Clear saved workspace** to delete the durable batch.
 
 ### 12.2 What does not persist
 
@@ -1255,7 +1255,7 @@ Read [Deploy Grounded DocParse on Azure for bulk medical faxes](azure-bulk-fax-d
 
 | Symptom | Likely cause | Action |
 | --- | --- | --- |
-| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:7137>; inspect `.runtime/streamlit.log` |
+| Browser does not open | Streamlit did not start or health check failed | Open <http://localhost:7137>; inspect `%LOCALAPPDATA%\GroundedDocParse\logs\streamlit.err.log` |
 | GLM parse fails before layout | Local service/model unavailable | Check `.runtime/vllm.log`, `nvidia-smi`, and `http://127.0.0.1:8080/v1/models` |
 | AI controls are disabled | Selected model key unavailable to Streamlit | Save it in Windows User scope and rerun `Launch-Grounded-DocParse.cmd` |
 | Unexpected remote destination | Custom `OPENAI_BASE_URL` is configured | Stop; verify/remove the environment value before processing documents |

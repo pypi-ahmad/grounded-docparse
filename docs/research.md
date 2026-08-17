@@ -26,6 +26,6 @@ Across both families:
 
 Markdown refinement is presentation-only. The selected AI provider returns directives keyed by existing elements, and deterministic code renders them. Extraction and chat operate on Markdown plus a compact layout tree; returned element IDs are validated before the UI can highlight them.
 
-OpenAI requests set `store=False` and omit application-supplied prompt-cache controls. The UI restores the active batch workspace after restart: sources, parse checkpoints, analyses, settings, and usage persist in SQLite plus sibling `workspaces/` artifacts. Reusable schemas and routing profiles persist in the same database. Extraction, routing review, and chat remain session-only.
+OpenAI requests set `store=False` and omit application-supplied prompt-cache controls. The UI restores completed results after restart. Sources and completed artifacts persist beside SQLite, while settings, failures, analyses, usage, reusable schemas, and routing profiles persist in the database. Incomplete processing is reset to pending and its partial progress is discarded. Extraction, routing review, and chat remain session-only.
 
 Automated tests use synthetic documents and fake gateways. Live evaluation is opt-in. The bundled corpus and the targeted crop experiment in [extraction quality research](extraction-quality-research.md) are regression evidence, not broad accuracy, throughput, cost, or external-product-equivalence claims.
