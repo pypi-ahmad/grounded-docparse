@@ -4,11 +4,11 @@
 
 ### 1) Top Risks (Prioritized)
 
-1. **Large orchestration hotspots — medium.** `pipeline.py` and `streamlit_app.py` each exceed 3,000 lines. Both are high-churn and combine many control paths, increasing regression and review cost.
-2. **Limited automated repository gate - medium.** The checked-in CI workflow runs linting, tests, and basic package checks, but it does not enforce a coverage baseline or exercise the Windows, WSL, Ollama, and GPU service topology.
-3. **Native adapter fidelity — medium.** Docling output is reconciled against a project-built source manifest. This correctly fails closed, but upstream conversion changes can cause valid documents to fail until adapters/tests are updated.
+1. **Large orchestration hotspots: medium.** `pipeline.py` and `streamlit_app.py` each exceed 3,000 lines. Both are high-churn and combine many control paths, increasing regression and review cost.
+2. **Limited automated repository gate: medium.** The checked-in CI workflow runs linting, tests, and basic package checks, but it does not enforce a coverage baseline or exercise the Windows, WSL, Ollama, and GPU service topology.
+3. **Native adapter fidelity: medium.** Docling output is reconciled against a project-built source manifest. This correctly fails closed, but upstream conversion changes can cause valid documents to fail until adapters/tests are updated.
 4. **Split result versions: medium.** Streamlit workspace `RESULT_VERSION` is `4.6.5`, OCR full JSON is `4.6.0`, and native JSON is `5.0.0`/`5.1.0`. Compatibility ownership is manual.
-5. **Provider preflight inconsistency — medium.** `DocumentAgent.analyze()` and CLI `--schema` validation still check `OPENAI_API_KEY` directly instead of the selected model's `api_key_name`. Region recovery and Markdown refinement are provider-neutral, but Gemini/Agnes classification or TOC can be reported unavailable unless the OpenAI compatibility key is also present.
+5. **Provider preflight inconsistency: medium.** `DocumentAgent.analyze()` and CLI `--schema` validation still check `OPENAI_API_KEY` directly instead of the selected model's `api_key_name`. Region recovery and Markdown refinement are provider-neutral, but Gemini/Agnes classification or TOC can be reported unavailable unless the OpenAI compatibility key is also present.
 
 ### 2) Technical Debt
 

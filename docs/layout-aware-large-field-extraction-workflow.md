@@ -8,7 +8,7 @@ A healthcare workflow might request Patient NPI, Rendering Provider NPI, service
 
 The central principle is:
 
-> Parse the source document once, then perform extraction against the resulting Markdown and layout structure—not directly against the PDF or image.
+> Parse the source document once, then perform extraction against the resulting Markdown and layout structure. Extraction never runs directly against the PDF or image.
 
 ## Current Capability and Proposed Extension
 

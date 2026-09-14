@@ -43,9 +43,9 @@ Automated tests use synthetic documents and fake OpenAI gateways. The installed 
 
 `.github/workflows/ci.yml` runs `ruff check`, `compileall`, and `pytest` on
 every push/PR to `main` (`windows-latest`, matching this project's primary
-OS). Not yet an enforced required status check — that is a manual GitHub →
+OS). Not yet an enforced required status check. That is a manual GitHub →
 Settings → Branches step. Nine tests are currently marked
-`@pytest.mark.xfail(strict=False)` pending investigation — see
+`@pytest.mark.xfail(strict=False)` pending investigation. See
 [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) §9 for the tracked
 fast-follow list before removing any of those markers.
 

@@ -161,8 +161,6 @@ The Streamlit process synchronously orchestrates a known set of capabilities. Pa
 
 ## The precise description
 
-The most accurate description is:
-
 > Grounded DocParse is a user-configured, bounded agentic workflow for document understanding. Specialized AI reasoning stages operate over a deterministic OCR evidence layer, while application code enforces context limits, structured contracts, finite repair, source grounding, automatic and human review gates, and safe failure behavior.
 
 That design provides useful model-driven judgment without surrendering control of document identity, evidence, or downstream business actions.

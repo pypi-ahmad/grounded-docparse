@@ -46,7 +46,7 @@ Each field should have:
 - The expected value type, such as text, number, whole number, yes/no, or date
 - A clear distinction from similar fields
 
-For example, “Patient NPI” and “Rendering Provider NPI” should be separate fields with descriptions explaining whose identifier is required. Avoid vague names such as “provider number” when several provider numbers may appear.
+For example, "Patient NPI" and "Rendering Provider NPI" should be separate fields with descriptions explaining whose identifier is required. Avoid vague names such as "provider number" when several provider numbers may appear.
 
 For repeating information, decide in advance how the business wants it represented. If a fixed number of positions is required, define separate fields such as primary, secondary, and tertiary codes. The current in-app builder is designed for individually named values, not an unlimited collection of repeating rows. When the number of line items, transactions, or codes varies widely, use an agreed summary or a separate downstream process designed for repeating records.
 
@@ -127,7 +127,7 @@ Add the approved field names, descriptions, and types. For a large schema:
 
 For the first large schema, import an approved CSV or XLSX field list, then review it in the schema builder. Use the columns **Field name**, **Description**, and **Type** in that order. XLSX imports read the first worksheet. Once the schema is complete, save it so this setup is not repeated for every document.
 
-The current UI runs one schema at a time and keeps only the latest extraction result in the active session. For a field set that must be split, create stable schemas by business group—for example, member details, provider details, service lines, and financial totals. Run and download each group before starting the next one, then merge the approved outputs in the downstream business process. The repository does not perform that cross-schema merge.
+The current UI runs one schema at a time and keeps only the latest extraction result in the active session. For a field set that must be split, create stable schemas by business group: for example, member details, provider details, service lines, and financial totals. Run and download each group before starting the next one, then merge the approved outputs in the downstream business process. The repository does not perform that cross-schema merge.
 
 Give the schema a meaningful name, such as the process and document family it supports. It can be exported as a schema file, shared with another authorized user, and imported later.
 
@@ -150,7 +150,7 @@ Review extracted fields according to their business importance and result status
 - **Inferred**: The app proposed a value from the document context but could not confirm an exact value-to-source match. Both the value and its highlighted source require manual confirmation; inferred is not the same as verified support.
 - **Not found**: The app could not support a value from the document. The value remains empty rather than being invented.
 
-Use **Show source** to open the cited page and highlighted region. Confirm both the value and its meaning. A correct number taken from the wrong role or section is still a business error—for example, a facility NPI returned as a rendering provider NPI.
+Use **Show source** to open the cited page and highlighted region. Confirm both the value and its meaning. A correct number taken from the wrong role or section is still a business error: for example, a facility NPI returned as a rendering provider NPI.
 
 For a schema with more than 100 fields, use a risk-based review process:
 
