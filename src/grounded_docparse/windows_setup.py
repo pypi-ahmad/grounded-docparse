@@ -1,3 +1,9 @@
+"""CLI entry point the native Windows launcher runs to pre-download model
+assets (PP-DocLayoutV3, Ollama OCR models, Docling/TableFormer/RapidOCR
+weights) before first use. Must not perform any parsing itself. Next file:
+grounded_ocr.py, which is what actually loads the layout model at runtime.
+"""
+
 from __future__ import annotations
 
 import argparse

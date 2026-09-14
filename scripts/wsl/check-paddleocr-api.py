@@ -1,3 +1,5 @@
+"""Run one real layout-parsing request against the local PaddleOCR-VL service."""
+
 from __future__ import annotations
 
 import base64
@@ -36,6 +38,8 @@ def main() -> int:
     )
     with urlopen(request, timeout=180) as response:
         payload = json.loads(response.read())
+    # PaddleX's own success contract: errorCode == 0 with a "result" key, distinct
+    # from the HTTP status code.
     if payload.get("errorCode") != 0 or "result" not in payload:
         raise SystemExit(f"PaddleOCR-VL inference probe failed: {payload}")
     return 0

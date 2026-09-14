@@ -1,3 +1,19 @@
+"""Single Streamlit process: upload, manual processing-type/routing review, engine and
+AI-feature selection, parse execution with progress reporting, results review
+(Markdown/JSON/evidence/source structure/annotated PDF), extraction/routing/chat, and
+downloads.
+
+This module owns UI-only state and presentation. It must not become an evidence
+owner: element identity, geometry, reading order, and native source spans/anchors are
+decided by the package (see universal.py for routing/validation, native.py for the
+native evidence contract, and pipeline.py for what actually runs during a parse).
+Streamlit reruns this entire script top-to-bottom on every widget interaction, so
+`st.session_state` is the only state that survives a rerun; guards like
+`durable_workspace_loaded` below exist to stop one-time setup from repeating on every
+rerun. Next file to read: workspace_store.py for the persistence contract this module
+restores from and writes back to.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -134,6 +150,9 @@ PROCESSING_LABELS = {
     "Image": ProcessingType.IMAGE,
     "Other Native": ProcessingType.OTHER_NATIVE,
 }
+# Bumping this invalidates every cached/restored result and forces a full reparse.
+# It tracks UI/session-state compatibility, not the public OCR/native JSON schema
+# versions (see native.py / models.py), which change independently.
 RESULT_VERSION = "4.6.5"
 THUMBNAILS_PER_GROUP = 12
 WORKSPACE_SETTING_KEYS = (
@@ -354,6 +373,11 @@ def render_session_cost_page() -> None:
     st.caption(f"Pricing as of {pricing_date}; synchronous API rates.")
 
 
+# st.session_state is one global namespace shared across all documents in a batch.
+# DOCUMENT_STATE_KEYS names the subset that is document-scoped (result, review state,
+# chat, etc.); save_active_workspace/load_workspace below swap that subset in and out
+# of the per-document workspace dict whenever the active document changes, so widgets
+# reading these keys always see the active document's values.
 DOCUMENT_STATE_KEYS = (
     "result",
     "result_source_hash",
@@ -506,6 +530,9 @@ def mark_ade_custom() -> None:
 
 
 def apply_engine_selection(target: ExtractionEngine | None = None) -> None:
+    # On failure this returns without updating extraction_engine/active_extraction_engine,
+    # so the previously active engine stays authoritative; toggle_extraction_engine below
+    # relies on that to revert the UI toggles to match.
     with ocr_operation():
         target = target or ExtractionEngine(st.session_state.extraction_engine)
         previous_value = st.session_state.get("active_extraction_engine")
@@ -541,6 +568,8 @@ def toggle_extraction_engine(target_value: str) -> None:
         st.session_state[f"engine-toggle-{engine.value}"] = engine is target
     apply_engine_selection(target)
     if st.session_state.get("engine_switch_error"):
+        # apply_engine_selection left the old engine active; flip the toggle widgets
+        # back so the UI doesn't show a switch that didn't actually happen.
         for engine in ExtractionEngine:
             st.session_state[f"engine-toggle-{engine.value}"] = engine is previous
     else:
@@ -1281,6 +1310,9 @@ def _apply_routing_review(
             )
         )
     segments.sort(key=lambda item: (item.start_page, item.end_page))
+    # Invariant: every page of the document must end up in exactly one segment, in
+    # order, with no gaps or overlaps — a reviewer-edited routing table that skips or
+    # double-assigns a page is rejected rather than silently accepted.
     covered = [
         page
         for segment in segments
@@ -1312,6 +1344,9 @@ st.session_state.setdefault("active_document_id", None)
 st.session_state.setdefault("restored_batch_documents", [])
 st.session_state.setdefault("workspace_upload_revision", 0)
 if not st.session_state.get("durable_workspace_loaded"):
+    # This block runs at most once per browser session: without the flag, the
+    # SQLite-backed workspace would be reloaded (and session_usage/history reset)
+    # on every Streamlit rerun, since the script re-executes top-to-bottom each time.
     try:
         durable_workspace = workspace_store.load(result_version=RESULT_VERSION)
     except Exception as exc:  # noqa: BLE001 - corrupt local state must not block startup
@@ -1636,6 +1671,11 @@ if batch_documents:
                 value=bool(restored_routes),
                 key=f"page-route-confirmed-{document.id}",
             )
+            # Gate for Mixed PDF: every page needs an explicit route, and the reviewer
+            # must tick "confirm" before this document is allowed into
+            # page_routes_by_document. Parsing later requires page_routes to cover
+            # every selected page (see universal.py); this is the UI-side half of
+            # that fail-closed contract.
             if len(routes) != inspection.page_count:
                 processing_errors.append(
                     f"{document.display_name}: select a route for every page"
@@ -1834,6 +1874,11 @@ with st.sidebar:
     enable_chat = st.session_state.enable_chat
     save_active_workspace()
 
+    # Encodes every parse-affecting setting (content range, AI features, engine,
+    # model, OCR cross-check, processing type, mixed-PDF routes, RESULT_VERSION) into
+    # one string. A stored result is reused only while its key matches; otherwise the
+    # document is reset to pending below. This is the single source of truth for
+    # "does this document need to be reparsed."
     def document_selection_key(document: BatchDocument) -> str:
         state = st.session_state.batch_workspaces[document.id]["state"]
         content_selection = (
@@ -1868,6 +1913,9 @@ with st.sidebar:
     for document in batch_documents:
         workspace = st.session_state.batch_workspaces[document.id]
         previous_selection_key = workspace.get("selection_key")
+        # A settings change since this document last completed invalidates its stored
+        # result: reset to pending so the next "Parse document" click reruns it under
+        # the new selection key rather than silently reusing stale output.
         if previous_selection_key is not None and previous_selection_key != selection_keys[document.id]:
             workspace.update(
                 status="pending",
@@ -2106,6 +2154,10 @@ if parse_clicked and batch_documents:
                 progress_state=progress_state,
                 workspace=workspace,
             ) -> None:
+                # Fixed progress-fraction budget per stage (layout 0-30%, recognition
+                # 30-72%, recovery/assemble/annotate/enhance filling the rest up to
+                # 100%). These fractions are an estimate of relative stage cost, not a
+                # measurement — TECHNICAL.md documents the same 30% layout split.
                 stage = event.stage
                 if stage == "batch":
                     progress_state["active"] = "layout"
@@ -2591,6 +2643,9 @@ if has_result:
         or any(turn.get("confidence") for turn in st.session_state.chat_history)
     )
     if has_ai_output:
+        # Document content is untrusted input to every AI feature (enhancement,
+        # classification, extraction, chat); this warning is shown whenever any AI
+        # call ran, not only when its result looks suspicious.
         st.warning(AI_REVIEW_WARNING)
 elif active_document is not None:
     active_workspace = st.session_state.batch_workspaces[active_document.id]
@@ -3327,6 +3382,10 @@ if batch_documents:
                     )
                 )
                 continue
+            # Native and OCR results carry different evidence contracts (immutable
+            # base_text/spans/anchors vs. elements with geometry/confidence — see
+            # native.py and models.py), so the archive entry is built differently for
+            # each rather than through one shared renderer.
             if isinstance(stored_result, NativeParseResult):
                 stored_native_extraction = state.get("native_extraction_result")
                 archive_entries.append(

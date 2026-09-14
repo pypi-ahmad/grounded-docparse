@@ -1,3 +1,13 @@
+"""Generate the synthetic Phase 1 evaluation corpus (fixture PDFs, annotations,
+manifest, and JSON schemas) under `benchmarks/corpus-v1/`, consumed by
+`scripts/evaluate_corpus.py` via `grounded_docparse.benchmark`.
+
+Every generated document is synthetic placeholder content (no real PHI/PII);
+one manifest entry references a real external document
+("public-water-mass-mailing") that this script does not fetch or embed — see
+the note near its `entries.append` below.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -76,6 +86,10 @@ def _save_degraded_scan(path: Path) -> None:
     degraded.save(path, "PDF", resolution=144)
 
 
+# Each values.pop(...) below both supplies that field's default and removes it from
+# values, so the trailing **values only re-spreads keys this function didn't already
+# handle explicitly (there normally are none — this shape exists so a caller could
+# pass an unlisted annotation field through untouched).
 def _annotation(
     document_id: str,
     reference_text: str | None,
@@ -421,6 +435,10 @@ def generate_corpus(repository_root: Path) -> Path:
         json.dumps(public_water_annotation, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    # kind="external" (no local path resolution, no sha256 check) marks a real document
+    # this script does not generate or ship. Running evaluate_corpus.py against this
+    # entry requires supplying it out-of-band via --external-source
+    # public-water-mass-mailing=<path>.
     entries.append(
         {
             "id": "public-water-mass-mailing",

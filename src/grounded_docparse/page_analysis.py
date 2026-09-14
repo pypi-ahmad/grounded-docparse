@@ -1,3 +1,14 @@
+"""Turns one OCR engine's raw per-page regions into grounded PageAnalysis evidence, then
+into PageDraft markdown-ready nodes.
+
+Must not: perform OCR/layout recognition itself (that is delegated to the engine runtimes
+in grounded_ocr.py, local_ocr.py, paddle_ocr.py, rapidocr_runtime.py) or invent regions that
+the selected engine did not return. Region identity, bbox, and text always trace back to the
+raw engine output; this module only classifies, orders, and scores what it is given.
+
+Next: render.py consumes PageDraft output to build the final document tree.
+"""
+
 from __future__ import annotations
 
 import math
@@ -81,6 +92,16 @@ def _percentile(histogram: list[int], fraction: float) -> int:
 
 
 def _dense_form_order(regions: list[LayoutRegionEvidence]) -> list[str]:
+    # Fallback reading order for dense forms (many short label:value regions), used only
+    # when the engine's own region order alternates between detected columns (see
+    # _reading_order's "dense_form" branch) and is therefore untrustworthy on its own.
+    # Heuristic, in order: pull out a left margin/letterhead column (narrow, tall boxes),
+    # then split the remaining regions into a "top" band (first few, vertically contiguous)
+    # versus the rest, group the top band into left-to-right components (e.g. letterhead
+    # blocks), and finally order top components, main body, margin, and any trailing
+    # (bottom ~8%) regions in that sequence. All normalized-coordinate distance/gap
+    # constants below (0.2, 0.08, 0.02, 0.92, ...) were tuned against form layouts and are
+    # not derived from any spec.
     def box(region: LayoutRegionEvidence) -> BoundingBox:
         return region.bbox.normalized
 
@@ -290,6 +311,9 @@ class PageAnalyzer:
                     warning,
                 )
         except Exception as exc:
+            # PaddleOCR-VL is fail-closed: its runtime failures propagate so the caller
+            # sees a hard error. Every other engine degrades to a per-page warning instead,
+            # so one engine outage doesn't take down pages that already rendered fine.
             if self.config.ocr_engine is OcrEngine.PADDLEOCR_VL_1_6:
                 raise
             warning = f"{self.engine_name} analysis unavailable: {type(exc).__name__}: {exc}"
@@ -495,6 +519,9 @@ class PageAnalyzer:
     ) -> LayoutRegionEvidence:
         width, height = page.render_width_pixels, page.render_height_pixels
         x0, y0, x1, y1 = raw.bbox
+        # Engines disagree on bbox units: some return already-normalized 0..1 coordinates,
+        # others (e.g. PP-DocLayoutV3-style detectors) return coordinates scaled to 1000.
+        # A bbox that only ever reaches 1.0 is treated as already normalized.
         scale = 1.0 if max(raw.bbox) <= 1.0 else 1000.0
         x0, x1 = sorted(
             (
@@ -508,6 +535,9 @@ class PageAnalyzer:
                 max(0.0, min(1.0, y1 / scale)),
             )
         )
+        # `normalized` is the single source of truth; `rendered` (pixels) and `source`
+        # (page.source_unit — pdf_points or pixels, see ingest.py) are both derived from it
+        # plus page geometry, never read back from the raw engine output.
         normalized = BoundingBox(x0=x0, y0=y0, x1=x1, y1=y1)
         polygon_rendered = [
             (point_x / scale * width, point_y / scale * height)
@@ -611,6 +641,9 @@ class PageAnalyzer:
                 basis=f"{self.engine_name} returned no layout regions"
             )
         order = [r.id for r in regions]
+        # These engines' own region order is treated as authoritative reading order
+        # (Docling document order, PaddleOCR block_order, or the PP-DocLayoutV3 detector
+        # order) — skip the column-alternation heuristic below entirely.
         if self.config.ocr_engine in {
             OcrEngine.PADDLEOCR_VL_1_6,
             OcrEngine.GLM_OCR,
@@ -635,11 +668,18 @@ class PageAnalyzer:
                 for index, group in enumerate(columns)
                 for region_id in group
             }
+            # More than one alternation between the two detected columns means the engine's
+            # region order isn't following a simple top-to-bottom-per-column pattern, so the
+            # order is flagged ambiguous rather than trusted as-is.
             sequence = [membership[item] for item in order if item in membership]
             switches = sum(a != b for a, b in pairwise(sequence))
             if switches > 1:
                 colon_regions = sum(":" in region.text for region in regions)
                 short_regions = sum(len(region.text) < 100 for region in regions)
+                # Heuristic signature of a dense label:value form (many short regions, most
+                # containing a colon); thresholds are tuned, not derived from a spec. Only
+                # in this case is the _dense_form_order() spatial fallback trustworthy —
+                # otherwise an ambiguous order is reported with no reordering attempted.
                 dense_form = (
                     len(regions) >= 12
                     and colon_regions >= 8
@@ -715,6 +755,9 @@ _TASK_MARKER = re.compile(r"^\s*\[([ xX])\]\s*(.*)$", re.DOTALL)
 
 
 def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
+    # Node types below are reclassified from text heuristics (regex list/checkbox markers,
+    # label lookups) applied on top of the engine's own region label; they refine
+    # presentation, they do not change or drop evidence.
     regions: list[RegionDraft] = []
     by_id = {region.id: region for region in analysis.regions}
     ordered_sources = [
@@ -723,6 +766,8 @@ def draft_from_analysis(analysis: PageAnalysis) -> PageDraft:
         if region_id in by_id
     ]
     ordered_ids = {region.id for region in ordered_sources}
+    # Invariant: every region in analysis.regions ends up in the draft even if reading_order
+    # is ambiguous/incomplete — leftovers are appended in their original (unordered) index.
     ordered_sources.extend(
         region for region in analysis.regions if region.id not in ordered_ids
     )
@@ -898,12 +943,16 @@ def _html_table_cells(text: str) -> list[TableCellDraft]:
         parser.feed(text)
         parser.close()
     except (AssertionError, ValueError):
+        # Malformed HTML (e.g. a </tr> or stray </td> with no open row/cell) is treated as
+        # "not a parseable table" rather than propagated — the caller falls back to no cells.
         return []
     occupied: set[tuple[int, int]] = set()
     cells: list[TableCellDraft] = []
     for row_index, row in enumerate(parser.rows):
         column_index = 0
         for value, row_span, column_span, header in row:
+            # A cell from an earlier row's rowspan can already occupy this column; skip
+            # forward to the next free grid slot instead of overlapping it.
             while (row_index, column_index) in occupied:
                 column_index += 1
             cells.append(

@@ -867,7 +867,7 @@ To review:
 5. ensure every page is covered exactly once; and
 6. select **Apply routing review**.
 
-Every segment—including non-extractable `other` or `medical_records` segments—must be approved before routed extraction. Approval confirms the routing decision; it does not make an ineligible category extractable.
+Every segment, including non-extractable `other` or `medical_records` segments, must be approved before routed extraction. Approval confirms the routing decision; it does not make an ineligible category extractable.
 
 Segment IDs are not durable business identifiers. Applying review sorts segments and can renumber them as `form-001`, `form-002`, and so on. Do not use them to join records across classification runs or substantial review edits.
 
@@ -1044,7 +1044,7 @@ Sample high-confidence fields according to the organization’s quality policy.
 
 ### 16.4 What a successful result means
 
-A successful run does not mean every requested value is populated. It means:
+A successful run does not require every requested value to be populated; it means:
 
 - the source was reconstructed well enough to review;
 - important values can be traced to source evidence;

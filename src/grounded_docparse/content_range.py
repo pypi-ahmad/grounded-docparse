@@ -1,3 +1,14 @@
+"""Caller-facing "process only these natural units" range contract.
+
+Responsibility: validate an optional 1-based, inclusive range (e.g. "pages
+3-5") against a source's actual unit count and produce the `AppliedContentRange`
+that gets embedded in output metadata. Note the convention: this range is
+1-indexed and inclusive on both ends, unlike the 0-indexed half-open
+character spans in native.py's `SourceSpan` — the two are not directly
+comparable. Next file: universal.py, which calls `resolve_content_range`
+during routing before a parser ever runs.
+"""
+
 from __future__ import annotations
 
 from enum import StrEnum

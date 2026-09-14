@@ -1,3 +1,21 @@
+<#
+    Grounded DocParse workstation installer: preflight checks, WSL2/Ubuntu
+    24.04 provisioning, Linux user creation, GPU-vs-CPU backend detection,
+    and installing the selected OCR runtime (vLLM+PaddleOCR-VL on NVIDIA,
+    otherwise Windows Ollama). Runs interactively by default (WinForms UI);
+    -PlanOnly/-EnsureHost/-Uninstall select a narrower non-interactive mode,
+    and -Provision is how a required-reboot flow resumes itself (see
+    Register-Resume/Ensure-Wsl).
+
+    Must not: delete anything outside the exact recognized per-user data
+    root during -Uninstall (see the path-equality guard inside
+    Invoke-Uninstall's WSL cleanup command). Must not log the forwarded API
+    keys/password captured below.
+
+    Next file to read: scripts\wsl\setup-glmocr.sh / setup-paddleocr.sh /
+    manage-ocr-stack.sh, which this script invokes over `wsl.exe` and which
+    own the actual Linux-side runtime install and lifecycle.
+#>
 [CmdletBinding()]
 param(
     [switch]$Provision,
@@ -21,6 +39,12 @@ $script:LogBox = $null
 $script:StatusLabel = $null
 $script:Progress = $null
 
+# Pulls the user's Windows-scoped keys into this process's environment, then
+# adds their names to WSLENV (a colon-separated list) so the WSL Linux side
+# of the install can see the same values - WSLENV is the documented
+# mechanism for sharing Windows environment variables into WSL, not a
+# project-specific convention. Values themselves are never written to
+# Write-InstallLog.
 $env:OPENAI_API_KEY = [Environment]::GetEnvironmentVariable('OPENAI_API_KEY', 'User')
 $env:OPENAI_BASE_URL = [Environment]::GetEnvironmentVariable('OPENAI_BASE_URL', 'User')
 $env:GOOGLE_API_KEY = [Environment]::GetEnvironmentVariable('GOOGLE_API_KEY', 'User')
@@ -120,6 +144,10 @@ function Invoke-External {
     }
 }
 
+# The command is base64-encoded before being embedded in the wsl.exe
+# argument string and decoded again inside bash. This sidesteps quoting and
+# escaping hazards (nested quotes, $-expansion) that arise from passing
+# arbitrary shell content through wsl.exe's own command-line parsing.
 function Invoke-WslShell {
     param(
         [Parameter(Mandatory)][string]$Command,
@@ -181,6 +209,11 @@ function Show-MainWindow {
     $form
 }
 
+# Collects a new Ubuntu username/password via a modal dialog; the password
+# is passed to Ensure-LinuxUser's `useradd`/`chpasswd` call as process stdin
+# (never as a command-line argument) and the caller clears
+# $credential.Password immediately after use to limit how long the plaintext
+# value stays resident.
 function Read-LinuxCredential {
     Add-Type -AssemblyName System.Windows.Forms
     $dialog = [System.Windows.Forms.Form]@{
@@ -232,9 +265,14 @@ function Test-Preflight {
     if (-not ('NativeCpu' -as [type])) {
         Add-Type 'public static class NativeCpu { [System.Runtime.InteropServices.DllImport("kernel32.dll")] public static extern bool IsProcessorFeaturePresent(uint feature); }'
     }
+    # Feature code 40 is Win32's PF_AVX2_INSTRUCTIONS_AVAILABLE.
     if (-not [NativeCpu]::IsProcessorFeaturePresent(40)) { throw 'CPU with AVX2 support is required.' }
 }
 
+# Writes a RunOnce registry value so Windows re-launches this script with
+# -Provision -InstallRoot ... immediately after the user's next sign-in. This
+# is how setup survives the mandatory reboot that enabling WSL2/Virtual
+# Machine Platform can require (see the two call sites in Ensure-Wsl below).
 function Register-Resume {
     New-Item -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\RunOnce' -Force | Out-Null
     $command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" -Provision -InstallRoot `"$InstallRoot`""
@@ -299,6 +337,10 @@ function Get-HardwareMode {
     $hasNvidia = [bool]($names -match 'NVIDIA')
     if ($hasNvidia) {
         $probe = Invoke-External 'wsl.exe' "-d `"$Distro`" -- nvidia-smi"
+        # An NVIDIA adapter is necessary but not sufficient: WSL GPU
+        # passthrough or the driver may still not expose CUDA, so this falls
+        # back to the CPU/Ollama profile instead of installing a vLLM
+        # backend that would never actually get a GPU.
         if ($probe.ExitCode -eq 0) { return [pscustomobject]@{ Backend = 'vllm'; Amd = $hasAmd } }
         Write-InstallLog 'NVIDIA adapter found, but CUDA is unavailable inside WSL; selecting the Windows Ollama/local CPU profile.'
     }
@@ -396,6 +438,12 @@ function Invoke-Uninstall {
     if ($distros -notmatch '(?m)^Ubuntu-24\.04$') { return }
     $projectRoot = Get-WslProjectRoot
     $escapedRoot = $projectRoot.Replace("'", "'\''")
+    # The `case` line is a belt-and-suspenders guard: it re-checks that the
+    # computed $data path is literally the expected literal string before
+    # the recursive rm -rf below runs, so a future edit that widens how
+    # $data is built cannot turn this into a delete of an unintended
+    # directory. PID files are killed best-effort (`|| true`) since a
+    # service may already be stopped.
     $command = "cd '$escapedRoot'`n" + @'
 set -e
 data="$HOME/.local/share/grounded-docparse"
@@ -409,6 +457,9 @@ rmdir -- "$data" 2>/dev/null || true
     Invoke-WslShell -Command $command -AllowFailure | Out-Null
 }
 
+# Mutually exclusive CLI modes, checked in this fixed order: a dry-run plan
+# report, host-only Ollama setup, uninstall cleanup, or (default) the full
+# interactive provisioning flow.
 if ($PlanOnly) {
     $video = @(Get-CimInstance Win32_VideoController | ForEach-Object Name)
     [ordered]@{

@@ -1,4 +1,18 @@
-from __future__ import annotations
+"""OpenAI-compatible document gateway: the single client each AI-backed feature calls.
+
+Responsible for presenting one `responses.parse`/`responses.create` surface over
+whichever provider is configured (OpenAI directly, or Gemini/Agnes adapted to look
+like OpenAI's `responses` API), issuing calls through `ProviderRuntime` for retry
+and concurrency, validating structured output against the expected Pydantic model,
+and recording per-call usage/trace for cost reporting.
+
+Must not: interpret or mutate OCR geometry/evidence itself (that stays owned by the
+grounded OCR/native pipelines - see pipeline.py); this module only turns already-built
+payloads into provider requests and validated responses. Retry/backoff policy and
+concurrency limits live in runtime.py, not here.
+
+Next: runtime.py for the retry/concurrency contract this module calls into.
+"""
 
 import base64
 import json
@@ -56,6 +70,13 @@ _SCHEMA_FAILURE_MARKERS = (
 
 
 def _is_schema_failure(exc: Exception) -> bool:
+    """Heuristic string match on the exception text.
+
+    There is no structured error code shared across the OpenAI SDK's
+    ValidationError and this module's own RuntimeErrors, so this substring
+    match is what decides whether a failure is worth a schema-repair retry
+    (see `_structured_document_request`) versus surfacing immediately.
+    """
     message = str(exc).casefold()
     return any(marker in message for marker in _SCHEMA_FAILURE_MARKERS)
 
@@ -70,6 +91,10 @@ class OpenAIDocumentGateway:
         if client is None and not os.getenv(config.cloud_model.api_key_name):
             raise RuntimeError(f"{config.cloud_model.api_key_name} is not set")
         self.config = config
+        # Gemini and Agnes are not OpenAI's SDK, so each is wrapped in a
+        # SimpleNamespace exposing `.responses` with the same parse/create
+        # shape the rest of this class calls. This keeps _request/_provider_request
+        # provider-agnostic; only this constructor knows which backend is active.
         if client is None and config.cloud_model.value.startswith("gemini-"):
             from types import SimpleNamespace
 
@@ -87,6 +112,10 @@ class OpenAIDocumentGateway:
 
             from .agnes_gateway import AgnesResponses
 
+            # max_retries=0: ProviderRuntime.request owns all retry/backoff
+            # decisions (status classification, Retry-After, budget limits);
+            # letting the SDK also retry would double the effective retry
+            # count and desync the runtime's attempt/usage accounting.
             agnes = OpenAI(
                 api_key=os.environ["AGNES_API_KEY"],
                 base_url=os.getenv(
@@ -98,6 +127,7 @@ class OpenAIDocumentGateway:
                 responses=AgnesResponses(agnes.chat.completions)
             )
         if client is None:
+            # Same reasoning as the Agnes branch above: retries are ProviderRuntime's job.
             client_options: dict[str, Any] = {"max_retries": 0}
             if os.getenv("OPENAI_BASE_URL"):
                 client_options["base_url"] = os.environ["OPENAI_BASE_URL"]
@@ -146,6 +176,10 @@ class OpenAIDocumentGateway:
         return f"data:image/png;base64,{payload}"
 
     def _record_usage(self, response: Any, *, agent: str, model: str) -> AgentUsage:
+        # `response` is either an SDK response object (normal path) or a raw
+        # dict decoded from JSON (the finalize_raw fallback below, used when
+        # schema validation fails but we still want a usage record). Both
+        # shapes are handled uniformly via `get`/`details_get`.
         usage = (
             response.get("usage")
             if isinstance(response, dict)
@@ -169,6 +203,9 @@ class OpenAIDocumentGateway:
             else lambda name, default: getattr(input_details, name, default)
         )
         cached_input_tokens = details_get("cached_tokens", 0)
+        # Provider-reported token counts are untrusted input: clamp to
+        # non-negative ints and cap cached tokens at input tokens so a
+        # malformed response can't inflate or corrupt the cost ledger.
         valid_input_tokens = (
             input_tokens if isinstance(input_tokens, int) and input_tokens >= 0 else 0
         )
@@ -229,6 +266,10 @@ class OpenAIDocumentGateway:
             str(reasoning.get("effort")) if isinstance(reasoning, dict) else None
         )
         responses = self.client.responses
+        # Only the real OpenAI SDK exposes with_raw_response (needed to recover
+        # usage/request-id even when Pydantic validation fails, see finalize_raw
+        # below). The Gemini/Agnes shims in __init__ don't implement it, so they
+        # fall through to the simpler `finalize_response` path with no raw fallback.
         raw_api = getattr(responses, "with_raw_response", None)
         response: Any = None
         call_usage: AgentUsage | None = None
@@ -292,6 +333,9 @@ class OpenAIDocumentGateway:
                     try:
                         response = raw.parse()
                     except ValidationError as exc:
+                        # The response failed schema validation, but we still want a
+                        # usage record and a diagnosable error rather than a bare
+                        # ValidationError, so re-decode the raw JSON best-effort.
                         try:
                             payload = json.loads(raw.content)
                         except (TypeError, ValueError):
@@ -405,6 +449,9 @@ class OpenAIDocumentGateway:
         payload: dict[str, Any],
         max_output_tokens: int,
     ) -> T:
+        # Exactly one repair retry, and only for failures _is_schema_failure
+        # recognizes as schema-shaped; any other exception (or a second
+        # schema failure) propagates immediately.
         for attempt in range(2):
             prompt = secure_document_prompt(system_prompt)
             if attempt:
@@ -834,6 +881,11 @@ class OpenAIDocumentGateway:
         repair: bool = False,
         issues: list[str] | None = None,
     ) -> dict[str, Any]:
+        # `schema` is caller-supplied (built at runtime from a reusable extraction
+        # schema), so the expected shape can't be a static Pydantic model here.
+        # Instead the JSON Schema itself is wrapped with a required `evidence`
+        # array and sent as a raw json_schema response format; the envelope is
+        # validated by the provider, and the returned payload is decoded below.
         evidence_item = {
             "type": "object",
             "properties": {
@@ -855,6 +907,10 @@ class OpenAIDocumentGateway:
         }
         agent = "extraction_critic" if repair else "extractor"
         model = self.model
+        # Same one-retry pattern as _structured_document_request, but the
+        # failure mode here is output_text not being decodable JSON (the
+        # json_schema response format is a provider-side best-effort, not a
+        # guarantee), rather than a Pydantic ValidationError.
         for format_attempt in range(2):
             started = time.perf_counter()
             call_usage: AgentUsage | None = None

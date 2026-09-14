@@ -394,7 +394,7 @@ Saving writes the reusable definition to the local SQLite database. An unsaved v
 
 ### 8.3 Import an extraction schema from Markdown
 
-Markdown is the easiest format for a business-owned field dictionary. Files must be UTF-8 `.md`, no larger than 1 MB, and use either a table or bullets—not both.
+Markdown is the easiest format for a business-owned field dictionary. Files must be UTF-8 `.md`, no larger than 1 MB, and use either a table or bullets, not both.
 
 Table form:
 
@@ -539,7 +539,7 @@ pages 7-8   authorization update
 pages 9-10  another new authorization
 ```
 
-The goal is not to extract from the whole packet. The goal is:
+Rather than extracting from the whole packet, the goal is to:
 
 1. parse all pages once;
 2. classify contiguous form segments;
@@ -621,7 +621,7 @@ Select **Classify forms**. The routing implementation:
 4. validates category keys and evidence element IDs;
 5. retries one invalid structured response;
 6. reconciles window boundaries; and
-7. assigns extraction eligibility from the saved profile—not from the model.
+7. assigns extraction eligibility from the saved profile, not from the model.
 
 Each segment records both predicted and effective page range/category. “Predicted” here means the classifier result after deterministic window reconciliation: ranges may already be clipped to the current context, invalid evidence IDs filtered, and same-category boundary segments merged. It is not an untouched copy of the provider’s raw response. Effective values may then reflect user review.
 

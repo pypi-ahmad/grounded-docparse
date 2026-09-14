@@ -33,6 +33,12 @@ def _page_image(source: Path, page_number: int, directory: Path) -> Path:
         document.close()
 
 
+# Walks the `glmocr` package's own raw result tree (not this codebase's Document/
+# Block models) to approximate rendered text for a rough character/table/heading
+# count. A dict only contributes its own content/text when it carries a bbox-like
+# key, which is this function's heuristic for "this is a leaf OCR element" versus
+# "this is a container to recurse into" — an untyped assumption about glmocr's
+# output shape that may need revisiting if that package's result format changes.
 def _content(result: Any) -> str:
     items = getattr(result, "json_result", result)
     if isinstance(items, str):

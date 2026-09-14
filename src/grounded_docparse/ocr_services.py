@@ -1,3 +1,15 @@
+"""Owns transitions between OCR/extraction engines: starting/stopping the WSL vLLM stacks
+(GLM-OCR, PaddleOCR-VL) via manage-ocr-stack.sh, and warming/unloading Ollama models.
+
+Must not: run two lifecycle transitions concurrently — GPU and service state is shared and
+singular, so every entry point that changes it goes through `ocr_operation()`'s process-wide
+lock. Must not leave the primary engine stopped after a temporary alternate-engine switch
+fails; temporary_alternate_ocr_engine's `finally` block exists to guarantee restoration.
+
+Next: config.py for the OcrEngine/AlternateOcrEngine/ExtractionEngine enums this module
+switches between.
+"""
+
 from __future__ import annotations
 
 import os
@@ -27,8 +39,11 @@ def _manager_command(*arguments: str) -> tuple[list[str], dict[str, str]]:
     manager = PROJECT_ROOT / "scripts" / "wsl" / "manage-ocr-stack.sh"
     environment = os.environ.copy()
     if os.name != "nt":
+        # Already running inside WSL/Linux: invoke the script directly, no wsl.exe hop.
         return ["bash", str(manager), *arguments], environment
     environment["DOCPARSE_WINDOWS_ROOT"] = str(PROJECT_ROOT)
+    # WSLENV controls which Windows env vars are visible inside the WSL process; the "/p"
+    # suffix tells WSL to translate the value between Windows and Linux path syntax.
     forwarded = [item for item in environment.get("WSLENV", "").split(":") if item]
     if "DOCPARSE_WINDOWS_ROOT/p" not in forwarded:
         forwarded.append("DOCPARSE_WINDOWS_ROOT/p")
@@ -58,6 +73,7 @@ def _run_manager(*arguments: str, timeout: float) -> None:
 def ensure_managed_ocr_engine(engine: OcrEngine) -> None:
     """Activate one local OCR service when managed-service mode is enabled."""
 
+    # Ollama and RapidOCR are Windows-native and never go through WSL service management.
     if engine in {OcrEngine.OLLAMA, OcrEngine.RAPIDOCR} or os.getenv(
         "DOCPARSE_MANAGE_OCR_SERVICES", "false"
     ).casefold() in {
@@ -67,6 +83,7 @@ def ensure_managed_ocr_engine(engine: OcrEngine) -> None:
     }:
         return
     if engine is OcrEngine.PADDLEOCR_VL_1_6:
+        # Release GLM's in-process GPU memory before Paddle's vLLM stack claims the GPU.
         clear_glmocr_runtimes()
     _run_manager("ensure", engine.value, timeout=1800)
 
@@ -89,6 +106,8 @@ def temporary_alternate_ocr_engine(
     if alternate.matches_primary(config.ocr_engine, config.ollama_model):
         raise ValueError("alternate OCR engine must differ from the primary engine")
     if alternate is AlternateOcrEngine.RAPIDOCR:
+        # RapidOCR needs no service switch (native Windows CPU) — nothing to start, and
+        # so nothing here to restore afterward either.
         yield
         return
 
@@ -116,6 +135,11 @@ def temporary_alternate_ocr_engine(
         alternate_started = True
         yield
     finally:
+        # Restoring the primary engine always takes priority: if unloading the alternate
+        # Ollama model fails, that error is held (not raised yet) so primary restoration
+        # still runs below. If primary restoration then also fails, its RuntimeError is
+        # what propagates — the held alternate cleanup_error is only raised once primary
+        # restoration has succeeded.
         cleanup_error: Exception | None = None
         if alternate_started and alternate_ollama is not None:
             try:

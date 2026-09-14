@@ -1,4 +1,17 @@
-from __future__ import annotations
+"""Installed `grounded-docparse` CLI: `parse` (legacy) and `ingest` (explicit routing) subcommands.
+
+`ingest` requires an explicit `--processing-type` for every input and an
+explicit `--page-route` for every page of a Mixed PDF - it never infers a
+route from a file extension, matching the app-wide fail-closed routing rule
+enforced by UniversalDocumentParser. `parse` is the older PDF/image-only OCR
+path and predates that routing model.
+
+Each document in a batch is isolated: one document's parse/extract/write
+failure is recorded in its manifest entry and does not stop the remaining
+documents (see the per-document try/except blocks in `_parse`/`_ingest`).
+
+Next: universal.py (`ingest`'s dispatcher) or pipeline.py (`parse`'s OCR engine).
+"""
 
 import argparse
 import hashlib
@@ -47,11 +60,16 @@ UNIVERSAL_SUFFIXES = SUPPORTED_SUFFIXES | {
 
 
 def _safe_stem(path: Path) -> str:
+    # `path` comes from user-supplied CLI input and is used below to build
+    # output file/folder names, so anything outside a conservative allowed
+    # set is replaced rather than trusted verbatim.
     value = re.sub(r"[^\w. -]+", "_", path.stem, flags=re.UNICODE).strip(" .")
     return value or "document"
 
 
 def _write(path: Path, value: str | bytes) -> None:
+    # Write to a sibling .tmp file and rename into place so a crash or
+    # interrupt mid-write never leaves a truncated output file at `path`.
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
     if isinstance(value, bytes):
@@ -155,6 +173,9 @@ def _processing_types(
 ) -> dict[Path, ProcessingType]:
     assignments: dict[Path, ProcessingType] = {}
     for value in values:
+        # rpartition (not partition/split) so a path containing "=" is
+        # split at the last one, keeping PATH=TYPE unambiguous regardless
+        # of what characters appear in PATH.
         raw_path, separator, raw_type = value.rpartition("=")
         if not separator or not raw_path or not raw_type:
             raise ValueError("--processing-type must use PATH=TYPE")
@@ -184,6 +205,9 @@ def _processing_types(
 def _page_routes(values: Sequence[str]) -> dict[Path, dict[int, PageRoute]]:
     assignments: dict[Path, dict[int, PageRoute]] = {}
     for value in values:
+        # Same rpartition reasoning as _processing_types: split PATH#PAGE=ROUTE
+        # from the right on each separator so path content can't be
+        # misinterpreted as the page/route fields.
         target, separator, raw_route = value.rpartition("=")
         raw_path, page_separator, raw_page = target.rpartition("#")
         if not separator or not page_separator or not raw_path:
@@ -227,6 +251,10 @@ def _parse(args: argparse.Namespace) -> int:
         base_folder = f"{stem}-{digest[:8]}"
         folder_name = base_folder
         duplicate_index = 2
+        # Same stem + truncated digest can coincide for two distinct inputs
+        # (different files with the same name in different discovered
+        # directories, or a rare hash-prefix collision); suffix rather than
+        # overwrite the earlier document's output folder.
         while folder_name.casefold() in used_folders:
             folder_name = f"{base_folder}-{duplicate_index}"
             duplicate_index += 1
@@ -406,6 +434,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "parse":
         try:
+            # Fail before running any (potentially costly local OCR) parse
+            # rather than discovering the missing key only after finishing it.
             if args.schema is not None and not os.getenv("OPENAI_API_KEY"):
                 raise ValueError("OPENAI_API_KEY is required when --schema is used")
             _validate_output(args)
@@ -415,6 +445,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
     if args.command == "ingest":
         try:
+            # Fail before running any (potentially costly local OCR) parse
+            # rather than discovering the missing key only after finishing it.
             if args.schema is not None and not os.getenv("OPENAI_API_KEY"):
                 raise ValueError("OPENAI_API_KEY is required when --schema is used")
             _validate_output(args)

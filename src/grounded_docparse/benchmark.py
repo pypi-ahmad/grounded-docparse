@@ -1,3 +1,16 @@
+"""Score live/offline pipeline output against annotated evaluation corpora:
+corpus manifest and annotation schemas, text/table/grounding/classification
+metrics, cost/telemetry summaries, and regression-policy gating.
+
+This module only scores results the caller already produced — it must not
+run the parser/OCR pipeline itself or mutate the `Document` it is given.
+Metric functions that can't be computed for a document return an
+`_unavailable(...)` marker rather than a fabricated number.
+
+Read `models.py` next for the `Document`/`Block` contracts consumed here, and
+`scripts/evaluate_corpus.py` for the CLI that drives this module end to end.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -20,6 +33,9 @@ from .models import (
     VerificationState,
 )
 
+# Corpus/annotation file formats are versioned independently of the public
+# output-JSON versions in render.py; bump these deliberately when the manifest
+# or annotation file shape changes.
 CORPUS_SCHEMA_VERSION = "1.1"
 SUPPORTED_CORPUS_SCHEMA_VERSIONS = {"1.0", CORPUS_SCHEMA_VERSION}
 ANNOTATION_SCHEMA_VERSION = "1.1"
@@ -32,6 +48,10 @@ class ReferenceBasis(StrEnum):
 
     @property
     def is_primary(self) -> bool:
+        # Only these two bases are trusted as ground truth: a human-verified source
+        # transcript, or an exactly-known synthetic fixture. GENERATED references (e.g.
+        # LLM-produced) are comparison-only and are scored under
+        # legacy_reference_agreement instead of source_verified_text.
         return self in {self.SOURCE_VERIFIED, self.SYNTHETIC_EXACT}
 
 
@@ -221,6 +241,11 @@ class RegressionPolicy(BaseModel):
     rules: list[RegressionRule] = Field(min_length=1)
 
 
+# Trust boundary: manifest/annotation `path` fields come from corpus JSON files, which
+# may be edited by hand. Reject an absolute path outright, then re-resolve and confirm
+# the result is still inside repository_root — this catches "../../" traversal that
+# would otherwise let a manifest read (or later, via load_corpus_manifest, hash-check)
+# a file outside the intended corpus tree.
 def _repository_path(repository_root: Path, value: str) -> Path:
     relative = Path(value)
     if relative.is_absolute():
@@ -268,6 +293,9 @@ def load_corpus_manifest(
         source_path = _repository_path(root, document.source.path)
         if not source_path.is_file():
             raise ValueError(f"local source does not exist: {document.source.path}")
+        # Verify the on-disk file still matches the checksum recorded in the manifest,
+        # so a corpus document edited or replaced after annotation fails loudly here
+        # instead of silently scoring against content the annotation no longer describes.
         actual_checksum = hashlib.sha256(source_path.read_bytes()).hexdigest()
         if actual_checksum != document.source.sha256:
             raise ValueError(
@@ -278,6 +306,8 @@ def load_corpus_manifest(
     return manifest
 
 
+# NFC-normalize before comparing so OCR/reference text using decomposed accent
+# sequences doesn't register as a mismatch against the same text in composed form.
 def _semantic_normalize(value: str) -> str:
     return " ".join(unicodedata.normalize("NFC", value).split())
 
@@ -288,6 +318,9 @@ def _semantic_words(value: str) -> list[str]:
     )
 
 
+# `<!-- PAGE BREAK -->` is the same page-boundary sentinel render.py inserts between
+# rendered pages; if that literal ever changes there, this split must change too or
+# page-level reference alignment silently degrades to whole-document comparison.
 def _markdown_reference_text(value: str) -> str:
     pages = value.split("<!-- PAGE BREAK -->")
     normalized: list[str] = []
@@ -314,6 +347,8 @@ def semantic_text_metrics(candidate: str, reference: str) -> dict[str, float]:
     word_accuracy, word_error_rate = _sequence_metrics(
         _semantic_words(candidate), _semantic_words(reference)
     )
+    # _sequence_metrics returns percentages (0..100); this function's contract is
+    # fractions (0..1), hence the /100 below.
     return {
         "character_accuracy": character_accuracy / 100,
         "character_error_rate": character_error_rate / 100,
@@ -322,6 +357,12 @@ def semantic_text_metrics(candidate: str, reference: str) -> dict[str, float]:
     }
 
 
+# recognized_text_only=False (the default) returns block.text as-is — the assembled
+# prose a normal render would show. recognized_text_only=True instead rebuilds text
+# from the block's structured fields (form label/value/hint, checkbox group/option,
+# caption, chart data) plus any atom text not already covered, i.e. what the
+# recognizer captured field-by-field. canonical_document_pages picks between the two
+# modes based on ReferenceBasis.is_primary (see evaluate_live_document).
 def _canonical_block_text(block: Block, *, recognized_text_only: bool = False) -> str:
     if block.table is not None:
         return " ".join(
@@ -365,6 +406,8 @@ def canonical_document_pages(
     pages: list[str] = []
     for page in document.pages:
         blocks = sorted(_flatten(page.blocks), key=lambda item: item.reading_order)
+        # REJECTED blocks are excluded from the candidate text — they are not part of
+        # what the pipeline actually emitted as output.
         pages.append(
             "\n".join(
                 text
@@ -408,6 +451,9 @@ def _aggregate_sequence_metrics(
     reference_size = sum(len(page) for page in reference_pages)
     candidate_size = sum(len(page) for page in candidate_pages)
     if reference_size == 0:
+        # Avoid dividing by zero: an empty reference is perfectly matched only by an
+        # equally empty candidate; any candidate content against an empty reference
+        # is 100% error (pure insertion).
         return (
             1.0 if candidate_size == 0 else 0.0,
             0.0 if candidate_size == 0 else 1.0,
@@ -423,6 +469,9 @@ def semantic_text_metrics_by_page(
     candidate_pages: list[str], reference: str
 ) -> dict[str, float | int]:
     reference_pages = reference.split("<!-- PAGE BREAK -->")
+    # Per-page comparison requires the reference and candidate to agree on page count.
+    # If they don't (or there's only one page to begin with), fall back to a single
+    # whole-document comparison rather than pairing pages that may not correspond.
     if len(reference_pages) != len(candidate_pages) or len(reference_pages) == 1:
         return {
             **semantic_text_metrics("\n".join(candidate_pages), reference),
@@ -451,6 +500,8 @@ def reading_order_metrics(
     reference_positions = {
         anchor_id: index for index, anchor_id in enumerate(reference_anchor_ids)
     }
+    # dict.fromkeys dedups while keeping first-seen order — an anchor id can appear
+    # more than once in candidate_anchor_ids (e.g. matched under more than one block).
     candidate = list(
         dict.fromkeys(
             anchor_id
@@ -518,6 +569,11 @@ def table_cell_metrics(
     }
 
 
+# Assumes candidate and reference boxes are already in the same coordinate unit
+# (both normalized 0..1, or both the same pixel/point space) — nothing here checks
+# that. grounding_metrics below feeds this from annotation.grounding_regions and
+# candidate boxes with their `unit` field explicitly dropped, so a real unit mismatch
+# between the two would silently produce a meaningless-but-plausible-looking overlap.
 def _intersection_over_union(
     candidate: list[float] | tuple[float, float, float, float],
     reference: list[float] | tuple[float, float, float, float],
@@ -569,6 +625,9 @@ def _json_type(value: Any) -> str:
     raise TypeError(f"unsupported JSON leaf type: {type(value).__name__}")
 
 
+# Builds RFC 6901 JSON Pointer paths (`~0` = literal `~`, `~1` = literal `/`); order
+# of the two replacements matters — escaping `~` first, then `/`, is what keeps a key
+# containing a real `~1`-looking substring from double-escaping.
 def _json_leaves(value: Any, pointer: str = "") -> dict[str, tuple[str, Any]]:
     if isinstance(value, dict):
         leaves: dict[str, tuple[str, Any]] = {}
@@ -622,6 +681,13 @@ def continuity_metrics(
     }
 
 
+# Standard word-level edit-distance DP, but each cell carries (total_edits, insertions)
+# instead of just total_edits. min() on the tuples picks, among alignments tied on total
+# edit distance, the one with the fewest insertions — so the returned count is not "how
+# many words got inserted" in isolation, it's the minimum insertion count achievable by
+# any alignment that still achieves the overall-minimum edit distance. This is what
+# hallucination_metrics reports as word_insertions/hallucination_rate: words the model
+# added that a minimal-cost alignment could not explain as substitutions or deletions.
 def _word_insertions(candidate: list[str], reference: list[str]) -> int:
     previous = [(index, 0) for index in range(len(reference) + 1)]
     for candidate_index, candidate_word in enumerate(candidate, 1):
@@ -652,6 +718,8 @@ def hallucination_metrics(
     candidate_words = _semantic_words(candidate_text)
     insertions = _word_insertions(candidate_words, _semantic_words(reference_text))
     normalized_candidate = _semantic_normalize(candidate_text).casefold()
+    # "False accept": a block the annotation says should have been rejected, but that
+    # still shows up among the blocks the pipeline actually kept (accepted_block_ids).
     rejected = set(rejected_block_ids)
     false_accept_count = len(rejected & set(accepted_block_ids))
     return {
@@ -677,6 +745,10 @@ def summarize_telemetry(
     model_usage: dict[str, dict[str, int]] = {}
     model_calls = 0
     for record in records:
+        # Accept two telemetry record shapes: current records carry a per-model
+        # "model_usage" dict directly (needed once a run can mix local OCR and a cloud
+        # model); older/simple records only have flat model/input_tokens/output_tokens
+        # fields, so synthesize an equivalent single-model dict for those.
         usage = record.get("model_usage")
         if usage is None:
             usage = {
@@ -745,6 +817,9 @@ def summarize_telemetry(
     rates = ModelRateCard.model_validate(rate_card)
     missing_models = sorted(model_usage.keys() - rates.models.keys())
     if missing_models:
+        # Fail closed rather than compute a partial cost: a per-page figure that
+        # silently omits one of several models used would be misleading, not just
+        # incomplete.
         output["cost_per_page"] = None
         output["cost_unavailable_reason"] = "rate card has no rates for: " + ", ".join(
             missing_models
@@ -902,6 +977,9 @@ def _classification_summary(
 
     bins: list[dict[str, Any]] = []
     calibration_error = 0.0
+    # 10 confidence bins of [lower, upper), except the last bin (index 9) which is
+    # [0.9, 1.0] inclusive of 1.0 — otherwise a confidence of exactly 1.0 would fall
+    # into no bin at all.
     for index in range(10):
         lower = index / 10
         upper = (index + 1) / 10
@@ -1294,6 +1372,9 @@ def evaluate_live_document(
     }
 
 
+# Distinct from None: several metrics legitimately report {"value": None, "reason":
+# ...} for "unavailable", which is a real value at that pointer, not a missing key.
+# _MISSING marks "the path does not resolve at all" so the two cases aren't conflated.
 _MISSING = object()
 
 
@@ -1320,6 +1401,9 @@ def evaluate_regression_policy(
         else RegressionPolicy.model_validate(policy)
     )
     if baseline is not None:
+        # Refuse to compare against a baseline from a different corpus, a different
+        # evaluation mode, or a different review threshold — a regression check across
+        # any of those would be comparing unrelated numbers, not measuring drift.
         for field in ("corpus_id", "evaluation_mode"):
             if baseline.get(field) != report.get(field):
                 raise ValueError(f"baseline {field} does not match candidate report")
@@ -1371,6 +1455,9 @@ def evaluate_regression_policy(
                     regression_passed = numeric_candidate <= (
                         float(baseline_value) + rule.max_regression
                     )
+            # Priority order for the single reported reason when a rule fails on more
+            # than one axis: both absolute and regression failing is reported distinctly
+            # from either failing alone, even though `passed` is False in all three cases.
             if reason is None and not absolute_passed and regression_passed is False:
                 reason = "absolute threshold and baseline regression failed"
             elif reason is None and not absolute_passed:
@@ -1422,11 +1509,15 @@ def live_telemetry_record(
     diagnostics = parse_result.runtime_diagnostics
     traces = list(parse_result.trace or [])
     image_traces = [trace for trace in traces if trace.image_count]
+    # source_page_pixels must be truthy here since crop_area_ratios below divides by it.
     crop_traces = [
         trace
         for trace in image_traces
         if trace.image_scope == "crop_batch" and trace.source_page_pixels
     ]
+    # "Repair" = any traced action other than the initial page_draft/page_plan steps
+    # that also names target block ids — i.e. a targeted correction pass, not the
+    # first-pass generation.
     repair_traces = [
         trace
         for trace in traces
@@ -1438,6 +1529,8 @@ def live_telemetry_record(
     blocks = [
         block for page in parse_result.document.pages for block in _flatten(page.blocks)
     ]
+    # getattr with a default tolerates parse_result values that predate these
+    # ocr_comparison_* fields or lack a metadata attribute entirely.
     metadata = getattr(parse_result, "metadata", None)
     return {
         "latency_seconds": latency_seconds,

@@ -1,3 +1,13 @@
+"""Parses user-supplied schema/classifier-profile files and persists them.
+
+Responsibility: turn uploaded Markdown/CSV/XLSX field definitions into
+`StoredSchema`/`ClassifierProfile` models, compile a `StoredSchema` into a
+JSON Schema for provider structured output, and persist both to SQLite.
+Untrusted upload content flows through here before it becomes a schema, so
+every parser must reject malformed input with a `ValueError` rather than
+guess. Next file: extraction.py, which consumes the compiled JSON Schema.
+"""
+
 from __future__ import annotations
 
 import csv
@@ -33,6 +43,9 @@ _ROUTING_BULLET = re.compile(
 )
 
 
+# Hand-rolled instead of a plain str.split("|"): Markdown table cells may
+# contain an escaped literal pipe (`\|`), which a naive split would treat as
+# a cell boundary. This walks the line once and only splits on unescaped "|".
 def _table_cells(line: str) -> list[str]:
     value = line.strip()
     value = value.removeprefix("|")
@@ -276,6 +289,9 @@ class SchemaStore:
 
     def _connect(self) -> sqlite3.Connection:
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # WAL + a busy timeout let concurrent Streamlit sessions read/write
+        # this file without one connection's lock immediately erroring out
+        # another; short-lived contention waits instead of failing.
         connection = sqlite3.connect(self.path, timeout=5)
         connection.execute("PRAGMA journal_mode=WAL")
         connection.execute("PRAGMA busy_timeout=5000")
@@ -309,6 +325,15 @@ class SchemaStore:
         return _stored_schema(row[0], row[1])
 
     def save(self, schema: StoredSchema) -> None:
+        # `name` is COLLATE NOCASE, so ON CONFLICT below matches an existing
+        # row by case-insensitive name: saving "Invoice" after "invoice"
+        # overwrites the same row rather than creating a second schema.
+        #
+        # Version 1 is stored as a bare JSON array of fields (the original,
+        # pre-version-2 on-disk shape, kept for backward compatibility with
+        # existing rows); version 2 stores the full model dump so the raw
+        # json_schema survives. `_stored_schema` below must keep parsing
+        # both shapes for as long as version-1 rows exist in the database.
         now = datetime.now(UTC).isoformat()
         stored_payload = (
             [field.model_dump(mode="json") for field in schema.fields]
@@ -386,6 +411,9 @@ class ClassifierProfileStore:
 
 def _stored_schema(name: str, payload: str) -> StoredSchema:
     value = json.loads(payload)
+    # A bare list is the legacy version-1-only on-disk shape (see save()
+    # above); a dict is the newer full-model-dump shape that can also carry
+    # a version-2 raw json_schema.
     if isinstance(value, list):
         return StoredSchema(name=name, fields=value)
     if isinstance(value, dict):
@@ -395,6 +423,11 @@ def _stored_schema(name: str, payload: str) -> StoredSchema:
 
 def compile_json_schema(schema: StoredSchema) -> dict:
     if schema.version == 2:
+        # Imported here rather than at module scope: extraction.py pulls in
+        # gateways.py, which imports the openai client. Deferring the import
+        # to this call site means listing/loading/saving schemas (the common
+        # path) never pays that import cost for callers who never compile a
+        # version-2 schema.
         from .extraction import validate_extraction_schema
 
         compiled = json.loads(json.dumps(schema.json_schema))
@@ -402,6 +435,9 @@ def compile_json_schema(schema: StoredSchema) -> dict:
         return compiled
     properties = {}
     for field in schema.fields:
+        # JSON Schema (and the provider structured-output contract) has no
+        # native date type, so "date" fields are compiled to a plain string
+        # with an instructional hint appended to the description instead.
         field_type = "string" if field.type == "date" else field.type
         description = field.description.strip()
         if field.type == "date":

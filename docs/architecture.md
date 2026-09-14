@@ -1,12 +1,12 @@
 # Grounded DocParse architecture
 
-This document is the definitive architecture guide for contributors. It describes the current checkout on branch `main` at commit `b7f21fd3689b559cf70627e3146b059ee75800d4`, including uncommitted implementation work in the working tree. Product behavior is defined by code and tests when another document disagrees.
+This document is the definitive architecture guide for contributors. It describes the current checkout on branch `main` at commit `193b898cb9c94710484268915de828988f4badea`, including uncommitted implementation work in the working tree. Product behavior is defined by code and tests when another document disagrees.
 
 ## What the repository contains
 
 Grounded DocParse is a local-first Python document-processing application. One Streamlit process provides the UI and orchestration. The package also exposes a CLI and synchronous Python API. Native parsers and local OCR engines produce source-linked evidence; optional AI features work on that evidence.
 
-The package is version `0.8.0`, supports Python 3.12 through 3.14, and uses the MIT license ([pyproject.toml](../pyproject.toml#L1-L28), [LICENSE](../LICENSE)).
+The package is version `0.9.1`, supports Python 3.12 through 3.14, and uses the MIT license ([pyproject.toml](../pyproject.toml#L1-L28), [LICENSE](../LICENSE)).
 
 ## Technology stack
 

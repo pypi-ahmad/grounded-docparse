@@ -1,3 +1,17 @@
+"""Builds immutable native evidence (`NativeDocument`/`NativeElement`/
+`SourceSpan` + anchors) for the two native routes: `PdfInspectorParser` (PDF,
+native and mixed pages) and `DoclingNativeParser` (Office/OpenDocument/HTML/
+EPUB/CSV via Docling).
+
+Must not: silently substitute OCR for a page requested as native (or vice
+versa), or accept converted content that cannot be tied back to an exact
+source span/anchor — both parsers raise instead.
+
+Next: `docling_native.py` for the source manifest, `claim_record` matching,
+and anchor types this file consumes; `native.py` for the `NativeDocument`/
+`NativeElement`/anchor contracts being populated.
+"""
+
 from __future__ import annotations
 
 import csv
@@ -37,6 +51,8 @@ from .universal import (
 
 
 def _pdf_inspector() -> ModuleType:
+    # Optional `native`-extra dependency; import lazily (see universal.py's
+    # inspect_pdf_content for the same pattern).
     try:
         import pdf_inspector
     except ImportError as exc:
@@ -65,6 +81,15 @@ def _native_type(item, roles: dict[tuple[int, int], str]) -> str:
 
 
 class PdfInspectorParser:
+    """Native/Mixed PDF route: extracts native pages with `pdf_inspector`,
+    runs OCR pages (if any) through the legacy `DocumentParser`, then merges
+    both into one page-ordered `NativeDocument`.
+
+    Must not: treat a page pdf-inspector or pdf_inspector's own extraction
+    flags as needing OCR as native anyway — raise `NativePdfRequiresMixed`/
+    `MixedNativePageUnusable` instead of silently downgrading fidelity.
+    """
+
     def __init__(
         self,
         config: ParserConfig,
@@ -94,6 +119,10 @@ class PdfInspectorParser:
             if content_range is not None
             else list(range(1, inspection.page_count + 1))
         )
+        # Native PDF has no per-page OCR option: every selected page is
+        # forced NATIVE regardless of any page_routes passed in. Mixed PDF
+        # uses the caller's reviewed per-page routes (already validated as
+        # covering every selected page by validate_pdf_processing_type).
         routes = (
             {page: PageRoute.NATIVE for page in selected_pages}
             if processing_type is ProcessingType.NATIVE_PDF
@@ -101,6 +130,9 @@ class PdfInspectorParser:
         )
         native_pages = [page for page, route in routes.items() if route is PageRoute.NATIVE]
         ocr_pages = [page for page, route in routes.items() if route is PageRoute.OCR]
+        # First (cheap) check: pdf-inspector's own classification already
+        # flagged these pages as needing OCR; fail closed rather than
+        # extracting native text pdf-inspector itself doesn't trust.
         unusable_native = set(native_pages) & set(inspection.pages_needing_ocr)
         if unusable_native:
             if processing_type is ProcessingType.NATIVE_PDF:
@@ -114,6 +146,9 @@ class PdfInspectorParser:
             extracted = self.pdf_module.extract_pages_markdown_bytes(
                 data, pages=[page - 1 for page in native_pages]
             )
+            # Second, authoritative check: the actual extraction (not just
+            # inspection's heuristic classification) can still flag a page
+            # as unusable; same fail-closed handling.
             unusable = {
                 page.page + 1 for page in extracted.pages if page.needs_ocr
             }
@@ -145,6 +180,9 @@ class PdfInspectorParser:
                 refine_markdown=refine_markdown,
                 visual_recovery=visual_recovery,
             )
+            # `subset` renumbers OCR pages 1..N in extraction order; map each
+            # subset page number back to its original document page number
+            # before merging results below.
             ocr_page_map = {
                 subset_page: source_page
                 for subset_page, source_page in enumerate(ocr_pages, start=1)
@@ -175,6 +213,10 @@ class PdfInspectorParser:
         def add_element(
             *, page: int, text: str, kind: str, bbox: tuple[float, float, float, float] | None
         ) -> None:
+            # base_text is immutable once built, so every SourceSpan's
+            # start/end must exactly match this concatenation (including the
+            # single "\n" inserted between elements) — anchors resolve back
+            # to base_text through these offsets.
             nonlocal base_length
             if not text:
                 return
@@ -212,6 +254,9 @@ class PdfInspectorParser:
                 )
             )
 
+        # Normalize absolute PDF-point coordinates into the [0, 1] fractional
+        # bbox convention OCR elements use, so native and OCR candidates
+        # below are comparable/mergeable.
         for item in native_items:
             width, height = page_sizes[item.page]
             bbox = (
@@ -232,6 +277,9 @@ class PdfInspectorParser:
                     (item.reading_order, item.text, str(item.type), item.bbox)
                 )
 
+        # A given page is entirely NATIVE or entirely OCR (see `routes`
+        # above), so each page's candidate list was populated by exactly one
+        # of the two loops above; sorting just restores reading order.
         for page in selected_pages:
             for _order, text, kind, bbox in sorted(candidates[page]):
                 add_element(page=page, text=text, kind=kind, bbox=bbox)
@@ -297,6 +345,15 @@ class PdfInspectorParser:
 
 
 class DoclingNativeParser:
+    """Office/OpenDocument/HTML/EPUB/CSV native route: runs Docling (OCR and
+    remote-model features disabled, see docling_native.make_docling_converter)
+    and reconciles its output against the pre-built source manifest.
+
+    Must not: accept a converted text/table value that never claims a
+    manifest record — see the `unclaimed` check at the end of `parse`, which
+    raises rather than silently dropping source content.
+    """
+
     def __init__(self, config: ParserConfig, *, converter=None) -> None:
         self.config = config
         self.converter = converter
@@ -319,6 +376,10 @@ class DoclingNativeParser:
 
         if source_format not in DOCLING_FORMAT_NAMES:
             raise ValueError(f"Docling native parsing does not support {source_format.value}")
+        # CSV rows are cheap to re-slice, so the range is applied to the
+        # input before conversion (unlike slide/sheet/section/block ranges
+        # below, which need the whole document converted first and are
+        # filtered from the resulting manifest instead).
         conversion_data = data
         if content_range is not None and content_range.unit is ContentUnit.ROW:
             rows = list(csv.reader(StringIO(data.decode("utf-8-sig"))))
@@ -328,6 +389,9 @@ class DoclingNativeParser:
             conversion_data = buffer.getvalue().encode("utf-8")
         manifest = build_source_manifest(conversion_data, source_format)
         if content_range is not None and content_range.unit is ContentUnit.ROW:
+            # Anchors built from `conversion_data` are row-numbered relative
+            # to the sliced subset; rewrite them back to the original file's
+            # row numbers so citations point at real source rows.
             for record in manifest.records:
                 if isinstance(record.anchor, CsvSourceAnchor):
                     record.anchor = record.anchor.model_copy(
@@ -359,6 +423,8 @@ class DoclingNativeParser:
                 for index, record in enumerate(manifest.records, start=1)
                 if content_range.start <= index <= content_range.end
             }
+        # Cache the converter on the instance; building it is expensive and
+        # its config (OCR/remote features disabled) doesn't vary per call.
         converter = self.converter or make_docling_converter()
         self.converter = converter
         try:
@@ -389,6 +455,8 @@ class DoclingNativeParser:
             return start, base_length
 
         def unit_for(item) -> str | None:
+            # Docling's provenance page_no is 1-indexed; manifest.units is
+            # 0-indexed in source order, hence the -1.
             provenance = getattr(item, "prov", None) or []
             if provenance and 1 <= provenance[0].page_no <= len(manifest.units):
                 return manifest.units[provenance[0].page_no - 1].id
@@ -396,12 +464,18 @@ class DoclingNativeParser:
 
         for item, _level in docling_document.iterate_items(with_groups=False):
             if isinstance(item, TextItem):
+                # Text nodes that belong to a table are re-emitted below via
+                # the TableItem branch; skip them here to avoid claiming/
+                # counting the same text twice.
                 parent_ref = getattr(getattr(item, "parent", None), "cref", "")
                 if str(parent_ref).startswith("#/tables/"):
                     continue
                 value = item.text.strip()
                 if not value:
                     continue
+                # Skip text that duplicates an asset's alt text/caption; that
+                # content is already attached to the asset record, not
+                # claimed here as separate body text.
                 if any(
                     value in {asset.alt_text, asset.caption}
                     for asset in manifest.assets
@@ -422,6 +496,12 @@ class DoclingNativeParser:
                         ),
                         None,
                     )
+                    # ODP-only fallback: if the text doesn't claim a
+                    # manifest record but exactly matches a slide's label
+                    # (case/whitespace-insensitive), anchor it to that
+                    # slide's <draw:name> attribute instead of raising. Why
+                    # only ODP needs this is unclear from this file; see
+                    # docling_native.py's manifest/record building.
                     if source_format is not SourceFormat.ODP or matching_unit is None:
                         raise
                     record = SimpleNamespace(
@@ -433,6 +513,11 @@ class DoclingNativeParser:
                             ),
                         )
                     )
+                # Content-range filtering happens here (after claiming), not
+                # before, because it depends on manifest state built from
+                # the whole document. The synthetic ODP fallback record
+                # above is never in selected_record_ids, so it's checked by
+                # unit membership directly instead.
                 if id(record) not in selected_record_ids and not isinstance(record, SimpleNamespace):
                     continue
                 if isinstance(record, SimpleNamespace) and record.anchor.unit_id not in selected_unit_ids:
@@ -469,6 +554,9 @@ class DoclingNativeParser:
                 )
                 if id(record) not in selected_record_ids:
                     continue
+                # record.cells, when present, is a manifest-derived cell
+                # grid (see docling_native.py) that takes precedence over
+                # Docling's own item.data.num_rows/num_cols reading.
                 if record.cells is not None:
                     cells = [
                         SimpleNamespace(
@@ -509,6 +597,11 @@ class DoclingNativeParser:
                     value = cell.text
                     if not value:
                         continue
+                    # Search from `cursor` (not 0) so a repeated cell value
+                    # can't match an earlier occurrence. A miss means the
+                    # cell text isn't reconstructable from base_text, which
+                    # would break the anchor-to-text invariant, so this
+                    # raises rather than silently anchoring the wrong cell.
                     cell_start = "".join(base_parts).find(value, cursor, end)
                     if cell_start < 0:
                         raise ValueError("table cell cannot be mapped into immutable base_text")
@@ -524,6 +617,9 @@ class DoclingNativeParser:
                             get_column_letter,
                         )
 
+                        # anchor.cell_range is the table's own origin cell;
+                        # add this cell's within-table row/col offset to get
+                        # its real spreadsheet address.
                         base_column = column_index_from_string(match.group(1))
                         base_row = int(match.group(2))
                         cell_anchor = CellSourceAnchor(
@@ -567,6 +663,11 @@ class DoclingNativeParser:
                     )
                     table_element.children.append(cell_id)
 
+        # Fail-closed integrity check: every non-empty manifest record must
+        # have been claimed by something Docling emitted above. A leftover
+        # unclaimed record means the native representation and Docling's
+        # output diverged, so raise rather than silently returning a
+        # document with missing source content.
         unclaimed = [record for record in manifest.records if record.text and not record.claimed]
         if unclaimed:
             raise ValueError(
@@ -587,6 +688,8 @@ class DoclingNativeParser:
         child_ids = {child for element in elements for child in element.children}
         markdown_parts = []
         for element in elements:
+            # Table cells are rendered as part of their parent table's text
+            # (below); skip them here to avoid emitting cell content twice.
             if element.id in child_ids:
                 continue
             if element.type == "table":

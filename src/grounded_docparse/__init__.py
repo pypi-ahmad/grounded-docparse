@@ -1,4 +1,12 @@
-"""Grounded document parsing pipeline."""
+"""Grounded document parsing pipeline.
+
+Curated public surface: every name re-exported here is the supported contract
+for callers outside this package (CLI, Streamlit app, and library users).
+Internal helpers that are not re-exported here should stay unexported rather
+than being added to this file. Start at native.py (immutable evidence
+contracts) or models.py (OCR result contracts) to see what these types
+represent, then universal.py for how a file gets routed to a parser.
+"""
 
 from .agentic import DocumentAgent, PreparedDocumentContext
 from .config import AlternateOcrEngine, OcrEngine, ParserConfig

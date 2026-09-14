@@ -430,7 +430,7 @@ Create an hourly `dr_checkpoint` with this explicit protocol:
 4. verify the dump and every committed input/output/definition blob referenced through sequence `N` are readable through the secondary endpoint with their exact versions/ETags/hashes; and
 5. write a recovery manifest containing checkpoint ID, sequence, UTC time, dump version/hash, Blob inventory hash and provider/config versions, sign its canonical bytes with a dedicated Key Vault asymmetric key, and store the manifest/signature in the secondary-readable recovery container.
 
-The checkpoint is valid only after all five steps succeed. Logical DR snapshots contain PHI, use the same access/encryption controls as source documents, retain the latest 35 days and are never application-downloadable. This verified checkpoint—not Flexible Server geo-restore or wall-clock guesswork—is the latest permissible coordinated regional recovery point.
+The checkpoint is valid only after all five steps succeed. Logical DR snapshots contain PHI, use the same access/encryption controls as source documents, retain the latest 35 days and are never application-downloadable. This verified checkpoint, not Flexible Server geo-restore or wall-clock guesswork, is the latest permissible coordinated regional recovery point.
 
 Regional failover follows this order:
 

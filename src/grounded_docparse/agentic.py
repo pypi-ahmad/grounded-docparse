@@ -1,4 +1,23 @@
-from __future__ import annotations
+"""DocumentAgent: optional, provider-backed document features layered on top of a completed parse.
+
+Covers classification, table-of-contents generation, custom form-segment
+classification and per-segment extraction, ad hoc schema extraction, and
+chat - all built from an already-completed `ParseResult`'s elements/markdown,
+never from raw pages or images. Each feature is independently isolated: a
+classification or TOC failure is recorded as a failed/partial feature and
+does not raise out of `analyze()`, so one feature failing never invalidates
+the local parse or the other features (see the per-future try/except in
+`analyze`).
+
+Must not: create or adjust OCR geometry/evidence (owned upstream by
+pipeline.py/render.py) or accept a citation/evidence reference that doesn't
+resolve to a real element - see the `known` filter in `chat` and the
+evidence-id checks in `_validate_segmentation` for where that boundary is
+enforced.
+
+Next: extraction.py (`DocumentExtractor`, used by `extract`/`extract_forms`
+for the actual grounded-field extraction contract).
+"""
 
 import hashlib
 import json
@@ -73,6 +92,11 @@ def _validate_segmentation(
     context: AgenticContext,
     profile: ClassifierProfile,
 ) -> list[str]:
+    # Trust boundary: `raw_segments` is provider output. This checks page
+    # ranges are contiguous and cover the window exactly once, categories are
+    # known, and every cited evidence element both exists and falls inside
+    # its own segment's page range - callers (see classify_forms) retry once
+    # with these issues fed back before giving up.
     issues: list[str] = []
     expected_pages = list(context.page_numbers)
     category_keys = {category.key for category in profile.categories} | {"other"}
@@ -106,6 +130,10 @@ def _validate_effective_segments(
     result: FormClassificationResult,
     parse_result: ParseResult,
 ) -> None:
+    # `eligible`/`schema_name` on each segment were computed against a
+    # specific profile snapshot; if the profile has since changed, those
+    # flags could route a segment to a schema that no longer matches its
+    # category, so a fingerprint mismatch is rejected outright.
     if result.profile_fingerprint != _profile_fingerprint(result.profile):
         raise ValueError("classifier profile changed after classification")
     pages = [page.number for page in parse_result.document.pages]
@@ -174,6 +202,10 @@ def _active_elements(result: ParseResult) -> list[Element]:
 def _page_markdown(result: ParseResult) -> dict[int, str]:
     separator = "\n\n<!-- PAGE BREAK -->\n\n"
     parts = result.markdown.rstrip().split(separator)
+    # Split by the page-break marker only if the count still lines up with
+    # the document's page count; presentation refinement or manual edits
+    # could have altered or removed markers, so a mismatch falls back to
+    # re-rendering markdown per page directly from the document model.
     if len(parts) == len(result.document.pages):
         return {
             page.number: f"{part.rstrip()}\n"
@@ -191,6 +223,12 @@ def _page_markdown(result: ParseResult) -> dict[int, str]:
     }
 
 
+# Packs pages into `AgenticContext` windows bounded by MAX_CONTEXT_CHARACTERS
+# and MAX_CONTEXT_PAGES so provider calls stay within a reasonable context
+# size and cost. A single page (or even a single layout record/element) that
+# alone exceeds the character budget is split further - down to slicing one
+# record's text in MAX_CONTEXT_CHARACTERS // 2 chunks - rather than ever
+# emitting an oversized context.
 def _prepare_agentic_context(result: ParseResult) -> PreparedDocumentContext:
     elements = _active_elements(result)
     by_page: dict[int, list[Element]] = {}
@@ -516,6 +554,13 @@ class DocumentAgent:
         boundary_pages: set[int] = set()
         warnings: list[str] = []
         previous_context: AgenticContext | None = None
+        # Each classifier window is independently classified, so a form
+        # segment that actually straddles two windows would otherwise get
+        # cut in half. To catch that: prepend the previous window's last
+        # page to this window's call (overlap, `candidate`) and remember
+        # `target_context`'s first page as a boundary; the merge pass below
+        # re-joins adjacent same-category segments that landed on either
+        # side of a recorded boundary.
         for target_context in prepared.contexts:
             context = target_context
             if previous_context is not None and target_context.page_numbers:
@@ -583,6 +628,11 @@ class DocumentAgent:
         segments: list[FormSegment] = []
         for raw in predicted:
             boundary_review = False
+            # Undo the window split from the overlap above: if the segment
+            # ending just before this one sits on a recorded window boundary
+            # and shares this segment's category, they were almost certainly
+            # one form segment classified twice - merge them and force
+            # review rather than trusting the auto-approval threshold.
             if (
                 segments
                 and raw.start_page in boundary_pages
@@ -745,6 +795,13 @@ class DocumentAgent:
     ) -> ExtractionResult:
         prepared = prepared_context or self.prepare(parse_result)
         contexts = prepared.contexts
+        # A schema with only flat (non-object, non-array) fields can be
+        # extracted independently per context window and merged field-by-
+        # field afterward (see the conflict-rank/arbitration logic below).
+        # A schema with nested objects or arrays can't be merged that way -
+        # a partial nested value from one window and another from a
+        # different window can't be safely combined - so it always goes
+        # through one DocumentExtractor call over the whole document.
         scalar_schema = all(
             not isinstance(field.get("properties"), dict) and "items" not in field
             for field in schema.get("properties", {}).values()
@@ -786,6 +843,12 @@ class DocumentAgent:
         ) as executor:
             results = list(executor.map(extract_context, contexts))
 
+        # Per field, pick the highest-confidence candidate across all
+        # context-window results, breaking ties by earliest page
+        # (`-(field.page or 10**9)` favors a real, low page number over a
+        # missing one). If two candidates at the same top confidence rank
+        # disagree on value, that field is flagged for arbitration below
+        # rather than silently keeping an arbitrary one.
         rank = {"not_found": 0, "inferred": 1, "medium": 2, "high": 3}
         fields: dict[str, ExtractedField] = {}
         warnings = [warning for result in results for warning in result.warnings]
@@ -812,6 +875,11 @@ class DocumentAgent:
                 conflicted_names.add(name)
             fields[name] = chosen
 
+        # Best-effort arbitration: re-extract just the pages involved in a
+        # conflict and let that result settle it. If the arbitration call
+        # itself fails, the field-by-field merge above is already a valid
+        # (if uncertain) result, so this only appends a warning rather than
+        # failing the whole extraction.
         if conflicted_names:
             conflict_pages = {
                 field.page
@@ -934,6 +1002,12 @@ class DocumentAgent:
             markdown = "\n\n<!-- PAGE BREAK -->\n\n".join(item.markdown for item in contexts)
             layout = [record for item in contexts for record in item.layout]
         else:
+            # Document too large for one context: retrieve a working set
+            # instead. Score every element by keyword overlap (weighted
+            # heavily) plus fuzzy similarity to the question, with a small
+            # boost for headings/titles, then keep the top 40 and each of
+            # their immediate neighbors (index-1/index/index+1) so a matched
+            # element keeps some surrounding context.
             terms = set(re.findall(r"[\w-]{2,}", question.casefold()))
             scored = []
             for index, element in enumerate(elements):
@@ -978,6 +1052,10 @@ class DocumentAgent:
             layout,
             history[-MAX_CHAT_TURN_PAIRS * 2 :],
         )
+        # Trust boundary: drop any citation the provider returned that
+        # doesn't resolve to a real element before it becomes a ChatSource -
+        # an answer can lose its evidence but must never cite one that
+        # doesn't exist.
         known = {element.id for element in elements}
         wire.citations = [item for item in wire.citations if item.element_id in known]
         by_id = {element.id: element for element in elements}

@@ -1,3 +1,16 @@
+"""Render canonical `Document`/`Block` evidence into Markdown, the grounded JSON
+envelopes, and annotated PDFs.
+
+This module renders; it does not originate evidence. Block identity, geometry,
+reading order, and confidence must already be settled by the parser/OCR layer
+(see `models.py`) before anything here runs — this file must not invent or
+reorder content, only decide how existing content is serialized and whether it
+looks complete enough to skip manual review.
+
+Read `models.py` next for the `Document`/`Block`/`Element` contracts this
+module consumes, and `quality.py` for the token/coverage helpers it calls.
+"""
+
 from __future__ import annotations
 
 import html
@@ -34,6 +47,7 @@ from .models import (
 )
 from .quality import WORD_PATTERN, incomplete_table, semantic_text
 
+# PyMuPDF colors are floats in 0..1 per channel, not 0..255.
 ANNOTATION_COLORS = {
     "text": (0.376, 0.647, 0.98),
     "heading": (0.114, 0.306, 0.847),
@@ -44,7 +58,15 @@ ANNOTATION_COLORS = {
 }
 RECOVERY_ANNOTATION_COLOR = (1.0, 0.55, 0.0)
 
+# Below this fraction of a block's expected tokens surviving into the rendered
+# body, the page is flagged needs_review (see _semantic_coverage / _page_quality_reasons).
 SEMANTIC_COVERAGE_THRESHOLD = 1.0
+
+# Source documents can carry literal HTML in table/figure text. This preview path treats
+# that text as untrusted: only an nh3 allowlist (tags/attributes below) survives cleaning,
+# and non-matched HTML-looking text is escaped rather than passed through. This sanitized
+# preview is not the export path — render_markdown/render_agentic_document below emit the
+# raw text as-is, so callers must not substitute this preview for canonical evidence.
 _MARKDOWN_PREVIEW_HTML_PATTERN = re.compile(
     r"<(?P<tag>[A-Za-z][\w:-]*)\b[^>]*>.*?</(?P=tag)\s*>"
     r"|<(?:img|br|hr)\b[^>]*?/?>",
@@ -76,6 +98,11 @@ def _line_key(value: str) -> str:
     return "|".join(parts)
 
 
+# Builds a multiset of every line the structured table cells would produce (per-cell,
+# per-flattened-multiline-cell, and per-row), keyed by whitespace/pipe-normalized text.
+# _table_residual_lines below subtracts this multiset from block.text's lines to recover
+# any stray lines the OCR/parse layer captured outside the structured cell grid, so that
+# text isn't silently dropped just because it didn't map cleanly to a cell.
 def _table_structure_lines(block: Block) -> Counter[str]:
     if block.table is None:
         return Counter()
@@ -110,6 +137,8 @@ def _table_residual_lines(block: Block) -> list[str]:
     return residuals
 
 
+# Same multiset-diff approach as _table_structure_lines, for form-field label/value/hint
+# combinations instead of table cells.
 def _form_structure_lines(block: Block) -> Counter[str]:
     if block.form is None:
         return Counter()
@@ -408,6 +437,10 @@ def _render_blocks(blocks: list[Block], builder: _MarkdownBuilder) -> None:
         index += 1
 
 
+# _Emission.start/end are Python string indices into the finished markdown, i.e. Unicode
+# codepoint offsets (matches the "range_units": "unicode_codepoints" contract emitted in
+# render_agentic_document's metadata). Every downstream span (atoms, page start/end) is
+# built from these offsets and must stay in that same unit.
 def _render_with_emissions(document: Document) -> tuple[str, dict[str, _Emission]]:
     builder = _MarkdownBuilder()
     for page_index, page in enumerate(document.pages):
@@ -482,6 +515,9 @@ def build_elements(
                     text=semantic_text(block),
                     reading_order=order,
                     confidence=block.confidence,
+                    # Elements repaired by the AI visual-recovery pass are labeled
+                    # "luna-recovery" instead of the OCR engine name, so consumers can
+                    # tell which elements did not come straight from local_source.
                     source=(
                         "luna-recovery"
                         if block.id in (recovered_element_ids or set())
@@ -642,6 +678,8 @@ def _semantic_coverage(block: Block, body: str) -> float:
         return 0.0
     expected = _semantic_tokens(block)
     if not expected:
+        # A block with no expected tokens (e.g. an empty checkbox option) is trivially
+        # fully covered — don't let it drag semantic_coverage below the review threshold.
         return 1.0
     rendered = Counter(WORD_PATTERN.findall(body.replace(r"\|", "|").casefold()))
     covered = sum((expected & rendered).values())
@@ -706,6 +744,8 @@ def _computed_page_quality(page, emissions: dict[str, _Emission]) -> PageQuality
         emission = emissions.get(block.id)
         body = (emission.coverage_body or emission.body) if emission else ""
         coverages.append(_semantic_coverage(block, body))
+    # A page with no blocks (e.g. blank page) has nothing to average; keep whatever
+    # semantic_coverage the page already carried rather than dividing by zero.
     coverage = (
         round(sum(coverages) / len(coverages), 6)
         if coverages
@@ -762,6 +802,10 @@ def render_agentic_document(
             end = emission.end if emission is not None else None
             coverage = _semantic_coverage(block, coverage_body)
             coverages.append(coverage)
+            # A VERIFIED status from the OCR/parse layer is not final: if this render
+            # pass finds the block's structure incomplete or its rendered text doesn't
+            # cover what was expected, downgrade to NEEDS_REVIEW here regardless of
+            # what upstream reported.
             status = block.verification
             if status is VerificationState.VERIFIED and (
                 coverage < SEMANTIC_COVERAGE_THRESHOLD or _incomplete_structure(block)
@@ -860,6 +904,9 @@ def render_agentic_document(
         pages=len(document.pages),
         processing_time=duration_ms / 1000,
     )
+    # "4.5.0" is the public OCR parse-JSON contract version (see TECHNICAL.md /
+    # docs/api.md). Bump it deliberately, in step with those docs, whenever this
+    # envelope's shape changes in a way consumers must react to.
     payload = {
         "schema_version": "4.5.0",
         "markdown": markdown,
@@ -910,7 +957,11 @@ def render_combined_result(
 ) -> str:
     """Flatten optional agentic results into the canonical v4.5 envelope."""
 
+    # payload aliases parse_result.structured_json rather than copying it — every
+    # assignment below mutates parse_result in place. Callers that need the pre-combined
+    # parse result afterward must snapshot it before calling this.
     payload = parse_result.structured_json
+    # "4.6.0" is the public "Full JSON" contract version (see TECHNICAL.md / docs/api.md).
     payload["schema_version"] = "4.6.0"
     payload["document_type"] = (
         analysis.classification.model_dump(mode="json")
@@ -1008,6 +1059,8 @@ def render_combined_result(
     metadata["luna_time"] = (
         metadata["luna_recovery_time"] + metadata["luna_agentic_time"]
     )
+    # Hardcoded label, not derived from the actually configured OCR/AI models — it only
+    # distinguishes "some AI stage ran" from "OCR only", not which engine or model.
     metadata["engine"] = (
         "glm-ocr + gpt-5.6-luna"
         if parse_result.trace or extra_traces
@@ -1092,6 +1145,14 @@ def _table_cell_atom_text(text: str) -> str:
     return text.replace("\r", " ").replace("\n", " ")
 
 
+# evidence.low_confidence_spans carries character offsets into evidence.text (the raw
+# OCR text for this cell/block). This function remaps those offsets into the *emitted*
+# markdown text, which may differ from the raw text by newline-flattening (table cells)
+# and/or pipe-escaping (`|` -> `\|`) and may be prefixed (a table row embeds several
+# cells). normalize/render replay exactly those transforms on the span boundaries so the
+# reported start/end stay correct for the text the caller actually sees. If emitted_text
+# doesn't match any transform this function knows about, it bails to [] rather than
+# reporting a span against text it can't prove corresponds to the source.
 def _emitted_confidence_spans(
     evidence: object | None,
     owner_text: str,
@@ -1209,6 +1270,10 @@ def _agentic_atoms(
             escaped = text.replace("|", r"\|")
             if escaped != text:
                 candidates.append(escaped)
+            # Search forward from atom_cursor first so repeated identical lines within
+            # the same block resolve to successive occurrences in order, not the same
+            # one twice. Only fall back to searching the whole [start, end) block span
+            # if that ordered search finds nothing.
             matches = [
                 (markdown.find(candidate, atom_cursor, end), candidate)
                 for candidate in candidates
@@ -1294,6 +1359,8 @@ def _as_pdf(data: bytes, filename: str) -> bytes:
     with pymupdf.open() as output:
         with Image.open(io.BytesIO(data)) as image:
             for frame in ImageSequence.Iterator(image):
+                # exif_transpose bakes in the capture-device rotation so the emitted PDF
+                # page reflects visual orientation, not raw sensor orientation.
                 rgb = ImageOps.exif_transpose(frame).convert("RGB")
                 buffer = io.BytesIO()
                 rgb.save(buffer, "PNG")
@@ -1360,12 +1427,16 @@ def render_annotated_pdf(
         expected_pages = page_count
     recovered_ids = recovered_element_ids or set()
     with pymupdf.open(stream=source, filetype="pdf") as output:
+        # Fail closed: annotating against a source PDF whose page count doesn't match
+        # the extracted document would silently draw boxes on the wrong pages.
         if expected_pages is not None and output.page_count != expected_pages:
             raise ValueError("source and extracted document page counts do not match")
         for element in elements:
             if element.bbox is None or not 1 <= element.page <= output.page_count:
                 continue
             page = output[element.page - 1]
+            # element.bbox is normalized 0..1 fractions of the page, not absolute
+            # PDF points — scale by this page's actual rect before drawing.
             x0, y0, x1, y1 = element.bbox
             rect = pymupdf.Rect(
                 x0 * page.rect.width,

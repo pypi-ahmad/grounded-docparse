@@ -1,3 +1,17 @@
+"""OCR/grounded-document field extraction: `DocumentExtractor` proposes and
+runs a strict-subset JSON Schema against the gateway model, then validates
+each extracted value against cited atom/block source evidence.
+
+Unlike native_extraction.py's exact-`char_interval`-only model, this file's
+grounding is deliberately looser: citations may be missing and get a fuzzy
+"inferred" fallback (`_resolve_inferred_evidence`), and numeric/boolean
+values are matched against markdown text via pattern heuristics
+(`_citations_contain_value`) rather than byte-exact substring matching.
+
+Next: `gateways.py` for `OpenAIDocumentGateway`; `models.py` for
+`ExtractedField`/`ExtractionResult`.
+"""
+
 from __future__ import annotations
 
 import json
@@ -37,6 +51,10 @@ UNSUPPORTED_KEYWORDS = {
     "minItems",
     "maxItems",
 }
+# Matches a numeric literal as it might appear in free-form markdown text
+# (thousands separators, currency symbol, accounting-style parens or a sign
+# for negatives) so an extracted number can be verified against evidence
+# text without requiring an exact substring match.
 NUMBER_BODY = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?"
 NUMERIC_LITERAL_PATTERN = re.compile(
     rf"(?<![\w.,])(?P<accounting>\()?[ \t]*(?P<sign_before>[+-])?[ \t]*"
@@ -73,6 +91,9 @@ def _validate_schema_node(schema: Any, *, path: str) -> None:
         raise ValueError(f"{path}: type must use the supported JSON Schema subset")
 
     non_null = [item for item in types if item != "null"]
+    # Extraction can't always find a value, and DocumentExtractor.extract
+    # falls back to nulling an ungroundable value (see the fallback there);
+    # every non-root field must be able to represent "not found".
     if path != "$" and "null" not in types:
         raise ValueError(f"{path}: extraction fields must be nullable")
     if len(non_null) != 1:
@@ -148,6 +169,9 @@ class DocumentExtractor:
             issues=None,
         )
         issues, evidence = _validate_and_resolve(draft, schema, parse_payload)
+        # One repair attempt only: if issues remain after this second pass,
+        # they're handled below (rescued via inferred evidence, or nulled
+        # out) rather than retried again.
         if issues:
             draft = self.gateway.extract_document(
                 model_context,
@@ -157,6 +181,12 @@ class DocumentExtractor:
             )
             issues, evidence = _validate_and_resolve(draft, schema, parse_payload)
 
+        # Remaining-issue fallback, in order: (1) if allow_inferred, try to
+        # rescue a value with no valid citation by fuzzy-matching it to the
+        # most similar remaining block, marked low-confidence "inferred";
+        # (2) any value still unresolved after that is forced to null
+        # (safe: every field is required to be nullable, see
+        # _validate_schema_node) rather than returned ungrounded.
         data = deepcopy(draft.get("data", {}))
         warnings: list[str] = []
         inferred: dict[str, list[dict]] = {}
@@ -192,6 +222,9 @@ class DocumentExtractor:
                     _set_pointer(data, pointer, None)
                 warnings.append(issue)
             _validate_instance(data, schema, path="$")
+            # require_all=False: some leaves are now legitimately null
+            # (just nulled above) and must not be flagged as missing
+            # evidence.
             _, evidence = _validate_and_resolve(
                 {"data": data, "evidence": draft.get("evidence", [])},
                 schema,
@@ -245,6 +278,11 @@ def _usage(gateway: object) -> RunUsage:
 
 def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
     payload = deepcopy(parse_payload)
+    # AI-refined markdown is presentation, not evidence: keep it separately
+    # under "refined_markdown" (used as model-facing context, see
+    # _model_extraction_context) but make "markdown" the pre-refinement
+    # base text, since that's what _citations_contain_value validates
+    # extracted values against later.
     refined_markdown = payload.get("markdown", "")
     payload["markdown"] = payload.get("base_markdown", refined_markdown)
     payload["refined_markdown"] = refined_markdown
@@ -254,6 +292,9 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
         metadata.pop("warnings", None)
         metadata.pop("trace", None)
     for page in payload.get("document", {}).get("pages", []):
+        # Exclude blocks that failed rendering or were rejected during OCR
+        # verification: the model must not extract from content the
+        # pipeline itself doesn't trust.
         page["blocks"] = [
             block
             for block in page.get("blocks", [])
@@ -261,6 +302,8 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
         ]
         for block in page["blocks"]:
             active_block_ids.add(block["id"])
+            # Internal audit/debug fields the model doesn't need and
+            # shouldn't see echoed back in its output.
             block.pop("correction_lineage", None)
             block.pop("reason", None)
             block.pop("verification_reason", None)
@@ -275,7 +318,13 @@ def _extraction_payload(parse_payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _model_extraction_context(parse_payload: dict[str, Any]) -> dict[str, Any]:
-    """Build the compact, identifier-rich context sent to Luna."""
+    """Build the compact, identifier-rich context sent to Luna.
+
+    Prefers refined_markdown (readable, AI-polished) as the document text
+    shown to the model here; the extracted values it returns are still
+    validated against the unrefined base markdown in
+    `_citations_contain_value`, not against this text.
+    """
 
     layout = []
     for page in parse_payload.get("document", {}).get("pages", []):
@@ -357,6 +406,9 @@ def _validate_and_resolve(
                     "bbox": source["bbox"],
                 }
             )
+        # Block-level citations are a fallback used only when the model
+        # didn't cite specific atoms; finer-grained atom citations take
+        # precedence when present.
         if not atom_ids:
             for block_id in block_ids:
                 block = blocks.get(block_id)
@@ -401,6 +453,13 @@ def _resolve_inferred_evidence(
     draft: dict[str, Any],
     parse_payload: dict[str, Any],
 ) -> dict[str, list[dict]]:
+    """Best-effort fallback used only when `allow_inferred=True`: for a
+    value with no valid citation, prefer any block the model did hint at
+    (`requested`), else pick the block whose text is most similar to the
+    value (`SequenceMatcher`, text capped at 1,000 chars to bound the O(n*m)
+    comparison cost). This is a similarity heuristic, not a grounding proof
+    — every result is tagged "confidence": "inferred".
+    """
     blocks = _active_blocks(parse_payload)
     requested: dict[str, list[str]] = {}
     for item in draft.get("evidence", []):
@@ -468,6 +527,9 @@ def _extracted_fields(
         field_pointer = f"/{escaped}"
         citations = list(evidence.get(field_pointer, []))
         if not citations:
+            # This top-level field has no direct citation (typical for an
+            # object/array field whose evidence lives on nested leaf
+            # pointers); fall back to any citation nested under it.
             citations = [
                 citation
                 for pointer, pointer_citations in evidence.items()
@@ -477,10 +539,16 @@ def _extracted_fields(
         if value is None or not citations:
             fields[name] = ExtractedField(value=value, confidence="not_found")
             continue
+        # Only the first citation is used for display (page/bbox/
+        # source_text); additional citations, if any, aren't surfaced here.
         citation = citations[0]
         block = blocks.get(citation.get("block_id"), {})
         source_text = str(block.get("text", ""))
         confidence = citation.get("confidence")
+        # "inferred" (set by _resolve_inferred_evidence) is passed through
+        # as-is; otherwise this is a simple substring heuristic, not the
+        # same value-containment check _citations_contain_value used
+        # during validation.
         if confidence != "inferred":
             confidence = (
                 "high"
@@ -522,6 +590,16 @@ def _citations_contain_value(
     citations: list[dict],
     markdown: str,
 ) -> bool:
+    """Check whether the cited spans of `markdown` actually support `value`.
+
+    A dict/list value is always accepted here (its own leaves are checked
+    individually elsewhere via `_non_null_leaves`). Booleans are matched via
+    `_evidence_contains_boolean`'s layered heuristics. Numbers are matched
+    with `NUMERIC_LITERAL_PATTERN` (currency/accounting/thousands-separator
+    aware), not exact substring. Strings fall back to a whitespace-
+    normalized, casefolded substring check. `\\|` is unescaped throughout,
+    since markdown tables escape a literal "|" inside a cell that way.
+    """
     if isinstance(value, (dict, list)):
         return True
     cited_text: list[str] = []
@@ -630,6 +708,12 @@ def _separator_row(cells: list[str] | None) -> bool:
 
 
 def _evidence_contains_boolean(evidence: str, value: bool) -> bool:
+    """Match a boolean value against evidence text via layered heuristics,
+    checked in order: a whole-word "true"/"false"; checkbox syntax
+    (`[x]`/`[✓]` for true, `[ ]` for false); a markdown table row where a
+    yes/no-shaped cell follows a non-empty label cell (skipping header/
+    separator rows); a "label: yes/no" line; a bare yes/no line.
+    """
     normalized = evidence
     folded = normalized.replace(r"\|", "|").casefold()
     if re.search(rf"\b{str(value).casefold()}\b", folded):
@@ -669,6 +753,10 @@ def _evidence_contains_boolean(evidence: str, value: bool) -> bool:
             if token is not None and token[0] == expected:
                 return True
         token = _boolean_token(line)
+        # Unclear from this file why a bare line that is exactly "no."
+        # (with the trailing period) is specifically excluded here — every
+        # other bare yes/no match above (including "no" without
+        # punctuation, and inside table cells) is accepted.
         if token is not None and token[0] == expected and token != ("no", "."):
             return True
     return False
@@ -686,6 +774,9 @@ def _validate_instance(value: Any, schema: dict[str, Any], *, path: str) -> None
         "object": lambda item: isinstance(item, dict),
         "array": lambda item: isinstance(item, list),
         "string": lambda item: isinstance(item, str),
+        # bool is a subclass of int in Python, so both checks explicitly
+        # exclude it — otherwise a bool value would satisfy a "number" or
+        # "integer" schema type.
         "number": lambda item: (
             isinstance(item, (int, float)) and not isinstance(item, bool)
         ),
@@ -719,6 +810,8 @@ def _non_null_leaves(value: Any, pointer: str = ""):
         yield pointer or "/", value
 
 
+# Similar to native_extraction.py's JSON-Pointer helpers but not shared
+# with them; why they weren't unified is unclear from this file.
 def _pointer_parts(pointer: str) -> list[str]:
     if pointer == "":
         return []
@@ -754,5 +847,9 @@ def _set_pointer(value: Any, pointer: str, replacement: Any) -> None:
 
 
 def _issue_pointer(issue: str) -> str | None:
+    # Depends on every pointer-scoped issue message elsewhere in this file
+    # being formatted as "<pointer>: detail"; an issue string that doesn't
+    # follow that convention silently returns None (treated as not
+    # pointer-specific) rather than raising.
     prefix, separator, _detail = issue.partition(":")
     return prefix if separator and prefix.startswith("/") else None

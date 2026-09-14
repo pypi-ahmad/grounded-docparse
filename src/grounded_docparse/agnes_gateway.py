@@ -1,4 +1,12 @@
-from __future__ import annotations
+"""Agnes adapter presenting the `.responses.parse`/`.create` surface gateways.py expects.
+
+Agnes speaks an OpenAI-compatible chat-completions API directly, so unlike
+gemini_gateway.py this is a thin reshape (chat messages, `response_format`
+json_schema) rather than a coordinate-space or truncation-handling adapter.
+
+Next: gemini_gateway.py for the sibling adapter with more provider-specific
+handling, or gateways.py for the interface both implement.
+"""
 
 import json
 from types import SimpleNamespace
@@ -65,7 +73,7 @@ class AgnesResponses:
                     "schema": text_format.model_json_schema(),
                 },
             },
-            temperature=0,
+            temperature=0,  # deterministic structured output, not a creative-writing call
             max_tokens=_max_output_tokens(kwargs.get("max_output_tokens")),
         )
         content = completion.choices[0].message.content

@@ -1,3 +1,16 @@
+"""Typed contracts for the OCR/grounded-parse family of results.
+
+Responsibility: the wire, draft, and canonical Pydantic models for OCR page
+analysis, layout regions, blocks/documents, agent usage/trace, classification,
+extraction, chat, and visual recovery. This module must not contain parsing,
+OCR, or provider-calling logic itself — only shape and cross-field validation.
+`model_config = ConfigDict(extra="forbid")` is repeated deliberately on almost
+every model: any unexpected field from provider/OCR output must fail loudly
+rather than pass through silently. Next file: native.py, which defines the
+separate immutable-evidence contract family for native (non-OCR) documents;
+these two model families are not interchangeable.
+"""
+
 from __future__ import annotations
 
 import json
@@ -94,6 +107,13 @@ class ReadingOrderStatus(StrEnum):
     UNAVAILABLE = "unavailable"
 
 
+# Three box representations exist because a box passes through three
+# coordinate spaces before it becomes evidence: `DraftBoundingBox` is raw
+# provider output (0-1, unvalidated ordering), `BoundingBox` is the same 0-1
+# normalized space after validation (the only box type stored as canonical
+# evidence), and `CoordinateBox` is an absolute space (rendered pixels or
+# source points/EMU, tagged by its `unit` field) used for provenance and
+# geometry math. Do not compare boxes across these types without converting.
 class BoundingBox(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -140,6 +160,10 @@ class CoordinateBox(BaseModel):
 
 
 class BoundingBoxProvenance(BaseModel):
+    """Ties one region's box across all three coordinate spaces: `normalized`
+    (canonical evidence), `rendered` (pixels at the DPI actually rendered),
+    and `source` (the original page's own unit, e.g. PDF points)."""
+
     model_config = ConfigDict(extra="forbid")
 
     normalized: BoundingBox
@@ -434,6 +458,10 @@ class SchemaField(BaseModel):
 
 
 class StoredSchema(BaseModel):
+    """Version 1 is the field-builder schema (`fields`, no raw JSON Schema);
+    version 2 is a user-supplied raw `json_schema` with no builder fields.
+    The two representations are mutually exclusive, enforced below."""
+
     model_config = ConfigDict(extra="forbid")
 
     version: Literal[1, 2] = 1
@@ -516,6 +544,11 @@ class FormSegmentationWire(BaseModel):
 
 
 class FormSegment(BaseModel):
+    """`predicted_*` fields are the frozen model proposal; `start_page`,
+    `end_page`, and `category` are the authoritative values after review and
+    may have been corrected by the user. Do not treat `predicted_*` as
+    current truth once `review_status` is `user_corrected`."""
+
     model_config = ConfigDict(extra="forbid")
 
     id: str
@@ -963,6 +996,10 @@ class Element(BaseModel):
     text: str = ""
     reading_order: int = Field(ge=1)
     confidence: float | None = Field(default=None, ge=0, le=1)
+    # "luna-recovery" marks text that AI enhancement repaired on an existing
+    # failed/low-confidence element; it is not a seventh OCR engine and never
+    # originates geometry, only replaces the text of an element another
+    # engine already produced.
     source: Literal[
         "glm-ocr",
         "paddleocr-vl-1.6",

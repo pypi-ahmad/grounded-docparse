@@ -1,3 +1,13 @@
+"""Build a content-hash snapshot of the tracked repository tree, then validate
+(and with `--write`, regenerate) the `wiki/` knowledge base against it: raw
+per-category file manifests, each article's `snapshot`/`tags`/`sources`
+frontmatter, and index/article wikilinks.
+
+This only shells out to git with a fixed, non-shell argument list (see
+`_git`) — it does not execute repository content. It must not treat wiki
+articles as anything but plain text to scan for frontmatter/wikilinks.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -18,6 +28,10 @@ CATEGORY_ORDER = (
 )
 INFRASTRUCTURE_FILES = {"index.md", "log.md", "agents.md"}
 WIKILINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|[^\]]+)?\]\]")
+# Caches, generated graphs/sites, and "wiki" itself are excluded from the snapshot:
+# wiki/docs-site/graphify-out are *outputs* of a snapshot (this script's own, or a
+# sibling tool's), so hashing them as inputs would make the snapshot depend on its
+# own prior output.
 EXCLUDED_PARTS = {
     ".git",
     ".worktrees",
@@ -73,6 +87,9 @@ def excluded(path: str) -> bool:
     return normalized == ".env" or any(part in EXCLUDED_PARTS for part in parts)
 
 
+# Checks below are order-dependent (first match wins): a top-level directory match
+# always beats a suffix match, so e.g. a .md file under src/ classifies as
+# application-code, not documentation.
 def classify_path(path: str) -> str:
     posix = PurePosixPath(path)
     parts = posix.parts
@@ -106,6 +123,8 @@ def _dirty_paths(repo_root: Path) -> set[str]:
         repo_root, "status", "--porcelain=v1", "--untracked-files=all"
     ).splitlines():
         raw = line[3:].strip()
+        # `git status --porcelain` reports a rename as "old -> new"; only the
+        # destination path is a current file worth tracking as dirty.
         if " -> " in raw:
             raw = raw.split(" -> ", maxsplit=1)[1]
         normalized = raw.strip('"').replace("\\", "/")
@@ -144,6 +163,10 @@ def build_snapshot(repo_root: Path) -> Snapshot:
     base_commit = _git(repo_root, "rev-parse", "HEAD")
     branch = _git(repo_root, "branch", "--show-current") or "detached"
     dirty = bool(_dirty_paths(repo_root))
+    # snapshot_id is a hash of file contents (path + sha256 pairs), not the git commit
+    # hash — it changes whenever tracked/untracked file content changes, including
+    # uncommitted edits, independent of whether HEAD moved. base_commit/dirty record
+    # the git-level state separately.
     snapshot_id = f"content-{digest.hexdigest()[:12]}"
     return Snapshot(base_commit, branch, dirty, snapshot_id, files, categories)
 
@@ -206,6 +229,8 @@ def manifests_match(wiki_root: Path, snapshot: Snapshot) -> bool:
             if manifest.get("files") != snapshot.categories[category]:
                 return False
     except (FileNotFoundError, json.JSONDecodeError):
+        # Missing or corrupt manifests just mean "not up to date" — treat that the
+        # same as a content mismatch rather than letting the caller crash.
         return False
     return True
 
@@ -219,6 +244,10 @@ def write_article_snapshots(wiki_root: Path, snapshot: Snapshot) -> None:
     pattern = re.compile(r"^snapshot:\s*.*$", re.MULTILINE)
     for article in article_paths(wiki_root):
         text = article.read_text(encoding="utf-8")
+        # count=1: only the first "snapshot: ..." line is stamped, and an article with
+        # none is left untouched rather than gaining one — validate_wiki reports a
+        # missing/stale snapshot field as its own separate error. Only write back when
+        # the content actually changed, to avoid no-op diffs.
         updated, count = pattern.subn(
             f"snapshot: {snapshot.snapshot_id}", text, count=1
         )
@@ -252,6 +281,9 @@ def _frontmatter(text: str) -> dict[str, str]:
     return values
 
 
+# A wikilink can name either the article's full relative path (minus .md) or just its
+# bare filename stem; `names` is keyed by both (see validate_wiki), and duplicate-name
+# collisions across either key are caught there before this function is ever called.
 def _resolve_target(target: str, names: dict[str, Path]) -> Path | None:
     normalized = target.strip().replace("\\", "/").removesuffix(".md").casefold()
     return names.get(normalized) or names.get(PurePosixPath(normalized).name)
