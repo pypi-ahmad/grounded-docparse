@@ -31,6 +31,10 @@ def main() -> int:
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
     image_base64 = base64.b64encode(buffer.getvalue()).decode()
+    # api_mode selects one of two mutually exclusive wire protocols configured in
+    # glmocr.yaml — Ollama's /api/generate shape or an OpenAI-compatible chat
+    # completion — never both; the payload and URL below must match whichever the
+    # config declares.
     if ocr_api.get("api_mode", "openai") == "ollama_generate":
         payload = {
             "model": ocr_api["model"],

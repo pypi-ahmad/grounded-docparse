@@ -1,3 +1,12 @@
+"""Windows-only self-termination for the "Stop app" UI action.
+
+Responsibility: let the running Streamlit process schedule its own delayed
+kill so the managed native launcher can restart cleanly. Must not run (or
+claim to be available) outside the managed Windows launcher, since nothing
+else is watching this process's PID to relaunch it. Next file: see
+scripts/windows/launch-native.ps1 for the launcher side of this contract.
+"""
+
 from __future__ import annotations
 
 import os
@@ -18,6 +27,11 @@ def schedule_managed_shutdown() -> int:
         raise RuntimeError(
             "Shutdown is available only when using the managed Windows launcher"
         )
+    # Self-kill is delegated to a detached PowerShell process rather than
+    # exiting inline: the 2-second delay gives this process time to finish
+    # sending its HTTP response to the UI before `Stop-Process` ends it.
+    # `os.getpid()` is this process's own PID (not attacker-controlled input),
+    # and shell=False with an argv list avoids any shell-parsing of it.
     command = (
         "Start-Sleep -Seconds 2; "
         f"Stop-Process -Id {os.getpid()} -ErrorAction SilentlyContinue"

@@ -1,3 +1,15 @@
+"""CLI that runs the real `DocumentParser`/`DocumentAgent`/`DocumentExtractor`
+pipeline (not a mock) against an evaluation corpus, scores the results with
+`grounded_docparse.benchmark`, and optionally gates on a regression policy.
+
+This calls whatever engines/providers the environment is configured for —
+running it with cloud models enabled makes live, billable API calls. It must
+not run without `--live` (see `main`) so it can't be invoked by accident.
+
+Next: `grounded_docparse/benchmark.py` for the scoring this script drives,
+and `benchmarks/` for the manifest/annotation files it reads by default.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -61,6 +73,9 @@ def _unit_interval(value: str) -> float:
     return parsed
 
 
+# `pages` is 1-indexed (matching --page-subset's DOCUMENT_ID=PAGE,... CLI syntax and
+# the rest of this codebase's page numbering); pymupdf's from_page/to_page are
+# 0-indexed, hence the -1 below.
 def _subset_pdf(data: bytes, pages: list[int]) -> bytes:
     source = pymupdf.open(stream=data, filetype="pdf")
     try:
@@ -84,6 +99,10 @@ def _subset_reference(reference: str, pages: list[int]) -> str:
     return "<!-- PAGE BREAK -->".join(reference_pages[page - 1] for page in pages)
 
 
+# Infers a JSON Schema from a sample annotation value (the extraction schema the
+# corpus expects), used to drive DocumentExtractor. Every non-root node is typed as
+# [inferred_type, "null"] — deliberately nullable, since a live extraction run may
+# not populate every field the sample happened to have.
 def _schema_node(value: Any, *, root: bool = False) -> dict[str, Any]:
     if isinstance(value, dict):
         properties = {name: _schema_node(child) for name, child in value.items()}
@@ -107,6 +126,11 @@ def _schema_node(value: Any, *, root: bool = False) -> dict[str, Any]:
     return {"type": [kind, "null"]}
 
 
+# --glm-only is meant to isolate the local OCR engine from the AI recovery/refinement
+# stage (referred to elsewhere in telemetry as "Luna"). This asserts that isolation
+# actually held for this parse — any recovery activity or Luna call time/count means
+# the comparison arm was contaminated, so it raises rather than reporting a misleading
+# "GLM-only" result.
 def _glm_only_proof(parse_result) -> dict[str, Any]:
     metadata = parse_result.metadata
     luna_calls = list(parse_result.usage.calls) if parse_result.usage else []
@@ -414,6 +438,8 @@ def main() -> int:
     )
     parser.add_argument("--baseline", type=Path, help="Prior compatible report JSON")
     args = parser.parse_args()
+    # Hard gate: this script makes real (potentially billable) provider/engine calls,
+    # so it never runs without an explicit --live rather than defaulting to "on".
     if not args.live:
         parser.error("visual-only evaluation requires --live")
     report, had_error = _live_report(args)

@@ -1,3 +1,13 @@
+"""Launch-scoped token usage tracking and estimated cost reporting.
+
+Responsibility: accumulate per-call `AgentUsage` records thread-safely across
+concurrent page/agent work, then turn them into an estimated cost summary
+using hardcoded per-model rates. Must not persist usage across app restarts
+or make network calls to look up live pricing. Next file: runtime.py, which
+is the provider retry/concurrency layer that produces the `AgentUsage`
+records this module summarizes.
+"""
+
 from __future__ import annotations
 
 import threading
@@ -42,6 +52,9 @@ class SessionUsageLedger:
         self._lock = threading.Lock()
 
     def extend(self, calls: Iterable[AgentUsage]) -> None:
+        # Deep-copy on both sides of the lock: callers mutating their own
+        # list after calling extend(), or mutating a returned snapshot,
+        # must never reach back into this ledger's internal state.
         copied = [call.model_copy(deep=True) for call in calls]
         with self._lock:
             self._calls.extend(copied)
@@ -52,6 +65,9 @@ class SessionUsageLedger:
 
 
 def pricing_for(model: str, *, pricing_date: date | None = None) -> ModelPricing:
+    # pricing_date is accepted for a historical-pricing lookup that is not
+    # implemented: every call currently gets today's hardcoded rate table
+    # below regardless of the date passed.
     del pricing_date
     pricing = {
         CloudModel.GPT_5_6_LUNA.value: ModelPricing(0.20, 1.20, 0.02),
@@ -66,12 +82,19 @@ def summarize_calls(
     calls: Iterable[AgentUsage], *, pricing_date: date | None = None
 ) -> UsageCostSummary:
     calls = list(calls)
+    # Calls with telemetry_available=False are excluded from cost math
+    # entirely rather than costed as zero: their true cost is unknown, and
+    # unavailable_calls below tells the caller how many are missing from the
+    # total rather than implying the total is complete.
     available = [call for call in calls if call.telemetry_available]
     unavailable_calls = sum(1 for call in calls if not call.telemetry_available)
     rows: list[ModelUsageCost] = []
     for model in sorted({call.model for call in available}):
         model_calls = [call for call in available if call.model == model]
         input_tokens = sum(call.input_tokens for call in model_calls)
+        # Clamp to input_tokens: a provider reporting cached tokens greater
+        # than its own input token count is treated as untrusted telemetry,
+        # not propagated into a nonsensical negative "uncached" cost below.
         cached_tokens = min(
             sum(call.cached_input_tokens for call in model_calls), input_tokens
         )

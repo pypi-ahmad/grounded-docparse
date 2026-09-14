@@ -1,3 +1,21 @@
+<#
+    Native Windows launcher for Grounded DocParse.
+
+    Responsibility: ensure uv/Python 3.12/Ollama are present, sync the locked
+    native environment, stop any previous instance of THIS app (never an
+    unrelated process), start Streamlit on 127.0.0.1:7137, wait for it to
+    report healthy, then follow its logs (plus the optional WSL OCR service
+    logs) until the process exits or startup fails.
+
+    Must not: stop or otherwise act on a process it has not verified is a
+    Grounded DocParse Streamlit listener started from $InstallRoot (see
+    Get-VerifiedGroundedDocParseProcess). Must not silently reassign the
+    Streamlit port if a foreign process already owns it.
+
+    Next file to read: installer\Install-GroundedDocParse.ps1 for first-time
+    WSL/GPU provisioning, or src\grounded_docparse\windows_setup.py for what
+    "--prepare-models" actually downloads/caches.
+#>
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$InstallRoot)
 
@@ -75,6 +93,11 @@ function Import-UserEnvironment {
     }
 }
 
+# Invariant: a PID recorded on disk or found listening on the app's port is
+# never trusted by itself, because PIDs are reused by the OS. It only counts
+# as "ours" if the live process's command line actually shows it running
+# `streamlit` against this exact streamlit_app.py path. Everything downstream
+# that stops a process must go through this check.
 function Get-VerifiedGroundedDocParseProcess {
     param([Parameter(Mandatory)][int]$ProcessId)
     $managedProcess = Get-CimInstance Win32_Process -Filter "ProcessId = $ProcessId" -ErrorAction SilentlyContinue
@@ -87,6 +110,10 @@ function Get-VerifiedGroundedDocParseProcess {
     $managedProcess
 }
 
+# Fails closed: if verification above did not match, this throws rather than
+# killing the PID anyway. Callers (stale PID file, port already in use) rely
+# on this to avoid ever terminating an unrelated process that happens to hold
+# the same PID or port.
 function Stop-VerifiedGroundedDocParseProcess {
     param([Parameter(Mandatory)][int]$ProcessId, [Parameter(Mandatory)][string]$Source)
     $managedProcess = Get-VerifiedGroundedDocParseProcess -ProcessId $ProcessId
@@ -98,6 +125,10 @@ function Stop-VerifiedGroundedDocParseProcess {
     Wait-Process -Id $ProcessId -Timeout 10 -ErrorAction SilentlyContinue
 }
 
+# $PidPath holds a plain integer PID from the last successful launch. A
+# missing, malformed, or unverifiable entry is expected after a crash or a
+# manual kill, not an error: it is cleaned up silently rather than aborting
+# the new launch.
 function Stop-PreviousManagedApp {
     if (-not (Test-Path -LiteralPath $PidPath)) { return }
     $savedPid = (Get-Content -Raw -LiteralPath $PidPath).Trim()
@@ -116,6 +147,11 @@ function Stop-PreviousManagedApp {
     Remove-Item -LiteralPath $PidPath -Force -ErrorAction SilentlyContinue
 }
 
+# Second recovery path, independent of the PID file: covers the case where
+# the file is missing/stale but a previous instance still owns the port.
+# Routes through the same verified-process check, so an unrelated process
+# that happens to be listening on 7137 is left alone (see the explicit
+# port-occupied throw further down in the main script instead).
 function Stop-AppListeningOnPort {
     param([int]$Port = $StreamlitPort)
     $listeners = @(
@@ -128,6 +164,10 @@ function Stop-AppListeningOnPort {
     }
 }
 
+# Polls /_stcore/health for up to 60s (1 attempt/second). Returns the
+# verified listener PID rather than a plain boolean, so the caller can record
+# and later safely stop exactly the process this launch started even if
+# something else raced for the same port.
 function Wait-AppHealthy {
     for ($attempt = 0; $attempt -lt 60; $attempt++) {
         try {
@@ -148,6 +188,10 @@ function Wait-AppHealthy {
     throw "Grounded DocParse did not become healthy at $StreamlitHealthUrl."
 }
 
+# Byte-offset tailer for a growing log file. If the file's current length is
+# ever less than the tracked offset, the file was truncated or rotated out
+# from under us, so the cursor resets to 0 instead of throwing on a negative
+# seek.
 function New-LogCursor {
     param(
         [Parameter(Mandatory)][string]$Path,
@@ -177,6 +221,8 @@ function Write-NewLogContent {
         $Cursor.Pending = ''
     }
     if ($length -gt $Cursor.Offset) {
+        # Opened with ReadWrite|Delete sharing so the process still writing
+        # (or rotating/deleting) this log is never blocked by our read.
         $stream = [IO.File]::Open(
             $Cursor.Path,
             [IO.FileMode]::Open,
@@ -198,6 +244,9 @@ function Write-NewLogContent {
                 if ($line) { Write-Host "[$($Cursor.Label)] $line" }
             }
         }
+        # The last split segment may be a partial line (no trailing newline
+        # yet); hold it back and prepend it to the next read instead of
+        # printing a line split across two polls.
         $Cursor.Pending = $lines[-1]
     }
     if ($Flush -and $Cursor.Pending) {
@@ -206,6 +255,11 @@ function Write-NewLogContent {
     }
 }
 
+# Blocks until $ListenerPid exits, tailing app stdout/stderr plus whichever
+# optional WSL OCR / Ollama logs exist under .runtime and %LOCALAPPDATA%.
+# On exit it only deletes $PidPath if it still points at this same PID -
+# guards against clobbering a PID file a newer, concurrently started launch
+# has already overwritten.
 function Follow-ManagedAppLogs {
     param(
         [Parameter(Mandatory)][int]$ListenerPid,
@@ -262,10 +316,18 @@ try {
     & $python -m grounded_docparse.windows_setup --prepare-models
     if ($LASTEXITCODE -ne 0) { throw 'Persistent OCR model setup failed.' }
 
+    # Fail-closed: by this point any previous instance of THIS app has
+    # already been stopped above. If something is still listening on the
+    # port, it is by definition not ours, so refuse to start rather than
+    # silently taking over a foreign listener.
     $portOwner = Get-NetTCPConnection -LocalPort $StreamlitPort -State Listen -ErrorAction SilentlyContinue
     if ($portOwner) {
         throw "Port $StreamlitPort is occupied by an unmanaged process; refusing to stop it."
     }
+    # DOCPARSE_MANAGE_OCR_SERVICES tells the app it may start/stop the
+    # optional WSL GLM/Paddle services itself when the user switches engines;
+    # DOCPARSE_STUDIO_DB_PATH pins the durable workspace SQLite location this
+    # launcher owns (see docs/run.md for the manual-launch equivalents).
     $env:DOCPARSE_MANAGE_OCR_SERVICES = 'true'
     $env:DOCPARSE_APP_SESSION_ID = [guid]::NewGuid().ToString('N')
     $env:DOCPARSE_STUDIO_DB_PATH = Join-Path $DataRoot 'studio.sqlite3'
@@ -289,6 +351,9 @@ try {
     Follow-ManagedAppLogs -ListenerPid $listenerPid -StdoutPath $stdout -StderrPath $stderr `
         -StdoutOffset $stdoutOffset -StderrOffset $stderrOffset
 } catch {
+    # Cleanup only ever targets a process this run itself started
+    # ($startedProcessId), and both stop attempts swallow their own errors so
+    # a failed cleanup does not mask the original startup error logged below.
     if ($startedProcessId) {
         try { Stop-VerifiedGroundedDocParseProcess -ProcessId $startedProcessId -Source 'failed startup' } catch { }
         try { Stop-AppListeningOnPort } catch { }

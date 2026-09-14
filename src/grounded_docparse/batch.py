@@ -1,3 +1,12 @@
+"""Batch upload identity, and ZIP archive export (full-batch and form-split).
+
+Responsibility: give each uploaded file a stable content-based identity and
+a unique display name, then package parse outputs into ZIP archives with a
+JSON manifest. Untrusted filenames from uploads must always pass through
+`_safe_name` before being used as an archive path. Next file: workspace_store.py,
+which persists these same batch documents and results durably.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -55,6 +64,12 @@ def build_batch_documents(
     if (measured_size if total_size is None else total_size) > MAX_BATCH_BYTES:
         raise ValueError("The combined upload size must not exceed 1 GB.")
 
+    # Two independent de-duplication keys here, deliberately not the same:
+    # `document_id` is keyed on name+content hash, so re-uploading the exact
+    # same file twice still gets distinct IDs (":1", ":2"). `display_name`
+    # is keyed on the casefolded name alone, so two different files that
+    # happen to share a name both get a "(n)" suffix for the UI/archive,
+    # regardless of whether their content differs.
     name_totals = Counter(name.casefold() for name, _source, _mime in uploads)
     name_occurrences: defaultdict[str, int] = defaultdict(int)
     content_occurrences: defaultdict[str, int] = defaultdict(int)
@@ -85,6 +100,11 @@ def build_batch_documents(
 
 
 def _safe_name(value: str, fallback: str) -> str:
+    # `value` is an untrusted upload filename (or a segment id/category
+    # derived from model output). Strip any directory components first so a
+    # crafted name like "../../evil" can't escape the archive folder, then
+    # drop everything but word characters/./space/- so the result is always
+    # a safe single path segment.
     leaf = value.replace("\\", "/").rsplit("/", 1)[-1].strip()
     cleaned = re.sub(r"[^\w. -]+", "_", leaf, flags=re.UNICODE).strip(" .")
     return cleaned or fallback
@@ -133,6 +153,9 @@ def build_output_archive(entries: Sequence[BatchArchiveEntry]) -> bytes:
 
 
 def _pdf_range(source: bytes, start_page: int, end_page: int) -> bytes:
+    # start_page/end_page are 1-indexed and inclusive (this package's page
+    # numbering convention); pymupdf's insert_pdf takes 0-indexed, inclusive
+    # from_page/to_page, hence the -1 on both bounds rather than just one.
     with pymupdf.open(stream=source, filetype="pdf") as document:
         output = pymupdf.open()
         output.insert_pdf(document, from_page=start_page - 1, to_page=end_page - 1)
@@ -154,6 +177,9 @@ def build_split_archive(
     )
     if any(not segment.approved for segment in segments):
         raise ValueError("all form segments must be approved before split export")
+    # Require segments to partition the document exactly: every parsed page
+    # appears in precisely one segment, in page order. This is what
+    # guarantees the split export can't silently drop or duplicate a page.
     covered = [
         page
         for segment in segments

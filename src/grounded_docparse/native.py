@@ -1,3 +1,15 @@
+"""Immutable native-document evidence contract (`base_text` + `SourceAnchor`).
+
+Responsibility: define the frozen `base_text` string, the `SourceSpan`s that
+map half-open character ranges of it to `SourceAnchor` records (page/slide/
+sheet/cell/CSV-row/text-line origin), and the `NativeDocument` model whose
+validator enforces that every element and asset actually grounds to a real,
+in-range span. This module must not perform any parsing or format-specific
+extraction itself — that lives in native_parsers.py and docling_native.py,
+which are the next files to read to see how these contracts get built and
+which the manual routing in universal.py dispatches to.
+"""
+
 from __future__ import annotations
 
 import json
@@ -97,6 +109,10 @@ class TextSourceAnchor(BaseModel):
     end_column: int = Field(ge=1)
 
 
+# Discriminated on `kind` because each native source format needs a
+# different notion of "where in the source": a page/box for PDF, a structural
+# path for DOCX/PPTX/HTML-like formats, a sheet+range for XLSX, a row/column
+# range for CSV, and a line/column range for plain text/Markdown.
 SourceAnchor = Annotated[
     PdfSourceAnchor
     | StructuralSourceAnchor
@@ -108,6 +124,9 @@ SourceAnchor = Annotated[
 
 
 class SourceSpan(BaseModel):
+    """`start`/`end` are a half-open `[start, end)` range over `base_text`,
+    measured in Unicode codepoints (Python string indices), not bytes."""
+
     model_config = ConfigDict(extra="forbid")
 
     start: int = Field(ge=0)
@@ -161,6 +180,10 @@ class NativeAsset(BaseModel):
     height: int | None = Field(default=None, gt=0)
     alt_text: str | None = None
     caption: str | None = None
+    # Fixed to False rather than omitted: this asset shape only exists for
+    # OCR-disabled Docling conversion, so the field makes that guarantee
+    # explicit and machine-checkable in every serialized document rather than
+    # relying on callers to remember which pipeline produced it.
     ocr_performed: Literal[False] = False
 
 
@@ -201,6 +224,10 @@ class NativeDocument(BaseModel):
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_format: SourceFormat
     requested_processing_type: ProcessingType
+    # Immutable by design (Pydantic `frozen=True` field + model-level
+    # `validate_assignment=True` above): every accepted value, native
+    # extraction, and render must trace back to this exact text. Presentation
+    # (refined Markdown) may diverge from base_text; evidence never does.
     base_text: str = Field(frozen=True)
     units: list[SourceUnit]
     elements: list[NativeElement]
@@ -208,6 +235,11 @@ class NativeDocument(BaseModel):
     warnings: list[str] = Field(default_factory=list)
     content_range: AppliedContentRange | None = None
 
+    # This is the enforcement point for the whole native-evidence guarantee:
+    # every element/asset must reference a real unit, every span must fall
+    # inside base_text, and IDs can't collide across the three ID spaces.
+    # If this validator ever accepts a document, downstream code is entitled
+    # to assume grounding is sound and skip re-checking it.
     @model_validator(mode="after")
     def valid_grounding(self) -> NativeDocument:
         unit_ids = {unit.id for unit in self.units}
@@ -236,6 +268,9 @@ class NativeDocument(BaseModel):
     def source_spans_for(self, start: int, end: int) -> list[SourceSpan]:
         if start < 0 or end <= start or end > len(self.base_text):
             raise ValueError("source range must be within base_text")
+        # Half-open interval overlap test: two [start, end) ranges overlap
+        # iff each starts before the other ends. Using <=/>= here would
+        # incorrectly count adjacent, non-overlapping spans as overlapping.
         return sorted(
             (
                 element.source
@@ -289,6 +324,9 @@ def render_native_document(
     *,
     markdown: str,
 ) -> RenderedNativeDocument:
+    # "5.0.0"/"5.1.0" below are the public native-document JSON contract
+    # versions (see docs/architecture.md); bump deliberately, not silently,
+    # on any shape change consumers could depend on.
     payload = {
         "schema_version": "5.0.0",
         "markdown": markdown,
@@ -325,7 +363,7 @@ def render_native_combined_result(
     extraction: NativeExtractionResult | None = None,
 ) -> str:
     payload = json.loads(parse_result.json)
-    payload["schema_version"] = "5.1.0"
+    payload["schema_version"] = "5.1.0"  # combined native + extraction contract
     payload["extraction"] = (
         json.loads(extraction.json) if extraction is not None else None
     )

@@ -1,3 +1,15 @@
+"""Durable single-workspace persistence: SQLite metadata + on-disk artifacts.
+
+Responsibility: persist the one active batch workspace (document identity,
+status, progress, and parse/analysis/extraction results) across app
+restarts, and restore it with crash-recovery normalization for anything that
+was mid-flight when the process last stopped. Must not persist more than one
+workspace (the schema is a deliberate singleton) and must not trust an
+on-disk result to be complete without checking its content hash and result
+version first. Next file: batch.py, which defines `BatchDocument`, the
+identity this store persists.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -61,6 +73,9 @@ def _now() -> str:
 
 
 def _parse_result_payload(result: ParseResult | NativeParseResult) -> dict:
+    # "kind" is the on-disk discriminator between the two independently
+    # shaped result families sharing one result_json column; `_parse_result`
+    # below must switch on it the same way to deserialize correctly.
     if isinstance(result, NativeParseResult):
         return {
             "kind": "native-v5",
@@ -188,6 +203,9 @@ class WorkspaceStore:
         connection.execute("PRAGMA busy_timeout=5000")
         connection.executescript(
             """
+            -- singleton + CHECK enforces at the database level that this
+            -- table can only ever hold row id 1: there is exactly one
+            -- active workspace, never a set of workspaces.
             CREATE TABLE IF NOT EXISTS batch_workspace (
                 singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
                 format_version INTEGER NOT NULL,
@@ -216,6 +234,11 @@ class WorkspaceStore:
             );
             """
         )
+        # Ad-hoc additive migration: there is no migration framework here,
+        # so an existing database created before this column existed gets it
+        # added in place. Any future column must follow the same pattern
+        # (check PRAGMA table_info, ALTER TABLE ADD COLUMN); this file has
+        # no mechanism for renaming or dropping a column safely.
         columns = {
             row[1]
             for row in connection.execute("PRAGMA table_info(batch_workspace_documents)")
@@ -227,10 +250,16 @@ class WorkspaceStore:
         return connection
 
     def _directory(self, document_id: str) -> Path:
+        # Re-hashed rather than used directly: document_id already contains
+        # a hash but also a ":N" occurrence suffix, which isn't a safe/clean
+        # directory name on its own.
         return self.artifact_root / hashlib.sha256(document_id.encode()).hexdigest()
 
     @staticmethod
     def _write(path: Path, value: bytes) -> None:
+        # Write-to-temp-then-rename so a crash mid-write can never leave a
+        # partially written file at `path`; os.replace is atomic on the same
+        # filesystem, unlike writing `path` directly.
         path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".tmp")
         temporary.write_bytes(value)
@@ -245,6 +274,9 @@ class WorkspaceStore:
     ) -> None:
         now = _now()
         keep = {document.id for document in documents}
+        # Source bytes are written before the DB row is inserted/updated:
+        # a concurrent load() must never see a document row whose source.bin
+        # doesn't exist yet.
         for document in documents:
             self._write(self._directory(document.id) / "source.bin", document.source)
         with self._connect() as connection:
@@ -302,6 +334,10 @@ class WorkspaceStore:
                     "DELETE FROM batch_workspace_documents WHERE document_id = ?",
                     (document_id,),
                 )
+        # Directory cleanup happens only after the DB transaction above has
+        # committed (the `with` block has exited): if the process died
+        # before commit, the row would still reference these files, so they
+        # must not be removed until the delete is durable.
         for document_id in existing - keep:
             directory = self._directory(document_id)
             if directory.parent == self.artifact_root and directory.exists():
@@ -402,6 +438,10 @@ class WorkspaceStore:
         with self._connect() as connection:
             connection.execute("DELETE FROM batch_workspace_documents")
             connection.execute("DELETE FROM batch_workspace")
+        # Guard before the recursive delete below: only ever remove a
+        # directory that is exactly "<database_dir>/workspaces". This is a
+        # deliberate last-resort check against ever rmtree-ing an unexpected
+        # path if artifact_root were ever constructed differently.
         root = self.artifact_root.resolve()
         expected_parent = self.database_path.parent.resolve()
         if root.parent != expected_parent or root.name != "workspaces":
@@ -419,6 +459,9 @@ class WorkspaceStore:
             ).fetchall()
         if workspace is None or not rows:
             return None
+        # `incompatible`: the stored result shape no longer matches this
+        # build's RESULT_VERSION, so every stored result is discarded rather
+        # than risk deserializing a shape this code no longer understands.
         incompatible = workspace["result_version"] != result_version
         if incompatible:
             with self._connect() as connection:
@@ -441,6 +484,11 @@ class WorkspaceStore:
                 )
         documents: list[StoredWorkspaceDocument] = []
         for row in rows:
+            # A document last saved as "processing" (or the legacy
+            # "interrupted" status from an older build) was mid-parse when
+            # the process stopped: there is no partial-parse resume, so its
+            # progress/result/analysis are cleared and it restarts from
+            # "pending" rather than being shown as if it had succeeded.
             unfinished = row["status"] in {"processing", "interrupted"}
             if unfinished:
                 with self._connect() as connection:
@@ -460,6 +508,10 @@ class WorkspaceStore:
             result = None
             extraction = None
             parsed_source = None
+            # Re-hash the on-disk source and compare to the hash recorded at
+            # save time: this catches truncated/corrupted local storage
+            # (disk issues, an interrupted write outside `_write`'s atomic
+            # path, manual tampering), not just a version mismatch.
             restore_error = (
                 "Saved source is corrupt or incomplete"
                 if hashlib.sha256(source).hexdigest() != row["content_sha256"]

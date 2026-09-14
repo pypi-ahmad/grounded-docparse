@@ -1,3 +1,14 @@
+"""Two RapidOCR-backed runtimes, both native Windows CPU (ONNX Runtime), no WSL dependency:
+
+- RapidOcrCropRuntime: OCRs a single already-cropped region image (used for recovery/
+  enhancement crops), one region in, one OcrRegion out.
+- DoclingRapidOcrRuntime: the "Docling + RapidOCR" extraction engine — runs Docling's full
+  page parse (layout, tables, OCR) and converts every item to an OcrRegion.
+
+Next: page_analysis.py's PageAnalyzer selects one of these via get_rapidocr_runtime /
+get_docling_rapidocr_runtime.
+"""
+
 from __future__ import annotations
 
 from functools import lru_cache
@@ -29,6 +40,8 @@ class RapidOcrCropRuntime:
             content = str(text).strip()
             raw_box = boxes[index] if boxes is not None and index < len(boxes) else None
             if raw_box is None:
+                # No polygon from the engine for this text line: fall back to a full-page
+                # bbox rather than dropping the recognized text.
                 polygon = ()
                 bbox = (0.0, 0.0, 1.0, 1.0)
             else:
@@ -60,6 +73,9 @@ class DoclingRapidOcrRuntime:
 
     @staticmethod
     def _bbox(value, size) -> tuple[float, float, float, float]:
+        # Docling bounding boxes are not guaranteed top-left-origin (PDF-derived boxes are
+        # often bottom-left); to_top_left_origin(1.0) flips them into the same normalized,
+        # top-left-origin space every other engine in this codebase uses.
         normalized = value.normalized(size).to_top_left_origin(1.0)
         return (
             round(min(float(normalized.l), float(normalized.r)), 8),
@@ -70,6 +86,11 @@ class DoclingRapidOcrRuntime:
 
     @classmethod
     def _confidence(cls, parsed_page, item_bbox, size) -> float | None:
+        # Docling reports OCR confidence per word/textline cell, not per higher-level item
+        # (paragraph, table cell, ...); this reconstructs one confidence for `item_bbox` by
+        # averaging the OCR-sourced cells whose center falls inside it, weighted by each
+        # cell's text length so long, confidently-read spans outweigh short noisy ones.
+        # Prefer textline-level cells; fall back to word-level only if none are present.
         candidates = tuple(getattr(parsed_page, "textline_cells", ()) or ())
         if not candidates:
             candidates = tuple(getattr(parsed_page, "word_cells", ()) or ())
@@ -113,6 +134,8 @@ class DoclingRapidOcrRuntime:
                         content = item.export_to_html(document, add_caption=False)
                     else:
                         content = str(text or "").strip()
+                    # Tables are always "attempted" even though `text` is None for them —
+                    # their content comes from export_to_html above, not the text field.
                     recognition_attempted = label == "table" or text is not None
                     parsed_page = (
                         getattr(parsed_pages[prov.page_no - 1], "parsed_page", None)

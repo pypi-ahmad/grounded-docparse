@@ -1,4 +1,19 @@
-from __future__ import annotations
+"""Gemini adapter presenting the `.responses.parse`/`.create` surface gateways.py expects.
+
+Wraps `google-genai` behind the same shape OpenAIDocumentGateway calls, plus
+Gemini-specific handling: its structured-output schema needs an explicit
+integer bounding-box definition (Gemini has no native box type), and its
+JSON output can be truncated by MAX_TOKENS rather than cleanly failing
+validation.
+
+Must not: let a malformed or missing bounding box, or a MAX_TOKENS truncation,
+surface as a plain validation error - those are raised as
+RetryableProviderError so ProviderRuntime's retry loop (see runtime.py's
+`_is_retryable`) picks them up instead of failing the page outright.
+
+Next: agnes_gateway.py for the sibling (OpenAI-compatible, simpler) adapter,
+or gateways.py for the interface both adapters implement.
+"""
 
 import base64
 import json
@@ -24,6 +39,12 @@ _GEMINI_BOX_DESCRIPTION = (
 
 
 def _response_schema(text_format: type) -> dict[str, Any]:
+    # PageDraft's bbox fields are normally untyped/opaque to the JSON Schema
+    # Gemini receives; here they're pinned to an explicit 4-integer array in
+    # Gemini's own coordinate space (see _GEMINI_BOX_DESCRIPTION: [ymin,
+    # xmin, ymax, xmax], 0-1000) since that's what its structured output
+    # actually returns - _normalize_page_draft_boxes converts it back to
+    # this app's normalized 0-1 x0/y0/x1/y1 boxes afterward.
     schema = text_format.model_json_schema()
     if text_format is not PageDraft:
         return schema
@@ -48,6 +69,13 @@ def _response_schema(text_format: type) -> dict[str, Any]:
 
 
 def _normalize_page_draft_boxes(value: Any) -> Any:
+    # Recursively converts every "bbox" in the raw (untrusted) Gemini
+    # payload from its [ymin, xmin, ymax, xmax] / 0-1000 coordinate space to
+    # this app's normalized {x0,y0,x1,y1} 0-1 space. A box that's malformed,
+    # out of range, or degenerate (zero/negative width or height) raises
+    # RetryableProviderError rather than being silently coerced, so the
+    # retry loop gets a chance at a better response instead of grounding
+    # evidence against a bad box.
     if isinstance(value, list):
         return [_normalize_page_draft_boxes(item) for item in value]
     if not isinstance(value, dict):
@@ -76,6 +104,9 @@ def _normalize_page_draft_boxes(value: Any) -> Any:
 
 
 def _validate_page_draft_grounding(draft: PageDraft) -> None:
+    # A region/atom/table cell with no bbox at all can't be grounded, so
+    # (like an invalid box above) this is treated as retryable rather than
+    # accepted with missing evidence.
     missing = 0
     for region in draft.regions:
         missing += region.bbox is None
@@ -162,6 +193,10 @@ class _GeminiResponses:
             if isinstance(parsed, PageDraft):
                 _validate_page_draft_grounding(parsed)
         except (json.JSONDecodeError, ValidationError) as exc:
+            # A MAX_TOKENS finish reason means the JSON was cut off mid-output
+            # rather than genuinely malformed - worth a retry (a fresh call
+            # may complete within the token budget) instead of surfacing as
+            # a hard schema failure.
             if _finish_reason(response) == "MAX_TOKENS":
                 raise RetryableProviderError(
                     "Gemini reached its output token limit before completing JSON"

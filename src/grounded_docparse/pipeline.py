@@ -1,3 +1,21 @@
+"""OCR/AI parse orchestration for a single uploaded document.
+
+``DocumentParser.parse`` owns the whole lifecycle: ingest and rasterize pages, run
+local layout/OCR analysis when enabled, build deterministic ``Block``/``Page``/
+``Document`` evidence, apply bounded visual-recovery and quality-repair passes
+through the optional cloud gateway, then render Markdown/JSON output. It must not
+let an optional AI stage (visual recovery, quality repair, Markdown refinement)
+invalidate an already-produced local parse — those stages report their own status
+on failure instead of failing the document. Conversely, a local OCR or AI-ADE pass
+that produces nothing usable for a nonblank page must raise rather than return an
+empty result that looks like a successful parse (see the nonblank-page checks in
+``_process_page`` and ``parse``).
+
+Read page_analysis.py next for how the local OCR analyses consumed here are
+produced, grounded_ocr.py for the underlying layout/recognition runtimes, and
+render.py for how the ``Document`` built here becomes Markdown/JSON output.
+"""
+
 from __future__ import annotations
 
 import html
@@ -1096,6 +1114,9 @@ def _recover_paddle_form_regions(
         return outcome
 
     pages_by_number = {page.number: page for page in pages}
+    # Each selected page is rendered and OCR'd twice below (190 and 200 DPI) so a
+    # checkbox state is trusted only when both passes agree; halve the budget here
+    # so the total render+OCR call count stays within max_visual_recovery_crops.
     page_limit = config.max_visual_recovery_crops // 2
     selected_pages = sorted(candidates)[:page_limit]
     if len(selected_pages) < len(candidates):
@@ -2821,6 +2842,11 @@ class DocumentParser:
             visual_recovery_crops = 0
             total = len(source.pages)
             effective_visual_recovery = visual_recovery and self._provider_available()
+            # Page workers below run in a thread pool, but progress_callback (e.g.
+            # Streamlit) is not safe to call off the caller's thread. Workers push
+            # events into this queue instead of calling the callback directly;
+            # only drain_progress(), invoked from the caller's thread, dequeues
+            # and delivers them.
             progress_events: SimpleQueue[ProgressEvent] = SimpleQueue()
 
             def queue_progress(event: ProgressEvent) -> None:
@@ -2897,6 +2923,9 @@ class DocumentParser:
                         analyses_by_page[page.number] = None
 
             if local_analysis_enabled:
+                # Fail closed rather than silently returning an empty parse: a
+                # nonblank document with no usable layout or recognized text from
+                # every page is treated as an engine failure, not a valid result.
                 nonblank = [
                     analysis
                     for analysis in analyses_by_page.values()
@@ -3064,6 +3093,10 @@ class DocumentParser:
                                     f"Recognized page {futures[future]}",
                                 )
                             except Exception:
+                                # One page's failure aborts the whole parse rather
+                                # than silently dropping a page: cancel the rest
+                                # of this batch's still-pending futures and
+                                # propagate.
                                 for remaining in pending:
                                     remaining.cancel()
                                 raise

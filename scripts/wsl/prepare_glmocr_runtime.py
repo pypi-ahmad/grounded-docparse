@@ -12,6 +12,9 @@ from typing import Any
 
 import yaml
 
+# Exact commit pins for reproducibility — bumping either requires re-downloading
+# (or re-caching offline) the corresponding snapshot; "latest" is deliberately not
+# used here.
 GLMOCR_REPO = "zai-org/GLM-OCR"
 GLMOCR_REVISION = "ca5d8b3e287e52589e37c28385d9655ee4372f9d"
 LAYOUT_REPO = "PaddlePaddle/PP-DocLayoutV3_safetensors"
@@ -55,6 +58,8 @@ def _resolve_snapshot(repo_id: str, revision: str, offline: bool) -> Path:
             "Run scripts/wsl/setup-glmocr.sh while online, then retry. "
             f"Upstream error: {type(exc).__name__}: {exc}"
         ) from exc
+    # Defend against snapshot_download resolving to a directory that doesn't actually
+    # match the pinned revision (the local cache directory name is the revision).
     if snapshot.name != revision:
         raise SystemExit(
             f"ERROR: {repo_id} resolved to {snapshot.name}, expected {revision}."
@@ -62,6 +67,9 @@ def _resolve_snapshot(repo_id: str, revision: str, offline: bool) -> Path:
     return snapshot
 
 
+# Write-to-temp-then-replace so a service reading RUNTIME_CONFIG/MANIFEST_FILE
+# concurrently (or a crash mid-write) never observes a truncated/partial file; the
+# temp file is cleaned up if anything raises before the replace.
 def _atomic_write(path: Path, content: str) -> None:
     descriptor, temporary_name = tempfile.mkstemp(
         dir=path.parent, prefix=f".{path.name}.", suffix=".tmp", text=True
@@ -109,9 +117,14 @@ def prepare(*, offline: bool, backend: str = "vllm") -> dict[str, str | int]:
         raise ValueError(f"Unsupported OCR backend: {backend}")
     RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
     layout_path = _resolve_snapshot(LAYOUT_REPO, LAYOUT_REVISION, offline)
+    # Default concurrency differs by backend (1 vs 16); GLMOCR_SDK_MAX_WORKERS
+    # overrides either default explicitly.
     max_workers = _positive_int(
         "GLMOCR_SDK_MAX_WORKERS", 1 if backend == "ollama" else 16
     )
+    # The vllm backend serves the GLM-OCR weights this script downloads directly; the
+    # ollama backend instead pulls "glm-ocr:latest" from Ollama's own model store, so
+    # there is no local Hugging Face snapshot path to resolve.
     glm_path = (
         _resolve_snapshot(GLMOCR_REPO, GLMOCR_REVISION, offline)
         if backend == "vllm"

@@ -1,3 +1,18 @@
+"""Builds a per-format `SourceManifest` (units, text/table `SourceRecord`s,
+and assets) directly from a document's raw XML/ZIP/workbook parts, ahead of
+Docling's own conversion. `native_parsers.py`'s `DoclingNativeParser` then
+matches Docling's output against this manifest via `claim_record`, so each
+converted value keeps an anchor into the real source structure.
+
+Must not: build a record whose anchor doesn't correspond to a real location
+in the source part; both directions of the manifest/Docling reconciliation
+are meant to fail (see `claim_record` and native_parsers.py's `unclaimed`
+check) rather than accept an unanchored or unmatched value.
+
+Next: `native_parsers.py` for how these records get claimed and rendered;
+`native.py` for the `SourceUnit`/`SourceAnchor`/`NativeAsset` contracts.
+"""
+
 from __future__ import annotations
 
 import csv
@@ -11,6 +26,9 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 from zipfile import ZipFile
 
+# defusedxml, not stdlib ElementTree: these XML parts come from an untrusted
+# uploaded document, and stdlib ElementTree is vulnerable to XML entity
+# expansion/external-entity attacks on untrusted input.
 from defusedxml import ElementTree as ET
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
@@ -63,6 +81,15 @@ def claim_record(
     unit_id: str | None = None,
     record_type: str | None = None,
 ) -> SourceRecord:
+    """Match a value Docling emitted back to the one manifest record it came
+    from, and mark that record claimed.
+
+    This is one half of the manifest/Docling grounding check: raising here
+    means Docling produced something with no corresponding manifest record.
+    The other half is native_parsers.py's post-loop `unclaimed` check, which
+    catches the opposite case — a manifest record Docling never emitted.
+    Together they enforce that the two sides match exactly.
+    """
     normalized = _norm(text)
     matches = [
         record
@@ -73,6 +100,11 @@ def claim_record(
         and (record_type is None or record.type == record_type)
     ]
     if not matches and record_type == "table":
+        # Docling's re-serialized table text doesn't always normalize to an
+        # exact match of the source table text; fall back to "the one
+        # unclaimed table in this unit", but only when that's unambiguous —
+        # more than one candidate means we can't tell which table it is, so
+        # treat it as no match rather than guessing.
         matches = [
             record
             for record in records
@@ -137,6 +169,10 @@ def _package_assets(
     return assets
 
 
+# The format builders below (_docx, _pptx, _xlsx, ...) parse each format's
+# raw ZIP/XML/workbook parts directly rather than via python-docx/pptx, so
+# every record's anchor path can be built to match the document's own
+# container structure (e.g. paragraph/table position) exactly.
 def _docx(data: bytes) -> SourceManifest:
     unit = _unit("document-1", "document", 1)
     records: list[SourceRecord] = []
@@ -161,6 +197,10 @@ def _docx(data: bytes) -> SourceManifest:
                     )
             elif _local(child.tag) == "tbl":
                 table += 1
+                # Unlike _xlsx, cells aren't tracked individually here — the
+                # whole table becomes one record/anchor, so
+                # native_parsers.py's TableItem branch falls back to
+                # Docling's own row/col reading for DOCX tables.
                 cells = [
                     _text(node)
                     for node in child.iter()
@@ -185,6 +225,8 @@ def _pptx(data: bytes) -> SourceManifest:
     units: list[SourceUnit] = []
     assets: list[NativeAsset] = []
     with ZipFile(BytesIO(data)) as archive:
+        # Sort numerically, not lexically: filenames aren't zero-padded, so
+        # a plain string sort would put slide10.xml before slide2.xml.
         slide_names = sorted(
             (
                 name
@@ -255,6 +297,9 @@ def _pptx(data: bytes) -> SourceManifest:
 
 
 def _xlsx(data: bytes) -> SourceManifest:
+    # data_only=False reads formula strings, not computed values: a cell
+    # containing a formula produces the formula text (e.g. "=SUM(A1:A2)"),
+    # not the last-calculated result.
     workbook = load_workbook(BytesIO(data), read_only=False, data_only=False)
     records: list[SourceRecord] = []
     units: list[SourceUnit] = []
@@ -288,6 +333,10 @@ def _xlsx(data: bytes) -> SourceManifest:
                         ],
                     )
                 )
+            # `_images`, `anchor._from`, and `image._data()` are
+            # underscore-prefixed openpyxl internals with no public
+            # equivalent found in this file; may break on an openpyxl
+            # upgrade.
             for image_index, image in enumerate(getattr(sheet, "_images", []), start=1):
                 anchor = getattr(image, "anchor", None)
                 marker = getattr(anchor, "_from", None)
@@ -321,6 +370,9 @@ def _csv_manifest(data: bytes) -> SourceManifest:
     width = max((len(row) for row in rows), default=1)
     records = []
     if rows:
+        # No `cells=` here (unlike _xlsx): CSV table cell coordinates come
+        # from Docling's own table reading in native_parsers.py, not from
+        # this manifest.
         records.append(
             SourceRecord(
                 " ".join(cell for row in rows for cell in row),
@@ -531,6 +583,10 @@ def _odf(data: bytes, source_format: SourceFormat) -> SourceManifest:
                 for row in (node for node in sheet.iter() if _local(node.tag) == "table-row"):
                     values: list[str] = []
                     for cell in (node for node in row if _local(node.tag) == "table-cell"):
+                        # ODF compresses runs of identical cells via
+                        # number-columns-repeated; expand it so column
+                        # indices below line up with the real, uncompressed
+                        # sheet grid.
                         repeat = int(next((value for key, value in cell.attrib.items() if _local(key) == "number-columns-repeated"), "1"))
                         values.extend([_text(cell)] * repeat)
                     rows.append(values)
@@ -563,6 +619,9 @@ def _odf(data: bytes, source_format: SourceFormat) -> SourceManifest:
             unit = _unit("document-1", "document", 1)
             units.append(unit)
             tables = [node for node in root.iter() if _local(node.tag) == "table"]
+            # Paragraphs/headings inside a table are re-emitted as part of
+            # the table's own record below; exclude them from
+            # table_descendants to avoid claiming the same text twice.
             table_descendants = {id(node) for table in tables for node in table.iter()}
             paragraph = 0
             table_index = 0
@@ -632,6 +691,16 @@ DOCLING_FORMAT_NAMES = {
 
 
 def make_docling_converter():
+    """Build the Docling converter used for normal native parsing.
+
+    Must not enable OCR (do_ocr is left unset/default-off here, unlike
+    make_docling_rapidocr_converter below, which is the explicit, separate
+    OCR engine), remote services, external plugins, or picture/chart
+    enrichment models — this parsing path is meant to be fully local and
+    deterministic, and those features would introduce network calls or
+    model-generated content into what's supposed to be a native, source-
+    grounded extraction.
+    """
     try:
         from docling.datamodel.base_models import InputFormat
         from docling.datamodel.pipeline_options import ConvertPipelineOptions
@@ -737,6 +806,8 @@ def ensure_docling_models() -> Path:
         ):
             return artifacts
     except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        # Any read/parse failure here just means "no valid cache"; fall
+        # through to a fresh download rather than propagating the error.
         pass
 
     artifacts.mkdir(parents=True, exist_ok=True)

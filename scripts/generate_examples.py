@@ -1,3 +1,10 @@
+"""Regenerate the two synthetic example PDFs under `examples/` (a clean native
+document and a degraded scanned fax). Both contain only fabricated text — no
+real patient data. `scripts/generate_evaluation_corpus.py` references these
+exact files by path as pre-existing corpus fixtures, so renaming the output
+paths here would break that script too.
+"""
+
 from __future__ import annotations
 
 import io

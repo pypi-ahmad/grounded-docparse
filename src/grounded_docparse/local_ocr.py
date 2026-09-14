@@ -1,3 +1,14 @@
+"""Adapts the GLM-OCR SDK (WSL-only, GPU-backed) into the typed OcrRegion/OcrPageResult
+evidence the rest of the pipeline expects.
+
+Must not: assume the SDK's JSON shape is stable — the parsing helpers below (_objects,
+_bbox, _regions) walk untrusted, possibly-changing SDK output defensively rather than
+indexing into a fixed schema. Must not call into the model outside GlmOcrRuntime's lock;
+the underlying model is not safe for concurrent invocation.
+
+Next: page_analysis.py consumes OcrRegion/OcrPageResult via PageAnalyzer.
+"""
+
 from __future__ import annotations
 
 import gc
@@ -38,6 +49,8 @@ GlmPageResult = OcrPageResult
 
 
 def _objects(value: Any) -> list[dict[str, Any]]:
+    # Recursively hunts an untrusted, arbitrarily-nested SDK JSON structure for any dict
+    # that looks like a region (has a bbox-like key), rather than indexing a fixed schema.
     if isinstance(value, str):
         try:
             value = json.loads(value)
@@ -71,6 +84,9 @@ def _bbox(item: dict[str, Any]) -> tuple[float, float, float, float] | None:
 
 
 def _regions(result: Any) -> list[OcrRegion]:
+    # The SDK exposes two parallel views of the same regions — json_result (formatted) and
+    # raw_json_result (raw, carries task_type/score) — that must be correlated by `index`,
+    # not by list position, since either view may omit or reorder entries.
     formatted = _objects(getattr(result, "json_result", result))
     raw = _objects(getattr(result, "raw_json_result", {}))
     raw_by_index = {
@@ -83,6 +99,9 @@ def _regions(result: Any) -> list[OcrRegion]:
             continue
         index = int(item.get("index", position))
         raw_item = raw_by_index.get(index, {})
+        # There is no explicit "did recognition run" flag from the SDK: it is inferred from
+        # task_type (present and not skip/abandon), and "failed" from that plus a missing
+        # content field on the matched raw item.
         task_type = str(raw_item.get("task_type", item.get("task_type", ""))).casefold()
         recognition_attempted = bool(task_type) and task_type not in {"skip", "abandon"}
         recognition_failed = (
@@ -115,7 +134,11 @@ def _regions(result: Any) -> list[OcrRegion]:
 
 
 class GlmOcrRuntime:
-    """One process-wide, serialized GLM-OCR instance; model loading is expensive."""
+    """One process-wide, serialized GLM-OCR instance; model loading is expensive.
+
+    `self._lock` serializes every call into `self._parser` (parse and parse_many alike):
+    the underlying model is not safe to invoke from multiple threads at once.
+    """
 
     def __init__(self, config_path: str, layout_device: str) -> None:
         try:
@@ -132,6 +155,8 @@ class GlmOcrRuntime:
             return _regions(self._parser.parse(str(image_path)))
 
     def parse_many(self, image_paths: list[Path]):
+        # preserve_order=False: the SDK may stream results in any order, so each result is
+        # matched back to its requested path via original_images rather than by position.
         expected = {path.resolve(): path for path in image_paths}
         seen: set[Path] = set()
         with self._lock:
@@ -158,12 +183,18 @@ class GlmOcrRuntime:
                         error=str(error) if error else None,
                     )
             except Exception as exc:  # noqa: BLE001 - SDK failures become page-level evidence
+                # A mid-stream SDK exception is remapped into a per-page error result for
+                # every page not yet yielded, instead of raising and losing already-produced
+                # results.
                 message = f"{type(exc).__name__}: {exc}"
                 for resolved, original in expected.items():
                     if resolved not in seen:
                         seen.add(resolved)
                         yield GlmPageResult(original, [], message)
                 return
+        # Completeness guarantee: even if the SDK silently drops a requested page (no
+        # exception, no yielded result for it), every input path still gets exactly one
+        # GlmPageResult.
         for resolved, original in expected.items():
             if resolved not in seen:
                 yield GlmPageResult(original, [], "GLM-OCR returned no result for page")
@@ -223,6 +254,8 @@ def clear_glmocr_runtimes() -> None:
     with _instances_lock:
         _instances.clear()
     gc.collect()
+    # Reads torch from already-imported modules rather than importing it directly: this
+    # module must not force a torch/CUDA dependency for callers that never loaded GLM-OCR.
     torch = sys.modules.get("torch")
     cuda = getattr(torch, "cuda", None)
     if cuda is not None and callable(getattr(cuda, "empty_cache", None)):

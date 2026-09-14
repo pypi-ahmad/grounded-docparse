@@ -1,3 +1,15 @@
+"""HTTP client for the PaddleOCR-VL full-document layout-parsing service (WSL vLLM/PaddleX,
+loopback-only — see config.validate_paddleocr_service_url).
+
+Must not: call parse_many/parse before parse_document has populated `_prepared` for the
+same document — this runtime is a two-phase protocol, not a per-page OCR call. Must treat
+the HTTP response as untrusted: `_request_pages` validates shape and page count strictly
+and raises rather than degrading to a best-effort partial parse.
+
+Next: page_analysis.py's PageAnalyzer.prepare_document/_runtime drive parse_document then
+parse_many.
+"""
+
 from __future__ import annotations
 
 import base64
@@ -128,6 +140,8 @@ class PaddleOcrRuntime:
             raise RuntimeError(
                 f"PaddleOCR-VL service request failed: {type(exc).__name__}: {exc}"
             ) from exc
+        # The service response is untrusted network input: any shape mismatch below raises
+        # rather than falling back to a partial/best-effort result.
         if not isinstance(body, dict) or body.get("errorCode", 0) != 0:
             message = (
                 body.get("errorMsg", "invalid service response")
@@ -171,6 +185,8 @@ class PaddleOcrRuntime:
             )
             for page, page_result in zip(pages, page_results, strict=True)
         ]
+        # `_prepared` is read by parse_many/parse from a possibly different thread; the
+        # lock guards against reading a half-written dict, not against re-preparing.
         with self._lock:
             self._prepared = {item.image_path.resolve(): item for item in parsed}
         return parsed
@@ -180,6 +196,8 @@ class PaddleOcrRuntime:
 
         with Image.open(image_path) as image:
             width, height = image.size
+        # temperature=0.0/topP=1.0 (deterministic decoding) is set only for this one-off
+        # recovery call; parse_document's whole-document call above does not set these.
         payload = {
             "file": base64.b64encode(image_path.read_bytes()).decode("ascii"),
             "fileType": 1,
@@ -200,6 +218,9 @@ class PaddleOcrRuntime:
         )
 
     def parse_many(self, image_paths: list[Path]):
+        # Fail-closed: a page missing from `_prepared` means parse_document was never
+        # called (or was called for a different document) — this never silently OCRs
+        # a single page on demand.
         with self._lock:
             prepared = dict(self._prepared)
         for image_path in image_paths:
@@ -221,6 +242,8 @@ _instances_lock = threading.Lock()
 def get_paddleocr_runtime(
     service_url: str, timeout_seconds: float = 900.0
 ) -> PaddleOcrRuntime:
+    # One cached runtime (and its `_prepared` cache) per (url, timeout) pair, so repeated
+    # calls for the same service reuse state instead of losing parse_document's results.
     key = (service_url.rstrip("/"), timeout_seconds)
     with _instances_lock:
         if key not in _instances:

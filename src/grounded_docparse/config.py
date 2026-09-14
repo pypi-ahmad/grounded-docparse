@@ -1,3 +1,14 @@
+"""Engine/model enums and the `ParserConfig` runtime settings contract.
+
+Responsibility: define the closed sets of supported OCR/cloud engines and the
+validated, immutable configuration those engines run under, loaded from
+environment variables via `ParserConfig.from_env()`. Must not read config
+from any source other than `os.environ`/`.env` here, and must not perform
+network calls — service URLs are validated for shape only, not reachability.
+Next file: native.py for the evidence contracts this config's chosen engine
+ultimately produces.
+"""
+
 from __future__ import annotations
 
 import os
@@ -9,6 +20,9 @@ from urllib.parse import urlsplit
 from dotenv import load_dotenv
 
 APP_ROOT = Path(__file__).resolve().parents[2]
+# override=False: real process/user environment variables always win over
+# whatever is in .env, so a deployment's explicit env config can't be
+# silently shadowed by a stray .env file in the repo.
 load_dotenv(APP_ROOT / ".env", override=False)
 
 LUNA_MODEL = "gpt-5.6-luna"
@@ -151,9 +165,16 @@ def default_alternate_ocr_engine(
         return AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6
     if ollama_model == AlternateOcrEngine.OLLAMA_PADDLEOCR_VL_1_6.ollama_model:
         return AlternateOcrEngine.OLLAMA_GLM_OCR
+    # Any engine distinct from the primary is sufficient for a disagreement
+    # check; RAPIDOCR is just the catch-all when the primary doesn't match one
+    # of the cases above, not a preferred choice.
     return AlternateOcrEngine.RAPIDOCR
 
 
+# These two validators enforce a security boundary, not just URL shape: every
+# configurable service endpoint must resolve to loopback (127.0.0.1/localhost/::1)
+# with no embedded credentials, so config can never be pointed at an arbitrary
+# remote/untrusted host.
 def validate_paddleocr_service_url(value: str) -> str:
     parsed = urlsplit(value)
     try:
@@ -335,6 +356,10 @@ class ParserConfig:
 
     @classmethod
     def from_env(cls) -> ParserConfig:
+        # Every field is read as `os.getenv(name, str(default))` then cast, so
+        # an unset variable reproduces the dataclass default exactly. Boolean
+        # flags below treat "0"/"false"/"no" (case-insensitive) as false and
+        # anything else, including "", as true.
         defaults = cls()
         threshold_defaults = defaults.analysis_thresholds
         thresholds = AnalysisThresholds(

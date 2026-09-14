@@ -1,3 +1,16 @@
+"""The "grounded OCR" engine shared by GLM-OCR and Local Ollama: PP-DocLayoutV3 (Windows
+CPU) detects and owns region identity/geometry/order, and a pluggable RegionRecognizer
+(GlmVllmRecognizer or Ollama's, see ollama_runtime.py) fills in each region's text.
+
+Must not: let a region's recognition failure silently disappear — every attempt sets
+`recognition_failed` explicitly rather than omitting the region. Must not exceed
+MAX_REGIONS_PER_PAGE (guards against a pathological/adversarial page overwhelming
+per-region recognition calls).
+
+Next: page_analysis.py's PageAnalyzer consumes GroundedOcrRuntime via
+get_grounded_ocr_runtime.
+"""
+
 from __future__ import annotations
 
 import base64
@@ -21,6 +34,7 @@ from .config import OcrEngine, ParserConfig, validate_loopback_origin
 from .local_ocr import OcrPageResult, OcrRegion
 
 LAYOUT_MODEL_ID = "PaddlePaddle/PP-DocLayoutV3_safetensors"
+# Pinned so layout detection stays reproducible; bump only deliberately.
 LAYOUT_MODEL_REVISION = "97d101e6db2642e162a1d05392d1b0231c91033e"
 LAYOUT_THRESHOLD = 0.3
 MAX_REGIONS_PER_PAGE = 256
@@ -64,6 +78,8 @@ class RegionRecognizer(Protocol):
 
 
 def clean_ocr_output(value: str) -> str:
+    # Strips model-specific control/stop tokens and an occasional markdown code-fence the
+    # recognizer wraps its answer in — both are model output quirks, not content.
     value = _CONTROL_TOKEN.sub("", value).strip()
     if value.startswith("```") and value.endswith("```"):
         value = re.sub(r"^```(?:markdown|md|html|text)?\s*", "", value, count=1)
@@ -104,6 +120,9 @@ class GlmVllmRecognizer:
         region_area: float = 0.0,
         timeout_seconds: float | None = None,
     ) -> str:
+        # region_area is part of the RegionRecognizer protocol — Ollama's recognizer uses
+        # it to size an output token budget; this vLLM backend always requests a fixed
+        # max_tokens below regardless of region size.
         del region_area
         image_url = "data:image/png;base64," + base64.b64encode(image_bytes).decode()
         payload = {
@@ -140,6 +159,9 @@ class GlmVllmRecognizer:
 
 
 def _overlap_over_smaller(first: LayoutRegion, second: LayoutRegion) -> float:
+    # Intersection divided by the SMALLER region's area, not the union (unlike standard
+    # IoU) — this makes a small region fully contained in a larger one register as a
+    # near-total overlap even though the two boxes are very different sizes.
     left = max(first.bbox[0], second.bbox[0])
     top = max(first.bbox[1], second.bbox[1])
     right = min(first.bbox[2], second.bbox[2])
@@ -210,6 +232,7 @@ class PPDocLayoutV3Detector:
             image = source.convert("RGB")
         width, height = image.size
         inputs = self._processor(images=[image], return_tensors="pt")
+        # The shared CPU model is not safe for concurrent inference; serialize every call.
         with self._lock, self._torch.inference_mode():
             outputs = self._model(**inputs)
         result = self._processor.post_process_object_detection(
@@ -237,7 +260,7 @@ class PPDocLayoutV3Detector:
                 for index, (label, score, box) in enumerate(
                     zip(labels, scores, boxes, strict=True)
                 )
-                if box[2] > box[0] and box[3] > box[1]
+                if box[2] > box[0] and box[3] > box[1]  # drop degenerate/zero-area boxes
             ]
         )
         if len(regions) > MAX_REGIONS_PER_PAGE:
@@ -291,6 +314,8 @@ def crop_region(
         min(height, math.ceil((bottom + region_height * padding) * height - epsilon)),
     )
     crop = image.crop(pixel_box)
+    # The recognizer expects horizontal text; a tall, narrow aside/vertical-text region is
+    # rotated to landscape before recognition rather than sent to the model sideways.
     if (
         region.label.casefold() in {"aside_text", "vertical_text"}
         and crop.height > crop.width * 2
@@ -361,6 +386,10 @@ class GroundedOcrRuntime:
                     image = source.convert("RGB")
                 regions: list[OcrRegion] = []
                 for position, item in enumerate(detected, start=1):
+                    # page_timeout_seconds (set for Ollama only, see _cached_grounded_runtime)
+                    # is a cumulative per-page budget shared across all of this page's
+                    # regions, not a per-region timeout — `remaining` shrinks every
+                    # iteration and a region starting after the deadline aborts the page.
                     if deadline is not None:
                         remaining = deadline - time.perf_counter()
                         if remaining <= 0:
@@ -417,6 +446,10 @@ class GroundedOcrRuntime:
                             item.index,
                             item.label,
                         )
+                        # Default behavior isolates a single region's recognition failure
+                        # (marks it failed, keeps processing the page's other regions); a
+                        # recognizer can opt into aborting the whole page instead via an
+                        # optional `fail_fast` attribute.
                         if getattr(self.recognizer, "fail_fast", False):
                             raise
                         content = ""
@@ -456,6 +489,9 @@ class GroundedOcrRuntime:
                         )
                 yield OcrPageResult(image_path=image_path, regions=regions)
             except Exception as exc:
+                # Page-level isolation: a detector crash or the page-deadline TimeoutError
+                # above becomes an error result for this one page rather than aborting the
+                # remaining pages in image_paths.
                 logger.exception(
                     "Grounded OCR page failed: image=%s elapsed_ms=%.1f",
                     image_path.name,
@@ -468,7 +504,8 @@ class GroundedOcrRuntime:
                 )
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=8)  # keyed on the full config tuple, so distinct configs each get
+# their own cached runtime rather than sharing one process-wide instance.
 def _cached_grounded_runtime(
     engine: OcrEngine,
     glm_vllm_base_url: str,

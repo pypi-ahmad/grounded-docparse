@@ -1,3 +1,11 @@
+"""Rasterizes uploaded PDFs and multi-frame images into per-page PNGs and page geometry.
+
+This module is the trust boundary for uploaded file bytes: it must reject anything that
+fails size, extension, or signature checks before any parser touches the content. It must
+not interpret page content (OCR, layout, or text extraction) — that belongs to
+page_analysis.py, which consumes the PageEvidence/IngestedDocument records built here.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -48,6 +56,8 @@ def render_region_crop(
     dpi: int,
     padding: float,
 ) -> Path:
+    # bbox coordinates are fractions of page width/height (0..1), independent of DPI;
+    # padding below is likewise a fraction of the box's own size, not pixels.
     if bbox.unit != "normalized":
         raise ValueError("region crop requires normalized coordinates")
     if dpi <= 0:
@@ -63,6 +73,8 @@ def render_region_crop(
     output.parent.mkdir(parents=True, exist_ok=True)
 
     if document.source_path.suffix.casefold() == ".pdf":
+        # PDF branch: reopen the source and clip in PDF point space (rect), then let
+        # get_pixmap rasterize at the requested dpi — resolution and geometry are decoupled.
         source = pymupdf.open(document.source_path)
         try:
             source_page = source[page.number - 1]
@@ -80,8 +92,12 @@ def render_region_crop(
         return output
 
     with Image.open(document.source_path) as source_image:
+        # Image branch: already-rasterized source, so normalized coords convert straight
+        # to pixels here instead of going through a points-based rect like the PDF branch.
         if getattr(source_image, "n_frames", 1) > 1:
             source_image.seek(page.number - 1)
+        # exif_transpose applies stored EXIF rotation before width/height are read, so
+        # crop math below matches what the page-level ingest already stored as size.
         image = ImageOps.exif_transpose(source_image).convert("RGB")
         width, height = image.size
         crop = image.crop(
@@ -92,6 +108,7 @@ def render_region_crop(
                 max(int(y1 * height), int(y0 * height) + 1),
             )
         )
+        # Upscale only; requested dpi below the source's own dpi is left as-is.
         scale = max(1.0, dpi / max(page.dpi, 1))
         if scale > 1:
             crop = crop.resize(
@@ -103,6 +120,8 @@ def render_region_crop(
 
 
 def _validate_input(data: bytes, filename: str, max_bytes: int) -> str:
+    # Untrusted upload: check size and extension first (cheap), then confirm the magic
+    # bytes/content actually match the claimed type before any parser opens the file.
     if not data:
         raise ValueError("Uploaded document is empty")
     if len(data) > max_bytes:
@@ -169,6 +188,8 @@ def _ingest_pdf(
             if not 1 <= start <= end <= document.page_count:
                 raise ValueError(f"page range must be within 1-{document.page_count}")
             selected = range(start, end + 1)
+        # PDF page geometry (page.rect) is in points at 72 points/inch; this converts
+        # the requested dpi into the pixmap scale factor pymupdf expects.
         scale = dpi / 72
         matrix = pymupdf.Matrix(scale, scale)
         for index, page in enumerate(document):
@@ -176,6 +197,8 @@ def _ingest_pdf(
             if page_number not in selected:
                 continue
             width, height = float(page.rect.width), float(page.rect.height)
+            # Bound the rendered pixel count before rasterizing an untrusted page at the
+            # requested dpi, so a pathological page size/dpi combination can't exhaust memory.
             if int(width * scale) * int(height * scale) > max_page_pixels:
                 raise ValueError(f"Page {page_number} exceeds rendered pixel limit")
             image_path = pages_dir / f"page-{page_number:04d}.png"
@@ -212,6 +235,7 @@ def _ingest_image(
 ) -> tuple[list[PageEvidence], int]:
     pages: list[PageEvidence] = []
     with Image.open(io.BytesIO(data)) as image:
+        # n_frames > 1 covers multi-page TIFFs; each frame becomes one PageEvidence entry.
         total_pages = int(getattr(image, "n_frames", 1))
         if page_range is not None:
             start, end = page_range
@@ -223,6 +247,7 @@ def _ingest_image(
                 raise ValueError(f"Document exceeds page limit of {max_pages}")
             if page_range is not None and not start <= page_number <= end:
                 continue
+            # Same untrusted-input pixel-count bound as the PDF path, checked pre-decode size.
             if frame.width * frame.height > max_page_pixels:
                 raise ValueError(f"Page {page_number} exceeds pixel limit")
             rgb = ImageOps.exif_transpose(frame).convert("RGB")

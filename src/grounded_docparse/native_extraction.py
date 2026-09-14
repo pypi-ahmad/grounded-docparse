@@ -1,3 +1,18 @@
+"""Translates a stored extraction schema into a LangExtract-compatible
+contract, sends only the immutable `base_text` of a native parse to
+LangExtract, and accepts a returned value only when its exact
+`char_interval` matches `base_text` and resolves through source spans to
+real anchors.
+
+Must not: accept a value grounded in refined Markdown, a paraphrase, an
+inferred/calculated value, or an interval that only approximately matches
+the source — see `_grounded_candidates`, which enforces this as a sequence
+of reject-with-warning gates rather than raising on the first mismatch.
+
+Next: `schema_store.py` for `compile_json_schema`; `native.py` for
+`CharacterInterval`/`NativeExtractionEvidence`/source-span resolution.
+"""
+
 from __future__ import annotations
 
 import hashlib
@@ -61,6 +76,7 @@ def _kind(schema: dict[str, Any]) -> str:
     return next(value for value in _types(schema) if value != "null")
 
 
+# RFC 6901 JSON Pointer escaping (~0 for literal "~", ~1 for literal "/").
 def _escape_pointer(value: str) -> str:
     return value.replace("~", "~0").replace("/", "~1")
 
@@ -126,6 +142,9 @@ def _collect_extraction_groups(
                     item = child["items"]
                     item_kind = _kind(item)
                     if item_kind == "array":
+                        # Native extraction has no representation for an
+                        # array-of-arrays; reject the schema up front rather
+                        # than producing a contract the model can't satisfy.
                         raise ValueError(
                             f"{child_pointer}: nested arrays are not supported by native extraction"
                         )
@@ -178,6 +197,11 @@ def _build_extraction_contract(
         required = []
         for field in group.fields:
             fields_by_class[field.extraction_class] = field
+            # Every field is declared "string" here regardless of
+            # field.value_type: the model must return the literal source
+            # substring verbatim so it can be exact-matched against
+            # base_text. Coercion to the real type happens afterward, in
+            # _coerce, only once that substring is confirmed grounded.
             properties[field.extraction_class] = {"type": "string"}
             required.append(field.extraction_class)
             details = f" -> {field.pointer_template} ({field.value_type})"
@@ -231,6 +255,13 @@ def _schema_fingerprint(schema: StoredSchema) -> str:
 
 
 def _coerce(value: str, field: ExtractionFieldSpec) -> Any:
+    """Convert an already-grounded literal substring to its schema type.
+
+    Called only after the caller has confirmed `value` is an exact,
+    anchor-resolved substring of base_text (see `_grounded_candidates`) —
+    this function only handles literal-format validation and type
+    conversion, not grounding.
+    """
     kind = field.value_type
     if kind == "string":
         converted: Any = value
@@ -246,6 +277,9 @@ def _coerce(value: str, field: ExtractionFieldSpec) -> Any:
         except InvalidOperation as exc:
             raise ValueError("is not an exact number literal") from exc
         if not number.is_finite():
+            # Reject inf/nan-shaped literals: JSON has no representation
+            # for them and downstream json.dumps would otherwise fail or
+            # produce non-standard output.
             raise ValueError("is not a finite number literal")
         converted = int(number) if number == number.to_integral() else float(number)
     elif kind == "boolean":
@@ -297,6 +331,14 @@ def _get_pointer(document: Any, pointer: str) -> Any:
 def _covered_by_spans(
     source_text: str, start: int, spans: list[Any]
 ) -> bool:
+    """Every non-whitespace character in `source_text` must fall inside at
+    least one resolved source span.
+
+    Whitespace is exempt because the separators inserted between elements
+    when base_text was assembled (see native_parsers.py's `add_element`,
+    which joins element text with "\\n") don't themselves belong to any
+    single element's span.
+    """
     for offset, character in enumerate(source_text, start=start):
         if character.isspace():
             continue
@@ -321,6 +363,16 @@ def _grounded_candidates(
     translated: TranslatedExtractionSchema,
     parse_result: NativeParseResult,
 ) -> tuple[list[_Accepted], list[str]]:
+    """Validate each model-returned extraction (`annotated`, untrusted
+    LangExtract/model output) through independent gates, in order: known
+    extraction class -> well-formed in-bounds char_interval -> the interval
+    is an *exact* substring match against base_text -> that substring fully
+    resolves to real source spans (`_covered_by_spans`) -> the literal text
+    is a valid, schema-conformant value (`_coerce`).
+
+    A candidate that fails any gate is dropped with a warning, not raised —
+    one bad field must not fail the whole extraction.
+    """
     accepted: list[_Accepted] = []
     warnings: list[str] = []
     base_text = parse_result.document.base_text
@@ -409,6 +461,9 @@ def _assemble_values(
             array_candidates[item.field.array_pointer].append(item)
 
     for pointer, candidates in scalar_candidates.items():
+        # A scalar field extracted more than once: keep the earliest
+        # occurrence in document order and warn about the rest, rather than
+        # failing the whole extraction over a duplicate.
         candidates.sort(key=lambda item: (item.start, item.end))
         chosen = candidates[0]
         _set_pointer(data, pointer, chosen.value)
@@ -426,12 +481,18 @@ def _assemble_values(
         if group_spec.item_schema is None:
             raise RuntimeError(f"{array_pointer}: missing translated item schema")
         item_schema = group_spec.item_schema
+        # group_index (model-supplied) groups sibling fields into one array
+        # item, e.g. one table row. It's optional: when the model omits it,
+        # `sequence` makes every candidate its own singleton group instead
+        # of merging them — a permissive fallback, not a grouping guarantee.
         grouped: dict[tuple[str, int], list[_Accepted]] = defaultdict(list)
         for sequence, item in enumerate(
             sorted(candidates, key=lambda value: value.start)
         ):
             group_key = item.group_index if item.group_index is not None else sequence
             grouped[(array_pointer, group_key)].append(item)
+        # Order assembled array items by document position, not by
+        # group_index value or discovery order.
         ordered_groups = sorted(
             grouped.values(), key=lambda group: min(item.start for item in group)
         )
@@ -465,6 +526,11 @@ def _assemble_values(
 
 
 class LangExtractNativeExtractor:
+    """Runs LangExtract against a native parse's immutable `base_text` and
+    returns only extractions that survive `_grounded_candidates`'
+    acceptance gates. `extract_func` is injectable for tests.
+    """
+
     def __init__(
         self,
         config: ParserConfig | None = None,
@@ -488,6 +554,9 @@ class LangExtractNativeExtractor:
             "api_key": api_key,
             "max_workers": self.config.provider_concurrency,
         }
+        # Agnes and any custom OpenAI-compatible endpoint are both routed
+        # through the "openai" provider via a base_url override; only
+        # Gemini gets its own provider name.
         provider = "gemini" if model.startswith("gemini-") else "openai"
         if provider == "openai":
             provider_kwargs.update(
@@ -499,6 +568,7 @@ class LangExtractNativeExtractor:
                 reasoning_effort=self.config.cloud_model.reasoning_effort,
             )
         if self.extract_func is None:
+            # Optional `native`-extra dependency; import lazily.
             try:
                 import langextract as lx
                 from langextract.factory import ModelConfig
@@ -532,8 +602,14 @@ class LangExtractNativeExtractor:
             batch_length=self.config.provider_concurrency,
             max_workers=self.config.provider_concurrency,
             extraction_passes=1,
+            # base_text may contain untrusted document content; don't let
+            # LangExtract fetch URLs found inside it.
             fetch_urls=False,
             show_progress=False,
+            # Fuzzy/lesser-match alignment stays off here too: LangExtract's
+            # own resolver must not approximate a match, since
+            # _grounded_candidates below re-validates every char_interval
+            # against base_text exactly regardless of what the resolver did.
             resolver_params={
                 "enable_fuzzy_alignment": False,
                 "accept_match_lesser": False,
@@ -541,6 +617,10 @@ class LangExtractNativeExtractor:
             },
         )
         if isinstance(annotated, list):
+            # Exactly one document was submitted (base_text as a single
+            # string); anything but a single-item list back indicates a
+            # LangExtract contract change, not a per-field failure, so this
+            # raises rather than warning like the per-candidate checks above.
             if len(annotated) != 1:
                 raise ValueError("LangExtract returned an unexpected document count")
             annotated = annotated[0]

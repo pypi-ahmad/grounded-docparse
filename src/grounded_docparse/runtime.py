@@ -1,3 +1,15 @@
+"""Per-document provider call policy: concurrency limiting, retry/backoff, and usage tallying.
+
+`ProviderRuntime` is the thing gateways.py calls `.request()` through for every
+provider HTTP call. It owns bounded/adaptive concurrency (grows on sustained
+success, halves on rate-limiting), exponential backoff with jitter and
+Retry-After support, and a small budget mechanism for full-page OCR fallbacks.
+It has no knowledge of document content, OCR evidence, or prompts - only of
+call outcomes (success, retryable failure, rate limited) and timing.
+
+Next: gateways.py, which builds the actual provider calls this wraps.
+"""
+
 from __future__ import annotations
 
 import logging
@@ -65,6 +77,10 @@ class ProviderRuntime:
         self._retry_sleep_seconds = 0.0
 
     def reserve_full_page_fallbacks(self, count: int) -> None:
+        # Caps how many pages of a `count`-page document may fall back to a
+        # full-page (rather than per-region) provider call, as a fraction of
+        # the document rather than a fixed number - bounds fallback cost on
+        # large documents without starving small ones.
         self._max_full_page_fallbacks = max(
             1, math.ceil(count * self.config.full_page_fallback_fraction)
         )
@@ -118,6 +134,10 @@ class ProviderRuntime:
                 return result
             if not self._is_retryable(caught) or attempt == self.config.provider_retry_attempts:
                 raise caught
+            # Full-jitter exponential backoff (delay scaled by a fresh random
+            # factor each attempt, capped), then widened to at least the
+            # provider's own Retry-After if it gave one - the server's stated
+            # wait always wins over our own backoff guess.
             delay = (
                 min(
                     self.config.provider_retry_cap_seconds,
@@ -162,6 +182,10 @@ class ProviderRuntime:
             )
 
     def _acquire(self) -> None:
+        # Bounded poll (0.05s) rather than a plain wait/notify: cooldown
+        # expiring is a time-based condition, not an event another thread
+        # can notify us of, so this loop has to wake up on its own to
+        # re-check whether the cooldown has lapsed.
         started = self._clock()
         while True:
             cooldown = 0.0
@@ -195,6 +219,11 @@ class ProviderRuntime:
     ) -> None:
         with self._condition:
             self._active -= 1
+            # AIMD-style concurrency adaptation: a 429 halves the effective
+            # limit immediately and resets the success streak; concurrency
+            # only climbs back up one slot at a time after a full
+            # provider_success_window of consecutive successes past cooldown,
+            # capped at the originally configured concurrency.
             if rate_limited:
                 self._rate_limit_events += 1
                 self._effective_concurrency = max(1, self._effective_concurrency // 2)
@@ -221,6 +250,10 @@ class ProviderRuntime:
 
     @staticmethod
     def _status(exc: Exception) -> int | None:
+        # Falls back to a duck-typed `.code` attribute for errors that aren't
+        # APIStatusError (e.g. the Gemini/Agnes adapters); the range check
+        # guards against that attribute holding something that isn't
+        # actually an HTTP status.
         if isinstance(exc, APIStatusError):
             return exc.status_code
         code = getattr(exc, "code", None)
@@ -228,12 +261,19 @@ class ProviderRuntime:
 
     @classmethod
     def _is_retryable(cls, exc: Exception) -> bool:
+        # The full retry policy: connection errors and explicitly-marked
+        # RetryableProviderError always retry; otherwise only 408/409/429 and
+        # any 5xx. Anything else (4xx schema/auth errors, etc.) is terminal.
         if isinstance(exc, (APIConnectionError, RetryableProviderError)):
             return True
         status = cls._status(exc)
         return status in {408, 409, 429} or (status is not None and 500 <= status < 600)
 
     def _retry_after(self, exc: Exception) -> float | None:
+        # Retry-After is attacker/provider-controlled header text: accept
+        # either a plain seconds value or an HTTP-date, and treat anything
+        # else (unparsable, missing tzinfo edge cases, overflow) as "no
+        # guidance" rather than raising.
         if not isinstance(exc, APIStatusError):
             return None
         value = exc.response.headers.get("Retry-After")

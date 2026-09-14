@@ -1,3 +1,13 @@
+"""Rewrite a PaddleX-generated PaddleOCR-VL pipeline YAML to point at this
+project's persistent model cache and local vLLM server, optionally
+downloading or validating the cached model/font assets first.
+
+Reads `source` (PaddleX's generated config) and writes the rewritten config
+to `target`; must not be used to bypass `validate_cached_assets` silently —
+see the `--ensure-assets`/`--offline` note in `main` for when validation
+actually runs.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -22,6 +32,9 @@ REQUIRED_ASSET_FILES = (
 )
 
 
+# Depth-first search through PaddleX's generated pipeline config, whose nesting
+# shape is owned by PaddleX (not this project) and can vary by version — this
+# doesn't assume a fixed structure, just that a dict keyed `name` exists somewhere.
 def find_submodule(value, name):
     if isinstance(value, dict):
         candidate = value.get(name)
@@ -39,6 +52,9 @@ def find_submodule(value, name):
     return None
 
 
+# PADDLE_PDX_CACHE_HOME is PaddleX's own environment variable, not this project's
+# DOCPARSE_* convention — kept as-is so it stays interchangeable with PaddleX's own
+# tooling and docs.
 def paddle_cache_root() -> Path:
     return Path(
         os.environ.get("PADDLE_PDX_CACHE_HOME", Path.home() / ".paddlex")
@@ -47,6 +63,8 @@ def paddle_cache_root() -> Path:
 
 def validate_cached_assets(cache_root: Path) -> dict[str, Path]:
     cache_root = cache_root.expanduser().resolve()
+    # Checks size, not just existence: an interrupted prior download can leave a
+    # zero-byte placeholder file that is_file() alone would accept as present.
     missing = [
         path
         for relative_path in REQUIRED_ASSET_FILES
@@ -75,11 +93,16 @@ def ensure_cached_assets(cache_root: Path) -> dict[str, Path]:
 
     cache_root = cache_root.expanduser().resolve()
     os.environ["PADDLE_PDX_CACHE_HOME"] = str(cache_root)
+    # Disables PaddleX's own model-source verification before triggering downloads.
     os.environ["PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK"] = "True"
 
     from paddlex.inference.utils.official_models import official_models
     from paddlex.utils.fonts import PINGFANG_FONT
 
+    # Return values discarded deliberately: calling get_model_path()/.path is what
+    # makes PaddleX download each asset if it's missing from cache_root. The actual
+    # paths this function reports come from validate_cached_assets below, once
+    # everything is confirmed present.
     official_models.get_model_path(VLM_MODEL_NAME)
     official_models.get_model_path(LAYOUT_MODEL_NAME)
     _ = PINGFANG_FONT.path
@@ -88,6 +111,9 @@ def ensure_cached_assets(cache_root: Path) -> dict[str, Path]:
 
 def configure_pipeline(config, port, cache_root=None):
     cache_root = paddle_cache_root() if cache_root is None else Path(cache_root)
+    # Fail closed if PaddleX generated a config this script doesn't recognize (wrong
+    # or missing submodule, unexpected model_name) rather than silently pointing a
+    # mismatched pipeline at this project's cache.
     layout = find_submodule(config, "LayoutDetection")
     if layout is None or layout.get("model_name") != LAYOUT_MODEL_NAME:
         raise RuntimeError("PaddleX v1.6 config must use PP-DocLayoutV3")
@@ -124,10 +150,16 @@ def main() -> None:
     config = yaml.safe_load(source.read_text(encoding="utf-8"))
     if not isinstance(config, dict):
         raise TypeError("PaddleX generated an invalid pipeline configuration")
+    # port is env-controlled and gets embedded verbatim into the generated YAML's
+    # server_url below; validating it's digits-only within the valid port range
+    # rejects malformed/unexpected values before they reach that string.
     port = os.environ.get("DOCPARSE_PADDLE_VLLM_PORT") or "8118"
     if not port.isdigit() or not 1 <= int(port) <= 65535:
         raise ValueError("DOCPARSE_PADDLE_VLLM_PORT must be between 1 and 65535")
     cache_root = paddle_cache_root()
+    # Cache completeness is only checked when the caller opts into --ensure-assets or
+    # --offline; with neither flag, configure_pipeline below proceeds on the
+    # assumption that cache_root already has everything it needs.
     try:
         if args.ensure_assets:
             ensure_cached_assets(cache_root)

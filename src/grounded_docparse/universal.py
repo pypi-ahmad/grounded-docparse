@@ -1,3 +1,17 @@
+"""Detects the source format of an uploaded document, validates that the
+caller-supplied `ProcessingType` is compatible with it, and dispatches to
+exactly one parser (legacy OCR, PDF Inspector, or Docling).
+
+Must not: infer or override a caller's processing-type selection, or route a
+document through a pipeline other than the one explicitly selected — a
+mismatch must fail closed (see `validate_processing_type` and
+`validate_pdf_processing_type`).
+
+Next: `pipeline.py` for the OCR/grounded-parse route used for Scanned PDF and
+Image; `native.py` for the `NativeParseResult`, `PageRoute`, `ProcessingType`,
+and `SourceFormat` contracts the native routes populate.
+"""
+
 from __future__ import annotations
 
 import csv
@@ -116,6 +130,8 @@ class MixedNativePageUnusable(ProcessingTypeMismatch):
 
 
 def inspect_pdf_content(data: bytes) -> PdfInspection:
+    # pdf_inspector ships only with the optional `native` extra; import
+    # lazily so code paths that never touch PDFs don't need it installed.
     try:
         import pdf_inspector
     except ImportError as exc:
@@ -138,6 +154,8 @@ def inspect_pdf_content(data: bytes) -> PdfInspection:
 
 
 def _zip_names(data: bytes) -> tuple[set[str], bytes | None]:
+    # `data` is untrusted upload content. Bound entry count and expanded size
+    # before reading names/contents to avoid a zip-bomb-style resource blowup.
     try:
         with ZipFile(BytesIO(data)) as archive:
             if len(archive.infolist()) > 10_000:
@@ -152,6 +170,10 @@ def _zip_names(data: bytes) -> tuple[set[str], bytes | None]:
 
 
 def detect_source_format(data: bytes, filename: str) -> SourceFormat:
+    # `filename` (and its extension) is caller-supplied and not trusted on
+    # its own; the checks below confirm `data` actually matches the claimed
+    # format (magic-byte signature, then ZIP container contents) before
+    # anything downstream treats it as that format.
     suffix = Path(filename).suffix.casefold()
     source_format = _SUFFIX_FORMATS.get(suffix)
     if source_format is None:
@@ -175,6 +197,8 @@ def detect_source_format(data: bytes, filename: str) -> SourceFormat:
         SourceFormat.ODS,
         SourceFormat.EPUB,
     }:
+        # The signature check above only proved "this is a ZIP"; confirm it
+        # also holds the specific parts/mimetype each format requires.
         names, mime = _zip_names(data)
         if source_format is SourceFormat.DOCX and not {
             "[Content_Types].xml",
@@ -239,6 +263,9 @@ def inspect_content_range(data: bytes, filename: str) -> ContentRangeInfo:
         rows = list(csv.reader(StringIO(data.decode("utf-8-sig"))))
         return ContentRangeInfo(unit=ContentUnit.ROW, total=max(1, len(rows)))
 
+    # Only formats other than PDF/image/CSV (which return above) reach here;
+    # importing docling_native (and Docling) lazily avoids paying that cost
+    # for the formats that don't need it.
     from .docling_native import build_source_manifest
 
     manifest = build_source_manifest(data, source_format)
@@ -259,6 +286,16 @@ def validate_pdf_processing_type(
     page_routes: dict[int, PageRoute] | None = None,
     content_range: AppliedContentRange | None = None,
 ) -> None:
+    """Enforce the fail-closed PDF routing contract for the pages actually
+    selected (via `content_range`, or all pages if unset).
+
+    Native PDF must not silently fall back to OCR: if any selected page needs
+    OCR, raise rather than proceed. Mixed PDF must not silently pick a route
+    either: every selected page must already have an explicit, reviewed entry
+    in `page_routes`. Scanned PDF has no `expected_type` entry, so it returns
+    early with no pdf-inspector classification requirement — it always goes
+    through the OCR engine regardless of `inspection.pdf_type`.
+    """
     selected_pages = (
         set(range(content_range.start, content_range.end + 1))
         if content_range is not None
@@ -289,6 +326,15 @@ def validate_pdf_processing_type(
 
 
 class UniversalDocumentParser:
+    """Validates a caller-supplied `ProcessingType` against the detected
+    `SourceFormat` and dispatches to exactly one parser: the legacy OCR
+    parser for Scanned PDF/Image, `PdfInspectorParser` for PDF, or
+    `DoclingNativeParser` for other native formats.
+
+    Must not: choose a route from file contents alone, or substitute a
+    different route than the one the caller selected.
+    """
+
     def __init__(
         self,
         config: ParserConfig | None = None,
@@ -303,6 +349,10 @@ class UniversalDocumentParser:
         self.pdf_parser = pdf_parser
         self.docling_parser = docling_parser
         self.pdf_inspector = pdf_inspector or inspect_pdf_content
+        # pdf_parser/docling_parser are left unset here and constructed
+        # lazily in parse() on first use, so a caller that never parses a PDF
+        # (or never parses a non-PDF native document) doesn't need that
+        # parser's optional-extra dependencies importable.
 
     def parse(
         self,
@@ -329,6 +379,8 @@ class UniversalDocumentParser:
             else None
         )
         if processing_type in {ProcessingType.SCANNED_PDF, ProcessingType.IMAGE}:
+            # Only route that still goes through the OCR/grounded pipeline
+            # (DocumentParser) rather than a native/PDF-Inspector path.
             legacy_kwargs = {
                 "progress_callback": progress_callback,
                 "refine_markdown": refine_markdown,
@@ -343,6 +395,9 @@ class UniversalDocumentParser:
             )
         inspection = None
         if source_format is SourceFormat.PDF:
+            # Native/Mixed PDF only: classify pages so
+            # validate_pdf_processing_type can enforce the fail-closed
+            # contract below before any page is actually parsed.
             inspection = self.pdf_inspector(data)
             validate_pdf_processing_type(
                 inspection,
@@ -354,6 +409,8 @@ class UniversalDocumentParser:
             if self.pdf_parser is None:
                 from .native_parsers import PdfInspectorParser
 
+                # See __init__: built here, not eagerly, to skip this import
+                # for non-PDF documents.
                 self.pdf_parser = PdfInspectorParser(self.config, self.legacy_parser)
             pdf_kwargs = {
                 "processing_type": processing_type,
@@ -374,6 +431,8 @@ class UniversalDocumentParser:
         if self.docling_parser is None:
             from .native_parsers import DoclingNativeParser
 
+            # Reached only for non-PDF, non-legacy formats; see __init__ for
+            # why this isn't constructed eagerly.
             self.docling_parser = DoclingNativeParser(self.config)
         docling_kwargs = {
             "source_format": source_format,

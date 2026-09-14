@@ -2,6 +2,13 @@
 
 Run from the repository root:
     uv run --with markdown python scripts/build_docs_site.py
+
+This must not publish security/threat-model documentation into the generated
+site (see `is_security_document`, `discover_markdown`, and the exclusion
+handling in `rewrite_links`) — that exclusion is filename-based, not
+content-based, so anything meant to stay unpublished must keep a matching
+name. `docs/codebase/` (see `docs/codebase/STRUCTURE.md`) documents the
+source tree this script reads from.
 """
 
 from __future__ import annotations
@@ -101,6 +108,9 @@ class Document:
     headings: tuple[str, ...]
 
 
+# Filename-only heuristic: a security/threat-model document whose filename doesn't
+# contain one of SECURITY_FILE_MARKERS would NOT be caught here and would be built
+# into the public site like any other doc.
 def is_security_document(path: Path) -> bool:
     name = path.name.casefold()
     return any(marker in name for marker in SECURITY_FILE_MARKERS)
@@ -122,6 +132,9 @@ def discover_markdown() -> tuple[list[Path], list[Path]]:
         capture_output=True,
         text=True,
     )
+    # This split is the primary security-exclusion gate: every *.md tracked (or
+    # untracked-but-unignored) file lands in one bucket or the other, and main()
+    # never builds a page for anything in `excluded`.
     included: list[Path] = []
     excluded: list[Path] = []
     for relative in result.stdout.splitlines():
@@ -133,6 +146,10 @@ def discover_markdown() -> tuple[list[Path], list[Path]]:
     return sorted(included), sorted(excluded)
 
 
+# URL shape is a deliberate mapping, not a mechanical slugify: README.md becomes the
+# site's index page, a leading "docs/" segment is dropped (so docs/api.md ->
+# api.html, not docs--api.html), and .github/ISSUE_TEMPLATE is relabeled
+# "issue-template" for a friendlier URL.
 def output_name(relative: str) -> str:
     if relative == "README.md":
         return "index.html"
@@ -228,11 +245,16 @@ def rewrite_links(rendered: str, document: Document, mapping: dict[str, Document
         try:
             relative = resolved.relative_to(ROOT).as_posix()
         except ValueError:
+            # Target resolves outside the repository root (e.g. "../.." past ROOT) —
+            # leave the original href alone rather than guess what it should become.
             return match.group(0)
         fragment = f"#{parsed.fragment}" if parsed.fragment else ""
         if relative in mapping:
             target = f"{mapping[relative].output_name}{fragment}"
         elif relative in excluded:
+            # A link from an included doc to a security/excluded doc must not resolve
+            # to that content (e.g. via a GitHub blob link below) — redirect to the
+            # same placeholder page discover_markdown's exclusion produces.
             target = "security-content-excluded.html"
         elif resolved.exists():
             kind = "tree" if resolved.is_dir() else "blob"
@@ -244,6 +266,10 @@ def rewrite_links(rendered: str, document: Document, mapping: dict[str, Document
     return re.sub(r"href=([\"'])(.*?)\1", replace_href, rendered)
 
 
+# Unlike rewrite_links, this has no `excluded` parameter: it does not check whether
+# an image path belongs to a security-excluded document before copying it into the
+# public assets/content/ tree. An included doc that happens to reference such an
+# image would still publish it.
 def copy_local_images(rendered: str, document: Document) -> str:
     def replace_src(match: re.Match[str]) -> str:
         quote, raw_target = match.group(1), html.unescape(match.group(2))
@@ -505,6 +531,10 @@ def main() -> None:
     manifest_path = OUTPUT / "site-manifest.json"
     expected_pages = {document.output_name for document in ordered}
     expected_pages.add("security-content-excluded.html")
+    # Incremental-build cleanup: delete pages the previous build produced that this
+    # build no longer generates (e.g. a doc was renamed or removed), so stale HTML
+    # doesn't accumulate. Path(filename).name plus the parent==OUTPUT check keeps
+    # this confined to top-level files directly in OUTPUT.
     if manifest_path.exists():
         previous = json.loads(manifest_path.read_text(encoding="utf-8"))
         for filename in previous.get("pages", []):
