@@ -11,7 +11,7 @@ from grounded_docparse.runtime import ProviderRuntime
 @pytest.mark.parametrize(
     ("model", "api_key_name"),
     [
-        (CloudModel.GPT_5_6_LUNA, "OPENAI_API_KEY"),
+        (CloudModel.GPT_6_SOL, "OPENAI_API_KEY"),
         (CloudModel.GEMINI_3_5_FLASH_LITE, "GOOGLE_API_KEY"),
         (CloudModel.GEMINI_3_7_FLASH, "GOOGLE_API_KEY"),
         (CloudModel.AGNES_2_5_FLASH, "AGNES_API_KEY"),

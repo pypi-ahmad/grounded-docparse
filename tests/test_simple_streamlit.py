@@ -12,7 +12,7 @@ from streamlit.testing.v1 import AppTest
 from grounded_docparse import ollama_runtime, pipeline, runtime_control, universal
 from grounded_docparse.agentic import DocumentAgent
 from grounded_docparse.batch import build_batch_documents
-from grounded_docparse.config import LUNA_MODEL, ExtractionEngine
+from grounded_docparse.config import OPENAI_MODEL, ExtractionEngine
 from grounded_docparse.content_range import AppliedContentRange, ContentUnit
 from grounded_docparse.models import (
     AgenticAnalysis,
@@ -334,7 +334,7 @@ def test_stale_session_result_is_discarded(monkeypatch) -> None:
         calls=[
             AgentUsage(
                 agent="old",
-                model=LUNA_MODEL,
+                model=OPENAI_MODEL,
                 input_tokens=100,
                 output_tokens=10,
             )
@@ -359,7 +359,7 @@ def test_restored_usage_does_not_populate_launch_session_cost(monkeypatch) -> No
                 "LegacyAgentUsage",
                 (),
                 {
-                    "model": LUNA_MODEL,
+                    "model": OPENAI_MODEL,
                     "input_tokens": 100,
                     "output_tokens": 10,
                 },
@@ -386,12 +386,23 @@ def test_session_cost_view_starts_empty_without_warming_an_engine() -> None:
     assert {item.label: item.value for item in app.metric} == {
         "Input tokens": "0",
         "Cache tokens": "0",
+        "Cache write tokens": "0",
         "Output tokens": "0",
         "Estimated cost": "$0.000000",
     }
     assert any(
         "No metered AI calls" in item.value for item in app.get("info")
     )
+
+
+def test_stale_model_selection_resets_to_sol() -> None:
+    app = AppTest.from_file("streamlit_app.py")
+    app.session_state["cloud_model"] = "gpt-5.6-luna"
+    app.session_state["cloud_model_label"] = "GPT 5.6 Luna"
+    app.run(timeout=20)
+    assert not app.exception
+    assert app.session_state["cloud_model"] == "gpt-6-sol"
+    assert app.session_state["cloud_model_label"] == "GPT 6 Sol"
 
 
 def test_studio_shows_default_luna_destination(monkeypatch) -> None:
@@ -401,7 +412,7 @@ def test_studio_shows_default_luna_destination(monkeypatch) -> None:
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
     assert any(
-        "Luna destination: OpenAI default endpoint" in item.value
+        "Sol destination: OpenAI default endpoint" in item.value
         for item in app.get("caption")
     )
 
@@ -417,7 +428,7 @@ def test_ocr_model_selection_updates_the_active_ui_engine(monkeypatch) -> None:
 
     assert not app.exception
     assert any(
-        "Powered by GLM-OCR + GPT 5.6 Luna" in item.value
+        "Powered by GLM-OCR + GPT 6 Sol" in item.value
         for item in app.get("caption")
     )
 
@@ -429,7 +440,7 @@ def test_studio_hides_custom_luna_destination(monkeypatch) -> None:
     app = AppTest.from_file("streamlit_app.py").run(timeout=20)
 
     assert not any("custom endpoint" in item.value for item in app.warning)
-    assert not any("Luna destination" in item.value for item in app.get("caption"))
+    assert not any("Sol destination" in item.value for item in app.get("caption"))
 
 
 def test_ade_presets_default_fast_and_allow_full_or_custom(monkeypatch) -> None:
@@ -517,7 +528,7 @@ def test_studio_shows_results_and_only_requested_tools(
                     calls=[
                         AgentUsage(
                             agent="visual_recovery",
-                            model=LUNA_MODEL,
+                            model=OPENAI_MODEL,
                             input_tokens=1_234,
                             cached_input_tokens=234,
                             output_tokens=56,
@@ -568,8 +579,9 @@ def test_studio_shows_results_and_only_requested_tools(
     assert metrics == {
         "Input tokens": "1,234",
         "Cache tokens": "234",
+        "Cache write tokens": "0",
         "Output tokens": "56",
-        "Estimated cost": "$0.000272",
+        "Estimated cost": "$0.002607",
         "Pages": "1",
         "Regions": "1",
         "Tables": "0",
@@ -739,10 +751,11 @@ def test_studio_shows_results_and_only_requested_tools(
         "Model": "Total",
         "Input tokens": 1_234,
         "Cache tokens": 234,
+        "Cache write tokens": 0,
         "Output tokens": 56,
-        "Estimated cost": pytest.approx(0.00027188),
+        "Estimated cost": pytest.approx(0.0026068),
     }
-    assert any("$0.02/M cached input" in item.value for item in app.get("caption"))
+    assert any("$0.20/M cached input" in item.value for item in app.get("caption"))
 
 
 @pytest.mark.xfail(
@@ -904,7 +917,7 @@ def test_multiple_uploads_process_sequentially_and_only_process_new_files(
                     calls=[
                         AgentUsage(
                             agent="visual_recovery",
-                            model=LUNA_MODEL,
+                            model=OPENAI_MODEL,
                             input_tokens=10,
                             output_tokens=1,
                         )
@@ -1304,7 +1317,7 @@ def test_interrupted_analysis_is_discarded_on_restart(
         annotated_pdf=simple_pdf,
     )
     selection_key = (
-        f"{document.id}:all:False:True:True:glm-vllm:gpt-5.6-luna:"
+        f"{document.id}:all:False:True:True:glm-vllm:gpt-6-sol:"
         "glm-ocr:latest:False:vllm-paddleocr-vl-1.6:scanned-pdf::4.6.5"
     )
     store = WorkspaceStore(database)

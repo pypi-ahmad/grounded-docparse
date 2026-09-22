@@ -41,7 +41,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
         calls=[
             AgentUsage(
                 agent="draft_parser",
-                model="gpt-5.6-luna",
+                model="gpt-6-sol",
                 input_tokens=120,
                 output_tokens=30,
             )
@@ -50,7 +50,7 @@ def test_agentic_document_maps_blocks_and_lines_to_canonical_markdown() -> None:
     trace = [
         AgentTraceEvent(
             agent="evidence_critic",
-            model="gpt-5.6-luna",
+            model="gpt-6-sol",
             action="finish_page",
             page=1,
             status="completed",

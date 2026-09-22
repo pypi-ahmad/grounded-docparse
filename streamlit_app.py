@@ -24,7 +24,6 @@ import math
 import os
 import sys
 from dataclasses import replace
-from datetime import datetime
 from pathlib import Path
 
 import pymupdf
@@ -308,11 +307,12 @@ def launch_usage_summary() -> UsageCostSummary:
 
 
 def render_usage_metrics(summary: UsageCostSummary) -> None:
-    usage_columns = st.columns(4)
+    usage_columns = st.columns(5)
     usage_columns[0].metric("Input tokens", f"{summary.input_tokens:,}")
     usage_columns[1].metric("Cache tokens", f"{summary.cached_input_tokens:,}")
     usage_columns[2].metric("Output tokens", f"{summary.output_tokens:,}")
     usage_columns[3].metric("Estimated cost", f"${summary.estimated_cost:.6f}")
+    usage_columns[4].metric("Cache write tokens", f"{summary.cache_write_tokens:,}")
 
 
 def render_session_cost_page() -> None:
@@ -336,6 +336,7 @@ def render_session_cost_page() -> None:
             ),
             "Input tokens": row.input_tokens,
             "Cache tokens": row.cached_input_tokens,
+            "Cache write tokens": row.cache_write_tokens,
             "Output tokens": row.output_tokens,
             "Estimated cost": row.estimated_cost,
         }
@@ -346,6 +347,7 @@ def render_session_cost_page() -> None:
             "Model": "Total",
             "Input tokens": summary.input_tokens,
             "Cache tokens": summary.cached_input_tokens,
+            "Cache write tokens": summary.cache_write_tokens,
             "Output tokens": summary.output_tokens,
             "Estimated cost": summary.estimated_cost,
         }
@@ -369,8 +371,13 @@ def render_session_cost_page() -> None:
             f"${cached_rate:.2f}/M cached input, "
             f"${row.pricing.output_per_million:.2f}/M output"
         )
-    pricing_date = datetime.now().astimezone().date().isoformat()
-    st.caption(f"Pricing as of {pricing_date}; synchronous API rates.")
+        if row.pricing.cache_write_per_million is not None:
+            st.caption(f"${row.pricing.cache_write_per_million:.2f}/M cache writes")
+    st.caption(
+        "Standard processing estimates. GPT 6 Sol rates verified 2026-09-23. "
+        "Above 272,000 input tokens per request, input and cache rates double; "
+        "output rates increase by 50%. Custom endpoint charges may differ."
+    )
 
 
 # st.session_state is one global namespace shared across all documents in a batch.
@@ -1400,8 +1407,11 @@ if app_view == "Session cost":
     st.stop()
 st.session_state.setdefault("extraction_engine", ExtractionEngine.OLLAMA.value)
 st.session_state.setdefault("active_extraction_engine", None)
-st.session_state.setdefault("cloud_model", CloudModel.GPT_5_6_LUNA.value)
-st.session_state.setdefault("cloud_model_label", CloudModel.GPT_5_6_LUNA.label)
+st.session_state.setdefault("cloud_model", CloudModel.GPT_6_SOL.value)
+st.session_state.setdefault("cloud_model_label", CloudModel.GPT_6_SOL.label)
+if st.session_state.cloud_model not in {model.value for model in CloudModel}:
+    st.session_state.cloud_model = CloudModel.GPT_6_SOL.value
+    st.session_state.cloud_model_label = CloudModel.GPT_6_SOL.label
 st.session_state.setdefault("ollama_model", OllamaOcrModel.PADDLEOCR_VL.value)
 if st.session_state.active_extraction_engine is None:
     apply_engine_selection()
@@ -1450,8 +1460,8 @@ if not has_environment:
         f"{selected_cloud_model.api_key_name} is not set. Local parsing remains "
         "available; AI extraction and enhancement will be skipped."
     )
-elif selected_cloud_model is CloudModel.GPT_5_6_LUNA and not os.getenv("OPENAI_BASE_URL"):
-    st.caption("Luna destination: OpenAI default endpoint")
+elif selected_cloud_model is CloudModel.GPT_6_SOL and not os.getenv("OPENAI_BASE_URL"):
+    st.caption("Sol destination: OpenAI default endpoint")
 if preload_error is not None:
     st.error(preload_error)
 if st.session_state.get("workspace_restore_error"):

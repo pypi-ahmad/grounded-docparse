@@ -203,6 +203,7 @@ class OpenAIDocumentGateway:
             else lambda name, default: getattr(input_details, name, default)
         )
         cached_input_tokens = details_get("cached_tokens", 0)
+        cache_write_tokens = details_get("cache_write_tokens", 0)
         # Provider-reported token counts are untrusted input: clamp to
         # non-negative ints and cap cached tokens at input tokens so a
         # malformed response can't inflate or corrupt the cost ledger.
@@ -217,6 +218,12 @@ class OpenAIDocumentGateway:
         valid_cached_input_tokens = min(
             valid_cached_input_tokens, valid_input_tokens
         )
+        valid_cache_write_tokens = min(
+            cache_write_tokens
+            if type(cache_write_tokens) is int and cache_write_tokens >= 0
+            else 0,
+            valid_input_tokens - valid_cached_input_tokens,
+        )
         if isinstance(input_tokens, int) and input_tokens >= 0:
             self.input_tokens += input_tokens
         if isinstance(output_tokens, int) and output_tokens >= 0:
@@ -226,6 +233,7 @@ class OpenAIDocumentGateway:
             model=model,
             input_tokens=valid_input_tokens,
             cached_input_tokens=valid_cached_input_tokens,
+            cache_write_tokens=valid_cache_write_tokens,
             output_tokens=output_tokens
             if isinstance(output_tokens, int) and output_tokens >= 0
             else 0,

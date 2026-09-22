@@ -247,7 +247,7 @@ def test_targeted_repair_replaces_only_exact_literal_and_records_provenance() ->
         evidence_ref=target.evidence_ref,
     )
 
-    _apply_span_repairs(block, [target], [decision], repair_source="gpt-5.6-luna")
+    _apply_span_repairs(block, [target], [decision], repair_source="gpt-6-sol")
 
     assert block.text == "Account 123 beside l24"
     assert block.atoms[0].text == "Account 123 beside l24"
@@ -288,7 +288,7 @@ def test_stale_target_does_not_replace_adjacent_text() -> None:
         evidence_ref=target.evidence_ref,
     )
 
-    _apply_span_repairs(block, [target], [decision], repair_source="gpt-5.6-luna")
+    _apply_span_repairs(block, [target], [decision], repair_source="gpt-6-sol")
 
     assert block.text == "AA11"
     assert block.atoms[0].text == "AA11"
@@ -335,7 +335,7 @@ def test_targeted_table_cell_repair_preserves_neighboring_cell() -> None:
         evidence_ref=target.evidence_ref,
     )
 
-    _apply_span_repairs(block, [target], [decision], repair_source="gpt-5.6-luna")
+    _apply_span_repairs(block, [target], [decision], repair_source="gpt-6-sol")
 
     assert [cell.text for cell in block.table.cells] == ["123", "l24"]
     assert block.atoms[0].text == "123"

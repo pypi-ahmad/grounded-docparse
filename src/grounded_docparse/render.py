@@ -1059,13 +1059,12 @@ def render_combined_result(
     metadata["luna_time"] = (
         metadata["luna_recovery_time"] + metadata["luna_agentic_time"]
     )
-    # Hardcoded label, not derived from the actually configured OCR/AI models — it only
-    # distinguishes "some AI stage ran" from "OCR only", not which engine or model.
-    metadata["engine"] = (
-        "glm-ocr + gpt-5.6-luna"
-        if parse_result.trace or extra_traces
-        else "glm-ocr"
-    )
+    # Preserve the parser's engine provenance and append models used by later stages.
+    engine_parts = parse_result.metadata.engine.split(" + ")
+    for trace in [*(parse_result.trace or []), *extra_traces]:
+        if trace.model and trace.model not in engine_parts:
+            engine_parts.append(trace.model)
+    metadata["engine"] = " + ".join(engine_parts)
     metadata["feature_statuses"] = (
         {
             name: feature.model_dump(mode="json")
