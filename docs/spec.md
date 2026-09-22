@@ -10,6 +10,7 @@ Parse native documents, scanned PDFs, and images into grounded Markdown and stru
 - Required independent processing type for every file: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`
 - Optional inclusive contiguous per-document range for every supported format, using natural pages, frames, slides, sheets, sections, blocks, or rows
 - Selectable AI model and optional AI-feature toggles
+- Default GPT model `gpt-6-sol` with medium reasoning; legacy GPT IDs are not accepted
 - Optional reusable scalar extraction schemas and custom form-routing profiles
 - Optional document-chat questions after parsing
 
@@ -43,6 +44,7 @@ Parse native documents, scanned PDFs, and images into grounded Markdown and stru
 - Persist reusable schemas, routing profiles, and the active batch workspace in SQLite plus sibling `workspaces/` artifacts. Restore that batch after restart. Keep extraction, routing review, and chat session-only. **Clear saved workspace** deletes the durable batch.
 - Process batch files sequentially, isolate per-file failures, skip unchanged completed files on rerun, and export a ZIP archive.
 - Allow local-only parsing without any cloud-provider key.
+- Show launch-scoped usage and Standard cost estimates, separating cache reads and writes. Apply Sol's long-context pricing per request, not to session totals; exclude calls marked as having unavailable telemetry.
 
 ## Public interfaces
 

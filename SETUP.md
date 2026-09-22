@@ -143,7 +143,7 @@ GLM parsing does not require an AI-provider credential. Set the user-level value
 
 Use `GOOGLE_API_KEY` for Gemini or `AGNES_API_KEY` for Agnes 2.5 Flash. `AGNES_BASE_URL` is optional. Equivalent names may be placed in a private root `.env` on other machines; process and User environment values take precedence. Never commit real credentials.
 
-The Windows launcher reads User scope directly, so a newly saved value does not require reopening the terminal. Restart the managed app after changing provider values. An unrelated process already listening on port `7137` is not terminated or adopted. Never store a real key in committed files, logs, or issue reports. The UI selects among GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash.
+The Windows launcher reads User scope directly, so a newly saved value does not require reopening the terminal. Restart the managed app after changing provider values. An unrelated process already listening on port `7137` is not terminated or adopted. Never store a real key in committed files, logs, or issue reports. The UI selects among GPT 6 Sol, Gemini 3.5 Flash Lite, Gemini Flash 3.7, and Agnes 2.5 Flash.
 
 ## Configuration reference
 
@@ -151,7 +151,7 @@ The Windows launcher reads User scope directly, so a newly saved value does not 
 
 | Variable | Default | Purpose |
 | --- | ---: | --- |
-| `DOCPARSE_CLOUD_MODEL` | `gpt-5.6-luna` | Default AI model for parser/API calls; the Streamlit model selector controls the active UI session |
+| `DOCPARSE_CLOUD_MODEL` | `gpt-6-sol` | Default AI model for parser/API calls, with medium reasoning; the Streamlit model selector controls the active UI session. Replace older GPT model IDs in existing settings; legacy IDs are not accepted. |
 | `DOCPARSE_RENDER_DPI` | `200` | Raster DPI for PDF pages |
 | `DOCPARSE_CROP_DPI` | `450` | Rerender DPI for source crops |
 | `DOCPARSE_CROP_PADDING` | `0.1` | Fractional padding around a crop |

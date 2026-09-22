@@ -84,7 +84,7 @@ It processes up to 20 uploaded files sequentially in one active local workspace,
 The application has two broad layers:
 
 1. **Document parsing:** the user selects one compatible processing type and one of six exclusive engines. Grounded choices include WSL vLLM, native Docling/RapidOCR, PDF Inspector, and Windows Ollama; **AI ADE** is the explicit direct-agentic option.
-2. **Optional AI features:** GPT 5.6 Luna, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or Agnes 2.5 Flash can enhance failed/sub-75%-confidence regions or reason over parsed content.
+2. **Optional AI features:** GPT 6 Sol, Gemini 3.5 Flash Lite, Gemini Flash 3.7, or Agnes 2.5 Flash can enhance failed/sub-75%-confidence regions or reason over parsed content.
 
 Local parsing can run without a cloud key. Optional features require the key for the selected provider and may send document content to it.
 
@@ -123,11 +123,15 @@ The application normally opens at <http://localhost:7137>. GLM-OCR uses loopback
 
 The native launch terminal remains open and follows labeled Streamlit, GLM-OCR, PaddleOCR, and Ollama logs. It waits for a keypress after the app stops so the last messages remain visible.
 
-The sidebar **Session cost** view summarizes total input tokens, cache tokens, output tokens, and estimated synchronous API cost for the current app launch. It provides one row per model and a combined Total row. Restarting the app resets the ledger even when the durable document workspace is restored.
+The sidebar **Session cost** view summarizes input tokens, **Cache tokens** (cache reads), **Cache write tokens**, output tokens, and estimated Standard processing cost for the current app launch. It provides one row per model and a combined Total row. Cache reads and writes are included in input tokens and charged at their respective rates, without a second ordinary-input charge. Restarting the app resets the ledger even when the durable document workspace is restored.
+
+GPT 6 Sol uses $2.00 input, $0.20 cached input, $2.50 cache writes, and $10.00 output per million tokens. For an individual request exceeding 272,000 input tokens, input and cache rates double and output rates increase by 50%. Combining several smaller requests does not trigger that threshold. Calls marked as having unavailable usage are excluded, and the view warns that the estimate may be incomplete. These are configured estimates, not an invoice or a live pricing lookup; custom endpoint charges can differ. Native LangExtract extraction currently returns an empty usage record, so this view does not measure its token cost.
 
 For complete setup, GPU, environment, and service instructions, read [SETUP.md](../SETUP.md).
 
 ### 3.3 Optional AI-provider configuration
+
+The default GPT model is `gpt-6-sol`, displayed as **GPT 6 Sol**, with `medium` reasoning. Parser/API settings use `DOCPARSE_CLOUD_MODEL`; the Streamlit selector controls the UI session. Older GPT model IDs are rejected in parser configuration. An obsolete Streamlit model selection resets to Sol when the app reruns.
 
 Local parsing does not need a cloud key. Optional enhancement and refinement require the selected provider key. Provider-aware routing, extraction, and chat use their configured model path. The current classification/TOC `DocumentAgent` preflight additionally checks `OPENAI_API_KEY`, even when Gemini or Agnes is selected.
 
@@ -1133,7 +1137,7 @@ Uploaded bytes and generated results may remain in the browser session and activ
 
 Do not treat closing a browser tab, refreshing, or restarting the app as deletion. Use **Clear saved workspace**, then apply the administrator's approved browser, host-storage, backup, and retention procedures for sensitive documents.
 
-The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. The managed Windows launcher stops the verified prior process and clears this cache on every launch. This is not durable-data deletion: the administrator must still use **Clear saved workspace** and handle browser, host-storage, and backup remnants under the approved procedure.
+The app also uses process-wide Streamlit data caches for page counts, selected-page PDFs, single-page views, thumbnails, and annotation variants. Cached document derivatives can outlive one browser session while the Streamlit process remains running. The managed Windows launcher stops the verified prior process and clears this cache on every launch. Administrators must still use **Clear saved workspace** and handle browser, host-storage, and backup remnants under the approved procedure.
 
 ### 18.3 Other residual data
 
@@ -1347,7 +1351,7 @@ Schemas and routing profiles are saved in SQLite. The active batch's sources, pa
 | Extraction | Collecting requested fields from parsed content |
 | GLM-OCR | Local layout and text-recognition system |
 | Grounding | Linking a result to known source evidence |
-| AI model | Selectable GPT 5.6 Luna, Gemini, or Agnes model used for enhancement and document reasoning |
+| AI model | Selectable GPT 6 Sol, Gemini, or Agnes model used for enhancement and document reasoning |
 | Markdown | Readable text format produced by the parser |
 | Routing profile | Reusable form categories and extraction rules |
 | Schema | Field names, descriptions, and types to extract |

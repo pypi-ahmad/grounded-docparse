@@ -7,7 +7,7 @@ document type can be diagnosed.
 
 The project does not accept or want donations, sponsorship, or paid support of
 any kind. Reproducible bug reports, focused pull requests, and documentation
-corrections are the contributions that help — see
+corrections help. See
 [Project participation](#project-participation) below.
 
 ## Where to ask

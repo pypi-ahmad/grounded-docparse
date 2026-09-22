@@ -6,7 +6,7 @@
 
 | Integration | Direction | Data/role | Boundary and constraints |
 |---|---|---|---|
-| OpenAI API / compatible base URL | Outbound HTTPS | GPT 5.6 Luna extraction, enhancement, refinement, chat, and schema work | `OPENAI_API_KEY`; optional `OPENAI_BASE_URL`; output is validated |
+| OpenAI API / compatible base URL | Outbound HTTPS | GPT 6 Sol extraction, enhancement, refinement, chat, and schema work | `OPENAI_API_KEY`; optional `OPENAI_BASE_URL`; output is validated |
 | Google Gemini | Outbound HTTPS | Gemini 3.5 Flash Lite or Gemini Flash 3.7 for the same AI tasks | `GOOGLE_API_KEY` |
 | Agnes AI | Outbound HTTPS | Agnes 2.5 Flash for the same AI tasks | `AGNES_API_KEY`; optional `AGNES_BASE_URL` |
 | GLM-OCR vLLM | Windows-to-WSL loopback | Crop recognition grounded by Windows CPU PP-DocLayoutV3 | Port `8080`; mutually exclusive with Paddle vLLM |
@@ -47,6 +47,7 @@ The `native` extra declares `pywin32` on Windows, but no source path currently i
 
 - `AgentTraceEvent` records agent/model/action/status, targets, duration, reasoning effort, and prompt version.
 - `RunUsage` and `RuntimeDiagnostics` record tokens, attempts, retries, throttling, cooldown, and sleep time.
+- `AgentUsage` and `RunUsage` distinguish cached input and cache-write tokens. `usage_costs.py` estimates Standard cost per request before aggregation; native LangExtract currently supplies no token usage. Sol uses medium reasoning in both the Responses gateway and the native adapter.
 - Native source units record the effective parser and page route; extraction JSON records accepted evidence and rejection warnings.
 - CLI stderr reports progress and per-document failures; the batch manifest records stage, status, and truncated error text.
 - There is no external metrics, tracing, alerting, or centralized logging backend.

@@ -31,7 +31,7 @@ The application and model services bind to loopback. The product has no HTTP app
 
 Each file has one required `ProcessingType`: `native-pdf`, `scanned-pdf`, `mixed-pdf`, `word`, `powerpoint`, `excel`, `csv`, `image`, or `other-native`.
 
-The selected type is authoritative. Extension, signature, and container checks validate it. Invalid combinations fail before parsing. Native PDF does not fall back to OCR, and Mixed PDF requires a confirmed route for every selected page.
+The selected type is authoritative. Extension, signature, and container checks validate it. Invalid combinations fail before parsing. Native PDF stops when OCR is required, and Mixed PDF requires a confirmed route for every selected page.
 
 `UniversalDocumentParser` dispatches to one route:
 

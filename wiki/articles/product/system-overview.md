@@ -1,7 +1,7 @@
 ---
 tags: product, architecture, overview
 sources: README.md, docs/architecture.md
-snapshot: content-f9e253cce532
+snapshot: content-0117589c51ef
 status: released
 ---
 

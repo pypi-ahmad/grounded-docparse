@@ -56,6 +56,23 @@ insufficient coverage.
 
 ## Calibrate the review threshold
 
+For GPT 6 Sol runs, pass
+`--rate-card benchmarks/rate-cards/openai-standard-2026-09-23.json` to the evaluator.
+The card uses Standard rates of $2.00 input, $0.20 cached input, $2.50 cache writes,
+and $10.00 output per million tokens. Above 272,000 input tokens in one request,
+input and cache rates double and output rates increase by 50%. Costs are calculated
+per request before aggregation. Cache reads and writes are subsets of input tokens,
+not additional input charges. Older aggregated Sol telemetry without request-level
+usage cannot produce a cost estimate. Historical rate cards remain unchanged.
+Current telemetry includes `usage_calls` with individual `AgentUsage` records,
+alongside aggregated `model_usage`. If both are present, their call and token
+totals must agree. Missing request usage, unavailable usage, mismatched totals,
+missing model rates, or missing Sol cache-read/write rates leave `cost_per_page`
+unset and populate `cost_unavailable_reason`. Older non-Sol aggregate records
+remain supported. The new rate-card fields `cached_input_per_million` and
+`cache_write_per_million` are optional for other models.
+See [OpenAI pricing](https://developers.openai.com/api/docs/pricing).
+
 Run the calibration manifest at candidate thresholds. Confidence below the
 threshold requires review; the default is `0.85`.
 

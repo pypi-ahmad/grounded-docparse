@@ -136,6 +136,21 @@ recovery_log: list[VisualRecoveryResult]
 
 ## Agentic features
 
+Usage records include `cache_write_tokens` alongside `input_tokens`,
+`cached_input_tokens`, and `output_tokens`. Cache reads and writes are subsets of
+input tokens. `RunUsage` computes totals across calls. Saved records without the
+cache-write field load with a zero default. The Session cost view uses GPT 6 Sol
+Standard rates and applies the long-context threshold to each request separately.
+`AgentUsage.telemetry_available=False` excludes a call from session cost math
+and increments the unavailable-call count. Native LangExtract extraction currently
+returns an empty `RunUsage`; it records the selected model and reasoning effort in
+its trace and metadata, but does not expose provider token usage.
+
+For combined OCR exports, `metadata.engine` preserves the parser's engine string
+and appends distinct model names from parse and later-stage traces. Existing
+`luna_*` timing fields and `luna-recovery` provenance remain serialized stage names;
+they do not select a GPT model.
+
 `DocumentAgent` accepts the same optional `config` and keyword-only `gateway_factory` constructor arguments as `DocumentParser`.
 
 ```text
@@ -350,7 +365,14 @@ These examples define the stable top-level envelopes, not complete JSON Schemas 
 
 ## Configuration and test doubles
 
-Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_CLOUD_MODEL` accepts `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`, or `agnes-2.5-flash`. `DOCPARSE_OCR_ENGINE` accepts `glm-ocr`, `paddleocr-vl-1.6`, `ollama`, or `rapidocr`; `DOCPARSE_OLLAMA_MODEL` selects the Ollama recognizer. `DOCPARSE_OCR_DISAGREEMENT_ENABLED` enables audit-only uncertain-region comparison, and `DOCPARSE_OCR_DISAGREEMENT_ENGINE` selects `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr`; omitting it chooses a compatible alternate automatically. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. GLM, Paddle, and Ollama service origins must remain loopback-only. Invalid enum values, numeric values, bounds, or service origins fail during configuration construction.
+`ParserConfig.cloud_model` defaults to `CloudModel.GPT_6_SOL` (`gpt-6-sol`).
+The OpenAI gateway sends `reasoning={"effort": "medium"}`; the native LangExtract
+adapter passes `reasoning_effort="medium"` to its OpenAI provider. No legacy GPT
+model aliases are accepted. The existing `DOCPARSE_LUNA_MAX_OUTPUT_TOKENS` setting
+still controls the output ceiling and defaults to 128,000 tokens; individual
+stages may use smaller caps.
+
+Pass an explicit `ParserConfig` to override environment-derived settings. Otherwise constructors call `ParserConfig.from_env()`. `DOCPARSE_CLOUD_MODEL` accepts `gpt-6-sol`, `gemini-3.5-flash-lite`, `gemini-3.7-flash`, or `agnes-2.5-flash`. `DOCPARSE_OCR_ENGINE` accepts `glm-ocr`, `paddleocr-vl-1.6`, `ollama`, or `rapidocr`; `DOCPARSE_OLLAMA_MODEL` selects the Ollama recognizer. `DOCPARSE_OCR_DISAGREEMENT_ENABLED` enables audit-only uncertain-region comparison, and `DOCPARSE_OCR_DISAGREEMENT_ENGINE` selects `ollama-glm-ocr`, `ollama-paddleocr-vl-1.6`, `rapidocr`, `vllm-paddleocr-vl-1.6`, or `vllm-glm-ocr`; omitting it chooses a compatible alternate automatically. `DOCPARSE_LOCAL_OCR_ENABLED` treats `0`, `false`, and `no` as false and every other value as true. GLM, Paddle, and Ollama service origins must remain loopback-only. Invalid enum values, numeric values, bounds, or service origins fail during configuration construction.
 
 `gateway_factory` is a test/compatibility seam rather than a published protocol. The constructor signatures show its internal `OpenAIDocumentGateway` default for fidelity; normal callers should omit this argument. A custom factory receives `ParserConfig` and must provide the methods exercised by the selected workflow, so requirements depend on enabled features. The package does not promise thread-safe reuse of parser/agent instances; create them per workflow. The process-wide `GlmOcrRuntime` serializes SDK model access.
 

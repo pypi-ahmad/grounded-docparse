@@ -21,7 +21,7 @@ The main processing library lives under `src/grounded_docparse/`:
 - `local_ocr.py` and `paddle_ocr.py` adapt OCR engines into common models.
 - `page_analysis.py` handles layout, reading order, and visual analysis.
 - `quality.py` performs quality checks and selects recovery candidates.
-- `pipeline.py` coordinates the end-to-end workflow.
+- `pipeline.py` coordinates the full workflow.
 - `render.py` and `native.py` produce OCR/native Markdown, JSON, elements or anchors, and optional annotated PDFs.
 - `agentic.py` and `extraction.py` provide classification, extraction, TOC, and chat workflows.
 - `schema_store.py` and `workspace_store.py` persist reusable schemas and workspaces.

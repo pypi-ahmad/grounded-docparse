@@ -1,5 +1,11 @@
 # Wiki operation log
 
+## 2026-09-23 — GPT 6 Sol working-tree documentation sync
+
+- Documented the Sol default, medium reasoning, session cost fields, and native extraction telemetry limit against current code.
+- Added request-level benchmark pricing and unavailable-cost conditions.
+- Marked affected articles as working-tree behavior and refreshed generated source manifests and article snapshots.
+
 ## 2026-08-15 — Native-only application hosting
 
 - Removed the temporary WSL-hosted Streamlit launcher and lifecycle sources.

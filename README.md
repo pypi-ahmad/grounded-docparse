@@ -38,7 +38,7 @@ Repository: [github.com/pypi-ahmad/grounded-docparse](https://github.com/pypi-ah
 
 Grounded DocParse is a local-first document processing studio for Windows. It handles scanned and selectable-text PDFs, images, Office files, spreadsheets, HTML, EPUB, Markdown, and OpenDocument formats. Every file receives an explicit processing type. The app validates that choice and never silently moves a document to another pipeline.
 
-The output is designed for review. OCR results retain page geometry, element identity, reading order, confidence, and source boxes. Native documents retain immutable text spans and anchors that point back to pages, paragraphs, slides, shapes, sheets, cells, tables, or CSV rows. Optional AI features operate on that evidence rather than replacing it.
+The output is designed for review. OCR results retain page geometry, element identity, reading order, confidence, and source boxes. Native documents retain immutable text spans and anchors that point back to pages, paragraphs, slides, shapes, sheets, cells, tables, or CSV rows. Optional AI features operate on that evidence and preserve it.
 
 Use the project when you need:
 
