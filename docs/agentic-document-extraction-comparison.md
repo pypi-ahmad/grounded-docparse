@@ -43,7 +43,7 @@ LandingAI ADE is a managed document-intelligence platform. Its current public su
 
 LandingAI Parse identifies elements such as text, tables, and form fields. Its output contains chunk IDs and grounding information, including the source page and coordinates. That representation can then be used by the other ADE operations. [LandingAI Parse documentation](https://docs.landing.ai/ade/parse)
 
-This public API design is agentic in a practical sense: a user can give the platform different document goals and definitions, and the platform applies specialized document reasoning to each goal. The public documentation does not establish that ADE uses an open-ended autonomous observe-plan-act loop internally, so this page does not assume one.
+This public API design is agentic in a practical sense. A user can give the platform different document goals and definitions, and the platform applies specialized document reasoning to each goal. The public documentation does not establish that ADE uses an open-ended autonomous observe-plan-act loop internally.
 
 ## How Grounded DocParse is agentic
 

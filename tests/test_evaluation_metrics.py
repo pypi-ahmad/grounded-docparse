@@ -395,6 +395,37 @@ def test_hallucination_separates_insertions_forbidden_rejections_and_false_accep
     }
 
 
+def test_sol_benchmark_prices_request_usage_and_rejects_legacy_aggregates() -> None:
+    from grounded_docparse.models import AgentUsage
+
+    calls = [AgentUsage(agent="test", model="gpt-6-sol", input_tokens=200_000,
+                        cached_input_tokens=20_000, cache_write_tokens=40_000,
+                        output_tokens=10_000)] * 2
+    record = {
+        "latency_seconds": 1, "pages": 2, "input_tokens": 400_000,
+        "output_tokens": 20_000,
+        "model_usage": {"gpt-6-sol": {"calls": 2, "input_tokens": 400_000,
+                                      "output_tokens": 20_000}},
+        "usage_calls": [call.model_dump() for call in calls],
+    }
+    rate_card = {"schema_version": "1.0", "models": {"gpt-6-sol": {
+        "input_per_million": 2, "output_per_million": 10,
+        "cached_input_per_million": 0.2, "cache_write_per_million": 2.5,
+    }}}
+    result = summarize_telemetry([record], rate_card=rate_card)
+    assert result["cost_per_page"] == pytest.approx(0.484)
+    record["usage_calls"][0]["telemetry_available"] = False
+    assert summarize_telemetry([record], rate_card=rate_card)["cost_per_page"] is None
+    record["usage_calls"] = []
+    result = summarize_telemetry([record], rate_card=rate_card)
+    assert result["cost_per_page"] is None
+    assert "does not match" in result["cost_unavailable_reason"]
+    del record["usage_calls"]
+    result = summarize_telemetry([record], rate_card=rate_card)
+    assert result["cost_per_page"] is None
+    assert "request-level" in result["cost_unavailable_reason"]
+
+
 def test_telemetry_uses_median_nearest_rank_and_optional_rate_card() -> None:
     records = [
         {

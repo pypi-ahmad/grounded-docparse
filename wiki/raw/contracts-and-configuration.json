@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f9e253cce532",
-    "base_commit": "848313df63fe5fbc50082e255bf9f96d528ff439",
+    "id": "content-0117589c51ef",
+    "base_commit": "6f0ec5ceedd23c7bf6ed1baef232f0e051cc5976",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-15T17:19:04.493519+00:00",
+  "generated_at": "2026-09-22T21:45:09.564934+00:00",
   "category": "contracts-and-configuration",
   "files": [
     {
       "path": ".env.example",
-      "sha256": "7f62e8d1a28c8595052c601462b121df9d928a9bd479e801bb2d47ead5b59982",
-      "size": 1581
+      "sha256": "947e881a7d137adbd06e6b92fe5efdbc60ede57718da784a531dc305fc0df32a",
+      "size": 1578
     },
     {
       "path": ".gitattributes",
@@ -23,6 +23,11 @@
       "path": ".github/ISSUE_TEMPLATE/config.yml",
       "sha256": "aa2e8c7d6a7ca53910da8663f9ef1b1ca9c001e316b959cb7c044384cc8a15cc",
       "size": 448
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "934a5279b4c7fce3c3dd0ac784521fcedcbb9192688cb5b206b4b131d26396e2",
+      "size": 612
     },
     {
       "path": ".gitignore",
@@ -51,13 +56,13 @@
     },
     {
       "path": "pyproject.toml",
-      "sha256": "5150b01b641571a028e3968de15a8d2cda658ac63c3ee1454f10cc7fec71999b",
-      "size": 2734
+      "sha256": "7ffe40bab3c833d68feaecb055cb1167932333afe570149ccd60aed6998f96a5",
+      "size": 2733
     },
     {
       "path": "uv.lock",
-      "sha256": "6bbe246f72a18d418a6994e45cc1851d0bbb5b491caed544258e09d95474bb1b",
-      "size": 1221092
+      "sha256": "04fb4a55b1cd280dad1cdc0deec856535c2ba9ea5756a0c7d3b408f9b7f025e8",
+      "size": 1214455
     }
   ]
 }

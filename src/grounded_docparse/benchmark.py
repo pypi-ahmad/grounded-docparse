@@ -26,12 +26,14 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .models import (
+    AgentUsage,
     Block,
     Document,
     DocumentClassification,
     DocumentType,
     VerificationState,
 )
+from .usage_costs import ModelPricing, estimate_call_cost
 
 # Corpus/annotation file formats are versioned independently of the public
 # output-JSON versions in render.py; bump these deliberately when the manifest
@@ -198,6 +200,8 @@ class ModelRate(BaseModel):
 
     input_per_million: float = Field(ge=0)
     output_per_million: float = Field(ge=0)
+    cached_input_per_million: float | None = Field(default=None, ge=0)
+    cache_write_per_million: float | None = Field(default=None, ge=0)
 
 
 class ModelRateCard(BaseModel):
@@ -826,14 +830,60 @@ def summarize_telemetry(
         )
         return output
     total_pages = sum(int(record["pages"]) for record in records)
-    cost = sum(
-        (
-            usage["input_tokens"] * rates.models[model].input_per_million
-            + usage["output_tokens"] * rates.models[model].output_per_million
-        )
-        / 1_000_000
-        for model, usage in model_usage.items()
-    )
+    cost = 0.0
+    for record in records:
+        raw_calls = record.get("usage_calls")
+        if raw_calls is not None:
+            calls = [AgentUsage.model_validate(call) for call in raw_calls]
+            reported = record.get("model_usage")
+            if reported is not None:
+                actual: dict[str, dict[str, int]] = {}
+                for call in calls:
+                    totals = actual.setdefault(
+                        call.model, {"calls": 0, "input_tokens": 0, "output_tokens": 0}
+                    )
+                    totals["calls"] += 1
+                    totals["input_tokens"] += call.input_tokens
+                    totals["output_tokens"] += call.output_tokens
+                expected = {
+                    model: {name: int(usage[name]) for name in
+                            ("calls", "input_tokens", "output_tokens")}
+                    for model, usage in reported.items()
+                }
+                if actual != expected:
+                    output["cost_per_page"] = None
+                    output["cost_unavailable_reason"] = "request-level usage does not match aggregate usage"
+                    return output
+        else:
+            legacy_usage = record.get("model_usage") or {
+                str(record.get("model", "unknown")): record
+            }
+            if "gpt-6-sol" in legacy_usage:
+                output["cost_per_page"] = None
+                output["cost_unavailable_reason"] = "GPT 6 Sol cost requires request-level usage"
+                return output
+            calls = [
+                AgentUsage(
+                    agent="benchmark", model=model,
+                    input_tokens=int(usage.get("input_tokens", 0)),
+                    output_tokens=int(usage.get("output_tokens", 0)),
+                )
+                for model, usage in legacy_usage.items()
+                if model in rates.models
+            ]
+        for call in calls:
+            rate = rates.models.get(call.model)
+            if not call.telemetry_available or rate is None:
+                output["cost_per_page"] = None
+                output["cost_unavailable_reason"] = "request usage or model pricing is unavailable"
+                return output
+            if call.model == "gpt-6-sol" and (
+                rate.cached_input_per_million is None or rate.cache_write_per_million is None
+            ):
+                output["cost_per_page"] = None
+                output["cost_unavailable_reason"] = "GPT 6 Sol cost requires cache read and write rates"
+                return output
+            cost += estimate_call_cost(call, ModelPricing(**rate.model_dump()))
     output["cost_per_page"] = cost / total_pages if total_pages else None
     output["cost_unavailable_reason"] = None if total_pages else "page count is zero"
     return output
@@ -1570,6 +1620,7 @@ def live_telemetry_record(
         "repaired_targets": len(repaired_targets),
         "model_usage": model_usage,
         "retries": diagnostics.retries if diagnostics is not None else 0,
+        "usage_calls": [call.model_dump(mode="json") for call in calls],
         "rate_limit_events": diagnostics.rate_limit_events
         if diagnostics is not None
         else 0,

@@ -143,7 +143,7 @@ def test_gateway_records_cached_input_tokens(response: object) -> None:
         ParserConfig(), client=SimpleNamespace(responses=object())
     )
 
-    call = gateway._record_usage(response, agent="test", model="gpt-5.6-luna")
+    call = gateway._record_usage(response, agent="test", model="gpt-6-sol")
 
     assert call.input_tokens == 100
     assert call.cached_input_tokens == 40
@@ -159,10 +159,37 @@ def test_gateway_defaults_missing_cached_input_tokens_to_zero() -> None:
     call = gateway._record_usage(
         {"usage": {"input_tokens": 100, "output_tokens": 20}},
         agent="test",
-        model="gpt-5.6-luna",
+        model="gpt-6-sol",
     )
 
     assert call.cached_input_tokens == 0
+    assert call.cache_write_tokens == 0
+
+
+@pytest.mark.parametrize("writes, expected", [(20, 20), (200, 60), (-1, 0), ("20", 0), (True, 0)])
+@pytest.mark.parametrize("as_object", [False, True])
+def test_gateway_records_bounded_cache_writes(writes, expected, as_object) -> None:
+    details = {"cached_tokens": 40, "cache_write_tokens": writes}
+    usage = {"input_tokens": 100, "input_tokens_details": details, "output_tokens": 20}
+    response = {"usage": usage}
+    if as_object:
+        usage["input_tokens_details"] = SimpleNamespace(**details)
+        response = SimpleNamespace(usage=SimpleNamespace(**usage))
+    gateway = OpenAIDocumentGateway(ParserConfig(), client=SimpleNamespace(responses=object()))
+    call = gateway._record_usage(response, agent="test", model="gpt-6-sol")
+    assert call.cache_write_tokens == expected
+    assert gateway.usage.cache_write_tokens == expected
+
+
+def test_sol_configuration_rejects_old_model_ids(monkeypatch) -> None:
+    from grounded_docparse.config import CloudModel
+
+    monkeypatch.setenv("DOCPARSE_CLOUD_MODEL", "gpt-6-sol")
+    assert ParserConfig.from_env().cloud_model is CloudModel.GPT_6_SOL
+    assert ParserConfig.from_env().cloud_model.reasoning_effort == "medium"
+    monkeypatch.setenv("DOCPARSE_CLOUD_MODEL", "gpt-5.6-luna")
+    with pytest.raises(ValueError):
+        ParserConfig.from_env()
 
 
 def _assert_untrusted_document_instruction(call: dict[str, object]) -> None:
@@ -191,7 +218,7 @@ def test_markdown_refinement_is_text_only() -> None:
     )
 
     assert result == parsed
-    assert responses.calls[0]["model"] == "gpt-5.6-luna"
+    assert responses.calls[0]["model"] == "gpt-6-sol"
     _assert_no_image_payload(responses.calls[0])
 
 
@@ -222,7 +249,7 @@ def test_agentic_analysis_requests_are_structured_text_only(method, parsed) -> N
     )
 
     call = responses.calls[0]
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert gateway.trace[0].reasoning_effort == "medium"
     assert call["store"] is False
@@ -302,7 +329,7 @@ def test_luna_draft_uses_deterministic_structured_vision_request(
 
     call = responses.calls[0]
     assert draft.regions[0].text == "Visible"
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert "temperature" not in call
     assert gateway.trace[0].reasoning_effort == "medium"
@@ -370,7 +397,7 @@ def test_incomplete_draft_reports_provider_context_before_schema_validation(
 
     with pytest.raises(
         RuntimeError,
-        match=("page_draft.*page 1.*gpt-5.6-luna.*max_output_tokens.*req-incomplete"),
+        match=("page_draft.*page 1.*gpt-6-sol.*max_output_tokens.*req-incomplete"),
     ):
         gateway.draft_page(_page(tmp_path / "page.png"))
     assert getattr(gateway, "input_tokens", None) == 7
@@ -443,7 +470,7 @@ def test_luna_crop_inspection_batches_images_in_one_request(tmp_path: Path) -> N
     assert len(inspection.decisions) == 2
     assert len(images) == 2
     assert all(image["detail"] == "original" for image in images)
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert call["input"][1]["content"][1]["detail"] == "original"
     assert "temperature" not in call
@@ -497,7 +524,7 @@ def test_quality_crop_inspection_uses_luna_and_records_page_targets(
 
     call = responses.calls[0]
     prompt = call["input"][0]["content"]
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert call["input"][1]["content"][1]["detail"] == "original"
     assert "Never invent" in prompt
@@ -535,7 +562,7 @@ def test_schema_architect_uses_luna_medium() -> None:
 
     call = responses.calls[0]
     assert json.loads(proposal.schema_text) == schema
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert gateway.usage.calls[0].agent == "schema_architect"
     _assert_untrusted_document_instruction(call)
@@ -566,7 +593,7 @@ def test_dynamic_extractor_uses_user_schema_and_luna_repair() -> None:
 
     call = responses.calls[0]
     assert result == payload
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert call["text"]["format"]["schema"]["properties"]["data"] == schema
     assert call["text"]["format"]["strict"] is True
@@ -611,7 +638,7 @@ def test_targeted_span_repair_sends_only_literal_context_and_crop(
         context_before="Acct ",
         context_after="23",
         confidence=0.4,
-        source="gpt-5.6-luna",
+        source="gpt-6-sol",
         bbox={"x0": 0.1, "y0": 0.1, "x1": 0.2, "y1": 0.2},
         evidence_ref="page:1:p1-b1:atom:0:0",
     )
@@ -639,7 +666,7 @@ def test_targeted_span_repair_sends_only_literal_context_and_crop(
     call = responses.calls[0]
     manifest = json.loads(call["input"][1]["content"][0]["text"])
     assert result.decisions[0].replacement_text == "1"
-    assert call["model"] == "gpt-5.6-luna"
+    assert call["model"] == "gpt-6-sol"
     assert call["reasoning"] == {"effort": "medium"}
     assert call["text_format"] is SpanRepairInspection
     assert manifest[0]["text"] == "l"

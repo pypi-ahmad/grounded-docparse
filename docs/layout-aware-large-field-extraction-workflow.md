@@ -37,7 +37,7 @@ The source document is evidence. The field specification is an instruction set. 
 ### Plain-language terms
 
 - **Grounded engine:** The selected vLLM, Docling/RapidOCR, or Ollama system that detects page regions and reads scanned PDFs or images.
-- **AI model:** Optional GPT 5.6 Luna, Gemini, or Agnes used for low-confidence repair and document-level tasks.
+- **AI model:** Optional GPT 6 Sol, Gemini, or Agnes used for low-confidence repair and document-level tasks.
 - **Layout tree:** An ordered list of parsed document regions with their page, type, text, and identifier.
 - **Schema:** The approved list of output fields, descriptions, and data types.
 - **Scalar field:** One value such as a name, date, amount, identifier, or yes/no answer.

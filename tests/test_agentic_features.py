@@ -67,6 +67,18 @@ def _result(page_count: int = 3) -> ParseResult:
     )
 
 
+def test_combined_export_preserves_actual_engine_and_model_provenance() -> None:
+    result = _result(1)
+    result.metadata.engine = "ollama + gemini-3.7-flash"
+    result.trace = [AgentTraceEvent(
+        agent="test", model="gemini-3.7-flash", action="test", status="completed",
+    ), AgentTraceEvent(
+        agent="test", model="gpt-6-sol", action="test", status="completed",
+    )]
+    payload = json.loads(render_combined_result(result, None, None))
+    assert payload["metadata"]["engine"] == "ollama + gemini-3.7-flash + gpt-6-sol"
+
+
 class FeatureGateway:
     instances: ClassVar[list[FeatureGateway]] = []
 
@@ -106,7 +118,7 @@ class FeatureGateway:
         self.usage.calls.append(
             AgentUsage(
                 agent="document_chat",
-                model="gpt-5.6-luna",
+                model="gpt-6-sol",
                 input_tokens=17,
                 output_tokens=5,
             )
@@ -114,7 +126,7 @@ class FeatureGateway:
         self.trace.append(
             AgentTraceEvent(
                 agent="document_chat",
-                model="gpt-5.6-luna",
+                model="gpt-6-sol",
                 action="document_chat",
                 status="completed",
                 duration_ms=12,

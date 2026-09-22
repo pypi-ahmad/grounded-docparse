@@ -110,7 +110,7 @@ def test_native_extraction_uses_only_base_text_and_fixed_model(monkeypatch) -> N
     call = calls[0]
     assert call["text_or_documents"] == "Invoice 42 true"
     assert "Refined" not in call["text_or_documents"]
-    assert call["config"]["model_id"] == "gpt-5.6-luna"
+    assert call["config"]["model_id"] == "gpt-6-sol"
     assert call["config"]["provider_kwargs"]["reasoning_effort"] == "medium"
     assert call["config"]["provider_kwargs"]["base_url"] == "https://example.invalid/v1"
     assert call["fetch_urls"] is False

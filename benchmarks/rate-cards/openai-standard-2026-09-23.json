@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "models": {
+    "gpt-6-sol": {
+      "input_per_million": 2.0,
+      "cached_input_per_million": 0.2,
+      "cache_write_per_million": 2.5,
+      "output_per_million": 10.0
+    }
+  }
+}

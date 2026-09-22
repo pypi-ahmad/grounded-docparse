@@ -370,6 +370,7 @@ class AgentUsage(BaseModel):
     model: str
     input_tokens: int = Field(default=0, ge=0)
     cached_input_tokens: int = Field(default=0, ge=0)
+    cache_write_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
     telemetry_available: bool = True
 
@@ -388,6 +389,11 @@ class RunUsage(BaseModel):
     @property
     def cached_input_tokens(self) -> int:
         return sum(call.cached_input_tokens for call in self.calls)
+
+    @computed_field
+    @property
+    def cache_write_tokens(self) -> int:
+        return sum(call.cache_write_tokens for call in self.calls)
 
     @computed_field
     @property
@@ -978,7 +984,7 @@ class EnhancementMetadata(BaseModel):
     status: Literal["off", "unavailable", "succeeded", "partial", "failed"] = (
         "off"
     )
-    model: str = "gpt-5.6-luna"
+    model: str = "gpt-6-sol"
     chunks_total: int = Field(default=0, ge=0)
     chunks_enhanced: int = Field(default=0, ge=0)
     warnings: list[str] = Field(default_factory=list)

@@ -152,7 +152,7 @@ def test_runtime_counts_logical_calls_separately_from_retry_attempts() -> None:
             raise _status_error(500)
         return "ok"
 
-    assert runtime.request(request, model="gpt-5.6-luna", stage="inspection") == "ok"
+    assert runtime.request(request, model="gpt-6-sol", stage="inspection") == "ok"
     diagnostics = runtime.diagnostics()
     assert diagnostics.model_calls == 1
     assert diagnostics.http_attempts == 3

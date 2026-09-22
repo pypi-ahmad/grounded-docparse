@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "snapshot": {
-    "id": "content-f9e253cce532",
-    "base_commit": "848313df63fe5fbc50082e255bf9f96d528ff439",
+    "id": "content-0117589c51ef",
+    "base_commit": "6f0ec5ceedd23c7bf6ed1baef232f0e051cc5976",
     "branch": "main",
     "dirty": true
   },
-  "generated_at": "2026-08-15T17:19:04.493519+00:00",
+  "generated_at": "2026-09-22T21:45:09.564934+00:00",
   "category": "runtime-and-operations",
   "files": [
     {
@@ -26,13 +26,13 @@
     },
     {
       "path": "installer/GroundedDocParse.iss",
-      "sha256": "2dec596d7a6df0bc8ee3c0d9b972ba5a17702a0031133e48042c55425ebbe7f4",
-      "size": 3473
+      "sha256": "052d0b728e2fd5d09dc5fd712451fb5d8d7793c78374b93dbcfcd9fd1155ee53",
+      "size": 5261
     },
     {
       "path": "installer/Install-GroundedDocParse.ps1",
-      "sha256": "de5c506d4a1f08599307a03d90719bcf37de063de1401e1f03a9414550edf9fd",
-      "size": 18377
+      "sha256": "0551e049eacdbeb2b98c47590465b02fdef056ad26b01e4952022d6f888083a9",
+      "size": 21662
     },
     {
       "path": "paddle-runtime/pyproject.toml",
@@ -46,48 +46,48 @@
     },
     {
       "path": "scripts/build-installer.ps1",
-      "sha256": "dd83e075b2b9cf931928aa40b4cee9ad2d0ce8bf849ca09bcb46f20e6130e9d0",
-      "size": 2008
+      "sha256": "7395544ecc28e161f5e79e9f0a567eb33008c069a70626fbac4b481d12d2c98c",
+      "size": 3331
     },
     {
       "path": "scripts/build_docs_site.py",
-      "sha256": "4b95450a5f90976327a58cfddc6eab816f42f8e021fc9ff89060c88435cc9a1b",
-      "size": 22216
+      "sha256": "fde0b67da6ae91d6924ba940d45647ff12a6c758f85493940e317f7e407c0bc9",
+      "size": 24395
     },
     {
       "path": "scripts/evaluate_corpus.py",
-      "sha256": "8199e4ad1aa1d251888e72e94f6d9d82507332b1c9ad54934630b1a5d6879aab",
-      "size": 17102
+      "sha256": "fb48cae763613276b7b9597bb6448c9d6ce0950c535d04a50ce3391cce02f85f",
+      "size": 18777
     },
     {
       "path": "scripts/generate_evaluation_corpus.py",
-      "sha256": "6a90c8c432807273eca1c434bb0cbd657f6bba1d1139452f61a7c96a92b952bb",
-      "size": 19739
+      "sha256": "bc9c6b7243e053c23f916f2693027bc1a877fe6d907f9d418ecb6958bd7996e1",
+      "size": 20822
     },
     {
       "path": "scripts/generate_examples.py",
-      "sha256": "c8bcf8927cdfbf946004a89874ef876955a78d03127960fa7589675496661c6e",
-      "size": 2655
+      "sha256": "9a4a6f7770b9a1d3d6f499f6800ef454ae921ccee34f539c949d817febf112fd",
+      "size": 3017
     },
     {
       "path": "scripts/refresh_knowledge_wiki.py",
-      "sha256": "053e464723c5780364c9fd386707d1116e62a8b03839091ab023d9817ec84af9",
-      "size": 12229
+      "sha256": "b1793e712f2b19510ef83e96381ab844e9bfa3c88ead3d39d9c09b61ec4a2d17",
+      "size": 14402
     },
     {
       "path": "scripts/windows/launch-native.ps1",
-      "sha256": "3144e8421ceb604f699a038dd228b3e92e4249d1fe4581d0ef48afb3ab31e6c7",
-      "size": 11742
+      "sha256": "8328b4cf5f43756730811a063a6596d0d77235f787033d0160744ee93c349dab",
+      "size": 17210
     },
     {
       "path": "scripts/wsl/benchmark_glmocr.py",
-      "sha256": "a469ad5510da259ad4ff35e93816f6bbebbd41411de7a1f3c3e2daf56e2aec60",
-      "size": 4190
+      "sha256": "ccd9f78cda2f49de8c7d46a2f59f889069ecae99e6934681a59011f4809ad660",
+      "size": 4685
     },
     {
       "path": "scripts/wsl/check-glmocr-api.py",
-      "sha256": "69ee45c34369ed3371913fbea88e771df914f036ce791037529509921c1971dd",
-      "size": 3142
+      "sha256": "aae39db4850f73f51af58014150b02b2e3d5d7ad093566fb6eb0bf390e8864ae",
+      "size": 3415
     },
     {
       "path": "scripts/wsl/check-installation.sh",
@@ -96,8 +96,8 @@
     },
     {
       "path": "scripts/wsl/check-paddleocr-api.py",
-      "sha256": "c795e5872e2efd8973a34f3b039fa39ead745d22630d8bd204ba9326b482566e",
-      "size": 1328
+      "sha256": "ff9368d5ed66ce6bdf0c4117e3225c67b9476c7d5bab157977f1dcc5cb8f29db",
+      "size": 1531
     },
     {
       "path": "scripts/wsl/manage-ocr-stack.sh",
@@ -106,13 +106,13 @@
     },
     {
       "path": "scripts/wsl/prepare_glmocr_runtime.py",
-      "sha256": "8cff3cf3f509f217b5468b2fef782aaf6683f02475cc90abb78cc331cec881b2",
-      "size": 5581
+      "sha256": "3039e4814477f5841e1fd5d9784d721bf0be7e98bc6914beba9f6cf3b7682b6f",
+      "size": 6528
     },
     {
       "path": "scripts/wsl/prepare_paddleocr_runtime.py",
-      "sha256": "403926e543cd87917e04e2311924ad8ff64fb3574be9efbc013e77c5d77e045c",
-      "size": 5184
+      "sha256": "be80bcc25eff0283db92743a95f6be861df15ea5ace09c9f652a5533f6243080",
+      "size": 7313
     },
     {
       "path": "scripts/wsl/serve-glmocr.sh",

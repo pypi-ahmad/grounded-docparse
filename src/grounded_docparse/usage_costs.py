@@ -24,6 +24,7 @@ class ModelPricing:
     input_per_million: float
     output_per_million: float
     cached_input_per_million: float | None = None
+    cache_write_per_million: float | None = None
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,7 @@ class ModelUsageCost:
     model: str
     input_tokens: int
     cached_input_tokens: int
+    cache_write_tokens: int
     output_tokens: int
     estimated_cost: float
     pricing: ModelPricing
@@ -41,6 +43,7 @@ class UsageCostSummary:
     models: tuple[ModelUsageCost, ...]
     input_tokens: int
     cached_input_tokens: int
+    cache_write_tokens: int
     output_tokens: int
     estimated_cost: float
     unavailable_calls: int
@@ -70,12 +73,36 @@ def pricing_for(model: str, *, pricing_date: date | None = None) -> ModelPricing
     # below regardless of the date passed.
     del pricing_date
     pricing = {
-        CloudModel.GPT_5_6_LUNA.value: ModelPricing(0.20, 1.20, 0.02),
+        CloudModel.GPT_6_SOL.value: ModelPricing(2.00, 10.00, 0.20, 2.50),
         CloudModel.GEMINI_3_5_FLASH_LITE.value: ModelPricing(0.30, 2.50),
         CloudModel.GEMINI_3_7_FLASH.value: ModelPricing(0.75, 3.75),
         CloudModel.AGNES_2_5_FLASH.value: ModelPricing(0.0, 0.0),
     }
     return pricing.get(model, ModelPricing(0.0, 0.0))
+
+
+def estimate_call_cost(call: AgentUsage, pricing: ModelPricing) -> float:
+    """Estimate Standard processing cost, applying Sol's threshold per request."""
+    cached = min(call.cached_input_tokens, call.input_tokens)
+    writes = min(call.cache_write_tokens, call.input_tokens - cached)
+    cached_rate = (
+        pricing.cached_input_per_million
+        if pricing.cached_input_per_million is not None
+        else pricing.input_per_million
+    )
+    write_rate = (
+        pricing.cache_write_per_million
+        if pricing.cache_write_per_million is not None
+        else pricing.input_per_million
+    )
+    long_context = call.model == CloudModel.GPT_6_SOL.value and call.input_tokens > 272_000
+    input_cost = (
+        (call.input_tokens - cached - writes) * pricing.input_per_million
+        + cached * cached_rate
+        + writes * write_rate
+    ) * (2 if long_context else 1)
+    output_cost = call.output_tokens * pricing.output_per_million * (1.5 if long_context else 1)
+    return (input_cost + output_cost) / 1_000_000
 
 
 def summarize_calls(
@@ -95,26 +122,25 @@ def summarize_calls(
         # Clamp to input_tokens: a provider reporting cached tokens greater
         # than its own input token count is treated as untrusted telemetry,
         # not propagated into a nonsensical negative "uncached" cost below.
-        cached_tokens = min(
-            sum(call.cached_input_tokens for call in model_calls), input_tokens
+        cached_tokens = sum(
+            min(call.cached_input_tokens, call.input_tokens) for call in model_calls
+        )
+        cache_write_tokens = sum(
+            min(
+                call.cache_write_tokens,
+                call.input_tokens - min(call.cached_input_tokens, call.input_tokens),
+            )
+            for call in model_calls
         )
         output_tokens = sum(call.output_tokens for call in model_calls)
         pricing = pricing_for(model, pricing_date=pricing_date)
-        cached_rate = (
-            pricing.cached_input_per_million
-            if pricing.cached_input_per_million is not None
-            else pricing.input_per_million
-        )
-        cost = (
-            (input_tokens - cached_tokens) * pricing.input_per_million
-            + cached_tokens * cached_rate
-            + output_tokens * pricing.output_per_million
-        ) / 1_000_000
+        cost = sum(estimate_call_cost(call, pricing) for call in model_calls)
         rows.append(
             ModelUsageCost(
                 model=model,
                 input_tokens=input_tokens,
                 cached_input_tokens=cached_tokens,
+                cache_write_tokens=cache_write_tokens,
                 output_tokens=output_tokens,
                 estimated_cost=cost,
                 pricing=pricing,
@@ -124,6 +150,7 @@ def summarize_calls(
         models=tuple(rows),
         input_tokens=sum(row.input_tokens for row in rows),
         cached_input_tokens=sum(row.cached_input_tokens for row in rows),
+        cache_write_tokens=sum(row.cache_write_tokens for row in rows),
         output_tokens=sum(row.output_tokens for row in rows),
         estimated_cost=sum(row.estimated_cost for row in rows),
         unavailable_calls=unavailable_calls,

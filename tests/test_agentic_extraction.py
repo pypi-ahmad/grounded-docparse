@@ -155,7 +155,7 @@ class ExtractionGateway:
         self.usage.calls.append(
             AgentUsage(
                 agent="schema_architect",
-                model="gpt-5.6-luna",
+                model="gpt-6-sol",
                 input_tokens=10,
                 output_tokens=5,
             )
@@ -168,7 +168,7 @@ class ExtractionGateway:
         self.usage.calls.append(
             AgentUsage(
                 agent="extraction_critic" if repair else "extractor",
-                model="gpt-5.6-luna",
+                model="gpt-6-sol",
                 input_tokens=20,
                 output_tokens=8,
             )

@@ -67,11 +67,11 @@ A poor source can still be processed, but missing or unreadable content cannot a
 
 First choose a compatible processing type for every file. Native PDFs use `pdf-inspector`; scanned PDFs and images use the selected OCR engine; Word, PowerPoint, Excel, CSV, and other native formats use Docling without OCR. For Mixed PDF, review the suggested Native/OCR route for every page and confirm the full table before parsing. Mismatched selections are blocked and never silently rerouted.
 
-For a comprehensive first parse, use **Full** ADE mode. It produces refined Markdown, document classification, and a table of contents in addition to the core parse; it does not run schema extraction. **Fast** mode is useful when speed matters and the document pattern is already familiar. **Custom** mode allows the optional features to be selected individually.
+Use **Full** ADE mode for the first pass. It produces refined Markdown, document classification, and a table of contents alongside the core parse; it does not run schema extraction. Use **Fast** when speed matters and the document pattern is familiar. **Custom** lets you select optional features individually.
 
 For scanned, faxed, blurred, or irregular documents, optionally enable **AI enhancement for failed or <75% confidence regions**. The app first relies on the selected grounded engine. The selected AI model is used only for failed or low-confidence existing regions; clean, high-confidence content is left untouched, and enhancement cannot create a detector region that does not exist.
 
-Visual recovery is not a second full-document OCR pass. It is a limited repair step for difficult regions.
+Visual recovery repairs selected difficult regions. It does not run a second full-document OCR pass.
 
 AI enhancement and field extraction are separate choices. Turning enhancement off does not turn extraction off; extraction then uses the selected engine result without remote image repair. A configured AI provider is still required for AI extraction.
 
@@ -137,7 +137,7 @@ Treat the saved schema as a business template. When requirements change, use a c
 
 Open **Extract**, select or load the schema, and choose **Run extraction**. If the approved field dictionary uses multiple schemas, complete and download each schema result separately.
 
-The app reviews the parsed representation for every requested field. OCR extraction associates values with existing document regions; native extraction uses immutable `base_text` and accepts only exact character intervals that resolve through source spans to source anchors. The result is not just a list of values; it is a list of values with review information and direct source evidence where available.
+The app reviews the parsed representation for every requested field. OCR extraction associates values with existing document regions; native extraction uses immutable `base_text` and accepts only exact character intervals that resolve through source spans to source anchors. Results include review information and direct source evidence where available.
 
 The fields may come from different pages, tables, headers, footers, or form sections. The user does not need to process each page separately.
 

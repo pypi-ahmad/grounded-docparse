@@ -25,12 +25,12 @@ APP_ROOT = Path(__file__).resolve().parents[2]
 # silently shadowed by a stray .env file in the repo.
 load_dotenv(APP_ROOT / ".env", override=False)
 
-LUNA_MODEL = "gpt-5.6-luna"
-LUNA_REASONING_EFFORT = "medium"
+OPENAI_MODEL = "gpt-6-sol"
+OPENAI_REASONING_EFFORT = "medium"
 
 
 class CloudModel(StrEnum):
-    GPT_5_6_LUNA = "gpt-5.6-luna"
+    GPT_6_SOL = OPENAI_MODEL
     GEMINI_3_5_FLASH_LITE = "gemini-3.5-flash-lite"
     GEMINI_3_7_FLASH = "gemini-3.7-flash"
     AGNES_2_5_FLASH = "agnes-2.5-flash"
@@ -38,7 +38,7 @@ class CloudModel(StrEnum):
     @property
     def label(self) -> str:
         return {
-            self.GPT_5_6_LUNA: "GPT 5.6 Luna",
+            self.GPT_6_SOL: "GPT 6 Sol",
             self.GEMINI_3_5_FLASH_LITE: "Gemini 3.5 Flash Lite",
             self.GEMINI_3_7_FLASH: "Gemini Flash 3.7",
             self.AGNES_2_5_FLASH: "Agnes 2.5 Flash",
@@ -46,11 +46,11 @@ class CloudModel(StrEnum):
 
     @property
     def reasoning_effort(self) -> str:
-        return "minimal" if self is self.GEMINI_3_5_FLASH_LITE else "medium"
+        return "minimal" if self is self.GEMINI_3_5_FLASH_LITE else OPENAI_REASONING_EFFORT
 
     @property
     def api_key_name(self) -> str:
-        if self is self.GPT_5_6_LUNA:
+        if self is self.GPT_6_SOL:
             return "OPENAI_API_KEY"
         if self is self.AGNES_2_5_FLASH:
             return "AGNES_API_KEY"
@@ -259,7 +259,7 @@ class AnalysisThresholds:
 @dataclass(frozen=True, slots=True)
 class ParserConfig:
     ocr_engine: OcrEngine = OcrEngine.GLM_OCR
-    cloud_model: CloudModel = CloudModel.GPT_5_6_LUNA
+    cloud_model: CloudModel = CloudModel.GPT_6_SOL
     render_dpi: int = 200
     crop_dpi: int = 450
     crop_padding: float = 0.1
