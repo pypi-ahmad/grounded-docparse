@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:4f7445f7255330782bee257544f3f8db0fb71773891353316c4a6cd75d02b456",
+  "claims": [
+    {
+      "id": "claim_97712e4d440a45a5ad480413b8f8cebd",
+      "statement": "When local OCR analysis is absent, DocumentParser drafts page regions through the selected gateway and raises if a nonblank page returns no regions; the focused test verifies this route skips local OCR.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/pipeline.py#L1927-L1980",
+          "version": "repo-lines-v1:sha256:b9a2c3d145d9998f6460d94e0003b22d66b65c8a306e10ef8ce96e08e421a74a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZiMmJhZTc2OWE3NmQxMGI0YzRiMWU0YzllY2M0ODIyMTAyMzgyMTliZmMxMWRkZjY0ZWNkYWVkMjhmMjYyZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5Y2U4NDUxMzIxZjk4MjZmNWQ2OTczZTQ1OTA4ZTc2ZDczNjk0N2M1MTU5NTc0ZGMwMmIyZjZmMTdmNTUyMjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViYTRlMzgzODZlNmZjMzBiMmJiNDBmZWI4ZmJjMTQzMTQ2MTk5MTJmNjU0OTAxZTEwNWQ1NzRiNTJiZmE5N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzNWNiNDE5YWZmMTBkYjE0NTY0ZmUwNWIyZDVkNWI0NDY0MjFhZjU2MDZlZDcyZTM2Mzk1MmE0Y2NlNmZjNTIifQ"
+        },
+        {
+          "resource": "repo://tests/test_simple_pipeline.py#L123-L149",
+          "version": "repo-lines-v1:sha256:ce7672c356b7017220c6369744ededd2001073ef6c06e028a982d07ff9be2177:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhYTMxMjNhZDgzOGNiNTU1OGM4MDNiZDVjMTQ2ODJmZTg0NjliNDIyMzQzNzEwOGQ4ODE4MmQ1NThlNjMxMzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkOWY2ZDAxYTdlYTA1ZWE2OWUyMmIxZWU3OWQ4MmZmNjMxNWI4ZTkxZDEzMGNlODgwMTczMTEwMDM1Njc0OTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY1NGMxMmE1NTA0Y2U1YjcxZmE3NDY4MDMzZjVlZWUxMjljYWU4ZmU0MmUzYTAxMjg4YzE3MzY2N2RjNjI2MTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3YmQyMjNjZmExZGEyMWQ1NTcwNmYyNDU5NDRhYTZjNDIxYjhlOGExZWQ5ZWI3NGIxMDkzNTAzZTE5NjE4YTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2c622d70b29c46e2a0d049d441820a96",
+      "statement": "DocumentAgent analyzes classification using the first two pages and builds the table of contents across prepared contexts; failures are recorded per feature and a TOC failure falls back to detected headings.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/agentic.py#L419-L529",
+          "version": "repo-lines-v1:sha256:b25cf89b895146e2f1bff4203405c35364712a293fa8f45c8a026f4c155c144a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTExLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2NDcxZWM4ZDU3ZWJmNzY3OGNiMTcyYmVjZjc2YmUzYWFmMjRjNmUzYmU5MzcyMjhmN2Q1NDUzMzBlNDM0YWZlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhZjU3YzQ3ZDk4NDhkOTkwMDE2NmNiMjY3YTA2NDRiNmZjNzczMGI4OGI0MGIxYzI5YjI2Yzk4MDNhOWJhNDc5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjODM3ODViNzdkYjI3ZjdmMzcwZWM0NjBhYWY5MWYwOTQxM2UxNTE1YzljM2RmMzdiMmUzY2UzZjkyYjAzMDkwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MWMwODZlNmMxODJjMjhmZWExYzIxYjQxNzgyM2I4Mjk1MjI1MzM5NTI5MTM0ZTg1MzQ2YzdhOTM1Y2Y0NTNmIn0"
+        },
+        {
+          "resource": "repo://tests/test_agentic_features.py#L178-L200",
+          "version": "repo-lines-v1:sha256:5269020749d139c3cc5aed78de9c158e1a1629343e59581a4565cd189775a415:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjYTQ3MjIwM2YxZTYzMzVjNmU5NTk3MDM3YmJiOGUxZTYxMzRkMTU5NTg2NjRjNGExMTM4NGFiNTk4MjU0YTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzYmY1ZTM0MWU3YTMyMjQyZTZkZmFiOGVhODg2ZDMxNGE1YzIyOGQ3MGFlZjBhYmE1MTdhYjYzYWUxYzU3MWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzNDUxZTljMmU5NjlhM2Q1YjMyMzFiODUyZDZlMWUzZWY5OGJlNDllM2QwNjE2MGEwYTJhODgxMDAyYTE2NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0f4c03c1e43c4e9c8ae56d006e062339",
+      "statement": "Routed form extraction checks that reviewed segments cover every page, are approved, and match the current profile schema mapping before extracting eligible segments; per-segment extraction errors are recorded and isolated.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/agentic.py#L129-L157",
+          "version": "repo-lines-v1:sha256:6b2e055e850af196a612e8d2eddc1c9e8662fa65d86c4b54981819eac0f2f9e3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlOTIzODMxZWNjNTlkZGYxZjg1MTM4ZjE4ZDU5MTQ3NzQxMDUzYzk0Y2Q4ODQwYjBlYTNiODExOTdhNThiYWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkYTg4NmUwN2JiOGNmOTNlOTU4MGY4M2I5Y2Q0ZWEyMzkwZWM3ZmExZTJhNGJiYzIwMTJjMGRjZGNkYWFjMjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyYWUxMmQ1ZmFhNWRhZWMwZjM2ZGJkYjliMWI5Mjc1OGRlY2VhYTdkZjgwOWZhMTg3MThjMzAxOGQ5ZThjMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzMGQ0M2IzYzk0OTRkMzI4ZGQ4YmI3YWY3Nzc0ODQxZWVkMDIxOGJiMWNiZmY1Zjk2NTM2MmY1ZWIxM2I0NmMifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/agentic.py#L699-L757",
+          "version": "repo-lines-v1:sha256:7f5718875330b1003d3f29a05861dc2541f6cd7b0359688fbf51c3230bcd6357:eyJzZWxlY3RlZExpbmVDb3VudCI6NTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2Nzc0MzJhNTgxYzc2MTkwOWI5YTU0YWMwNzNlMDA3MmU5ZDk5ZmM0MDViZDM2ZGEwM2NjMmIyNGZlZTdjMTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNzYwZjQ5MThiMjhhNjUxZjkwMTcxYjk4NDEwMTgzZDIyYTExMzg0MzVjMzlkZDMyYzQwNjQzNmJkNjY5MWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmZjNlZGE0Nzg0MDU5YWRmODNlZDQ2YjY2NTQ1NTEzYTU5NmM1YzNlNzA3ZjVkYjMxOTVlYTEzMzM4NThkMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmYWVlYmY4OWI3NjUyZTY0MzBlMjdkNmVlNjQ1YWJkYzRkMTQyYmE0NWU5YjQwZWIwOTI1YWVlMjBlZmRlNTgifQ"
+        },
+        {
+          "resource": "repo://tests/test_form_routing.py#L206-L257",
+          "version": "repo-lines-v1:sha256:3a978e8486e6eb34081faf90de7f7e6e4f9e9a36f03926e5e2f62d327cdc8f64:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmNmQ0YmQ4YTRhYzE5MjQ3MTIxOGViMmUyNDNhNTM3MzQ0ZmYwNzg1Y2FhN2NkNDQ0MzNlZDk2NTQzMGJjYTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0MTlhNmRjYzA0ZTIxM2EzYzdhNzdhNDU2YjAxZTc2ZDFlZjc4Y2QwMGJiZWMxZDhmODE0NThmZTkzZWRjNTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzMjJhOTQ4NjVhNmU3ZmI5OWM4MzhhZmFjODg3Mjk1NzQxNTJjODNhYTk2N2E4OWFmYjA3ZDM5M2ZlM2JlNjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3ZjJlNTM5ZmQ5MDlmYTQ2YmIwZTJmMGU1ZDNiNDhjZTJmMTkxYmRkZTg0YjkwMDg2ZThmYjc2ZjIzOTczZjkifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:c73909b30d73edc34acab2881e88bf53e312d53187aa0e04b2b1884c8e854626",
+  "claims": [
+    {
+      "id": "claim_b5f37895ffee44cfac9ed5acfca055a3",
+      "statement": "Native extraction accepts a candidate only after validating its class, interval bounds, exact substring match, source-span coverage, and schema-coerced value; rejected candidates produce warnings.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/native_extraction.py#L361-L428",
+          "version": "repo-lines-v1:sha256:c7ed2c9957f579f7b4541aa246d6142b1f08456df6433740bedb79314bd04ecc:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyYjAxM2Q4OWUyMDRmOTg3NGY0OGFkNGFjMWY0ZmNlYmM2NzNmNWU4NTM3NjY2OGUyODU2MzYzMzNmYjdhZGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwMjU2MGYxZDdhNGVmZDUwODg4Yjg2MjhkNGFlMjFkNGU0NWVkNWZhOTIxMTYyMzU1MzViZGNlZmY0YjNlMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkNmQ0MWJmMDA5ZjJiYjU2ZGNmODMwY2VmZWU4ZmVjMjc2MDBkZWVlOTIzMWJiZWEwNTgyZDBmZDExYjVjZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1YTgzYjQ0MDQ2NTdlYTY0YWE1ODA4ZTYxMzU2ZmU4YjExMzBkMGI2MjE0YWUxOTEzYjRiZmU3OGZjZmIxYTAifQ"
+        },
+        {
+          "resource": "repo://tests/test_native_extraction.py#L92-L177",
+          "version": "repo-lines-v1:sha256:bc2b4fbf8d503a7db4b4094c81676b97fe16e692bf2e275f7b4148fbbc60eb4c:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4YjY1ZTlhMTJhYjYxZjY0NmYzMzg2OTBkNzVkNGYzNDQxNGIzZWE0NDRjMDcyODgyOTY1NGZkZTFmMjRlYWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiOTc0ZGE0MDg2MzJhNGFhN2UyYWU4MGI4NjAzOTFhM2RjZDgyMTFjNzllY2FkN2NhOGU5NTEyOGIwMDE4MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwNjI0NjYwMTM1NTY1NDM0ZDVjZWQxMDRjMGJjNjQyZmJmYmQwOTUzZGYwYTE2YzJkNTA5MjY2NGIyNzNkZWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e4ce554fd3fd4ba5bb83022096a4b748",
+      "statement": "DocumentAgent.chat removes provider citations that do not resolve to parsed element IDs and lowers confidence to low when no valid citation remains.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/agentic.py#L1055-L1080",
+          "version": "repo-lines-v1:sha256:2c20e2927b730fb2f11e90b23f8078793a0b0ae0ebe6c9c2d0ed4d1edfa97fe8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyZjZjMDcwYzhkYjFhNWU4YjNmMzgzZGNmMWMwOWM5YzlmMjRkMGFhZThhNTcxZjNhODQ4MzM4YzExMzU4MWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmNTdjNDdkOTg0OGQ5OTAwMTY2Y2IyNjdhMDY0NGI2ZmM3NzMwYjg4YjQwYjFjMjliMjZjOTgwM2E5YmE0NzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmN2FhY2RkOTU4OTZhZWRlMmE2M2E5YWUyZDk2ZmYwMGMzMTNkY2MwMzNlNWViMGU2MjFmMDQ2MjQzMmY3YTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhOWY4YzJiYzdhMTQxYTAyMmFmM2ZlYjhhYjUwMDhlYzI1NzU3ZWYyNGFjZDA0OWY1MDg5YTc0YjdjOWFlODEifQ"
+        },
+        {
+          "resource": "repo://tests/test_agentic_features.py#L202-L218",
+          "version": "repo-lines-v1:sha256:cc70ffdfd39b152e1da38fddb773264861fee0643f6ebed92fd6135c8599891b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjMWYwZjc5NzBiN2IzNDRhNjA0MDZhNWE3ZDBkODVhODYxODBjODVjNWM3ZjU1ZjhkYmY4NDc0NGI2YWFlZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkZDZlMjExY2YyODQ0ZjhiYjg4NWFlZDYzYjUyZGQzYzUxNGNlZmU4YjJlZTY3MzRhOTJmYWNkYmQ4YTI0ZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1NTIyZjMxOWMwYjY3ZTIxYjdlZjBjYzFmNzMwMGQ0ZjkyNTRlMzE1NzBiMjk4NzA3N2MxOWViNzYxZTExOGQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

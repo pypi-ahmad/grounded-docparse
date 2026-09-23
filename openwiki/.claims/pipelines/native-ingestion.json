@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1bde5eddf25d2cbd31f10a79b4a5f9961fc1c5680f7d00a88e27a9e86c313719",
+  "claims": [
+    {
+      "id": "claim_b3b3570411b74e29b3f8402a3faf94d2",
+      "statement": "PdfInspectorParser fails when a selected native PDF page is marked as needing OCR; mixed PDFs follow explicit per-page routes and merge native and OCR pages in source order.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/native_parsers.py#L272-L345",
+          "version": "repo-lines-v1:sha256:eee4f218dea84b092475bf6d043dfe89ecff39dbc1bba4963e914eb4407c19f9:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkZWM0YjIwOTZhMjcyYmZiZmE5NGE5NTFiNjlmMGI4MzIwZjRhODllN2YyYjcxNjA1NmY3OWFiZTA4NjJjZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3YjlmZDM4ODQ5ZTA1ZDBiOWNhNzcwZjJkMjlhNWE2Mzc5MjMxNzkxMGJkZDdhMWQ1ZTExODMwY2E2Njg5NzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkZDhiODUzOGY1ZTkzNGQ1ODNkYmM2YzA4NzU5YjVhNDViYWU0YzE3OTUyNzYxMDM0NGQ2NzNmOGY0NmVmOGMifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/native_parsers.py#L83-L182",
+          "version": "repo-lines-v1:sha256:1a764175e629c690fdc80a76d07d2d5e952b7caa3ab2665451dd3677f45aadb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmZDU5YjVjMzM1Yjg2ZGMzY2U3NTNhMGZhNjE2OTFjMTk4MDE0YWFjMDcwZmU1NjA3MWQzOTRmZTYyODM1OGEwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2ZDAwMDc4NzVkZThmOTJkOTJiNzg3YTAxOGMxNmMwMDA0MThiZDVmOTQ5OTIzYjkwZjRkNjNjN2VjMTZkODNhIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1NTA3ODJjYzlkYTEwZjBkOWE1MzI4ODdjNDFmZTE5YjRmMzNlNDM2YTUwM2M3YjMzZDQ5NTQ3MWU5M2VkOWE0IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2OTMzY2YxZjViZWIzZTRkOWE4MjIwODFlNjBhOThlMmUwMWJjZDY1OWMwYjI3YjQ0YWQ3NzQwNmQ3ZjE0ZTA3In0"
+        },
+        {
+          "resource": "repo://tests/test_native_pdf_parser.py#L104-L197",
+          "version": "repo-lines-v1:sha256:1f9db10e18f1360e523b844301ebfd72c42c832b42729772445c63fe19000cd5:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NGE1ZjAzNjg0MWRiYzc3ZTIwZDRlNjFmZTVlMWZlMWJiNTE1MTIyYjQxZGUwZTMzMjhhODY4MmU4NzRlMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0NmNmODI3MWY0OTMxYTY2ZWQ3MWI4YWUyNTQ0MmY2MTBhN2Q1NTU1YzRlYjUwMzRjZWEwZWE5MmVmNWE3ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2YWQyMzM1ZDM5NGEwMTE2NjAyYjcyMGNiNzJjNDdmN2NiNDk5YTM3MzM0MzMzMmEwNGU4OTRjMDE3MjkxMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMxMTQ5ODk4YzY4MzMwZGM1Y2ZlMTI4MjlmNmNiNGEyZjNlZmI0ZjEwNTI2MTVjZGM5NWQ0ZGViM2QyMTU0MmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f27f2f4a3209497c88aac96c411a1a6d",
+      "statement": "DoclingNativeParser builds a source manifest, converts with the project's OCR-disabled native converter, and raises when converted content cannot be claimed against the manifest.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/docling_native.py#L693-L732",
+          "version": "repo-lines-v1:sha256:eeb8141a14c3f0c9e28c609c2d10c4ad4d36f9100c6ce3171230aa38abea2a58:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMWQ2YzY1NDMyMzM0MmVlMmMyMWMzMjdmZWVhZjc0MjdjY2ZmZjBmZTk4Nzg4ZTg5YzNhYWYwNThlYTQ5NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNzliMjY0OWM1N2NkNzNiYjQ4Y2VmODA2N2QzNGI2ZTA1NWViYjUyMjc4ODU0ZmQyOGVlODZlZWU4NzNlOGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5MTA4NmQ1OTljNWRiMzMzMzc0YTIyNzIyZGUwNGVjOWMwZjJkODJhNWY5Y2I0ZDkyNGQzYTVlZjc5YjhjYzkifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/native_parsers.py#L347-L355",
+          "version": "repo-lines-v1:sha256:2d8eb138a42e8e45481816a25be0ef7c175c852b469e0a481e03982a3a775b8b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmIzZTM5ZDM1MzBlN2E0YjBiZjQ3ZDk4NTcwZTcxNzkwNmExZGU5MjM2NDg5ZWI0NWVjNjA4NzhlY2M1NjVkMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOWY4NzNlOGVkMDU3ZGJmYzlkYmRlMDc1YjVlNDcyZTk1YTcyMzNmYmM4MGJjNjg0Mjc5MmEyZDIxYmJmY2ZmYSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjZhZDIzMzVkMzk0YTAxMTY2MDJiNzIwY2I3MmM0N2Y3Y2I0OTlhMzczMzQzMzMyYTA0ZTg5NGMwMTcyOTEyYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTk0NmFhZGVlNzFmYmEyN2RkZDdkMmE2ZGU5ZTljM2NlNjQzMGQxMDI2MzY4YTU1M2FjNmM5OTIxYzc1MWVjMyJ9"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/native_parsers.py#L426-L488",
+          "version": "repo-lines-v1:sha256:aba0d77d1444c2fe26f8bcf002001269d337f3afbcee8e9cddf4c2f184595b7a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxOTVjNmNhODIyZmVhNWI3YjdlOWZiMmJhYWZhYjZlOTVmMjRhZmY3OWVhOGUzM2E0OGE3YzJmM2NjN2YyYjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MjM0MGRkYjJhYmM2Y2IwNjQwYWI0ODhiYjUxMmE3NDFkNzMwNjI3MDE0OTVjN2EwYTQ1ZWNhZTNkNzk4NjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVkZTU4NDhjNzRlYzZmZDhmZjBmZWI0ZGEzNDkzZGNmZjk4ZGExYmMxNmFkN2U1ZjhlYjg3MTVjOWEyZjMyOTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjZTA4ZDlkZDBlMmQ0YWNlZjc5MTdkYjg2MjI5MjYwMDg4YjkzOGEzZDU2OTRiMGY2ZDM3MmFlNTcyN2MxN2MifQ"
+        },
+        {
+          "resource": "repo://tests/test_docling_native_parser.py#L133-L171",
+          "version": "repo-lines-v1:sha256:c674afdc735ecae71cac4c376e379d4b103fdd7fd46d5ca565beb65ce0fa253d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkZDFjZTM1ZjYxYmZhMzA5YTBiMWEyYjNkNDQ1MTMyZjdkODkzMzMwZjYzNWI3NzJlNzM1YzJkMzgzYTYzNDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3MGEwNTg3ODQ3NGZhNjdiZmYxMTY4NTI4YWU5YzY4ZmE5OWY1MDc3YWYwODMyNjNhZWU5ZmVjOGFkYmIwZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhZWI2ZmI3MDUxNGI1YWI4Njc3NDQ3YjkwNGE1MzhmNjQyYTQ4NTQ1ZTUwOTMyNjY4YjMwMWVkZTI3ODdiMTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjMmUzZWRmZGM5M2Y2YTdjNDA0OWE3M2I4MzRkYjEzNjBmOTlkZTAwYzVhZDljNGI2NjBhZDFmMmUyNGM2MjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7bb5876989894630937f013cd78f7933",
+      "statement": "CSV row ranges are sliced before conversion, then CSV anchors are rewritten to the original file's row numbers.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/native_parsers.py#L379-L402",
+          "version": "repo-lines-v1:sha256:6815e9f61094637213d5ac5ee9c8a9d701e6301854af5a74e798726c4a6d84a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMjU0N2I4NjMxNTI1YmM3MDZjMDNjOWIwMTIyOGMzOThhNzk1ZmIwYTkwYTU0YjJkMTRjNDcyM2Q2YWU0MjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMTdlMWM4Y2VkNjE2MDNmYjA5YmFkYzcyNjMzZWQxMzVmNWE4YzllOTE4MDc5YzYzM2Y4MjY1NTc1MWVjMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4OWM0ZDJhNjdmYmFkYTFjMTJiYWNmYzM4ZWM4ZjE3ZmE2NTIwM2NmMjBmODcwNGEzNzkwODI5MDA1OTIzMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxMzA5NWJkMzY3NDliMGQ0ZTA2YzJlMjA3MzJmYmE2ZWM0ZWJmM2NhODFkNjdiNDdmNjZmNjhhMGU3YThmZjgifQ"
+        },
+        {
+          "resource": "repo://tests/test_content_range.py#L19-L65",
+          "version": "repo-lines-v1:sha256:dcd3a56452d08dbcbf5d0291d3fa7d1fde8eb605cdddc0ded8ede3b851f04061:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkZjk3NDU5YWVkYzYxMTBmNmI2MDg5ZDBlMDJlOWJmZTdjMDc2NjVhN2U3NjQzMzk5MTdkNDYwMzE4MDUzMzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2YThiMGI1MTNiM2FmZjEwZjlhOTM1MmM0ZWNhMGRkNjNmM2RkZWU3Yjg5ZDE4MzhkYTg3MmUxY2ZmMjlhMWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiN2UyOTU5MTA2YWJiMzIzMzJhOGU3MzBhN2E0NDk3YWY0NWUyM2QwYTQ4OTMxODE1MjZjMjUwOTZlZDYzNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjZWM3ODg1Yjc1NzZkZDZkZTQ2OTljMTAxYjgwYWI2YzMyZjhhMTk2MjUzNjQwZTUxOTE5YmFjNGYxNjM1NTUifQ"
+        },
+        {
+          "resource": "repo://tests/test_docling_native_parser.py#L234-L249",
+          "version": "repo-lines-v1:sha256:bda4804ac39178298d060a2f0c150ffbb6e69fc54167171f5b3455158f2d4745:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYjE1OGI3MmRmOTNkZDU1OTE4Yjc2YzA0OWQ0NzdkNjI4NGM2MDk4MzAwMWQxMWZmMjg4ZGUyYWZlOGM0MjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhNDc2YzNiMjgxYWRjYTUyNDJlZTQ3YjAwYTJhYWM0M2M1Y2Q0N2FkMzgwZTBjZDViZWZlYWM4MWQyMGVkMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2NjY5YmM2NmQ2NDc2Mjc1MGEzMjQzYzQ3ZDMyNjJmNWI3NmE0OTI3NGUzMTUxM2IzMzZhMzVhOGU2YzFhMTMifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

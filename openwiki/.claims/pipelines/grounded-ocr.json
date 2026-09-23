@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:931ff3ce8f702e50c12052d1ac18930980b90687b6b0d8818c1bcff6e623ba84",
+  "claims": [
+    {
+      "id": "claim_73d05dbfccfa44af909256f1eaf17ecc",
+      "statement": "GroundedOcrRuntime retains each detector region's index, box, and confidence; a region recognition exception marks that region failed and continues unless fail_fast is set, while a page-level exception yields an OcrPageResult error.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/grounded_ocr.py#L346-L503",
+          "version": "repo-lines-v1:sha256:f090c3613d04c5654ed738e4ae8a6c71cc03004a3d6ab5f763786f6f838a8329:eyJzZWxlY3RlZExpbmVDb3VudCI6MTU4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjMWM3NDVmNWI5YmY0OWQ2NWU0YmMwNTYyYjhhYzJkNWQ2ODNmNjU0NWJhNTY0ZGU0YWJjNTZmODAyZjI3ZTUzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjZGE4N2JjZDM1Mzk2ZGY0YTgxZTc0NjZmZjEyMDhiNWI5MmU1ZGRkM2M5YzljMzYyZTgzY2E3NmMyYWIwZjRkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyMzhkMzI5YThiMGQ1YTcwMjVmNmE4MzBiMDZiYWE3MjQ3NGJjNGJiZDkyOWU2MzEwNGE5OTUxMDAwOTk0ZjVkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwY2JjYWFiM2I4MTY1YjJiYTJiOGE3ZDdjZDc2ZWRjZTJhZDViZDAyNjM4Mjc5ODBkNTNmNWY0M2IyNWRmYzMwIn0"
+        },
+        {
+          "resource": "repo://tests/test_grounded_ocr.py#L46-L63",
+          "version": "repo-lines-v1:sha256:03434d32a85513a3df30f3185839c13913c20393ef563056071a32841c6490eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjZmOTdjM2VmM2U1ZmQ5NjlkN2FkZmRjZDI3YzE1NTE1MjcyMjNjYTc4OWZjZTBjZDQyOWI3MWFjYmRhYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzZjhkNjAzN2MzYzQzYzE1ZDI1YzIwN2NmMmY2YzU4NTEzMjQ4MWE2OTU0NjQwYTI2NjI0MTJmYjdlNDAxMjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNWMzZWM5MmU0NWY0M2I4ZmRlYzljYWMzNjY1MWIzNzhkMjliMmI0OTk2MzU5ZmIxMmM4YWU1YzFlODljZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwZjVkMWEyMjg0OTM5MmJkOWUxNjYwYjMzOTBhNzg5YjMxZTZlYjE0NjEzMDFmMTMwNzQ4ZmY4YjEyMDU5MmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_328bfb8e15f647a3b43171ad54083553",
+      "statement": "DocumentParser raises when local OCR returns no usable regions for every nonblank page rather than returning an empty successful parse.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/pipeline.py#L2925-L2958",
+          "version": "repo-lines-v1:sha256:1f540417ff8776ef99f4be7f7282b715c6d294f303226863e484216ec22a6e46:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5NzRlMWI1ODliNzQwNjQ2MjU4MGM1MTMxMmQ5Nzg3ZWYyNzc4NTEwYTBkMzMxZjAyMDU0ZmFlYmMzNjUxOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMTdlMWM4Y2VkNjE2MDNmYjA5YmFkYzcyNjMzZWQxMzVmNWE4YzllOTE4MDc5YzYzM2Y4MjY1NTc1MWVjMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljODY2YTg3MTdiNmM0NGMyZWNiNjU5OGNhZTM5ZGZlNTA3ZTQ4NGNhZTMzNDM5ZGFlMjcwYTk2ZDE3MTgzNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2ZmVmODdmMjYwYmFjNWIxY2ZhODllMGVlMTI2MjMxNWRkZTcwMGNiMzM5ZWMwODQ1Y2IyMWU1NDgxZWU5NDEifQ"
+        },
+        {
+          "resource": "repo://tests/test_strict_recovery_contract.py#L178-L211",
+          "version": "repo-lines-v1:sha256:7f719883b4f845d89292bfcb698e1507c665e083f9b75ff06c7d4ba72a6325d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwYTNjNThkMTY3OTlkZTQxM2E1NzUwMjAwM2MxNjhhOGNkZWMxOWM2OTRhMWFjOGNlYjViMzkyZTllOWJiZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWY4YzJiYzdhMTQxYTAyMmFmM2ZlYjhhYjUwMDhlYzI1NzU3ZWYyNGFjZDA0OWY1MDg5YTc0YjdjOWFlODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5N2I2YTJjZmNhNDViMGMyYzU2ZjNmYmQ2MzE0YWQyMmNjYzVlMDBjZTE2NTQ4Mjc4ZTNkNmUzMGM3OWNmMjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczZDU1YWY3NTgwOWI4OWQxYjUwOTg1MGY3YzEyYmM4MDllNTRlYTQwMmYwYWIyNTdkZDczMDE3NGM0ZWE3MzAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0a11b060fc4f4b5f9a9f616270a38986",
+      "statement": "The visual-recovery tests verify that corrections preserve the primary region's type, reading order, and geometry, and that rejected or low-confidence corrections leave primary text visible for review.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/pipeline.py#L657-L716",
+          "version": "repo-lines-v1:sha256:cec8dd9a92abbc2687d2f8a60dfea70433d208a3151b026c58051113e8ae410a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczNzJlYTE5MTBiZjYzNzQ1N2Q2MTZhZjhhN2RkMDBhZjgyMzMyMWQ5OTljMzg0OTYxMjUxYWUyNTdjN2MxNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiOTc0ZGE0MDg2MzJhNGFhN2UyYWU4MGI4NjAzOTFhM2RjZDgyMTFjNzllY2FkN2NhOGU5NTEyOGIwMDE4MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2YWQ3NjYyZDA1ODAzZWZmMjM2OGRmNzY3YjJjOGE3YmNhOGUxMDBhZTI4NjEyMmRhMDY0YzVhYTMyYjk0NDEifQ"
+        },
+        {
+          "resource": "repo://tests/test_strict_recovery_contract.py#L115-L175",
+          "version": "repo-lines-v1:sha256:50eb72a5b7adfaea2afbe234ec7fce67c28baee3602482f2bc28556e5a97cac5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5ODcwOTY2ZjFhNWYzNzM1YWRiYWM3OTY5ZWRiMGE0Y2M3MThiOGE2YjQzZmI1ODhkNDRiZTMwODgwM2RmYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwZmM3ZDVhZTg1N2IxOTg5NmFhMTU4YzFmZGM2ZWRmMDJkMjAxOWViNTY3MDMxYWM0YjU5OGJlMjRjMmM5MWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlmNjM3ZDE2YjYzMDgxMjBhM2M1YmEzZjdmN2QwNTg3YWViZjBmOGIwZDY1MzM2ZjFjZWE2ZDc2MTBiOTdiOTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhNjEwZWI2OTU3MTJkNmRlNzExNDJlZGJlOWYyZjdiOWVkODVjYTQ5NWEwM2Q4NTA1MGQ5ZGNjOTc4Y2VmMWEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

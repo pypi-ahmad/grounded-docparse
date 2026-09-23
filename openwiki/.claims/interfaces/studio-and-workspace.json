@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:d431a224f75865095f32217e391286a9ed5e8455230eff80bd3acde74e5f6c4d",
+  "claims": [
+    {
+      "id": "claim_a7d70e76754b42b7a641820499c04d76",
+      "statement": "WorkspaceStore stores workspace and document records in SQLite and keeps source and parse artifacts in per-document directories under its database directory.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/workspace_store.py#L193-L266",
+          "version": "repo-lines-v1:sha256:753586405bf6239e252c5b72afb9cc9b3cbef95cfe31286e222761be6db6f971:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiYjcxMTE5OTBhNmE5YjYyYTcxOTdmYzk2MTkwZjFkN2VkMjVjMTA1MjZjOWVjODk0NTdkMWRmMzM0NDhlOTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0MDg4MDY5MzM1OGRlN2ViOGQ5MjM5YzVmN2RjNmQ5YzU3OTBkYjZiMmNlMTkwZjI0MzZlYTIwODJmNGU4NzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiOTc0ZGE0MDg2MzJhNGFhN2UyYWU4MGI4NjAzOTFhM2RjZDgyMTFjNzllY2FkN2NhOGU5NTEyOGIwMDE4MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5YzFjNTJjNzNiYjVkZGZmZDczM2YzNmEzMjQ3YTU1ZWRhZmI5NGJlMjlmNzljMGQxZDdjYTllOTZlMDcxZmYifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/workspace_store.py#L268-L395",
+          "version": "repo-lines-v1:sha256:0fb164a2fdd0f50171d240efb8b8ffa41d1e915fc97e35eda7f2fcb37e1784a4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5MGYyMGYwNGM0NjI4MTJlMDhiYzBjYzk0NTdhOTg3OTA5NGZlNTA4MDEyMTQ2OTU4N2Q1NDZhYWM1NGNjZTU2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlZjJlNGNiYjc1MDJkNTUyODRmZTgwMWQwOTY0Nzg0Mjg2OWIzYjFmZTY2MjBjNzllYmE5NWM1MTFjMTllMzZkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlNGE4OWM1ODZkMDI1NDdhNzJiNzg3OGMyMjFiMTU1NGU5MjQ0ZDcwM2ZmMzQ4YzFjMzNlNTA1ZDcwMGI5M2EzIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlMTNkYzE3N2YxNzI1NjBjYTE2NDFhOGE3ZjgwODBlNzA1MzRhM2VhZjQ2NjJiODE4ZmZlMmU2NDA2NzgzYWMwIn0"
+        },
+        {
+          "resource": "repo://tests/test_workspace_store.py#L31-L82",
+          "version": "repo-lines-v1:sha256:afdf44407fa5ff2e647a8a09335a5bc63ad2ec38f3fbf3e91f95b20c8ce9f3af:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzM2RiNzMzYzgyZGE5YmE1MGRmYjQ1NTlhY2YwMGFmNmYxZjU3OWZhMGY2Zjc4MWY4NDk5ZTY1NmVhODJhMDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiZTAwYmE5OTIzNTBmZTg0Y2VhY2U2ZGU0MWFjZWI2M2RmNzU2YjUzOGFhMWFjYTZiODYwMDIzNDIxMWE1ZjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmZDIxYzljNTAwYWNhZDVlMjlhYjU2ZmMzZjlmNzM5MjIzOTczMmZjMjMzMzgzYTk0ZDk2NmY0YjBiNGEyNTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f9ef402290674fe8bca24c52364a0bb9",
+      "statement": "When the stored result version changes, WorkspaceStore clears stored outputs and returns documents to pending; processing or interrupted records also restart as pending without restoring partial work.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/workspace_store.py#L452-L505",
+          "version": "repo-lines-v1:sha256:dbd7b811479f7983b1610fb7959303cd8d5cf82978eacb574020c2588a210e75:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyYTAxNTY2NDkzNzk4YWVjN2ZiZjc3ZWE1MjQyZGQ0ODI0NjJiY2Q4MTgxZjk0NGVkZTk5YzU0ZmQ3OGY4ODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyMTdlMWM4Y2VkNjE2MDNmYjA5YmFkYzcyNjMzZWQxMzVmNWE4YzllOTE4MDc5YzYzM2Y4MjY1NTc1MWVjMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5OGUyNWI2YWMwMWQ5NjcwY2FiN2NiZjg0ZDRhNTgxZDI0NGNlMmI0YzVmZTUzMzQwYzMzYzM4NzFkNDRiNGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiNmM2ZTAzZDczMjcxMWY3MGQ3NjkxZTA2MDQyZDE3NzFhOGQyYjRjYzZiZmViNTk4MjkwNDBjYTE3ZDNhNDMifQ"
+        },
+        {
+          "resource": "repo://tests/test_workspace_store.py#L170-L197",
+          "version": "repo-lines-v1:sha256:1179005e0e673374030d3232ad4c3bc7edb9af1e791fad23d8c3994ef67748a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljNTJlOTk2NWQ4NWE0N2Q5OTgxNjNlZTRkODdjOTMwZDE2MTBjNjMzMmQwZDBmNWFiM2FkMjBmYjUxMGEwNGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNWQ0NTQ4OTJmMGU1MjhjOTU5ZGY3NzZlNjljNzk5NDMzODExNjIyZTNkOWU3ZjJmYzkxYWMxZmY2NzNlOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNiZDliMjE3ODZmODIzMWFmZjBkNzQ3ZTRhMzhjMTc2YmI1OWRmZTQ2MjU1Mzc1MTI1OGU0MzY2MzNkNzc2ZWYifQ"
+        },
+        {
+          "resource": "repo://tests/test_workspace_store.py#L247-L288",
+          "version": "repo-lines-v1:sha256:21c3899576dc222052d991914fb336f2d864520cccc9655dacda20c0adfcf2bf:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2ZmE5M2MzOGE2ZmVhYmVhNTMzMTdiYjBiNzZmNDU3MWU1MjgwMDRlMTI2Zjc4M2JhZDE0ZWE3ZWQ4MWM1MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdmNzVkYzlkZDVlYTc5ODMxNmExYTJlZmU4MWM1MTgwNTI0NmI5MGFmN2MyZTdiY2Q2ZGFiZGNkMDJlY2E5NTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmMmRjMjcxNDhkNDRhNTE4OWU0OGJiY2RmZDM0N2FhMGIwNjBmN2JjYjIxYzgzN2EwNzQyYzA3YmNjYmM2YjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_741629cfebc0447088f8cc95959d0b46",
+      "statement": "The Streamlit studio includes parse-affecting settings and RESULT_VERSION in each document selection key and resets a stored result to pending when that key changes.",
+      "evidence": [
+        {
+          "resource": "repo://streamlit_app.py#L1887-L1938",
+          "version": "repo-lines-v1:sha256:befe59e0540824460d5ef2f0dd4e552481d052b708a9a39d48662921dd5e663f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NTQ5MmM2NzI0Mjk5ZDRlYzQ5MTUyZmI4OWJjNGJiNTIzOTJkZTMwZjI2N2QwYzdkZGFlOWY1N2UzYmRiZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmOGI4MDZhYmUwYmNiYjBjMWQ5Mzg3NzRjOWU5YjUyZjdiM2NhMmZhZGJmYmNjMmQxMTcxNDk2ZTcyNzQ5YjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlNGI2NzNkM2VjNmRhNjZiOTAzNzg2YTEyNjgzNWFmNDYzZDhjM2VmNDE5OTEzZjE5N2M2YTdkZmYzYzU4ZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4MzkzNWJhYWE1NmY3MGUwNTY5YjdiZjhhOTlhNmJlZjFlZjc2ZmU3M2UwNGQ5MTk4MGI0MzdiZWE2NTA4YmIifQ"
+        },
+        {
+          "resource": "repo://tests/test_simple_streamlit.py#L327-L350",
+          "version": "repo-lines-v1:sha256:f22bb2042e437a82611f1d689713e97293ce32368b40818208ee19f8df271278:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4Y2JlMzZjYmZmMmY2MTJhZWI1Y2I1ZGZlZDljYzE5OGVhZDM1M2I3NTkyZGY0MTE3OWUxZDQ5Nzc1MmI1ZmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2ZTkwNGZmZDQ1ZDA3ZTQwNjI5MDNkNjI2ZmY1OGY2MmNhY2VkYjlhOWUwYWVmMDkwYzc1MWY5MDU1ZGRiNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4YjczYTUwOWRmYWU1N2YwYmIzYmYyNGQzYWI1ZWNiMDM1OWZiZDRmZDI5N2I0NTE0ZjMyZGIzYmM3NDE2Y2EifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

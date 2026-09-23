@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:b261b9edc9cc279e1e3a76af163906f9ad4baeb29ff0b3c2f017572c710fad4c",
+  "claims": [
+    {
+      "id": "claim_2e36d740cf2344af94ae8bb8d2020649",
+      "statement": "The repository's contributor guide requires synthetic fixtures and fake provider gateways for tests, and its shared PDF fixture creates a document in memory.",
+      "evidence": [
+        {
+          "resource": "repo://TESTING.md#L69-L73",
+          "version": "repo-lines-v1:sha256:d2b2f8b7d081ac840baf87fde3faace81707da7329f89bd6e4360d3e3953be42:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWIzMDNjZDFjNjA3YWQzMDRkNjA1ZDU4NDg0YmQyZjYxMzAzZjRjYzA4OWNhZTBhNWQwZDE2Y2FiYmFkNmY3MiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjI3MTRiYmRmN2U1ZjJkNzMxYTU3YTNjNTgxYzM1MWZmODMzNzY1MjYyMGU5NDMyMmZjMWNlNGY5YWYyNzQyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzZjZDU3ZjVmN2IyNWUwNWY5YjRhYTg2ZjI3YWNjNGE1ODk2OWFlYTljOWYyYTIyNWJhYTYyNTM5MjU3NGJiNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://tests/conftest.py#L7-L15",
+          "version": "repo-lines-v1:sha256:1a4429f8ed2af50f39acb04596727d19bce5fd9cfdffa663c583c9cd26ec0aab:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGM1YjA1OTE1Y2QyZWU1ZDVjZmFjMjc4ZDE2NTJhOWU3NWJiNjFkYTE1OTQ1ODQ5MmNmNTg5MWRiY2QwNjFhNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODRmYTc0ZGU4YjI1Zjk4NTJkNWMxN2I0N2MzMzg0N2I3M2I2MTQ2NmQ3MDk3MmFjNWY2NTdlNTc0Nzc4YjdlNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGI1OWYyNTQ0YTFmNmNiYzkxMjY5YWM0Mzk3OTNiODJlYWNkMDM5OWE2YjhkNWZiMTIyNjM4YzI4MjQ2ZmY2YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fb5d47f0b3ee4bbeb133b27f93c83b55",
+      "statement": "The configured GitHub Actions workflow runs on Windows with Python 3.12.10 and runs Ruff, compileall, and the full Pytest suite after installing the locked native extra.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/ci.yml#L9-L30",
+          "version": "repo-lines-v1:sha256:587e9ed05a1bdb428f54afeb1e5e8f9373fb1925298b7f57d71305f63f3b9a54:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5ZDgwMTU0ZWQ0MmZjNWM3NzliMTMzMTU3OGI1OGI4OWM4MDFlYWNlNzRmMjRjZDQ4ZWI0YTIzNTc5NDBhOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NGU4MzExYzYwYjUxM2U5YjY3Yjc3YThlNTZhMDI2MDVmODI1NDhiYWYwY2U0NzU3OGU1NjZhNWFlZmE0OWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlMmM3MjFiM2RjMjBmZjczNGQ5N2NmNWI5OWU1NWU4ZDRjNzJmOThiZWYzYjk5ZjkwM2NjMWYyYzRjZGM2ZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}

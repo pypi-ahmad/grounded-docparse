@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture/system-overview.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:4243fe767153d27cccf03f91a20326e42de2a028268da37c1c97c733dd4e014b",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/evidence/source-grounding.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:c73909b30d73edc34acab2881e88bf53e312d53187aa0e04b2b1884c8e854626",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/features/agentic-document-tools.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:4f7445f7255330782bee257544f3f8db0fb71773891353316c4a6cd75d02b456",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/interfaces/studio-and-workspace.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:d431a224f75865095f32217e391286a9ed5e8455230eff80bd3acde74e5f6c4d",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/operations/runtimes-and-configuration.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:04510e829fd63a7acf55fc221a949697b3b34c98cec76480396e5839235331bc",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/pipelines/grounded-ocr.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:931ff3ce8f702e50c12052d1ac18930980b90687b6b0d8818c1bcff6e623ba84",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/pipelines/native-ingestion.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:1bde5eddf25d2cbd31f10a79b4a5f9961fc1c5680f7d00a88e27a9e86c313719",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/quickstart.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:02cfad471d1b74197ed641bc1f12a75325e42ed9652c326f6c3098b7580a76f3",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/testing/contracts-and-verification.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:b261b9edc9cc279e1e3a76af163906f9ad4baeb29ff0b3c2f017572c710fad4c",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    },
+    "/openwiki/workflows/explicit-ingestion-and-routing.md": {
+      "gitHead": "a16d27e145718118de3f72ddf10133e2e02c7a23",
+      "sourceFingerprint": "sha256:337522a0d17f7b98ebab771c1a0cb06deeef91ed5c103e2c4d0fe5c7b50e3a63",
+      "pageVersion": "sha256:cbcfda8e4b85d33c01d35e0c4a957ff9a9800da855c6fa66115a9f31381ff7a7",
+      "completedBy": "codex",
+      "completedRunId": "7358b2c6-b9b8-46ef-accf-179893f7a715"
+    }
+  }
+}

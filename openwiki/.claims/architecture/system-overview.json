@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:4243fe767153d27cccf03f91a20326e42de2a028268da37c1c97c733dd4e014b",
+  "claims": [
+    {
+      "id": "claim_32e393b73d014136868ebdf098b7f8e9",
+      "statement": "UniversalDocumentParser validates the caller-supplied processing type against the detected format before dispatching to the OCR parser, PDF Inspector, or native Docling parser, and it lazily constructs the native parsers.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/universal.py#L328-L355",
+          "version": "repo-lines-v1:sha256:56ab58e15827387a74fbf5c4072d0d1dba7159a151850768f6ce748ac6863549:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2ZmJjNzFkOTAzOWM1MGU2ODhkOThkMzgwZmFmMjk0MGQyMzY3NmNkZTkwYTRjZTJhMDU0MzM5YjkxOTdhNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2OGQyMTAwZThhZTQ2YWFiMmQwYWZhODMzMzc0YmNlZWQzODYyM2JlY2I0NDRmMTNkY2U4MmJmZjc3NDljMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2YWQyMzM1ZDM5NGEwMTE2NjAyYjcyMGNiNzJjNDdmN2NiNDk5YTM3MzM0MzMzMmEwNGU4OTRjMDE3MjkxMmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI0YmRjNDhmYWI0NzQ4MDhhMjk4YTI4NGE1MzNlNDc5YTZlZjNkZGU3NDA2MDlhNTZmZGFjYTQ3NzgxNTZkMzkifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/universal.py#L357-L447",
+          "version": "repo-lines-v1:sha256:b7cb302055dfe061f0b64103edcb2ae73aef8e5ac5fa64d93e7fc45bb858f903:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MDA1OWNmNDkwNzNkZmYwODBhYzU2YjM3OTI4M2RjMzcyMTE5ZGRmMDAzNGM0NzRiNTQ2ZmI1MTdjNDllM2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWY4YzJiYzdhMTQxYTAyMmFmM2ZlYjhhYjUwMDhlYzI1NzU3ZWYyNGFjZDA0OWY1MDg5YTc0YjdjOWFlODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhYjUxOWEwODJhNWI4M2E4NjU0YzhjMzJhNjM2MGRlMGE3NGNlZDY2NTNiYTRkMDRmYWJkYjc0NDAyMWMwODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://tests/test_universal_parser.py#L87-L220",
+          "version": "repo-lines-v1:sha256:bc4fa77753ab772d671e36c793f069745e2ac55a26c8c65519496348dac371fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM0LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjNTczMzk4Y2JiMjA2ZGVlYjg2YzFmMGUyZDM2MjlhODE5MmM4MWY1YTIzODlhNmI5ZWY5OTI4ZTM4MGQzMjc4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2ODAzNzU1MWRhZGVhNGM5YmU3MWZiNjE5NzI5N2YxOGM2YmIzNjFmZmJhMTQ4ZmE1MzY3MmNmYmFlNWFjZjhkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5MTY0NzQzYTc4MDcxYTIyOGI4NGViYWE4MDQ5MDc3NDZiYjIwMDZkY2NlZTJiN2VkOGM2YjNiYWFmYzg3OWJkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwMjI5YzNmZDMxN2QwMzc5YmM2NDUwNzVmZWQzNTZlMzhlOWE4NmI5MGQzZmZmNzU3ODNkMTM2MmI0MzkxYmY3In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_202c5661bdb74d32bcdea2437739ac37",
+      "statement": "Native results use immutable base_text with validated source spans and anchors, while OCR results use page elements with their own evidence metadata.",
+      "evidence": [
+        {
+          "resource": "repo://src/grounded_docparse/models.py#L993-L1029",
+          "version": "repo-lines-v1:sha256:09be8e127be2c7eeac8bb34f87b02b1bdc7a8d163399eba24b7c3277691f853b:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyMThkOWEyYzlmNmUyMjJlZGM5OTcwYWNlMzdiNmY2ZWRhMjkwZmYwYWIzMjdmOTgxODQ4YzAxODQ0MWVmMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlYjcwMjU3NTkzZGEwNmY2ODJhM2RkZGE1NGE5ZDI2MGQ0ZmM1MTRmNjQ1MjM3ZjVjYTc0YjA4ZjhkYTYxYTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2ZmM5MzdmNTJiN2Q5NmE1OTNkYjFjNDY4YzcwYWJkODM2ODE3YjgxN2MzZGJhNmRlZjAyODU5Y2FkNzczMzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlM2Y3MmY5Yzg4MTRmM2NkZGY3MDg3MmJiOWVkNmNiZjJhNGQ3ZWUxYmVhYTgwYWU5NzliMzNjMDQ5ZjhhMDgifQ"
+        },
+        {
+          "resource": "repo://src/grounded_docparse/native.py#L220-L281",
+          "version": "repo-lines-v1:sha256:dbbd9c4dcb16729de7765aa40464d404dfc4a3421dba87026e25b1f9aaf840d2:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNzM0NDVhMDgxODI2N2JiZjMyOWFlNDQyMzZjNzY1MDc1OTJlYjA5NGRmOGM5NmNiZmYzYzBmYjM0NTM2MmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhOWY4YzJiYzdhMTQxYTAyMmFmM2ZlYjhhYjUwMDhlYzI1NzU3ZWYyNGFjZDA0OWY1MDg5YTc0YjdjOWFlODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkNmQ0MWJmMDA5ZjJiYjU2ZGNmODMwY2VmZWU4ZmVjMjc2MDBkZWVlOTIzMWJiZWEwNTgyZDBmZDExYjVjZmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY4ODUyM2NlYWVhMmIzYjY1NDRhZDY0YjdiN2M2ODI0ZDY1MjNlMjE0YTYyYzcwNTIzZThlOThhODhiYmNkZTgifQ"
+        },
+        {
+          "resource": "repo://tests/test_native_models.py#L62-L123",
+          "version": "repo-lines-v1:sha256:3a6e432a2b594fdb4ea46a3349ec91fb5544c58a854bc52cedc8537578f4f50f:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YjBhNTZhMzAxNjAyMmIwNjMyOTU4ZTVkNjQ5Y2YwOTg2NjRkY2UwMWI1MDI5ZThhMGVlOTUxY2RhMDdjYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmY2ZkNGI1ZmJiMTdhNjFhZjIyNTIzNWE2NmQ5NTdkZWIwODBlYTY1Y2VhODA3NDM3NWZkMjY2NTkyZjVmMDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiOTc0ZGE0MDg2MzJhNGFhN2UyYWU4MGI4NjAzOTFhM2RjZDgyMTFjNzllY2FkN2NhOGU5NTEyOGIwMDE4MzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4OTI1NWVhMGM1OThiNzI4NDVkNDc0OGZmMjAyZDI0ZTM1N2QwNjY4YzRiOGExM2QxZjg3OTcxMzk1MTAyZGUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-23T14:49:53.692Z"
+  }
+}
