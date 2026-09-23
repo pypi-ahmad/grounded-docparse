@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Grounded DocParse Document Lifecycle",
+    "quality_profile": "showcase",
+    "output": "docs/diagrams/document-lifecycle.sequence.html",
+    "viewBox": [1120, 720],
+    "column_fit": "spread"
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "User" },
+    { "id": "surface", "type": "frontend", "label": "Streamlit or CLI" },
+    { "id": "router", "type": "backend", "label": "Universal router" },
+    { "id": "parser", "type": "backend", "label": "Selected parser" },
+    { "id": "evidence", "type": "backend", "label": "Evidence builder" },
+    { "id": "ai", "type": "cloud", "label": "Optional AI stages" },
+    { "id": "output", "type": "backend", "label": "Output renderer" }
+  ],
+  "segments": [
+    { "from": 145, "to": 255, "label": "Intake and routing" },
+    { "from": 273, "to": 450, "label": "Parse and ground" },
+    { "from": 468, "to": 625, "label": "Render and return" }
+  ],
+  "messages": [
+    { "id": "submit", "from": "user", "to": "surface", "y": 175, "label": "Submit file and processing type", "variant": "emphasis" },
+    { "id": "validate", "from": "surface", "to": "router", "y": 220, "label": "Validate type, signature, and range", "variant": "emphasis" },
+    { "id": "dispatch", "from": "router", "to": "parser", "y": 275, "label": "Dispatch exactly one route", "variant": "emphasis" },
+    { "id": "regions", "from": "parser", "to": "evidence", "y": 330, "label": "Return regions or native spans", "variant": "default" },
+    { "id": "context", "from": "evidence", "to": "ai", "y": 385, "label": "Provide bounded grounded context", "variant": "default" },
+    { "id": "results", "from": "ai", "to": "evidence", "y": 430, "label": "Validated optional results", "variant": "return" },
+    { "id": "canonical", "from": "evidence", "to": "output", "y": 490, "label": "Canonical document and evidence", "variant": "emphasis" },
+    { "id": "artifacts", "from": "output", "to": "user", "y": 560, "label": "Markdown, JSON, and available artifacts", "variant": "return" }
+  ],
+  "activations": [
+    { "participant": "surface", "from": 170, "to": 235, "type": "frontend" },
+    { "participant": "router", "from": 215, "to": 295, "type": "backend" },
+    { "participant": "parser", "from": 265, "to": 350, "type": "backend" },
+    { "participant": "evidence", "from": 325, "to": 510, "type": "backend" },
+    { "participant": "ai", "from": 380, "to": 450, "type": "cloud" },
+    { "participant": "output", "from": 485, "to": 580, "type": "backend" }
+  ]
+}

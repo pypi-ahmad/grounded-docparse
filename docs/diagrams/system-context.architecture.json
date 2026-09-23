@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Grounded DocParse System Context",
+    "quality_profile": "showcase",
+    "output": "docs/diagrams/system-context.architecture.html",
+    "viewBox": [1400, 720]
+  },
+  "layout": { "mode": "grid", "origin": [80, 100], "cols": 4, "gapX": 70, "gapY": 70, "cellW": 220, "cellH": 86 },
+  "components": [
+    { "id": "user", "type": "external", "label": "Local user", "row": 0, "col": 0, "size": [230, 86] },
+    { "id": "integrator", "type": "external", "label": "Python integrator", "row": 0, "col": 1, "size": [230, 86] },
+    { "id": "ui", "type": "frontend", "label": "Streamlit studio", "row": 1, "col": 0, "size": [230, 86] },
+    { "id": "cli", "type": "backend", "label": "grounded-docparse CLI", "row": 1, "col": 1, "size": [230, 86] },
+    { "id": "api", "type": "backend", "label": "Python API", "row": 1, "col": 2, "size": [230, 86] },
+    { "id": "core", "type": "backend", "label": "Grounded DocParse package", "row": 2, "col": 1, "size": [230, 86] },
+    { "id": "local", "type": "backend", "label": "Windows local parsers and Ollama", "row": 3, "col": 0, "size": [230, 86] },
+    { "id": "wsl", "type": "cloud", "label": "Optional WSL OCR services", "row": 3, "col": 1, "size": [230, 86] },
+    { "id": "cloud", "type": "cloud", "label": "Optional selected AI provider", "row": 3, "col": 2, "size": [230, 86] },
+    { "id": "store", "type": "database", "label": "SQLite and workspace artifacts", "row": 3, "col": 3, "size": [230, 86] }
+  ],
+  "connections": [
+    { "id": "user-ui", "from": "user", "to": "ui" },
+    { "id": "user-cli", "from": "user", "to": "cli" },
+    { "id": "integrator-api", "from": "integrator", "to": "api" },
+    { "id": "ui-core", "from": "ui", "to": "core" },
+    { "id": "cli-core", "from": "cli", "to": "core" },
+    { "id": "api-core", "from": "api", "to": "core" },
+    { "id": "core-local", "from": "core", "to": "local" },
+    { "id": "core-wsl", "from": "core", "to": "wsl" },
+    { "id": "core-cloud", "from": "core", "to": "cloud" },
+    { "id": "core-store", "from": "core", "to": "store" }
+  ]
+}

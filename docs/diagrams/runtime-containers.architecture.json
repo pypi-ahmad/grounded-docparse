@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Grounded DocParse Runtime Containers",
+    "quality_profile": "showcase",
+    "output": "docs/diagrams/runtime-containers.architecture.html",
+    "viewBox": [1500, 820]
+  },
+  "layout": { "mode": "grid", "origin": [80, 110], "cols": 5, "gapX": 55, "gapY": 55, "cellW": 205, "cellH": 82 },
+  "components": [
+    { "id": "browser", "type": "frontend", "label": "Browser", "row": 0, "col": 0, "size": [230, 82] },
+    { "id": "app", "type": "backend", "label": "Streamlit process", "row": 0, "col": 1, "size": [230, 82] },
+    { "id": "package", "type": "backend", "label": "Python package", "row": 0, "col": 2, "size": [230, 82] },
+    { "id": "layout", "type": "backend", "label": "CPU PP-DocLayoutV3", "row": 1, "col": 1, "size": [230, 82] },
+    { "id": "native", "type": "backend", "label": "PDF Inspector, Docling, RapidOCR", "row": 1, "col": 2, "size": [230, 82] },
+    { "id": "ollama", "type": "backend", "label": "Ollama service", "row": 1, "col": 3, "size": [230, 82] },
+    { "id": "sqlite", "type": "database", "label": "SQLite and artifacts", "row": 1, "col": 4, "size": [230, 82] },
+    { "id": "glm", "type": "cloud", "label": "GLM vLLM", "row": 2, "col": 1, "size": [230, 82] },
+    { "id": "paddle", "type": "cloud", "label": "PaddleX and Paddle vLLM", "row": 3, "col": 0, "size": [230, 82] },
+    { "id": "provider", "type": "cloud", "label": "Optional cloud model", "row": 2, "col": 4, "size": [230, 82] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Windows host", "wraps": ["browser", "app", "package", "layout", "native", "ollama", "sqlite"], "pad": 30 },
+    { "kind": "region", "label": "Optional WSL2", "wraps": ["glm", "paddle"], "pad": 30 }
+  ],
+  "connections": [
+    { "id": "browser-app", "from": "browser", "to": "app" },
+    { "id": "app-package", "from": "app", "to": "package" },
+    { "id": "package-layout", "from": "package", "to": "layout" },
+    { "id": "package-native", "from": "package", "to": "native" },
+    { "id": "package-ollama", "from": "package", "to": "ollama" },
+    { "id": "package-sqlite", "from": "package", "to": "sqlite" },
+    { "id": "package-glm", "from": "package", "to": "glm" },
+    { "id": "package-paddle", "from": "package", "to": "paddle", "fromSide": "right", "toSide": "bottom", "via": [[1370, 151], [1370, 700], [195, 700]] },
+    { "id": "package-provider", "from": "package", "to": "provider" }
+  ]
+}
