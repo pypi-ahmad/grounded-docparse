@@ -1,6 +1,6 @@
-# How Grounded DocParse Is Agentic
+# How Grounded DocParse is agentic
 
-Grounded DocParse is a **bounded, evidence-grounded agentic document system**. It does more than send one prompt to a language model: it prepares structured document context, assigns specialized reasoning tasks, validates the responses, performs limited repair when necessary, and routes uncertain results through human review gates.
+Grounded DocParse is a **bounded, evidence-grounded agentic document system**. It prepares structured document context, assigns specialized reasoning tasks, validates responses, performs limited repairs, and routes uncertain results through human review.
 
 It is deliberately not a fully autonomous general-purpose agent. The application does not invent its own goals, execute arbitrary tools, take external business actions, or run an open-ended planning loop. Deterministic application code remains in control of what an AI model can see, what it may propose, what is accepted, and when the workflow stops.
 
@@ -130,8 +130,6 @@ For extraction, the model receives document Markdown and an identifier-rich layo
 
 For chat, only citations that map to known element IDs are exposed. The UI can then open the cited annotated page and highlight the stored source box. The answer is therefore reviewable against the same evidence used by extraction and routing.
 
-Grounding turns a model response from an unsupported assertion into a claim that can be inspected, accepted, corrected, or rejected.
-
 ## Failure isolation and deterministic fallbacks
 
 Agentic features are optional enhancements around a completed parse. Their failures are isolated:
@@ -143,7 +141,7 @@ Agentic features are optional enhancements around a completed parse. Their failu
 - an extraction failure for one eligible form does not remove successful form results; and
 - unsupported extracted leaves become explicit warnings and empty or inferred states.
 
-The application exposes feature status, duration, warnings, model usage, and trace events in its results. This provides an operational record of which reasoning stages ran and what they consumed, without treating a model response as unquestionable truth.
+Results report feature status, duration, warnings, model usage, and trace events. Reviewers can see which reasoning stages ran and what they consumed, then check model outputs against the grounded evidence.
 
 ## What the app does not do
 

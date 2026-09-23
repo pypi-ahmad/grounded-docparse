@@ -1,4 +1,4 @@
-# Run Local Ollama OCR
+# Run local Ollama OCR
 
 This guide explains how to run and troubleshoot the Local Ollama extraction engine on Windows.
 

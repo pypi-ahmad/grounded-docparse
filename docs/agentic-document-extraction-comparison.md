@@ -1,6 +1,6 @@
-# Agentic Document Extraction: LandingAI ADE and Grounded DocParse
+# Agentic document extraction: LandingAI ADE and Grounded DocParse
 
-Agentic document extraction is more than OCR followed by a prompt. It is a controlled document-understanding workflow that can perceive visual structure, choose among specialized tasks, reason from user instructions, validate its outputs, preserve uncertainty, and connect results back to source evidence.
+Agentic document extraction uses OCR within a controlled document-understanding workflow. The system reads visual structure, selects specialized tasks, follows user instructions, validates its outputs, tracks uncertainty, and ties results to source evidence.
 
 LandingAI calls its managed platform **Agentic Document Extraction (ADE)**. Grounded DocParse implements a related pattern with six selectable extraction engines, optional bounded OpenAI/Gemini/Agnes reasoning, deterministic validation, and review controls. The products are not connected, and their contracts are not identical.
 
@@ -92,7 +92,7 @@ The two systems use related concepts, but their nouns are not interchangeable. A
 
 ## Do we have Parse, Classify, Split, Section, and Extract?
 
-### Parse — yes
+### Parse: yes
 
 Grounded DocParse converts supported PDFs and images into:
 
@@ -106,7 +106,7 @@ Grounded DocParse converts supported PDFs and images into:
 
 Our elements serve a purpose comparable to LandingAI chunks, but they are not API-compatible representations.
 
-### Classify — yes, with a different execution point
+### Classify: yes, with a different execution point
 
 Grounded DocParse provides two classification modes:
 
@@ -117,7 +117,7 @@ Custom classification assigns categories to contiguous page ranges rather than r
 
 Unlike LandingAI Classify, our classification requires a completed local OCR parse because it reasons over the resulting Markdown and layout elements.
 
-### Split — yes
+### Split: yes
 
 Custom form routing can separate a mixed packet into logical segments such as `new_request`, `update`, `records`, and `other`. Each segment has a page range, category, confidence, reasoning, evidence IDs, review status, extraction eligibility, and optional assigned schema.
 
@@ -125,11 +125,11 @@ After every segment is approved, **Download split documents** creates a dedicate
 
 Eligible segments can also be extracted with their assigned schemas. Split export does not require a segment to be extractable. LandingAI Split similarly returns classified sub-documents with Markdown content. [LandingAI Split API](https://docs.landing.ai/api-reference/tools/ade-split)
 
-### Section — yes
+### Section: yes
 
 Optional TOC generation creates hierarchical sections with titles, levels, pages, child sections, and grounded element references. Returned page and element references are validated. If the optional model call fails, the application can build a deterministic fallback from accepted GLM headings.
 
-### Extract — yes
+### Extract: yes
 
 Users can define fields and descriptions in the UI or import schema definitions from JSON or Markdown. The extraction stage receives refined document Markdown plus an identifier-rich layout tree.
 
@@ -139,23 +139,23 @@ For mixed packets, only segments that have an approved status, are marked eligib
 
 ## Do we meet the characteristics of agentic extraction?
 
-### 1. Visual and structural understanding — yes, with a boundary
+### 1. Visual and structural understanding: yes, with a boundary
 
 The parser represents text, headings, lists, tables, form fields, checkboxes, figures, captions, reading order, hierarchy, page location, and geometry. It also preserves multi-page order and supplies bounded cross-page context to later stages.
 
 It does not build an unrestricted semantic knowledge graph connecting every concept across every page. Its page relationships are the explicit document hierarchy, reading order, context windows, sections, and contiguous form segments.
 
-### 2. Goal-directed behavior — yes
+### 2. Goal-directed behavior: yes
 
 The system selects specialized behavior from the user’s requested outcome: recover weak text, refine presentation, classify, section, route forms, extract fields, or answer a question. These capabilities share prepared evidence but have independent controls and failure states.
 
-### 3. Adaptive processing — yes
+### 3. Adaptive processing: yes
 
 Extraction uses user-defined field names, descriptions, and types rather than a hard-coded template. Routing uses user-defined category descriptions and extraction eligibility. The same logic can therefore operate across varying document layouts without training a new template model for every form.
 
 This does not guarantee that every unseen layout will be interpreted correctly; representative evaluation and human review remain necessary.
 
-### 4. Grounding — yes, strongly enforced
+### 4. Grounding: yes, strongly enforced
 
 Accepted results can resolve to known source records containing:
 
@@ -167,19 +167,19 @@ Accepted results can resolve to known source records containing:
 
 Before marking an extracted value verified, the application validates that its citations exist and that the cited text supports the proposed value. An inferred value may retain a candidate source location without literal support, but it remains labeled and warned accordingly. Chat exposes only citations that map to known element IDs.
 
-### 5. Validation and self-correction — yes, bounded
+### 5. Validation and self-correction: yes, bounded
 
 The application validates structured model responses, extraction schemas, extracted instances, evidence pointers, cited content, categories, page ranges, complete segmentation coverage, and TOC references.
 
 Invalid structured output receives one repair opportunity. Form routing makes one validation-informed retry. Extraction can make one semantic evidence-repair request. These loops stop after their defined attempt; the application does not keep prompting until it receives a plausible result.
 
-### 6. Uncertainty handling — yes
+### 6. Uncertainty handling: yes
 
 The system can distinguish verified, inferred, not-found, and null extraction outcomes. Routing carries confidence and review status. Visual states include checked, unchecked, indeterminate, and unknown. Optional feature failures and partial fallbacks are exposed as statuses and warnings.
 
 An inferred value is not presented as verified evidence. An unresolved value is cleared or reported as missing rather than being silently invented.
 
-### 7. Orchestration — yes
+### 7. Orchestration: yes
 
 The application coordinates a known workflow:
 
@@ -199,7 +199,7 @@ input validation
 
 Optional failures remain isolated where possible. A failed classification, TOC, extraction, or chat operation does not retroactively erase a successful local OCR parse.
 
-### 8. Controlled autonomy — yes
+### 8. Controlled autonomy: yes
 
 The model may make bounded classification, organization, extraction, and question-answering decisions. Application code retains authority over available context, structured contracts, source identity, geometry, confidence thresholds, repair limits, routing eligibility, and stopping conditions.
 
@@ -215,13 +215,13 @@ The application has no open-ended planner, arbitrary tool execution, durable age
 - The current logical form router does not replace a separate-document export feature.
 - Public LandingAI API behavior does not reveal or prove an undocumented internal autonomous-agent architecture.
 
-## Bottom line
+## Summary
 
-LandingAI ADE and Grounded DocParse both implement practical agentic document intelligence: they establish a structured document representation and support goal-directed operations such as classification, organization, splitting or routing, and schema extraction.
+LandingAI ADE and Grounded DocParse both support document workflows built around a structured representation, with tasks such as classification, organization, splitting or routing, and schema extraction.
 
-Grounded DocParse fully provides Parse, Classify, Section, and Extract equivalents. It partially provides Split through grounded logical segmentation and selective extraction, but it does not currently emit separate sub-document files.
+Grounded DocParse covers Parse, Classify, Section, and Extract equivalents. Its Split support is partial: it segments documents and extracts selected categories, but does not create separate sub-document files.
 
-Across the broader agentic criteria, Grounded DocParse provides visual and structural understanding, adaptive task definitions, source grounding, bounded repair, explicit uncertainty, workflow orchestration, and controlled autonomy. Its design deliberately favors finite, inspectable decisions over open-ended autonomous behavior.
+Across the other criteria, Grounded DocParse uses visual and structural context, configurable task definitions, source grounding, limited repair, explicit uncertainty, workflow orchestration, and bounded autonomy. Its decisions remain finite and inspectable.
 
 ## References
 

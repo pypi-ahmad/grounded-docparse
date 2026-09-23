@@ -16,7 +16,7 @@ may retain aggregate metrics and page numbers only.
 
 ## Findings
 
-- Public Water pages 4–6 mix literal OCR with generative figure prose. Page 4's
+- Public Water pages 4 to 6 mix literal OCR with generative figure prose. Page 4's
   output is longer than the reference while retaining most reference tokens, so
   strict WER penalizes description style. Page 6's expected visual facts are
   present in atomic visual labels but were invisible to the legacy evaluator.
@@ -27,8 +27,8 @@ may retain aggregate metrics and page numbers only.
   nested content. After Unicode and punctuation normalization, the two copies
   have identical word tokens. This is a deterministic hierarchy/deduplication
   defect, not an OCR-model limitation.
-- Amerigroup pages 3–4 contain small rotated card images. Targeted crops can help
-  model perception, but the source raster is only roughly 128–155 effective DPI;
+- Amerigroup pages 3 to 4 contain small rotated card images. Targeted crops can help
+  model perception, but the source raster is only roughly 128 to 155 effective DPI;
   rendering at 450 DPI mostly upsamples existing pixels.
 - Amerigroup page 11 is severely degraded. Correct behavior is explicit review or
   unresolved evidence, not agreement with asserted reference values.
@@ -42,7 +42,7 @@ Corpus annotation v1.1 records a reference basis. Only `source_verified` and
 populate `legacy_reference_agreement`; the existing `semantic_text`
 field remains as a compatibility alias. Figure descriptions are excluded from
 recognized-text scoring, while literal visual atoms remain eligible. Public Water
-pages 4–6 use source-checked literal anchors rather than an invented full-page
+pages 4 to 6 use source-checked literal anchors rather than an invented full-page
 transcription.
 
 This follows the separation used by
@@ -71,7 +71,7 @@ synthesis; references to full-page recovery below describe historical runs only.
 
 ### July 2026 targeted result
 
-Three live A/B runs of Public Water source pages 4–6 did not justify enabling the
+Three live A/B runs of Public Water source pages 4 to 6 did not justify enabling the
 context crop. Median source-checked anchor coverage increased from 95.24% to 100%,
 but generated-reference word agreement decreased from 72.10% to 69.28%, insertion
 diagnostics increased from 5.29% to 7.32%, and median calls increased from 18 to 19.
@@ -85,7 +85,7 @@ targeted regression observation, not a document-wide accuracy result.
 
 ## Acceptance and limitations
 
-Targeted A/B evaluation uses Public Water pages 4–6 and local Amerigroup pages 3,
+Targeted A/B evaluation uses Public Water pages 4 to 6 and local Amerigroup pages 3,
 4, 11, and 32. A candidate context setting must fix at least one verified literal,
 keep all source-verified metrics non-regressing, leave illegible page 11 in review,
 add no forbidden literals, keep call counts unchanged, and stay within the

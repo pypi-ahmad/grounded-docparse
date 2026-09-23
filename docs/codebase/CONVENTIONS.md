@@ -42,7 +42,7 @@
 - Use synthetic bytes/documents and fakes; never require live OpenAI or real user documents in the default suite.
 - Use `monkeypatch` for environment/provider boundaries and `tmp_path` for persistence/output isolation.
 - Parameterize validation cases; use `pytest.importorskip` only for optional native dependency coverage.
-- Assert observable routes, exact evidence spans, serialized contracts, and failure behavior—not private call ordering unless routing itself is the contract.
+- Assert observable routes, exact evidence spans, serialized contracts, and failure behavior. Avoid assertions about private call ordering unless routing itself is the contract.
 - Public schema changes require versioning plus renderer, persistence, and compatibility tests.
 
 ### 6) Evidence

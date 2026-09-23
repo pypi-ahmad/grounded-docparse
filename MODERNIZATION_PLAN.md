@@ -1,4 +1,4 @@
-# Modernization Plan — Grounded DocParse
+# Modernization plan: Grounded DocParse
 
 Cites [docs/architecture.md](docs/architecture.md), [TECHNICAL.md](TECHNICAL.md),
 [CONTRIBUTING.md](CONTRIBUTING.md), and [SECURITY.md](SECURITY.md) for
@@ -7,19 +7,16 @@ regenerate those documents.
 
 ## 1. Executive summary
 
-Grounded DocParse is a mature, actively-maintained, current-stack Python
-project (`uv` + locked `pyproject.toml`, Python 3.12.10) with a real 528-item
-`pytest` suite that runs entirely offline in ~68 seconds. No WSL2, no GPU,
-and no live network call is required to execute it, contrary to what the
-project's WSL/GPU-coupled *runtime* topology might suggest. This is not a
-legacy-rescue case. The actual gap is narrow and specific: **no
-`.github/workflows/` exists at all**, so none of this real test investment
-runs in CI today, and the suite is not currently 100% green: **9 of 528
-tests fail on `main` right now**, plus 2 auto-fixable `ruff` violations. The
-plan is one phase: author a CI workflow targeting the 519 tests that pass
-today (naming the 9 failures as an explicit, tracked quarantine list rather
-than silently excluding them), and record the pre-existing lint/test defects
-as a fast-follow, not a blocker.
+Grounded DocParse is a Python project using `uv`, a locked `pyproject.toml`,
+and Python 3.12.10. Its 528-test `pytest` suite runs offline in about 68 seconds;
+tests do not require WSL2, a GPU, or a network connection. Those resources are
+part of the runtime setup, not the test requirements. This is not a legacy
+rescue project. The immediate gap was CI: no
+`.github/workflows/` directory existed, so the tests did not run in CI. At the
+time of this plan, 9 of 528 tests failed on `main`, along with 2 auto-fixable
+`ruff` violations. The plan proposes one phase: add CI for the 519 passing
+tests, track the 9 failures in a quarantine list, and list the existing lint
+and test defects as follow-up work.
 
 ## 2. Current state assessment
 
@@ -65,7 +62,7 @@ depends on, verified live this pass (2026-08-17), not assumed from docs:
    debugging, out of scope for this planning pass; flagged in § 9 for the
    maintainer.
 
-## 3. Feasibility spike result & strategy
+## 3. Feasibility spike result and strategy
 
 **Spike performed 2026-08-17**, not assumed:
 
@@ -224,7 +221,7 @@ fast-follow fixes (§ 9) are separately estimated.
 | 1.3 | Update `CONTRIBUTING.md` to state CI now runs these checks automatically and note the 9-test quarantine + 2 lint-error fast-follow (H8) | docs | 1.2 |
 | 1.4 | Update `TECHNICAL.md`'s development section to reference the new CI workflow | docs | 1.2 |
 
-#### Risks & Mitigations
+#### Risks and mitigations
 
 - **Risk:** `windows-latest` GitHub Actions runner resolves dependencies or
   behaves differently than the local Windows dev machine. → **Mitigation:**
@@ -249,7 +246,7 @@ fast-follow fixes (§ 9) are separately estimated.
   runner regardless of project maturity; those paths remain covered by
   `TESTING.md`'s manual verification process.
 
-#### Verification & Exit Criteria (Definition of Done)
+#### Verification and exit criteria (definition of done)
 
 - [x] `uv sync --locked --extra native` installs cleanly on the CI runner
       (confirmed via the green GitHub Actions run below).

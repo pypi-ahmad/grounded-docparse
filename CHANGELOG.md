@@ -117,7 +117,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Pinned GLM-OCR and PP-DocLayoutV3 snapshots for cached-offline startup, restored the SDK's task/label mappings while retaining document boilerplate, and selected measured WSL throughput defaults.
-- Corrected GLM's 0–1000 coordinates, dense-form reading order, vLLM context sizing, and WSL multimodal startup memory behavior.
+- Corrected GLM's 0 to 1000 coordinates, dense-form reading order, vLLM context sizing, and WSL multimodal startup memory behavior.
 - Refreshed all repository documentation for the GLM-first pipeline, current Streamlit workflow, Python API, configuration, security boundaries, and locked WSL runtime.
 - Enabled evidence-triggered Luna visual recovery by default with a sidebar opt-out while allowing GLM-only parsing without an OpenAI key.
 - Removed the API-key requirement from the Windows/WSL launcher.

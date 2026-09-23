@@ -1,4 +1,4 @@
-# Layout-Aware Workflow for Extracting Large Field Sets
+# Layout-aware workflow for extracting large field sets
 
 ## Purpose
 
@@ -6,11 +6,9 @@ This guide explains how business and technical users can extract a large, predef
 
 A healthcare workflow might request Patient NPI, Rendering Provider NPI, service dates, diagnosis codes, claim totals, and policy numbers. The same approach applies to invoices, contracts, bank statements, applications, onboarding packets, certificates, compliance forms, reports, and other document families.
 
-The central principle is:
+Parse the source document once. Run extraction against the resulting Markdown and layout structure, never directly against the PDF or image.
 
-> Parse the source document once, then perform extraction against the resulting Markdown and layout structure. Extraction never runs directly against the PDF or image.
-
-## Current Capability and Proposed Extension
+## Current capability and proposed extension
 
 | Capability | Status |
 | --- | --- |
@@ -25,7 +23,7 @@ The central principle is:
 
 Yes, a Markdown field-specification upload can be integrated cleanly as an optional feature. It should create or propose an extraction schema after parsing; it should not become a new document parser or bypass the existing grounding rules.
 
-## The Two Inputs Must Remain Separate
+## The two inputs must remain separate
 
 The workflow has two conceptually different inputs:
 
@@ -62,7 +60,7 @@ Parsed document + approved schema
   -> structured JSON with grounding metadata
 ```
 
-## Workflow for a Business User
+## Workflow for a business user
 
 ### 1. Define the business outcome
 
@@ -163,7 +161,7 @@ Download the extraction JSON for downstream processing and an annotated PDF for 
 
 The output should enter a business system only after the organization applies its normal validation, approval, privacy, and retention controls.
 
-## Workflow for a Technical User
+## Workflow for a technical user
 
 ### Stage 1: Source ingestion and visual parsing
 
@@ -219,7 +217,7 @@ The application resolves each accepted field back to the original parse structur
 
 Bounding boxes are normalized coordinates between 0 and 1 and must be ordered so `x0 ≤ x1` and `y0 ≤ y1`. The canonical parse models validate these invariants. Extraction then copies the page and box from the resolved block or atom citation into both evidence and the flattened field view; it does not accept provider-supplied geometry. Evidence records use `block_id` or `atom_id` and object-form coordinates. The flattened `fields` view exposes the parent block as `element_id` and the same box as a four-number array for UI and consumer convenience.
 
-## Representative Extraction Output
+## Representative extraction output
 
 The following is a representative shape for one schema result:
 
@@ -307,7 +305,7 @@ The following is a representative shape for one schema result:
 
 Token counts and trace details in the example are abbreviated. A live export records the actual provider calls and trace events.
 
-## Optional Markdown Field-Specification Feature
+## Optional Markdown field-specification feature
 
 ### Recommended user experience
 
@@ -387,7 +385,7 @@ For very large specifications, a later optional orchestration layer could:
 
 This layer should orchestrate extraction only. It must not rerun local OCR, modify canonical elements, or synthesize bounding boxes. A merged export should label incomplete groups and must not present partial data as a complete result. Group identity should be derived from the parse-result identity, approved schema content, and group name so retries do not duplicate fields or usage records. Conflicting field names should fail before provider calls. These concerns are intentionally deferred from the recommended single-schema first version.
 
-## Safety and Governance Requirements
+## Safety and governance requirements
 
 Both the source document and field-specification Markdown are untrusted inputs. An optional Markdown-upload feature should enforce these boundaries:
 
@@ -407,7 +405,7 @@ For the proposed Markdown uploader, parse the file as UTF-8 field-definition tex
 
 When AI features are used, selected recovery crops or recognized Markdown/layout context leave the workstation for the selected OpenAI, Google, or Agnes provider. Operators must approve its retention, residency, and access policies. Provider timeout or credential failure leaves a completed local parse intact and marks the optional attempt failed rather than fabricating a result.
 
-## General Applicability
+## General applicability
 
 The pipeline is not specific to healthcare. The same pattern applies whenever a user needs repeatable, structured values with a path back to the source document:
 
@@ -424,7 +422,7 @@ The pipeline is not specific to healthcare. The same pattern applies whenever a 
 
 The core sequence remains: parse once, review the grounded document, extract against an approved schema, validate evidence, and export structured results. Field definitions, repeating-data design, validation rules, privacy controls, and required human review still vary by domain.
 
-## Recommended Decision
+## Recommended decision
 
 Add Markdown field-specification upload as an optional post-parse schema-authoring feature, not as another source-document format. The uploaded Markdown should be converted into an approved schema, after which the existing extraction pipeline should operate on the parsed document Markdown and layout tree.
 

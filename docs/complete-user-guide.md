@@ -1,6 +1,6 @@
-# Grounded DocParse Complete User Guide
+# Grounded DocParse complete user guide
 
-This guide explains Grounded DocParse in simple language for business users, reviewers, technical users, and administrators. It covers what the application can do, what it cannot do, every major screen and feature, and how to complete common document-processing workflows safely.
+Use this guide to learn Grounded DocParse as a business user, reviewer, technical user, or administrator. It describes the application's features and limits, its screens, and common document-processing workflows.
 
 You do not need to understand AI or write code to use the application. Technical notes are included for readers who need to understand data flow, privacy, outputs, or integration behavior.
 
@@ -33,8 +33,8 @@ Upload one or more documents
 
 | User | Start with | Main responsibility |
 | --- | --- | --- |
-| Business operator | Sections 2–16, 18, and 20–22 | Upload, parse, route, extract, review, download, and understand session handling |
-| Business reviewer | Sections 8–16, 18, and 20 | Check source evidence, routing decisions, critical values, and retained outputs |
+| Business operator | Sections 2 through 16, 18, and 20 through 22 | Upload, parse, route, extract, review, download, and understand session handling |
+| Business reviewer | Sections 8 through 16, 18, and 20 | Check source evidence, routing decisions, critical values, and retained outputs |
 | Technical administrator | Sections 3, 4, 14, 15, and 18 | Setup, credentials, privacy, runtime, troubleshooting |
 | Developer or integrator | Sections 14, 15, 17, and 19 | Understand contracts, limits, persistence, and integration options |
 
@@ -207,7 +207,7 @@ Use a content range when:
 - cost and processing time should be reduced; or
 - a user is testing a small part of a document.
 
-The parser keeps original source indices. Selecting PDF pages 4–6 therefore produces evidence and annotations on pages 4–6, and the annotated file retains the original page count.
+The parser keeps original source indices. Selecting PDF pages 4 through 6 therefore produces evidence and annotations on those pages, and the annotated file retains the original page count.
 
 **Download before changing scope:** choosing a different upload or changing the content range resets the current parse, extraction, routing, and chat state.
 

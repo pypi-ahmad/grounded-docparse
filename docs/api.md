@@ -1,6 +1,6 @@
 # Python API
 
-The package requires Python 3.12–3.14. On Windows, install native parsing and CPU layout with `uv sync --locked --extra native --extra windows-layout`. WSL vLLM engines require their dedicated setup commands; Ollama recognition uses the native Windows service.
+The package requires Python 3.12 through 3.14. On Windows, install native parsing and CPU layout with `uv sync --locked --extra native --extra windows-layout`. WSL vLLM engines require their dedicated setup commands; Ollama recognition uses the native Windows service.
 
 ## CLI batch command
 
@@ -280,7 +280,7 @@ Schema import/export uses the `StoredSchema` shape, not compiled JSON Schema:
 }
 ```
 
-Names contain 1–100 characters. Each field name matches `^[A-Za-z_][A-Za-z0-9_]*$`, field names are unique case-insensitively, and at least one field is required.
+Names contain 1 to 100 characters. Each field name matches `^[A-Za-z_][A-Za-z0-9_]*$`, field names are unique case-insensitively, and at least one field is required.
 
 `ExtractionResult` is a dataclass with `data`, evidence by JSON Pointer, serialized `json`, warnings, token counts, usage, trace, and top-level `fields`. Field confidence is `high`, `medium`, `inferred`, or `not_found`.
 

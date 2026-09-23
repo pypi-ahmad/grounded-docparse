@@ -1,4 +1,4 @@
-# Business User Workflow for Extracting Large Field Sets
+# Business workflow for extracting large field sets
 
 ## Purpose
 
@@ -11,7 +11,7 @@ The process has two goals:
 
 The app processes up to 20 uploaded documents sequentially in one session. It can optionally segment a mixed PDF into contiguous business forms and route eligible categories to their assigned extraction schemas. A business requirement may contain more than 100 fields, but the app does not automatically split or merge oversized schemas.
 
-## The Workflow at a Glance
+## The workflow at a glance
 
 | Phase | What the user does | What the user receives |
 |---|---|---|
@@ -24,7 +24,7 @@ The app processes up to 20 uploaded documents sequentially in one session. It ca
 | Validate | Review missing, inferred, and important values | An approved business result |
 | Export | Download the required outputs | Markdown, source structure, extraction JSON, full JSON, and annotated PDF when available |
 
-## 1. Define the Business Fields First
+## 1. Define the business fields first
 
 For a small request, a short field list may be enough. For 100 or more fields, begin with a field dictionary agreed upon by the business team. Do this before processing documents so that similar-looking values are not confused.
 
@@ -50,7 +50,7 @@ For example, "Patient NPI" and "Rendering Provider NPI" should be separate field
 
 For repeating information, decide in advance how the business wants it represented. If a fixed number of positions is required, define separate fields such as primary, secondary, and tertiary codes. The current in-app builder is designed for individually named values, not an unlimited collection of repeating rows. When the number of line items, transactions, or codes varies widely, use an agreed summary or a separate downstream process designed for repeating records.
 
-## 2. Upload the Document
+## 2. Upload the document
 
 Use **Upload documents** to select up to 20 supported PDFs, Office/open formats, CSV, HTML, EPUB, Markdown, or images. Files run sequentially. Every document has an independent optional range using its natural units, such as pages, frames, slides, sheets, sections, blocks, or rows.
 
@@ -63,7 +63,7 @@ Before parsing:
 
 A poor source can still be processed, but missing or unreadable content cannot always be recovered reliably.
 
-## 3. Choose the Processing Options
+## 3. Choose the processing options
 
 First choose a compatible processing type for every file. Native PDFs use `pdf-inspector`; scanned PDFs and images use the selected OCR engine; Word, PowerPoint, Excel, CSV, and other native formats use Docling without OCR. For Mixed PDF, review the suggested Native/OCR route for every page and confirm the full table before parsing. Mismatched selections are blocked and never silently rerouted.
 
@@ -75,7 +75,7 @@ Visual recovery repairs selected difficult regions. It does not run a second ful
 
 AI enhancement and field extraction are separate choices. Turning enhancement off does not turn extraction off; extraction then uses the selected engine result without remote image repair. A configured AI provider is still required for AI extraction.
 
-## 4. Parse the Document
+## 4. Parse the document
 
 Select **Parse document**. The progress area shows the major stages while the app:
 
@@ -90,7 +90,7 @@ The source locations and reading order remain fixed. AI enhancement may repair e
 
 If an optional AI feature is unavailable or inconclusive, a successful grounded parse remains available. AI schema extraction requires the selected provider.
 
-## 5. Review the Parse Before Extracting
+## 5. Review the parse before extracting
 
 Do not begin with the field values. First confirm that the source document was captured well enough to support extraction.
 
@@ -113,7 +113,7 @@ Look especially for:
 
 If a major section is unreadable, use a clearer source document where possible. Extraction cannot safely supply information that is absent from the readable source.
 
-## 6. Build and Save the Extraction Schema
+## 6. Build and save the extraction schema
 
 The field dictionary is prepared before processing begins, but the in-app schema is created or selected after the first document has been parsed. Open **Extract** and expand **Extraction keys**.
 
@@ -133,7 +133,7 @@ Give the schema a meaningful name, such as the process and document family it su
 
 Treat the saved schema as a business template. When requirements change, use a clearly named updated schema so users know which field definition set produced a result.
 
-## 7. Run the Field Extraction
+## 7. Run the field extraction
 
 Open **Extract**, select or load the schema, and choose **Run extraction**. If the approved field dictionary uses multiple schemas, complete and download each schema result separately.
 
@@ -141,7 +141,7 @@ The app reviews the parsed representation for every requested field. OCR extract
 
 The fields may come from different pages, tables, headers, footers, or form sections. The user does not need to process each page separately.
 
-## 8. Interpret and Validate the Results
+## 8. Interpret and validate the results
 
 Review extracted fields according to their business importance and result status.
 
@@ -162,7 +162,7 @@ For a schema with more than 100 fields, use a risk-based review process:
 
 The confidence label supports review prioritization; it does not replace accountable business validation.
 
-## 9. Use Chat for Follow-up Questions
+## 9. Use chat for follow-up questions
 
 If document chat was enabled, use the **Chat** tab for questions that are easier to express conversationally, such as asking which page contains a policy number or whether a particular clause appears.
 
@@ -170,7 +170,7 @@ When the answer has a valid citation, use **Show source** to inspect it. If the 
 
 Chat is useful for investigation and review. The saved schema remains the repeatable method for extracting a controlled set of fields.
 
-## 10. Export the Results
+## 10. Export the results
 
 After review, download the outputs needed by the business process:
 
@@ -181,7 +181,7 @@ After review, download the outputs needed by the business process:
 
 The extraction output is suitable for a downstream workflow only after the organization applies its required validation and approval controls.
 
-## 11. Repeat Consistently
+## 11. Repeat consistently
 
 For additional documents:
 
@@ -194,7 +194,7 @@ For additional documents:
 
 Consistency matters more than continually changing field instructions. Reuse the same names and definitions when the business meaning has not changed. Update the schema deliberately when document formats or requirements change.
 
-## Applying the Workflow Beyond Healthcare
+## Applying the workflow beyond healthcare
 
 The healthcare field examples are only one use case. The same workflow can be applied wherever information must be captured from documents while retaining a path back to the source.
 
@@ -210,7 +210,7 @@ Examples include:
 
 The field names change, but the business pattern remains the same: define the required information, parse the entire document, review source coverage, extract against a reusable schema, validate exceptions, and export grounded results.
 
-## What a Successful Run Looks Like
+## What a successful run looks like
 
 A successful run does not mean every field is populated. It means:
 
@@ -221,4 +221,4 @@ A successful run does not mean every field is populated. It means:
 - The same approved schema can be reused consistently.
 - The exported result is ready for the organization’s normal quality and approval process.
 
-This combination of automation, source highlighting, and exception-based review allows business teams to handle large field sets without treating the output as an unaudited black box.
+Automation handles extraction, while source highlighting and exception review let business teams check large field sets against their documents.

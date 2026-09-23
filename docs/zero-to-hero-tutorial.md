@@ -1,4 +1,4 @@
-# Grounded DocParse: Zero-to-Hero Tutorial
+# Grounded DocParse: zero-to-hero tutorial
 
 This tutorial explains the repository from first principles through day-to-day use, Python integration, internal implementation, testing, and production deployment boundaries. It is written for a newcomer who has never used the application, but it also shows developers where each behavior lives in the code.
 
@@ -19,11 +19,11 @@ The most important grounded-path rule is that the selected local engine and dete
 
 Use these reading paths if you do not need every section immediately:
 
-- **First-time user:** Sections 2–10.
-- **Medical-fax operator:** Sections 2–12, especially Section 11.
-- **Python integrator:** Sections 2–6 and 13–15.
-- **Repository contributor:** Sections 2–6 and 13–18.
-- **Production or Azure owner:** Sections 16–19, then the dedicated [Azure bulk-fax runbook](azure-bulk-fax-deployment.md).
+- **First-time user:** Sections 2 through 10.
+- **Medical-fax operator:** Sections 2 through 12, especially Section 11.
+- **Python integrator:** Sections 2 through 6 and 13 through 15.
+- **Repository contributor:** Sections 2 through 6 and 13 through 18.
+- **Production or Azure owner:** Sections 16 through 19, then the dedicated [Azure bulk-fax runbook](azure-bulk-fax-deployment.md).
 
 ## 2. What problem does this project solve?
 
@@ -539,7 +539,7 @@ pages 7-8   authorization update
 pages 9-10  another new authorization
 ```
 
-Rather than extracting from the whole packet, the goal is to:
+For this packet, use the following workflow:
 
 1. parse all pages once;
 2. classify contiguous form segments;
@@ -1074,7 +1074,7 @@ runtime diagnostics
 
 ### 15.3 Routing contracts
 
-`ClassifierProfile` supports 1–50 unique category keys. `other` is reserved. An extractable category must have a schema name; a non-extractable category may not have one.
+`ClassifierProfile` supports 1 to 50 unique category keys. `other` is reserved. An extractable category must have a schema name; a non-extractable category may not have one.
 
 `FormSegment` preserves:
 
